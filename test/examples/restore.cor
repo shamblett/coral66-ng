@@ -1,0 +1,1130 @@
+'CORAL''PROGRAM'  RESTORE FILES 11B
+ 
+'DEFINE' VERSION NUMBER " IDENT (\VMS 12\) ";
+'COMMENT':
+ 
+      Sub-System    :   File Recovery Program
+ 
+      Computer Type :   DEC VAX VMS Version 4.4 FILES-11 Structure level 2
+ 
+      Author        :   W. B. Langdon  CEGB ( CERL )
+ 
+      Creation Date :   6 Decmeber 1982
+ 
+;
+'COMMENT':
+ 
+      FUNCTIONAL DESCRIPTION.
+      ---------- -----------
+ 
+        This program tries to recover deleted files on FILES-11 structure
+        level 2 volumes. It has not been tried on multi-volumn sets.
+          It searches the index file INDEXF for an entry
+        corrosponding to the deleted file. If the entry is found then it
+        may be restored if the users so wishes.
+;
+ 
+ 
+'COMMENT':
+ 
+      GLOBAL OBJECTS USED WITHIN PROGRAM.
+      ------ ------- ---- ------ -------
+ 
+      SYSTEM SERVICES:
+
+          SYS$ASCTIM
+
+
+      STREAM I/O PROCEDURES:  ( Brian Christie's I/O package )
+
+          CLOSE ALL STREAMS, CONTINUE ON ERROR, EXIT ON ERROR, FIND IN, 
+          FIND OUT, IN BLOCK, IN CHAR, IN STREAM, LAST  ERROR, OPEN STREAM, 
+          OUT BLOCK, OUT CHAR, OUT INT, OUT TEXT, OUT STREAM
+;
+
+(-Page *** Modifications *** )
+
+
+'COMMENT':
+ 
+	MODIFICATIONS:
+ 
+Author	: WBL
+Date	: 11 February 1983	
+Version	: 8A
+Changes	: remove wear-out of program based on files age.
+          Add status checks and diagnostic outputs on OPENSTREAM ( indexf ),
+          IN STREAM ( indexf ) in main program and OUTBLOCK in UP DATE BLOCK
+            NB no difficulty was found in going from VAX/VMS version 2.5 to 3.0
+ 
+Author	: WBL
+Date	: 2 March 1983	
+Version	: 8.1
+Changes	: Add SET FILE PAR call on INDEXF that was removed by accident
+ 
+Author	: WBL
+Date	: 3 March 1983	
+Version	: 10A
+Changes	: In rearrange procedure ASK to limit number of times question 
+          is asked avoids indefinite loop on EOF and limit answer to one char
+
+Author	: WBL
+Date	: ?	
+Version	: 10B
+Changes	: ?
+
+Author	: WBL
+Date	: 24 january 1985
+Version	: VMS 10B
+Changes	: Use SDL CORAL-66 compiler and CSID IO package to run in native mode.
+          Replace ? by \ in code inserts
+          Replace "SF:[200,200]STREAMLIB.CRL" by VAXIOP
+          Replace BUFFER [0:255] by [0:127]
+          Add VMS string descriptor FILE COUNT, FILE ADDRESS and use FILE COUNT
+            inplace of FILE [0] and FILE ADDRESS in place of FILE0
+          Add RBUFFER and WBUFFER and use them in place of most of BUFFER
+          Add lable parameters to inner procedures SAME CHARS and ADD to allow
+            jumps to lables out side them.
+          Remove VBN HI and VBN LO and change calls of FINDIN etc.
+          Remove check for MAXFILES exceeding 32k-1
+
+Author	: WBL
+Date	: 20 May 1986
+Version	: VMS 10B ZZ
+Changes	: Add using SHARE I/O procedure
+          Add back in setting MAX ENTRY (and now include high order word
+            which up to now has been forced to be zero, otherwise got zero)
+            cf. MAXFILES in version VMS 10B
+          Replace setting file position before start of search loop by setting
+            inside. This is needed because with B. Christie's I/O package
+            IN BLOCK and OUT BLOCK do not update the file position.
+
+Author	: WBL
+Date	: 21 May 1986
+Version	: VMS 11
+Changes	: Add support for %% wildcard, allow $ and _ as legal file name,
+            characters, expand FILE from 0:31 to 0:132.
+          Move "Search finished" to END LOOP:
+          Move " Continue search? out of ASK = YES condition to after it and
+            if NO jump to new lable END PROC rather than END LOOP
+          Add support for long file names by using new procedure BUFF CHAR 
+            in place of reading from BUFF directly. Split F NAME MAX into
+            F NAME MAX1 and F NAME MAX2 and similary treat F NAME START
+          Add write through CACHE
+;
+'COMMENT'
+Author	: WBL
+Date	: 18 December 1986
+Version	: VMS 12
+Changes	: Allow - in a legal file name,
+          Create procedure DISPLAY FILE HEADER from code in main program,
+            make it additionally display FH2$W_SEG_NUM, file extension fid, 
+            back link fid and file creation and revision date and times
+          Add F NAME LIMIT to cope with file extension headers
+;
+
+'COMMENT'::;
+
+
+'COMMENT' stream input/output library communicator;
+
+  'LIBRARY' ( VAXIOP );
+
+'COMMENT' System service communicator. Nb 3rd param is byte address;
+
+'EXTERNAL' (
+'DEFINE' VI  "'VALUE' 'INTEGER'";    (Immediate value)
+'DEFINE' LI  "'LOCATION' 'INTEGER'"; (Address of variable)
+'DEFINE' SD  "'VALUE' 'INTEGER'";    (Address of string descriptor)
+
+'INTEGER''PROCEDURE' SYS ASCTIM     /SYS$ASCTIM      (LI,SD,VI,VI);
+                                     (Convert binary time to ASCII string)
+'DELETE' SD;
+'DELETE' LI;
+'DELETE' VI;
+);
+
+'DEFINE' IDENT (ID) "'PROCEDURE' COIDENT;'CODE''BEGIN'\ .IDENT /\ID\/ \'END'";
+
+'DEFINE' YES "0";
+'DEFINE' NO  "1";
+
+'DEFINE' SPACE "32"; ( ascii )
+
+
+'SEGMENT' MAIN
+'BEGIN'
+  VERSION NUMBER;
+
+'DEFINE' HOMEBLOCK "2";   ( second block of INDEXF is Home block )
+
+'COMMENT' Home block word offsets. These are derived from
+  SYS$LIBRARY:LIB.MLB module $HM2DEF;
+
+'DEFINE' STRUCLEV      " 6"; ( LSB contains version MSB hold structure level )
+'DEFINE' IB MAP VBN    "11"; ( Virtual block number of start of index bit map )
+'DEFINE' MAX FILES LO  "14"; ( maximium number of entries in INDEXF )
+'DEFINE' MAX FILES HI  "15";
+'DEFINE' IB MAP SIZE   "16"; ( index bit map size, in blocks )
+
+
+'COMMENT' Home block word offsets. These are derived from
+  SYS$LIBRARY:LIB.MLB module $FH2DEF. And dumps of SI: and DY: [0,0]INDEXF.SYS
+  DUMP /HEAD is also useful;
+
+'DEFINE' ID OFFSET   " 0"; ( byte offset, holds word offset to start file name )
+'DEFINE' SEG NUM     " 2"; ( file segment number )
+'DEFINE' F ID NUM    " 4"; ( file identification - entry number in INDEXF )
+'DEFINE' F ID SEQ    " 5"; (                     - sequence number )
+'DEFINE' F ID RVN    " 6"; (                     - relative volumn number )
+'DEFINE' EX FID NUM  " 7"; ( extension file number )
+'DEFINE' EX FID SEQ  " 8"; ( extension file sequence number )
+'DEFINE' EX FID RVN  " 9"; ( extension relative volumn number )
+'DEFINE' BK FID NUM  "33"; ( back link file number )
+'DEFINE' BK FID SEQ  "34"; ( back link file sequence number )
+'DEFINE' BK FID RVN  "35"; ( back link relative volumn number )
+
+'DEFINE' F NAME MAX1 "20"; ( maximium length of 1st file name segment in bytes )
+'DEFINE' F NAME MAX2 "86"; ( maximium length of file name in bytes )
+'DEFINE' CREDATE     "22"; ( creation date+time, byte offset from ident start)
+'DEFINE' REVDATE     "30"; ( revision date+time, byte offset from ident start)
+
+'DEFINE' FILECHAR "26";         ( file characteristics first word of bit mask )
+'DEFINE' MARK DEL "'HEX'(8000)";( bit of above mask denoting maked for delete )
+
+'COMMENT' last word of block is a simple 16-bit checksum;
+
+
+'COMMENT' stream numbers;
+
+  'INTEGER' INDEX, TT IN, TT OUT;
+
+  'INTEGER' BITMAP SIZE, ENTRY NO, FIRST ENTRY;
+  'INTEGER' F NAME LIMIT, F NAME START1, F NAME START2;
+  'INTEGER' START BIT MAP;
+
+
+  'INTEGER''ARRAY' BUFFER [0:127];
+    'OVERLAY' BUFFER [0] 'WITH' 'BYTE''ARRAY' BUFF [0:511];
+
+  'BYTE''ARRAY' FILE [0:132];
+    'OVERLAY' FILE [0] 'WITH' 'INTEGER' FILE0;
+  'COMMENT' String descriptor block for FILE. Nb. the most significant word
+    of FILE COUNT should be HEX (010E) but nobody checks this so leave as zero;
+  'INTEGER' FILE COUNT, FILE ADDRESS;
+
+(-PAGE *** RBUFFER, WBUFFER *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  PROCESS:   Access BUFFER as though it were a word array.
+ 
+  HISTORY:   added 25-Jan-85 VMS 10B
+ 
+**********************************************************************
+;
+
+'INTEGER''PROCEDURE' RBUFFER ( 'VALUE''INTEGER' WORD OFFSET );
+  'BEGIN'
+
+    'ANSWER' 'IF' 'BITS' [1,0] WORD OFFSET = 0 'THEN'
+               'BITS' [16,0] BUFFER [ WORD OFFSET/2 ]
+             'ELSE'
+               'BITS' [16,16] BUFFER [ WORD OFFSET/2 ];
+
+  'END'PROCEDURE  RBUFFER;
+
+
+'PROCEDURE' WBUFFER ( 'VALUE''INTEGER' WORD OFFSET, DATA );
+  'BEGIN'
+
+    'IF' 'BITS' [1,0] WORD OFFSET = 0 'THEN'
+      'BITS' [16,0] BUFFER [ WORD OFFSET/2 ] := DATA
+    'ELSE'
+      'BITS' [16,16] BUFFER [ WORD OFFSET/2 ] := DATA;
+
+  'END'PROCEDURE  WBUFFER;
+
+(-PAGE *** READ BLOCK and WRITE BLOCK *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  INPUTS :   BUFFER
+ 
+  PROCESS:   
+ 
+  OUTPUTS:   BUFFER
+  
+  GLOBALS:   
+ 
+  MACROS :   
+ 
+  HISTORY:
+WBL VMS11  21-May-86 Procedure written
+
+**********************************************************************
+;
+
+'DEFINE' CACHE LIMIT "99";
+
+'INTEGER' CACHE NUM BLOCKS := 0;
+'INTEGER' CACHE FIRST BLOCK;
+
+'INTEGER''ARRAY' CACHE [ 0: CACHE LIMIT, 0:127 ];
+
+
+'INTEGER''PROCEDURE' RESIDENT ( 'VALUE''INTEGER' BLOCK NO );
+  'BEGIN'
+    'INTEGER' OFFSET;
+
+    OFFSET := BLOCK NO - CACHE FIRST BLOCK;
+
+    'ANSWER' 'IF'   OFFSET >= 0                                    'AND' 
+                  BLOCK NO <  CACHE FIRST BLOCK + CACHE NUM BLOCKS   'THEN'
+               OFFSET
+             'ELSE'
+               -1;
+
+  'END'PROCEDURE  RESIDENT;
+
+
+'INTEGER''PROCEDURE' READ BLOCK ( 'VALUE''INTEGER' BLOCK NO );
+  'BEGIN'
+    'INTEGER''PROCEDURE' MOVE FROM CACHE;
+      'BEGIN'
+        'INTEGER' N, OFFSET;
+
+        OFFSET := RESIDENT ( BLOCK NO );
+
+        'IF' OFFSET < 0 'THEN'
+          'ANSWER' -1;
+
+        'FOR' N := 0 'STEP' 1 'UNTIL' 127 'DO'
+          BUFFER [ N ] := CACHE [ OFFSET, N ];
+
+        'ANSWER' 512;
+
+      'END'PROCEDURE  MOVE FROM CACHE;
+
+(-PAGE *** READ BLOCK *** Page 2 *** )
+
+
+    'INTEGER''PROCEDURE' READ ( 'LOCATION''INTEGER' START BUFFER;
+                                'VALUE''INTEGER'    NBLKS         );
+      'BEGIN'
+        'INTEGER' LENGTH, SAVE;
+
+        SAVE := ASK IN STREAM;
+
+        IN STREAM ( INDEX );
+
+        FIND IN ( BLOCK NO );
+        LENGTH := INBLOCK ( 'LOCATION' ( START BUFFER ), NBLKS*512 );
+
+        IN STREAM ( SAVE );
+
+        'ANSWER' LENGTH;
+
+      'END'PROCEDURE  READ;
+
+
+    'INTEGER''PROCEDURE' READ INTO CACHE;
+      'BEGIN'
+        'INTEGER' LENGTH;
+
+        LENGTH := READ ( CACHE [ 0, 0 ], CACHE LIMIT + 1 );
+
+        'IF' LENGTH <= 0 'THEN'
+          'ANSWER' LENGTH;
+
+        CACHE NUM BLOCKS  := LENGTH / 512;
+        CACHE FIRST BLOCK := BLOCK NO;
+
+        'ANSWER' MOVE FROM CACHE;
+
+      'END'PROCEDURE  READ INTO CACHE;
+
+
+    'ANSWER' 'IF' CACHE NUM BLOCKS = 0 'THEN'
+               READ INTO CACHE
+
+             'ELSE''IF' RESIDENT ( BLOCK NO ) >= 0 'THEN'
+               MOVE FROM CACHE
+
+             'ELSE''IF' BLOCK NO <= CACHE LIMIT 'THEN'
+               READ ( BUFFER [ 0 ], 1 )
+
+             'ELSE'
+               READ INTO CACHE;
+
+  'END'PROCEDURE  READ BLOCK;
+
+(-PAGE *** WRITE BLOCK *** )
+
+
+'INTEGER''PROCEDURE' WRITE BLOCK ( 'VALUE''INTEGER' BLOCK NO );
+  'BEGIN'
+    'INTEGER' DUMMY, OFFSET, SAVE;
+
+    OFFSET := RESIDENT ( BLOCK NO );
+    'IF' OFFSET >= 0 'THEN'
+      'BEGIN'
+        'INTEGER' N;
+
+        'FOR' N := 0 'STEP' 1 'UNTIL' 127 'DO'
+          CACHE [ OFFSET, N ] := BUFFER [ N ];
+
+      'END' RESIDENT; (so update CACHE to be on safe side)
+
+    SAVE := ASK OUT STREAM;
+
+    OUT STREAM ( INDEX );
+
+    FIND OUT ( BLOCK NO );
+
+    CONTINUE ON ERROR ( 8 );
+    OUT BLOCK ( 'LOCATION' ( BUFFER [ 0 ] ), 512 );
+    EXIT ON ERROR ( 8 );
+
+    OUT STREAM ( SAVE );
+
+    'ANSWER' 'IF' LAST ERROR ( DUMMY ) <> 0 'THEN'
+               -1
+             'ELSE'
+               512;
+
+  'END'PROCEDURE  WRITE BLOCK;
+
+
+'DELETE' CACHE LIMIT;
+
+(-PAGE *** ASK *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  INPUTS :   STRING  question to be asked of user
+ 
+  PROCESS:   Asks question of operator. 
+ 
+  OUTPUTS:   returns answer. If no answer given replies NO.
+ 
+  MACROS :   NO, YES
+ 
+**********************************************************************
+;
+
+'INTEGER''PROCEDURE' ASK ( 'VALUE''INTEGER' QUESTION );
+  'BEGIN'
+    'INTEGER' CHAR, TRIES;
+
+    TRIES := 0;
+
+ASK QUESTION:
+    TRIES := TRIES + 1;
+    OUTTEXT ( QUESTION );
+    OUTCHAR ( ESC );
+
+    CHAR := INCHAR;
+
+    'IF' CHAR <> EOL 'THEN'
+      'BEGIN'
+        'INTEGER' DUMMY;
+        'FOR' DUMMY := INCHAR 'WHILE' DUMMY >= SPACE 'DO';
+      'END' FLUSH INPUT LINE;
+
+    'IF'       CHAR 'MASK' 'OCTAL' ( 137 ) = 'LITERAL' (Y) 'THEN'
+      'ANSWER' YES
+
+    'ELSE''IF' CHAR 'MASK' 'OCTAL' ( 137 ) = 'LITERAL' (N) 'OR'
+                                      CHAR = EOL           'THEN'
+      'ANSWER' NO
+
+    'ELSE''IF' CHAR = EOF 'THEN'
+      'GOTO' ERROR  'COMMENT' exit program on <control-Z>;
+
+    'ELSE''IF' TRIES <= 3 'THEN'
+      'BEGIN'
+         OUTTEXT ( " I don't understand. Answer Y or N " );
+         OUTCHAR ( EOL );
+         'GOTO' ASK QUESTION;
+
+      'END' TRY AGAIN
+    'ELSE'
+      'GOTO' ERROR; ( exit program )
+      
+  'END'PROCEDURE  ASK;
+
+(-PAGE ***  ERROR1, ERROR2, STREAM ERROR *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  INPUTS :   STRING1, STRING2   text to be displayed to operator
+             TT OUT             stream to operator's console
+
+  PROCESS:   Display text to operator then exit to ERROR:
+
+  CALLED :   main program, UPDATE BIT MAP, UPDATE BLOCK
+
+**********************************************************************
+;
+ 
+'PROCEDURE' ERROR1 ( 'VALUE''INTEGER' STRING1 );
+  'BEGIN'
+    OUTSTREAM ( TT OUT );
+    OUTTEXT ( "ERROR - " );
+    OUTTEXT ( STRING1 );
+    OUTCHAR ( EOL );
+    'GOTO' ERROR;
+ 
+  'END'PROCEDURE  ERROR1;
+ 
+ 
+'PROCEDURE' ERROR2 ( 'VALUE''INTEGER' STRING1, STRING2 );
+  'BEGIN'
+    OUTSTREAM ( TT OUT );
+    OUTTEXT ( "ERROR - " );
+    OUTTEXT ( STRING1 );
+    OUTCHAR ( EOL );
+    OUTTEXT ( STRING2 );
+    OUTCHAR ( EOL );
+    'GOTO' ERROR;
+ 
+  'END'PROCEDURE  ERROR2;
+
+'PROCEDURE' STREAM ERROR ( 'VALUE''INTEGER' STRING, AUX ERROR CODE );
+  'BEGIN'
+    OUTSTREAM ( TT OUT );
+    OUTCHAR ( EOL );
+    OUTCHAR ( EOL );
+    OUTTEXT ( " I/O error" );
+    OUTTEXT ( STRING );
+    OUTCHAR ( EOL );
+    'IF' AUX ERROR CODE = 'OCTAL' ( 360 ) 'THEN'
+      'BEGIN'
+        OUTTEXT ( "           Privilege violation " );
+        OUTCHAR ( EOL );
+      'END';
+    'GOTO' ERROR;
+ 
+  'END'PROCEDURE  STREAM ERROR;
+
+(-PAGE *** BUFF CHAR *** )
+ 
+'COMMENT' ***********************************************************
+ 
+  INPUTS :   CHAR NO       num of character required. In range 1:F NAME LIMIT
+             BUFF          byte array holding current entry in INDEXF
+             F NAME START1 offset into BUFF showing start of file name
+             F NAME START2 offset into BUFF showing start of 2nd file segment
+
+  PROCESS:
+ 
+  OUTPUTS:   returns character
+
+  MACROS :   F NAME MAX1
+ 
+  CHANGES:
+WBL VMS11  21-May-86 Procedure added.
+
+**********************************************************************
+;
+
+'INTEGER''PROCEDURE' BUFF CHAR ( 'VALUE''INTEGER' CHAR NO );
+  'BEGIN'
+
+    'ANSWER' 'IF'       CHAR NO <= F NAME MAX1 'THEN'
+               BUFF [ F NAME START1 + CHAR NO - 1 ]
+             'ELSE'
+               BUFF [ F NAME START2 + CHAR NO - 1 - F NAME MAX1 ];
+
+  'END';
+
+(-PAGE *** DISPLAY FILE HEADER *** )
+ 
+'COMMENT' ***********************************************************
+ 
+  INPUTS :   
+
+  PROCESS:   
+ 
+  OUTPUTS:   
+
+  MACROS :   
+
+  CALLS  :   RBUFFER
+ 
+  CHANGES:
+WBL VMS12  15-Dec-86 New procedure
+
+**********************************************************************
+;
+
+'PROCEDURE' DISPLAY FILE HEADER;
+  'BEGIN'
+    'PROCEDURE' OUT FILE ID ( 'VALUE''INTEGER' INDEX, SEQUENCE NO, VOLUMN NO );
+      'BEGIN'
+        OUTTEXT ( " (" );
+        OUTINT  ( INDEX, 6, 10 );       ( file identification - index )
+        OUTTEXT ( ", " );
+        OUTINT  ( SEQUENCE NO, 6, 10 ); ( sequence number )
+        OUTTEXT ( ", " );
+        OUTINT  ( VOLUMN NO, 6, 10 );   ( volumn number )
+        OUTTEXT ( ") " );
+      'END' PROCEDURE OUT FILE ID;
+
+    'PROCEDURE' OUT TIME ( 'VALUE''INTEGER' IDENT BYTE OFFSET );
+      'BEGIN'
+        'BYTE''ARRAY' STRING [ 0:22 ] := 'LITERAL'(A);
+        'OVERLAY' STRING [0] 'WITH' 'INTEGER' STRING0;
+        'INTEGER' STRING COUNT, STRING ADDRESS;
+        STRING COUNT   := 23;
+        STRING ADDRESS := 'LOCATION' (STRING0) * 4;
+
+        SYS ASCTIM ( STRING COUNT,
+                     'LOCATION'(STRING COUNT)*4,
+                     'LOCATION'(BUFFER [ 0 ] )*4 + 
+                                            F NAME START1 + IDENT BYTE OFFSET ,
+                     0                            );
+
+        OUT TEXT ( 'LOCATION' (STRING COUNT) );
+
+      'END' PROCEDURE OUT FILE ID;
+
+(-PAGE *** DISPLAY FILE HEADER *** Page 2 *** )
+
+
+    'INTEGER' J;
+
+    OUTCHAR ( EOL );
+    OUTTEXT ( 'IF' RBUFFER (SEG NUM) = 0 'THEN'
+                "Deleted file "
+              'ELSE'
+                "Deleted file extension "  );
+
+    'FOR' J := 1 'STEP' 1 'UNTIL' F NAME LIMIT 'DO'
+      OUTCHAR ( BUFF CHAR ( J ) );
+ 
+    OUTTEXT ( " found" );
+    OUTCHAR ( EOL );
+
+    'IF' RBUFFER (SEG NUM) = 0 'THEN'
+      'BEGIN'
+        OUTTEXT ( "Creation date " );
+        OUT TIME ( CREDATE );
+        OUTTEXT ( " " );
+        OUTTEXT ( "Revision date " );
+        OUT TIME ( REVDATE );
+        OUTCHAR ( EOL );
+      'END';
+
+    OUTTEXT ( "File id     " );
+    OUT FILE ID ( ENTRY NO,
+                  RBUFFER (F ID SEQ), 
+                  RBUFFER (F ID RVN) );
+    OUTTEXT ( "Segment num " );
+    OUT INT ( RBUFFER (SEG NUM), 6, 10 );
+    OUTCHAR ( EOL );
+
+    OUTTEXT ( "Extension   " );
+    OUT FILE ID ( RBUFFER (EX FID NUM), 
+                  RBUFFER (EX FID SEQ), 
+                  RBUFFER (EX FID RVN) );
+    OUTTEXT ( "Back pointer" );
+    OUT FILE ID ( RBUFFER (BK FID NUM), 
+                  RBUFFER (BK FID SEQ), 
+                  RBUFFER (BK FID RVN) );
+    OUTCHAR ( EOL );
+ 
+  'END'PROCEDURE  DISPLAY FILE HEAD;
+
+(-PAGE *** FILE MATCH *** )
+ 
+'COMMENT' ***********************************************************
+ 
+  INPUTS :   FILE         byte array holdin file name suppiled by user
+             FILE COUNT   number of characters in FILE
+             F NAME LIMIT number of characters in block
+
+  PROCESS:   Compares the file name in the entry with that supplied by the
+             user. Taking note of any wild card characters in the users spec.
+ 
+  OUTPUTS:   'answer's YES if they match NO otherwise.
+
+  MACROS :   NO, YES
+
+  CALLS  :   BUFF CHAR
+ 
+  CHANGES:
+WBL VMS10B 25-JAN-85 Add lable argument to SAME CHARS and macro SAME CHAR
+  and use it inplace of SAME CHARS. Use FILE COUNT in place of FILE [0].
+WBL VMS11  21-May-86 Add 'OR' FILE [ FILE POS ] = 'LITERAL' ( %% ), rename 
+  BUFF POS as BUFF NO and init to 0 instead of F NAME START+1, use BUFF CHAR
+  Replace BUFF POS > F NAME MAX + F NAME START by BUFF NO > F NAME MAX2
+WBL VMS12  18-Dec-86 Replace F NAME MAX2 by F NAME LIMIT, add PART MATCH and
+  return it instead of NO if exceed F NAME LIMIT
+
+**********************************************************************
+;
+
+(-PAGE *** FILE MATCH *** Page 2 *** )
+
+
+'DEFINE' SAME CHAR "SAME CHARS ( BUFF NAME EXCEEDED )";
+
+
+'INTEGER''PROCEDURE' FILE MATCH;
+  'BEGIN'
+    'INTEGER' BUFF NO, FILE POS;
+
+    'INTEGER''PROCEDURE' SAME CHARS ( 'LABEL' BUFF NAME EXCEEDED );
+      'BEGIN'
+        'IF' BUFF NO > F NAME LIMIT 'THEN'
+          'GOTO' BUFF NAME EXCEEDED;
+
+        'ANSWER'  'IF' FILE [ FILE POS ] = BUFF CHAR ( BUFF NO ) 'OR'
+                       FILE [ FILE POS ] = 'LITERAL' ( %% )     'THEN'
+                    YES
+                  'ELSE'
+                    NO;
+
+      'END'PROCEDURE SAME CHARS;
+
+    'INTEGER' PART MATCH, WILD FLAG;
+
+    BUFF NO   := 0;
+    PART MATCH:= NO;
+    WILD FLAG := NO;
+
+    'FOR' FILE POS := 1 'STEP' 1 'UNTIL' FILE COUNT 'DO'
+      'BEGIN'
+        'IF' FILE [ FILE POS ] = 'LITERAL' (*) 'THEN'
+          WILD FLAG := YES
+        'ELSE'
+          'BEGIN'
+            'IF' WILD FLAG = YES 'THEN'
+              'BEGIN'
+                WILD FLAG := NO;
+                'FOR' BUFF NO := BUFF NO + 1 'WHILE' SAME CHAR = NO 'DO';
+              'END'
+            'ELSE'                  
+              'BEGIN'
+                BUFF NO := BUFF NO + 1;
+                'IF' SAME CHAR = NO 'THEN'
+                  'ANSWER' NO;
+
+              'END';
+            PART MATCH := YES; (file matches so far)
+          'END';
+      'END';
+    'ANSWER' YES;
+
+BUFF NAME EXCEEDED:
+  'COMMENT' Remainder of the file name is not stored. If matched begining of 
+     file name fail safe by assuming the rest would have would have matched;
+
+    'ANSWER' PART MATCH;
+
+
+  'END'PROCEDURE  FILE MATCH;
+
+'DELETE' SAME CHAR;
+
+(-PAGE *** GET FILE NAME *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  INPUTS :
+ 
+  PROCESS:   Reads file from operators console and places it in FILE.
+             Those parts of the file name that are not specified eg.
+             version number are set to wild cards.
+ 
+  OUTPUTS:   FILE
+  
+  GLOBALS:   ERROR: control is passed to this label after repeted errors.
+ 
+  MACROS :   NO, SPACE, YES
+
+  NOTE   :   A leading semicolon will be treated as a syntax error but is
+             ok if a dot is 1st character. (eg .:nn is ok)
+ 
+  HISTORY:
+WBL VMS10B 25-JAN-85 Add lable argument to procedure ADD. Add setting of 
+  FILE ADDRESS and replace FILE [0] by FILE COUNT.
+WBL VMS11  21-May-86 Replace POS < 31 by POS < 132, add $ _ and %% to legal
+WBL VMS12  18-Dec-86 Add 'LITERAL'(-) to procedure LEGAL
+
+**********************************************************************
+;
+
+'PROCEDURE' GET FILE NAME;
+  'BEGIN'
+    'INTEGER' END NAME FOUND, POS;
+
+    'INTEGER''PROCEDURE' READ PART ( 'VALUE''INTEGER' TERM );
+      'BEGIN'
+
+        'PROCEDURE' ADD ( 'VALUE''INTEGER' CHAR; 'LABEL' READ PART ERROR );
+          'BEGIN'
+            'IF' POS < 132 'THEN'
+              'BEGIN'
+                FILE [ POS ] := 'IF' CHAR < 'LITERAL' (a) 'OR'
+                                     CHAR > 'LITERAL' (z)    'THEN'
+                                  CHAR
+                                'ELSE'
+                                  CHAR 'MASK' 'OCTAL' (137); ( upper case )
+                POS := POS + 1;
+              'END'
+            'ELSE'
+              'GOTO' READ PART ERROR;
+
+           'END'PROCEDURE  ADD;
+
+        'INTEGER''PROCEDURE' LEGAL ( 'VALUE''INTEGER' CHAR );
+           'ANSWER' 'IF' CHAR >= 'LITERAL' (0) 'AND' CHAR <= 'LITERAL' (9) 'OR'
+                         CHAR >= 'LITERAL' (A) 'AND' CHAR <= 'LITERAL' (Z) 'OR'
+                         CHAR >= 'LITERAL' (a) 'AND' CHAR <= 'LITERAL' (z) 'OR'
+                         CHAR =  'LITERAL' ($)  'OR'
+                         CHAR =  'LITERAL' (_)  'OR'
+                         CHAR =  'LITERAL' (-)  'OR'
+                         CHAR =  'LITERAL' (%%) 'OR'
+                         CHAR =  'LITERAL' (*)                           'THEN'
+                      YES
+                    'ELSE'
+                      NO;
+
+        'INTEGER' CHAR, CHARS ADDED;;
+
+        CHARS ADDED := NO;  ( initialise )
+        CHAR        := EOL; ( default )
+
+        'IF' END NAME FOUND = NO 'THEN'
+          'BEGIN'
+            'FOR' CHAR := INCHAR 'WHILE' LEGAL ( CHAR ) = YES 'DO'
+              'BEGIN'
+                CHARS ADDED := YES;
+                ADD ( CHAR, READ PART ERROR );
+              'END';
+          'END';
+
+        'IF' CHARS ADDED = NO 'THEN'
+          ADD ( 'LITERAL'(*), READ PART ERROR);(null part replace by wild card)
+
+        'IF' CHAR = TERM 'OR' CHAR = SPACE 'OR' CHAR = EOL 'THEN'
+          'BEGIN'
+            'IF' TERM <> 0 'THEN'
+              ADD ( TERM, READ PART ERROR );
+            'IF' CHAR = SPACE 'OR' CHAR = EOL 'THEN'
+              END NAME FOUND := YES;
+            'ANSWER' YES;
+
+          'END';
+
+READ PART ERROR:
+        'ANSWER' NO;
+
+      'END'PROCEDURE  READ PART;
+
+    'INTEGER' NERRORS := 0;
+
+  'COMMENT' Setup second half of VMS string descriptor for FILE;
+    FILE ADDRESS := 'LOCATION' ( FILE0 ) * 4 + 1;
+
+ASKFILE:
+    OUTTEXT ( "File ? " );
+    OUTCHAR ( ESC );
+
+    POS := 1;
+    END NAME FOUND := NO;
+    'IF' READ PART ( 'LITERAL' (.) ) = YES 'AND'
+         READ PART ( 'LITERAL' (;) ) = YES 'AND'
+         READ PART ( 0 )             = YES   'THEN'
+      FILE COUNT := POS - 1 'COMMENT' set length;
+
+    'ELSE'
+      'BEGIN'
+        OUTTEXT ( "File name syntax error " );
+        OUTCHAR ( EOL );
+        N ERRORS := NERRORS + 1;
+        'IF' NERRORS < = 3 'THEN'
+          'GOTO' ASK FILE
+
+        'ELSE'
+          'GOTO' ERROR;
+
+      'END';
+
+  'END'PROCEDURE  GET FILE NAME; 
+
+(-PAGE *** UPDATE BIT MAP *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  INPUTS :   BUFFER/BUFF
+             ENTRY NO     First file entry has ENTRY NO equal to one.
+             START BITMAP virtual block number of first block in bit map
+             BITMAP SIZE  in blocks
+
+  PROCESS:   When the file is deleted then the bit in the bit map indicating
+             whether it's entry in INDEXF.SYS is in use may be cleared. This
+             procedure sets it again.
+
+  OUTPUTS:   BUFFER/BUFF
+             Disk block containing use/free block is modified and written back.
+ 
+  CALLS  :   ERROR1, READ BLOCK, WRITE BLOCK
+
+  HISTORY:
+WBL VMS10B 25-JAN-85 Replace SAVE HI and SAVE LO by SAVE and change calling of
+  WHERE IN and FINDOUT. Replace VBN HI and VBN LO by VBN and change calling
+  of FINDIN.
+WBL VMS11  21-May-86 Replace INBLOCK, OUTBLOCK etc by READ BLOCK and WRITE BLOCK
+  Add check for WRITE BLOCK error
+ 
+**********************************************************************
+;
+ 
+'PROCEDURE' UPDATE BITMAP;
+  'BEGIN'
+    'INTEGER' BIT NUMBER, BIT OFFSET, BYTE NUMBER, BYTE OFFSET, BLOCK NUMBER;
+    'INTEGER' VBN;
+
+    'BYTE''ARRAY' BIT [ 0:7 ] := 
+      'OCTAL'(001),'OCTAL'(002),'OCTAL'(004),'OCTAL'(010),
+      'OCTAL'(020),'OCTAL'(040),'OCTAL'(100),'OCTAL'(200);
+
+     BIT NUMBER   := ENTRY NO - 1;             ( entry no starts from one )
+     BYTE NUMBER  := BIT NUMBER / 8;
+     BIT  OFFSET  := BIT NUMBER - BYTE NUMBER * 8;
+     BLOCK NUMBER := BYTE NUMBER / 512;
+     BYTE OFFSET  := BYTE NUMBER - BLOCK NUMBER * 512;
+
+  'COMMENT' check required bit lies in the bit map;
+
+     'IF' BLOCK NUMBER >= BIT MAP SIZE 'THEN'
+       ERROR1 ( " bit map overflow " );
+
+  'COMMENT' read in relevant block of bit map;
+
+     VBN := START BITMAP + BLOCK NUMBER;
+
+     'IF' READ BLOCK ( VBN ) <> 512 'THEN'
+       ERROR1 ( "Read error on bitmap" );
+
+   'COMMENT' ensure free/used bit describing file header is set to used;
+
+     BUFF [ BYTE OFFSET ] := BUFF [ BYTE OFFSET ] 'UNION' BIT [ BIT OFFSET ];
+
+    
+   'COMMENT' write block back to index file;
+
+     'IF' WRITE BLOCK ( VBN ) <> 512 'THEN'
+       ERROR1 ( "Write error on bitmap" );
+
+  'END'PROCEDURE  UPDATE BITMAP;
+ 
+(-PAGE *** UPDATE BLOCK *** )
+ 
+'COMMENT' ***********************************************************
+ 
+ 
+  INPUTS :   BUFFER       holds block to be updated
+             ENTRY NO     This forms one word of the three word file 
+                          identification. First file entry has ENTRY NO
+                          equal to one.
+             FIRST ENTRY  virtual block number of first entry.
+
+  PROCESS:   When the file is deleted the first word of the three word file
+             identification code held in the entry is replaced by zero.
+             A bit in the file characteristics bit mask may be set to indicate
+             that the file is marked for delete. Inaddition the the checksum 
+             is also zeroed. Both these words are recalculated, the marked
+             for delete bit is always cleared and then the entry is replaced.
+
+  OUTPUTS:   BUFFER
+             Disk block containing entry is modified and written back.
+
+  CALLS  :   ERROR1, WRITE BLOCK
+ 
+  MACROS :   F ID NUM, FILE CHAR, MARK DEL
+  HISTORY:
+WBL VMS10B 25-JAN-85 Replace BUFFER[] by WBUFFER() and RBUFFER(). Replace 
+  VBN HI and VBN LO by VBN and change calling of FINDOUT
+WBL VMS11  21-May-86 Replace OUT BLOCK etc. by WRITE BLOCK, use ERROR1 
+  instead of STREAM ERROR
+
+**********************************************************************
+;
+
+'DEFINE' NOT ( XBITS ) "'INTEGER'( 'HEX'(FFFF) 'DIFFER' XBITS )"; (complement)
+
+'PROCEDURE' UPDATE BLOCK;
+  'BEGIN'
+    'INTEGER' CHECK SUM, N;
+
+  'COMMENT' undelete entry;
+ 
+    WBUFFER (F ID NUM, ENTRY NO);
+
+  'COMMENT' clear marked for delete bit;
+
+    WBUFFER (FILE CHAR, RBUFFER (FILE CHAR) 'MASK' NOT ( MARK DEL ) );
+
+  'COMMENT' calculate checksum and restore it;
+
+    CHECK SUM := 0;
+
+    'FOR' N := 0 'STEP' 1 'UNTIL' 254 'DO'
+      CHECK SUM := CHECK SUM + RBUFFER ( N );
+
+    WBUFFER ( 255, CHECK SUM );
+
+ 'COMMENT' write block back to index file;
+
+    'IF' WRITE BLOCK ( ENTRY NO + FIRST ENTRY - 1 ) <> 512 'THEN'
+      ERROR1 ( "I/O error on writting to INDEXF" );
+
+  'END'PROCEDURE  UPDATE BLOCK;
+
+'DELETE' NOT;
+
+(-PAGE *** main program *** )
+
+  'INTEGER' MAX ENTRY;
+
+  'INTEGER' AUX, ERROR TYPE;
+
+  OPENSTREAM ( "SYS$INPUT", "TXT", TT IN );
+  OPENSTREAM ( "SYS$OUTPUT", "TXT", TT OUT );
+
+  OUTSTREAM ( TT OUT );
+
+  OUTCHAR ( EOL );
+  OUTCHAR ( EOL );
+  OUTTEXT ( "  FILES-11B restoration program. " );
+  OUTCHAR ( EOL );  OUTCHAR ( EOL );
+  OUTTEXT ( "  Version :  VMS Native mode 12" );
+  OUTCHAR ( EOL );
+  OUTTEXT ( "  Author  :  W. B. Langdon  CEGB  0372 374488 " );
+  OUTCHAR ( EOL ); OUTCHAR ( EOL ); OUTCHAR ( EOL );
+
+
+  CONTINUE ON ERROR ( 7 );
+  OPENSTREAM ( "INDEXF", "BLK", INDEX );
+  EXIT ON ERROR ( 7 );
+  ERROR TYPE := LAST ERROR ( AUX );
+  'IF' ERROR TYPE <> 0 'THEN'
+    STREAM ERROR ( " on setting up stream to INDEXF. Is device ready ?", AUX );
+
+  SET FILE PAR   ( INDEX , "MOD", 0, 0 );
+  SHARE ( INDEX );
+
+  CONTINUE ON ERROR ( 3 );
+  INSTREAM ( INDEX );
+  EXIT ON ERROR ( 3 );
+  ERROR TYPE := LAST ERROR ( AUX );
+  'IF' ERROR TYPE <> 0 'THEN'
+    STREAM ERROR ( " on opening INDEXF", AUX );
+
+'COMMENT' read in Home Block;
+ 
+  'IF' READ BLOCK ( HOME BLOCK ) <> 512 'THEN'
+    ERROR1 ( "Home block read error on INDEXF" );
+ 
+'COMMENT' Check that this is a structure level 2 volumn;
+ 
+  'IF' 'BITS' [8,8] RBUFFER ( STRUCLEV ) <> 2 'THEN'
+    ERROR2 ( "This is not a structure level 2 Volumn ",
+             "use INDEX program for structure level 1" );
+ 
+'COMMENT' check version number;
+ 
+  'IF' 'BITS' [8,0] RBUFFER (STRUCLEV) <> 1 'THEN'
+    'BEGIN'
+      OUTTEXT ( "WARNING - new version of FILES-11B.  Version " );
+      OUTINT  ( 'BITS' [8,0] RBUFFER (STRUCLEV), 4, 10 );
+      OUTCHAR ( EOL );
+    'END';
+ 
+'COMMENT' Extract the maximium number of files INDEXF can hold;
+ 
+  MAX ENTRY := RBUFFER (MAXFILES LO) + RBUFFER (MAXFILES HI)*'OCTAL' (200000);
+ 
+'COMMENT' Find the virtual blocks containing the start of the bit map. Then
+  find the first entry by adding the number of blocks used by the bit map 
+  to the VBN of the first block of the bit map ;
+
+  START BITMAP := RBUFFER ( IB MAP VBN );
+  BIT MAP SIZE := RBUFFER ( IB MAP SIZE );
+  FIRST ENTRY  := START BIT MAP + BIT MAP SIZE;
+ 
+'COMMENT' End of Home block checks;
+
+(-PAGE *** search for deleted file header *** )
+ 
+  IN STREAM ( TT IN );
+  GET FILE NAME;
+
+  OUTTEXT ( "Starting search for " );
+  OUTTEXT ( 'LOCATION' ( FILE COUNT ) );
+  OUTCHAR ( EOL );
+
+  'FOR' ENTRY NO := 1 'STEP'1 'UNTIL' MAX ENTRY 'DO'
+    'BEGIN'
+      'INTEGER' LENGTH;
+ 
+      LENGTH := READ BLOCK ( ENTRY NO - 1 + FIRST ENTRY );
+ 
+      'IF' LENGTH < 0 'THEN'
+        'GOTO' END LOOP; ( end of file found )
+
+      'IF' LENGTH <> 512 'THEN'
+        ERROR1 ( "Read error on INDEXF" );
+
+
+   'COMMENT' find the start of this entries file name segments; 
+
+      F NAME START1 := BUFF [ ID OFFSET ]*2; (convert from word to byte offset)
+      F NAME START2 := F NAME START1 + F NAME MAX1 + 2 + 4*8; (ie. add 1 word )
+                                                              (+4 8 byte times)
+      F NAME LIMIT  := 'IF' RBUFFER (SEG NUM) = 0 'THEN'
+                         F NAME MAX2 'COMMENT' Only first header has full name;
+                       'ELSE'
+                         F NAME MAX1;'COMMENT' File name extension missing;
+
+    'COMMENT' if this entry has been deleted and it's name matches
+      that supplied by the user then restore it, if required;
+ 
+(-----'IF' FILE MATCH = YES 'THEN'---------------------------------------------)
+      'IF' RBUFFER (F ID NUM) = 0 'AND' FILE MATCH = YES 'THEN'
+        'BEGIN'
+          DISPLAY FILE HEADER;
+
+          INSTREAM ( TT IN );
+          'IF' ASK ( "Do you wish to restore it? Y/N " ) = YES 'THEN'
+            'BEGIN'
+              UPDATE BLOCK;
+              UPDATE BITMAP;
+            'END';
+
+          'IF' ASK ( "Continue search for file(s)? Y/N " ) = NO 'THEN'
+            'GOTO' END PROC;
+ 
+        'END' DELETED FILE FOUND;
+    'END'LOOP;
+END LOOP:
+  OUTTEXT ( "Search finished" );
+  OUTCHAR ( EOL );
+
+END PROC:
+ERROR:
+  CLOSE ALL STREAMS;
+ 
+'END'SEGMENT;
+'FINISH'

@@ -1,0 +1,634 @@
+            This is one version of 
+            http://www.gtoal.com/languages/coral66/coral66-grammar.txt from your 
+            personal cache.
+            The page may have changed since that time. Click here for the 
+            current page.
+            Since this page is stored on your computer, publicly linking to this 
+            page will not work.
+
+            Google may not be affiliated with the authors of this page nor 
+            responsible for its content. This page may be protected by 
+            copyright. 
+
+
+
+
+Actual ::= 
+    Expression
+    Wordreference
+    Destination
+    Name 
+
+
+Actuallist ::= 
+    Actual
+    Actual , Actuallist 
+
+
+Addoperator ::= 
+    +
+    - 
+
+
+Alternative ::= 
+    Statement 
+
+
+Answerspec ::= 
+    Numbertype 
+    Void
+
+
+Answerstatement ::= 
+    ANSWER Expression 
+
+
+Arraydec ::= 
+    Numbertype ARRAY Arraylist Presetlist 
+
+
+Arrayitem ::= 
+    Idlist [ Sizelist ] 
+
+
+Arraylist ::= 
+    Arrayitem
+    Arrayitem , Arraylist 
+
+
+Assignmentstatement ::= 
+    Variable := Expression 
+
+
+Base ::= 
+    ( Id )
+    Id [ Signedinteger  ] 
+
+
+Bitposition ::=  Integer
+
+
+Block ::= 
+    BEGIN Declist ; Statementlist END 
+
+
+Booleanword ::= 
+    Booleanword2 
+    Booleanword4 DIFFER Booleanword5 
+
+
+Booleanword2 ::= 
+    Booleanword3 
+    Booleanword5 UNION Booleanword6 
+
+
+Booleanword3 ::= 
+    Booleanword6 MASK Typedprimary 
+
+
+Booleanword4 ::= 
+    Booleanword 
+    Typedprimary 
+
+
+Booleanword5 ::= 
+    Booleanword2 
+    Typedprimary 
+
+
+Booleanword6 ::= 
+    Booleanword3 
+    Typedprimary 
+
+
+Bracketedcomment ::= 
+    (  any sequence of characters in which round brackets are matched )
+
+
+Codesequence ::= 
+    defined in a particular implementation 
+
+
+Codestatement ::= 
+    CODE BEGIN Codesequence END 
+
+
+Commentsentence ::= 
+        COMMENT any sequence of characters not including a semi-colon ;
+
+
+Commoncommunicator ::= 
+    COMMON ( Commonitemlist ) 
+
+
+Commonitem ::= 
+    Datadec 
+    Overlaydec 
+    Placespec 
+    Procedurespec 
+    Void 
+
+
+Commonitemlist ::= 
+    Commonitem
+    Commonitem ; Commonitemlist 
+
+
+Comparator ::= 
+    <
+    <=
+    =
+    >=
+    >
+    <> 
+
+
+Comparison ::= 
+    Simpleexpression Comparator Simpleexpression 
+
+
+Compoundstatement ::= 
+    BEGIN Statementlist END 
+
+
+Condition ::= 
+    Condition OR Subcondition
+    Subcondition 
+
+
+Conditionalexpression ::= 
+    IF Condition
+    THEN Expression
+    ELSE Expression 
+
+
+Conditionalstatement ::= 
+    IF Condition THEN Consequence
+    IF Condition THEN Consequence ELSE Alternative 
+
+
+Consequence ::= 
+    Simplestatement
+    Label :  Consequence 
+
+
+Constant ::= 
+    Number
+    Addoperator Number 
+
+
+Constantlist ::= 
+    Group
+    Group , Constantlist 
+
+
+Datadec ::= 
+    Numberdec
+    Arraydec
+    Tabledec 
+
+
+Dec ::= 
+    Datadec
+    Overlaydec
+    Switchdec
+    Proceduredec 
+
+
+Declist ::= 
+    Dec
+    Dec ; Declist 
+
+
+Destination ::= 
+    Label
+    Switch [ Index ] 
+
+
+Digit ::= 0 1 2 3 4 5 6 7 8 9
+
+
+Digitlist ::= 
+    Digit
+    Digit Digitlist
+
+
+Dimension ::= 
+    Lowerbound : Upperbound 
+
+
+Dummystatement ::= 
+    void 
+
+
+Elementdec ::= 
+    Id Numbertype Wordposition
+    Id Partwordtype Wordposition , Bitposition 
+
+
+Elementdeclist ::= 
+    Elementdec
+    Elementdec ;  Elementdeclist  
+
+
+Elementpresetlist ::= 
+    PRESET Constantlist
+    Void 
+
+
+Elementscale ::= 
+    ( Totalbits , Fractionbits )
+    ( Totalbits ) 
+
+
+Endcomment ::= 
+    Id 
+
+
+Expression ::= 
+    Unconditionalexpression
+    Conditionalexpression 
+
+
+Factor ::= 
+    Primary
+    Booleanword 
+
+
+Forelement ::= 
+    Expression
+    Expression WHILE Condition
+    Expression STEP Expression UNTIL Expression 
+
+
+Forlist ::= 
+    Forelement
+    Forelement , Forlist 
+
+
+Formalpair ::= 
+    Id : Id 
+
+
+Formalpairlist ::= 
+    Formalpair
+    Formalpair , Formalpairlist 
+
+
+Forstatement ::= 
+    FOR Wordreference := Forlist DO Statement 
+
+
+Fractionbits ::= Signedinteger 
+
+
+Gotostatement ::= 
+    GOTO Destination 
+
+
+Group ::= 
+    Constant
+    ( Constantlist )
+    Void 
+
+
+Id ::= 
+    Letter Letterdigitstring
+
+
+Idlist ::= 
+    Id
+    Id , Idlist 
+
+
+Index ::= 
+    Expression 
+
+
+Integer ::= 
+    Digitlist
+        OCTAL ( Octallist )
+        LITERAL ( printing character )
+
+
+Label ::= Id 
+
+
+Labellist ::= 
+    Label
+    Label , Labellist 
+
+
+Length ::= Integer 
+
+
+Letter ::= a b c d e f g h i j k l m n o p q r s t u v w x y z
+
+
+Letterdigitstring ::= 
+    Letter Letterdigitstring
+    Digit Letterdigitstring
+    Void 
+
+
+Lowerbound ::= 
+    Signedinteger 
+
+
+Macrobody ::= 
+        any sequence of characters in which string quotes are matched 
+
+
+Macrocall ::= 
+    Macroname 
+    Macroname (  Macrostringlist ) 
+
+
+Macrodefinition ::= 
+        DEFINE Macroname " Macrobody " ;
+        DEFINE Macroname ( Idlist ) " Macrobody " ;
+
+
+Macrodeletion ::= 
+        DELETE Macroname ;
+
+
+Macroname ::= 
+    Id 
+
+
+Macrostring ::= 
+    any sequence of characters in which commas are protected by round or square brackets and in which such brackets are properly matched and nested 
+
+
+Macrostringlist ::= 
+    Macrostring , Macrostringlist
+    Macrostring
+
+
+Multoperator ::= 
+    *
+    / 
+
+
+Name ::= 
+    Id 
+
+
+Number ::= 
+    Real
+    Integer 
+
+
+Numberdec ::= 
+    Numbertype Idlist Presetlist 
+
+
+Numbertype ::= 
+    FLOATING
+    FIXED Scale
+    INTEGER 
+
+
+Octaldigit ::= 0 1 2 3 4 5 6 7
+
+
+Octallist ::= 
+    Octaldigit
+    Octaldigit Octalist
+
+
+Overlaydec ::= 
+    OVERLAY Base WITH Datadec 
+
+
+Parameterspec ::= 
+    VALUE Formalpairlist
+    LOCATION Formalpairlist
+    Specifier Idlist 
+    etc 
+
+
+Parameterspec ::= 
+    Specifier Idlist
+    Tablespec
+    Procedurespec 
+
+
+Parameterspeclist ::= 
+    Parameterspec
+    Parameterspec ; Parameterspeclist 
+
+
+Partword ::= 
+    Id [ Index ]
+    BITS [ Totalbits ,  Bitposition] Typedprimary 
+
+
+Partwordreference ::= 
+    Id [ Index ]
+    BITS [ Totalbits , Bitposition ] Wordreference 
+
+
+Partwordtype ::= 
+    Elementscale
+    UNSIGNED Elementscale 
+
+
+Placespec ::= 
+    LABEL Idlist 
+    SWITCH Idlist 
+
+
+Presetlist ::= 
+    := Constantlist
+    Void 
+
+
+Primary ::= 
+    Untypedprimary
+    Typedprimary 
+
+
+Procedurecall ::= 
+    Id
+    Id ( Actuallist ) 
+
+
+Proceduredec ::= 
+    Answerspec PROCEDURE Procedureheading ; Statement 
+    Answerspec RECURSIVE Procedureheading ; Statement
+
+
+Procedureheading ::= 
+    Id
+    Id ( Parameterspeclist ) 
+
+
+Procedurespec ::= 
+    Answerspec PROCEDURE Procparamlist 
+
+
+Procparameter ::= 
+    Id
+    Id ( Typelist ) 
+
+
+Procparamlist ::= 
+    Procparameter 
+    Procparameter , Procparamlist 
+
+
+Real ::= 
+    Digitlist . Digitlist
+    Digitlist 10 Signedinteger
+        10 Signedinteger
+    Digitlist . Digitlist 10 Signedinteger
+        OCTAL ( Octallist . Octallist ) 
+
+
+Scale ::=  ( Totalbits , Fractionbits ) 
+
+
+Sign ::= 
+    +
+    -
+    Void 
+
+
+Signedinteger ::= 
+    Integer
+    Addoperator Integer 
+
+
+Simpleexpression ::= 
+    Term
+    Addoperator Term
+    Simpleexpression Addoperator Term
+
+
+Simplestatement ::= 
+    Assignmentstatement
+    Gotostatement
+    Procedurecall
+    Answerstatement
+    Codestatement
+    Compoundstatement
+    Block
+    Dummystatement 
+
+
+Sizelist ::= 
+    Dimension
+    Dimension , Dimension 
+
+
+Specifier ::= 
+    VALUE Numbertype
+    LOCATION Numbertype
+    Numbertype ARRAY 
+    LABEL
+    SWITCH 
+
+
+Specimen ::= 
+    ALPHA Sign
+    BETA Sign
+
+
+Statement ::= 
+    Label : Statement
+    Simplestatement
+    Conditionalstatement
+    Forstatement 
+
+
+Statementlist ::= 
+    Statement
+    Statement ; Statementlist 
+
+
+String ::= 
+    " sequence of characters with quotes matched "
+
+
+Subcondition ::= 
+    Subcondition AND Comparison
+    Comparison 
+
+
+Switch ::= Id 
+
+
+Switchdec ::= 
+    SWITCH Switch := Labellist 
+
+
+Tabledec ::= 
+    TABLE Id [ Width , Length ] 
+        [Elementdeclist Elementpresetlist ] Presetlist 
+
+
+Tablespec ::= 
+    TABLE Id [ Width, Length ] [ Elementdeclist ] 
+
+
+Term ::= 
+    Factor
+    Term Multoperator Factor 
+
+
+Totalbits ::= Integer 
+
+
+Type ::= 
+    Specifier
+    TABLE
+    Answerspec PROCEDURE 
+
+
+Typedprimary ::= 
+    Wordreference
+    Partword
+    LOCATION ( Wordreference )
+    Numbertype ( Expression )
+    Procedurecall
+    Integer 
+
+
+Typelist ::= 
+    Type 
+    Type , Typelist 
+
+
+Unconditionalexpression ::= 
+    Simpleexpression
+    String 
+
+
+Untypedprimary ::= 
+    Real
+    ( Expression ) 
+
+
+Upperbound ::= 
+    Signedinteger 
+
+
+Variable ::= 
+    Wordreference
+    Partwordreference 
+
+
+Width ::= Integer 
+
+
+Wordposition ::= Signedinteger 
+
+
+Wordreference ::= 
+    Id
+    Id [ Index ]
+    Id [ Index ,  Index]
+    [  ] 
+
