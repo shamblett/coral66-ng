@@ -1,0 +1,47 @@
+/*
+* Project: coral66
+* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+* Date   : 31/01/2026
+*/
+
+#include "CodeGeneration.hpp"
+#include "CodeGenerator.hpp"
+
+#include <llvm/MC/TargetRegistry.h>
+
+namespace coral66::CGLLVM
+{
+
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const Semantics::Program& program,
+                                                  const Options& options)
+{
+    // Minimal SourceInterface stub or pass nullptr if not needed by basic codegen yet
+    // The previous CodeGenerator constructor took SourceInterface.
+    // We can pass a dummy one or update Codegen.hpp to take SourceInterface?
+    // CodeGenerator.hpp needs SourceInterface.
+    // For now, let's assume caller provides it or we stub it.
+    // But generateLLVM signature in Codegen.hpp does NOT take SourceInterface.
+    // This is an issue. I should update Codegen.hpp or remove dependency.
+    
+    // Stub SourceInterface
+    class StubSourceInterface : public SourceInterface {
+    public:
+        std::uint64_t getLineNumber(std::uint32_t, std::uint64_t) const noexcept override { return 0; }
+        std::uint64_t getLineStartOffset(std::uint32_t, std::uint64_t) const noexcept override { return 0; }
+        std::uint64_t getLineEndOffset(std::uint32_t, std::uint64_t) const noexcept override { return 0; }
+        std::span<const Source::File> getFiles() const noexcept override { return {}; }
+        std::span<const Source::PPRecord> getSubstitutions() const noexcept override { return {}; }
+        const LanguageOptions& getLanguageOptions() const noexcept override { static LanguageOptions opts = LanguageOptions::native(); return opts; }
+    } stubSource;
+
+    CodeGenerator generator(module, program, stubSource, options);
+    generator.generate();
+
+    // Return target machine (stub)
+    std::string error;
+    auto target = llvm::TargetRegistry::lookupTarget(module.getTargetTriple(), error);
+    if (!target) return nullptr;
+    return std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module.getTargetTriple(), "generic", "", {}, {}));
+}
+
+} // namespace coral66::CGLLVM

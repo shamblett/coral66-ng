@@ -1,0 +1,13 @@
+/*
+* Project: coral66
+* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+* Date   : 31/01/2026
+*/
+
+#include "CodeGenerator.hpp"
+
+namespace coral66::CGLLVM
+{
+// Declarations are currently handled in CodeGenerator.cpp visit(Declaration)
+// This file can be used for complex declarations later.
+}

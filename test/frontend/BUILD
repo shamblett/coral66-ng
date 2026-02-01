@@ -1,5 +1,5 @@
 #
-# Test suite support library tests
+# Test suite frontend library tests
 #
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
