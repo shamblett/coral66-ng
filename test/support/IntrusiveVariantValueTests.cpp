@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "vendor/catch2v3/catch_amalgamated.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 #include "support/AbstractIntrusiveVariant.hpp"
 #include "support/IntrusiveVariantValue.hpp"

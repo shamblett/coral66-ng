@@ -13,8 +13,10 @@ cc_library(
     ],
     visibility = ["//test:__pkg__"],
     deps = [
-        "//support",
         "//test/vendor/catch2v3",
+        "//test/vendor/common",
+        "//support",
+
     ],
 )
 
@@ -26,7 +28,5 @@ cc_test(
     visibility = ["//test:__pkg__"],
     deps = [
         "supporttestlib",
-        "//support",
-        "//test/common",
     ],
 )

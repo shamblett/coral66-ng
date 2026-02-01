@@ -6,15 +6,15 @@
 
 #pragma once
 
-#include "vendor/catch2v3/catch_amalgamated.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 #include <llvm/ADT/APInt.h>
 #include <llvm/ADT/APSInt.h>
 
-#include "frontend/Compiler/Diagnostic.hpp"
-#include "frontend/Compiler/CustomDiagnostics.hpp"
-#include "frontend/Compiler/Semantics.hpp"
-#include "frontend/Preprocessor/Preprocessor.hpp"
+#include "frontend/common/Diagnostic.hpp"
+#include "frontend/common/CustomDiagnostics.hpp"
+#include "frontend/compiler/Semantics.hpp"
+#include "frontend/compilerPreprocessor.hpp"
 #include "support/Filesystem.hpp"
 #include "support/Text.hpp"
 

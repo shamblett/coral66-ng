@@ -4,9 +4,9 @@
  * Date   : 31/01/2026
  */
 
-#include "vendor/catch2v3/catch_amalgamated.hpp"
+#include "testvendor/catch2v3/catch_amalgamated.hpp"
 
-#include "TestConfig.hpp"
+#include "test/common/TestConfig.hpp"
 
 int main(int argc, char* argv[])
 {

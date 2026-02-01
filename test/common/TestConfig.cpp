@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "common/TestConfig.hpp"
+#include "test/common/TestConfig.hpp"
 
 #include <llvm/Support/Process.h>
 
