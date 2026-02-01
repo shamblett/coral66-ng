@@ -1,0 +1,1370 @@
+/*
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
+
+#include "Parser.hpp"
+
+/**
+ * @file ParserExpressions.cpp
+ * @brief Implements parsing functions for C expressions.
+ *
+ * This file contains the implementations of the recursive descent parser for
+ * all C expression types, including assignment, binary operators (logical, bitwise,
+ * arithmetic), unary expressions, postfix expressions, and primary expressions (literals, identifiers).
+ * It also handles operator precedence parsing.
+ */
+
+#include <llvm/Support/ConvertUTF.h>
+
+#include <algorithm>
+
+#include "frontend/common/ErrorMessages.hpp"
+#include "frontend/common/ParserUtilities.hpp"
+
+using namespace coral66::Syntax;
+
+coral66::Syntax::Expression coral66::Parser::parseExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
+                                                     Context& context)
+{
+    const auto* start = begin;
+    auto assignment = parseAssignmentExpression(
+        begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::Comma)));
+
+    std::vector<std::pair<Lexer::CTokenIterator, AssignmentExpression>> expressions;
+    if (begin != end)
+    {
+        while (begin < end && begin->getTokenType() == Lexer::TokenType::Comma)
+        {
+            const auto* token = begin++;
+            auto otherAssignment = parseAssignmentExpression(
+                begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::Comma)));
+            if (otherAssignment)
+            {
+                expressions.emplace_back(token, std::move(*otherAssignment));
+            }
+        }
+    }
+    if (!assignment)
+    {
+        return Expression(start, begin, {}, std::move(expressions));
+    }
+    return Expression(start, begin, std::make_unique<AssignmentExpression>(std::move(*assignment)),
+                      std::move(expressions));
+}
+
+std::optional<coral66::Syntax::AssignmentExpression>
+    coral66::Parser::parseAssignmentExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    const auto* start = begin;
+    auto result = parseConditionalExpression(begin, end, context.withRecoveryTokens(assignmentSet));
+
+    std::vector<AssignmentExpression::Operand> list;
+    while (begin != end && isAssignment(begin->getTokenType()))
+    {
+        const auto* token = begin;
+        begin++;
+        if (auto conditional = parseConditionalExpression(begin, end, context.withRecoveryTokens(assignmentSet)))
+        {
+            list.push_back({[token]() -> AssignmentExpression::AssignOperator
+                            {
+                                switch (token->getTokenType())
+                                {
+                                    case Lexer::TokenType::Assignment:
+                                        return AssignmentExpression::AssignOperator::NoOperator;
+                                    case Lexer::TokenType::PlusAssign:
+                                        return AssignmentExpression::AssignOperator::PlusAssign;
+                                    case Lexer::TokenType::MinusAssign:
+                                        return AssignmentExpression::AssignOperator::MinusAssign;
+                                    case Lexer::TokenType::DivideAssign:
+                                        return AssignmentExpression::AssignOperator::DivideAssign;
+                                    case Lexer::TokenType::MultiplyAssign:
+                                        return AssignmentExpression::AssignOperator::MultiplyAssign;
+                                    case Lexer::TokenType::ModuloAssign:
+                                        return AssignmentExpression::AssignOperator::ModuloAssign;
+                                    case Lexer::TokenType::ShiftLeftAssign:
+                                        return AssignmentExpression::AssignOperator::LeftShiftAssign;
+                                    case Lexer::TokenType::ShiftRightAssign:
+                                        return AssignmentExpression::AssignOperator::RightShiftAssign;
+                                    case Lexer::TokenType::BitAndAssign:
+                                        return AssignmentExpression::AssignOperator::BitAndAssign;
+                                    case Lexer::TokenType::BitOrAssign:
+                                        return AssignmentExpression::AssignOperator::BitOrAssign;
+                                    case Lexer::TokenType::BitXorAssign:
+                                        return AssignmentExpression::AssignOperator::BitXorAssign;
+                                    default: CLD_UNREACHABLE;
+                                }
+                            }(),
+                            token, std::move(*conditional)});
+        }
+    }
+
+    if (!result)
+    {
+        return {};
+    }
+    return AssignmentExpression(start, begin, std::move(*result), std::move(list));
+}
+
+namespace
+{
+using StateVariant =
+    std::variant<std::monostate, std::optional<Term>, std::optional<AdditiveExpression>, std::optional<ShiftExpression>,
+                 std::optional<RelationalExpression>, std::optional<EqualityExpression>,
+                 std::optional<BitAndExpression>, std::optional<BitXorExpression>, std::optional<BitOrExpression>,
+                 std::optional<LogicalAndExpression>, std::optional<LogicalOrExpression>>;
+
+enum class EndState : std::uint8_t
+{
+    Term,
+    Additive,
+    Shift,
+    Relational,
+    Equality,
+    BitAnd,
+    BitXor,
+    BitOr,
+    LogicalAnd,
+    LogicalOr
+};
+
+StateVariant parseBinaryOperators(EndState endState, coral66::Lexer::CTokenIterator& begin, coral66::Lexer::CTokenIterator end,
+                                  coral66::Parser::Context& context)
+{
+    StateVariant state;
+    const auto* start = begin;
+    auto firstSet = [endState, &state]() -> coral66::Parser::Context::TokenBitSet
+    {
+        coral66::Parser::Context::TokenBitSet result;
+        switch (endState)
+        {
+            case EndState::LogicalOr:
+                result |= coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::LogicOr);
+                if (std::holds_alternative<std::optional<LogicalOrExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::LogicalAnd:
+                result |= coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::LogicAnd);
+                if (std::holds_alternative<std::optional<LogicalAndExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::BitOr:
+                result |= coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::BitOr);
+                if (std::holds_alternative<std::optional<BitOrExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::BitXor:
+                result |= coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::BitXor);
+                if (std::holds_alternative<std::optional<BitXorExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::BitAnd:
+                result |= coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::Ampersand);
+                if (std::holds_alternative<std::optional<BitAndExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::Equality:
+                result |=
+                    coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::Equal, coral66::Lexer::TokenType::NotEqual);
+                if (std::holds_alternative<std::optional<EqualityExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::Relational:
+                result |= coral66::Parser::Context::fromTokenTypes(
+                    coral66::Lexer::TokenType::LessThan, coral66::Lexer::TokenType::LessThanOrEqual,
+                    coral66::Lexer::TokenType::GreaterThan, coral66::Lexer::TokenType::GreaterThanOrEqual);
+                if (std::holds_alternative<std::optional<RelationalExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::Shift:
+                result |= coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::ShiftLeft,
+                                                               coral66::Lexer::TokenType::ShiftRight);
+                if (std::holds_alternative<std::optional<ShiftExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::Additive:
+                result |=
+                    coral66::Parser::Context::fromTokenTypes(coral66::Lexer::TokenType::Plus, coral66::Lexer::TokenType::Minus);
+                if (std::holds_alternative<std::optional<AdditiveExpression>>(state))
+                {
+                    return result;
+                }
+                [[fallthrough]];
+            case EndState::Term:
+                result |= coral66::Parser::Context::fromTokenTypes(
+                    coral66::Lexer::TokenType::Asterisk, coral66::Lexer::TokenType::Division, coral66::Lexer::TokenType::Percent);
+                [[fallthrough]];
+            default: return result;
+        }
+    };
+    while (
+        [&state, endState]() -> bool
+        {
+            switch (endState)
+            {
+                case EndState::Term: return !std::holds_alternative<std::optional<Term>>(state);
+                case EndState::Additive: return !std::holds_alternative<std::optional<AdditiveExpression>>(state);
+                case EndState::Shift: return !std::holds_alternative<std::optional<ShiftExpression>>(state);
+                case EndState::Relational: return !std::holds_alternative<std::optional<RelationalExpression>>(state);
+                case EndState::Equality: return !std::holds_alternative<std::optional<EqualityExpression>>(state);
+                case EndState::BitAnd: return !std::holds_alternative<std::optional<BitAndExpression>>(state);
+                case EndState::BitXor: return !std::holds_alternative<std::optional<BitXorExpression>>(state);
+                case EndState::BitOr: return !std::holds_alternative<std::optional<BitOrExpression>>(state);
+                case EndState::LogicalAnd: return !std::holds_alternative<std::optional<LogicalAndExpression>>(state);
+                case EndState::LogicalOr: return !std::holds_alternative<std::optional<LogicalOrExpression>>(state);
+            }
+            return false;
+        }())
+    {
+        // We are using an index instead of visit to save on stack space and increase speed
+        switch (state.index())
+        {
+            case coral66::getIndex<std::monostate>(state):
+            {
+                auto result = parseCastExpression(begin, end, context.withRecoveryTokens(firstSet()));
+
+                std::vector<Term::Operand> list;
+                while (begin != end
+                       && (begin->getTokenType() == coral66::Lexer::TokenType::Asterisk
+                           || begin->getTokenType() == coral66::Lexer::TokenType::Division
+                           || begin->getTokenType() == coral66::Lexer::TokenType::Percent))
+                {
+                    const auto* token = begin;
+                    begin++;
+                    if (auto newCast = parseCastExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.push_back({[&token]
+                                        {
+                                            switch (token->getTokenType())
+                                            {
+                                                case coral66::Lexer::TokenType::Asterisk:
+                                                    return Term::BinaryDotOperator::BinaryMultiply;
+                                                case coral66::Lexer::TokenType::Division:
+                                                    return Term::BinaryDotOperator::BinaryDivide;
+                                                case coral66::Lexer::TokenType::Percent:
+                                                    return Term::BinaryDotOperator::BinaryModulo;
+                                                default: CLD_UNREACHABLE;
+                                            }
+                                        }(),
+                                        token, std::move(*newCast)});
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<Term>{};
+                }
+                else
+                {
+                    state = Term(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<Term>>(state):
+            {
+                auto& result = coral66::get<std::optional<Term>>(state);
+
+                std::vector<AdditiveExpression::Operand> list;
+                while (begin != end
+                       && (begin->getTokenType() == coral66::Lexer::TokenType::Plus
+                           || begin->getTokenType() == coral66::Lexer::TokenType::Minus))
+                {
+                    const auto* token = begin;
+                    begin++;
+                    if (auto newTerm = parseTerm(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.push_back({token->getTokenType() == coral66::Lexer::TokenType::Plus ?
+                                            AdditiveExpression::BinaryDashOperator::BinaryPlus :
+                                            AdditiveExpression::BinaryDashOperator::BinaryMinus,
+                                        token, std::move(*newTerm)});
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<AdditiveExpression>{};
+                }
+                else
+                {
+                    state = AdditiveExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<AdditiveExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<AdditiveExpression>>(state);
+
+                std::vector<ShiftExpression::Operand> list;
+                while (begin != end
+                       && (begin->getTokenType() == coral66::Lexer::TokenType::ShiftRight
+                           || begin->getTokenType() == coral66::Lexer::TokenType::ShiftLeft))
+                {
+                    const auto* token = begin;
+                    begin++;
+                    if (auto newAdd = parseAdditiveExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.push_back({token->getTokenType() == coral66::Lexer::TokenType::ShiftRight ?
+                                            ShiftExpression::Right :
+                                            ShiftExpression::Left,
+                                        token, std::move(*newAdd)});
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<ShiftExpression>{};
+                }
+                else
+                {
+                    state = ShiftExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<ShiftExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<ShiftExpression>>(state);
+
+                std::vector<RelationalExpression::Operand> list;
+                while (begin != end
+                       && (begin->getTokenType() == coral66::Lexer::TokenType::LessThan
+                           || begin->getTokenType() == coral66::Lexer::TokenType::LessThanOrEqual
+                           || begin->getTokenType() == coral66::Lexer::TokenType::GreaterThan
+                           || begin->getTokenType() == coral66::Lexer::TokenType::GreaterThanOrEqual))
+                {
+                    const auto* token = begin;
+                    begin++;
+                    if (auto newShift = parseShiftExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.push_back({[token]() -> RelationalExpression::RelationalOperator
+                                        {
+                                            switch (token->getTokenType())
+                                            {
+                                                case coral66::Lexer::TokenType::LessThan:
+                                                    return RelationalExpression::RelationalOperator::LessThan;
+                                                case coral66::Lexer::TokenType::LessThanOrEqual:
+                                                    return RelationalExpression::RelationalOperator::LessThanOrEqual;
+                                                case coral66::Lexer::TokenType::GreaterThan:
+                                                    return RelationalExpression::RelationalOperator::GreaterThan;
+                                                case coral66::Lexer::TokenType::GreaterThanOrEqual:
+                                                    return RelationalExpression::RelationalOperator::GreaterThanOrEqual;
+                                                default: CLD_UNREACHABLE;
+                                            }
+                                        }(),
+                                        token, std::move(*newShift)});
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<RelationalExpression>{};
+                }
+                else
+                {
+                    state = RelationalExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<RelationalExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<RelationalExpression>>(state);
+
+                std::vector<EqualityExpression::Operator> list;
+                while (begin != end
+                       && (begin->getTokenType() == coral66::Lexer::TokenType::Equal
+                           || begin->getTokenType() == coral66::Lexer::TokenType::NotEqual))
+                {
+                    const auto* token = begin;
+                    begin++;
+                    if (auto newRelational = parseRelationalExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.push_back({token->getTokenType() == coral66::Lexer::TokenType::Equal ?
+                                            EqualityExpression::EqualityOperator::Equal :
+                                            EqualityExpression::EqualityOperator::NotEqual,
+                                        token, std::move(*newRelational)});
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<EqualityExpression>{};
+                }
+                else
+                {
+                    state = EqualityExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<EqualityExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<EqualityExpression>>(state);
+                std::vector<std::pair<coral66::Lexer::CTokenIterator, EqualityExpression>> list;
+                while (begin != end && begin->getTokenType() == coral66::Lexer::TokenType::Ampersand)
+                {
+                    const auto* token = begin++;
+                    if (auto newEqual = parseEqualityExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.emplace_back(token, std::move(*newEqual));
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<BitAndExpression>{};
+                }
+                else
+                {
+                    state = BitAndExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<BitAndExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<BitAndExpression>>(state);
+                std::vector<std::pair<coral66::Lexer::CTokenIterator, BitAndExpression>> list;
+                while (begin != end && begin->getTokenType() == coral66::Lexer::TokenType::BitXor)
+                {
+                    const auto* token = begin++;
+                    if (auto bitAnd = parseBitAndExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.emplace_back(token, std::move(*bitAnd));
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<BitXorExpression>{};
+                }
+                else
+                {
+                    state = BitXorExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<BitXorExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<BitXorExpression>>(state);
+                std::vector<std::pair<coral66::Lexer::CTokenIterator, BitXorExpression>> list;
+                while (begin != end && begin->getTokenType() == coral66::Lexer::TokenType::BitOr)
+                {
+                    const auto* token = begin++;
+                    if (auto bitXor = parseBitXorExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.emplace_back(token, std::move(*bitXor));
+                    }
+                }
+                if (!result)
+                {
+                    state = std::optional<BitOrExpression>{};
+                }
+                else
+                {
+                    state = BitOrExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<BitOrExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<BitOrExpression>>(state);
+                std::vector<std::pair<coral66::Lexer::CTokenIterator, BitOrExpression>> list;
+                while (begin != end && begin->getTokenType() == coral66::Lexer::TokenType::LogicAnd)
+                {
+                    const auto* token = begin++;
+                    if (auto bitOr = parseBitOrExpression(begin, end, context.withRecoveryTokens(firstSet())))
+                    {
+                        list.emplace_back(token, std::move(*bitOr));
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<LogicalAndExpression>{};
+                }
+                else
+                {
+                    state = LogicalAndExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            case coral66::getIndex<std::optional<LogicalAndExpression>>(state):
+            {
+                auto& result = coral66::get<std::optional<LogicalAndExpression>>(state);
+                std::vector<std::pair<coral66::Lexer::CTokenIterator, LogicalAndExpression>> list;
+                while (begin != end && begin->getTokenType() == coral66::Lexer::TokenType::LogicOr)
+                {
+                    const auto* token = begin++;
+                    if (auto logicAnd = parseLogicalAndExpression(begin, end, context))
+                    {
+                        list.emplace_back(token, std::move(*logicAnd));
+                    }
+                }
+
+                if (!result)
+                {
+                    state = std::optional<LogicalOrExpression>{};
+                }
+                else
+                {
+                    state = LogicalOrExpression(start, begin, std::move(*result), std::move(list));
+                }
+                break;
+            }
+            default: break;
+        }
+    }
+
+    return state;
+}
+
+} // namespace
+
+std::optional<coral66::Syntax::ConditionalExpression>
+    coral66::Parser::parseConditionalExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    const auto* start = begin;
+    auto logicalOrExpression = coral66::get<std::optional<LogicalOrExpression>>(
+        parseBinaryOperators(EndState::LogicalOr, begin, end,
+                             context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::QuestionMark))));
+    if (begin != end && begin->getTokenType() == Lexer::TokenType::QuestionMark)
+    {
+        const auto* questionMarkpos = begin;
+        begin++;
+        auto optionalExpression = std::make_unique<Expression>(
+            parseExpression(begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::Colon))));
+        const auto* colon = begin;
+        if (!expect(Lexer::TokenType::Colon, begin, end, context,
+                    [&] {
+                        return Notes::TO_MATCH_N_HERE.args(*questionMarkpos, context.getSourceInterface(),
+                                                           *questionMarkpos);
+                    }))
+        {
+            context.skipUntil(begin, end, firstExpressionSet);
+        }
+        auto optionalConditional = parseConditionalExpression(begin, end, context);
+        if (!logicalOrExpression)
+        {
+            return {};
+        }
+        return ConditionalExpression(
+            start, begin, std::move(*logicalOrExpression), questionMarkpos, std::move(optionalExpression), colon,
+            optionalConditional ? std::make_unique<ConditionalExpression>(std::move(*optionalConditional)) :
+                                  std::unique_ptr<ConditionalExpression>{});
+    }
+    if (!logicalOrExpression)
+    {
+        return {};
+    }
+    return ConditionalExpression(start, begin, std::move(*logicalOrExpression));
+}
+
+std::optional<coral66::Syntax::LogicalOrExpression>
+    coral66::Parser::parseLogicalOrExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<LogicalOrExpression>>(parseBinaryOperators(EndState::LogicalOr, begin, end, context));
+}
+
+std::optional<coral66::Syntax::LogicalAndExpression>
+    coral66::Parser::parseLogicalAndExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<LogicalAndExpression>>(
+        parseBinaryOperators(EndState::LogicalAnd, begin, end, context));
+}
+
+std::optional<coral66::Syntax::BitOrExpression>
+    coral66::Parser::parseBitOrExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<BitOrExpression>>(parseBinaryOperators(EndState::BitOr, begin, end, context));
+}
+
+std::optional<coral66::Syntax::BitXorExpression>
+    coral66::Parser::parseBitXorExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<BitXorExpression>>(parseBinaryOperators(EndState::BitXor, begin, end, context));
+}
+
+std::optional<coral66::Syntax::BitAndExpression>
+    coral66::Parser::parseBitAndExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<BitAndExpression>>(parseBinaryOperators(EndState::BitAnd, begin, end, context));
+}
+
+std::optional<coral66::Syntax::EqualityExpression>
+    coral66::Parser::parseEqualityExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<EqualityExpression>>(parseBinaryOperators(EndState::Equality, begin, end, context));
+}
+
+std::optional<coral66::Syntax::RelationalExpression>
+    coral66::Parser::parseRelationalExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<RelationalExpression>>(
+        parseBinaryOperators(EndState::Relational, begin, end, context));
+}
+
+std::optional<coral66::Syntax::ShiftExpression>
+    coral66::Parser::parseShiftExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<ShiftExpression>>(parseBinaryOperators(EndState::Shift, begin, end, context));
+}
+
+std::optional<coral66::Syntax::AdditiveExpression>
+    coral66::Parser::parseAdditiveExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    return coral66::get<std::optional<AdditiveExpression>>(parseBinaryOperators(EndState::Additive, begin, end, context));
+}
+
+std::optional<coral66::Syntax::Term> coral66::Parser::parseTerm(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
+                                                        Context& context)
+{
+    return coral66::get<std::optional<Term>>(parseBinaryOperators(EndState::Term, begin, end, context));
+}
+
+std::optional<coral66::Syntax::TypeName> coral66::Parser::parseTypeName(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
+                                                                Context& context)
+{
+    const auto* start = begin;
+    auto specifierQualifiers =
+        parseSpecifierQualifierList(begin, end, context.withRecoveryTokens(firstAbstractDeclaratorSet));
+    if (specifierQualifiers.empty())
+    {
+        if (begin != end)
+        {
+            context.log(Errors::Parser::EXPECTED_TYPENAME_BEFORE_N.args(*begin, context.getSourceInterface(), *begin));
+        }
+        else
+        {
+            context.log(Errors::Parser::EXPECTED_TYPENAME.args(diag::after(*(begin - 1)), context.getSourceInterface(),
+                                                               *(begin - 1)));
+        }
+    }
+
+    if (begin < end && firstIsInAbstractDeclarator(*begin, context))
+    {
+        auto abstractDeclarator = std::make_unique<AbstractDeclarator>(parseAbstractDeclarator(begin, end, context));
+        return TypeName(start, begin, std::move(specifierQualifiers), std::move(abstractDeclarator));
+    }
+
+    return TypeName(start, begin, std::move(specifierQualifiers), nullptr);
+}
+
+namespace
+{
+bool isPostFixOperator(const coral66::Lexer::CToken& token)
+{
+    switch (token.getTokenType())
+    {
+        case coral66::Lexer::TokenType::Arrow:
+        case coral66::Lexer::TokenType::Dot:
+        case coral66::Lexer::TokenType::OpenSquareBracket:
+        case coral66::Lexer::TokenType::OpenParentheses:
+        case coral66::Lexer::TokenType::Increment:
+        case coral66::Lexer::TokenType::Decrement: return true;
+        default: break;
+    }
+    return false;
+}
+
+void parsePostFixExpressionSuffix(coral66::Lexer::CTokenIterator start, coral66::Lexer::CTokenIterator& begin,
+                                  coral66::Lexer::CTokenIterator end, std::unique_ptr<PostFixExpression>& current,
+                                  coral66::Parser::Context& context)
+{
+    while (begin != end && isPostFixOperator(*begin))
+    {
+        if (begin->getTokenType() == coral66::Lexer::TokenType::OpenParentheses)
+        {
+            auto scope = context.parenthesesEntered(begin);
+            const auto* openPpos = begin;
+            begin++;
+            std::vector<AssignmentExpression> nonCommaExpressions;
+            bool first = true;
+            while (begin < end && begin->getTokenType() != coral66::Lexer::TokenType::CloseParentheses)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else if (begin->getTokenType() == coral66::Lexer::TokenType::Comma)
+                {
+                    begin++;
+                }
+                else if (firstIsInAssignmentExpression(*begin, context))
+                {
+                    expect(coral66::Lexer::TokenType::Comma, begin, end, context);
+                }
+                else
+                {
+                    break;
+                }
+
+                auto assignment = parseAssignmentExpression(
+                    begin, end,
+                    context.withRecoveryTokens(coral66::Parser::Context::fromTokenTypes(
+                        coral66::Lexer::TokenType::CloseParentheses, coral66::Lexer::TokenType::Comma)));
+                if (assignment)
+                {
+                    nonCommaExpressions.push_back(std::move(*assignment));
+                }
+            }
+
+            const auto* closeParentheses = begin;
+            if (!expect(coral66::Lexer::TokenType::CloseParentheses, begin, end, context,
+                        [&] {
+                            return coral66::Notes::TO_MATCH_N_HERE.args(*openPpos, context.getSourceInterface(), *openPpos);
+                        }))
+            {
+                context.skipUntil(begin, end, coral66::Parser::firstPostfixSet);
+            }
+            if (current)
+            {
+                current = std::make_unique<PostFixExpression>(PostFixExpressionFunctionCall(
+                    start, begin, std::move(current), openPpos, std::move(nonCommaExpressions), closeParentheses));
+            }
+        }
+        else if (begin->getTokenType() == coral66::Lexer::TokenType::OpenSquareBracket)
+        {
+            auto scope = context.squareBracketEntered(begin);
+            const auto* openPpos = begin;
+            begin++;
+            auto expression = parseExpression(begin, end,
+                                              context.withRecoveryTokens(coral66::Parser::Context::fromTokenTypes(
+                                                  coral66::Lexer::TokenType::CloseSquareBracket)));
+            const auto* closePpos = begin;
+            if (!expect(coral66::Lexer::TokenType::CloseSquareBracket, begin, end, context,
+                        [&] {
+                            return coral66::Notes::TO_MATCH_N_HERE.args(*openPpos, context.getSourceInterface(), *openPpos);
+                        }))
+            {
+                context.skipUntil(begin, end, coral66::Parser::firstPostfixSet);
+            }
+            if (current)
+            {
+                current = std::make_unique<PostFixExpression>(PostFixExpressionSubscript(
+                    start, begin, std::move(current), openPpos, std::move(expression), closePpos));
+            }
+        }
+        else if (begin->getTokenType() == coral66::Lexer::TokenType::Increment)
+        {
+            begin++;
+            if (current)
+            {
+                current = std::make_unique<PostFixExpression>(
+                    PostFixExpressionIncrement(start, begin, std::move(current), (begin - 1)));
+            }
+        }
+        else if (begin->getTokenType() == coral66::Lexer::TokenType::Decrement)
+        {
+            begin++;
+            if (current)
+            {
+                current = std::make_unique<PostFixExpression>(
+                    PostFixExpressionDecrement(start, begin, std::move(current), (begin - 1)));
+            }
+        }
+        else if (begin->getTokenType() == coral66::Lexer::TokenType::Dot)
+        {
+            const auto* id = ++begin;
+            if (!expect(coral66::Lexer::TokenType::Identifier, begin, end, context))
+            {
+                id = nullptr;
+                context.skipUntil(begin, end, coral66::Parser::firstPostfixSet);
+            }
+            if (current)
+            {
+                current =
+                    std::make_unique<PostFixExpression>(PostFixExpressionDot(start, begin, std::move(current), id));
+            }
+        }
+        else
+        {
+            const auto* id = ++begin;
+            if (!expect(coral66::Lexer::TokenType::Identifier, begin, end, context))
+            {
+                id = nullptr;
+                context.skipUntil(begin, end, coral66::Parser::firstPostfixSet);
+            }
+            if (current)
+            {
+                current =
+                    std::make_unique<PostFixExpression>(PostFixExpressionArrow(start, begin, std::move(current), id));
+            }
+        }
+    }
+}
+} // namespace
+
+std::optional<coral66::Syntax::CastExpression> coral66::Parser::parseCastExpression(Lexer::CTokenIterator& begin,
+                                                                            Lexer::CTokenIterator end, Context& context)
+{
+    const auto* start = begin;
+    if (begin == end || begin->getTokenType() != Lexer::TokenType::OpenParentheses || begin + 1 == end
+        || !firstIsInTypeName(*(begin + 1), context))
+    {
+        auto unary = parseUnaryExpression(begin, end, context);
+        if (!unary)
+        {
+            return {};
+        }
+        return CastExpression(start, begin, std::move(*unary));
+    }
+    begin++;
+    auto typeName = parseTypeName(
+        begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::CloseParentheses)));
+    const auto* closeParenth = begin;
+    if (!expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                [&] { return Notes::TO_MATCH_N_HERE.args(*start, context.getSourceInterface(), *start); }))
+    {
+        context.skipUntil(begin, end, firstExpressionSet);
+    }
+    if (begin == end || begin->getTokenType() != Lexer::TokenType::OpenBrace)
+    {
+        auto cast = parseCastExpression(begin, end, context);
+        if (!cast || !typeName)
+        {
+            return {};
+        }
+        return CastExpression(start, begin,
+                              CastExpression::CastVariant{start, std::move(*typeName), closeParenth,
+                                                          std::make_unique<CastExpression>(std::move(*cast))});
+    }
+
+    std::optional<Lexer::CTokenIterator> openBrace;
+    if (!expect(Lexer::TokenType::OpenBrace, begin, end, context))
+    {
+        context.skipUntil(begin, end, firstInitializerListSet);
+    }
+    else
+    {
+        openBrace = begin - 1;
+    }
+
+    auto initializer = parseInitializerList(
+        begin, end,
+        context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::CloseBrace, Lexer::TokenType::Comma)));
+    if (begin < end && begin->getTokenType() == Lexer::TokenType::Comma)
+    {
+        begin++;
+    }
+    if (openBrace)
+    {
+        if (!expect(Lexer::TokenType::CloseBrace, begin, end, context,
+                    [&]
+                    { return Notes::TO_MATCH_N_HERE.args(**openBrace, context.getSourceInterface(), **openBrace); }))
+        {
+            context.skipUntil(begin, end, firstPostfixSet);
+        }
+    }
+    else
+    {
+        if (!expect(Lexer::TokenType::CloseBrace, begin, end, context))
+        {
+            context.skipUntil(begin, end, firstPostfixSet);
+        }
+    }
+    std::unique_ptr<PostFixExpression> current;
+    if (initializer && typeName)
+    {
+        current = std::make_unique<PostFixExpression>(PostFixExpressionTypeInitializer(
+            start, begin, start, std::move(*typeName), closeParenth, std::move(*initializer)));
+    }
+    parsePostFixExpressionSuffix(start, begin, end, current, context);
+    if (!current)
+    {
+        return {};
+    }
+    return CastExpression(start, begin, UnaryExpressionPostFixExpression(start, begin, std::move(*current)));
+}
+
+std::optional<coral66::Syntax::UnaryExpression>
+    coral66::Parser::parseUnaryExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    const auto* start = begin;
+    if (begin < end && begin->getTokenType() == Lexer::TokenType::SizeofKeyword)
+    {
+        begin++;
+        if (begin < end && begin->getTokenType() == Lexer::TokenType::OpenParentheses
+            && (begin + 1 == end || firstIsInTypeName(*(begin + 1), context)))
+        {
+            const auto* openPpos = begin;
+            begin++;
+            auto type = parseTypeName(
+                begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::CloseParentheses)));
+            if (!expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                        [&]
+                        { return Notes::TO_MATCH_N_HERE.args(*openPpos, context.getSourceInterface(), *openPpos); }))
+            {
+                context.skipUntil(begin, end);
+            }
+            if (!type)
+            {
+                return {};
+            }
+            return UnaryExpression(
+                UnaryExpressionSizeOf(start, begin, start, std::make_unique<TypeName>(std::move(*type))));
+        }
+
+        auto unary = parseUnaryExpression(begin, end, context);
+        if (!unary)
+        {
+            return {};
+        }
+        return UnaryExpression(
+            UnaryExpressionSizeOf(start, begin, start, std::make_unique<UnaryExpression>(std::move(*unary))));
+    }
+    if (context.isInPreprocessor() && begin < end && begin->getTokenType() == Lexer::TokenType::Identifier
+        && begin->getText() == "defined")
+    {
+        if (begin->isMacroInserted())
+        {
+            context.log(Warnings::PP::MACRO_EXPANSION_PRODUCING_DEFINED_IS_NOT_PORTABLE.args(
+                *begin, context.getSourceInterface(), *begin));
+        }
+        begin++;
+        std::optional<Lexer::CTokenIterator> openP;
+        if (begin->getTokenType() == Lexer::TokenType::OpenParentheses)
+        {
+            openP = begin;
+            begin++;
+        }
+        std::string_view identifier;
+        if (!expectIdentifier(begin, end, context, identifier))
+        {
+            context.skipUntil(begin, end,
+                              openP ? Context::fromTokenTypes(Lexer::TokenType::CloseParentheses) :
+                                      Context::TokenBitSet{});
+        }
+        if (openP)
+        {
+            if (!expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                        [&] { return Notes::TO_MATCH_N_HERE.args(**openP, context.getSourceInterface(), **openP); }))
+            {
+                context.skipUntil(begin, end);
+            }
+        }
+        return UnaryExpression(UnaryExpressionDefined(start, begin, std::move(identifier)));
+    }
+    if (begin < end
+        && (begin->getTokenType() == Lexer::TokenType::Increment || begin->getTokenType() == Lexer::TokenType::Decrement
+            || begin->getTokenType() == Lexer::TokenType::Ampersand
+            || begin->getTokenType() == Lexer::TokenType::Asterisk || begin->getTokenType() == Lexer::TokenType::Plus
+            || begin->getTokenType() == Lexer::TokenType::Minus
+            || begin->getTokenType() == Lexer::TokenType::LogicalNegation
+            || begin->getTokenType() == Lexer::TokenType::BitWiseNegation
+            || begin->getTokenType() == Lexer::TokenType::GNUExtension))
+    {
+        const auto* token = begin;
+        begin++;
+        auto op = [&token]
+        {
+            switch (token->getTokenType())
+            {
+                case Lexer::TokenType::Increment: return UnaryExpressionUnaryOperator::UnaryOperator::Increment;
+                case Lexer::TokenType::Decrement: return UnaryExpressionUnaryOperator::UnaryOperator::Decrement;
+                case Lexer::TokenType::Ampersand: return UnaryExpressionUnaryOperator::UnaryOperator::Ampersand;
+                case Lexer::TokenType::Asterisk: return UnaryExpressionUnaryOperator::UnaryOperator::Asterisk;
+                case Lexer::TokenType::Plus: return UnaryExpressionUnaryOperator::UnaryOperator::Plus;
+                case Lexer::TokenType::Minus: return UnaryExpressionUnaryOperator::UnaryOperator::Minus;
+                case Lexer::TokenType::LogicalNegation: return UnaryExpressionUnaryOperator::UnaryOperator::LogicalNot;
+                case Lexer::TokenType::BitWiseNegation: return UnaryExpressionUnaryOperator::UnaryOperator::BitNot;
+                case Lexer::TokenType::GNUExtension: return UnaryExpressionUnaryOperator::UnaryOperator::GNUExtension;
+                default: CLD_UNREACHABLE;
+            }
+        }();
+        if (op == Syntax::UnaryExpressionUnaryOperator::UnaryOperator::GNUExtension)
+        {
+            std::optional<decltype(context.enableExtensions(true))> enabler = context.enableExtensions(true);
+        }
+        auto cast = parseCastExpression(begin, end, context);
+        if (!cast)
+        {
+            return {};
+        }
+        return UnaryExpression(
+            UnaryExpressionUnaryOperator(start, begin, op, token, std::make_unique<CastExpression>(std::move(*cast))));
+    }
+
+    auto postFix = parsePostFixExpression(begin, end, context);
+    if (!postFix)
+    {
+        return {};
+    }
+    return UnaryExpression(UnaryExpressionPostFixExpression(start, begin, std::move(*postFix)));
+}
+
+std::optional<coral66::Syntax::PostFixExpression>
+    coral66::Parser::parsePostFixExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
+{
+    std::unique_ptr<PostFixExpression> current;
+
+    const auto* start = begin;
+    if (begin == end || begin->getTokenType() != Lexer::TokenType::OpenParentheses || begin + 1 == end
+        || !firstIsInTypeName(*(begin + 1), context))
+    {
+        auto token = context.withRecoveryTokens(firstPostfixSet);
+        std::optional<coral66::Syntax::PrimaryExpression> newPrimary;
+        if (begin < end && begin->getTokenType() == Lexer::TokenType::Identifier
+            && begin->getText() == "__builtin_va_arg")
+        {
+            const auto* builtInToken = begin++;
+            const Lexer::CToken* openParentheses = nullptr;
+            if (expect(Lexer::TokenType::OpenParentheses, begin, end, context))
+            {
+                openParentheses = begin - 1;
+            }
+            auto expression =
+                parseAssignmentExpression(begin, end,
+                                          context.withRecoveryTokens(Context::fromTokenTypes(
+                                              Lexer::TokenType::Comma, Lexer::TokenType::CloseParentheses)));
+            expect(Lexer::TokenType::Comma, begin, end, context);
+            const auto* comma = begin - 1;
+            auto type = parseTypeName(
+                begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::CloseParentheses)));
+            if (openParentheses)
+            {
+                expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                       [&] {
+                           return Notes::TO_MATCH_N_HERE.args(*openParentheses, context.getSourceInterface(),
+                                                              *openParentheses);
+                       });
+            }
+            else
+            {
+                expect(Lexer::TokenType::CloseParentheses, begin, end, context);
+            }
+            if (type && expression && openParentheses != nullptr)
+            {
+                newPrimary = PrimaryExpression(
+                    PrimaryExpressionBuiltinVAArg(start, begin, builtInToken, openParentheses,
+                                                  std::make_unique<AssignmentExpression>(std::move(*expression)), comma,
+                                                  std::make_unique<TypeName>(std::move(*type)), begin - 1));
+            }
+        }
+        else if (begin < end && begin->getTokenType() == Lexer::TokenType::Identifier
+                 && begin->getText() == "__builtin_offsetof")
+        {
+            const auto* builtInToken = begin++;
+            const Lexer::CToken* openParentheses = nullptr;
+            if (expect(Lexer::TokenType::OpenParentheses, begin, end, context))
+            {
+                openParentheses = begin - 1;
+            }
+            auto type = parseTypeName(
+                begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::CloseParentheses)));
+            expect(Lexer::TokenType::Comma, begin, end, context);
+            const auto* comma = begin - 1;
+            expect(Lexer::TokenType::Identifier, begin, end, context);
+            const auto* member = begin - 1;
+
+            std::vector<PrimaryExpressionBuiltinOffsetOf::Variant> suffixes;
+            while (begin != end
+                   && (begin->getTokenType() == Lexer::TokenType::Dot
+                       || begin->getTokenType() == Lexer::TokenType::OpenSquareBracket))
+            {
+                if (begin->getTokenType() == Lexer::TokenType::Dot)
+                {
+                    begin++;
+                    expect(Lexer::TokenType::Identifier, begin, end, context);
+                    suffixes.emplace_back(begin - 1);
+                }
+                else
+                {
+                    const auto* openSquareBracket = begin++;
+                    auto expression = parseExpression(begin, end, context);
+                    expect(Lexer::TokenType::CloseSquareBracket, begin, end, context,
+                           [&] {
+                               return Notes::TO_MATCH_N_HERE.args(*openSquareBracket, context.getSourceInterface(),
+                                                                  *openSquareBracket);
+                           });
+                    suffixes.emplace_back(PrimaryExpressionBuiltinOffsetOf::Subscript{
+                        openSquareBracket, std::make_unique<Expression>(std::move(expression)), begin - 1});
+                }
+            }
+
+            if (openParentheses)
+            {
+                expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                       [&] {
+                           return Notes::TO_MATCH_N_HERE.args(*openParentheses, context.getSourceInterface(),
+                                                              *openParentheses);
+                       });
+            }
+            else
+            {
+                expect(Lexer::TokenType::CloseParentheses, begin, end, context);
+            }
+            if (type && openParentheses != nullptr)
+            {
+                newPrimary = PrimaryExpression(PrimaryExpressionBuiltinOffsetOf(
+                    start, begin, builtInToken, openParentheses, std::make_unique<TypeName>(std::move(*type)), comma,
+                    member, std::move(suffixes), begin - 1));
+            }
+        }
+        else if (begin < end && begin->getTokenType() == Lexer::TokenType::Identifier)
+        {
+            begin++;
+            newPrimary = PrimaryExpression(PrimaryExpressionIdentifier(start, begin, begin - 1));
+        }
+        else if (begin < end && begin->getTokenType() == Lexer::TokenType::Literal)
+        {
+            auto value =
+                coral66::match(begin->getValue(),
+                           []<typename T0>(T0&& value) -> PrimaryExpressionConstant::Variant
+                           {
+                               using T = std::decay_t<T0>;
+                               if constexpr (std::is_constructible_v<PrimaryExpressionConstant::Variant, T>)
+                               {
+                                   return {std::forward<T0>(value)};
+                               }
+                               else
+                               {
+                                   CLD_UNREACHABLE;
+                               }
+                           });
+            auto type = begin->getType();
+            begin++;
+            newPrimary = PrimaryExpression(PrimaryExpressionConstant(start, begin, std::move(value), type));
+        }
+        else if (begin < end && begin->getTokenType() == Lexer::TokenType::StringLiteral)
+        {
+            newPrimary = PrimaryExpression(parseStringLiteral(begin, end, context));
+        }
+        else if (begin < end && begin->getTokenType() == Lexer::TokenType::OpenParentheses)
+        {
+            auto scope = context.parenthesesEntered(begin);
+            const auto* openPpos = begin++;
+            auto expression = parseExpression(
+                begin, end, context.withRecoveryTokens(Context::fromTokenTypes(Lexer::TokenType::CloseParentheses)));
+            if (!expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                        [&]
+                        { return Notes::TO_MATCH_N_HERE.args(*openPpos, context.getSourceInterface(), *openPpos); }))
+            {
+                context.skipUntil(begin, end);
+            }
+            newPrimary = PrimaryExpression(PrimaryExpressionParentheses(start, begin, std::move(expression)));
+        }
+        else
+        {
+            if (begin == end)
+            {
+                context.log(Errors::Parser::EXPECTED_LITERAL_N_OR_N.args(
+                    diag::after(*(begin - 1)), context.getSourceInterface(), Lexer::TokenType::Identifier,
+                    Lexer::TokenType::OpenParentheses, *(begin - 1)));
+            }
+            else
+            {
+                context.log(Errors::Parser::EXPECTED_LITERAL_N_OR_N_INSTEAD_OF_N.args(
+                    *begin, context.getSourceInterface(), Lexer::TokenType::Identifier,
+                    Lexer::TokenType::OpenParentheses, *begin));
+            }
+            context.skipUntil(begin, end);
+        }
+        if (newPrimary)
+        {
+            current = std::make_unique<PostFixExpression>(
+                PostFixExpressionPrimaryExpression(start, begin, std::move(*newPrimary)));
+        }
+    }
+    else
+    {
+        begin++;
+        auto type = parseTypeName(begin, end, context);
+        const auto* closeParentheses = begin;
+        if (!expect(Lexer::TokenType::CloseParentheses, begin, end, context,
+                    [&] { return Notes::TO_MATCH_N_HERE.args(*start, context.getSourceInterface(), *start); }))
+        {
+            context.skipUntil(begin, end, Context::fromTokenTypes(Lexer::TokenType::OpenBrace));
+        }
+
+        std::optional<Lexer::CTokenIterator> openBrace;
+        if (!expect(Lexer::TokenType::OpenBrace, begin, end, context))
+        {
+            context.skipUntil(begin, end, firstInitializerListSet);
+        }
+        else
+        {
+            openBrace = begin - 1;
+        }
+
+        auto initializer = parseInitializerList(begin, end, context);
+        if (begin < end && begin->getTokenType() == Lexer::TokenType::Comma)
+        {
+            begin++;
+        }
+        if (openBrace)
+        {
+            if (!expect(Lexer::TokenType::CloseBrace, begin, end, context,
+                        [&] {
+                            return Notes::TO_MATCH_N_HERE.args(**openBrace, context.getSourceInterface(), **openBrace);
+                        }))
+            {
+                context.skipUntil(begin, end, firstPostfixSet);
+            }
+        }
+        else
+        {
+            if (!expect(Lexer::TokenType::CloseBrace, begin, end, context))
+            {
+                context.skipUntil(begin, end, firstPostfixSet);
+            }
+        }
+        if (initializer && type)
+        {
+            current = std::make_unique<PostFixExpression>(PostFixExpressionTypeInitializer(
+                start, begin, start, std::move(*type), closeParentheses, std::move(*initializer)));
+        }
+    }
+
+    parsePostFixExpressionSuffix(start, begin, end, current, context);
+
+    if (!current)
+    {
+        return {};
+    }
+    return std::move(*current);
+}
+
+coral66::Syntax::PrimaryExpressionConstant coral66::Parser::parseStringLiteral(Lexer::CTokenIterator& begin,
+                                                                       Lexer::CTokenIterator end, Context& context)
+{
+    CLD_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::StringLiteral);
+    const auto* start = begin;
+    using stringVariant = std::variant<std::string, Lexer::NonCharString>;
+    stringVariant literal = match(
+        begin->getValue(), [](const std::string& str) -> stringVariant { return str; },
+        [](const Lexer::NonCharString& str) -> stringVariant { return str; },
+        [](auto&&) -> stringVariant { CLD_UNREACHABLE; });
+    begin++;
+    while (begin < end && begin->getTokenType() == Lexer::TokenType::StringLiteral)
+    {
+        literal = match(
+            begin->getValue(),
+            [&literal, &context](const std::string& str) -> stringVariant
+            {
+                return match(
+                    literal, [&str](const std::string& lhs) -> stringVariant { return lhs + str; },
+                    [&str, &context](Lexer::NonCharString lhs) -> stringVariant
+                    {
+                        std::uint8_t size = context.getSourceInterface().getLanguageOptions().sizeOf(
+                            context.getSourceInterface().getLanguageOptions().wcharUnderlyingType);
+                        switch (size)
+                        {
+                            case 2:
+                            {
+                                auto* sourceStart = str.data();
+                                std::vector<llvm::UTF16> utf16(str.size());
+                                auto* targetStart = utf16.data();
+                                auto result = llvm::ConvertUTF8toUTF16(
+                                    reinterpret_cast<const llvm::UTF8**>(&sourceStart),
+                                    reinterpret_cast<const llvm::UTF8*>(sourceStart + str.size()), &targetStart,
+                                    targetStart + utf16.size(), llvm::strictConversion);
+                                if (result != llvm::conversionOK)
+                                {
+                                    CLD_UNREACHABLE;
+                                }
+                                std::transform(utf16.data(), targetStart, std::back_inserter(lhs.characters),
+                                               [](llvm::UTF16 ch) -> std::uint32_t { return ch; });
+                                return lhs;
+                            }
+                            case 4:
+                            {
+                                auto* sourceStart = str.data();
+                                std::vector<llvm::UTF32> utf32(str.size());
+                                auto* targetStart = utf32.data();
+                                auto result = llvm::ConvertUTF8toUTF32(
+                                    reinterpret_cast<const llvm::UTF8**>(&sourceStart),
+                                    reinterpret_cast<const llvm::UTF8*>(sourceStart + str.size()), &targetStart,
+                                    targetStart + utf32.size(), llvm::strictConversion);
+                                if (result != llvm::conversionOK)
+                                {
+                                    CLD_UNREACHABLE;
+                                }
+                                std::transform(utf32.data(), targetStart, std::back_inserter(lhs.characters),
+                                               [](llvm::UTF32 ch) -> std::uint32_t { return ch; });
+                                return lhs;
+                            }
+                            default: CLD_UNREACHABLE;
+                        }
+                    },
+                    [](const auto&) -> stringVariant { CLD_UNREACHABLE; });
+            },
+            [&literal, &context](Lexer::NonCharString str) -> stringVariant
+            {
+                return match(
+                    literal,
+                    [&str, &context](const std::string& lhs) -> stringVariant
+                    {
+                        std::uint8_t size = context.getSourceInterface().getLanguageOptions().sizeOf(
+                            context.getSourceInterface().getLanguageOptions().wcharUnderlyingType);
+                        switch (size)
+                        {
+                            case 2:
+                            {
+                                auto* sourceStart = lhs.data();
+                                std::vector<llvm::UTF16> utf16(lhs.size());
+                                auto* targetStart = utf16.data();
+                                auto result = llvm::ConvertUTF8toUTF16(
+                                    reinterpret_cast<const llvm::UTF8**>(&sourceStart),
+                                    reinterpret_cast<const llvm::UTF8*>(sourceStart + lhs.size()), &targetStart,
+                                    targetStart + utf16.size(), llvm::strictConversion);
+                                if (result != llvm::conversionOK)
+                                {
+                                    CLD_UNREACHABLE;
+                                }
+                                std::transform(utf16.data(), targetStart,
+                                               std::inserter(str.characters, str.characters.begin()),
+                                               [](llvm::UTF16 ch) -> std::uint32_t { return ch; });
+                                return lhs;
+                            }
+                            case 4:
+                            {
+                                auto* sourceStart = lhs.data();
+                                std::vector<llvm::UTF32> utf32(lhs.size());
+                                auto* targetStart = utf32.data();
+                                auto result = llvm::ConvertUTF8toUTF32(
+                                    reinterpret_cast<const llvm::UTF8**>(&sourceStart),
+                                    reinterpret_cast<const llvm::UTF8*>(sourceStart + lhs.size()), &targetStart,
+                                    targetStart + utf32.size(), llvm::strictConversion);
+                                if (result != llvm::conversionOK)
+                                {
+                                    CLD_UNREACHABLE;
+                                }
+                                std::transform(utf32.data(), targetStart, std::back_inserter(str.characters),
+                                               [](llvm::UTF32 ch) -> std::uint32_t { return ch; });
+                                return lhs;
+                            }
+                            default: CLD_UNREACHABLE;
+                        }
+                    },
+                    [&str](Lexer::NonCharString lhs) -> stringVariant
+                    {
+                        lhs.characters.insert(lhs.characters.end(), str.characters.begin(), str.characters.end());
+                        return lhs;
+                    },
+                    [](const auto&) -> stringVariant { CLD_UNREACHABLE; });
+            },
+            [](auto&&) -> stringVariant { CLD_UNREACHABLE; });
+        begin++;
+    }
+    return PrimaryExpressionConstant(
+        start, begin,
+        match(
+            literal, [](const std::string& str) -> PrimaryExpressionConstant::Variant { return str; },
+            [](const Lexer::NonCharString& str) -> PrimaryExpressionConstant::Variant { return str; },
+            [](const auto&) -> PrimaryExpressionConstant::Variant { CLD_UNREACHABLE; }),
+        Lexer::CToken::Type::None);
+}
