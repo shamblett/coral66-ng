@@ -10,6 +10,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <optional>
 
 #include "lib/support/Utilities.hpp"
 

@@ -14,6 +14,10 @@
 
 namespace coral66::Lexer
 {
+
+class CToken;
+class PPToken;
+
 /**
  * @brief Enumeration of all possible token types in the C language and Preprocessor.
  */
@@ -202,4 +206,43 @@ public:
     }
 };
 
+/**
+ * @brief A Preprocessor Token.
+ *
+ * Represents a token produced by the initial lexing phase. It contains raw string values
+ * and information relevant to the preprocessor (like character space offsets).
+ */
+class PPToken final : public TokenBase
+{
+    std::string m_value;
+    std::uint64_t m_charSpaceOffset;
+    std::uint64_t m_charSpaceLength; /**< Length of the token after trigraphs and Backslash Newline pairs in its
+                                      representation have been removed*/
+
+public:
+    PPToken(TokenType tokenType, std::uint64_t const offset, std::uint64_t const length, std::uint64_t const charSpaceOffset,
+            std::uint64_t const charSpaceLength, std::uint32_t const fileID, std::uint32_t const macroID = 0, std::string_view const value = {})
+        : TokenBase(tokenType, offset, length, fileID, macroID),
+          m_value(value.begin(), value.end()),
+          m_charSpaceOffset(charSpaceOffset),
+          m_charSpaceLength(charSpaceLength)
+    {
+    }
+
+    [[nodiscard]] std::uint64_t getCharSpaceOffset() const noexcept
+    {
+        return m_charSpaceOffset;
+    }
+
+    [[nodiscard]] std::uint64_t getCharSpaceLength() const
+    {
+        return m_charSpaceLength;
+    }
+
+    [[nodiscard]] std::string_view getValue() const noexcept
+    {
+        return m_value;
+    }
+
+};
 } // namespace coral66::Lexer
