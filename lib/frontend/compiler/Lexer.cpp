@@ -17,10 +17,10 @@
 #include <llvm/Support/Error.h>
 #include <llvm/Support/UnicodeCharRanges.h>
 
-#include "support/ScopeExit.hpp"
-#include "support/Text.hpp"
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/common/SourceObject.hpp"
+#include "lib/support/ScopeExit.hpp"
+#include "lib/support/Text.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
 
 using namespace coral66::Lexer;
 

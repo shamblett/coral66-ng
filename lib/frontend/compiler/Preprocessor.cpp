@@ -10,9 +10,9 @@
 #include <vector>
 #include <algorithm>
 
-#include "support/ScopeExit.hpp"
+#include "lib/support/ScopeExit.hpp"
 
-#include "frontend/common/ErrorMessages.hpp
+#include "lib/frontend/common/ErrorMessages.hpp
 #include "Parser.hpp"
 #include "PreprocessorParser.hpp"
 

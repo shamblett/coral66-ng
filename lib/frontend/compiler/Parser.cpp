@@ -5,8 +5,8 @@
  */
 
 #include "Parser.hpp"
-#include "../common/SourceObject.hpp"
-#include "frontend/common/ErrorMessages.hpp"
+#include "lib/frontend//common/SourceObject.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
 
 namespace coral66::Parser
 {

@@ -8,8 +8,8 @@
 
 #include <functional>
 
-#include "support/Expected.hpp"
-#include "support/ScopeExit.hpp"
+#include "lib/support/Expected.hpp"
+#include "lib/support/ScopeExit.hpp"
 
 #include "ProgramInterface.hpp"
 #include "Syntax.hpp"

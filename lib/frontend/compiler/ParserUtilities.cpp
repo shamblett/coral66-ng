@@ -6,7 +6,7 @@
 
 #include "ParserUtilities.hpp"
 
-#include "frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
 
 bool coral66::Parser::expectIdentifier(Lexer::CTokenIterator& begin, const Lexer::CTokenIterator end, Context& context,
                                    std::string_view& value, const coral66::function_ref<Message()> additional)

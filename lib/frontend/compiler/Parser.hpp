@@ -6,7 +6,7 @@
 #pragma once
 
 #include "Syntax.hpp"
-#include "frontend/common/Message.hpp"
+#include "lib/frontend/common/Message.hpp"
 #include <vector>
 
 namespace coral66::Parser

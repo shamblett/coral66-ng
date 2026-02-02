@@ -8,7 +8,7 @@
 
 #include "SemanticAnalysis.hpp"
 #include "Program.hpp"
-#include "frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
 
 namespace coral66::Semantics
 {

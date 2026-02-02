@@ -6,8 +6,8 @@
 
 #include "PreprocessorParser.hpp"
 
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/common/SourceObject.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
 
 namespace
 {

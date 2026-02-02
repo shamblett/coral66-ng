@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "Semantics.hpp"
-#include "support/IntrusiveVariantValue.hpp"
+#include "lib/support/IntrusiveVariantValue.hpp"
 
 namespace coral66::Semantics
 {

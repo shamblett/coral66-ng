@@ -12,17 +12,17 @@
 #include <string>
 #include <vector>
 
-#include "support/tsl/ordered_map.h"
+#include "lib/support/vendor/tsl/ordered_map.h"
 
-#include "support/AbstractIntrusiveVariant.hpp"
-#include "support/IntrusiveVariantValue.hpp"
+#include "lib/support/AbstractIntrusiveVariant.hpp"
+#include "lib/support/IntrusiveVariantValue.hpp"
 
-#include "../common/SourceObject.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
 #include "Lexer.hpp"
-#include "SemanticsCommon.hpp"
-#include "frontend/common/Attributes.hpp"
-#include "frontend/common/DiagnosticUtilities.hpp"
-#include "frontend/common/LanguageOptions.hpp"
+#include "lib/frontend/common/SemanticsCommon.hpp"
+#include "lib/frontend/common/Attributes.hpp"
+#include "lib/frontend/common/DiagnosticUtilities.hpp"
+#include "lib/frontend/common/LanguageOptions.hpp"
 
 /**
  * @file Semantics.hpp

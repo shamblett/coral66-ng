@@ -19,8 +19,8 @@
 #include <span>
 #include <unordered_set>
 
-#include "support/ScopeExit.hpp"
-#include "frontend/common/ErrorMessages.hpp"
+#include "lib/support/ScopeExit.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
 #include "ParserUtilities.hpp"
 #include "SemanticUtilities.hpp"
 #include "Semantics.hpp"
