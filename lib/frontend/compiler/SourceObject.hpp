@@ -11,11 +11,11 @@
 #include <type_traits>
 #include <vector>
 
-#include "support/Util.hpp"
+#include "lib/support/Utilities.hpp"
 
-#include "frontend/common/LanguageOptions.hpp"
+#include "lib/frontend/common/LanguageOptions.hpp"
 #include "Lexer.hpp"
-#include "SourceInterface.hpp"
+#include "lib/frontend/common/SourceInterface.hpp"
 
 /**
  * @file SourceObject.hpp

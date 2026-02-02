@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "support/IntrusiveVariantValue.hpp"
-#include "support/Text.hpp"
+#include "lib/support/IntrusiveVariantValue.hpp"
+#include "lib/support/Text.hpp"
 
 #include <type_traits>
 

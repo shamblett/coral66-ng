@@ -6,12 +6,12 @@
 
 #include "LanguageOptions.hpp"
 
-#include "Support/Utilities.hpp"
+#include "lib/support/Utilities.hpp"
 
 #include <limits>
 #include <numeric>
 
-#include "Diagnostic.hpp"
+#include "../compiler/Diagnostic.hpp"
 #include "targets/X86TargetFeatures.hpp"
 
 namespace

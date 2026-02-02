@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "support/AbstractIntrusiveVariant.hpp"
-#include "support/IntrusiveVariantValue.hpp"
-#include "support/Util.hpp"
+#include "lib/support/AbstractIntrusiveVariant.hpp"
+#include "lib/support/IntrusiveVariantValue.hpp"
+#include "lib/support/Utilities.hpp"
 
 #include <vector>
 #include <string>

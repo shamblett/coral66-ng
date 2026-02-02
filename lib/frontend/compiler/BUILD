@@ -7,6 +7,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "compiler",
     srcs = [
+        "Diagnostic.cpp",
         "Lexer.cpp",
         "Parser.cpp",
         "ParserDeclarations.cpp",
@@ -29,6 +30,7 @@ cc_library(
         "Syntax.cpp",
     ],
     hdrs = [
+        "Diagnostic.hpp",
         "Lexer.hpp",
         "Parser.hpp",
         "ParserUtilities.hpp",
