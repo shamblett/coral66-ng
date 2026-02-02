@@ -30,7 +30,7 @@ public:
         IsX86,
     // x86 features
 #define HANDLE_VALUE(x) x,
-#include "Targets/X86Features.def"
+#include "lib/frontend/common/targets/X86Features.def"
     };
 
     virtual bool hasFeature(Features features) const = 0;

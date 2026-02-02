@@ -6,15 +6,22 @@
 
 #pragma once
 
+#include <llvm/ADT/APSInt.h>
+#include <llvm/ADT/APFloat.h>
+#include <llvm/Support/raw_ostream.h>
+
 #include <cstdint>
+#include <variant>
 #include <string>
 #include <string_view>
+
+#include "lib/support/Utilities.hpp"
 
 #include "SourceInterface.hpp"
 
 namespace coral66::Lexer
 {
-
+struct NonCharString;
 class CToken;
 class PPToken;
 
@@ -244,5 +251,106 @@ public:
         return m_value;
     }
 
+};
+
+struct NonCharString
+{
+    std::vector<std::uint32_t> characters;
+    enum Type : std::uint8_t
+    {
+        Wide
+    } type;
+
+    bool operator==(const std::wstring& wideString) const
+    {
+        if (type != Wide)
+        {
+            return false;
+        }
+        return std::ranges::equal(characters,wideString);
+    }
+
+    bool operator==(const NonCharString& other) const
+    {
+        if (type != other.type)
+        {
+            return false;
+        }
+        return std::ranges::equal(characters,other.characters);
+    }
+};
+
+/**
+ * @brief A C Token.
+ *
+ * Represents a token after preprocessing, used by the parser. It may contain
+ * parsed semantic values (like integer or floating-point values) in addition to the
+ * basic token information.
+ */
+class CToken final : public TokenBase
+{
+    using variant = std::variant<std::monostate, llvm::APSInt, llvm::APFloat, std::string, NonCharString>;
+    variant m_value; ///< Optional value of the token
+
+public:
+    enum Type : std::uint8_t
+    {
+        None,
+        Integer,
+        Floating,
+        Fixed
+    };
+
+    static Type fromUnderlyingType(LanguageOptions::UnderlyingType const underlyingType)
+    {
+        switch (underlyingType)
+        {
+            case LanguageOptions::UnderlyingType::UnsignedShort:
+            case LanguageOptions::UnderlyingType::Int:
+            case LanguageOptions::UnderlyingType::UnsignedInt:
+            case LanguageOptions::UnderlyingType::Long:
+            case LanguageOptions::UnderlyingType::UnsignedLong:
+            case LanguageOptions::UnderlyingType::LongLong:
+            case LanguageOptions::UnderlyingType::UnsignedLongLong: return Integer;
+        }
+        CLD_UNREACHABLE;
+    }
+
+private:
+    Type m_type;
+
+public:
+    using ValueType = variant;
+
+    CToken(TokenType tokenType, std::uint64_t offset, std::uint64_t length, std::uint32_t fileId, std::uint32_t macroId,
+           variant value = std::monostate{}, Type type = Type::None)
+        : TokenBase(tokenType, offset, length, fileId, macroId), m_value(std::move(value)), m_type(type)
+    {
+    }
+
+    [[nodiscard]] const variant& getValue() const noexcept
+    {
+        return m_value;
+    }
+
+    [[nodiscard]] std::string_view getText() const noexcept
+    {
+        return coral66::get<std::string>(m_value);
+    }
+
+    [[nodiscard]] Type getType() const noexcept
+    {
+        return m_type;
+    }
+
+    void setType(Type type) noexcept
+    {
+        m_type = type;
+    }
+
+    void setValue(const variant& value) noexcept
+    {
+        m_value = value;
+    }
 };
 } // namespace coral66::Lexer
