@@ -6,24 +6,26 @@
 
 #include "Parser.hpp"
 
+#include <algorithm>
+#include <span>
+#include <unordered_set>
+
+#include "ParserUtilities.hpp"
+#include "SemanticUtilities.hpp"
+#include "Semantics.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/support/ScopeExit.hpp"
+
 /**
  * @file ParserDeclarations.cpp
  * @brief Implements parsing functions for C declarations and statements.
  *
  * This file contains the implementations of the recursive descent parser for
- * top-level declarations (TranslationUnit, ExternalDeclaration), function definitions,
- * struct/union/enum specifiers, declarators, and statements (CompoundStatement, etc.).
+ * top-level declarations (TranslationUnit, ExternalDeclaration), function
+ * definitions, struct/union/enum specifiers, declarators, and statements
+ * (CompoundStatement, etc.).
  */
 
-#include <algorithm>
-#include <span>
-#include <unordered_set>
-
-#include "lib/support/ScopeExit.hpp"
-#include "lib/frontend/common/ErrorMessages.hpp"
-#include "ParserUtilities.hpp"
-#include "SemanticUtilities.hpp"
-#include "Semantics.hpp"
 
 using namespace coral66::Syntax;
 

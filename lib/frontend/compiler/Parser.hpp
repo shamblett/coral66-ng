@@ -5,9 +5,11 @@
  */
 #pragma once
 
-#include "Syntax.hpp"
-#include "lib/frontend/common/Message.hpp"
 #include <vector>
+
+#include "lib/frontend/common/Message.hpp"
+
+#include "Syntax.hpp"
 
 namespace coral66::Parser
 {
