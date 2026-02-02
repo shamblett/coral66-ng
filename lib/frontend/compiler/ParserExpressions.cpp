@@ -20,8 +20,8 @@
 
 #include <algorithm>
 
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/common/ParserUtilities.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "ParserUtilities.hpp"
 
 using namespace coral66::Syntax;
 
