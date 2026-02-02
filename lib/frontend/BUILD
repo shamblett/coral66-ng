@@ -5,5 +5,7 @@
 package_group(
     name = "frontend",
     packages = [
+        "//lib/frontend/common",
+        "//lib/frontend/compiler",
     ],
 )

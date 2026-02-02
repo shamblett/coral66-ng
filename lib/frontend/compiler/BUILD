@@ -17,8 +17,8 @@ cc_library(
         "PreprocessorSyntax.cpp",
         "Program.cpp",
         "ProgramInterface.cpp",
-        "SemanticAnalysisAttributes.cpp",
         "SemanticAnalysis.cpp",
+        "SemanticAnalysisAttributes.cpp",
         "SemanticAnalysisBuiltins.cpp",
         "SemanticAnalysisDeclarations.cpp",
         "SemanticAnalysisExpressions.cpp",
@@ -26,7 +26,7 @@ cc_library(
         "SemanticAnalysisTypes.cpp",
         "Semantics.cpp",
         "SourceObject.cpp",
-        "Syntax.cpp"
+        "Syntax.cpp",
     ],
     hdrs = [
         "Lexer.hpp",
@@ -38,17 +38,18 @@ cc_library(
         "Program.hpp",
         "ProgramInterface.hpp",
         "SemanticAnalysis.hpp",
-        "Semantics.hpp",
         "SemanticUtilities.hpp",
+        "Semantics.hpp",
         "SourceObject.hpp",
         "Syntax.hpp",
     ],
     visibility = [
-        "//main:__pkg__",
+        "//lib/backend:__pkg__",
+        "//lib/main:__pkg__",
         "//test:__subpackages__",
     ],
     deps = [
-        "//frontend/common",
-        "//support",
+        "//lib/frontend/common",
+        "//lib/support",
     ],
 )

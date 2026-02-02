@@ -16,14 +16,14 @@ cc_library(
     ],
     visibility = ["//test:__pkg__"],
     deps = [
-        "//support",
+        "//lib/support",
         "//test/common",
         "//test/vendor/catch2v3",
     ],
 )
 
 cc_test(
-    name = "frontend",
+    name = "backend",
     srcs = [
         "main.cpp",
     ],

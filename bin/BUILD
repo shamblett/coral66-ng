@@ -8,6 +8,6 @@ cc_binary(
     name = "coral66",
     srcs = ["main.cpp"],
     deps = [
-        "//main",
+        "//lib/main",
     ],
 )

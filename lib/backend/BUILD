@@ -6,28 +6,30 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
     name = "backend",
-    srcs = ["ABIImplementation.cpp",
-            "CodeGeneration.cpp",
-            "CodeGenerator.cpp",
-            "CodeGeneratorDeclarations.cpp",
-            "CodeGeneratorExpressions.cpp",
-            "CodeGeneratorStatements.cpp",
-            "X64ABI.cpp",
-        
+    srcs = [
+        "ABIImplementation.cpp",
+        "CodeGeneration.cpp",
+        "CodeGenerator.cpp",
+        "CodeGeneratorDeclarations.cpp",
+        "CodeGeneratorExpressions.cpp",
+        "CodeGeneratorStatements.cpp",
+        "X64ABI.cpp",
     ],
-    hdrs = ["ABIImplementation.hpp",
-            "CodeGeneration.hpp",
-            "CodeGenerator.hpp",
-            "CommonABIImplementation.hpp",
-            "TypeIdentity.hpp",
-            "X64ABI.hpp",
+    hdrs = [
+        "ABIImplementation.hpp",
+        "CodeGeneration.hpp",
+        "CodeGenerator.hpp",
+        "CommonABIImplementation.hpp",
+        "TypeIdentity.hpp",
+        "X64ABI.hpp",
     ],
     visibility = [
-        "//main:__pkg__",
+        "//lib/main:__pkg__",
         "//test:__subpackages__",
     ],
     deps = [
-        "//frontend",
-        "//support",
+        "//lib/frontend/common",
+        "//lib/frontend/compiler",
+        "//lib/support",
     ],
 )

@@ -11,13 +11,13 @@ cc_library(
         "LexerTests.cpp",
         "Parser.cpp",
         "PreprocessorTests",
-        "SemanticsTests"
+        "SemanticsTests",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
-         "//test/vendor/catch2v3",
-         "//test/common",
-         "//support",
+        "//lib/support",
+        "//test/common",
+        "//test/vendor/catch2v3",
     ],
 )
 
@@ -28,7 +28,6 @@ cc_test(
     ],
     visibility = ["//test:__pkg__"],
     deps = [
-        "supporttestlib",
-
+        "frontendtestlib",
     ],
 )

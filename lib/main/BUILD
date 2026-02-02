@@ -15,12 +15,12 @@ cc_library(
         "Main.hpp",
     ],
     visibility = [
-        "//coral66:__pkg__",
+        "//bin/coral66:__pkg__",
         "//test:__subpackages__",
     ],
     deps = [
-        "//frontend",
-        "//backend",
-        "//support",
+        "//lib/backend",
+        "//lib/frontend",
+        "//lib/support",
     ],
 )

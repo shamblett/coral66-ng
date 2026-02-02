@@ -30,10 +30,10 @@ cc_library(
         "vendor/tsl/ordered_map.h",
     ],
     visibility = [
-        "//frontend:__subpackages__",
-        "//backend:__subpackages__",
-        "//main:__pkg__",
+        "//lib/backend:__subpackages__",
+        "//lib/frontend:__subpackages__",
+        "//lib/main:__pkg__",
         "//test:__subpackages__",
     ],
-    deps = ["//llvm:llvm-21"],
+    deps = ["//lib/llvm:llvm-21"],
 )

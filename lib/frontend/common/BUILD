@@ -27,15 +27,16 @@ cc_library(
         "Message.hpp",
         "SemanticsCommon.hpp",
         "SourceInterface.hpp",
-        "traget/X86features.def",
         "target/x86TargetFeatures.hpp",
+        "traget/X86features.def",
     ],
     visibility = [
-        "//frontend:__subpackages__",
-        "//main:__pkg__",
+        "//lib/backend:__subpackages__",
+        "//lib/frontend:__subpackages__",
+        "//lib/main:__pkg__",
         "//test:__subpackages__",
     ],
     deps = [
-        "//support",
+        "//lib/support",
     ],
 )

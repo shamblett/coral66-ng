@@ -9,5 +9,5 @@ cc_library(
     linkopts = [
         "-L /usr/lib64/llvm21/lib64/ -lLLVM",
     ],
-    visibility = ["//support:__pkg__"],
+    visibility = ["//lib/support:__pkg__"],
 )
