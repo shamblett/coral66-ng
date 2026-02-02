@@ -8,7 +8,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "backendtestlib",
     srcs = [
-        "CodeGeneratorTests,cpp",
+        "CodeGeneratorTests.cpp",
         "Common.cpp",
     ],
     hdrs = [

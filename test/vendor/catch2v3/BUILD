@@ -1,10 +1,10 @@
-#
-# Test suite Catch library library tests
-#
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
-load("@rules_cc//cc:cc_test.bzl", "cc_test")
+package(default_visibility = ["//visibility:public"])
 
-package(default_visibility = ["//test"])
-
-exports_files(["catch_amalgamated.hpp"])
+cc_library(
+    name = "catch2v3",
+    srcs = ["catch_amalgamated.cpp"],
+    hdrs = ["catch_amalgamated.hpp"],
+    visibility = ["//visibility:public"],
+)

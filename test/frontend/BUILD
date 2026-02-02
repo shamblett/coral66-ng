@@ -9,9 +9,9 @@ cc_library(
     name = "frontendtestlib",
     srcs = [
         "LexerTests.cpp",
-        "Parser.cpp",
-        "PreprocessorTests",
-        "SemanticsTests",
+        "ParserTests.cpp",
+        "PreprocessorTests.cpp",
+        "SemanticsTests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
@@ -24,7 +24,7 @@ cc_library(
 cc_test(
     name = "frontend",
     srcs = [
-        "main.cc",
+        "main.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
