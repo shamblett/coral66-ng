@@ -7,7 +7,6 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "compiler",
     srcs = [
-        "Diagnostic.cpp",
         "Lexer.cpp",
         "Parser.cpp",
         "ParserDeclarations.cpp",
@@ -26,11 +25,9 @@ cc_library(
         "SemanticAnalysisStatements.cpp",
         "SemanticAnalysisTypes.cpp",
         "Semantics.cpp",
-        "SourceObject.cpp",
         "Syntax.cpp",
     ],
     hdrs = [
-        "Diagnostic.hpp",
         "Lexer.hpp",
         "Parser.hpp",
         "ParserUtilities.hpp",
@@ -42,7 +39,6 @@ cc_library(
         "SemanticAnalysis.hpp",
         "SemanticUtilities.hpp",
         "Semantics.hpp",
-        "SourceObject.hpp",
         "Syntax.hpp",
     ],
     visibility = [

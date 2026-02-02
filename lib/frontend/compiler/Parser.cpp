@@ -4,9 +4,9 @@
  * Date   : 31/01/2026
  */
 
-#include "frontend/common/ErrorMessages.hpp"
 #include "Parser.hpp"
-#include "SourceObject.hpp"
+#include "../common/SourceObject.hpp"
+#include "frontend/common/ErrorMessages.hpp"
 
 namespace coral66::Parser
 {

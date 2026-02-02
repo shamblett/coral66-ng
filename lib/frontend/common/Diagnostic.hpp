@@ -9,9 +9,9 @@
 #include "lib/support/Constexpr.hpp"
 #include "lib/support/Text.hpp"
 #include "lib/support/Utilities.hpp"
-#include "lib/frontend/common/CustomDiagnostics.hpp"
-#include "lib/frontend/common/DiagnosticUtilities.hpp"
-#include "lib/frontend/common/Message.hpp"
+#include "CustomDiagnostics.hpp"
+#include "DiagnosticUtilities.hpp"
+#include "Message.hpp"
 
 #include <array>
 #include <optional>

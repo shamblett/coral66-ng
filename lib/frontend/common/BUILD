@@ -8,8 +8,10 @@ cc_library(
     name = "common",
     srcs = [
         "ConstantValue.cpp",
+        "Diagnostic.cpp",
         "LanguageOptions.cpp",
         "Message.cpp",
+        "SourceObject.cpp",
         "targets/X86TargetFeatures.cpp",
     ],
     hdrs = [
@@ -17,6 +19,7 @@ cc_library(
         "Builtins.def",
         "ConstantValue.hpp",
         "CustomDiagnostics.hpp",
+        "Diagnostic.hpp",
         "DiagnosticUtilities.hpp",
         "ErrorMessages.hpp",
         "LanguageOptions.hpp",
@@ -25,6 +28,7 @@ cc_library(
         "Message.hpp",
         "SemanticsCommon.hpp",
         "SourceInterface.hpp",
+        "SourceObject.hpp",
         "targets/X86Features.def",
         "targets/X86TargetFeatures.hpp",
     ],

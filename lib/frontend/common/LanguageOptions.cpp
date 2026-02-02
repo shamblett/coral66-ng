@@ -11,7 +11,7 @@
 #include <limits>
 #include <numeric>
 
-#include "../compiler/Diagnostic.hpp"
+#include "Diagnostic.hpp"
 #include "targets/X86TargetFeatures.hpp"
 
 namespace

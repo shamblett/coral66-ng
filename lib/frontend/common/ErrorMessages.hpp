@@ -11,7 +11,7 @@
  *
  */
 
-#include "../compiler/Diagnostic.hpp"
+#include "Diagnostic.hpp"
 #include "lib/support/Constexpr.hpp"
 
 #define CREATE_NOTE_2(variableName, format)                                           \

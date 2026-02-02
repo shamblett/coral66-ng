@@ -17,12 +17,12 @@
 #include "support/AbstractIntrusiveVariant.hpp"
 #include "support/IntrusiveVariantValue.hpp"
 
+#include "../common/SourceObject.hpp"
+#include "Lexer.hpp"
+#include "SemanticsCommon.hpp"
 #include "frontend/common/Attributes.hpp"
 #include "frontend/common/DiagnosticUtilities.hpp"
 #include "frontend/common/LanguageOptions.hpp"
-#include "Lexer.hpp"
-#include "SourceObject.hpp"
-#include "SemanticsCommon.hpp"
 
 /**
  * @file Semantics.hpp

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "SourceObject.hpp"
+#include "../common/SourceObject.hpp"
 
 namespace coral66
 {

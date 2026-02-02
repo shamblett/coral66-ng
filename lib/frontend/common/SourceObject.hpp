@@ -14,7 +14,7 @@
 #include "lib/support/Utilities.hpp"
 
 #include "lib/frontend/common/LanguageOptions.hpp"
-#include "Lexer.hpp"
+#include "LexerCommon.hpp"
 #include "lib/frontend/common/SourceInterface.hpp"
 
 /**
