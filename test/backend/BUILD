@@ -7,16 +7,18 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_library(
     name = "backendtestlib",
-    srcs = ["CodeGeneratorTests,cpp",
-            "Common.cpp",
+    srcs = [
+        "CodeGeneratorTests,cpp",
+        "Common.cpp",
     ],
-    hdrs = ["Common.hpp", 
-    ]
+    hdrs = [
+        "Common.hpp",
+    ],
     visibility = ["//test:__pkg__"],
     deps = [
-         "//test/vendor/catch2v3",
-         "//test/common",
-         "//support",
+        "//support",
+        "//test/common",
+        "//test/vendor/catch2v3",
     ],
 )
 
@@ -24,10 +26,9 @@ cc_test(
     name = "frontend",
     srcs = [
         "main.cpp",
-    ]
+    ],
     visibility = ["//test:__pkg__"],
     deps = [
         "backendtestlib",
-
     ],
 )

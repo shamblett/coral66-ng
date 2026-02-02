@@ -6,10 +6,4 @@ package_group(
     name = "frontend",
     packages = [
     ],
-
-    deps = [
-        "//frontend/common",
-        "//frontend/compiler",
-        "//support",
-        ],
 )
