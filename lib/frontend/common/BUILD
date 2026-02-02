@@ -7,11 +7,11 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "common",
     srcs = [
-        "ConstValue.cpp",
+        "ConstantValue.cpp",
         "Diagnostic.cpp",
         "LanguageOptions.cpp",
         "Message.cpp",
-        "targets/x86Features.cpp",
+        "targets/X86TargetFeatures.cpp",
     ],
     hdrs = [
         "Attributes.hpp",

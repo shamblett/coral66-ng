@@ -11,7 +11,7 @@
  *
  */
 
-#include "support/Triple.hpp"
+#include "lib/support/Triple.hpp"
 
 #include <cstdint>
 #include <memory>
