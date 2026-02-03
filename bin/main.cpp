@@ -4,7 +4,7 @@
 * Date   : 31/01/2026
 */
 
-#include "main/Main.hpp"
+#include "lib/main/Main.hpp"
 
 #include <string_view>
 #include <vector>
