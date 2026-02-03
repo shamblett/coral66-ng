@@ -1952,9 +1952,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>>
     processNumber(const char* begin, const char* end, std::uint64_t, ConversionContext&)
 {
     std::string text(begin, end);
-    bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos || text.find('E') != std::string::npos;
-    
-    if (isFloat)
+
     {
         llvm::APFloat number(llvm::APFloat::IEEEdouble());
         auto result = number.convertFromString(text, llvm::APFloat::rmNearestTiesToEven);
@@ -1965,7 +1963,6 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>>
         }
         return {{std::move(number), CToken::Floating}};
     }
-    else
     {
         // Integer (Decimal)
         // Coral 66 integers are decimal. OCTAL is handled via OCTAL().
