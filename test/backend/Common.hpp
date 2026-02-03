@@ -10,12 +10,12 @@
 
 #include <llvm/IR/Module.h>
 
-#include "frontend/compiler/Lexer.hpp"
-#include "frontend/compiler/Parser.hpp"
-#include "frontend/compiler/Program.hpp"
-#include "frontend/compiler/Semantics.hpp"
-#include "frontend/compiler/Preprocessor.hpp"
-#include "support/FunctionRef.hpp"
+#include "lib/frontend/compiler/Lexer.hpp"
+#include "lib/frontend/compiler/Parser.hpp"
+#include "lib/frontend/compiler/Program.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/Preprocessor.hpp"
+#include "lib/support/FunctionRef.hpp"
 
 #include <regex>
 

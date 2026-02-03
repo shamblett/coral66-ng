@@ -6,7 +6,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_library(
-    name = "backendtestlib",
+    name = "backendtest",
     srcs = [
         "CodeGeneratorTests.cpp",
         "Common.cpp",
@@ -16,6 +16,9 @@ cc_library(
     ],
     visibility = ["//test:__pkg__"],
     deps = [
+        "//lib/backend",
+        "//lib/frontend/common",
+        "//lib/frontend/compiler",
         "//lib/support",
         "//test/common",
         "//test/vendor/catch2v3",
@@ -29,6 +32,6 @@ cc_test(
     ],
     visibility = ["//test:__pkg__"],
     deps = [
-        "backendtestlib",
+        "backendtest",
     ],
 )

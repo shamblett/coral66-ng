@@ -9,7 +9,7 @@
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/Instructions.h>
 
-#include <coral66/LLVMBackend/CodeGeneration.hpp>
+#include "lib/backend//CodeGeneration.hpp"
 
 #include "Common.hpp"
 
