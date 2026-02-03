@@ -42,7 +42,7 @@ cc_library(
         "Syntax.hpp",
     ],
     visibility = [
-        "//lib/backend:__pkg__",
+        "//lib/backend:__subpackages__",
         "//lib/main:__pkg__",
         "//test:__subpackages__",
     ],

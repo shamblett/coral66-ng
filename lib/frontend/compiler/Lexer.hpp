@@ -13,6 +13,7 @@
 #include <tuple>
 #include <vector>
 
+#include "lib/support/Utilities.hpp"
 
 #include "lib/frontend/common/CustomDiagnostics.hpp"
 #include "lib/frontend/common/LanguageOptions.hpp"
