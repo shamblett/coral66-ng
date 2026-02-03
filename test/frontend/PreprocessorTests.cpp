@@ -6,9 +6,9 @@
 
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/compiler/SourceObject.hpp"
-#include "frontend/compiler/Preprocessor.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
+#include "lib/frontend/compiler/Preprocessor.hpp"
 
 #include "test/common/TestConfig.hpp"
 

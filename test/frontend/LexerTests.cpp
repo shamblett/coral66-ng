@@ -8,9 +8,9 @@
 
 #include <llvm/Support/Format.h>
 
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/compiler/Lexer.hpp"
-#include "frontend/compiler/SourceObject.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/compiler/Lexer.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
 
 #include <array>
 

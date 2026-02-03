@@ -6,11 +6,11 @@
 
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#include "frontend/coommon/ErrorMessages.hpp"
-#include "frontend/compiler/Parser.hpp"
-#include "frontend/compiler/SourceObject.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/compiler/Parser.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
 
-#include "../TestConfig.hpp"
+#include "test/common/TestConfig.hpp"
 
 #define treeProduces(source, matches)                         \
     do                                                        \

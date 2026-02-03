@@ -6,10 +6,10 @@
 
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/compiler/Parser.hpp"
-#include "frontend/compiler/Semantics.hpp"
-#include "frontend/compiler/SourceObject.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/compiler/Parser.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/common/SourceObject.hpp"
 
 #include "test/common/TestConfig.hpp"
 
