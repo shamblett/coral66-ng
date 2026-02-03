@@ -6,8 +6,8 @@
 
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#include "support/AbstractIntrusiveVariant.hpp"
-#include "support/IntrusiveVariantValue.hpp"
+#include "lib/support/AbstractIntrusiveVariant.hpp"
+#include "lib/support/IntrusiveVariantValue.hpp"
 
 namespace
 {

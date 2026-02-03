@@ -13,6 +13,8 @@ cc_library(
     ],
     visibility = ["//test:__subpackages__"],
     deps = [
+        "//lib/frontend/common",
+        "//lib/frontend/compiler",
         "//lib/support",
         "//test/vendor/catch2v3",
     ],

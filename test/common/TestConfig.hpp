@@ -11,12 +11,12 @@
 #include <llvm/ADT/APInt.h>
 #include <llvm/ADT/APSInt.h>
 
-#include "frontend/common/Diagnostic.hpp"
-#include "frontend/common/CustomDiagnostics.hpp"
-#include "frontend/compiler/Semantics.hpp"
-#include "frontend/compilerPreprocessor.hpp"
-#include "support/Filesystem.hpp"
-#include "support/Text.hpp"
+#include "lib/frontend/common/Diagnostic.hpp"
+#include "lib/frontend/common/CustomDiagnostics.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/Preprocessor.hpp"
+#include "lib/support/Filesystem.hpp"
+#include "lib/support/Text.hpp"
 
 #include <numeric>
 

@@ -11,8 +11,8 @@
 
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#include "support/AbstractIntrusiveVariant.hpp"
-#include "support/IntrusiveVariantAllocator.hpp"
+#include "lib/support/AbstractIntrusiveVariant.hpp"
+#include "lib/support/IntrusiveVariantAllocator.hpp"
 
 #include <queue>
 

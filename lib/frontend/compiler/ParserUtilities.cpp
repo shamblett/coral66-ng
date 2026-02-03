@@ -59,23 +59,6 @@ bool coral66::Parser::expect(Lexer::TokenType expected, Lexer::CTokenIterator& b
     return true;
 }
 
-bool coral66::Parser::firstIsInExternalDeclaration(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    return firstIsInDeclaration(token, context) || firstIsInFunctionDefinition(token, context);
-}
-
-bool coral66::Parser::firstIsInFunctionDefinition(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    return firstIsInDeclarationSpecifier(token, context);
-}
-
-bool coral66::Parser::firstIsInDeclaration(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    return firstIsInDeclarationSpecifier(token, context);
-}
-
-
-
 bool coral66::Parser::firstIsInDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
     return firstIsInPointer(token, context) || firstIsInDirectDeclarator(token, context);
@@ -85,12 +68,6 @@ bool coral66::Parser::firstIsInDirectDeclarator(const Lexer::CToken& token, cons
 {
     return token.getTokenType() == Lexer::TokenType::Identifier
            || token.getTokenType() == Lexer::TokenType::OpenParentheses;
-}
-
-[[maybe_unused]] bool coral66::Parser::firstIsInParameterTypeList(const Lexer::CToken& token,
-                                                              const coral66::Parser::Context& context)
-{
-    return firstIsInParameterList(token, context);
 }
 
 bool coral66::Parser::firstIsInAbstractDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context)
@@ -104,21 +81,12 @@ bool coral66::Parser::firstIsInDirectAbstractDeclarator(const Lexer::CToken& tok
            || token.getTokenType() == Lexer::TokenType::OpenSquareBracket;
 }
 
-bool coral66::Parser::firstIsInParameterList(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    return firstIsInDeclarationSpecifier(token, context);
-}
 
 bool coral66::Parser::firstIsInPointer(const Lexer::CToken& token, const coral66::Parser::Context&)
 {
     return token.getTokenType() == Lexer::TokenType::Asterisk;
 }
 
-[[maybe_unused]] bool coral66::Parser::firstIsInCompoundItem(const Lexer::CToken& token,
-                                                         const coral66::Parser::Context& context)
-{
-    return firstIsInDeclaration(token, context) || firstIsInStatement(token, context);
-}
 
 bool coral66::Parser::firstIsInInitializer(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
@@ -205,11 +173,6 @@ bool coral66::Parser::firstIsInAdditiveExpression(const Lexer::CToken& token, co
 bool coral66::Parser::firstIsInTerm(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
     return firstIsInCastExpression(token, context);
-}
-
-[[maybe_unused]] bool coral66::Parser::firstIsInTypeName(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    return firstIsInSpecifierQualifier(token, context);
 }
 
 bool coral66::Parser::firstIsInCastExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)

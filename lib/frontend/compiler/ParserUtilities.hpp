@@ -29,14 +29,6 @@ bool expect(Lexer::TokenType expected, Lexer::CTokenIterator& begin, Lexer::CTok
 
 bool firstIsInExternalDeclaration(const Lexer::CToken& token, const coral66::Parser::Context& context);
 
-bool firstIsInFunctionDefinition(const Lexer::CToken& token, const coral66::Parser::Context& context);
-
-bool firstIsInDeclaration(const Lexer::CToken& token, const coral66::Parser::Context& context);
-
-bool firstIsInDeclarationSpecifier(const Lexer::CToken& token, const coral66::Parser::Context& context);
-
-bool firstIsInSpecifierQualifier(const Lexer::CToken& token, const coral66::Parser::Context& context);
-
 bool firstIsInDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context);
 
 bool firstIsInDirectDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context);
@@ -46,8 +38,6 @@ bool firstIsInParameterTypeList(const Lexer::CToken& token, const coral66::Parse
 bool firstIsInAbstractDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context);
 
 bool firstIsInDirectAbstractDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context);
-
-bool firstIsInParameterList(const Lexer::CToken& token, const coral66::Parser::Context& context);
 
 bool firstIsInPointer(const Lexer::CToken& token, const coral66::Parser::Context& context);
 

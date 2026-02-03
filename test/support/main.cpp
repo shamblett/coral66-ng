@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "testvendor/catch2v3/catch_amalgamated.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 #include "test/common/TestConfig.hpp"
 
