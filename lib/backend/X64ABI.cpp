@@ -4,8 +4,6 @@
 * Date   : 31/01/2026
 */
 
-#pragma once
-
 #include "lib/frontend/compiler/Semantics.hpp"
 
 #include <algorithm>
