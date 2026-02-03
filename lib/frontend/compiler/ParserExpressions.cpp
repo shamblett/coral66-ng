@@ -11,9 +11,7 @@
  * @brief Implements parsing functions for C expressions.
  *
  * This file contains the implementations of the recursive descent parser for
- * all C expression types, including assignment, binary operators (logical, bitwise,
- * arithmetic), unary expressions, postfix expressions, and primary expressions (literals, identifiers).
- * It also handles operator precedence parsing.
+ * all Coral expression types, including assignment and primary expressions (literals, identifiers).
  */
 
 #include <llvm/Support/ConvertUTF.h>
@@ -25,8 +23,9 @@
 
 using namespace coral66::Syntax;
 
-coral66::Syntax::Expression coral66::Parser::parseExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
-                                                     Context& context)
+std::unique_ptr<Expression>
+coral66::Parser::parseExpression(Lexer::CTokenIterator &begin,
+                                 Lexer::CTokenIterator end, Context &context)
 {
     const auto* start = begin;
     auto assignment = parseAssignmentExpression(

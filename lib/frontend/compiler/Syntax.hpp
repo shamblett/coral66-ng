@@ -113,7 +113,8 @@ public:
                      std::vector<std::unique_ptr<Declaration>>&& elements);
     [[nodiscard]] Lexer::CTokenIterator getIdentifier() const;
     [[nodiscard]] const Expression* getWidth() const;
-    [[nodiscard]] const Expression* getLength() const;
+    [[nodiscard]] const Expressiobinary operators (logical, bitwise,
+ * arithmetic), unary expressions, postfix expressions, n* getLength() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getElements() const;
 };
 
