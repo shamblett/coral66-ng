@@ -8,9 +8,9 @@
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
-#include "frontend/compiler/Program.hpp"
-#include "frontend/compiler/Semantics.hpp"
-#include "support/Filesystem.hpp"
+#include "lib/frontend/compiler/Program.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/support/Filesystem.hpp"
 
 #include "CodeGeneration.hpp"
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <coral66/Frontend/Compiler/Semantics.hpp>
+#include "lib/frontend/compiler/Semantics.hpp"
 
 #include <algorithm>
 #include <numeric>
@@ -29,13 +29,6 @@ namespace coral66::CGLLVM
 // does not equal the type system a backend may care about, however. The LLVM backend eg, does not care about any
 // qualifiers, making nonqualified, const qualpragma once
 
-#include <cld/Frontend/Compiler/Semantics.hpp>
-
-#include <algorithm>
-#include <numeric>
-#include <tuple>
-#include <variant>
-ified or volatile qualified types equal.
 
 template <class T>
 struct TypeHasher
@@ -331,19 +324,5 @@ struct TypeEqual<Semantics::ErrorType>
     }
 };
 
-inline bool TypeEqual<Semantics::Type>::operator()(const Semantics::Type& lhs,
-                                                   const Semantics::Type& rhs) const noexcept
-{
-    if (lhs.index() != rhs.index())
-    {
-        return false;
-    }
-    return lhs.match(
-        [&]<typename T0>(T0&& value) -> bool
-        {
-            using T = std::decay_t<T0>;
-            return TypeEqual<T>{}(value, rhs.as<T>());
-        });
-}
 
 } // namespace coral66::CGLLVM

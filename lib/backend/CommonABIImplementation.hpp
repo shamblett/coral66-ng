@@ -19,7 +19,7 @@
 #include "TypeIdentity.hpp"
 
 /**
- * @file CommonABIImpl.hpp
+ * @file CommonABIImplementation.hpp
  * @brief Defines a common base class for ABI implementations with caching.
  *
  * This file provides the CommonABIImplementation template class, which extends ABIImplementation.
