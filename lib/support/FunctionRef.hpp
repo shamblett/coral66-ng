@@ -21,7 +21,7 @@
  * - No heap allocation.
  * - Cheap to copy (pointer-sized).
  * - Type erasure: Can hold any callable with a compatible signature.
- * - Non-owning: The caller must ensure the callable outlives the `function_ref`.
+ * - Non-owning: The caller must ensure the callable outlives the `FunctionRef`.
  */
 
 namespace coral66

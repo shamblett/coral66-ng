@@ -2,7 +2,7 @@
 common --enable_bzlmod
 
 # C++ standard
-build --cxxopt="-std=c++20"
+build --cxxopt="-std=c++23"
 
 # Write to ccache cache
 build --sandbox_writable_path=/home/steve/.cache/ccache

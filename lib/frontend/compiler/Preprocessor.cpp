@@ -12,7 +12,7 @@
 
 #include "lib/support/ScopeExit.hpp"
 
-#include "lib/frontend/common/ErrorMessages.hpp
+#include "lib/frontend/common/ErrorMessages.hpp"
 #include "Parser.hpp"
 #include "PreprocessorParser.hpp"
 

@@ -9,7 +9,7 @@
 #include "lib/frontend/common/ErrorMessages.hpp"
 
 bool coral66::Parser::expectIdentifier(Lexer::CTokenIterator& begin, const Lexer::CTokenIterator end, Context& context,
-                                   std::string_view& value, const coral66::function_ref<Message()> additional)
+                                   std::string_view& value, const coral66::FunctionRef<Message()> additional)
 {
     if (begin == end || begin->getTokenType() != Lexer::TokenType::Identifier)
     {
@@ -35,7 +35,7 @@ bool coral66::Parser::expectIdentifier(Lexer::CTokenIterator& begin, const Lexer
 }
 
 bool coral66::Parser::expect(Lexer::TokenType expected, Lexer::CTokenIterator& begin, const Lexer::CTokenIterator end,
-                         Context& context, const coral66::function_ref<Message()> additional)
+                         Context& context, const coral66::FunctionRef<Message()> additional)
 {
     if (begin == end || begin->getTokenType() != expected)
     {
@@ -59,16 +59,6 @@ bool coral66::Parser::expect(Lexer::TokenType expected, Lexer::CTokenIterator& b
     return true;
 }
 
-bool coral66::Parser::isAssignment(const Lexer::TokenType type)
-{
-    return type == Lexer::TokenType::Assignment || type == Lexer::TokenType::PlusAssign
-           || type == Lexer::TokenType::MinusAssign || type == Lexer::TokenType::DivideAssign
-           || type == Lexer::TokenType::MultiplyAssign || type == Lexer::TokenType::ModuloAssign
-           || type == Lexer::TokenType::ShiftLeftAssign || type == Lexer::TokenType::ShiftRightAssign
-           || type == Lexer::TokenType::BitAndAssign || type == Lexer::TokenType::BitOrAssign
-           || type == Lexer::TokenType::BitXorAssign;
-}
-
 bool coral66::Parser::firstIsInExternalDeclaration(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
     return firstIsInDeclaration(token, context) || firstIsInFunctionDefinition(token, context);
@@ -84,69 +74,7 @@ bool coral66::Parser::firstIsInDeclaration(const Lexer::CToken& token, const cor
     return firstIsInDeclarationSpecifier(token, context);
 }
 
-bool coral66::Parser::firstIsInDeclarationSpecifier(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    switch (token.getTokenType())
-    {
-        case Lexer::TokenType::GNUAttribute:
-        case Lexer::TokenType::GNUExtension:
-        case Lexer::TokenType::TypedefKeyword:
-        case Lexer::TokenType::ExternKeyword:
-        case Lexer::TokenType::StaticKeyword:
-        case Lexer::TokenType::AutoKeyword:
-        case Lexer::TokenType::RegisterKeyword:
-        case Lexer::TokenType::VoidKeyword:
-        case Lexer::TokenType::CharKeyword:
-        case Lexer::TokenType::ShortKeyword:
-        case Lexer::TokenType::IntKeyword:
-        case Lexer::TokenType::Int128Keyword:
-        case Lexer::TokenType::LongKeyword:
-        case Lexer::TokenType::FloatKeyword:
-        case Lexer::TokenType::UnderlineBool:
-        case Lexer::TokenType::DoubleKeyword:
-        case Lexer::TokenType::SignedKeyword:
-        case Lexer::TokenType::UnsignedKeyword:
-        case Lexer::TokenType::EnumKeyword:
-        case Lexer::TokenType::StructKeyword:
-        case Lexer::TokenType::UnionKeyword:
-        case Lexer::TokenType::ConstKeyword:
-        case Lexer::TokenType::RestrictKeyword:
-        case Lexer::TokenType::VolatileKeyword:
-        case Lexer::TokenType::InlineKeyword: return true;
-        case Lexer::TokenType::Identifier:
-            return context.isTypedefInScope(token.getText()) || context.isBuiltin(token.getText());
-        default: return false;
-    }
-}
 
-bool coral66::Parser::firstIsInSpecifierQualifier(const Lexer::CToken& token, const coral66::Parser::Context& context)
-{
-    switch (token.getTokenType())
-    {
-        case Lexer::TokenType::GNUAttribute:
-        case Lexer::TokenType::VoidKeyword:
-        case Lexer::TokenType::CharKeyword:
-        case Lexer::TokenType::ShortKeyword:
-        case Lexer::TokenType::IntKeyword:
-        case Lexer::TokenType::Int128Keyword:
-        case Lexer::TokenType::LongKeyword:
-        case Lexer::TokenType::FloatKeyword:
-        case Lexer::TokenType::UnderlineBool:
-        case Lexer::TokenType::DoubleKeyword:
-        case Lexer::TokenType::SignedKeyword:
-        case Lexer::TokenType::UnsignedKeyword:
-        case Lexer::TokenType::EnumKeyword:
-        case Lexer::TokenType::StructKeyword:
-        case Lexer::TokenType::UnionKeyword:
-        case Lexer::TokenType::GNUExtension:
-        case Lexer::TokenType::ConstKeyword:
-        case Lexer::TokenType::RestrictKeyword:
-        case Lexer::TokenType::VolatileKeyword: return true;
-        case Lexer::TokenType::Identifier:
-            return context.isTypedefInScope(token.getText()) || context.isBuiltin(token.getText());
-        default: return false;
-    }
-}
 
 bool coral66::Parser::firstIsInDeclarator(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
@@ -189,8 +117,7 @@ bool coral66::Parser::firstIsInPointer(const Lexer::CToken& token, const coral66
 [[maybe_unused]] bool coral66::Parser::firstIsInCompoundItem(const Lexer::CToken& token,
                                                          const coral66::Parser::Context& context)
 {
-    return firstIsInDeclaration(token, context) || firstIsInStatement(token, context)
-           || token.getTokenType() == Lexer::TokenType::GNUExtension;
+    return firstIsInDeclaration(token, context) || firstIsInStatement(token, context);
 }
 
 bool coral66::Parser::firstIsInInitializer(const Lexer::CToken& token, const coral66::Parser::Context& context)
@@ -209,16 +136,9 @@ bool coral66::Parser::firstIsInStatement(const Lexer::CToken& token, const coral
 {
     return token.getTokenType() == Lexer::TokenType::IfKeyword || token.getTokenType() == Lexer::TokenType::ForKeyword
            || token.getTokenType() == Lexer::TokenType::OpenBrace
-           || token.getTokenType() == Lexer::TokenType::SwitchKeyword
-           || token.getTokenType() == Lexer::TokenType::ContinueKeyword
-           || token.getTokenType() == Lexer::TokenType::BreakKeyword
-           || token.getTokenType() == Lexer::TokenType::CaseKeyword
-           || token.getTokenType() == Lexer::TokenType::DefaultKeyword
            || token.getTokenType() == Lexer::TokenType::Identifier
            || token.getTokenType() == Lexer::TokenType::DoKeyword
-           || token.getTokenType() == Lexer::TokenType::WhileKeyword
-           || token.getTokenType() == Lexer::TokenType::ReturnKeyword
-           || token.getTokenType() == Lexer::TokenType::GotoKeyword || token.getTokenType() == Lexer::TokenType::GNUASM
+           || token.getTokenType() == Lexer::TokenType::GotoKeyword
            || token.getTokenType() == Lexer::TokenType::SemiColon || firstIsInExpression(token, context);
 }
 
@@ -299,14 +219,12 @@ bool coral66::Parser::firstIsInCastExpression(const Lexer::CToken& token, const 
 
 bool coral66::Parser::firstIsInUnaryExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
-    return firstIsInPostFixExpression(token, context) || token.getTokenType() == Lexer::TokenType::Increment
-           || token.getTokenType() == Lexer::TokenType::Decrement || token.getTokenType() == Lexer::TokenType::Ampersand
+    return firstIsInPostFixExpression(token, context) ||
+           token.getTokenType() == Lexer::TokenType::Ampersand
            || token.getTokenType() == Lexer::TokenType::Asterisk || token.getTokenType() == Lexer::TokenType::Plus
            || token.getTokenType() == Lexer::TokenType::Minus
            || token.getTokenType() == Lexer::TokenType::BitWiseNegation
-           || token.getTokenType() == Lexer::TokenType::LogicalNegation
-           || token.getTokenType() == Lexer::TokenType::SizeofKeyword
-           || token.getTokenType() == Lexer::TokenType::GNUExtension;
+           || token.getTokenType() == Lexer::TokenType::LogicalNegation;
 }
 
 bool coral66::Parser::firstIsInPostFixExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)

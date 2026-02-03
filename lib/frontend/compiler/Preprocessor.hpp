@@ -96,8 +96,7 @@ std::string reconstruct(const T* begin, const T* end, const SourceInterface& sou
         }
         result.insert(result.size(), newLines, '\n');
         if (newLines == 0
-            && (begin->hasLeadingWhitespace()
-                || Lexer::needsWhitespaceInBetween(prev->getTokenType(), begin->getTokenType())))
+            && (begin->hasLeadingWhitespace()))
         {
             result += " " + Lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
         }

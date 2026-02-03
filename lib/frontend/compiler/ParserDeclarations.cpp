@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-//#include "Parser.hpp"
+#include "Parser.hpp"
 
 #include <algorithm>
 #include <span>
