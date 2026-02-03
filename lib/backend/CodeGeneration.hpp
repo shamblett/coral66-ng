@@ -10,7 +10,7 @@
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
-#include "support/Filesystem.hpp"
+#include "lib/support/Filesystem.hpp"
 
 /**
  * @file Codegen.hpp

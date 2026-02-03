@@ -8,7 +8,7 @@
 
 #include <llvm/Support/raw_ostream.h>
 
-#include "frontend/compiler/ErrorMessages.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
 
 void coral66::detail::CommandLine::printHelp(llvm::raw_ostream& os,
                                          std::vector<std::pair<std::string_view, std::string_view>> options)

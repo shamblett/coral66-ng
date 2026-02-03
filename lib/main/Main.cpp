@@ -17,15 +17,15 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Timer.h>
 
-#include "frontend/common/ErrorMessages.hpp"
-#include "frontend/common/LanguageOptions.hpp"
-#include "frontend/compiler/Parser.hpp"
-#include "frontend/compiler/Program.hpp"
-#include "frontend/compiler/Preprocessor.hpp"
-#include "backend/CodeGeneration.hpp"
-#include "support/Filesystem.hpp"
-#include "support/Triple.hpp"
-#include "main/CommandLine.hpp"
+#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/LanguageOptions.hpp"
+#include "lib/frontend/compiler/Parser.hpp"
+#include "lib/frontend/compiler/Program.hpp"
+#include "lib/frontend/compiler/Preprocessor.hpp"
+#include "lib/backend/CodeGeneration.hpp"
+#include "lib/support/Filesystem.hpp"
+#include "lib/support/Triple.hpp"
+#include "lib/main/CommandLine.hpp"
 
 CLD_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
 ("Path of the output file");
@@ -809,7 +809,7 @@ int doActionOnAllFiles(Action action, const coral66::LanguageOptions& languageOp
 
 void printVersion(llvm::raw_ostream& os) // NOLINT(*-prefer-static-over-anonymous-namespace)
 {
-    os << "coral66 version " << CLD_VERSION << '\n';
+    os << "coral66 version " << "1.0-beta" << '\n';
     os.flush();
 }
 

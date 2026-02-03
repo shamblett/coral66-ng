@@ -7,7 +7,7 @@
 #pragma once
 
 #include <llvm/IR/IRBuilder.h>
-#include "frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
 
 namespace coral66::CGLLVM
 {

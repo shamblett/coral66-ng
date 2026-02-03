@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
 
 #include <algorithm>
 #include <numeric>
