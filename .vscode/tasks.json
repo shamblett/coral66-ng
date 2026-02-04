@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Frontend Tests (Debug)",
+            "type": "shell",
+            "command": "bazel",
+            "args": [
+                "build",
+                "//test/frontend:frontend",
+                "--compilation_mode=dbg",
+                "--strip=never"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
