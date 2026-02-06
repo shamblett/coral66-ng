@@ -1,10 +1,14 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #include "Lexer.hpp"
+
+#include <llvm/Support/ConvertUTF.h>
+#include <llvm/Support/Error.h>
+#include <llvm/Support/UnicodeCharRanges.h>
 
 #include <algorithm>
 #include <charconv>
@@ -13,14 +17,10 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <llvm/Support/ConvertUTF.h>
-#include <llvm/Support/Error.h>
-#include <llvm/Support/UnicodeCharRanges.h>
-
-#include "lib/support/ScopeExit.hpp"
-#include "lib/support/Text.hpp"
 #include "lib/frontend/common/ErrorMessages.hpp"
 #include "lib/frontend/common/SourceObject.hpp"
+#include "lib/support/ScopeExit.hpp"
+#include "lib/support/Text.hpp"
 
 using namespace coral66::Lexer;
 
@@ -40,35 +40,63 @@ bool isKeyword(std::string_view characters, const coral66::LanguageOptions&)
 TokenType charactersToKeyword(std::string_view characters)
 {
     using namespace coral66::Lexer;
-    if (characters == "BEGIN") return TokenType::BeginKeyword;
-    if (characters == "END") return TokenType::EndKeyword;
-    if (characters == "PROCEDURE") return TokenType::ProcedureKeyword;
-    if (characters == "PROGRAM") return TokenType::ProgramKeyword;
-    if (characters == "SEGMENT") return TokenType::SegmentKeyword;
-    if (characters == "IF") return TokenType::IfKeyword;
-    if (characters == "THEN") return TokenType::ThenKeyword;
-    if (characters == "ELSE") return TokenType::ElseKeyword;
-    if (characters == "FOR") return TokenType::ForKeyword;
-    if (characters == "STEP") return TokenType::StepKeyword;
-    if (characters == "UNTIL") return TokenType::UntilKeyword;
-    if (characters == "DO") return TokenType::DoKeyword;
-    if (characters == "GOTO") return TokenType::GotoKeyword;
-    if (characters == "ANSWER") return TokenType::AnswerKeyword;
-    if (characters == "INTEGER") return TokenType::IntegerKeyword;
-    if (characters == "FLOATING") return TokenType::FloatingKeyword;
-    if (characters == "FIXED") return TokenType::FixedKeyword;
-    if (characters == "BITS") return TokenType::BitsKeyword;
-    if (characters == "ARRAY") return TokenType::ArrayKeyword;
-    if (characters == "TABLE") return TokenType::TableKeyword;
-    if (characters == "PRESET") return TokenType::PresetKeyword;
-    if (characters == "OVERLAY") return TokenType::OverlayKeyword;
-    if (characters == "VALUE") return TokenType::ValueKeyword;
-    if (characters == "LOCATION") return TokenType::LocationKeyword;
-    if (characters == "COMMON") return TokenType::CommonKeyword;
-    if (characters == "COMMENT") return TokenType::CommentKeyword;
-    if (characters == "DEFINE") return TokenType::DefineKeyword;
-    if (characters == "CODE") return TokenType::CodeKeyword;
-    
+    if (characters == "BEGIN")
+        return TokenType::BeginKeyword;
+    if (characters == "END")
+        return TokenType::EndKeyword;
+    if (characters == "PROCEDURE")
+        return TokenType::ProcedureKeyword;
+    if (characters == "PROGRAM")
+        return TokenType::ProgramKeyword;
+    if (characters == "SEGMENT")
+        return TokenType::SegmentKeyword;
+    if (characters == "IF")
+        return TokenType::IfKeyword;
+    if (characters == "THEN")
+        return TokenType::ThenKeyword;
+    if (characters == "ELSE")
+        return TokenType::ElseKeyword;
+    if (characters == "FOR")
+        return TokenType::ForKeyword;
+    if (characters == "STEP")
+        return TokenType::StepKeyword;
+    if (characters == "UNTIL")
+        return TokenType::UntilKeyword;
+    if (characters == "DO")
+        return TokenType::DoKeyword;
+    if (characters == "GOTO")
+        return TokenType::GotoKeyword;
+    if (characters == "ANSWER")
+        return TokenType::AnswerKeyword;
+    if (characters == "INTEGER")
+        return TokenType::IntegerKeyword;
+    if (characters == "FLOATING")
+        return TokenType::FloatingKeyword;
+    if (characters == "FIXED")
+        return TokenType::FixedKeyword;
+    if (characters == "BITS")
+        return TokenType::BitsKeyword;
+    if (characters == "ARRAY")
+        return TokenType::ArrayKeyword;
+    if (characters == "TABLE")
+        return TokenType::TableKeyword;
+    if (characters == "PRESET")
+        return TokenType::PresetKeyword;
+    if (characters == "OVERLAY")
+        return TokenType::OverlayKeyword;
+    if (characters == "VALUE")
+        return TokenType::ValueKeyword;
+    if (characters == "LOCATION")
+        return TokenType::LocationKeyword;
+    if (characters == "COMMON")
+        return TokenType::CommonKeyword;
+    if (characters == "COMMENT")
+        return TokenType::CommentKeyword;
+    if (characters == "DEFINE")
+        return TokenType::DefineKeyword;
+    if (characters == "CODE")
+        return TokenType::CodeKeyword;
+
     CLD_UNREACHABLE;
 }
 
@@ -533,9 +561,8 @@ decltype(auto) mapArgument(const IntervalMap& intervalMap, Arg&& arg)
         {
             using T1 = std::tuple_element_t<0, T>;
             using T3 = std::tuple_element_t<2, T>;
-            static_assert(
-                std::is_base_of_v<coral66::Lexer::TokenBase,
-                                  std::decay_t<T3>> || std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T1>>);
+            static_assert(std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T3>>
+                          || std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T1>>);
             if constexpr (std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T1>>)
             {
                 return std::make_tuple(std::get<0>(arg), map(intervalMap, std::get<1>(arg)).first,
@@ -558,10 +585,10 @@ template <class Diag, class Tuple, std::size_t... ints>
 auto mapArguments(const Diag&, const IntervalMap& intervalMap, Tuple&& tuple, std::index_sequence<ints...>)
 {
     return std::make_tuple(
-        [&tuple, &intervalMap]<typename T0>([[maybe_unused]]T0 value)
+        [&tuple, &intervalMap]<typename T0>([[maybe_unused]] T0 value)
         {
             constexpr auto i = T0::value;
-            if  constexpr (static_cast<bool>(Diag::constraints[i] & Diag::LocationConstraint))
+            if constexpr (static_cast<bool>(Diag::constraints[i] & Diag::LocationConstraint))
             {
                 return mapArgument(intervalMap, std::get<i>(tuple));
             }
@@ -627,9 +654,10 @@ public:
     std::uint64_t tokenStartOffset;
     bool leadingWhitespace = false;
 
-    Context(std::string_view const sourceSpace, const IntervalMap& characterToSourceSpace, std::string_view const characterSpace,
-            std::uint64_t& offset, std::vector<std::uint64_t> lineStarts, llvm::raw_ostream* reporter,
-            std::string_view const path, const coral66::LanguageOptions& languageOptions) noexcept
+    Context(std::string_view const sourceSpace, const IntervalMap& characterToSourceSpace,
+            std::string_view const characterSpace, std::uint64_t& offset, std::vector<std::uint64_t> lineStarts,
+            llvm::raw_ostream* reporter, std::string_view const path,
+            const coral66::LanguageOptions& languageOptions) noexcept
         : m_reporter(reporter),
           m_sourceSpace(sourceSpace),
           m_characterSpace(characterSpace),
@@ -637,7 +665,8 @@ public:
           m_lineStarts(std::move(lineStarts)),
           m_characterToSourceSpace(characterToSourceSpace),
           m_fakeFile{coral66::to_string(path), coral66::to_string(sourceSpace), {}, false},
-          m_languageOptions(languageOptions),tokenStartOffset(0)
+          m_languageOptions(languageOptions),
+          tokenStartOffset(0)
     {
     }
 
@@ -753,8 +782,8 @@ constexpr auto UTF32_MAX = 0x10FFFF;
  * @return Unicode value
  */
 template <class T, class PosArg>
-std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location, PosArg&& arg,
-                                                       T& context)
+std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
+                                                       PosArg&& arg, T& context)
 {
     CLD_ASSERT(value.size() == 4 || value.size() == 8);
     auto result = hexToValue(value);
@@ -774,7 +803,8 @@ std::optional<std::uint32_t> universalCharacterToValue(std::string_view const va
     }
     else if ((result >= 0xD800 && result <= 0xDFFF))
     {
-        context.report(coral66::Errors::Lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location, std::forward<PosArg>(arg));
+        context.report(coral66::Errors::Lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location,
+                       std::forward<PosArg>(arg));
         return {};
     }
     return result;
@@ -787,7 +817,7 @@ struct Start final
 
 struct CharacterLiteral final
 {
-    [[maybe_unused]]bool wide = false;
+    [[maybe_unused]] bool wide = false;
     std::string characters;
 
     std::pair<StateMachine, bool> advance(char c, Context& context);
@@ -795,7 +825,7 @@ struct CharacterLiteral final
 
 struct StringLiteral final
 {
-    [[maybe_unused]]bool wide = false;
+    [[maybe_unused]] bool wide = false;
     std::string characters;
     bool sawQuote = false;
 
@@ -819,7 +849,7 @@ struct PreprocessingNumber final
 struct MaybeUC final
 {
     std::unique_ptr<StateMachine> prevState{};
-    [[maybe_unused]]bool error = false;
+    [[maybe_unused]] bool error = false;
 
     std::pair<StateMachine, bool> advance(std::uint32_t c, Context& context) noexcept;
 };
@@ -996,13 +1026,13 @@ std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& cont
         context.push(TokenType::StringLiteral, characters);
         return {Start{}, false};
     }
-    
+
     if (c == '\'')
     {
         sawQuote = true;
         return {std::move(*this), true};
     }
-    
+
     characters += c;
     if ((c == '\n' || c == '\r'))
     {
@@ -1116,8 +1146,8 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
         // TODO: Warning that the universal character is treated as backslash followed by identifier
         if (suspHolder)
         {
-            context.withOffset(result + 1,
-                               [&] { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
+            context.withOffset(result + 1, [&]
+                               { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
         }
         context.push(result, result + 1, TokenType::Backslash);
         context.tokenStartOffset++;
@@ -1161,8 +1191,8 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
         if (suspHolder)
         {
             // TODO: Warning that the universal character is treated as backslash followed by identifier
-            context.withOffset(ucStart + 1,
-                               [&] { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
+            context.withOffset(ucStart + 1, [&]
+                               { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
             context.push(ucStart, ucStart + 1, TokenType::Backslash);
             context.tokenStartOffset++;
             return {Text{(big ? "U" : "u") + characters}, true};
@@ -1201,48 +1231,65 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c, Context& contex
 {
     switch (first)
     {
-        case static_cast<int>(TokenType::Minus):
-            context.push(1, TokenType::Minus); 
-            return {Start{}, false};
+        case static_cast<int>(TokenType::Minus): context.push(1, TokenType::Minus); return {Start{}, false};
         case static_cast<int>(TokenType::GreaterThan):
-            if (c == '=') { context.push(TokenType::GreaterThanOrEqual); return {Start{}, true}; }
-            context.push(1, TokenType::GreaterThan); 
+            if (c == '=')
+            {
+                context.push(TokenType::GreaterThanOrEqual);
+                return {Start{}, true};
+            }
+            context.push(1, TokenType::GreaterThan);
             return {Start{}, false};
         case static_cast<int>(TokenType::LessThan):
-            if (c == '=') { context.push(TokenType::LessThanOrEqual); return {Start{}, true}; }
-            if (c == '>') { context.push(TokenType::NotEqual); return {Start{}, true}; } // Coral <> for Not Equal
-            context.push(1, TokenType::LessThan); 
+            if (c == '=')
+            {
+                context.push(TokenType::LessThanOrEqual);
+                return {Start{}, true};
+            }
+            if (c == '>')
+            {
+                context.push(TokenType::NotEqual);
+                return {Start{}, true};
+            } // Coral <> for Not Equal
+            context.push(1, TokenType::LessThan);
             return {Start{}, false};
-        case static_cast<int>(TokenType::Ampersand):
-            context.push(1, TokenType::Ampersand); return {Start{}, false};
-        case static_cast<int>(TokenType::BitOr):
-            context.push(1, TokenType::BitOr); return {Start{}, false};
-        case static_cast<int>(TokenType::Plus):
-            context.push(1, TokenType::Plus); return {Start{}, false};
+        case static_cast<int>(TokenType::Ampersand): context.push(1, TokenType::Ampersand); return {Start{}, false};
+        case static_cast<int>(TokenType::BitOr): context.push(1, TokenType::BitOr); return {Start{}, false};
+        case static_cast<int>(TokenType::Plus): context.push(1, TokenType::Plus); return {Start{}, false};
         case static_cast<int>(TokenType::Assignment):
-            if (c == '=') { context.push(TokenType::Equal); return {Start{}, true}; }
-            context.push(1, TokenType::Assignment); return {Start{}, false};
+            if (c == '=')
+            {
+                context.push(TokenType::Equal);
+                return {Start{}, true};
+            }
+            context.push(1, TokenType::Assignment);
+            return {Start{}, false};
         case static_cast<int>(TokenType::LogicalNegation):
-            context.push(1, TokenType::LogicalNegation); return {Start{}, false};
-        case static_cast<int>(TokenType::Asterisk):
-            context.push(1, TokenType::Asterisk); return {Start{}, false};
+            context.push(1, TokenType::LogicalNegation);
+            return {Start{}, false};
+        case static_cast<int>(TokenType::Asterisk): context.push(1, TokenType::Asterisk); return {Start{}, false};
         case static_cast<int>(TokenType::Division):
             // Keep comment handling?
-            if (c == '/') return {LineComment{}, true};
-            if (c == '*') return {BlockComment{}, true};
-            context.push(1, TokenType::Division); return {Start{}, false};
-        case static_cast<int>(TokenType::Percent):
-            context.push(1, TokenType::Percent); return {Start{}, false};
+            if (c == '/')
+                return {LineComment{}, true};
+            if (c == '*')
+                return {BlockComment{}, true};
+            context.push(1, TokenType::Division);
+            return {Start{}, false};
+        case static_cast<int>(TokenType::Percent): context.push(1, TokenType::Percent); return {Start{}, false};
         case static_cast<int>(TokenType::Colon):
-            if (c == '=') { context.push(TokenType::Assignment); return {Start{}, true}; } // :=
-            context.push(1, TokenType::Colon); return {Start{}, false};
-        case static_cast<int>(TokenType::BitXor):
-            context.push(1, TokenType::BitXor); return {Start{}, false};
+            if (c == '=')
+            {
+                context.push(TokenType::Assignment);
+                return {Start{}, true};
+            } // :=
+            context.push(1, TokenType::Colon);
+            return {Start{}, false};
+        case static_cast<int>(TokenType::BitXor): context.push(1, TokenType::BitXor); return {Start{}, false};
         case static_cast<int>(TokenType::Pound):
-             context.push(context.tokenStartOffset,
-                          context.tokenStartOffset + (context.currentView().front() == '#' ? 1 : 2),
-                          TokenType::Pound);
-             return {Start{}, false};
+            context.push(context.tokenStartOffset,
+                         context.tokenStartOffset + (context.currentView().front() == '#' ? 1 : 2), TokenType::Pound);
+            return {Start{}, false};
         default: CLD_UNREACHABLE;
     }
 }
@@ -1327,8 +1374,10 @@ struct [[maybe_unused]] FirstArgOfMethod<R (*)(U, Args...) noexcept>
 };
 } // namespace
 
-coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, const not_null<const LanguageOptions> languageOptions,
-                                         llvm::raw_ostream* reporter, bool* errorsOccurred, std::string_view const sourcePath)
+coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
+                                                 const not_null<const LanguageOptions> languageOptions,
+                                                 llvm::raw_ostream* reporter, bool* errorsOccurred,
+                                                 std::string_view const sourcePath)
 {
     if (errorsOccurred)
     {
@@ -1426,9 +1475,9 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, const not_n
                                                                                        {"?\?!", '|'},
                                                                                        {"?\?>", '}'},
                                                                                        {"?\?-", '~'}}};
-                const auto result = std::ranges::find_if(mapping
-                    ,
-                    coral66::compose(coral66::bind_front(std::equal_to<>{}, view), &decltype(mapping)::value_type::first));
+                const auto result =
+                    std::ranges::find_if(mapping, coral66::compose(coral66::bind_front(std::equal_to<>{}, view),
+                                                                   &decltype(mapping)::value_type::first));
                 CLD_ASSERT(result != mapping.end());
                 characterToSourceSpace.emplace_back(charactersSpace.size(), pos, pos + view.size());
                 charactersSpace += result->second;
@@ -1637,7 +1686,8 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, const not_n
 
 [[nodiscard]] std::string_view coral66::Lexer::TokenBase::getRepresentation(const SourceInterface& sourceObject) const
 {
-    return std::string_view(sourceObject.getFiles()[static_cast<std::uint64_t>(m_fileID)].source).substr(m_offset, m_length);
+    return std::string_view(sourceObject.getFiles()[static_cast<std::uint64_t>(m_fileID)].source)
+        .substr(m_offset, m_length);
 }
 
 [[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getLine(const SourceInterface& sourceObject) const noexcept
@@ -1749,8 +1799,9 @@ enum class Literal
     StringLiteral,
 };
 
-std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view const characters, ConversionContext& context,
-                                                            bool wide, Literal const literalType)
+std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view const characters,
+                                                            ConversionContext& context, bool wide,
+                                                            Literal const literalType)
 {
     const std::uint32_t largestCharacter = [&context, wide]() -> std::uint32_t
     {
@@ -1870,9 +1921,9 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
         if (iter[1] == 'x')
         {
             iter += 2;
-            const auto* lastHex = std::find_if(
-                iter, end,
-                [](char c) { return !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'); });
+            const auto* lastHex =
+                std::find_if(iter, end, [](char c)
+                             { return !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'); });
             if (lastHex == iter)
             {
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 2);
@@ -1939,7 +1990,8 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
         {
             if (*iter > largestCharacter)
             {
-                context.report(coral66::Errors::Lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, context.token, context.token);
+                context.report(coral66::Errors::Lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, context.token,
+                               context.token);
                 errorOccured = true;
             }
         }
@@ -1948,21 +2000,25 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
     return {result, errorOccured};
 }
 
-std::optional<std::pair<CToken::ValueType, CToken::Type>>
-    processNumber(const char* begin, const char* end, std::uint64_t, ConversionContext&)
+std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const char* begin, const char* end,
+                                                                        std::uint64_t, ConversionContext&)
 {
     std::string text(begin, end);
+    bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos
+                   || text.find('E') != std::string::npos;
 
+    if (isFloat)
     {
         llvm::APFloat number(llvm::APFloat::IEEEdouble());
         auto result = number.convertFromString(text, llvm::APFloat::rmNearestTiesToEven);
         if (!result)
         {
-             // Fallback or error
-             return {};
+            // Fallback or error
+            return {};
         }
         return {{std::move(number), CToken::Floating}};
     }
+    else
     {
         // Integer (Decimal)
         // Coral 66 integers are decimal. OCTAL is handled via OCTAL().
@@ -1984,7 +2040,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>>
 } // namespace
 
 coral66::CSourceObject coral66::Lexer::toCTokens(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
-                                         bool* errorsOccurred)
+                                                 bool* errorsOccurred)
 {
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
@@ -1994,7 +2050,7 @@ coral66::CSourceObject coral66::Lexer::toCTokens(PPSourceObject&& sourceObject, 
 }
 
 coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter,
-                                         bool* errorsOccurred)
+                                                 bool* errorsOccurred)
 {
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
@@ -2005,8 +2061,8 @@ coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObj
 }
 
 std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,
-                                                      const PPSourceInterface& sourceInterface,
-                                                      llvm::raw_ostream* reporter, bool* errorsOccurred)
+                                                              const PPSourceInterface& sourceInterface,
+                                                              llvm::raw_ostream* reporter, bool* errorsOccurred)
 {
     if (errorsOccurred)
     {
@@ -2090,10 +2146,9 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                 {
                     break;
                 }
-                result.emplace_back(TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
-                                    iter->getMacroId(),
-                                    llvm::APSInt(llvm::APInt(64, static_cast<std::uint64_t>(chars[0]), true), false),
-                                    CToken::Integer);
+                result.emplace_back(
+                    TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(), iter->getMacroId(),
+                    llvm::APSInt(llvm::APInt(64, static_cast<std::uint64_t>(chars[0]), true), false), CToken::Integer);
                 break;
             }
             default:
@@ -2105,8 +2160,8 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
 }
 
 std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const PPToken& ppToken,
-                                                                 const PPSourceInterface& sourceInterface,
-                                                                 llvm::raw_ostream* reporter)
+                                                                         const PPSourceInterface& sourceInterface,
+                                                                         llvm::raw_ostream* reporter)
 {
     CLD_ASSERT(ppToken.getTokenType() == coral66::Lexer::TokenType::StringLiteral);
     bool errorsOccurred = false;
@@ -2198,7 +2253,7 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::Assignment: return "'='";
         case TokenType::Colon: return "':'";
         case TokenType::QuestionMark: return "'?'";
-        
+
         // Coral Keywords
         case TokenType::BeginKeyword: return "'BEGIN'";
         case TokenType::EndKeyword: return "'END'";
@@ -2232,7 +2287,7 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::OpenSquareBracket: return "'['";
         case TokenType::CloseSquareBracket: return "']'";
         case TokenType::Dot: return "'.'";
-        
+
         case TokenType::Pound: return "'#'";
         case TokenType::DoublePound: return "'##'";
         case TokenType::Newline: return "newline";
@@ -2389,8 +2444,10 @@ bool coral66::Lexer::needsWhitespaceInBetween(TokenType const left, TokenType co
     // Simplified for Coral: most punctuation separates itself.
     // But we might want to prevent accidental merging if we have ambiguous multi-char operators.
     // For now, minimal logic:
-    if (left == TokenType::PPNumber && isText(right)) return true;
-    if (left == TokenType::PPNumber && right == TokenType::PPNumber) return true;
+    if (left == TokenType::PPNumber && isText(right))
+        return true;
+    if (left == TokenType::PPNumber && right == TokenType::PPNumber)
+        return true;
     return false;
 }
 
@@ -2426,8 +2483,7 @@ bool coral66::Lexer::isText(TokenType const tokenType)
         case TokenType::CommonKeyword:
         case TokenType::CommentKeyword:
         case TokenType::DefineKeyword:
-        case TokenType::CodeKeyword:
-             return true;
+        case TokenType::CodeKeyword: return true;
         default: return false;
     }
 }
