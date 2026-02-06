@@ -13,7 +13,7 @@
 #include "lib/support/Filesystem.hpp"
 
 /**
- * @file Codegeneration.hpp
+ * @file CodeGeneration.hpp
  * @brief Defines the entry point and options for LLVM code generation.
  *
  * This file declares the `generateLLVM` function, which orchestrates the translation

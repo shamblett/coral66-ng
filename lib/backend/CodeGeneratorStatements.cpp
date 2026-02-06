@@ -4,8 +4,6 @@
 * Date   : 31/01/2026
 */
 
-#include "CodeGenerator.hpp"
-
 namespace coral66::CGLLVM
 {
 // Statements are currently stubbed in CodeGenerator.cpp

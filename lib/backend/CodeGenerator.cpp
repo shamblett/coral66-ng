@@ -6,7 +6,6 @@
 
 #include "CodeGenerator.hpp"
 #include <llvm/IR/Module.h>
-#include <llvm/IR/Verifier.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/InlineAsm.h>
 
@@ -77,7 +76,7 @@ llvm::Type* CodeGenerator::convertType(const Semantics::Type& type)
 
 llvm::BasicBlock* CodeGenerator::getOrCreateLabel(const Semantics::LabelStatement* label)
 {
-    if (m_labels.find(label) == m_labels.end())
+    if (!m_labels.contains(label))
     {
         m_labels[label] = llvm::BasicBlock::Create(m_module.getContext(), "label", m_currentFunction);
     }
@@ -89,8 +88,8 @@ llvm::Value* CodeGenerator::emitAddress(const Semantics::ExpressionBase& expr)
     if (auto* declRead = dynamic_cast<const Semantics::DeclarationRead*>(&expr))
     {
         const auto* decl = &declRead->getDeclRead();
-        if (m_locals.count(decl)) return m_locals[decl];
-        if (m_globals.count(decl)) return m_globals[decl];
+        if (m_locals.contains(decl)) return m_locals[decl];
+        if (m_globals.contains(decl)) return m_globals[decl];
     }
     else if (auto* part = dynamic_cast<const Semantics::PartWordAccess*>(&expr))
     {
@@ -403,6 +402,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::ExpressionBase& expr)
     );
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 llvm::Value* CodeGenerator::visit(const Semantics::Constant& expr)
 {
     auto& val = expr.getValue();

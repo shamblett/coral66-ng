@@ -6,11 +6,8 @@
 
 #pragma once
 
-#include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
-#include "lib/frontend/compiler/Program.hpp"
 #include "lib/frontend/compiler/Semantics.hpp"
-#include "lib/support/Filesystem.hpp"
 
 #include "CodeGeneration.hpp"
 
@@ -77,7 +74,7 @@ public:
     llvm::Value* visit(const Semantics::UnaryOperator& expr);
     llvm::Value* visit(const Semantics::CallExpression& expr);
     llvm::Value* visit(const Semantics::PartWordAccess& expr);
-    llvm::Value* visit(const Semantics::ErrorExpression& expr);
+    static llvm::Value* visit(const Semantics::ErrorExpression& expr);
 
 private:
     void generateProcedure(const Semantics::ProcedureDeclaration& procDecl);
