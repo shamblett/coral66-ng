@@ -35,7 +35,7 @@ TEST_CASE("Commandline options", "[coral66]")
             "BEGIN\n"
             "  INTEGER i;\n"
             "  FOR i := 0 STEP 2 UNTIL 10 DO\n"
-            "    answer i;\n"
+            "    ANSWER i;\n"
             "END");
         SECTION("Normal")
         {
