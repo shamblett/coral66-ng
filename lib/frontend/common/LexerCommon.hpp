@@ -10,7 +10,6 @@
 #include <llvm/ADT/APFloat.h>
 #include <llvm/Support/raw_ostream.h>
 
-#include <cstdint>
 #include <variant>
 #include <string>
 #include <string_view>

@@ -10,9 +10,7 @@
 #include <llvm/ADT/APFloat.h>
 #include <variant>
 #include <string>
-#include <optional>
 
-#include "DiagnosticUtilities.hpp"
 #include "LanguageOptions.hpp"
 
 namespace coral66::Semantics

@@ -14,7 +14,6 @@
 #include <string>
 #include <string_view>
 #include <optional>
-#include <cstdint>
 #include <tuple>
 
 namespace coral66::Semantics
