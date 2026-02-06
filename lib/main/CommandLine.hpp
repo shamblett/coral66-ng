@@ -716,9 +716,6 @@ public:
                 }
                 else
                 {
-#if defined(_MSC_VER) && !defined(__clang__)
-                    constexpr bool isTupleVector = IsTuple<std::decay_t<typename ValueType<Storage>::type>>{};
-#endif
                     if constexpr (isTupleVector)
                     {
                         if (m_firstArg)
@@ -728,10 +725,6 @@ public:
                         m_queue.push_back(
                             [=, this]
                             {
-#if defined(_MSC_VER) && !defined(__clang__)
-                                constexpr std::size_t storageIndex =
-                                    indexOf(cliOption->getArgNames(), arg<cliOption, i, index>.value);
-#endif
                                 std::get<storageIndex>(m_storage.back()) = value;
                             });
                     }

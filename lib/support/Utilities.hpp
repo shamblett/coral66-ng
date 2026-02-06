@@ -46,8 +46,6 @@
                 else                \
                     __builtin_unreachable()
 
-        #elif defined(_MSC_VER)
-
             #define CLD_UNREACHABLE  \
                 do                   \
                     __assume(false); \
@@ -127,8 +125,6 @@
 
 #if __has_attribute(always_inline) || __GNUC__ >= 5
     #define CLD_ALWAYS_INLINE inline __attribute__((always_inline))
-#elif defined(_MSC_VER)
-    #define CLD_ALWAYS_INLINE __forceinline
 #else
     #define CLD_ALWAYS_INLINE inline
 #endif

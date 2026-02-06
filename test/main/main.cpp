@@ -10,12 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-#ifdef _MSC_VER
-    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
-    _CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDERR);
-    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
-    _CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDERR);
-#endif
+
     auto enable = coral66::Tests::enableParallelization();
 
     Catch::Session session; // There must be exactly one instance

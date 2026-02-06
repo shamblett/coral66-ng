@@ -63,7 +63,7 @@
 /**
  * If exceptions are enabled, throw the exception passed in parameter, otherwise call std::terminate.
  */
-#if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || (defined(_MSC_VER) && defined(_CPPUNWIND))) \
+#if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)) \
     && !defined(TSL_NO_EXCEPTIONS)
     #define TSL_OH_THROW_OR_TERMINATE(ex, msg) throw ex(msg)
 #else
@@ -150,12 +150,8 @@ static_assert(std::numeric_limits<slz_size_type>::max() >= std::numeric_limits<s
 template <class T, class Deserializer>
 static T deserialize_value(Deserializer& deserializer)
 {
-    // MSVC < 2017 is not conformant, circumvent the problem by removing the template keyword
-#if defined(_MSC_VER) && _MSC_VER < 1910
-    return deserializer.Deserializer::operator()<T>();
-#else
+
     return deserializer.Deserializer::template operator()<T>();
-#endif
 }
 
 /**
