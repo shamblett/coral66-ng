@@ -68,7 +68,7 @@ constexpr std::optional<Arg> nextArg(std::string_view& text)
     std::size_t modifierEnd = result + 1;
     for (; modifierEnd != text.size() && !(text[modifierEnd] >= '0' && text[modifierEnd] <= '9'); modifierEnd++)
         ;
-    CLD_ASSERT(modifierEnd != text.size());
+    CORAL66_ASSERT(modifierEnd != text.size());
     auto view = text.substr(result, modifierEnd - result + 1);
     auto modifier = view;
     modifier.remove_prefix(1);
@@ -747,7 +747,7 @@ constexpr auto Diagnostic<N, format, Mods...>::getConstraints() -> std::array<st
         }
         else
         {
-            CLD_UNREACHABLE;
+            CORAL66_UNREACHABLE;
         }
     };
     (setConstraint.template operator()<Mods>(), ...);
@@ -831,7 +831,7 @@ constexpr auto Diagnostic<N, format, Mods...>::getModifiers(std::index_sequence<
             }
             else
             {
-                CLD_UNREACHABLE;
+                CORAL66_UNREACHABLE;
             }
         }(std::integral_constant<std::size_t, ints>{}),
         ...);

@@ -114,7 +114,7 @@ public:
 
     [[nodiscard]] const LanguageOptions& getLanguageOptions() const noexcept override
     {
-        CLD_ASSERT(m_languageOptions);
+        CORAL66_ASSERT(m_languageOptions);
         return *m_languageOptions;
     }
 };
@@ -167,23 +167,23 @@ public:
 
     [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t const fileID, std::uint64_t const offset) const noexcept override
     {
-        CLD_ASSERT(fileID < m_files.size());
+        CORAL66_ASSERT(fileID < m_files.size());
         auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
-        CLD_ASSERT(result != m_files[fileID].starts.end());
+        CORAL66_ASSERT(result != m_files[fileID].starts.end());
         return std::distance(m_files[fileID].starts.begin(), result) + (*result == offset ? 1 : 0);
     }
 
     [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
     {
-        CLD_ASSERT(fileID < m_files.size());
-        CLD_ASSERT(line - 1 < m_files[fileID].starts.size());
+        CORAL66_ASSERT(fileID < m_files.size());
+        CORAL66_ASSERT(line - 1 < m_files[fileID].starts.size());
         return m_files[fileID].starts[line - 1];
     }
 
     [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
     {
-        CLD_ASSERT(fileID < m_files.size());
-        CLD_ASSERT(line < m_files[fileID].starts.size());
+        CORAL66_ASSERT(fileID < m_files.size());
+        CORAL66_ASSERT(line < m_files[fileID].starts.size());
         return m_files[fileID].starts[line] - 1;
     }
 

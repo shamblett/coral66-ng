@@ -104,7 +104,7 @@ coral66::PP::File coral66::PP::parseFile(Lexer::PPTokenIterator& begin, Lexer::P
 coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end, Context& context,
                                    bool const)
 {
-    CLD_ASSERT(begin != end);
+    CORAL66_ASSERT(begin != end);
     std::vector<GroupPart> parts;
     do
     {
@@ -135,7 +135,7 @@ coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer:
 coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
                                                Context& context)
 {
-    CLD_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::Identifier && begin->getValue() == "DEFINE");
+    CORAL66_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::Identifier && begin->getValue() == "DEFINE");
     const auto* defineToken = begin;
     begin++;
     
@@ -159,7 +159,7 @@ coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& b
 }
 
 // Unused functions removed (parseIfSection, parseElseGroup, parseElIfGroup, parseIfGroup)
-coral66::PP::IfSection coral66::PP::parseIfSection(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CLD_UNREACHABLE; }
-coral66::PP::ElseGroup coral66::PP::parseElseGroup(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CLD_UNREACHABLE; }
-coral66::PP::ElIfGroup coral66::PP::parseElIfGroup(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CLD_UNREACHABLE; }
-coral66::PP::IfGroup coral66::PP::parseIfGroup(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CLD_UNREACHABLE; }
+coral66::PP::IfSection coral66::PP::parseIfSection(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CORAL66_UNREACHABLE; }
+coral66::PP::ElseGroup coral66::PP::parseElseGroup(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CORAL66_UNREACHABLE; }
+coral66::PP::ElIfGroup coral66::PP::parseElIfGroup(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CORAL66_UNREACHABLE; }
+coral66::PP::IfGroup coral66::PP::parseIfGroup(Lexer::PPTokenIterator&, Lexer::PPTokenIterator const, Context&) { CORAL66_UNREACHABLE; }

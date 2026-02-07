@@ -28,7 +28,7 @@
 #define CREATE_NOTE_7(...) CREATE_NOTE_VAARG(__VA_ARGS__)
 #define CREATE_NOTE_8(...) CREATE_NOTE_VAARG(__VA_ARGS__)
 
-#define CREATE_NOTE(...) P99_PASTE2(CREATE_NOTE_, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
+#define CREATE_NOTE(...) P99_PASTE2(CREATE_NOTE_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
 #define CREATE_NOTE_VAARG(variableName, format, ...)                                  \
     namespace detail                                                                  \
@@ -53,7 +53,7 @@
 #define CREATE_WARNING_8(...) CREATE_WARNING_VAARG(__VA_ARGS__)
 #define CREATE_WARNING_9(...) CREATE_WARNING_VAARG(__VA_ARGS__)
 
-#define CREATE_WARNING(...) P99_PASTE2(CREATE_WARNING_, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
+#define CREATE_WARNING(...) P99_PASTE2(CREATE_WARNING_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
 #define CREATE_WARNING_VAARG(variableName, cliName, format, ...)                               \
     namespace detail                                                                           \
@@ -78,7 +78,7 @@
 #define CREATE_ERROR_7(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 #define CREATE_ERROR_8(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 
-#define CREATE_ERROR(...) P99_PASTE2(CREATE_ERROR_, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
+#define CREATE_ERROR(...) P99_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
 #define CREATE_ERROR_VAARG(variableName, format, ...)                                 \
     namespace detail                                                                  \

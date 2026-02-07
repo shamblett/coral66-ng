@@ -50,7 +50,7 @@ public:
     template <class... Args>
     Ret operator()(Args&&... args) const
     {
-        CLD_ASSERT(m_callable);
+        CORAL66_ASSERT(m_callable);
         return m_callback(m_callable, std::forward<Args>(args)...);
     }
 

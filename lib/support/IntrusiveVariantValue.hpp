@@ -456,19 +456,19 @@ public:
     template <class V>
     IntrusiveVariantValue(const V&)
     {
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 
     template <class V>
     IntrusiveVariantValue(V&&) noexcept // NOLINT(*-forwarding-reference-overload)
     {
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 
     template <class V, class... Args>
     IntrusiveVariantValue(std::in_place_type_t<V>, Args&&...) noexcept
     {
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 };
 
@@ -582,22 +582,22 @@ public:
         return *object;
     }
 
-    Base* CLD_NON_NULL operator->()
+    Base* CORAL66_NON_NULL operator->()
     {
         return &get();
     }
 
-    const Base* CLD_NON_NULL operator->() const
+    const Base* CORAL66_NON_NULL operator->() const
     {
         return &get();
     }
 
-    Base* CLD_NON_NULL data()
+    Base* CORAL66_NON_NULL data()
     {
         return &get();
     }
 
-    const Base* CLD_NON_NULL data() const
+    const Base* CORAL66_NON_NULL data() const
     {
         return &get();
     }

@@ -36,7 +36,7 @@ bool isWhitespace(std::uint32_t c) noexcept;
 template <class Iter>
 std::uint8_t getNumBytesForUTF8(Iter begin, Iter end)
 {
-    CLD_ASSERT(begin != end);
+    CORAL66_ASSERT(begin != end);
     std::uint8_t des;
     std::int8_t temp = *begin;
     std::memcpy(&des, &temp, 1);

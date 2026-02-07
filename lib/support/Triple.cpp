@@ -14,8 +14,8 @@ coral66::Triple::Triple(coral66::Architecture const architecture, coral66::Platf
 
 coral66::Triple coral66::Triple::defaultTarget()
 {
-#ifdef CLD_DEFAULT_TARGET
-    static auto target = fromString(CLD_DEFAULT_TARGET);
+#ifdef CORAL66_DEFAULT_TARGET
+    static auto target = fromString(CORAL66_DEFAULT_TARGET);
     return target;
 #endif
     return native();

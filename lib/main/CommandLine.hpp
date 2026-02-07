@@ -471,7 +471,7 @@ constexpr static std::size_t indexOf(std::array<std::string_view, size> array, s
             return i;
         }
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 template <class T>
@@ -517,7 +517,7 @@ public:
     template <class... Args>
     Ret operator()(Args&&... args)
     {
-        CLD_ASSERT(m_call);
+        CORAL66_ASSERT(m_call);
         return (*m_call)(m_storage, std::forward<Args>(args)...);
     }
 };
@@ -1090,68 +1090,68 @@ auto parseCommandLine(std::span<std::string_view> commandLine, llvm::raw_ostream
 
 } // namespace coral66
 
-#define CLD_MACRO_NULL_SEP(NAME, i, REC, RES) REC RES
+#define CORAL66_MACRO_NULL_SEP(NAME, i, REC, RES) REC RES
 
-#define CLD_MACRO_GEN_STRING(NAME, STRING, INDEX) \
+#define CORAL66_MACRO_GEN_STRING(NAME, STRING, INDEX) \
     constexpr static auto NAME## arg## INDEX = ::coral66::Constexpr::basic_fixed_string{STRING};
 
-#define CLD_MACRO_GEN_STRINGS(NAME, ...) \
-    P99_FOR(NAME, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CLD_MACRO_NULL_SEP, CLD_MACRO_GEN_STRING, __VA_ARGS__)
+#define CORAL66_MACRO_GEN_STRINGS(NAME, ...) \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_NULL_SEP, CORAL66_MACRO_GEN_STRING, __VA_ARGS__)
 
-#define CLD_MACRO_REMOVE_PAREN(...) __VA_ARGS__
+#define CORAL66_MACRO_REMOVE_PAREN(...) __VA_ARGS__
 
-#define CLD_MACRO_GEN_STRINGS2(NAME, PACK) CLD_MACRO_GEN_STRINGS(NAME, CLD_MACRO_REMOVE_PAREN PACK)
+#define CORAL66_MACRO_GEN_STRINGS2(NAME, PACK) CORAL66_MACRO_GEN_STRINGS(NAME, CORAL66_MACRO_REMOVE_PAREN PACK)
 
-#define CLD_MACRO_COMMA_SEP(NAME, i, REC, RES) REC, RES
+#define CORAL66_MACRO_COMMA_SEP(NAME, i, REC, RES) REC, RES
 
-#define CLD_MACRO_LIST_STRING(NAME, STRING, INDEX) detail::NAME## arg## INDEX
+#define CORAL66_MACRO_LIST_STRING(NAME, STRING, INDEX) detail::NAME## arg## INDEX
 
-#define CLD_MACRO_LIST_STRINGS(NAME, ...) \
-    P99_FOR(NAME, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CLD_MACRO_COMMA_SEP, CLD_MACRO_LIST_STRING, __VA_ARGS__)
+#define CORAL66_MACRO_LIST_STRINGS(NAME, ...) \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_COMMA_SEP, CORAL66_MACRO_LIST_STRING, __VA_ARGS__)
 
-#define CLD_MACRO_LIST_STRINGS2(NAME, PACK) CLD_MACRO_LIST_STRINGS(NAME, CLD_MACRO_REMOVE_PAREN PACK)
+#define CORAL66_MACRO_LIST_STRINGS2(NAME, PACK) CORAL66_MACRO_LIST_STRINGS(NAME, CORAL66_MACRO_REMOVE_PAREN PACK)
 
-#define CLD_MACRO_STRINGIFY_SECOND(x, y) #y
+#define CORAL66_MACRO_STRINGIFY_SECOND(x, y) #y
 
-#define CLD_MACRO_GEN_BIND(NAME, STRING, INDEX) \
-    constexpr static auto NAME## bind## INDEX = ::coral66::Constexpr::basic_fixed_string{CLD_MACRO_STRINGIFY_SECOND STRING};
+#define CORAL66_MACRO_GEN_BIND(NAME, STRING, INDEX) \
+    constexpr static auto NAME## bind## INDEX = ::coral66::Constexpr::basic_fixed_string{CORAL66_MACRO_STRINGIFY_SECOND STRING};
 
-#define CLD_MACRO_GEN_BINDS(NAME, ...) \
-    P99_FOR(NAME, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CLD_MACRO_NULL_SEP, CLD_MACRO_GEN_BIND, __VA_ARGS__)
+#define CORAL66_MACRO_GEN_BINDS(NAME, ...) \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_NULL_SEP, CORAL66_MACRO_GEN_BIND, __VA_ARGS__)
 
-#define CLD_MACRO_LIST_BIND_DEFER(index, type, name) detail::name## bind## index, ::std::in_place_type<type>
+#define CORAL66_MACRO_LIST_BIND_DEFER(index, type, name) detail::name## bind## index, ::std::in_place_type<type>
 
-#define CLD_MACRO_GET_FIRST(x, y) x
+#define CORAL66_MACRO_GET_FIRST(x, y) x
 
-#define CLD_MACRO_LIST_BIND(NAME, ARG, INDEX) CLD_MACRO_LIST_BIND_DEFER(INDEX, CLD_MACRO_GET_FIRST ARG, NAME)
+#define CORAL66_MACRO_LIST_BIND(NAME, ARG, INDEX) CORAL66_MACRO_LIST_BIND_DEFER(INDEX, CORAL66_MACRO_GET_FIRST ARG, NAME)
 
-#define CLD_MACRO_LIST_BINDS(NAME, ...) \
-    P99_FOR(NAME, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CLD_MACRO_COMMA_SEP, CLD_MACRO_LIST_BIND, __VA_ARGS__)
+#define CORAL66_MACRO_LIST_BINDS(NAME, ...) \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_COMMA_SEP, CORAL66_MACRO_LIST_BIND, __VA_ARGS__)
 
-#define CLD_MACRO_CLI_OPT_2(NAME, PACK)                                    \
+#define CORAL66_MACRO_CLI_OPT_2(NAME, PACK)                                    \
     namespace detail                                                       \
     {                                                                      \
-    CLD_MACRO_GEN_STRINGS2(NAME, PACK)                                     \
+    CORAL66_MACRO_GEN_STRINGS2(NAME, PACK)                                     \
     }                                                                      \
     constexpr static auto NAME = ::coral66::detail::CommandLine::parseOptions< \
-        ::coral66::detail::CommandLine::Pack<CLD_MACRO_LIST_STRINGS2(NAME, PACK)>>
+        ::coral66::detail::CommandLine::Pack<CORAL66_MACRO_LIST_STRINGS2(NAME, PACK)>>
 
-#define CLD_MACRO_CLI_OPT_3(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
-#define CLD_MACRO_CLI_OPT_4(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
-#define CLD_MACRO_CLI_OPT_5(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
-#define CLD_MACRO_CLI_OPT_6(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
-#define CLD_MACRO_CLI_OPT_7(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
-#define CLD_MACRO_CLI_OPT_8(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
-#define CLD_MACRO_CLI_OPT_9(...) CLD_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_3(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_4(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_5(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_6(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_7(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_8(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
+#define CORAL66_MACRO_CLI_OPT_9(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
 
-#define CLD_CLI_OPT_VARARG(NAME, PACK, ...)                                    \
+#define CORAL66_CLI_OPT_VARARG(NAME, PACK, ...)                                    \
     namespace detail                                                           \
     {                                                                          \
-    CLD_MACRO_GEN_STRINGS2(NAME, PACK)                                         \
-    CLD_MACRO_GEN_BINDS(NAME, __VA_ARGS__)                                     \
+    CORAL66_MACRO_GEN_STRINGS2(NAME, PACK)                                         \
+    CORAL66_MACRO_GEN_BINDS(NAME, __VA_ARGS__)                                     \
     }                                                                          \
     constexpr static auto NAME = ::coral66::detail::CommandLine::parseOptions<     \
-        ::coral66::detail::CommandLine::Pack<CLD_MACRO_LIST_STRINGS2(NAME, PACK)>, \
-        CLD_MACRO_LIST_BINDS(NAME, __VA_ARGS__)>
+        ::coral66::detail::CommandLine::Pack<CORAL66_MACRO_LIST_STRINGS2(NAME, PACK)>, \
+        CORAL66_MACRO_LIST_BINDS(NAME, __VA_ARGS__)>
 
-#define CLD_CLI_OPT(...) P99_PASTE2(CLD_MACRO_CLI_OPT_, CLD_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
+#define CORAL66_CLI_OPT(...) P99_PASTE2(CORAL66_MACRO_CLI_OPT_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)

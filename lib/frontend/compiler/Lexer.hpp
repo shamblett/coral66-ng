@@ -40,9 +40,9 @@ using PPSourceObject = SourceObject<Lexer::PPToken>;
 
 namespace Lexer
 {
-using TokenIterator = const TokenBase* CLD_NON_NULL;
-using CTokenIterator = const CToken* CLD_NON_NULL;
-using PPTokenIterator = const PPToken* CLD_NON_NULL;
+using TokenIterator = const TokenBase* CORAL66_NON_NULL;
+using CTokenIterator = const CToken* CORAL66_NON_NULL;
+using PPTokenIterator = const PPToken* CORAL66_NON_NULL;
 
 /**
  * @brief Tokenizes a raw source string into a stream of Preprocessor Tokens (PPTokens).
@@ -140,7 +140,7 @@ struct StringConverter<Lexer::TokenBase>
 {
     static std::string inFormat(const Lexer::TokenBase& arg, const SourceInterface* sourceInterface)
     {
-        CLD_ASSERT(sourceInterface);
+        CORAL66_ASSERT(sourceInterface);
         auto spelling = Lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {
@@ -155,7 +155,7 @@ struct StringConverter<Lexer::TokenBase>
 
     static std::string inArg(const Lexer::TokenBase& arg, const SourceInterface* sourceInterface)
     {
-        CLD_ASSERT(sourceInterface);
+        CORAL66_ASSERT(sourceInterface);
         auto spelling = Lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {

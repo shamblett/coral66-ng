@@ -38,12 +38,12 @@ public:
 
     explicit constexpr MaxVector(std::size_t size) : m_size(size)
     {
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
     }
 
     constexpr MaxVector(std::initializer_list<T> initializerList) noexcept : m_size(initializerList.size())
     {
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
         for (std::size_t i = 0; i < m_size; i++)
         {
             m_array[i] = initializerList[i];
@@ -53,7 +53,7 @@ public:
     template <std::size_t N2>
     constexpr MaxVector(const MaxVector<T, N2>& rhs) noexcept : m_size(rhs.size())
     {
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
         for (std::size_t i = 0; i < m_size; i++)
         {
             m_array[i] = rhs[i];
@@ -63,7 +63,7 @@ public:
     constexpr MaxVector& operator=(std::initializer_list<T> initializerList) noexcept
     {
         m_size = initializerList.size();
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
         for (std::size_t i = 0; i < m_size; i++)
         {
             m_array[i] = initializerList[i];
@@ -73,7 +73,7 @@ public:
     template <class Iter>
     constexpr MaxVector(Iter first, Iter last) : m_size(last - first)
     {
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
         for (auto iter = first; iter != last; ++iter)
         {
             m_array[iter - first] = *iter;
@@ -118,7 +118,7 @@ public:
     constexpr void resize(std::size_t size) noexcept
     {
         m_size = size;
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
     }
 
     constexpr void resize(std::size_t size, const T& value) noexcept
@@ -128,7 +128,7 @@ public:
             m_array[i] = value;
         }
         m_size = size;
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
     }
 
     [[nodiscard]] constexpr bool empty() const noexcept
@@ -138,25 +138,25 @@ public:
 
     [[nodiscard]] constexpr T& operator[](std::size_t n) noexcept
     {
-        CLD_ASSERT(n < m_size);
+        CORAL66_ASSERT(n < m_size);
         return m_array[n];
     }
 
     [[nodiscard]] constexpr const T& operator[](std::size_t n) const noexcept
     {
-        CLD_ASSERT(n < m_size);
+        CORAL66_ASSERT(n < m_size);
         return m_array[n];
     }
 
     [[nodiscard]] constexpr T& at(std::size_t n) noexcept
     {
-        CLD_ASSERT(n < m_size);
+        CORAL66_ASSERT(n < m_size);
         return m_array[n];
     }
 
     [[nodiscard]] constexpr const T& at(std::size_t n) const noexcept
     {
-        CLD_ASSERT(n < m_size);
+        CORAL66_ASSERT(n < m_size);
         return m_array[n];
     }
 
@@ -172,13 +172,13 @@ public:
 
     [[nodiscard]] constexpr T& back() noexcept
     {
-        CLD_ASSERT(!empty());
+        CORAL66_ASSERT(!empty());
         return at(m_size - 1);
     }
 
     [[nodiscard]] constexpr const T& back() const noexcept
     {
-        CLD_ASSERT(!empty());
+        CORAL66_ASSERT(!empty());
         return at(m_size - 1);
     }
 
@@ -195,13 +195,13 @@ public:
     constexpr void push_back(const T& value) noexcept
     {
         m_array[m_size++] = value;
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
     }
 
     constexpr void push_back(T&& value) noexcept
     {
         m_array[m_size++] = std::move(value);
-        CLD_ASSERT(m_size <= N);
+        CORAL66_ASSERT(m_size <= N);
     }
 
     constexpr void pop_back() noexcept

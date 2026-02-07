@@ -58,7 +58,7 @@ PointRange getPointRange(const T& arg)
     }
     else if constexpr (detail::IsIterable<T>{})
     {
-        CLD_ASSERT(std::begin(arg) != std::end(arg));
+        CORAL66_ASSERT(std::begin(arg) != std::end(arg));
         auto& first = *std::begin(arg);
         auto& last = *(std::end(arg) - 1);
         if constexpr (std::is_pointer_v<std::decay_t<decltype(first)>> || IsSmartPtr<std::decay_t<decltype(first)>>{})
@@ -78,7 +78,7 @@ PointRange getPointRange(const T& arg)
                               using V = std::decay_t<T0>;
                               if constexpr (std::is_pointer_v<V> || IsSmartPtr<V>{})
                               {
-                                  CLD_ASSERT(value);
+                                  CORAL66_ASSERT(value);
                                   return getPointRange(*value);
                               }
                               else
@@ -99,7 +99,7 @@ PointRange getPointRange(const T& arg)
             PointLocation first, second;
             if constexpr (std::is_pointer_v<T1>)
             {
-                CLD_ASSERT(arg1);
+                CORAL66_ASSERT(arg1);
                 first = {arg1->getOffset(), arg1->getFileId(), arg1->getMacroId()};
             }
             else
@@ -108,7 +108,7 @@ PointRange getPointRange(const T& arg)
             }
             if constexpr (std::is_pointer_v<T2>)
             {
-                CLD_ASSERT(arg2);
+                CORAL66_ASSERT(arg2);
                 second = {arg2->getOffset() + arg2->getLength(), arg2->getFileId(), arg2->getMacroId()};
             }
             else

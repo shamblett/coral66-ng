@@ -49,7 +49,7 @@ coral66::LanguageOptions coral66::LanguageOptions::native(Language language)
             switch (std::numeric_limits<long double>::digits)
             {
                 case 64: return 80;
-                default: CLD_UNREACHABLE;
+                default: CORAL66_UNREACHABLE;
             }
         }(),
         alignof(long double),
@@ -109,7 +109,7 @@ bool coral66::LanguageOptions::isSigned(coral66::LanguageOptions::UnderlyingType
         case UnderlyingType::Long:
         case UnderlyingType::LongLong: return true;
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 std::uint8_t coral66::LanguageOptions::sizeOf(coral66::LanguageOptions::UnderlyingType const type) const
@@ -124,7 +124,7 @@ std::uint8_t coral66::LanguageOptions::sizeOf(coral66::LanguageOptions::Underlyi
         case UnderlyingType::LongLong:
         case UnderlyingType::UnsignedLongLong: return 8;
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 std::uint8_t coral66::LanguageOptions::alignOf(coral66::LanguageOptions::UnderlyingType const type) const
@@ -139,7 +139,7 @@ std::uint8_t coral66::LanguageOptions::alignOf(coral66::LanguageOptions::Underly
         case UnderlyingType::LongLong:
         case UnderlyingType::UnsignedLongLong: return alignOfLongLong;
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 std::string_view coral66::LanguageOptions::string(coral66::LanguageOptions::UnderlyingType const type)
@@ -154,7 +154,7 @@ std::string_view coral66::LanguageOptions::string(coral66::LanguageOptions::Unde
         case UnderlyingType::LongLong: return "long long";
         case UnderlyingType::UnsignedLongLong: return "unsigned long long";
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 bool coral66::DefaultTargetFeatures::hasFeature(coral66::TargetFeatures::Features) const

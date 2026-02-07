@@ -27,124 +27,124 @@
 #include "lib/support/Triple.hpp"
 #include "lib/main/CommandLine.hpp"
 
-CLD_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
+CORAL66_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
 ("Path of the output file");
 
-CLD_CLI_OPT(COMPILE_ONLY, ("-c", "--compile"))("Stop after compiling object files");
+CORAL66_CLI_OPT(COMPILE_ONLY, ("-c", "--compile"))("Stop after compiling object files");
 
-CLD_CLI_OPT(ASSEMBLY_OUTPUT, ("-S", "--assemble"))("Stop after compiling and output assembly files");
+CORAL66_CLI_OPT(ASSEMBLY_OUTPUT, ("-S", "--assemble"))("Stop after compiling and output assembly files");
 
-CLD_CLI_OPT(PREPROCESS_ONLY, ("-E", "--preprocess"))("Preprocess to stdout or output file");
+CORAL66_CLI_OPT(PREPROCESS_ONLY, ("-E", "--preprocess"))("Preprocess to stdout or output file");
 
-CLD_CLI_OPT(SYNTAX_ONLY, ("-fsyntax-only"))("Stop after semantic analysis and produce no output file");
+CORAL66_CLI_OPT(SYNTAX_ONLY, ("-fsyntax-only"))("Stop after semantic analysis and produce no output file");
 
-CLD_CLI_OPT(TARGET, ("--target=<arg>", "-target <arg>"), (std::string_view, arg))("Compiler target triple to use");
+CORAL66_CLI_OPT(TARGET, ("--target=<arg>", "-target <arg>"), (std::string_view, arg))("Compiler target triple to use");
 
-CLD_CLI_OPT(DEFINE_MACRO, ("-D<macro>=<value>", "-D<macro>", "--define-macro <macro>", "--define-macro=<macro>"),
+CORAL66_CLI_OPT(DEFINE_MACRO, ("-D<macro>=<value>", "-D<macro>", "--define-macro <macro>", "--define-macro=<macro>"),
             (std::string_view, macro), (std::string_view, value))
 ("Define macro for the whole translation unit", coral66::CLIMultiArg::List);
 
-CLD_CLI_OPT(EMIT_LLVM, ("-emit-llvm"))("Use LLVM IR instead of machine code and assembly");
+CORAL66_CLI_OPT(EMIT_LLVM, ("-emit-llvm"))("Use LLVM IR instead of machine code and assembly");
 
-CLD_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (std::uint8_t, level))("Optimization level");
+CORAL66_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (std::uint8_t, level))("Optimization level");
 
-CLD_CLI_OPT(INCLUDES, ("-I<dir>", "-I <dir>", "--include-directory <dir>", "--include-directory=<dir>"),
+CORAL66_CLI_OPT(INCLUDES, ("-I<dir>", "-I <dir>", "--include-directory <dir>", "--include-directory=<dir>"),
             (std::string_view, dir))
 ("Additional include directories", coral66::CLIMultiArg::List);
 
-CLD_CLI_OPT(ISYSTEM, ("-isystem<dir>", "-isystem <dir>"), (std::string, dir))
+CORAL66_CLI_OPT(ISYSTEM, ("-isystem<dir>", "-isystem <dir>"), (std::string, dir))
 ("Append to system include directories", coral66::CLIMultiArg::List);
 
-CLD_CLI_OPT(PIE, ("-f[no-]PIE"))("Build a position independent executable");
+CORAL66_CLI_OPT(PIE, ("-f[no-]PIE"))("Build a position independent executable");
 
-CLD_CLI_OPT(PIC, ("-f[no-]PIC"))("Build position independent code");
+CORAL66_CLI_OPT(PIC, ("-f[no-]PIC"))("Build position independent code");
 
-CLD_CLI_OPT(FREESTANDING, ("-ffreestanding"))("Compile in a freestanding environment");
+CORAL66_CLI_OPT(FREESTANDING, ("-ffreestanding"))("Compile in a freestanding environment");
 
-CLD_CLI_OPT(EMIT_ALL_DECLS, ("-femit-all-decls"))("Compile in a freestanding environment");
+CORAL66_CLI_OPT(EMIT_ALL_DECLS, ("-femit-all-decls"))("Compile in a freestanding environment");
 
-CLD_CLI_OPT(VERSION, ("--version"))("Print version");
+CORAL66_CLI_OPT(VERSION, ("--version"))("Print version");
 
-CLD_CLI_OPT(HELP, ("--help", "-help"))("Display all options");
+CORAL66_CLI_OPT(HELP, ("--help", "-help"))("Display all options");
 
-CLD_CLI_OPT(TIME, ("-time"))("Time individual components");
+CORAL66_CLI_OPT(TIME, ("-time"))("Time individual components");
 
-CLD_CLI_OPT(STANDARD_VERSION, ("-std=<arg>", "--std=<arg>", "--std <arg>"), (std::string_view, arg))
+CORAL66_CLI_OPT(STANDARD_VERSION, ("-std=<arg>", "--std=<arg>", "--std <arg>"), (std::string_view, arg))
 ("C standard version");
 
-CLD_CLI_OPT(WARNINGS, ("-W[no-]<warning>", "--warn-[no-]<warning>", "--warn-=[no-]<warning>"),
+CORAL66_CLI_OPT(WARNINGS, ("-W[no-]<warning>", "--warn-[no-]<warning>", "--warn-=[no-]<warning>"),
             (std::string_view, warning))
 ("Enable/disable specified warning", coral66::CLIMultiArg::List);
 
-CLD_CLI_OPT(G0, ("-g0"))("No debug info");
+CORAL66_CLI_OPT(G0, ("-g0"))("No debug info");
 
-CLD_CLI_OPT(G1, ("-g1", "-gline-tables-only", "-gmlt"))("Lines only");
+CORAL66_CLI_OPT(G1, ("-g1", "-gline-tables-only", "-gmlt"))("Lines only");
 
-CLD_CLI_OPT(G2, ("-g2", "-g", "--debug"))("Generated debugging info");
+CORAL66_CLI_OPT(G2, ("-g2", "-g", "--debug"))("Generated debugging info");
 
-CLD_CLI_OPT(G3, ("-g3"))("Generated extded debugging info");
+CORAL66_CLI_OPT(G3, ("-g3"))("Generated extded debugging info");
 
-CLD_CLI_OPT(MMX, ("-m[no-]mx"))("Enable x86 MMX extensions");
+CORAL66_CLI_OPT(MMX, ("-m[no-]mx"))("Enable x86 MMX extensions");
 
-CLD_CLI_OPT(SSE, ("-m[no-]sse"))("Enable x86 SSE extensions");
+CORAL66_CLI_OPT(SSE, ("-m[no-]sse"))("Enable x86 SSE extensions");
 
-CLD_CLI_OPT(THREEDNOWA, ("-m[no-]3dnowa"))("Enable x86 3DNowA! extensions");
+CORAL66_CLI_OPT(THREEDNOWA, ("-m[no-]3dnowa"))("Enable x86 3DNowA! extensions");
 
-CLD_CLI_OPT(SSE2, ("-m[no-]sse2"))("Enable x86 SSE 2 extensions");
+CORAL66_CLI_OPT(SSE2, ("-m[no-]sse2"))("Enable x86 SSE 2 extensions");
 
-CLD_CLI_OPT(SSE3, ("-m[no-]sse3"))("Enable x86 SSE 3 extensions");
+CORAL66_CLI_OPT(SSE3, ("-m[no-]sse3"))("Enable x86 SSE 3 extensions");
 
-CLD_CLI_OPT(SSSE3, ("-m[no-]ssse3"))("Enable x86 SSSE 3 extensions");
+CORAL66_CLI_OPT(SSSE3, ("-m[no-]ssse3"))("Enable x86 SSSE 3 extensions");
 
-CLD_CLI_OPT(SSE4_1, ("-m[no-]sse4.1"))("Enable x86 SSE 4.1 extensions");
+CORAL66_CLI_OPT(SSE4_1, ("-m[no-]sse4.1"))("Enable x86 SSE 4.1 extensions");
 
-CLD_CLI_OPT(SSE4_2, ("-m[no-]sse4.2"))("Enable x86 SSE 4.2 extensions");
+CORAL66_CLI_OPT(SSE4_2, ("-m[no-]sse4.2"))("Enable x86 SSE 4.2 extensions");
 
-CLD_CLI_OPT(AVX, ("-m[no-]avx"))("Enable x86 AVX extensions");
+CORAL66_CLI_OPT(AVX, ("-m[no-]avx"))("Enable x86 AVX extensions");
 
-CLD_CLI_OPT(AVX2, ("-m[no-]avx2"))("Enable x86 AVX 2 extensions");
+CORAL66_CLI_OPT(AVX2, ("-m[no-]avx2"))("Enable x86 AVX 2 extensions");
 
-CLD_CLI_OPT(AES, ("-m[no-]aes"))("Enable x86 AES extensions");
+CORAL66_CLI_OPT(AES, ("-m[no-]aes"))("Enable x86 AES extensions");
 
-CLD_CLI_OPT(PCLMUL, ("-m[no-]pclmul"))("Enable x86 PCLMUL extensions");
+CORAL66_CLI_OPT(PCLMUL, ("-m[no-]pclmul"))("Enable x86 PCLMUL extensions");
 
-CLD_CLI_OPT(FSGSBASE, ("-m[no-]fsgsbase"))("Enable x86 FSGSBASE extensions");
+CORAL66_CLI_OPT(FSGSBASE, ("-m[no-]fsgsbase"))("Enable x86 FSGSBASE extensions");
 
-CLD_CLI_OPT(RDRND, ("-m[no-]frdrnd"))("Enable x86 RDRND extensions");
+CORAL66_CLI_OPT(RDRND, ("-m[no-]frdrnd"))("Enable x86 RDRND extensions");
 
-CLD_CLI_OPT(PTWRITE, ("-m[no-]ptwrite"))("Enable x86 PTWRITE extensions");
+CORAL66_CLI_OPT(PTWRITE, ("-m[no-]ptwrite"))("Enable x86 PTWRITE extensions");
 
-CLD_CLI_OPT(SSE4A, ("-m[no-]sse4a"))("Enable x86 SSE 4a extensions");
+CORAL66_CLI_OPT(SSE4A, ("-m[no-]sse4a"))("Enable x86 SSE 4a extensions");
 
-CLD_CLI_OPT(XOPA, ("-m[no-]xop"))("Enable x86 XOP extensions");
+CORAL66_CLI_OPT(XOPA, ("-m[no-]xop"))("Enable x86 XOP extensions");
 
-CLD_CLI_OPT(FMA4, ("-m[no-]fma4"))("Enable x86 FMA4 extensions");
+CORAL66_CLI_OPT(FMA4, ("-m[no-]fma4"))("Enable x86 FMA4 extensions");
 
-CLD_CLI_OPT(LWP, ("-m[no-]lwp"))("Enable x86 LWP extensions");
+CORAL66_CLI_OPT(LWP, ("-m[no-]lwp"))("Enable x86 LWP extensions");
 
-CLD_CLI_OPT(BMI, ("-m[no-]bmi"))("Enable x86 BMI extensions");
+CORAL66_CLI_OPT(BMI, ("-m[no-]bmi"))("Enable x86 BMI extensions");
 
-CLD_CLI_OPT(BMI2, ("-m[no-]bmi2"))("Enable x86 BMI 2 extensions");
+CORAL66_CLI_OPT(BMI2, ("-m[no-]bmi2"))("Enable x86 BMI 2 extensions");
 
-CLD_CLI_OPT(LZCNT, ("-m[no-]lzcnt"))("Enable x86 LZCNT extensions");
+CORAL66_CLI_OPT(LZCNT, ("-m[no-]lzcnt"))("Enable x86 LZCNT extensions");
 
-CLD_CLI_OPT(FXSR, ("-m[no-]fxsr"))("Enable x86 FXSR extensions");
+CORAL66_CLI_OPT(FXSR, ("-m[no-]fxsr"))("Enable x86 FXSR extensions");
 
-CLD_CLI_OPT(XSAVE, ("-m[no-]xsave"))("Enable x86 XSAVE extensions");
+CORAL66_CLI_OPT(XSAVE, ("-m[no-]xsave"))("Enable x86 XSAVE extensions");
 
-CLD_CLI_OPT(XSAVEOPT, ("-m[no-]xsaveopt"))("Enable x86 XSAVEOPT extensions");
+CORAL66_CLI_OPT(XSAVEOPT, ("-m[no-]xsaveopt"))("Enable x86 XSAVEOPT extensions");
 
-CLD_CLI_OPT(TBM, ("-m[no-]tbm"))("Enable x86 TBM extensions");
+CORAL66_CLI_OPT(TBM, ("-m[no-]tbm"))("Enable x86 TBM extensions");
 
-CLD_CLI_OPT(THREEDNOW, ("-m[no-]3dnow"))("Enable x86 3DNow! extensions");
+CORAL66_CLI_OPT(THREEDNOW, ("-m[no-]3dnow"))("Enable x86 3DNow! extensions");
 
-CLD_CLI_OPT(RTM, ("-m[no-]rtm"))("Enable x86 RTM extensions");
+CORAL66_CLI_OPT(RTM, ("-m[no-]rtm"))("Enable x86 RTM extensions");
 
-CLD_CLI_OPT(MWAITX, ("-m[no-]mwaitx"))("Enable x86 MWAITX extensions");
+CORAL66_CLI_OPT(MWAITX, ("-m[no-]mwaitx"))("Enable x86 MWAITX extensions");
 
-CLD_CLI_OPT(CLZERO, ("-m[no-]mwaitx"))("Enable x86 CLZERO extensions");
+CORAL66_CLI_OPT(CLZERO, ("-m[no-]mwaitx"))("Enable x86 CLZERO extensions");
 
-CLD_CLI_OPT(PKU, ("-m[no-]pku"))("Enable x86 PKU extensions");
+CORAL66_CLI_OPT(PKU, ("-m[no-]pku"))("Enable x86 PKU extensions");
 
  // ReSharper disable once CppRedundantNamespaceDefinition
 namespace coral66::cli

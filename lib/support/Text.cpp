@@ -128,7 +128,7 @@ unsigned coral66::unsafeColumnWidth(std::string_view const text)
         llvm::UTF32* target = buf.data();
         if (llvm::conversionOK
             != ConvertUTF8toUTF32(&start, start + length, &target, target + 1, llvm::strictConversion))
-            CLD_UNREACHABLE;
+            CORAL66_UNREACHABLE;
         const int Width = unsafeCharWidth(buf[0]);
         columnWidth += Width;
     }

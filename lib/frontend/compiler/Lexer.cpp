@@ -97,7 +97,7 @@ TokenType charactersToKeyword(std::string_view characters)
     if (characters == "CODE")
         return TokenType::CodeKeyword;
 
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 #pragma region UnicodeRanges
@@ -490,7 +490,7 @@ std::uint8_t getNumUTF8ForUTF32(std::uint32_t c)
     {
         return 4;
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 template <class Iter>
@@ -520,7 +520,7 @@ std::pair<std::uint64_t, std::uint64_t> map(const IntervalMap& intervalMap, std:
 {
     auto result = std::lower_bound(intervalMap.begin(), intervalMap.end(), offset,
                                    [](auto&& lhs, auto&& rhs) { return std::get<0>(lhs) < rhs; });
-    CLD_ASSERT(result != intervalMap.end());
+    CORAL66_ASSERT(result != intervalMap.end());
     if (std::get<0>(*result) > offset)
     {
         --result;
@@ -528,12 +528,12 @@ std::pair<std::uint64_t, std::uint64_t> map(const IntervalMap& intervalMap, std:
     const auto next = result + 1;
     if (next == intervalMap.end())
     {
-        CLD_ASSERT(intervalMap.size() >= 2);
+        CORAL66_ASSERT(intervalMap.size() >= 2);
         // does this make sense?
         return {std::get<2>(intervalMap[intervalMap.size() - 2]), std::get<2>(intervalMap[intervalMap.size() - 2])};
     }
     const auto denominator = std::get<0>(*next) - std::get<0>(*result);
-    CLD_ASSERT(denominator != 0);
+    CORAL66_ASSERT(denominator != 0);
     const auto nominatorRange = std::get<2>(*result) - std::get<1>(*result);
     const auto lowBound = (offset - std::get<0>(*result)) * nominatorRange / denominator + std::get<1>(*result);
     const auto highBound = (offset + 1 - std::get<0>(*result)) * nominatorRange / denominator + std::get<1>(*result);
@@ -615,19 +615,19 @@ class Context : private coral66::SourceInterface
     [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t offset) const noexcept override
     {
         auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
-        CLD_ASSERT(result != m_lineStarts.end());
+        CORAL66_ASSERT(result != m_lineStarts.end());
         return std::distance(m_lineStarts.begin(), result) + (*result == offset ? 1 : 0);
     }
 
     [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t, std::uint64_t line) const noexcept override
     {
-        CLD_ASSERT(line - 1 < m_lineStarts.size());
+        CORAL66_ASSERT(line - 1 < m_lineStarts.size());
         return m_lineStarts[line - 1];
     }
 
     [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t, std::uint64_t line) const noexcept override
     {
-        CLD_ASSERT(line - 1 < m_lineStarts.size());
+        CORAL66_ASSERT(line - 1 < m_lineStarts.size());
         if (line != m_lineStarts.size())
         {
             return m_lineStarts[line] - 1;
@@ -767,7 +767,7 @@ std::uint32_t hexToValue(std::string_view const value)
 {
     std::uint32_t result;
     auto errors = std::from_chars(value.data(), value.data() + value.size(), result, 16);
-    CLD_ASSERT(errors.ec == std::errc{});
+    CORAL66_ASSERT(errors.ec == std::errc{});
     return result;
 }
 
@@ -785,7 +785,7 @@ template <class T, class PosArg>
 std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
                                                        PosArg&& arg, T& context)
 {
-    CLD_ASSERT(value.size() == 4 || value.size() == 8);
+    CORAL66_ASSERT(value.size() == 4 || value.size() == 8);
     auto result = hexToValue(value);
     if (result < 0xA0)
     {
@@ -1123,7 +1123,7 @@ std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c, Context& context
         {
             return {UniversalCharacter{c == 'U', coral66::get<PreprocessingNumber>(std::move(*prevState))}, true};
         }
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 
     if (prevState)
@@ -1141,7 +1141,7 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
     if (!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
     {
         std::size_t result = context.view(context.tokenStartOffset, context.getOffset() - 1).rfind('\\');
-        CLD_ASSERT(result != std::string_view::npos);
+        CORAL66_ASSERT(result != std::string_view::npos);
         result += context.tokenStartOffset;
         // TODO: Warning that the universal character is treated as backslash followed by identifier
         if (suspHolder)
@@ -1161,7 +1161,7 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
     }
 
     std::size_t ucStart = context.currentView().rfind('\\');
-    CLD_ASSERT(ucStart != std::string_view::npos);
+    CORAL66_ASSERT(ucStart != std::string_view::npos);
     ucStart += context.tokenStartOffset;
     auto result = universalCharacterToValue(characters, ucStart, std::pair{ucStart, context.getOffset()}, context);
     if (!result)
@@ -1292,7 +1292,7 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c, Context& contex
             context.push(context.tokenStartOffset,
                          context.tokenStartOffset + (context.currentView().front() == '#' ? 1 : 2), TokenType::Pound);
             return {Start{}, false};
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -1480,7 +1480,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
                 const auto result =
                     std::ranges::find_if(mapping, coral66::compose(coral66::bind_front(std::equal_to<>{}, view),
                                                                    &decltype(mapping)::value_type::first));
-                CLD_ASSERT(result != mapping.end());
+                CORAL66_ASSERT(result != mapping.end());
                 characterToSourceSpace.emplace_back(charactersSpace.size(), pos, pos + view.size());
                 charactersSpace += result->second;
             }
@@ -1791,7 +1791,7 @@ std::uint32_t octalToValue(std::string_view const value)
 {
     std::uint32_t result;
     auto errors = std::from_chars(value.data(), value.data() + value.size(), result, 8);
-    CLD_ASSERT(errors.ec == std::errc{});
+    CORAL66_ASSERT(errors.ec == std::errc{});
     return result;
 }
 
@@ -2165,7 +2165,7 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
                                                                          const PPSourceInterface& sourceInterface,
                                                                          llvm::raw_ostream* reporter)
 {
-    CLD_ASSERT(ppToken.getTokenType() == coral66::Lexer::TokenType::StringLiteral);
+    CORAL66_ASSERT(ppToken.getTokenType() == coral66::Lexer::TokenType::StringLiteral);
     bool errorsOccurred = false;
     ConversionContext context{reporter, sourceInterface, ppToken, &errorsOccurred};
     bool wide = ppToken.getRepresentation(sourceInterface)[0] == 'L';
@@ -2182,7 +2182,7 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
         if (llvm::ConvertUTF32toUTF8(&start, start + chars.size(), &dest, dest + utf8.size(), llvm::strictConversion)
             != llvm::conversionOK)
         {
-            CLD_UNREACHABLE;
+            CORAL66_UNREACHABLE;
         }
 
         if (wide)
@@ -2212,12 +2212,12 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
                                           llvm::strictConversion)
                 != llvm::conversionOK)
             {
-                CLD_UNREACHABLE;
+                CORAL66_UNREACHABLE;
             }
             return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
                           ppToken.getMacroId(), NonCharString{{utf16.data(), dest}, NonCharString::Wide});
         }
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -2294,10 +2294,10 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::DoublePound: return "'##'";
         case TokenType::Newline: return "newline";
         case TokenType::PPNumber: return "preprocessing number";
-        case TokenType::Miscellaneous: CLD_UNREACHABLE;
+        case TokenType::Miscellaneous: CORAL66_UNREACHABLE;
         case TokenType::Backslash: return "'\\'";
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const tokenType)
@@ -2373,10 +2373,10 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
         case TokenType::DoublePound: return "##";
         case TokenType::Newline: return "newline";
         case TokenType::PPNumber: return "preprocessing number";
-        case TokenType::Miscellaneous: CLD_UNREACHABLE;
+        case TokenType::Miscellaneous: CORAL66_UNREACHABLE;
         case TokenType::Backslash: return "\\";
     }
-    CLD_UNREACHABLE;
+    CORAL66_UNREACHABLE;
 }
 
 std::string coral66::Lexer::normalizeSpelling(std::string_view tokenSpelling)

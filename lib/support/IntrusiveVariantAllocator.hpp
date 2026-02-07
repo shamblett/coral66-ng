@@ -120,7 +120,7 @@ public:
 
     void operator()(T* pointer) const noexcept
     {
-        CLD_ASSERT(m_allocator);
+        CORAL66_ASSERT(m_allocator);
         m_allocator->destroy(pointer);
     }
 };
@@ -271,8 +271,8 @@ public:
         auto slab = std::lower_bound(m_slabs.begin(), m_slabs.end(), pointerIntoObject,
                                      [](const std::unique_ptr<Slab>& slab1, std::byte* value)
                                      { return std::end(slab1->storage) < value; });
-        CLD_ASSERT(slab != m_slabs.end());
-        CLD_ASSERT((*slab)->storage <= pointerIntoObject && pointerIntoObject < std::end((*slab)->storage));
+        CORAL66_ASSERT(slab != m_slabs.end());
+        CORAL66_ASSERT((*slab)->storage <= pointerIntoObject && pointerIntoObject < std::end((*slab)->storage));
         if constexpr (needsDestructor)
         {
             auto& metadata = (*slab)->metadata[(pointerIntoObject - (*slab)->storage) / allocSize];

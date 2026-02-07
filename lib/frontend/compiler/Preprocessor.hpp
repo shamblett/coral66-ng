@@ -50,7 +50,7 @@ std::string reconstruct(const T* begin, const T* end, const SourceInterface& sou
             {
                 tuple = coral66::match(
                     sourceInterface.getSubstitutions()[std::get<0>(tuple)],
-                    [](std::monostate) -> std::tuple<std::uint32_t, std::uint32_t, std::uint64_t> { CLD_UNREACHABLE; },
+                    [](std::monostate) -> std::tuple<std::uint32_t, std::uint32_t, std::uint64_t> { CORAL66_UNREACHABLE; },
                     [isPrev](const Source::Substitution& substitution)
                     {
                         if (isPrev && substitution.closeParentheses)

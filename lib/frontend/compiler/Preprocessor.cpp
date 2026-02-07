@@ -169,22 +169,22 @@ class Preprocessor final : private coral66::PPSourceInterface
 
     std::uint64_t getLineNumber(std::uint32_t const fileID, std::uint64_t const offset) const noexcept override
     {
-        CLD_ASSERT(fileID < m_files.size());
+        CORAL66_ASSERT(fileID < m_files.size());
         auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
         return std::distance(m_files[fileID].starts.begin(), result) + (*result == offset ? 1 : 0);
     }
 
     std::uint64_t getLineStartOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
     {
-        CLD_ASSERT(fileID < m_files.size());
-        CLD_ASSERT(line - 1 < m_files[fileID].starts.size());
+        CORAL66_ASSERT(fileID < m_files.size());
+        CORAL66_ASSERT(line - 1 < m_files[fileID].starts.size());
         return m_files[fileID].starts[line - 1];
     }
 
     [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
     {
-        CLD_ASSERT(fileID < m_files.size());
-        CLD_ASSERT(line < m_files[fileID].starts.size());
+        CORAL66_ASSERT(fileID < m_files.size());
+        CORAL66_ASSERT(line < m_files[fileID].starts.size());
         return m_files[fileID].starts[line] - 1;
     }
 
@@ -237,7 +237,7 @@ public:
 
     void process(coral66::PPSourceObject&& sourceObject)
     {
-        CLD_ASSERT(sourceObject.getFiles().size() == 1);
+        CORAL66_ASSERT(sourceObject.getFiles().size() == 1);
         m_files.push_back({std::move(sourceObject.getFiles()[0].path),
                            std::move(sourceObject.getFiles()[0].source),
                            std::move(sourceObject.getFiles()[0].starts),

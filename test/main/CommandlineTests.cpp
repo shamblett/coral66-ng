@@ -13,16 +13,16 @@
 
 namespace
 {
-CLD_CLI_OPT(COMPILE_ONLY, ("-c", "--compile"))("Stop after compiling object files");
-CLD_CLI_OPT(INCLUDES, ("-I<dir>", "--include-directory <dir>", "--include-directory=<dir>"), (std::string_view, dir))
+CORAL66_CLI_OPT(COMPILE_ONLY, ("-c", "--compile"))("Stop after compiling object files");
+CORAL66_CLI_OPT(INCLUDES, ("-I<dir>", "--include-directory <dir>", "--include-directory=<dir>"), (std::string_view, dir))
 ("Additional include directories", coral66::CLIMultiArg::List);
 
-CLD_CLI_OPT(STRING_ARG, ("--prefix=<arg>", "--prefix <arg>"), (std::string, arg))("A std::string arg");
-CLD_CLI_OPT(STRING_VIEW_ARG, ("--prefix=<arg>", "--prefix <arg>"), (std::string_view, arg))("A std::string_view arg");
-CLD_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (std::uint8_t, level))("Optimization level");
-CLD_CLI_OPT(OPT_CHAR, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (coral66::cli::Char, level))
+CORAL66_CLI_OPT(STRING_ARG, ("--prefix=<arg>", "--prefix <arg>"), (std::string, arg))("A std::string arg");
+CORAL66_CLI_OPT(STRING_VIEW_ARG, ("--prefix=<arg>", "--prefix <arg>"), (std::string_view, arg))("A std::string_view arg");
+CORAL66_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (std::uint8_t, level))("Optimization level");
+CORAL66_CLI_OPT(OPT_CHAR, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (coral66::cli::Char, level))
 ("Optimization level");
-CLD_CLI_OPT(PIE, ("-f[no-]pie"))("Position independent executable");
+CORAL66_CLI_OPT(PIE, ("-f[no-]pie"))("Position independent executable");
 } // namespace
 
 using namespace coral66::Errors::CLI;

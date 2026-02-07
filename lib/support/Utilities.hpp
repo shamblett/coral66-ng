@@ -22,53 +22,53 @@
 
 #ifdef NDEBUG
 
-    #ifndef CLD_USE_ASSERTS
+    #ifndef CORAL66_USE_ASSERTS
 
         #ifdef __clang__
 
-            #define CLD_UNREACHABLE          \
+            #define CORAL66_UNREACHABLE          \
                 do                           \
                     __builtin_unreachable(); \
                 while (0)
 
-            #define CLD_ASSERT(...) __builtin_assume(bool(__VA_ARGS__))
+            #define CORAL66_ASSERT(...) __builtin_assume(bool(__VA_ARGS__))
 
         #elif defined(__GNUC__)
 
-            #define CLD_UNREACHABLE          \
+            #define CORAL66_UNREACHABLE          \
                 do                           \
                     __builtin_unreachable(); \
                 while (0)
 
-            #define CLD_ASSERT(...) \
+            #define CORAL66_ASSERT(...) \
                 if (__VA_ARGS__)    \
                     ;               \
                 else                \
                     __builtin_unreachable()
 
-            #define CLD_UNREACHABLE  \
+            #define CORAL66_UNREACHABLE  \
                 do                   \
                     __assume(false); \
                 while (0)
 
-            #define CLD_ASSERT(...) __assume((bool)(__VA_ARGS__))
+            #define CORAL66_ASSERT(...) __assume((bool)(__VA_ARGS__))
 
         #else
 
-            #define CLD_UNREACHABLE
+            #define CORAL66_UNREACHABLE
 
-            #define CLD_ASSERT(...)
+            #define CORAL66_ASSERT(...)
 
         #endif
 
     #else
 
-        #define CLD_UNREACHABLE \
+        #define CORAL66_UNREACHABLE \
             do                  \
                 std::abort();   \
             while (0)
 
-        #define CLD_ASSERT(...)                                                    \
+        #define CORAL66_ASSERT(...)                                                    \
             do                                                                     \
             {                                                                      \
                 if (!(__VA_ARGS__))                                                \
@@ -82,7 +82,7 @@
 
 #else
 
-    #define CLD_ASSERT(...)                                                    \
+    #define CORAL66_ASSERT(...)                                                    \
         do                                                                     \
         {                                                                      \
             if (!(__VA_ARGS__))                                                \
@@ -92,7 +92,7 @@
             }                                                                  \
         } while (0)
 
-    #define CLD_UNREACHABLE                                                              \
+    #define CORAL66_UNREACHABLE                                                              \
         do                                                                               \
         {                                                                                \
             std::abort(); /* So that the compiler sees code afterwards is unreachable */ \
@@ -101,11 +101,11 @@
 #endif
 
 #ifdef __clang__
-    #define CLD_NON_NULL _Nonnull
-    #define CLD_NULLABLE _Nullable
+    #define CORAL66_NON_NULL _Nonnull
+    #define CORAL66_NULLABLE _Nullable
 #else
-    #define CLD_NON_NULL
-    #define CLD_NULLABLE
+    #define CORAL66_NON_NULL
+    #define CORAL66_NULLABLE
 #endif
 
 #ifndef __has_attribute
@@ -113,20 +113,20 @@
 #endif
 
 #if __has_attribute(diagnose_if)
-    #define CLD_WARN_IF(expr, message) __attribute__((diagnose_if((expr), message, "warning")))
-    #define CLD_ERROR_IF(expr, message) __attribute__((diagnose_if((expr), message, "error")))
+    #define CORAL66_WARN_IF(expr, message) __attribute__((diagnose_if((expr), message, "warning")))
+    #define CORAL66_ERROR_IF(expr, message) __attribute__((diagnose_if((expr), message, "error")))
 #else
-    #define CLD_WARN_IF(expr, message)
-    #define CLD_ERROR_IF(expr, message)
+    #define CORAL66_WARN_IF(expr, message)
+    #define CORAL66_ERROR_IF(expr, message)
 #endif
 
-#define CLD_WARN_ON_USAGE(message) CLD_WARN_IF(1, message)
-#define CLD_ERROR_ON_USAGE(message) CLD_ERROR_IF(1, message)
+#define CORAL66_WARN_ON_USAGE(message) CORAL66_WARN_IF(1, message)
+#define CORAL66_ERROR_ON_USAGE(message) CORAL66_ERROR_IF(1, message)
 
 #if __has_attribute(always_inline) || __GNUC__ >= 5
-    #define CLD_ALWAYS_INLINE inline __attribute__((always_inline))
+    #define CORAL66_ALWAYS_INLINE inline __attribute__((always_inline))
 #else
-    #define CLD_ALWAYS_INLINE inline
+    #define CORAL66_ALWAYS_INLINE inline
 #endif
 
 namespace coral66
@@ -134,9 +134,9 @@ namespace coral66
 template <typename T, typename Variant>
 constexpr decltype(auto) get(Variant&& variant) noexcept
 {
-    CLD_ASSERT(!variant.valueless_by_exception() && std::holds_alternative<T>(variant));
+    CORAL66_ASSERT(!variant.valueless_by_exception() && std::holds_alternative<T>(variant));
     auto* value = std::get_if<T>(&variant);
-    CLD_ASSERT(value);
+    CORAL66_ASSERT(value);
     if constexpr (std::is_lvalue_reference_v<Variant>)
     {
         return *value;
@@ -150,9 +150,9 @@ constexpr decltype(auto) get(Variant&& variant) noexcept
 template <std::size_t i, typename Variant>
 constexpr decltype(auto) get(Variant&& variant) noexcept
 {
-    CLD_ASSERT(!variant.valueless_by_exception() && variant.index() == i);
+    CORAL66_ASSERT(!variant.valueless_by_exception() && variant.index() == i);
     auto* value = std::get_if<i>(&variant);
-    CLD_ASSERT(value);
+    CORAL66_ASSERT(value);
     if constexpr (std::is_lvalue_reference_v<Variant>)
     {
         return *value;
@@ -230,7 +230,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant,
     }
     else
     {
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 }
 
@@ -241,7 +241,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
     {
         case 0: return std::forward<Callable>(callable)(coral66::get<0>(std::forward<Variant>(variant)));
         case 1: return std::forward<Callable>(callable)(coral66::get<1>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -253,7 +253,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 0: return std::forward<Callable>(callable)(coral66::get<0>(std::forward<Variant>(variant)));
         case 1: return std::forward<Callable>(callable)(coral66::get<1>(std::forward<Variant>(variant)));
         case 2: return std::forward<Callable>(callable)(coral66::get<2>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -266,7 +266,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 1: return std::forward<Callable>(callable)(coral66::get<1>(std::forward<Variant>(variant)));
         case 2: return std::forward<Callable>(callable)(coral66::get<2>(std::forward<Variant>(variant)));
         case 3: return std::forward<Callable>(callable)(coral66::get<3>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -280,7 +280,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 2: return std::forward<Callable>(callable)(coral66::get<2>(std::forward<Variant>(variant)));
         case 3: return std::forward<Callable>(callable)(coral66::get<3>(std::forward<Variant>(variant)));
         case 4: return std::forward<Callable>(callable)(coral66::get<4>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -295,7 +295,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 3: return std::forward<Callable>(callable)(coral66::get<3>(std::forward<Variant>(variant)));
         case 4: return std::forward<Callable>(callable)(coral66::get<4>(std::forward<Variant>(variant)));
         case 5: return std::forward<Callable>(callable)(coral66::get<5>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -311,7 +311,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 4: return std::forward<Callable>(callable)(coral66::get<4>(std::forward<Variant>(variant)));
         case 5: return std::forward<Callable>(callable)(coral66::get<5>(std::forward<Variant>(variant)));
         case 6: return std::forward<Callable>(callable)(coral66::get<6>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -328,7 +328,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 5: return std::forward<Callable>(callable)(coral66::get<5>(std::forward<Variant>(variant)));
         case 6: return std::forward<Callable>(callable)(coral66::get<6>(std::forward<Variant>(variant)));
         case 7: return std::forward<Callable>(callable)(coral66::get<7>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -346,7 +346,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 6: return std::forward<Callable>(callable)(coral66::get<6>(std::forward<Variant>(variant)));
         case 7: return std::forward<Callable>(callable)(coral66::get<7>(std::forward<Variant>(variant)));
         case 8: return std::forward<Callable>(callable)(coral66::get<8>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -365,7 +365,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 7: return std::forward<Callable>(callable)(coral66::get<7>(std::forward<Variant>(variant)));
         case 8: return std::forward<Callable>(callable)(coral66::get<8>(std::forward<Variant>(variant)));
         case 9: return std::forward<Callable>(callable)(coral66::get<9>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -385,7 +385,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 8: return std::forward<Callable>(callable)(coral66::get<8>(std::forward<Variant>(variant)));
         case 9: return std::forward<Callable>(callable)(coral66::get<9>(std::forward<Variant>(variant)));
         case 10: return std::forward<Callable>(callable)(coral66::get<10>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -406,7 +406,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 9: return std::forward<Callable>(callable)(coral66::get<9>(std::forward<Variant>(variant)));
         case 10: return std::forward<Callable>(callable)(coral66::get<10>(std::forward<Variant>(variant)));
         case 11: return std::forward<Callable>(callable)(coral66::get<11>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
@@ -428,14 +428,14 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
         case 10: return std::forward<Callable>(callable)(coral66::get<10>(std::forward<Variant>(variant)));
         case 11: return std::forward<Callable>(callable)(coral66::get<11>(std::forward<Variant>(variant)));
         case 12: return std::forward<Callable>(callable)(coral66::get<12>(std::forward<Variant>(variant)));
-        default: CLD_UNREACHABLE;
+        default: CORAL66_UNREACHABLE;
     }
 }
 
 template <class Callable, class Variant>
 constexpr decltype(auto) visit(Callable&& callable, Variant&& variant)
 {
-    CLD_ASSERT(!variant.valueless_by_exception());
+    CORAL66_ASSERT(!variant.valueless_by_exception());
     return visitImpl<std::variant_size_v<std::decay_t<Variant>> - 1>(std::forward<Callable>(callable),
                                                                      std::forward<Variant>(variant));
 }
@@ -444,14 +444,14 @@ constexpr decltype(auto) visit(Callable&& callable, Variant&& variant)
 template <typename Variant, typename... Matchers>
 constexpr decltype(auto) match(const Variant&& variant, const Matchers&&... matchers)
 {
-    CLD_ASSERT(!variant.valueless_by_exception());
+    CORAL66_ASSERT(!variant.valueless_by_exception());
     return detail::visit(detail::overload{std::forward<Matchers>(matchers)...}, std::forward<Variant>(variant));
 }
 
 template <typename Variant, typename... Matchers>
 constexpr decltype(auto) match(Variant&& variant, Matchers&&... matchers)
 {
-    CLD_ASSERT(!variant.valueless_by_exception());
+    CORAL66_ASSERT(!variant.valueless_by_exception());
     return detail::visit(detail::overload{std::forward<Matchers>(matchers)...}, std::forward<Variant>(variant));
 }
 
@@ -601,18 +601,18 @@ constexpr auto compose(F&& f, G&& g)
 template <class T>
 class not_null
 {
-    T* CLD_NON_NULL m_ptr;
+    T* CORAL66_NON_NULL m_ptr;
 
 public:
-    constexpr not_null(T* CLD_NON_NULL ptr) : m_ptr(ptr)
+    constexpr not_null(T* CORAL66_NON_NULL ptr) : m_ptr(ptr)
     {
-        CLD_ASSERT(m_ptr);
+        CORAL66_ASSERT(m_ptr);
     }
 
     template <class U, std::enable_if_t<std::is_convertible_v<U, T*>>* = nullptr>
     constexpr not_null(U&& u) : m_ptr(std::forward<U>(u))
     {
-        CLD_ASSERT(m_ptr);
+        CORAL66_ASSERT(m_ptr);
     }
 
     template <class U, std::enable_if_t<std::is_convertible_v<U*, T*>>* = nullptr>
@@ -623,18 +623,18 @@ public:
     not_null(std::nullptr_t) = delete;
     not_null& operator=(std::nullptr_t) = delete;
 
-    constexpr T* CLD_NON_NULL get() const
+    constexpr T* CORAL66_NON_NULL get() const
     {
-        CLD_ASSERT(m_ptr);
+        CORAL66_ASSERT(m_ptr);
         return m_ptr;
     }
 
-    constexpr operator T* CLD_NON_NULL() const
+    constexpr operator T* CORAL66_NON_NULL() const
     {
         return get();
     }
 
-    constexpr T* CLD_NON_NULL operator->() const
+    constexpr T* CORAL66_NON_NULL operator->() const
     {
         return get();
     }

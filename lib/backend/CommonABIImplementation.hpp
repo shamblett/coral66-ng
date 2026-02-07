@@ -58,7 +58,7 @@ protected:
     const T& getAdjustment(const Semantics::FunctionType& functionType) const
     {
         auto result = m_adjustments.find(functionType);
-        CLD_ASSERT(result != m_adjustments.end());
+        CORAL66_ASSERT(result != m_adjustments.end());
         return result->second.first;
     }
 

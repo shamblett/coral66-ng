@@ -179,7 +179,7 @@ class AttributeHolder
         }
         else
         {
-            CLD_UNREACHABLE;
+            CORAL66_UNREACHABLE;
         }
     }
 
@@ -200,7 +200,7 @@ public:
         constexpr std::size_t index = indexFromType<U>(static_cast<T*>(nullptr));
         auto result = std::lower_bound(m_attributes.begin(), m_attributes.end(), index,
                                        [](const T& value, std::size_t index1) { return value.index() < index1; });
-        CLD_ASSERT(result != m_attributes.end() && result->index() == index);
+        CORAL66_ASSERT(result != m_attributes.end() && result->index() == index);
         return coral66::get<U>(*result);
     }
 

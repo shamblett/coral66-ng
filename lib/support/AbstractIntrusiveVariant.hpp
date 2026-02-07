@@ -63,7 +63,7 @@ class AbstractIntrusiveVariant
     template <class First, class...>
     static First first()
     {
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 
 public:
@@ -98,14 +98,14 @@ public:
     template <class T>
     [[nodiscard]] constexpr const T& as() const noexcept
     {
-        CLD_ASSERT(index() == std::integral_constant<index_type, indexOf<T>()>::value);
+        CORAL66_ASSERT(index() == std::integral_constant<index_type, indexOf<T>()>::value);
         return *static_cast<const T*>(this);
     }
 
     template <class T>
     [[nodiscard]] constexpr T& as() noexcept
     {
-        CLD_ASSERT(index() == std::integral_constant<index_type, indexOf<T>()>::value);
+        CORAL66_ASSERT(index() == std::integral_constant<index_type, indexOf<T>()>::value);
         return *static_cast<T*>(this);
     }
 
@@ -218,7 +218,7 @@ public:
                  }
                  else
                  {
-                     CLD_UNREACHABLE;
+                     CORAL66_UNREACHABLE;
                  }
              }...}};
         deleteFuncs[pointer->index()](pointer);
@@ -230,88 +230,88 @@ using IntrVarPtr = std::unique_ptr<T, ::coral66::IntrusiveVariantDeleter<T>>;
 
 } // namespace coral66
 
-#define CLD_GEN_INTR_VAR_WARNING_FUNCS(ThisClass)                                                             \
+#define CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ThisClass)                                                             \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Function always returns false")                                                        \
-    constexpr CLD_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, bool> is() const noexcept     \
+    CORAL66_WARN_ON_USAGE("Function always returns false")                                                        \
+    constexpr CORAL66_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, bool> is() const noexcept     \
     {                                                                                                         \
         return false;                                                                                         \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Function always returns true")                                                         \
-    constexpr CLD_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, bool> is() const noexcept      \
+    CORAL66_WARN_ON_USAGE("Function always returns true")                                                         \
+    constexpr CORAL66_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, bool> is() const noexcept      \
     {                                                                                                         \
         return true;                                                                                          \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_ERROR_ON_USAGE("Cast will never succeed")                                                             \
-    CLD_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, T&> as() noexcept                       \
+    CORAL66_ERROR_ON_USAGE("Cast will never succeed")                                                             \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, T&> as() noexcept                       \
     {                                                                                                         \
         return AbstractIntrusiveVariant::as<T>();                                                             \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_ERROR_ON_USAGE("Cast will never succeed")                                                             \
-    CLD_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, const T&> as() const noexcept           \
+    CORAL66_ERROR_ON_USAGE("Cast will never succeed")                                                             \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, const T&> as() const noexcept           \
     {                                                                                                         \
         return AbstractIntrusiveVariant::as<T>();                                                             \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
-    CLD_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, ThisClass&> as() noexcept                \
+    CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, ThisClass&> as() noexcept                \
     {                                                                                                         \
         return *this;                                                                                         \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
-    CLD_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, const ThisClass&> as() const noexcept    \
+    CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, const ThisClass&> as() const noexcept    \
     {                                                                                                         \
         return *this;                                                                                         \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Function will always return nullptr")                                                  \
-    CLD_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, T*> tryAs() noexcept                    \
+    CORAL66_WARN_ON_USAGE("Function will always return nullptr")                                                  \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, T*> tryAs() noexcept                    \
     {                                                                                                         \
         return nullptr;                                                                                       \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Function will always return nullptr")                                                  \
-    CLD_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, const T*> tryAs() const noexcept        \
+    CORAL66_WARN_ON_USAGE("Function will always return nullptr")                                                  \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<!std::is_same_v<T, ThisClass>, const T*> tryAs() const noexcept        \
     {                                                                                                         \
         return nullptr;                                                                                       \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
-    CLD_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, ThisClass*> tryAs() noexcept             \
+    CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, ThisClass*> tryAs() noexcept             \
     {                                                                                                         \
         return this;                                                                                          \
     }                                                                                                         \
                                                                                                               \
     template <class T>                                                                                        \
-    CLD_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
-    CLD_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, const ThisClass*> tryAs() const noexcept \
+    CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                 \
+    CORAL66_ALWAYS_INLINE std::enable_if_t<std::is_same_v<T, ThisClass>, const ThisClass*> tryAs() const noexcept \
     {                                                                                                         \
         return this;                                                                                          \
     }                                                                                                         \
                                                                                                               \
     template <class... F>                                                                                     \
-    CLD_WARN_ON_USAGE("Class type " #ThisClass " known ahead of time already")                                \
-    CLD_ALWAYS_INLINE decltype(auto) match(F&&... f)                                                          \
+    CORAL66_WARN_ON_USAGE("Class type " #ThisClass " known ahead of time already")                                \
+    CORAL66_ALWAYS_INLINE decltype(auto) match(F&&... f)                                                          \
     {                                                                                                         \
         return AbstractIntrusiveVariant::match(std::forward<F>(f)...);                                        \
     }                                                                                                         \
                                                                                                               \
     template <class... F>                                                                                     \
-    CLD_WARN_ON_USAGE("Class type " #ThisClass " known ahead of time already")                                \
-    CLD_ALWAYS_INLINE decltype(auto) match(F&&... f) const                                                    \
+    CORAL66_WARN_ON_USAGE("Class type " #ThisClass " known ahead of time already")                                \
+    CORAL66_ALWAYS_INLINE decltype(auto) match(F&&... f) const                                                    \
     {                                                                                                         \
         return AbstractIntrusiveVariant::match(std::forward<F>(f)...);                                        \
     }

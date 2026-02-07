@@ -312,7 +312,7 @@ public:
             case LanguageOptions::UnderlyingType::LongLong:
             case LanguageOptions::UnderlyingType::UnsignedLongLong: return Integer;
         }
-        CLD_UNREACHABLE;
+        CORAL66_UNREACHABLE;
     }
 
 private:

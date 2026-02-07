@@ -200,14 +200,14 @@ public:
     [[nodiscard]] const Variant& getValue() const { return m_value; }
     [[nodiscard]] Lexer::CTokenIterator begin() const override { return m_begin; }
     [[nodiscard]] Lexer::CTokenIterator end() const override { return m_end; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(Constant)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(Constant)
 };
 
 class Useable;
 
 class DeclarationRead final : public ExpressionBase
 {
-    const Useable* CLD_NON_NULL m_declRead;
+    const Useable* CORAL66_NON_NULL m_declRead;
     Lexer::CTokenIterator m_identifierToken;
 
 public:
@@ -218,7 +218,7 @@ public:
     [[nodiscard]] const Useable& getDeclRead() const { return *m_declRead; }
     [[nodiscard]] Lexer::CTokenIterator begin() const override { return m_identifierToken; }
     [[nodiscard]] Lexer::CTokenIterator end() const override { return m_identifierToken + 1; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(DeclarationRead)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(DeclarationRead)
 };
 
 class BinaryOperator final : public ExpressionBase
@@ -247,7 +247,7 @@ public:
     [[nodiscard]] Kind getKind() const { return m_kind; }
     [[nodiscard]] Lexer::CTokenIterator begin() const override;
     [[nodiscard]] Lexer::CTokenIterator end() const override;
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(BinaryOperator)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(BinaryOperator)
 };
 
 class UnaryOperator final : public ExpressionBase
@@ -267,7 +267,7 @@ public:
     [[nodiscard]] const ExpressionBase& getOperand() const { return *m_operand; }
     [[nodiscard]] Lexer::CTokenIterator begin() const override;
     [[nodiscard]] Lexer::CTokenIterator end() const override;
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(UnaryOperator)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(UnaryOperator)
 };
 
 class PartWordAccess final : public ExpressionBase
@@ -288,7 +288,7 @@ public:
     [[nodiscard]] const ExpressionBase& getBase() const { return *m_base; }
     [[nodiscard]] std::uint32_t getStartBit() const { return m_startBit; }
     [[nodiscard]] std::uint32_t getWidth() const { return m_width; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(PartWordAccess)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(PartWordAccess)
 };
 
 class CallExpression final : public ExpressionBase
@@ -307,7 +307,7 @@ public:
     [[nodiscard]] const std::vector<coral66::IntrVarPtr<ExpressionBase>>& getArguments() const { return m_arguments; }
     [[nodiscard]] Lexer::CTokenIterator begin() const override { return m_begin; }
     [[nodiscard]] Lexer::CTokenIterator end() const override { return m_end; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(CallExpression)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(CallExpression)
 };
 
 class ErrorExpression final : public ExpressionBase
@@ -319,7 +319,7 @@ public:
         : ExpressionBase(std::in_place_type<ErrorExpression>, std::move(type), {}), m_begin(begin), m_end(end) {}
     [[nodiscard]] Lexer::CTokenIterator begin() const override { return m_begin; }
     [[nodiscard]] Lexer::CTokenIterator end() const override { return m_end; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(ErrorExpression)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ErrorExpression)
 };
 
 // ============================================================================
@@ -355,7 +355,7 @@ public:
         : Statement(sp, std::in_place_type<AssignmentStatement>), m_target(std::move(target)), m_value(std::move(value)) {}
     [[nodiscard]] const ExpressionBase& getExpression() const { return *m_value; }
     [[nodiscard]] const ExpressionBase& getTarget() const { return *m_target; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(AssignmentStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(AssignmentStatement)
 };
 
 class IfStatement final : public Statement
@@ -369,7 +369,7 @@ public:
     [[nodiscard]] const ExpressionBase& getCondition() const { return *m_condition; }
     [[nodiscard]] const Statement& getThenBranch() const { return *m_thenBranch; }
     [[nodiscard]] const Statement* getElseBranch() const { return m_elseBranch.get(); }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(IfStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(IfStatement)
 };
 
 class LabelStatement final : public Statement
@@ -380,7 +380,7 @@ public:
     LabelStatement(Lexer::CTokenIterator name, const Statement* target)  // NOLINT(*-pro-type-member-init)
         : Statement(ScopePoint{0}, std::in_place_type<LabelStatement>), m_name(name), m_target(target) {}
     [[nodiscard]] const Statement* getTarget() const { return m_target; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(LabelStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelStatement)
 };
 
 class GotoStatement final : public Statement
@@ -390,7 +390,7 @@ public:
     explicit GotoStatement(ScopePoint sp, const LabelStatement* label) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<GotoStatement>), m_label(label) {}
     [[nodiscard]] const LabelStatement* getLabel() const { return m_label; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(GotoStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(GotoStatement)
 };
 
 class ForStatement final : public Statement
@@ -413,7 +413,7 @@ public:
     [[nodiscard]] const ExpressionBase& getUntil() const { return *m_until; }
     [[nodiscard]] const Statement& getBody() const { return *m_body; }
 
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(ForStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ForStatement)
 };
 
 class AnswerStatement final : public Statement
@@ -423,7 +423,7 @@ public:
     explicit AnswerStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& expression) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AnswerStatement>), m_expression(std::move(expression)) {}
     [[nodiscard]] const ExpressionBase& getExpression() const { return *m_expression; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(AnswerStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(AnswerStatement)
 };
 
 class CodeStatement final : public Statement
@@ -433,7 +433,7 @@ public:
     CodeStatement(ScopePoint sp, std::string code)  // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<CodeStatement>), m_code(std::move(code)) {}
     [[nodiscard]] std::string_view getCode() const { return m_code; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(CodeStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(CodeStatement)
 };
 
 class ProcedureCallStatement final : public Statement
@@ -443,7 +443,7 @@ public:
     explicit ProcedureCallStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& callExpr) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<ProcedureCallStatement>), m_callExpr(std::move(callExpr)) {}
     [[nodiscard]] const ExpressionBase& getCallExpr() const { return *m_callExpr; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(ProcedureCallStatement)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ProcedureCallStatement)
 };
 
 // ============================================================================
@@ -484,7 +484,7 @@ public:
     VariableDeclaration(Lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<VariableDeclaration>, nameToken), m_type(std::move(type)) {}
     [[nodiscard]] const Type& getType() const { return *m_type; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(VariableDeclaration)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(VariableDeclaration)
 };
 
 class ProcedureDeclaration final : public Declaration
@@ -497,7 +497,7 @@ public:
     [[nodiscard]] const Type& getType() const { return *m_type; }
     void setBody(std::vector<coral66::IntrVarPtr<Statement>> body) { m_body = std::move(body); }
     [[nodiscard]] const std::vector<coral66::IntrVarPtr<Statement>>& getBody() const { return m_body; }
-    CLD_GEN_INTR_VAR_WARNING_FUNCS(ProcedureDeclaration)
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ProcedureDeclaration)
 };
 
 // ============================================================================

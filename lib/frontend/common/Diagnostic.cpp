@@ -27,7 +27,7 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
     {
         location.first = coral66::match(
             sourceInterface.getSubstitutions()[location.first.macroId],
-            [](std::monostate) -> PointLocation { CLD_UNREACHABLE; },
+            [](std::monostate) -> PointLocation { CORAL66_UNREACHABLE; },
             [](const coral66::Source::Substitution& substitution) -> PointLocation
             {
                 return {substitution.replacedIdentifier.getOffset(), substitution.replacedIdentifier.getFileId(),
@@ -49,7 +49,7 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
     {
         location.second = coral66::match(
             sourceInterface.getSubstitutions()[location.second.macroId],
-            [](std::monostate) -> PointLocation { CLD_UNREACHABLE; },
+            [](std::monostate) -> PointLocation { CORAL66_UNREACHABLE; },
             [](const coral66::Source::Substitution& substitution) -> PointLocation
             {
                 return {substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
@@ -150,7 +150,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                             reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &utf32,
                             llvm::strictConversion);
                         (void)result;
-                        CLD_ASSERT(result == llvm::conversionOK);
+                        CORAL66_ASSERT(result == llvm::conversionOK);
                         if (!coral66::isWhitespace(utf32))
                         {
                             ptr = before;
@@ -169,7 +169,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                             reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &utf32,
                             llvm::strictConversion);
                         (void)result;
-                        CLD_ASSERT(result == llvm::conversionOK);
+                        CORAL66_ASSERT(result == llvm::conversionOK);
                         if (coral66::isWhitespace(utf32))
                         {
                             start = before;
@@ -371,7 +371,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             iter, [](const DiagnosticBase::Underline& underline) { return underline.index; },
             [](const DiagnosticBase::InsertAfter& insertAfter) { return insertAfter.index; },
             [](const DiagnosticBase::Annotate& annotate) { return annotate.index; });
-        CLD_ASSERT(arguments[index].range);
+        CORAL66_ASSERT(arguments[index].range);
         arguments[index].range = toMacroId0Range(*arguments[index].range, sourceInterface);
         auto startLine = getLineCol(arguments[index].range->first, sourceInterface).first;
         auto endLine = getLineCol(arguments[index].range->second, sourceInterface).first;
@@ -397,7 +397,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                 // This case only occurs when we are pointing at a newline
                 // into the second line
                 // We want to handle this specially for InsertAfter
-                CLD_ASSERT(!std::holds_alternative<Annotate>(iter));
+                CORAL66_ASSERT(!std::holds_alternative<Annotate>(iter));
                 continue;
             }
             vector.push_back(
@@ -412,14 +412,14 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                      {
                          if (insertAfter.text >= 0)
                          {
-                             CLD_ASSERT(arguments[insertAfter.text].inArgText);
+                             CORAL66_ASSERT(arguments[insertAfter.text].inArgText);
                              return ModifierOfLine::InsertAfter{*arguments[insertAfter.text].inArgText};
                          }
                          return ModifierOfLine::InsertAfter{};
                      },
                      [&arguments, index](const DiagnosticBase::Annotate& annotate) -> ModifierOfLine::variant
                      {
-                         CLD_ASSERT(arguments[annotate.text].inArgText);
+                         CORAL66_ASSERT(arguments[annotate.text].inArgText);
                          const auto begin = arguments[index].range->first.offset;
                          const auto end = arguments[index].range->second.offset;
                          return ModifierOfLine::Annotate{*arguments[annotate.text].inArgText,
@@ -502,7 +502,7 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
 {
     switch (this->m_severity)
     {
-        case coral66::Severity::None: CLD_UNREACHABLE;
+        case coral66::Severity::None: CORAL66_UNREACHABLE;
         case coral66::Severity::Error: llvm::WithColor(ss, ss.RED, true) << "error: "; break;
         case coral66::Severity::Warning: llvm::WithColor(ss, ss.MAGENTA, true) << "warning: "; break;
         case coral66::Severity::Note: llvm::WithColor(ss, ss.CYAN, true) << "note: "; break;
@@ -517,7 +517,7 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
         ss.write(last, iter->view.data() - last);
         if (mods.empty())
         {
-            CLD_ASSERT(arguments[index].inFormatText);
+            CORAL66_ASSERT(arguments[index].inFormatText);
             ss << *arguments[index].inFormatText;
         }
         else
