@@ -1,5 +1,5 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -9,7 +9,6 @@
 
 int main(int argc, char* argv[])
 {
-
     auto enable = coral66::Tests::enableParallelization();
 
     Catch::Session session; // There must be exactly one instance
@@ -47,4 +46,3 @@ extern "C" int lprofGetHostName(char* Name, int Len)
 }
 
 #endif
-

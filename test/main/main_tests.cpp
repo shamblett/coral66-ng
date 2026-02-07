@@ -1,5 +1,5 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -10,12 +10,12 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#define coral66_MAIN_PRODUCES(matcher, ...)       \
+#define coral66_MAIN_PRODUCES(matcher, ...)   \
     [](std::vector<std::string_view> ref)     \
     {                                         \
         std::string storage;                  \
         llvm::raw_string_ostream ss(storage); \
-        coral66::main(ref, &ss);                  \
+        coral66::main(ref, &ss);              \
         ss.flush();                           \
         CHECK_THAT(storage, matcher);         \
         if (!storage.empty())                 \
@@ -31,11 +31,11 @@ TEST_CASE("Commandline options", "[coral66]")
     SECTION("Compile")
     {
         auto dummyFile = createInclude("main.cor", "PROGRAM LoopTest\n"
-            "BEGIN\n"
-            "  INTEGER i;\n"
-            "  FOR i := 0 STEP 2 UNTIL 10 DO\n"
-            "    ANSWER i;\n"
-            "END");
+                                                   "BEGIN\n"
+                                                   "  INTEGER i;\n"
+                                                   "  FOR i := 0 STEP 2 UNTIL 10 DO\n"
+                                                   "    ANSWER i;\n"
+                                                   "END");
         SECTION("Normal")
         {
             std::vector<std::string_view> vector = {"-c", "main.cor"};
@@ -51,9 +51,9 @@ TEST_CASE("Commandline options", "[coral66]")
             CHECK(coral66::fs::exists(coral66::fs::path("main.bc")));
         }
         coral66_MAIN_PRODUCES(ProducesError(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME),
-                          {"-c", "main.cor", "-S"});
+                              {"-c", "main.cor", "-S"});
         coral66_MAIN_PRODUCES(ProducesError(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME),
-                          {"-c", "main.cor", "-E"});
+                              {"-c", "main.cor", "-E"});
     }
     SECTION("Assembly")
     {
@@ -73,7 +73,7 @@ TEST_CASE("Commandline options", "[coral66]")
             CHECK(coral66::fs::exists(coral66::fs::path("main.ll")));
         }
         coral66_MAIN_PRODUCES(ProducesError(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME),
-                          {"-S", "main.cor", "-E"});
+                              {"-S", "main.cor", "-E"});
     }
 
     SECTION("output file")
@@ -105,6 +105,7 @@ TEST_CASE("Commandline options", "[coral66]")
     coral66_MAIN_PRODUCES(ProducesError(UNKNOWN_LANGUAGE_STANDARD_N, "java8"), {"-std=java8", "-c", "main.c"});
     coral66_MAIN_PRODUCES(ProducesError(NO_SOURCE_FILES_SPECIFIED), {"-c"});
     coral66_MAIN_PRODUCES(ProducesError(FAILED_TO_OPEN_C_SOURCE_FILE_N, "missing.c"), {"missing.c", "-c"});
-    coral66_MAIN_PRODUCES(ProducesError(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"),
-                      {"main.cor", "-c", "-o", "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"});
+    coral66_MAIN_PRODUCES(
+        ProducesError(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"),
+        {"main.cor", "-c", "-o", "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"});
 }
