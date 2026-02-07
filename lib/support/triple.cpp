@@ -8,7 +8,8 @@
 
 #include "utilities.hpp"
 
-coral66::Triple::Triple(coral66::Architecture const architecture, coral66::Platform const operatingSystem, coral66::Environment const environment)
+coral66::Triple::Triple(coral66::Architecture const architecture, coral66::Platform const operatingSystem,
+                        coral66::Environment const environment)
     : m_architecture(architecture), m_operatingSystem(operatingSystem), m_environment(environment)
 {
 }
@@ -24,19 +25,19 @@ coral66::Triple coral66::Triple::defaultTarget()
 
 coral66::Triple coral66::Triple::native()
 {
- // ReSharper disable once CppDFAUnusedValue
+    // ReSharper disable once CppDFAUnusedValue
     Architecture architecture = Architecture ::Unknown;
 #if defined(_M_AMD64) || defined(__x86_64__)
     architecture = Architecture::x86_64;
 #endif
 
- // ReSharper disable once CppDFAUnusedValue
+    // ReSharper disable once CppDFAUnusedValue
     Platform operatingSystem = Platform::Unknown;
 #if defined(__linux__)
     operatingSystem = Platform ::Linux;
 #endif
 
- // ReSharper disable once CppDFAUnusedValue
+    // ReSharper disable once CppDFAUnusedValue
     Environment environment = Environment ::Unknown;
 #if defined(__GNUC__)
     environment = Environment ::GNU;
@@ -52,17 +53,17 @@ coral66::Triple coral66::Triple::fromString(std::string_view string)
     string.remove_prefix(std::min(second.size() + 1, string.size()));
     const auto third = string.substr(0, string.find('-'));
     string.remove_prefix(std::min(third.size() + 1, string.size()));
-    auto  architecture = Architecture::Unknown;
+    auto architecture = Architecture::Unknown;
     if (first == "x86_64")
     {
         architecture = Architecture::x86_64;
     }
-    auto  platform = Platform::Unknown;
+    auto platform = Platform::Unknown;
     if (second == "linux")
     {
         platform = Platform::Linux;
     }
-    auto  environment = Environment::Unknown;
+    auto environment = Environment::Unknown;
     if (third == "gnu")
     {
         environment = Environment::GNU;

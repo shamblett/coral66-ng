@@ -56,14 +56,14 @@ void toSafeUTF8(std::string_view const inputLine, OutputIter1 outputIter, Output
 {
     constexpr static std::string_view REPLACEMENT_CHARACTER = "\xEF\xBF\xBD";
     std::int64_t delta = 0;
-    const auto *sourceStart = inputLine.data();
-    const auto *const sourceEnd = inputLine.data() + inputLine.size();
+    const auto* sourceStart = inputLine.data();
+    const auto* const sourceEnd = inputLine.data() + inputLine.size();
     while (sourceStart != sourceEnd)
     {
         do
         {
             llvm::UTF32 utf32;
-            const auto *const prev = sourceStart;
+            const auto* const prev = sourceStart;
             if (llvm::convertUTF8Sequence(reinterpret_cast<const llvm::UTF8**>(&sourceStart),
                                           reinterpret_cast<const llvm::UTF8*>(sourceEnd), &utf32,
                                           llvm::strictConversion)

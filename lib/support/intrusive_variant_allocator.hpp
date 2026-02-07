@@ -125,7 +125,7 @@ public:
     }
 };
 
-} // namespace detail::IntrusiveVariantAllocator
+} // namespace detail::IntrVarAllocator
 
 template <class T>
 using IVAUniquePtr = std::unique_ptr<T, detail::IntrVarAllocator::Deleter<T>>;
@@ -165,7 +165,7 @@ class IntrusiveVariantAllocator<Base, AbstractIntrusiveVariant<Base, Subclasses.
             auto* storage = (*m_slabs.insert(insertPoint, std::move(newSlab)))->storage;
             return m_heads.insert(m_heads.begin() + index, storage);
         }
- // ReSharper disable once CppDFALocalValueEscapesFunction
+        // ReSharper disable once CppDFALocalValueEscapesFunction
         return head;
     }
 
@@ -302,10 +302,9 @@ public:
               std::enable_if_t<std::is_same_v<U, Base> && (std::is_copy_constructible_v<Subclasses> && ...)>* = nullptr>
     [[nodiscard]] coral66::not_null<Base> alloc(const Base& value)
     {
-        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, const Base&), sizeof...(Subclasses)> copyConstructors = {
-            +[](IntrusiveVariantAllocator* self, const Base& value) -> Base* {
-                return self->template alloc<Subclasses>(static_cast<const Subclasses&>(value));
-            }...};
+        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, const Base&), sizeof...(Subclasses)>
+            copyConstructors = {+[](IntrusiveVariantAllocator* self, const Base& value) -> Base*
+                                { return self->template alloc<Subclasses>(static_cast<const Subclasses&>(value)); }...};
         return copyConstructors[value.index()](this, value);
     }
 
@@ -313,10 +312,9 @@ public:
               std::enable_if_t<std::is_same_v<U, Base> && (std::is_move_constructible_v<Subclasses> && ...)>* = nullptr>
     [[nodiscard]] coral66::not_null<Base> alloc(Base&& value)
     {
-        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, Base &&), sizeof...(Subclasses)> moveConstructors = {
-            +[](IntrusiveVariantAllocator* self, Base&& value) -> Base* {
-                return self->template alloc<Subclasses>(static_cast<Subclasses&&>(std::move(value)));
-            }...};
+        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, Base&&), sizeof...(Subclasses)> moveConstructors = {
+            +[](IntrusiveVariantAllocator* self, Base&& value) -> Base*
+            { return self->template alloc<Subclasses>(static_cast<Subclasses&&>(std::move(value))); }...};
         return moveConstructors[value.index()](this, std::move(value));
     }
 

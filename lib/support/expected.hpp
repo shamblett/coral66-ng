@@ -41,9 +41,8 @@ public:
     using ValueType = T;
     using ErrorType = E;
 
-    static_assert(
-        std::is_move_constructible_v<
-            ValueType> && std::is_move_assignable_v<ValueType> && std::is_move_constructible_v<ErrorType> && std::is_move_assignable_v<ErrorType>);
+    static_assert(std::is_move_constructible_v<ValueType> && std::is_move_assignable_v<ValueType>
+                  && std::is_move_constructible_v<ErrorType> && std::is_move_assignable_v<ErrorType>);
 
     constexpr Expected() = default;
 
@@ -77,7 +76,7 @@ public:
      * @param expected Other expected
      */
     template <class U>
- // ReSharper disable once CppNonExplicitConvertingConstructor
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     constexpr Expected(const Expected<U, E>& expected);
 
     /**

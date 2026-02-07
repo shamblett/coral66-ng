@@ -11,8 +11,10 @@
  * within the coral66 project.
  *
  * It provides a collection of:
- * - Compile-time string manipulation via `basic_fixed_string`, allowing strings to be used as non-type template parameters.
- * - Type traits for detecting and working with standard library types like tuples, variants, smart pointers, and containers.
+ * - Compile-time string manipulation via `basic_fixed_string`, allowing strings to be used as non-type template
+ * parameters.
+ * - Type traits for detecting and working with standard library types like tuples, variants, smart pointers, and
+ * containers.
  * - Integer type selection (`suitableUInt`, `suitableInt`) based on value ranges.
  * - `std::variant` helper utilities for type containment and union operations.
  * - Preprocessor macros (some adapted from the P99 library) for variadic argument counting and iteration.
@@ -59,7 +61,7 @@ public:
         return {m_data, N};
     }
 
-    static constexpr std::size_t size()  noexcept
+    static constexpr std::size_t size() noexcept
     {
         return N;
     }
@@ -89,22 +91,22 @@ public:
     {
     }
 
-    static constexpr std::basic_string_view<T> view()  noexcept
+    static constexpr std::basic_string_view<T> view() noexcept
     {
         return "";
     }
 
-    static constexpr std::size_t size()  noexcept
+    static constexpr std::size_t size() noexcept
     {
         return 0;
     }
 
-    static constexpr const T* begin()  noexcept
+    static constexpr const T* begin() noexcept
     {
         return nullptr;
     }
 
-    static constexpr const T* end()  noexcept
+    static constexpr const T* end() noexcept
     {
         return nullptr;
     }
@@ -126,16 +128,16 @@ basic_fixed_string(const U (&input)[M]) -> basic_fixed_string<U, M - 1>;
 template <std::size_t max>
 using suitableUInt =
     std::conditional_t<max <= std::numeric_limits<std::uint8_t>::max(), type_identity<std::uint8_t>,
-                                std::conditional<max <= std::numeric_limits<std::uint16_t>::max(), std::uint16_t,
-                                                 std::conditional_t<max <= std::numeric_limits<std::uint32_t>::max(),
-                                                                    std::uint32_t, std::uint64_t>>>::type;
+                       std::conditional<max <= std::numeric_limits<std::uint16_t>::max(), std::uint16_t,
+                                        std::conditional_t<max <= std::numeric_limits<std::uint32_t>::max(),
+                                                           std::uint32_t, std::uint64_t>>>::type;
 
 template <std::size_t max>
 using suitableInt =
     std::conditional_t<max <= std::numeric_limits<std::int8_t>::max(), type_identity<std::int8_t>,
-                                std::conditional<max <= std::numeric_limits<std::int16_t>::max(), std::int16_t,
-                                                 std::conditional_t<max <= std::numeric_limits<std::int32_t>::max(),
-                                                                    std::int32_t, std::int64_t>>>::type;
+                       std::conditional<max <= std::numeric_limits<std::int16_t>::max(), std::int16_t,
+                                        std::conditional_t<max <= std::numeric_limits<std::int32_t>::max(),
+                                                           std::int32_t, std::int64_t>>>::type;
 
 #pragma GCC diagnostic pop
 
@@ -239,7 +241,7 @@ constexpr bool IsTypeCompleteV<T, std::void_t<decltype(sizeof(T))>> = true;
 namespace detail
 {
 template <class T, class... Args>
- // ReSharper disable once CppFunctionIsNotImplemented
+// ReSharper disable once CppFunctionIsNotImplemented
 constexpr auto variantTypesContain(std::variant<Args...>) -> std::disjunction<std::is_same<T, Args>...>;
 
 template <class Variant, class OtherVariant>
@@ -255,8 +257,7 @@ struct VariantUnion<std::variant<ThisArgs...>, std::variant<First>>
 template <class... ThisArgs, class First, class... Args>
 struct VariantUnion<std::variant<ThisArgs...>, std::variant<First, Args...>>
 {
-    using type =
-        std::conditional_t<(std::is_same_v<ThisArgs, First> || ...),
+    using type = std::conditional_t<(std::is_same_v<ThisArgs, First> || ...),
                                     VariantUnion<std::variant<ThisArgs...>, std::variant<Args...>>,
                                     VariantUnion<std::variant<ThisArgs..., First>, std::variant<Args...>>>::type;
 };
@@ -274,7 +275,7 @@ struct Fold
 };
 
 template <class... Variants>
- // ReSharper disable once CppFunctionIsNotImplemented
+// ReSharper disable once CppFunctionIsNotImplemented
 constexpr auto variantTypeUnion(Variants...) -> decltype((std::declval<Fold<Variants>>() + ...))::type;
 } // namespace detail
 
@@ -284,8 +285,8 @@ constexpr bool variantTypesContainV = decltype(detail::variantTypesContain<T>(st
 template <class... Variant>
 using VariantUnion = decltype(detail::variantTypeUnion(std::declval<Variant>()...));
 
-// See https://gitlab.inria.fr/gustedt/p99/-/tree/master. Code was copied and pasted out of multiple header files without
-// modifications to any macros that start with the P99_ or P00_ prefix. Copyright notice follows:
+// See https://gitlab.inria.fr/gustedt/p99/-/tree/master. Code was copied and pasted out of multiple header files
+// without modifications to any macros that start with the P99_ or P00_ prefix. Copyright notice follows:
 
 /* This may look like nonsense, but it really is -*- mode: C; coding: utf-8 -*- */
 /*                                                                              */
@@ -371,12 +372,12 @@ using VariantUnion = decltype(detail::variantTypeUnion(std::declval<Variant>()..
 
 #define CORAL66_MACRO_COUNT_ARGUMENTS(...) CORAL66_MACRO_COUNT_ARGUMENTS_(__VA_ARGS__, CORAL66_MACRO_RSEQ_N())
 #define CORAL66_MACRO_COUNT_ARGUMENTS_(...) CORAL66_MACRO_ARGUMENTS_N(__VA_ARGS__)
-#define CORAL66_MACRO_ARGUMENTS_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, \
-                              _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, _36,  \
-                              _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, _53,  \
-                              _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, N, ...)                             \
+#define CORAL66_MACRO_ARGUMENTS_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18,     \
+                                  _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, _29, _30, _31, _32, _33, _34, _35, \
+                                  _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, \
+                                  _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, N, ...)                       \
     N
-#define CORAL66_MACRO_RSEQ_N()                                                                                            \
+#define CORAL66_MACRO_RSEQ_N()                                                                                        \
     63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36,   \
         35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, \
         7, 6, 5, 4, 3, 2, 1, 0

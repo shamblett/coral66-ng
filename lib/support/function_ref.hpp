@@ -40,9 +40,11 @@ public:
 
     template <class Callable, std::enable_if_t<!std::is_same_v<std::decay_t<Callable>, FunctionRef>>* = nullptr>
     FunctionRef(Callable&& callable)
-        : m_callback(+[](void* callable, Params... params) -> Ret {
-              return (*static_cast<std::remove_reference_t<Callable>*>(callable))(std::forward<Params>(params)...);
-          }),
+        : m_callback(+[](void* callable, Params... params) -> Ret
+                     {
+                         return (*static_cast<std::remove_reference_t<Callable>*>(callable))(
+                             std::forward<Params>(params)...);
+                     }),
           m_callable(&callable)
     {
     }

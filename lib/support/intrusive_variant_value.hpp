@@ -22,7 +22,8 @@
  * Key Features:
  * - Inline storage: Avoids heap allocation for the variant object itself.
  * - Value semantics: Supports copy/move construction and assignment, properly handling the active subclass.
- * - Type Safety: Ensures the active type is tracked and managed correctly via the base `AbstractIntrusiveVariant` mechanisms.
+ * - Type Safety: Ensures the active type is tracked and managed correctly via the base `AbstractIntrusiveVariant`
+ * mechanisms.
  * - interoperability: Can be compared and accessed like the underlying base class type.
  */
 namespace coral66
@@ -30,14 +31,14 @@ namespace coral66
 namespace detail::IntrusiveVariantStorage
 {
 template <class... Args>
- // ReSharper disable once CppFunctionIsNotImplemented
+// ReSharper disable once CppFunctionIsNotImplemented
 auto deduceArgs(::coral66::AbstractIntrusiveVariant<Args...>*) -> ::coral66::AbstractIntrusiveVariant<Args...>;
 
 template <class Base, class... SubClasses>
 class IntrusiveVariantStorageBase
 {
 protected:
-    alignas(SubClasses...) std::byte m_storage[std::max({sizeof(SubClasses)...})] = {  };
+    alignas(SubClasses...) std::byte m_storage[std::max({sizeof(SubClasses)...})] = {};
     coral66::suitableUInt<sizeof...(SubClasses)> m_index;
 
     [[nodiscard]] Base& get()
@@ -50,9 +51,8 @@ protected:
     [[nodiscard]] const Base& get() const
     {
         constexpr std::array<const Base& (*)(const std::byte*), sizeof...(SubClasses)> converters = {
-            +[](const std::byte* ptr) -> const Base& {
-                return *std::launder(reinterpret_cast<const SubClasses*>(ptr));
-            }...};
+            +[](const std::byte* ptr) -> const Base&
+            { return *std::launder(reinterpret_cast<const SubClasses*>(ptr)); }...};
         return converters[m_index](m_storage);
     }
 };
@@ -72,7 +72,7 @@ struct IntrusiveVariantStorageDestruct<Base, SpecialMem::Trivial, SubClasses...>
     : IntrusiveVariantStorageBase<Base, SubClasses...>
 {
 protected:
- // ReSharper disable once CppMemberFunctionMayBeStatic
+    // ReSharper disable once CppMemberFunctionMayBeStatic
     void destruct() {}
 
 public:
@@ -506,8 +506,8 @@ public:
     }
 
     template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue&
-        operator=(T&& value) noexcept(std::is_nothrow_move_assignable_v<T>&& std::is_nothrow_move_constructible_v<T>)
+    IntrusiveVariantValue& operator=(T&& value) noexcept(std::is_nothrow_move_assignable_v<T>
+                                                         && std::is_nothrow_move_constructible_v<T>)
     {
         constexpr auto var = Base::template indexOf<T>();
         if (this->m_index == var)
@@ -532,8 +532,8 @@ public:
     }
 
     template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue& operator=(const T& value) noexcept(
-        std::is_nothrow_copy_assignable_v<T>&& std::is_nothrow_copy_constructible_v<T>)
+    IntrusiveVariantValue& operator=(const T& value) noexcept(std::is_nothrow_copy_assignable_v<T>
+                                                              && std::is_nothrow_copy_constructible_v<T>)
     {
         constexpr auto var = Base::template indexOf<T>();
         if (this->m_index == var)
@@ -550,8 +550,8 @@ public:
     }
 
     template <class U = Base,
-              std::enable_if_t<
-                  std::is_same_v<U, Base> && std::conjunction_v<std::is_copy_constructible<SubClasses>...>>* = nullptr>
+              std::enable_if_t<std::is_same_v<U, Base>
+                               && std::conjunction_v<std::is_copy_constructible<SubClasses>...>>* = nullptr>
     IntrusiveVariantValue(const U& value) noexcept((std::is_nothrow_copy_constructible_v<SubClasses> && ...))
     {
         this->m_index = value.index();
@@ -562,12 +562,12 @@ public:
     }
 
     template <class U = Base,
-              std::enable_if_t<
-                  std::is_same_v<U, Base> && std::conjunction_v<std::is_move_constructible<SubClasses>...>>* = nullptr>
+              std::enable_if_t<std::is_same_v<U, Base>
+                               && std::conjunction_v<std::is_move_constructible<SubClasses>...>>* = nullptr>
     IntrusiveVariantValue(U&& value) noexcept((std::is_nothrow_move_constructible_v<SubClasses> && ...))
     {
         this->m_index = value.index();
-        constexpr std::array<void (*)(std::byte*, Base &&), sizeof...(SubClasses)> moveConstructors = {
+        constexpr std::array<void (*)(std::byte*, Base&&), sizeof...(SubClasses)> moveConstructors = {
             +[](std::byte* storage, Base&& value) { new (storage) SubClasses(static_cast<SubClasses&&>(value)); }...};
         moveConstructors[this->m_index](this->m_storage, std::forward<U>(value));
     }
@@ -636,25 +636,25 @@ bool operator!=(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue
 }
 
 template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
-bool operator==(const IntrusiveVariantValue<T>& lhs, const U& rhs)
+bool operator==(const IntrusiveVariantValue<T>& lhs, const U & rhs)
 {
     return *lhs == rhs;
 }
 
 template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
-bool operator==(const T& lhs, const IntrusiveVariantValue<U>& rhs)
+bool operator==(const T & lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return lhs == *rhs;
 }
 
 template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
-bool operator!=(const T& lhs, const IntrusiveVariantValue<U>& rhs)
+bool operator!=(const T & lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return !(lhs == rhs);
 }
 
 template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
-bool operator!=(const IntrusiveVariantValue<T>& lhs, const U& rhs)
+bool operator!=(const IntrusiveVariantValue<T>& lhs, const U & rhs)
 {
     return !(lhs == rhs);
 }

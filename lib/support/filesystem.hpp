@@ -6,7 +6,6 @@
 
 #pragma once
 
-
 #include <filesystem>
 #include <fstream>
 
@@ -18,4 +17,3 @@ using ifstream = std::ifstream;
 using ofstream = std::ofstream;
 using fstream = std::fstream;
 } // namespace coral66::fs
-

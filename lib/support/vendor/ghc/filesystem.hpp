@@ -1731,8 +1731,8 @@ GHC_INLINE void path::postprocess_path_with_format(path::impl_string_type& p, pa
     }
     else
     {
-        std::string::iterator new_end = std::unique(
-            p.begin(), p.end(), [](path::value_type lhs, path::value_type rhs) { return lhs == rhs && lhs == '/'; });
+        std::string::iterator new_end = std::unique(p.begin(), p.end(), [](path::value_type lhs, path::value_type rhs)
+                                                    { return lhs == rhs && lhs == '/'; });
         p.erase(new_end, p.end());
     }
 }
@@ -5000,9 +5000,9 @@ GHC_INLINE space_info space(const path& p, std::error_code& ec) noexcept
 {
     ec.clear();
     #ifdef GHC_OS_WINDOWS
-    ULARGE_INTEGER freeBytesAvailableToCaller = {{ 0, 0 }};
-    ULARGE_INTEGER totalNumberOfBytes = {{ 0, 0 }};
-    ULARGE_INTEGER totalNumberOfFreeBytes = {{ 0, 0 }};
+    ULARGE_INTEGER freeBytesAvailableToCaller = {{0, 0}};
+    ULARGE_INTEGER totalNumberOfBytes = {{0, 0}};
+    ULARGE_INTEGER totalNumberOfFreeBytes = {{0, 0}};
     if (!GetDiskFreeSpaceExW(detail::fromUtf8<std::wstring>(p.u8string()).c_str(), &freeBytesAvailableToCaller,
                              &totalNumberOfBytes, &totalNumberOfFreeBytes))
     {

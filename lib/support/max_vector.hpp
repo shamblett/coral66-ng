@@ -68,7 +68,8 @@ public:
         {
             m_array[i] = initializerList[i];
         }
-    return *this;}
+        return *this;
+    }
 
     template <class Iter>
     constexpr MaxVector(Iter first, Iter last) : m_size(last - first)

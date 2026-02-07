@@ -26,7 +26,7 @@
 
         #ifdef __clang__
 
-            #define CORAL66_UNREACHABLE          \
+            #define CORAL66_UNREACHABLE      \
                 do                           \
                     __builtin_unreachable(); \
                 while (0)
@@ -35,20 +35,20 @@
 
         #elif defined(__GNUC__)
 
-            #define CORAL66_UNREACHABLE          \
+            #define CORAL66_UNREACHABLE      \
                 do                           \
                     __builtin_unreachable(); \
                 while (0)
 
             #define CORAL66_ASSERT(...) \
-                if (__VA_ARGS__)    \
-                    ;               \
-                else                \
+                if (__VA_ARGS__)        \
+                    ;                   \
+                else                    \
                     __builtin_unreachable()
 
-            #define CORAL66_UNREACHABLE  \
-                do                   \
-                    __assume(false); \
+            #define CORAL66_UNREACHABLE \
+                do                      \
+                    __assume(false);    \
                 while (0)
 
             #define CORAL66_ASSERT(...) __assume((bool)(__VA_ARGS__))
@@ -64,11 +64,11 @@
     #else
 
         #define CORAL66_UNREACHABLE \
-            do                  \
-                std::abort();   \
+            do                      \
+                std::abort();       \
             while (0)
 
-        #define CORAL66_ASSERT(...)                                                    \
+        #define CORAL66_ASSERT(...)                                                \
             do                                                                     \
             {                                                                      \
                 if (!(__VA_ARGS__))                                                \
@@ -82,7 +82,7 @@
 
 #else
 
-    #define CORAL66_ASSERT(...)                                                    \
+    #define CORAL66_ASSERT(...)                                                \
         do                                                                     \
         {                                                                      \
             if (!(__VA_ARGS__))                                                \
@@ -92,7 +92,7 @@
             }                                                                  \
         } while (0)
 
-    #define CORAL66_UNREACHABLE                                                              \
+    #define CORAL66_UNREACHABLE                                                          \
         do                                                                               \
         {                                                                                \
             std::abort(); /* So that the compiler sees code afterwards is unreachable */ \
@@ -539,29 +539,23 @@ public:
     template <class... Last>
     decltype(auto) operator()(Last&&... last) & noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
     {
-        return std::apply(
-            [&]<typename... T0>(T0&&... members) -> decltype(auto)
-            { return std::invoke(f, std::forward<T0>(members)..., std::forward<Last>(last)...); },
-            front);
+        return std::apply([&]<typename... T0>(T0&&... members) -> decltype(auto)
+                          { return std::invoke(f, std::forward<T0>(members)..., std::forward<Last>(last)...); }, front);
     }
 
     template <class... Last>
     decltype(auto) operator()(Last&&... last) const& noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
     {
-        return std::apply(
-            [&]<typename... T0>(T0&&... members) -> decltype(auto)
-            { return std::invoke(f, std::forward<T0>(members)..., std::forward<Last>(last)...); },
-            front);
+        return std::apply([&]<typename... T0>(T0&&... members) -> decltype(auto)
+                          { return std::invoke(f, std::forward<T0>(members)..., std::forward<Last>(last)...); }, front);
     }
 
     template <class... Last>
     decltype(auto) operator()(Last&&... last) && noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
     {
         return std::apply(
-            [&]<typename... T0>(T0&&... members) -> decltype(auto) {
-                return std::invoke(std::move(f), std::forward<T0>(members)...,
-                                   std::forward<Last>(last)...);
-            },
+            [&]<typename... T0>(T0&&... members) -> decltype(auto)
+            { return std::invoke(std::move(f), std::forward<T0>(members)..., std::forward<Last>(last)...); },
             std::move(front));
     }
 
@@ -569,10 +563,8 @@ public:
     decltype(auto) operator()(Last&&... last) const&& noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
     {
         return std::apply(
-            [&]<typename... T0>(T0&&... members) -> decltype(auto) {
-                return std::invoke(std::move(f), std::forward<T0>(members)...,
-                                   std::forward<Last>(last)...);
-            },
+            [&]<typename... T0>(T0&&... members) -> decltype(auto)
+            { return std::invoke(std::move(f), std::forward<T0>(members)..., std::forward<Last>(last)...); },
             std::move(front));
     }
 };
@@ -591,9 +583,8 @@ constexpr auto compose(F&& f, G&& g)
     return [f = std::forward<F>(f), g = std::forward<G>(g)]<typename T0>(T0&& value)
     {
         static_assert(std::is_invocable_v<std::decay_t<G>, std::decay_t<T0>>);
-        static_assert(
-            std::is_invocable_v<std::decay_t<F>, decltype(std::invoke(std::declval<std::decay_t<G>>(),
-                                                                      std::forward<T0>(value)))>);
+        static_assert(std::is_invocable_v<std::decay_t<F>, decltype(std::invoke(std::declval<std::decay_t<G>>(),
+                                                                                std::forward<T0>(value)))>);
         return std::invoke(f, std::invoke(g, std::forward<T0>(value)));
     };
 }

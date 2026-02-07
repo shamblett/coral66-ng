@@ -63,8 +63,7 @@
 /**
  * If exceptions are enabled, throw the exception passed in parameter, otherwise call std::terminate.
  */
-#if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)) \
-    && !defined(TSL_NO_EXCEPTIONS)
+#if (defined(__cpp_exceptions) || defined(__EXCEPTIONS) || defined(_CPPUNWIND)) && !defined(TSL_NO_EXCEPTIONS)
     #define TSL_OH_THROW_OR_TERMINATE(ex, msg) throw ex(msg)
 #else
     #define TSL_OH_NO_EXCEPTIONS
@@ -150,7 +149,6 @@ static_assert(std::numeric_limits<slz_size_type>::max() >= std::numeric_limits<s
 template <class T, class Deserializer>
 static T deserialize_value(Deserializer& deserializer)
 {
-
     return deserializer.Deserializer::template operator()<T>();
 }
 
@@ -538,10 +536,10 @@ public:
     {
     }
 
-    ordered_hash(ordered_hash&& other) noexcept(
-        std::is_nothrow_move_constructible<Hash>::value&& std::is_nothrow_move_constructible<KeyEqual>::value&&
-            std::is_nothrow_move_constructible<buckets_container_type>::value&&
-                std::is_nothrow_move_constructible<values_container_type>::value)
+    ordered_hash(ordered_hash&& other) noexcept(std::is_nothrow_move_constructible<Hash>::value
+                                                && std::is_nothrow_move_constructible<KeyEqual>::value
+                                                && std::is_nothrow_move_constructible<buckets_container_type>::value
+                                                && std::is_nothrow_move_constructible<values_container_type>::value)
         : Hash(std::move(static_cast<Hash&>(other))),
           KeyEqual(std::move(static_cast<KeyEqual&>(other))),
           m_buckets_data(std::move(other.m_buckets_data)),

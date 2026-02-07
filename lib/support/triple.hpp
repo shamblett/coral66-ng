@@ -7,11 +7,11 @@
 #pragma once
 
 /**
-* Architecture support.
-*
-* Note that we only cater for x86_64 GNU Linux.
-*
-*/
+ * Architecture support.
+ *
+ * Note that we only cater for x86_64 GNU Linux.
+ *
+ */
 
 #include <string_view>
 
