@@ -4,9 +4,9 @@
  * Date   : 31/01/2026
  */
  
-#include "X86TargetFeatures.hpp"
+#include "x86_target_features.hpp"
 
-bool coral66::X86TargetFeatures::hasFeature(coral66::TargetFeatures::Features const features) const
+bool coral66::x86_target_features::hasFeature(coral66::TargetFeatures::Features const features) const
 {
     switch (features)
     {
@@ -15,11 +15,11 @@ bool coral66::X86TargetFeatures::hasFeature(coral66::TargetFeatures::Features co
 #define HANDLE_VALUE(x) \
     case x: return m_## x;
 //
-#include "X86Features.def"
+#include "x86_features.def"
     }
 }
 
-bool coral66::X86TargetFeatures::setFeature(coral66::TargetFeatures::Features const features, bool value)
+bool coral66::x86_target_features::setFeature(coral66::TargetFeatures::Features const features, bool value)
 {
     switch (features)
     {
@@ -27,6 +27,6 @@ bool coral66::X86TargetFeatures::setFeature(coral66::TargetFeatures::Features co
 #define HANDLE_VALUE(x) \
     case x: m_## x = value; return true;
 //
-#include "X86Features.def"
+#include "x86_features.def"
     }
 }

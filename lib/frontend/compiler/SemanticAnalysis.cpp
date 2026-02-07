@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <ranges>
 
-#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/error_messages.hpp"
 
 namespace coral66::Semantics
 {
@@ -20,7 +20,7 @@ IntrVarPtr<T> makeIntr(Args&&... args)
     return IntrVarPtr<T>(new T(std::forward<Args>(args)...));
 }
 
-SemanticAnalysis::SemanticAnalysis(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter, bool* errors)
+SemanticAnalysis::SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter, bool* errors)
     : m_sourceInterface(sourceInterface), m_reporter(reporter), m_errors(errors)
 {
 }

@@ -7,16 +7,15 @@
 #pragma once
 
 #include <algorithm>
+#include <optional>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include <optional>
 
+#include "lexer_common.hpp"
+#include "lib/frontend/common/language_options.hpp"
+#include "lib/frontend/common/source_interface.hpp"
 #include "lib/support/Utilities.hpp"
-
-#include "lib/frontend/common/LanguageOptions.hpp"
-#include "LexerCommon.hpp"
-#include "lib/frontend/common/SourceInterface.hpp"
 
 /**
  * @file SourceObject.hpp
@@ -73,7 +72,7 @@ template <class T>
 class SourceObjectStorage;
 
 template <>
-class SourceObjectStorage<Lexer::CToken> : public SourceInterface
+class SourceObjectStorage<Lexer::CToken> : public source_interface
 {
     LanguageOptions m_languageOptions = LanguageOptions::native();
 

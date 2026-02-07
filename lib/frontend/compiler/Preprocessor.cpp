@@ -6,15 +6,14 @@
 
 #include "Preprocessor.hpp"
 
+#include <algorithm>
 #include <unordered_map>
 #include <vector>
-#include <algorithm>
 
-#include "lib/support/ScopeExit.hpp"
-
-#include "lib/frontend/common/ErrorMessages.hpp"
 #include "Parser.hpp"
 #include "PreprocessorParser.hpp"
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/support/ScopeExit.hpp"
 
 namespace
 {

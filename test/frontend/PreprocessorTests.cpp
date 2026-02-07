@@ -4,13 +4,12 @@
  * Date   : 31/01/2026
  */
 
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
-
-#include "lib/frontend/common/ErrorMessages.hpp"
-#include "lib/frontend/common/SourceObject.hpp"
 #include "lib/frontend/compiler/Preprocessor.hpp"
 
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/source_object.hpp"
 #include "test/common/TestConfig.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 namespace
 {

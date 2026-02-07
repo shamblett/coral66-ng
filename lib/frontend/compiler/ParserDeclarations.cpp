@@ -13,7 +13,7 @@
 #include "ParserUtilities.hpp"
 #include "SemanticUtilities.hpp"
 #include "Semantics.hpp"
-#include "lib/frontend/common/ErrorMessages.hpp"
+#include "lib/frontend/common/error_messages.hpp"
 #include "lib/support/ScopeExit.hpp"
 
 /**

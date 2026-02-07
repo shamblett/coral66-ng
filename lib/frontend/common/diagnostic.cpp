@@ -4,24 +4,24 @@
  * Date   : 31/01/2026
  */
 
-#include "Diagnostic.hpp"
+#include "diagnostic.hpp"
 
+#include <llvm/ADT/STLExtras.h>
 #include <llvm/Support/Format.h>
 #include <llvm/Support/WithColor.h>
-#include <llvm/ADT/STLExtras.h>
 
 #include <algorithm>
 #include <array>
 #include <map>
 
-#include "SourceObject.hpp"
+#include "source_object.hpp"
 
 namespace
 {
 using PointLocation = coral66::diag::PointLocation;
 
 std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation, PointLocation> location,
-                                                        const coral66::SourceInterface& sourceInterface)
+                                                        const coral66::source_interface& sourceInterface)
 {
     while (location.first.macroId != 0)
     {
@@ -71,7 +71,7 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
 }
 
 std::pair<std::uint64_t, std::uint64_t> getLineCol(const PointLocation& pointLocation,
-                                                   const coral66::SourceInterface& sourceInterface)
+                                                   const coral66::source_interface& sourceInterface)
 {
     const auto line = sourceInterface.getLineNumber(pointLocation.fileId, pointLocation.offset);
     const auto column = pointLocation.offset - sourceInterface.getLineStartOffset(pointLocation.fileId, line) + 1;
@@ -279,7 +279,7 @@ auto coral66::diag::after(const Lexer::TokenBase& token) -> std::tuple<const Lex
 
 coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
-    std::span<Argument> arguments, std::span<const Modifiers> modifiers, const SourceInterface& sourceInterface) const
+    std::span<Argument> arguments, std::span<const Modifiers> modifiers, const source_interface& sourceInterface) const
 {
     if (m_severity == Severity::Warning
         && !sourceInterface.getLanguageOptions().enabledWarnings.contains(to_string(m_name)))
@@ -493,7 +493,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     }
 
     ss.flush();
-    return Message(m_severity, std::move(result));
+    return {m_severity, std::move(result)};
 }
 
 void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const std::string_view message,
@@ -547,7 +547,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(std::string_
                                          ": ";
     evaluateFormatsInMessage(message, arguments, ss);
     ss.flush();
-    return Message(m_severity, std::move(result));
+    return {m_severity, std::move(result)};
 }
 
 std::unordered_set<std::string_view>& coral66::detail::Diagnostic::DiagnosticBase::allWarnings()

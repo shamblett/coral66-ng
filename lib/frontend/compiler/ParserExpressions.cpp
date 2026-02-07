@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
-#include "lib/frontend/common/ErrorMessages.hpp"
 #include "ParserUtilities.hpp"
+#include "lib/frontend/common/error_messages.hpp"
 
 using namespace coral66::Syntax;
 

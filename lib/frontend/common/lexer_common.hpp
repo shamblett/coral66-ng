@@ -6,17 +6,16 @@
 
 #pragma once
 
-#include <llvm/ADT/APSInt.h>
 #include <llvm/ADT/APFloat.h>
+#include <llvm/ADT/APSInt.h>
 #include <llvm/Support/raw_ostream.h>
 
-#include <variant>
 #include <string>
 #include <string_view>
+#include <variant>
 
 #include "lib/support/Utilities.hpp"
-
-#include "SourceInterface.hpp"
+#include "source_interface.hpp"
 
 namespace coral66::Lexer
 {
@@ -155,11 +154,11 @@ protected:
     }
 
 public:
-    [[nodiscard]] std::string_view getRepresentation(const SourceInterface& sourceObject) const;
+    [[nodiscard]] std::string_view getRepresentation(const source_interface& sourceObject) const;
 
-    [[nodiscard]] std::uint64_t getLine(const SourceInterface& sourceObject) const noexcept;
+    [[nodiscard]] std::uint64_t getLine(const source_interface& sourceObject) const noexcept;
 
-    [[nodiscard]] std::uint64_t getColumn(const SourceInterface& sourceObject) const noexcept;
+    [[nodiscard]] std::uint64_t getColumn(const source_interface& sourceObject) const noexcept;
 
     [[nodiscard]] TokenType getTokenType() const noexcept
     {

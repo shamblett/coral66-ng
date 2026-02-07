@@ -14,7 +14,7 @@ namespace coral66::CGLLVM
 {
 
 code_generator::code_generator(llvm::Module& module, const Semantics::Program& program,
-                               const SourceInterface& sourceInterface, const CGLLVM::Options& options)
+                               const source_interface& sourceInterface, const CGLLVM::Options& options)
     : m_module(module), m_program(program), m_sourceInterface(sourceInterface), m_options(options)
 {
 }

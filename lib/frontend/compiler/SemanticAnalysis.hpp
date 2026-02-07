@@ -17,7 +17,7 @@ namespace coral66::Semantics
 
 class SemanticAnalysis final : public ProgramInterface
 {
-    const SourceInterface& m_sourceInterface;
+    const source_interface& m_sourceInterface;
     llvm::raw_ostream* m_reporter;
     bool* m_errors;
     std::vector<coral66::IntrVarPtr<Statement>> m_currentBlockStatements;
@@ -27,7 +27,7 @@ class SemanticAnalysis final : public ProgramInterface
     std::unordered_map<std::string_view, const Useable*> m_symbolTable;
     
 public:
-    SemanticAnalysis(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);
+    SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);
 
     [[nodiscard]] const LanguageOptions& getLanguageOptions() const override { return m_sourceInterface.getLanguageOptions(); }
 

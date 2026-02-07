@@ -28,7 +28,7 @@ class code_generator final
 {
     llvm::Module& m_module;
     const Semantics::Program& m_program;
-    const SourceInterface& m_sourceInterface;
+    const source_interface& m_sourceInterface;
     const CGLLVM::Options& m_options;
 
     llvm::IRBuilder<> m_builder{m_module.getContext()};
@@ -41,7 +41,7 @@ class code_generator final
 
 public:
     explicit code_generator(llvm::Module& module, const Semantics::Program& program,
-                            const SourceInterface& sourceInterface, const CGLLVM::Options& options);
+                            const source_interface& sourceInterface, const CGLLVM::Options& options);
 
     void generate();
 

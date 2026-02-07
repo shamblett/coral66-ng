@@ -10,15 +10,15 @@
  *
  */
 
-#include "lib/frontend//common/LanguageOptions.hpp"
+#include "lib/frontend//common/language_options.hpp"
 
 namespace coral66
 {
  // ReSharper disable once CppClassNeedsConstructorBecauseOfUninitializedMember
-class X86TargetFeatures final : public TargetFeatures
+class x86_target_features final : public TargetFeatures
 {
 #define HANDLE_VALUE(x) bool m_## x;
-#include "X86Features.def"
+#include "x86_features.def"
 public:
     bool hasFeature(Features features) const override;
 

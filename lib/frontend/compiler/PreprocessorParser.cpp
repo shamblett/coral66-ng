@@ -6,8 +6,8 @@
 
 #include "PreprocessorParser.hpp"
 
-#include "lib/frontend/common/ErrorMessages.hpp"
-#include "lib/frontend/common/SourceObject.hpp"
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/source_object.hpp"
 
 namespace
 {
@@ -52,7 +52,7 @@ coral66::Lexer::PPTokenIterator findNewline(coral66::Lexer::PPTokenIterator cons
 
 } // namespace
 
-coral66::PP::Context::Context(const coral66::SourceInterface& sourceInterface, llvm::raw_ostream* reporter)
+coral66::PP::Context::Context(const coral66::source_interface& sourceInterface, llvm::raw_ostream* reporter)
     : m_sourceInterface(sourceInterface), m_reporter(reporter)
 {
 }
@@ -74,7 +74,7 @@ std::size_t coral66::PP::Context::getErrorCount() const
     return m_errorCount;
 }
 
-const coral66::SourceInterface& coral66::PP::Context::getSourceInterface() const
+const coral66::source_interface& coral66::PP::Context::getSourceInterface() const
 {
     return m_sourceInterface;
 }

@@ -10,7 +10,7 @@
 #include <span>
 #include <variant>
 
-#include "LanguageOptions.hpp"
+#include "language_options.hpp"
 
 /**
  * @file SourceInterface.hpp
@@ -44,15 +44,15 @@ using PPRecord =
     std::variant<std::monostate, Source::Substitution, Source::Stringification, Source::TokenConcatenation>;
 } // namespace Source
 
-class SourceInterface
+class source_interface
 {
 public:
-    SourceInterface() = default;
-    virtual ~SourceInterface() = default;
-    SourceInterface(const SourceInterface&) = default;
-    SourceInterface& operator=(const SourceInterface&) = default;
-    SourceInterface(SourceInterface&&) noexcept = default;
-    SourceInterface& operator=(SourceInterface&&) noexcept = default;
+    source_interface() = default;
+    virtual ~source_interface() = default;
+    source_interface(const source_interface&) = default;
+    source_interface& operator=(const source_interface&) = default;
+    source_interface(source_interface&&) noexcept = default;
+    source_interface& operator=(source_interface&&) noexcept = default;
 
     [[nodiscard]] virtual std::uint64_t getLineNumber(std::uint32_t fileID, std::uint64_t offset) const noexcept = 0;
 
@@ -67,7 +67,7 @@ public:
     [[nodiscard]] virtual const LanguageOptions& getLanguageOptions() const noexcept = 0;
 };
 
-class PPSourceInterface : virtual public SourceInterface
+class PPSourceInterface : virtual public source_interface
 {
 public:
     PPSourceInterface() = default;

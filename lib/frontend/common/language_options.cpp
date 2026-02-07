@@ -4,15 +4,14 @@
  * Date   : 31/01/2026
  */
 
-#include "LanguageOptions.hpp"
-
-#include "lib/support/Utilities.hpp"
+#include "language_options.hpp"
 
 #include <limits>
 #include <numeric>
 
-#include "Diagnostic.hpp"
-#include "targets/X86TargetFeatures.hpp"
+#include "diagnostic.hpp"
+#include "lib/support/Utilities.hpp"
+#include "targets/x86_target_features.hpp"
 
 namespace
 {
@@ -20,7 +19,7 @@ std::unique_ptr<coral66::TargetFeatures> tripleToFeatures(const coral66::Triple&
 {
     if (triple.getArchitecture() == coral66::Architecture::x86_64)
     {
-        auto result = std::make_unique<coral66::X86TargetFeatures>();
+        auto result = std::make_unique<coral66::x86_target_features>();
         result->setFeature(coral66::TargetFeatures::SSE, true);
         result->setFeature(coral66::TargetFeatures::SSE2, true);
         return result;

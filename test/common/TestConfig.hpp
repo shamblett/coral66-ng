@@ -6,21 +6,19 @@
 
 #pragma once
 
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
-
 #include <llvm/ADT/APInt.h>
 #include <llvm/ADT/APSInt.h>
-
-#include "lib/frontend/common/Diagnostic.hpp"
-#include "lib/frontend/common/CustomDiagnostics.hpp"
-#include "lib/frontend/compiler/Semantics.hpp"
-#include "lib/frontend/compiler/Preprocessor.hpp"
-#include "lib/support/Filesystem.hpp"
-#include "lib/support/Text.hpp"
 
 #include <numeric>
 
 #include "TestTargets.hpp"
+#include "lib/frontend/common/custom_diagnostics.hpp"
+#include "lib/frontend/common/diagnostic.hpp"
+#include "lib/frontend/compiler/Preprocessor.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/support/Filesystem.hpp"
+#include "lib/support/Text.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 namespace coral66::Tests
 {

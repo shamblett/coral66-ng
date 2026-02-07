@@ -17,8 +17,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "lib/frontend/common/ErrorMessages.hpp"
-#include "lib/frontend/common/SourceObject.hpp"
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/source_object.hpp"
 #include "lib/support/ScopeExit.hpp"
 #include "lib/support/Text.hpp"
 
@@ -599,7 +599,7 @@ auto mapArguments(const Diag&, const IntervalMap& intervalMap, Tuple&& tuple, st
         }(std::integral_constant<std::size_t, ints>{})...);
 }
 
-class Context : private coral66::SourceInterface
+class Context : private coral66::source_interface
 {
     llvm::raw_ostream* m_reporter;
     std::vector<PPToken> m_result;
@@ -1686,18 +1686,18 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
                           languageOptions, {}, {{std::move(characterToSourceSpace)}});
 }
 
-[[nodiscard]] std::string_view coral66::Lexer::TokenBase::getRepresentation(const SourceInterface& sourceObject) const
+[[nodiscard]] std::string_view coral66::Lexer::TokenBase::getRepresentation(const source_interface& sourceObject) const
 {
     return std::string_view(sourceObject.getFiles()[static_cast<std::uint64_t>(m_fileID)].source)
         .substr(m_offset, m_length);
 }
 
-[[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getLine(const SourceInterface& sourceObject) const noexcept
+[[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getLine(const source_interface& sourceObject) const noexcept
 {
     return sourceObject.getLineNumber(m_fileID, m_offset);
 }
 
-[[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getColumn(const SourceInterface& sourceObject) const noexcept
+[[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getColumn(const source_interface& sourceObject) const noexcept
 {
     auto line = sourceObject.getLineNumber(m_fileID, m_offset);
     return m_offset - sourceObject.getLineStartOffset(m_fileID, line) + 1;

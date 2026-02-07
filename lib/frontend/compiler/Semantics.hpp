@@ -12,16 +12,13 @@
 #include <string>
 #include <vector>
 
-#include "lib/support/vendor/tsl/ordered_map.h"
-
+#include "Lexer.hpp"
+#include "lib/frontend/common/attributes.hpp"
+#include "lib/frontend/common/semantics_common.hpp"
+#include "lib/frontend/common/source_object.hpp"
 #include "lib/support/AbstractIntrusiveVariant.hpp"
 #include "lib/support/IntrusiveVariantValue.hpp"
-
-#include "lib/frontend/common/SourceObject.hpp"
-#include "Lexer.hpp"
-#include "lib/frontend/common/SemanticsCommon.hpp"
-#include "lib/frontend/common/Attributes.hpp"
-
+#include "lib/support/vendor/tsl/ordered_map.h"
 
 /**
  * @file Semantics.hpp

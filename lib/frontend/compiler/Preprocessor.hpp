@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include "lib/frontend/common/SourceObject.hpp"
+#include "lib/frontend/common/source_object.hpp"
 
 namespace coral66
 {
@@ -31,7 +31,7 @@ PPSourceObject preprocess(PPSourceObject&& sourceObject, const Options& options 
                           llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr) noexcept;
 
 template <class T>
-std::string reconstruct(const T* begin, const T* end, const SourceInterface& sourceInterface) noexcept
+std::string reconstruct(const T* begin, const T* end, const source_interface& sourceInterface) noexcept
 {
     static_assert(std::is_base_of_v<Lexer::TokenBase, T>);
     if (begin == end)

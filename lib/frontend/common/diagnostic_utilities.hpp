@@ -11,9 +11,9 @@
  *
  */
 
-#include "LexerCommon.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lexer_common.hpp"
 #include "lib/support/AbstractIntrusiveVariant.hpp"
+#include "lib/support/Utilities.hpp"
 
 namespace coral66::diag
 {

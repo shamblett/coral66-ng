@@ -6,12 +6,13 @@
 
 #pragma once
 
-#include <llvm/ADT/APSInt.h>
 #include <llvm/ADT/APFloat.h>
-#include <variant>
-#include <string>
+#include <llvm/ADT/APSInt.h>
 
-#include "LanguageOptions.hpp"
+#include <string>
+#include <variant>
+
+#include "language_options.hpp"
 
 namespace coral66::Semantics
 {
@@ -19,7 +20,7 @@ class Type;
 class ProgramInterface;
 class Issue;
 
-class ConstantValue final
+class constant_value final
 {
 public:
     using ValueType = std::variant<llvm::APSInt, llvm::APFloat, std::string>;
@@ -28,15 +29,15 @@ private:
     ValueType m_value;
 
 public:
-    ConstantValue() = default;
+    constant_value() = default;
 
-    /*implicit*/ ConstantValue(ValueType value) : m_value(std::move(value)) {}
+    /*implicit*/ constant_value(ValueType value) : m_value(std::move(value)) {}
 
-    ConstantValue(llvm::APSInt integer);
-    ConstantValue(llvm::APFloat floating);
-    ConstantValue(std::string string);
+    constant_value(llvm::APSInt integer);
+    constant_value(llvm::APFloat floating);
+    constant_value(std::string string);
 
-    ConstantValue castTo(const Type& type, const ProgramInterface* program, const LanguageOptions& options,
+    constant_value castTo(const Type& type, const ProgramInterface* program, const LanguageOptions& options,
                       Issue* issue = nullptr) const;
 
     // Add accessors if needed by other parts of the system

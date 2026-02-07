@@ -5,13 +5,14 @@
  */
 
 #include "Parser.hpp"
-#include "lib/frontend/common/SourceObject.hpp"
-#include "lib/frontend/common/ErrorMessages.hpp"
+
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/source_object.hpp"
 
 namespace coral66::Parser
 {
 
-Context::Context(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter)
+Context::Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter)
     : m_sourceInterface(sourceInterface), m_reporter(reporter)
 {
 }
@@ -28,7 +29,7 @@ void Context::log(const Message& message)
     }
 }
 
-const SourceInterface& Context::getSourceInterface() const
+const source_interface& Context::getSourceInterface() const
 {
     return m_sourceInterface;
 }

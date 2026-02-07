@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "Message.hpp"
+#include "message.hpp"
 
 llvm::raw_ostream& coral66::operator<<(llvm::raw_ostream& os, const coral66::Message& message)
 

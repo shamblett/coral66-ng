@@ -15,7 +15,7 @@
 #include <variant>
 #include <vector>
 
-#include "lib/frontend/common/Message.hpp"
+#include "lib/frontend/common/message.hpp"
 #include "lib/support/Constexpr.hpp"
 #include "lib/support/MaxVector.hpp"
 #include "lib/support/Text.hpp"

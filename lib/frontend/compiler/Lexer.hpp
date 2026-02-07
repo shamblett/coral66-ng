@@ -13,11 +13,10 @@
 #include <tuple>
 #include <vector>
 
+#include "lib/frontend/common/custom_diagnostics.hpp"
+#include "lib/frontend/common/language_options.hpp"
+#include "lib/frontend/common/lexer_common.hpp"
 #include "lib/support/Utilities.hpp"
-
-#include "lib/frontend/common/CustomDiagnostics.hpp"
-#include "lib/frontend/common/LanguageOptions.hpp"
-#include "lib/frontend/common/LexerCommon.hpp"
 
 /**
  * @file Lexer.hpp
@@ -124,12 +123,12 @@ struct CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'>
 template <>
 struct StringConverter<Lexer::TokenType>
 {
-    static std::string inFormat(Lexer::TokenType arg, const SourceInterface*)
+    static std::string inFormat(Lexer::TokenType arg, const source_interface*)
     {
         return coral66::to_string(tokenName(arg));
     }
 
-    static std::string inArg(Lexer::TokenType arg, const SourceInterface*)
+    static std::string inArg(Lexer::TokenType arg, const source_interface*)
     {
         return coral66::to_string(tokenValue(arg));
     }
@@ -138,7 +137,7 @@ struct StringConverter<Lexer::TokenType>
 template <>
 struct StringConverter<Lexer::TokenBase>
 {
-    static std::string inFormat(const Lexer::TokenBase& arg, const SourceInterface* sourceInterface)
+    static std::string inFormat(const Lexer::TokenBase& arg, const source_interface* sourceInterface)
     {
         CORAL66_ASSERT(sourceInterface);
         auto spelling = Lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
@@ -153,7 +152,7 @@ struct StringConverter<Lexer::TokenBase>
         return "'" + spelling + "'";
     }
 
-    static std::string inArg(const Lexer::TokenBase& arg, const SourceInterface* sourceInterface)
+    static std::string inArg(const Lexer::TokenBase& arg, const source_interface* sourceInterface)
     {
         CORAL66_ASSERT(sourceInterface);
         auto spelling = Lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));

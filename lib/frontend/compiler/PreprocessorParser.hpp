@@ -16,12 +16,12 @@ namespace PP
 {
 class Context final
 {
-    const SourceInterface& m_sourceInterface;
+    const source_interface& m_sourceInterface;
     llvm::raw_ostream* m_reporter;
     std::size_t m_errorCount = 0;
 
 public:
-    explicit Context(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
+    explicit Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
 
     Context(const Context&) = delete;
     Context& operator=(const Context&) = delete;
@@ -32,7 +32,7 @@ public:
 
     [[nodiscard]] std::size_t getErrorCount() const;
 
-    [[nodiscard]] const SourceInterface& getSourceInterface() const;
+    [[nodiscard]] const source_interface& getSourceInterface() const;
 };
 
 File buildTree(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);

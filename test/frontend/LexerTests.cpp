@@ -4,17 +4,16 @@
  * Date   : 31/01/2026
  */
 
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
+#include "lib/frontend/compiler/Lexer.hpp"
 
 #include <llvm/Support/Format.h>
 
-#include "lib/frontend/common/ErrorMessages.hpp"
-#include "lib/frontend/compiler/Lexer.hpp"
-#include "lib/frontend/common/SourceObject.hpp"
-
 #include <array>
 
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/source_object.hpp"
 #include "test/common/TestConfig.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66::Errors::Lexer;
 using namespace Catch::Matchers;

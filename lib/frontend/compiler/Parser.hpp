@@ -7,24 +7,23 @@
 
 #include <vector>
 
-#include "lib/frontend/common/Message.hpp"
-
 #include "Syntax.hpp"
+#include "lib/frontend/common/message.hpp"
 
 namespace coral66::Parser
 {
 
 class Context
 {
-    const SourceInterface& m_sourceInterface;
+    const source_interface& m_sourceInterface;
     llvm::raw_ostream* m_reporter;
     std::size_t m_errorCount = 0;
 
 public:
-    Context(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
+    Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
 
     void log(const Message& message);
-    [[nodiscard]] const SourceInterface& getSourceInterface() const;
+    [[nodiscard]] const source_interface& getSourceInterface() const;
     [[nodiscard]] std::size_t getErrorCount() const;
 };
 

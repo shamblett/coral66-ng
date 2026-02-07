@@ -18,8 +18,8 @@
 #include <llvm/Support/Timer.h>
 
 #include "lib/backend/code_generation.hpp"
-#include "lib/frontend/common/ErrorMessages.hpp"
-#include "lib/frontend/common/LanguageOptions.hpp"
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/language_options.hpp"
 #include "lib/frontend/compiler/Parser.hpp"
 #include "lib/frontend/compiler/Preprocessor.hpp"
 #include "lib/frontend/compiler/Program.hpp"

@@ -25,7 +25,7 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const Se
     // This is an issue. I should update Codegen.hpp or remove dependency.
 
     // Stub SourceInterface
-    class StubSourceInterface : public SourceInterface
+    class StubSourceInterface : public source_interface
     {
     public:
         [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t) const noexcept override

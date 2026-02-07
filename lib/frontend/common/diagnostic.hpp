@@ -6,19 +6,18 @@
 
 #pragma once
 
-#include "lib/support/Constexpr.hpp"
-#include "lib/support/Text.hpp"
-#include "lib/support/Utilities.hpp"
-#include "CustomDiagnostics.hpp"
-#include "DiagnosticUtilities.hpp"
-#include "Message.hpp"
-
 #include <array>
 #include <optional>
+#include <span>
 #include <unordered_map>
 #include <unordered_set>
 
-#include <span>
+#include "custom_diagnostics.hpp"
+#include "diagnostic_utilities.hpp"
+#include "lib/support/Constexpr.hpp"
+#include "lib/support/Text.hpp"
+#include "lib/support/Utilities.hpp"
+#include "message.hpp"
 
 /**
  * @file Diagnostic.hpp
@@ -250,7 +249,7 @@ protected:
 
     Message print(std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
                   std::span<Argument> arguments, std::span<const Modifiers> modifiers,
-                  const SourceInterface& sourceInterface) const;
+                  const source_interface& sourceInterface) const;
 
     Message print(std::string_view message, std::span<Argument> arguments) const;
 
@@ -395,7 +394,7 @@ struct AnnotateExpr
  * @tparam Mods A list of modifiers (Underline, Annotate, etc.) applying to the arguments.
  */
 template <std::size_t N, auto& format, class... Mods>
-class Diagnostic : public detail::Diagnostic::DiagnosticBase
+class diagnostic : public detail::Diagnostic::DiagnosticBase
 {
 public:
     enum Constraint : std::uint8_t
@@ -515,8 +514,8 @@ private:
     template <class T>
     struct HasStringConverters<
         T, std::void_t<
-               decltype(diag::StringConverter<T>::inFormat(std::declval<T>(), std::declval<const SourceInterface*>()),
-                        diag::StringConverter<T>::inArg(std::declval<T>(), std::declval<const SourceInterface*>()))>>
+               decltype(diag::StringConverter<T>::inFormat(std::declval<T>(), std::declval<const source_interface*>()),
+                        diag::StringConverter<T>::inArg(std::declval<T>(), std::declval<const source_interface*>()))>>
         : std::true_type
     {
     };
@@ -554,7 +553,7 @@ private:
     }
 
     template <class Tuple, std::size_t... ints>
-    static std::array<Argument, N> createArgumentArray(const SourceInterface* sourceInterface, Tuple&& args,
+    static std::array<Argument, N> createArgumentArray(const source_interface* sourceInterface, Tuple&& args,
                                                        std::index_sequence<ints...>);
 
     constexpr static coral66::MaxVector<std::string_view, N> customModifiersFor(std::size_t i)
@@ -606,7 +605,7 @@ private:
     }
 
 public:
-    constexpr Diagnostic(const Severity severity, const std::string_view name) : detail::Diagnostic::DiagnosticBase(severity, name)
+    constexpr diagnostic(const Severity severity, const std::string_view name) : detail::Diagnostic::DiagnosticBase(severity, name)
     {
     }
 
@@ -621,7 +620,7 @@ public:
     }
 
     template <class T, class... Args>
-    Message args(const T& location, const SourceInterface& sourceInterface, Args&&... args) const;
+    Message args(const T& location, const source_interface& sourceInterface, Args&&... args) const;
 
     template <class... Args>
     Message argsCLI(Args&&... args) const;
@@ -675,12 +674,12 @@ constexpr auto makeDiagnostic(Severity category, std::string_view name)
     static_assert(tmp, "Not allowed to have any holes between % indices");
     constexpr bool duplicates = detail::Diagnostic::checkForNoDuplicates<n, Args...>();
     static_assert(duplicates, "Not allowed to have any duplicate indices in Modifiers");
-    return Diagnostic<n, text, Args...>(category, name);
+    return diagnostic<n, text, Args...>(category, name);
 }
 
 template <std::size_t N, auto& format, class... Mods>
 template <class T, class... Args>
-Message Diagnostic<N, format, Mods...>::args(const T& location, const SourceInterface& sourceInterface,
+Message diagnostic<N, format, Mods...>::args(const T& location, const source_interface& sourceInterface,
                                              Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
@@ -694,7 +693,7 @@ Message Diagnostic<N, format, Mods...>::args(const T& location, const SourceInte
 
 template <std::size_t N, auto& format, class... Mods>
 template <class... Args>
-Message Diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
+Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
     [[maybe_unused]] auto* v = this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
@@ -707,7 +706,7 @@ Message Diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
 }
 
 template <std::size_t N, auto& format, class... Mods>
-constexpr auto Diagnostic<N, format, Mods...>::getConstraints() -> std::array<std::underlying_type_t<Constraint>, N>
+constexpr auto diagnostic<N, format, Mods...>::getConstraints() -> std::array<std::underlying_type_t<Constraint>, N>
 {
     std::array<std::underlying_type_t<Constraint>, N> result{};
     auto text = getFormat();
@@ -756,7 +755,7 @@ constexpr auto Diagnostic<N, format, Mods...>::getConstraints() -> std::array<st
 
 template <std::size_t N, auto& format, class... Mods>
 template <class Tuple, std::size_t... ints>
-auto Diagnostic<N, format, Mods...>::createArgumentArray(const SourceInterface* sourceInterface, Tuple&& args,
+auto diagnostic<N, format, Mods...>::createArgumentArray(const source_interface* sourceInterface, Tuple&& args,
                                                          std::index_sequence<ints...>) -> std::array<Argument, N>
 {
     (void)sourceInterface;
@@ -800,7 +799,7 @@ auto Diagnostic<N, format, Mods...>::createArgumentArray(const SourceInterface* 
 
 template <std::size_t N, auto& format, class... Mods>
 template <std::size_t... ints>
-constexpr auto Diagnostic<N, format, Mods...>::getModifiers(std::index_sequence<ints...>)
+constexpr auto diagnostic<N, format, Mods...>::getModifiers(std::index_sequence<ints...>)
     -> std::array<Modifiers, sizeof...(Mods)>
 {
     std::array<Modifiers, sizeof...(Mods)> result = {};
