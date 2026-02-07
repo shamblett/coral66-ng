@@ -494,7 +494,7 @@ std::uint8_t getNumUTF8ForUTF32(std::uint32_t c)
 }
 
 template <class Iter>
-Iter findUTF8StartByte(Iter begin, Iter end)
+[[maybe_unused]] Iter findUTF8StartByte(Iter begin, Iter end)
 {
     return std::find_if(begin, end, [](std::uint8_t const c) { return c >= 0b1100'0000 || c < 0b1000'0000; });
 }
@@ -612,20 +612,20 @@ class Context : private coral66::SourceInterface
     coral66::Source::File m_fakeFile;
     const coral66::LanguageOptions& m_languageOptions;
 
-    std::uint64_t getLineNumber(std::uint32_t, std::uint64_t offset) const noexcept override
+    [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t offset) const noexcept override
     {
         auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
         CLD_ASSERT(result != m_lineStarts.end());
         return std::distance(m_lineStarts.begin(), result) + (*result == offset ? 1 : 0);
     }
 
-    std::uint64_t getLineStartOffset(std::uint32_t, std::uint64_t line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t, std::uint64_t line) const noexcept override
     {
         CLD_ASSERT(line - 1 < m_lineStarts.size());
         return m_lineStarts[line - 1];
     }
 
-    std::uint64_t getLineEndOffset(std::uint32_t, std::uint64_t line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t, std::uint64_t line) const noexcept override
     {
         CLD_ASSERT(line - 1 < m_lineStarts.size());
         if (line != m_lineStarts.size())
@@ -635,17 +635,17 @@ class Context : private coral66::SourceInterface
         return m_sourceSpace.size();
     }
 
-    std::span<const coral66::Source::File> getFiles() const noexcept override
+    [[nodiscard]] std::span<const coral66::Source::File> getFiles() const noexcept override
     {
         return {&m_fakeFile, &m_fakeFile + 1};
     }
 
-    std::span<const coral66::Source::PPRecord> getSubstitutions() const noexcept override
+    [[nodiscard]] std::span<const coral66::Source::PPRecord> getSubstitutions() const noexcept override
     {
         return {};
     }
 
-    const coral66::LanguageOptions& getLanguageOptions() const noexcept override
+    [[nodiscard]] const coral66::LanguageOptions& getLanguageOptions() const noexcept override
     {
         return m_languageOptions;
     }
@@ -727,24 +727,24 @@ public:
         return m_result;
     }
 
-    void push(std::uint64_t start, std::uint64_t const end, TokenType tokenType, std::string value = {})
+    void push(std::uint64_t start, std::uint64_t const end, TokenType tokenType, const std::string& value = {})
     {
         auto sourceStart = map(m_characterToSourceSpace, start).first;
         auto sourceEnd = map(m_characterToSourceSpace, end - 1).second;
         auto& newToken = m_result.emplace_back(tokenType, sourceStart, sourceEnd - sourceStart, start, end - start, 0,
-                                               0, std::move(value));
+                                               0, value);
         newToken.setLeadingWhitespace(leadingWhitespace);
         leadingWhitespace = false;
     }
 
-    void push(TokenType tokenType, std::string value = {})
+    void push(TokenType tokenType, const std::string& value = {})
     {
-        push(tokenStartOffset, m_offset, tokenType, std::move(value));
+        push(tokenStartOffset, m_offset, tokenType, value);
     }
 
-    void push(std::uint64_t diff, TokenType tokenType, std::string value = {})
+    void push(std::uint64_t diff, TokenType tokenType, const std::string& value = {})
     {
-        push(tokenStartOffset, m_offset - diff, tokenType, std::move(value));
+        push(tokenStartOffset, m_offset - diff, tokenType, value);
     }
 
     [[nodiscard]] std::string_view view(std::uint64_t const startOffset, std::uint64_t const endOffset) const
@@ -757,7 +757,7 @@ public:
         return view(tokenStartOffset, m_offset);
     }
 
-    bool errorsOccurred() const
+    [[nodiscard]] bool errorsOccurred() const
     {
         return m_errorsOccurred;
     }
@@ -887,7 +887,7 @@ struct Punctuation final
     std::underlying_type_t<TokenType> first;
 
 private:
-    static constexpr std::underlying_type_t<TokenType> POUND_PERCENT =
+    [[maybe_unused]] static constexpr std::underlying_type_t<TokenType> POUND_PERCENT =
         std::numeric_limits<std::underlying_type_t<TokenType>>::max() - 1;
 
 public:
@@ -972,7 +972,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
                 context.leadingWhitespace = true;
                 return *this;
             }
-            if (!llvm::sys::unicode::isPrintable(c))
+            if (!llvm::sys::unicode::isPrintable(c)) // NOLINT(*-narrowing-conversions)
             {
                 std::string buffer = "\\U";
                 buffer.reserve(10);
@@ -1070,7 +1070,7 @@ std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& cont
     if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '_'
         && !C99AllowedIDChar.contains(c))
     {
-        context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, std::move(characters));
+        context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, characters);
         return {Start{}, false};
     }
     characters.resize(characters.size() + 4);
@@ -1092,7 +1092,7 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
         && (((characters.back() | toLower) != 'e' && (characters.back() | toLower) != 'p') || (c != '+' && c != '-'))
         && !C99AllowedIDChar.contains(c))
     {
-        context.push(1, TokenType::PPNumber, std::move(characters));
+        context.push(1, TokenType::PPNumber, characters);
         return {Start{}, false};
     }
     characters.resize(characters.size() + 4);
@@ -1102,7 +1102,7 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c, Context& context) noexcept
+std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c, Context& context) noexcept // NOLINT(*-make-member-function-const)
 {
     if (c == 'u' || c == 'U')
     {
@@ -1212,7 +1212,8 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
     return {std::move(newText), true};
 }
 
-std::pair<StateMachine, bool> Dot::advance(char const c, Context& context)
+// ReSharper disable once CppMemberFunctionMayBeConst
+std::pair<StateMachine, bool> Dot::advance(char const c, Context& context) // NOLINT(*-make-member-function-const)
 {
     if (c >= '0' && c <= '9')
     {
@@ -1227,7 +1228,8 @@ std::pair<StateMachine, bool> Dot::advance(char const c, Context& context)
     return {Start{}, false};
 }
 
-std::pair<StateMachine, bool> Punctuation::advance(char const c, Context& context)
+// ReSharper disable once CppMemberFunctionMayBeConst
+std::pair<StateMachine, bool> Punctuation::advance(char const c, Context& context) // NOLINT(*-make-member-function-const)
 {
     switch (first)
     {
@@ -1304,7 +1306,7 @@ std::pair<StateMachine, bool> AfterInclude::advance(char const c, Context& conte
 
     if (c != '\n')
     {
-        context.push(TokenType::StringLiteral, std::move(characters));
+        context.push(TokenType::StringLiteral, characters);
         return {Start{}, true};
     }
 
@@ -1322,7 +1324,7 @@ std::pair<StateMachine, bool> AfterInclude::advance(char const c, Context& conte
         // if the delimiter is a < however then subsequent tokens will later be retokenized in the preprocessor
         // which might form a valid include after macro substitution
     }
-    context.push(1, TokenType::StringLiteral, std::move(characters));
+    context.push(1, TokenType::StringLiteral, characters);
     return {Start{}, false};
 }
 
@@ -1332,7 +1334,7 @@ std::pair<StateMachine, bool> LineComment::advance(char const c, Context&) noexc
     {
         return {Start{}, false};
     }
-    return {std::move(*this), true};
+    return {*this, true};
 }
 
 StateMachine BlockComment::advance(char c, Context& context) noexcept
@@ -1392,7 +1394,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
 
     {
         std::string::size_type pos = 0;
-        while ((pos = source.find("\r\n", pos)) != source.npos)
+        while ((pos = source.find("\r\n", pos)) != std::string::npos)
         {
             source.erase(pos, 1);
         }
@@ -1456,7 +1458,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
             }
             auto pos = stringView.data() + curr - source.data();
             auto prefix = stringView.substr(0, curr);
-            if (prefix.length() != 0)
+            if (!prefix.empty())
             {
                 characterToSourceSpace.emplace_back(charactersSpace.size(), pos - prefix.size(), pos);
             }
@@ -1588,7 +1590,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
                            std::pair{context.tokenStartOffset, context.getOffset()});
             return false;
         },
-        [&context](StringLiteral& s)
+        [&context](const StringLiteral& s)
         {
             if (s.sawQuote)
             {
@@ -2028,7 +2030,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
         {
             return {};
         }
-        // Use default size (e.g. 32 or 64 bit signed/unsigned)
+        // Use default size (e.g. 32 or 64-bit signed/unsigned)
         // For now, let's make it 64-bit signed APSInt
         if (value.getBitWidth() < 64)
         {
@@ -2045,8 +2047,8 @@ coral66::CSourceObject coral66::Lexer::toCTokens(PPSourceObject&& sourceObject, 
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
-    return CSourceObject(std::move(tokens), std::move(sourceObject.getFiles()), sourceObject.getLanguageOptions(),
-                         std::move(sourceObject.getSubstitutions()));
+    return {std::move(tokens), std::move(sourceObject.getFiles()), sourceObject.getLanguageOptions(),
+                         std::move(sourceObject.getSubstitutions())};
 }
 
 coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter,
@@ -2055,9 +2057,9 @@ coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObj
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
-    return CSourceObject(std::move(tokens), {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
+    return {std::move(tokens), {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
                          sourceObject.getLanguageOptions(),
-                         {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()});
+                         {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()}};
 }
 
 std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,

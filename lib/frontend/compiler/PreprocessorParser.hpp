@@ -21,7 +21,7 @@ class Context final
     std::size_t m_errorCount = 0;
 
 public:
-    Context(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
+    explicit Context(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
 
     Context(const Context&) = delete;
     Context& operator=(const Context&) = delete;
@@ -30,9 +30,9 @@ public:
 
     void log(const Message& message);
 
-    std::size_t getErrorCount() const;
+    [[nodiscard]] std::size_t getErrorCount() const;
 
-    const SourceInterface& getSourceInterface() const;
+    [[nodiscard]] const SourceInterface& getSourceInterface() const;
 };
 
 File buildTree(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);

@@ -4,10 +4,11 @@
  * Date   : 31/01/2026
  */
 
-#include <algorithm>
-
 #include "SemanticAnalysis.hpp"
-#include "Program.hpp"
+
+#include <algorithm>
+#include <ranges>
+
 #include "lib/frontend/common/ErrorMessages.hpp"
 
 namespace coral66::Semantics
@@ -284,9 +285,9 @@ void SemanticAnalysis::visit(const Syntax::ArrayDeclaration& node)
         elemTypePtr = &fixedType;
 
     std::vector<std::uint64_t> dims;
-    for(const auto& d : node.getDimensions())
+    for (const auto& val : node.getDimensions() | std::views::values)
     {
-        visit(*d.second); // Visit upper bound
+        visit(*val); // Visit upper bound
         if (auto* c = dynamic_cast<const Constant*>(m_lastExpression.get())) {
              if (std::holds_alternative<llvm::APSInt>(c->getValue()))
                  dims.push_back(std::get<llvm::APSInt>(c->getValue()).getZExtValue());
@@ -344,8 +345,8 @@ void SemanticAnalysis::visit(const Syntax::AssignmentStatement& node)
     visit(node.getExpression());
     auto rhs = std::move(m_lastExpression);
     
-    const std::string& name = std::get<std::string>(node.getIdentifier()->getValue());
-    auto it = std::find_if(m_symbolTable.begin(), m_symbolTable.end(), [&](const auto& p){ return p.first == name; });
+    const auto& name = std::get<std::string>(node.getIdentifier()->getValue());
+    auto it = std::ranges::find_if(m_symbolTable, [&](const auto& p){ return p.first == name; });
     
     if (it != m_symbolTable.end())
     {
@@ -391,10 +392,10 @@ void SemanticAnalysis::visit([[maybe_unused]]const Syntax::GotoStatement& node)
 
 void SemanticAnalysis::visit(const Syntax::ForStatement& node)
 {
-    std::string name = std::string(node.getVariable()->getText());
-    auto it = std::find_if(m_symbolTable.begin(), m_symbolTable.end(), [&](const auto& p){ return p.first == name; });
-    
-    if (it != m_symbolTable.end())
+    auto name = std::string(node.getVariable()->getText());
+
+    if (auto it = std::ranges::find_if(m_symbolTable, [&](const auto& p) { return p.first == name; });
+        it != m_symbolTable.end())
     {
         IntrusiveVariantValue<Type> type = it->second->match(
             [](const VariableDeclaration& v) { return cloneType(v.getType()); },
@@ -477,10 +478,10 @@ void SemanticAnalysis::visit(const Syntax::LiteralExpression& node)
 
 void SemanticAnalysis::visit(const Syntax::IdentifierExpression& node)
 {
-    std::string name = std::get<std::string>(node.getIdentifier()->getValue());
-    auto it = std::find_if(m_symbolTable.begin(), m_symbolTable.end(), [&](const auto& p){ return p.first == name; });
-    
-    if (it != m_symbolTable.end())
+    auto name = std::get<std::string>(node.getIdentifier()->getValue());
+
+    if (const auto it = std::ranges::find_if(m_symbolTable, [&](const auto& p) { return p.first == name; });
+        it != m_symbolTable.end())
     {
         IntrusiveVariantValue<Type> type = it->second->match(
             [](const VariableDeclaration& v) { return cloneType(v.getType()); },

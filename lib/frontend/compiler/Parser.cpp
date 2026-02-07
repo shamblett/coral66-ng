@@ -68,7 +68,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         *errors = context.getErrorCount() > 0;
     }
 
-    return Syntax::Program(sourceObject.data().data(), end, std::move(block));
+    return {sourceObject.data().data(), end, std::move(block)};
 }
 
 std::unique_ptr<Syntax::Block> parseBlock(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context)
@@ -92,8 +92,7 @@ std::unique_ptr<Syntax::Block> parseBlock(Lexer::CTokenIterator& begin, Lexer::C
                 decls.push_back(std::move(d));
             continue;
         }
-        auto stmt = parseStatement(begin, end, context);
-        if (stmt)
+        if (auto stmt = parseStatement(begin, end, context))
         {
             stmts.push_back(std::move(stmt));
             continue;
@@ -270,7 +269,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
                     auto paramDecls = parseDeclaration(begin, end, context);
                     for (auto& p : paramDecls) parameters.push_back(std::move(p));
                     
-                    if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon) begin++;
+                    if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon) begin++; // NOLINT(*-branch-clone)
                     else if (begin != end && begin->getTokenType() == Lexer::TokenType::Comma) begin++;
                     else if (begin != end && begin->getTokenType() != Lexer::TokenType::CloseParentheses) begin++; 
                 }
@@ -282,8 +281,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
             }
             if (begin != end && begin->getTokenType() == Lexer::TokenType::BeginKeyword)
             {
-                auto body = parseBlock(begin, end, context);
-                if (body)
+                if (auto body = parseBlock(begin, end, context))
                 {
                     if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon) begin++;
                     result.push_back(std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters), std::move(body)));
@@ -505,8 +503,7 @@ std::unique_ptr<Syntax::Expression> parseExpression(Lexer::CTokenIterator& begin
         {
             auto op = begin;
             begin++;
-            auto right = parseExpression(begin, end, context);
-            if (right)
+            if (auto right = parseExpression(begin, end, context))
             {
                 return std::make_unique<Syntax::BinaryExpression>(left->begin(), right->end(), std::move(left), op, std::move(right));
             }

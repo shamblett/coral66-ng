@@ -52,6 +52,7 @@ class Preprocessor final : private coral66::PPSourceInterface
         append(m_result, std::move(tokens));
     }
 
+    // ReSharper disable once CppDFAUnreachableFunctionCall
     bool log(const coral66::Message& message)
     {
         if (m_reporter)
@@ -66,6 +67,7 @@ class Preprocessor final : private coral66::PPSourceInterface
     }
 
     template <class F>
+    // ReSharper disable once CppDFAUnreachableFunctionCall
     void macroSubstitute(std::vector<coral66::Lexer::PPToken>&& tokens, F lineOutput)
     {
         if (tokens.empty())
@@ -108,7 +110,7 @@ class Preprocessor final : private coral66::PPSourceInterface
             output.insert(output.end(), std::move_iterator(start), std::move_iterator(iter));
             
             auto i = ++m_macroID;
-            m_substitutions.push_back(coral66::Source::Substitution{*result->second.identifierPos, *iter, {}, false});
+            m_substitutions.emplace_back(coral66::Source::Substitution{*result->second.identifierPos, *iter, {}, false});
             
             std::vector<coral66::Lexer::PPToken> replacement(result->second.replacement.begin(), result->second.replacement.end());
             for (auto& tok : replacement)
@@ -128,6 +130,7 @@ class Preprocessor final : private coral66::PPSourceInterface
         lineOutput(std::move(output));
     }
 
+    // ReSharper disable once CppDFAUnreachableFunctionCall
     std::optional<Macro> parseDefineDirective(const coral66::PP::DefineDirective& defineDirective)
     {
         if (defineDirective.tokens.size() != 2)
@@ -291,24 +294,23 @@ public:
 
     void visit(const coral66::PP::DefineDirective& defineDirective)
     {
-        auto macro = parseDefineDirective(defineDirective);
-        if (macro)
+        if (auto macro = parseDefineDirective(defineDirective))
         {
             m_defines.emplace(macro->identifierPos->getValue(), *macro);
         }
     }
     
     // Unused visitors
-    void visit(const coral66::PP::IfSection&) {}
-    void visit(const coral66::PP::UnknownDirective&) {}
-    void visit(const coral66::PP::NonDirective&) {}
+    static void visit(const coral66::PP::IfSection&) {}
+    static void visit(const coral66::PP::UnknownDirective&) {}
+    static void visit(const coral66::PP::NonDirective&) {}
     
     // ControlLine variants
-    void visit(const coral66::PP::ControlLine::IncludeTag&) {}
-    void visit(const coral66::PP::ControlLine::LineTag&) {}
-    void visit(const coral66::PP::ControlLine::ErrorTag&) {}
-    void visit(const coral66::PP::ControlLine::PragmaTag&) {}
-    void visit(const coral66::Lexer::PPTokenIterator&) {} // undef
+    static void visit(const coral66::PP::ControlLine::IncludeTag&) {}
+    static void visit(const coral66::PP::ControlLine::LineTag&) {}
+    static void visit(const coral66::PP::ControlLine::ErrorTag&) {}
+    static void visit(const coral66::PP::ControlLine::PragmaTag&) {}
+    static void visit(const coral66::Lexer::PPTokenIterator&) {} // undef
 
     bool errorsOccurred() const
     {
@@ -327,7 +329,7 @@ coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& source
     {
         *errorsOccurred = preprocessor.errorsOccurred();
     }
-    return PPSourceObject(std::move(preprocessor.getResult()), std::move(preprocessor.getFiles()), &languageOptions,
+    return {std::move(preprocessor.getResult()), std::move(preprocessor.getFiles()), &languageOptions,
                           {preprocessor.getSubstitutionsVector().begin(), preprocessor.getSubstitutionsVector().end()},
-                          {std::move(preprocessor.getIntervalMaps())});
+                          {std::move(preprocessor.getIntervalMaps())}};
 }

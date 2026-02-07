@@ -5,8 +5,6 @@
  */
 
 #include "Semantics.hpp"
-#include "Program.hpp"
-#include "ProgramInterface.hpp" // Included for potential future use if ProgramInterface methods are needed
 
 namespace coral66::Semantics
 {
@@ -25,7 +23,7 @@ std::uint64_t Type::getAlignOf(const ProgramInterface& program) const
 bool Type::operator==(const Type& rhs) const
 {
     if (index() != rhs.index()) return false;
-    return match([&](const auto& t) { return t.equalsImpl(rhs.as<std::decay_t<decltype(t)>>()); });
+    return match([&]<typename T0>(const T0& t) { return t.equalsImpl(rhs.as<std::decay_t<T0>>()); });
 }
 
 bool Type::operator!=(const Type& rhs) const
@@ -34,13 +32,15 @@ bool Type::operator!=(const Type& rhs) const
 }
 
 // PrimitiveType
-std::uint64_t PrimitiveType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const
+// ReSharper disable once CppMemberFunctionMayBeStatic
+std::uint64_t PrimitiveType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     // Simplified: 4 bytes for Integer/Floating, 4 for Bits
     return 4;
 }
 
-std::uint64_t PrimitiveType::getAlignOfImpl(const ProgramInterface&) const
+// ReSharper disable once CppMemberFunctionMayBeStatic
+std::uint64_t PrimitiveType::getAlignOfImpl(const ProgramInterface&) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
 }
@@ -86,7 +86,8 @@ std::uint64_t TableType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& p
     return 0;
 }
 
-std::uint64_t TableType::getAlignOfImpl([[maybe_unused]]const ProgramInterface& program) const
+// ReSharper disable once CppMemberFunctionMayBeStatic
+std::uint64_t TableType::getAlignOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
 }
@@ -97,12 +98,14 @@ bool TableType::equalsImpl(const TableType& rhs) const
 }
 
 // OverlayType
-std::uint64_t OverlayType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const
+// ReSharper disable once CppMemberFunctionMayBeStatic
+std::uint64_t OverlayType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 0;
 }
 
-std::uint64_t OverlayType::getAlignOfImpl([[maybe_unused]]const ProgramInterface& program) const
+// ReSharper disable once CppMemberFunctionMayBeStatic
+std::uint64_t OverlayType::getAlignOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
 }

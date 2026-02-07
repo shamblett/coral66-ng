@@ -6,10 +6,7 @@
 
 #pragma once
 
-#include <vector>
-
 #include "Semantics.hpp"
-#include "lib/support/IntrusiveVariantValue.hpp"
 
 namespace coral66::Semantics
 {

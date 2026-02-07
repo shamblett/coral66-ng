@@ -24,8 +24,8 @@ public:
     Context(const SourceInterface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
 
     void log(const Message& message);
-    const SourceInterface& getSourceInterface() const;
-    std::size_t getErrorCount() const;
+    [[nodiscard]] const SourceInterface& getSourceInterface() const;
+    [[nodiscard]] std::size_t getErrorCount() const;
 };
 
 Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);

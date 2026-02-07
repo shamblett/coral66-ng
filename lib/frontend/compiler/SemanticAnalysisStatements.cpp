@@ -4,7 +4,6 @@
  * Date   : 31/01/2026
  */
 
-#include "SemanticAnalysis.hpp"
 
 namespace coral66::Semantics
 {

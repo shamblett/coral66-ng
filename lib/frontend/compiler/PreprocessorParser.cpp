@@ -36,6 +36,7 @@ namespace
     return true;
 }
 
+// ReSharper disable once CppDFAUnreachableFunctionCall
 coral66::Lexer::PPTokenIterator findNewline(coral66::Lexer::PPTokenIterator const begin, coral66::Lexer::PPTokenIterator const end)
 {
     return std::find_if(begin, end,
