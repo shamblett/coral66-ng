@@ -1,17 +1,16 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #pragma once
 
-
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #include <unordered_map>
 

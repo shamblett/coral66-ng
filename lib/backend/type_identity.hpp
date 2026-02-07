@@ -1,17 +1,17 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #pragma once
-
-#include "lib/frontend/compiler/Semantics.hpp"
 
 #include <algorithm>
 #include <numeric>
 #include <tuple>
 #include <variant>
+
+#include "lib/frontend/compiler/Semantics.hpp"
 
 /**
  * @file TypeIdentity.hpp
@@ -28,7 +28,6 @@ namespace coral66::CGLLVM
 // Default std::hash and operator== of Semantics::Type and subclasses make use of equality the way C defines it. This
 // does not equal the type system a backend may care about, however. The LLVM backend eg, does not care about any
 // qualifiers, making nonqualified, const qualpragma once
-
 
 template <class T>
 struct TypeHasher
@@ -143,12 +142,13 @@ struct TypeHasher<Semantics::OverlayType>
 
 inline std::size_t TypeHasher<Semantics::Type>::operator()(const Semantics::Type& arg) const noexcept
 {
-    return coral66::rawHashCombine(std::hash<std::size_t>{}(arg.index()), arg.match(
-                                                                          []<typename T0>(const T0& arg1) -> std::size_t
-                                                                          {
-                                                                              using T = std::decay_t<T0>;
-                                                                              return TypeHasher<T>{}(arg1);
-                                                                          }));
+    return coral66::rawHashCombine(std::hash<std::size_t>{}(arg.index()),
+                                   arg.match(
+                                       []<typename T0>(const T0& arg1) -> std::size_t
+                                       {
+                                           using T = std::decay_t<T0>;
+                                           return TypeHasher<T>{}(arg1);
+                                       }));
 }
 
 template <class T>
@@ -164,11 +164,11 @@ struct TypeEqual<std::variant<Args...>>
             return false;
         }
         return coral66::match(lhs,
-                          [&]<typename T0>(T0&& value)
-                          {
-                              using T = std::decay_t<T0>;
-                              return TypeEqual<T>{}(value, coral66::get<T>(rhs));
-                          });
+                              [&]<typename T0>(T0&& value)
+                              {
+                                  using T = std::decay_t<T0>;
+                                  return TypeEqual<T>{}(value, coral66::get<T>(rhs));
+                              });
     }
 };
 
@@ -241,8 +241,8 @@ struct TypeEqual<Semantics::FunctionType>
         {
             return false;
         }
-        return std::ranges::equal(lhs.getParameters(),rhs.getParameters()
-            ,
+        return std::ranges::equal(
+            lhs.getParameters(), rhs.getParameters(),
             [](const Semantics::FunctionType::Parameter& lhs, const Semantics::FunctionType::Parameter& rhs)
             { return TypeEqual<Semantics::Type>{}(*lhs.type, *rhs.type); });
     }
@@ -293,7 +293,8 @@ struct TypeEqual<Semantics::FixedType>
 {
     bool operator()(const Semantics::FixedType& lhs, const Semantics::FixedType& rhs) const noexcept
     {
-        return std::tuple(lhs.getTotalBits(), lhs.getFractionalBits()) == std::tuple(rhs.getTotalBits(), rhs.getFractionalBits());
+        return std::tuple(lhs.getTotalBits(), lhs.getFractionalBits())
+               == std::tuple(rhs.getTotalBits(), rhs.getFractionalBits());
     }
 };
 
@@ -323,6 +324,5 @@ struct TypeEqual<Semantics::ErrorType>
         return true;
     }
 };
-
 
 } // namespace coral66::CGLLVM

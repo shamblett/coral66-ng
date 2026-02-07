@@ -1,8 +1,10 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
+
+#include "x64_abi.hpp"
 
 #include <algorithm>
 #include <numeric>
@@ -10,7 +12,6 @@
 #include <variant>
 
 #include "lib/frontend/compiler/Semantics.hpp"
-#include "x64_abi.hpp"
 
 namespace coral66::CGLLVM
 {

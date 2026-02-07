@@ -1,8 +1,8 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #pragma once
 
@@ -41,7 +41,7 @@ class code_generator final
 
 public:
     explicit code_generator(llvm::Module& module, const Semantics::Program& program,
-                           const SourceInterface& sourceInterface, const CGLLVM::Options& options);
+                            const SourceInterface& sourceInterface, const CGLLVM::Options& options);
 
     void generate();
 
@@ -54,7 +54,7 @@ public:
 
     // Visitors (Top Level)
     void visit(const Semantics::Declaration& decl);
-    
+
     // Visitors (Statements)
     void visit(const Semantics::Statement& stmt);
     void visit(const Semantics::AssignmentStatement& stmt);
