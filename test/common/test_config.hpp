@@ -77,7 +77,8 @@ struct ProducesError : Catch::Matchers::StringMatcherBase
 
 struct ProducesNoErrors : Catch::Matchers::StringMatcherBase
 {
-    ProducesNoErrors() : StringMatcherBase("contains", Catch::Matchers::CasedString("error: ", Catch::CaseSensitive::Yes))
+    ProducesNoErrors()
+        : StringMatcherBase("contains", Catch::Matchers::CasedString("error: ", Catch::CaseSensitive::Yes))
     {
     }
 
@@ -113,7 +114,9 @@ struct ProducesNote : Catch::Matchers::StringMatcherBase
 
 struct ProducesNoNotes : Catch::Matchers::StringMatcherBase
 {
-    ProducesNoNotes() : StringMatcherBase("contains", Catch::Matchers::CasedString("note: ", Catch::CaseSensitive::Yes)) {}
+    ProducesNoNotes() : StringMatcherBase("contains", Catch::Matchers::CasedString("note: ", Catch::CaseSensitive::Yes))
+    {
+    }
 
     bool match(const std::string& source) const override
     {
@@ -129,7 +132,8 @@ struct ProducesNoNotes : Catch::Matchers::StringMatcherBase
 struct ProducesWarning : Catch::Matchers::StringMatcherBase
 {
     ProducesWarning(const std::string& comparator)
-        : StringMatcherBase("contains", Catch::Matchers::CasedString("warning: " + comparator, Catch::CaseSensitive::Yes))
+        : StringMatcherBase("contains",
+                            Catch::Matchers::CasedString("warning: " + comparator, Catch::CaseSensitive::Yes))
     {
     }
 
@@ -186,7 +190,8 @@ struct ProducesLines : Catch::Matchers::MatcherBase<std::string_view>
     {
         return "lines match \""
                + std::accumulate(m_linesTrimmed.begin(), m_linesTrimmed.end(), std::string(),
-                                 [first = true](const std::string& lhs, const std::string& rhs) mutable {
+                                 [first = true](const std::string& lhs, const std::string& rhs) mutable
+                                 {
                                      if (!first)
                                      {
                                          return lhs + '\n' + rhs;
@@ -225,10 +230,9 @@ private:
     {
         // ASCII should hopefully suffice for our tests... Otherwise I will have to properly parse it to UTF32
         // and use one of the whitespace sets of the Lexer to match whitespace characters
-        auto end =
-            std::find_if(std::make_reverse_iterator(text.end()), std::make_reverse_iterator(text.begin()), [](char c) {
-                return c != ' ' && c != '\t';
-            }).base();
+        auto end = std::find_if(std::make_reverse_iterator(text.end()), std::make_reverse_iterator(text.begin()),
+                                [](char c) { return c != ' ' && c != '\t'; })
+                       .base();
         return text.substr(0, end - text.begin());
     }
 
@@ -288,7 +292,7 @@ struct StringMaker<llvm::APInt>
 template <>
 struct StringMaker<coral66::Semantics::Type>
 {
-    static std::string convert([[maybe_unused]]const coral66::Semantics::Type& type)
+    static std::string convert([[maybe_unused]] const coral66::Semantics::Type& type)
     {
         return "Type";
     }
@@ -301,7 +305,7 @@ struct StringMaker<coral66::PPSourceObject>
     {
         return "'"
                + coral66::PP::reconstruct(sourceObject.data().data(),
-                                      sourceObject.data().data() + sourceObject.data().size(), sourceObject)
+                                          sourceObject.data().data() + sourceObject.data().size(), sourceObject)
                + "'";
     }
 };
