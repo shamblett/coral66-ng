@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include "Lexer.hpp"
+#include "lexer.hpp"
 
 namespace coral66::Syntax
 {

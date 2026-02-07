@@ -8,7 +8,7 @@
 
 #include <llvm/IR/IRBuilder.h>
 
-#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/semantics.hpp"
 
 namespace coral66::CGLLVM
 {

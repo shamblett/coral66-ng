@@ -4,11 +4,11 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/semantics.hpp"
 
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/common/source_object.hpp"
-#include "lib/frontend/compiler/Parser.hpp"
+#include "lib/frontend/compiler/parser.hpp"
 #include "test/common/TestConfig.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "PreprocessorSyntax.hpp"
+#include "preprocessor_syntax.hpp"
 
 namespace coral66
 {

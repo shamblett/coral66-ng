@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "ProgramInterface.hpp"
+#include "program_interface.hpp"
 
 namespace coral66::Semantics
 {

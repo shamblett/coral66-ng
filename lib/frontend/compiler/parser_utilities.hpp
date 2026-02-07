@@ -11,11 +11,10 @@
  *
  */
 
-#include "lib/support/FunctionRef.hpp"
-
 #include <string_view>
 
-#include "Parser.hpp"
+#include "lib/support/FunctionRef.hpp"
+#include "parser.hpp"
 
 namespace coral66::Parser
 {

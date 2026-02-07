@@ -6,18 +6,17 @@
 
 #pragma once
 
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
-
 #include <llvm/IR/Module.h>
 
-#include "lib/frontend/compiler/Lexer.hpp"
-#include "lib/frontend/compiler/Parser.hpp"
-#include "lib/frontend/compiler/Program.hpp"
-#include "lib/frontend/compiler/Semantics.hpp"
-#include "lib/frontend/compiler/Preprocessor.hpp"
-#include "lib/support/FunctionRef.hpp"
-
 #include <regex>
+
+#include "lib/frontend/compiler/lexer.hpp"
+#include "lib/frontend/compiler/parser.hpp"
+#include "lib/frontend/compiler/preprocessor.hpp"
+#include "lib/frontend/compiler/program.hpp"
+#include "lib/frontend/compiler/semantics.hpp"
+#include "lib/support/FunctionRef.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 inline coral66::Semantics::Program generateProgram(std::string source)
 {

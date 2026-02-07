@@ -8,11 +8,11 @@
 
 #include <memory>
 #include <optional>
+#include <span>
 #include <variant>
 #include <vector>
-#include <span>
 
-#include "Lexer.hpp"
+#include "lexer.hpp"
 
 namespace coral66::PP
 {

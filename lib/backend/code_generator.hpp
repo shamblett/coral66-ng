@@ -9,7 +9,7 @@
 #include <llvm/IR/IRBuilder.h>
 
 #include "code_generation.hpp"
-#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/semantics.hpp"
 
 namespace coral66::CGLLVM
 {

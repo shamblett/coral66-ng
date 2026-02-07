@@ -4,17 +4,17 @@
  * Date   : 31/01/2026
  */
 
-#include "Parser.hpp"
+#include "parser.hpp"
 
 #include <algorithm>
 #include <span>
 #include <unordered_set>
 
-#include "ParserUtilities.hpp"
-#include "SemanticUtilities.hpp"
-#include "Semantics.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/support/ScopeExit.hpp"
+#include "parser_utilities.hpp"
+#include "semantic_utilities.hpp"
+#include "semantics.hpp"
 
 /**
  * @file ParserDeclarations.cpp

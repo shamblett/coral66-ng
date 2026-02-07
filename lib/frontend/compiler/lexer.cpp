@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "Lexer.hpp"
+#include "lexer.hpp"
 
 #include <llvm/Support/ConvertUTF.h>
 #include <llvm/Support/Error.h>

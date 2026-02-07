@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "Parser.hpp"
+#include "parser.hpp"
 
 /**
  * @file ParserExpressions.cpp
@@ -18,8 +18,8 @@
 
 #include <algorithm>
 
-#include "ParserUtilities.hpp"
 #include "lib/frontend/common/error_messages.hpp"
+#include "parser_utilities.hpp"
 
 using namespace coral66::Syntax;
 

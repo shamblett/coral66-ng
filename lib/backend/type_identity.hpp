@@ -11,7 +11,7 @@
 #include <tuple>
 #include <variant>
 
-#include "lib/frontend/compiler/Semantics.hpp"
+#include "lib/frontend/compiler/semantics.hpp"
 
 /**
  * @file TypeIdentity.hpp

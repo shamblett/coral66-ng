@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "Syntax.hpp"
+#include "syntax.hpp"
 
 namespace coral66::Syntax
 {

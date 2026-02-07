@@ -4,12 +4,11 @@
  * Date   : 31/01/2026
  */
 
-#include "SemanticAnalysis.hpp"
-
 #include <algorithm>
 #include <ranges>
 
 #include "lib/frontend/common/error_messages.hpp"
+#include "semantic_analysis.hpp"
 
 namespace coral66::Semantics
 {

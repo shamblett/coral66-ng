@@ -4,16 +4,16 @@
  * Date   : 31/01/2026
  */
 
-#include "Preprocessor.hpp"
+#include "preprocessor.hpp"
 
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
 
-#include "Parser.hpp"
-#include "PreprocessorParser.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/support/ScopeExit.hpp"
+#include "parser.hpp"
+#include "preprocessor_parser.hpp"
 
 namespace
 {

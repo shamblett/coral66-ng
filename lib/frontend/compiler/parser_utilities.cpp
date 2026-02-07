@@ -4,9 +4,8 @@
  * Date   : 31/01/2026
  */
 
-#include "ParserUtilities.hpp"
-
 #include "lib/frontend/common/error_messages.hpp"
+#include "parser_utilities.hpp"
 
 bool coral66::Parser::expectIdentifier(Lexer::CTokenIterator& begin, const Lexer::CTokenIterator end, Context& context,
                                    std::string_view& value, const coral66::FunctionRef<Message()> additional)
