@@ -13,21 +13,21 @@
 
 namespace
 {
-    coral66::PPSourceObject preprocess(std::string source)
-    {
-        std::string storage;
-        llvm::raw_string_ostream ss(storage);
-        bool errorsOccurred = false;
-        auto options = coral66::LanguageOptions::native();
-        auto tokens = coral66::Lexer::tokenize(source, &options, &ss, &errorsOccurred);
-        UNSCOPED_INFO(ss.str());
-        REQUIRE_FALSE(errorsOccurred);
-        auto result = coral66::PP::preprocess(std::move(tokens), {}, &ss, &errorsOccurred);
-        UNSCOPED_INFO(ss.str());
-        REQUIRE_FALSE(errorsOccurred);
-        return result;
-    }
+coral66::PPSourceObject preprocess(std::string source)
+{
+    std::string storage;
+    llvm::raw_string_ostream ss(storage);
+    bool errorsOccurred = false;
+    auto options = coral66::LanguageOptions::native();
+    auto tokens = coral66::Lexer::tokenize(source, &options, &ss, &errorsOccurred);
+    UNSCOPED_INFO(ss.str());
+    REQUIRE_FALSE(errorsOccurred);
+    auto result = coral66::PP::preprocess(std::move(tokens), {}, &ss, &errorsOccurred);
+    UNSCOPED_INFO(ss.str());
+    REQUIRE_FALSE(errorsOccurred);
+    return result;
 }
+} // namespace
 
 namespace coral66::Tests
 {
@@ -44,13 +44,17 @@ public:
         bool errors = false;
         auto options = coral66::LanguageOptions::native();
         auto ret = coral66::Lexer::tokenize(m_source, &options, nullptr, &errors);
-        if(errors) return false;
-        
+        if (errors)
+            return false;
+
         // Simple token comparison ignoring locations
-        if (ret.data().size() != arg.data().size()) return false;
-        
-        for(size_t i = 0; i < ret.data().size(); ++i) {
-            if (ret.data()[i].getValue() != arg.data()[i].getValue()) return false;
+        if (ret.data().size() != arg.data().size())
+            return false;
+
+        for (size_t i = 0; i < ret.data().size(); ++i)
+        {
+            if (ret.data()[i].getValue() != arg.data()[i].getValue())
+                return false;
         }
         return true;
     }
@@ -60,7 +64,7 @@ public:
         return "produces pp tokens of:\n" + m_source;
     }
 };
-}
+} // namespace coral66::Tests
 
 using namespace coral66::Tests;
 
@@ -77,7 +81,7 @@ TEST_CASE("Coral DEFINE Macro", "[PP]")
         auto ret = preprocess("DEFINE A '10'; DEFINE B '20'; A B");
         CHECK_THAT(ret, ProducesPP("10 20"));
     }
-    
+
     SECTION("Replacement is tokenized")
     {
         // "1 + 2" should be tokenized to '1', '+', '2'

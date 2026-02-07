@@ -11,21 +11,21 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#define treeProduces(source, matches)                         \
-    do                                                        \
-    {\
-        std::string string;                                   \
-        llvm::raw_string_ostream ss(string);                  \
+#define treeProduces(source, matches)                             \
+    do                                                            \
+    {                                                             \
+        std::string string;                                       \
+        llvm::raw_string_ostream ss(string);                      \
         coral66::PPSourceObject tokens;                           \
         auto options = coral66::LanguageOptions::native();        \
         tokens = coral66::Lexer::tokenize(source, &options, &ss); \
-        CHECK_THAT(string, Catch::Matchers::Equals(""));      \
-        string.clear();                                       \
+        CHECK_THAT(string, Catch::Matchers::Equals(""));          \
+        string.clear();                                           \
         auto ctokens = coral66::Lexer::toCTokens(tokens, &ss);    \
-        CHECK_THAT(string, Catch::Matchers::Equals(""));      \
-        string.clear();                                       \
+        CHECK_THAT(string, Catch::Matchers::Equals(""));          \
+        string.clear();                                           \
         auto tree = coral66::Parser::parseProgram(ctokens, &ss);  \
-        CHECK_THAT(string, matches);                          \
+        CHECK_THAT(string, matches);                              \
     } while (0)
 
 using namespace coral66::Errors::Parser;
@@ -79,7 +79,8 @@ TEST_CASE("Coral Parse Mixed", "[parser]")
             i := 1;
             end:;
         END
-    )", Catch::Matchers::Equals(""));
+    )",
+                 Catch::Matchers::Equals(""));
 }
 
 TEST_CASE("Coral Parse Fixed Type", "[parser]")
@@ -99,8 +100,9 @@ TEST_CASE("Coral Parse Table", "[parser]")
                 FIXED(16,8) y
             ];
         END
-    )", Catch::Matchers::Equals(""));
-    
+    )",
+                 Catch::Matchers::Equals(""));
+
     // Anonymous table?
     treeProduces(R"(
         PROGRAM
@@ -110,7 +112,8 @@ TEST_CASE("Coral Parse Table", "[parser]")
                 INTEGER x
             ] T;
         END
-    )", Catch::Matchers::Equals(""));
+    )",
+                 Catch::Matchers::Equals(""));
 }
 
 TEST_CASE("Coral Parse Overlay", "[parser]")
@@ -124,7 +127,8 @@ TEST_CASE("Coral Parse Overlay", "[parser]")
                 FIXED(16,8) y
             ];
         END
-    )", Catch::Matchers::Equals(""));
+    )",
+                 Catch::Matchers::Equals(""));
 }
 
 TEST_CASE("Coral Parse Answer Statement", "[parser]")

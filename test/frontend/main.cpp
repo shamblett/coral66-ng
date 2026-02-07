@@ -9,7 +9,6 @@
 
 int main(int argc, char* argv[])
 {
-
     auto enable = coral66::Tests::enableParallelization();
 
     Catch::Session session; // There must be exactly one instance
@@ -47,4 +46,3 @@ extern "C" int lprofGetHostName(char* Name, int Len)
 }
 
 #endif
-
