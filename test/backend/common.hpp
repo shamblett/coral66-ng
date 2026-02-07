@@ -1,8 +1,8 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #pragma once
 
@@ -35,7 +35,8 @@ inline coral66::Semantics::Program generateProgram(std::string source)
     return program;
 }
 
-inline coral66::Semantics::Program generateProgramWithOptions(std::string source, const coral66::LanguageOptions& options)
+inline coral66::Semantics::Program generateProgramWithOptions(std::string source,
+                                                              const coral66::LanguageOptions& options)
 {
     bool errors = false;
     auto pptokens = coral66::Lexer::tokenize(std::move(source), &options, &llvm::errs(), &errors);
@@ -80,15 +81,13 @@ auto computeInJIT(std::unique_ptr<llvm::Module>&& module, std::string_view funct
 {
     if constexpr (std::is_void_v<typename detail::return_type<Fn>::type>)
     {
-        detail::computeAndGet(std::move(module), functionName,
-                              [&](std::uintptr_t symbol)
+        detail::computeAndGet(std::move(module), functionName, [&](std::uintptr_t symbol)
                               { reinterpret_cast<Fn*>(symbol)(std::forward<Args&&>(args)...); });
     }
     else
     {
         typename detail::return_type<Fn>::type result;
-        detail::computeAndGet(std::move(module), functionName,
-                              [&](std::uintptr_t symbol)
+        detail::computeAndGet(std::move(module), functionName, [&](std::uintptr_t symbol)
                               { result = reinterpret_cast<Fn*>(symbol)(std::forward<Args&&>(args)...); });
         return result;
     }

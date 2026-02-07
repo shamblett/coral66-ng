@@ -1,14 +1,13 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
-
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #include <llvm/Support/TargetSelect.h>
 
 #include "test/common/TestConfig.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 int main(int argc, char* argv[])
 {

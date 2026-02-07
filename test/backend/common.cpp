@@ -1,8 +1,8 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #include "common.hpp"
 
@@ -18,15 +18,15 @@
 #include <stdarg.h>
 
 void coral66::Tests::detail::computeAndGet(std::unique_ptr<llvm::Module>&& module, std::string_view functionName,
-                                       coral66::FunctionRef<void(std::uintptr_t)> symbolCallback)
+                                           coral66::FunctionRef<void(std::uintptr_t)> symbolCallback)
 {
     llvm::orc::LLJITBuilder builder;
     auto jit = llvm::cantFail(builder.create());
     {
     }
     llvm::orc::SymbolStringPtr pointer = jit->getExecutionSession().intern("printf");
-    //llvm::cantFail(jit->getMainJITDylib().define(
-      //  llvm::orc::absoluteSymbols({{pointer, llvm::JITEvaluatedSymbol::fromPointer(debugging_printf)}})));
+    // llvm::cantFail(jit->getMainJITDylib().define(
+    //   llvm::orc::absoluteSymbols({{pointer, llvm::JITEvaluatedSymbol::fromPointer(debugging_printf)}})));
 
     llvm::orc::ThreadSafeContext ctx(std::make_unique<llvm::LLVMContext>());
     llvm::cantFail(jit->addIRModule(llvm::orc::ThreadSafeModule{std::move(module), ctx}));
