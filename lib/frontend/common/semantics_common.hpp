@@ -6,15 +6,15 @@
 
 #pragma once
 
+#include <optional>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <vector>
+
 #include "lib/support/AbstractIntrusiveVariant.hpp"
 #include "lib/support/IntrusiveVariantValue.hpp"
 #include "lib/support/Utilities.hpp"
-
-#include <vector>
-#include <string>
-#include <string_view>
-#include <optional>
-#include <tuple>
 
 namespace coral66::Semantics
 {
@@ -37,8 +37,8 @@ class ErrorType;
 // Type Hierarchy
 // ============================================================================
 
-class Type : public AbstractIntrusiveVariant<Type, PrimitiveType, ArrayType, ProcedureType,
-                                             FixedType, TableType, OverlayType, VoidType, ErrorType>
+class Type : public AbstractIntrusiveVariant<Type, PrimitiveType, ArrayType, ProcedureType, FixedType, TableType,
+                                             OverlayType, VoidType, ErrorType>
 {
 public:
     enum TypeFlags : std::uint8_t
@@ -127,10 +127,14 @@ private:
     }
 
 public:
-    PrimitiveType(Kind kind, TypeFlags flags = Nothing)
-        : Type(std::in_place_type<PrimitiveType>, flags), m_kind(kind) {}
+    PrimitiveType(Kind kind, TypeFlags flags = Nothing) : Type(std::in_place_type<PrimitiveType>, flags), m_kind(kind)
+    {
+    }
 
-    [[nodiscard]] Kind getKind() const { return m_kind; }
+    [[nodiscard]] Kind getKind() const
+    {
+        return m_kind;
+    }
 
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(PrimitiveType)
 };
@@ -138,9 +142,19 @@ public:
 class VoidType final : public Type
 {
     friend class Type;
-    [[nodiscard]] static std::uint64_t getSizeOfImpl(const ProgramInterface&) { return 0; }
-    [[nodiscard]] static std::uint64_t getAlignOfImpl(const ProgramInterface&) { return 0; }
-    [[nodiscard]] static bool equalsImpl(const VoidType&) { return true; }
+    [[nodiscard]] static std::uint64_t getSizeOfImpl(const ProgramInterface&)
+    {
+        return 0;
+    }
+    [[nodiscard]] static std::uint64_t getAlignOfImpl(const ProgramInterface&)
+    {
+        return 0;
+    }
+    [[nodiscard]] static bool equalsImpl(const VoidType&)
+    {
+        return true;
+    }
+
 public:
     explicit VoidType(TypeFlags flags = Nothing) : Type(std::in_place_type<VoidType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(VoidType)
@@ -162,10 +176,18 @@ class FixedType final : public Type
 
 public:
     FixedType(std::uint8_t totalBits, std::uint8_t fractionalBits, TypeFlags flags = Nothing)
-        : Type(std::in_place_type<FixedType>, flags), m_totalBits(totalBits), m_fractionalBits(fractionalBits) {}
+        : Type(std::in_place_type<FixedType>, flags), m_totalBits(totalBits), m_fractionalBits(fractionalBits)
+    {
+    }
 
-    [[nodiscard]] std::uint8_t getTotalBits() const { return m_totalBits; }
-    [[nodiscard]] std::uint8_t getFractionalBits() const { return m_fractionalBits; }
+    [[nodiscard]] std::uint8_t getTotalBits() const
+    {
+        return m_totalBits;
+    }
+    [[nodiscard]] std::uint8_t getFractionalBits() const
+    {
+        return m_fractionalBits;
+    }
 
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(FixedType)
 };
@@ -173,7 +195,7 @@ public:
 class ArrayType final : public Type
 {
     const Type* m_elementType;
-    std::vector<std::uint64_t> m_dimensions; 
+    std::vector<std::uint64_t> m_dimensions;
 
     friend class Type;
 
@@ -182,11 +204,20 @@ class ArrayType final : public Type
     [[nodiscard]] bool equalsImpl(const ArrayType& rhs) const;
 
 public:
-    ArrayType(coral66::not_null<const Type> elementType, std::vector<std::uint64_t> dimensions, TypeFlags flags = Nothing)
-        : Type(std::in_place_type<ArrayType>, flags), m_elementType(elementType), m_dimensions(std::move(dimensions)) {}
+    ArrayType(coral66::not_null<const Type> elementType, std::vector<std::uint64_t> dimensions,
+              TypeFlags flags = Nothing)
+        : Type(std::in_place_type<ArrayType>, flags), m_elementType(elementType), m_dimensions(std::move(dimensions))
+    {
+    }
 
-    [[nodiscard]] const Type& getElementType() const { return *m_elementType; }
-    [[nodiscard]] const std::vector<std::uint64_t>& getDimensions() const { return m_dimensions; }
+    [[nodiscard]] const Type& getElementType() const
+    {
+        return *m_elementType;
+    }
+    [[nodiscard]] const std::vector<std::uint64_t>& getDimensions() const
+    {
+        return m_dimensions;
+    }
 
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ArrayType)
 };
@@ -201,8 +232,13 @@ class TableType final : public Type
 
 public:
     explicit TableType(const TableInfo& info, TypeFlags flags = Nothing)
-        : Type(std::in_place_type<TableType>, flags), m_info(&info) {}
-    [[nodiscard]] const TableInfo& getInfo() const { return *m_info; }
+        : Type(std::in_place_type<TableType>, flags), m_info(&info)
+    {
+    }
+    [[nodiscard]] const TableInfo& getInfo() const
+    {
+        return *m_info;
+    }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(TableType)
 };
 
@@ -216,8 +252,13 @@ class OverlayType final : public Type
 
 public:
     explicit OverlayType(const OverlayInfo& info, TypeFlags flags = Nothing)
-        : Type(std::in_place_type<OverlayType>, flags), m_info(&info) {}
-    [[nodiscard]] const OverlayInfo& getInfo() const { return *m_info; }
+        : Type(std::in_place_type<OverlayType>, flags), m_info(&info)
+    {
+    }
+    [[nodiscard]] const OverlayInfo& getInfo() const
+    {
+        return *m_info;
+    }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(OverlayType)
 };
 
@@ -228,24 +269,38 @@ public:
     {
         const Type* CORAL66_NON_NULL type;
         std::string_view name;
-        bool isValue; 
+        bool isValue;
     };
 
 private:
-    const Type* m_returnType; 
+    const Type* m_returnType;
     std::vector<Parameter> m_parameters;
 
     friend class Type;
-    [[nodiscard]] static std::uint64_t getSizeOfImpl(const ProgramInterface&) { CORAL66_UNREACHABLE; }
-    [[nodiscard]] static std::uint64_t getAlignOfImpl(const ProgramInterface&) { CORAL66_UNREACHABLE; }
+    [[nodiscard]] static std::uint64_t getSizeOfImpl(const ProgramInterface&)
+    {
+        CORAL66_UNREACHABLE;
+    }
+    [[nodiscard]] static std::uint64_t getAlignOfImpl(const ProgramInterface&)
+    {
+        CORAL66_UNREACHABLE;
+    }
     [[nodiscard]] bool equalsImpl(const ProcedureType& rhs) const;
 
 public:
     ProcedureType(const Type* returnType, std::vector<Parameter> parameters, TypeFlags flags = Nothing)
-        : Type(std::in_place_type<ProcedureType>, flags), m_returnType(returnType), m_parameters(std::move(parameters)) {}
+        : Type(std::in_place_type<ProcedureType>, flags), m_returnType(returnType), m_parameters(std::move(parameters))
+    {
+    }
 
-    [[nodiscard]] const Type* getReturnType() const { return m_returnType; }
-    [[nodiscard]] const std::vector<Parameter>& getParameters() const { return m_parameters; }
+    [[nodiscard]] const Type* getReturnType() const
+    {
+        return m_returnType;
+    }
+    [[nodiscard]] const std::vector<Parameter>& getParameters() const
+    {
+        return m_parameters;
+    }
 
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ProcedureType)
 };
@@ -253,9 +308,19 @@ public:
 class ErrorType : public Type
 {
     friend class Type;
-    static std::size_t getSizeOfImpl(const ProgramInterface&) { CORAL66_UNREACHABLE; }
-    static std::size_t getAlignOfImpl(const ProgramInterface&) { CORAL66_UNREACHABLE; }
-    static bool equalsImpl(const ErrorType&) { return true; }
+    static std::size_t getSizeOfImpl(const ProgramInterface&)
+    {
+        CORAL66_UNREACHABLE;
+    }
+    static std::size_t getAlignOfImpl(const ProgramInterface&)
+    {
+        CORAL66_UNREACHABLE;
+    }
+    static bool equalsImpl(const ErrorType&)
+    {
+        return true;
+    }
+
 public:
     ErrorType(TypeFlags flags = Nothing) : Type(std::in_place_type<ErrorType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ErrorType)

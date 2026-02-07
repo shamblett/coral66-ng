@@ -58,11 +58,11 @@ enum class TokenType : std::uint8_t
     Assignment,
     Colon,
     QuestionMark,
-    Newline,            ///<[PP]
+    Newline, ///<[PP]
     OpenSquareBracket,
     CloseSquareBracket,
     Dot,
-    
+
     // Coral 66 Keywords
     BeginKeyword,
     EndKeyword,
@@ -142,8 +142,8 @@ protected:
 
     TokenBase() = default;
 
-    TokenBase(TokenType const tokenType, std::uint64_t const offset, std::uint64_t const length, std::uint32_t const fileID,
-              std::uint32_t macroID)
+    TokenBase(TokenType const tokenType, std::uint64_t const offset, std::uint64_t const length,
+              std::uint32_t const fileID, std::uint32_t macroID)
         : m_leadingWhitespace(false),
           m_tokenType(tokenType),
           m_macroId(macroID),
@@ -225,8 +225,9 @@ class PPToken final : public TokenBase
                                       representation have been removed*/
 
 public:
-    PPToken(TokenType tokenType, std::uint64_t const offset, std::uint64_t const length, std::uint64_t const charSpaceOffset,
-            std::uint64_t const charSpaceLength, std::uint32_t const fileID, std::uint32_t const macroID = 0, std::string_view const value = {})
+    PPToken(TokenType tokenType, std::uint64_t const offset, std::uint64_t const length,
+            std::uint64_t const charSpaceOffset, std::uint64_t const charSpaceLength, std::uint32_t const fileID,
+            std::uint32_t const macroID = 0, std::string_view const value = {})
         : TokenBase(tokenType, offset, length, fileID, macroID),
           m_value(value.begin(), value.end()),
           m_charSpaceOffset(charSpaceOffset),
@@ -248,7 +249,6 @@ public:
     {
         return m_value;
     }
-
 };
 
 struct NonCharString
@@ -265,7 +265,7 @@ struct NonCharString
         {
             return false;
         }
-        return std::ranges::equal(characters,wideString);
+        return std::ranges::equal(characters, wideString);
     }
 
     bool operator==(const NonCharString& other) const
@@ -274,7 +274,7 @@ struct NonCharString
         {
             return false;
         }
-        return std::ranges::equal(characters,other.characters);
+        return std::ranges::equal(characters, other.characters);
     }
 };
 

@@ -96,7 +96,8 @@ class SourceObjectStorage<Lexer::PPToken> : public PPSourceInterface
 public:
     SourceObjectStorage() = default;
 
-    SourceObjectStorage(std::vector<Lexer::IntervalMap> intervalMap, not_null<const LanguageOptions> const languageOptions)
+    SourceObjectStorage(std::vector<Lexer::IntervalMap> intervalMap,
+                        not_null<const LanguageOptions> const languageOptions)
         : m_intervalMap(std::move(intervalMap)), m_languageOptions(languageOptions)
     {
     }
@@ -150,7 +151,7 @@ public:
     {
     }
 
-    ~SourceObject()override = default;
+    ~SourceObject() override = default;
     SourceObject(const SourceObject&) = delete;
     SourceObject& operator=(const SourceObject&) = delete;
     SourceObject(SourceObject&&)
@@ -164,7 +165,8 @@ public:
 #endif
         = default;
 
-    [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t const fileID, std::uint64_t const offset) const noexcept override
+    [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t const fileID,
+                                              std::uint64_t const offset) const noexcept override
     {
         CORAL66_ASSERT(fileID < m_files.size());
         auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
@@ -172,14 +174,16 @@ public:
         return std::distance(m_files[fileID].starts.begin(), result) + (*result == offset ? 1 : 0);
     }
 
-    [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t const fileID,
+                                                   std::uint64_t const line) const noexcept override
     {
         CORAL66_ASSERT(fileID < m_files.size());
         CORAL66_ASSERT(line - 1 < m_files[fileID].starts.size());
         return m_files[fileID].starts[line - 1];
     }
 
-    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID,
+                                                 std::uint64_t const line) const noexcept override
     {
         CORAL66_ASSERT(fileID < m_files.size());
         CORAL66_ASSERT(line < m_files[fileID].starts.size());

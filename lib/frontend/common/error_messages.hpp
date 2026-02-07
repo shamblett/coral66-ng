@@ -14,12 +14,13 @@
 #include "diagnostic.hpp"
 #include "lib/support/Constexpr.hpp"
 
-#define CREATE_NOTE_2(variableName, format)                                           \
-    namespace detail                                                                  \
-    {\
+#define CREATE_NOTE_2(variableName, format)                                                           \
+    namespace detail                                                                                  \
+    {                                                                                                 \
     constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                 \
-    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Note, "")
+    }                                                                                                 \
+    constexpr auto variableName =                                                                     \
+        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Note, "")
 
 #define CREATE_NOTE_3(...) CREATE_NOTE_VAARG(__VA_ARGS__)
 #define CREATE_NOTE_4(...) CREATE_NOTE_VAARG(__VA_ARGS__)
@@ -30,21 +31,22 @@
 
 #define CREATE_NOTE(...) P99_PASTE2(CREATE_NOTE_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_NOTE_VAARG(variableName, format, ...)                                  \
-    namespace detail                                                                  \
-    {\
+#define CREATE_NOTE_VAARG(variableName, format, ...)                                                  \
+    namespace detail                                                                                  \
+    {                                                                                                 \
     constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                 \
-    constexpr auto variableName =                                                     \
+    }                                                                                                 \
+    constexpr auto variableName =                                                                     \
         ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Note, "")
 
-#define CREATE_WARNING_3(variableName, cliName, format)                                        \
-    namespace detail                                                                           \
-    {\
+#define CREATE_WARNING_3(variableName, cliName, format)                                                        \
+    namespace detail                                                                                           \
+    {                                                                                                          \
     constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};          \
     inline auto P99_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName); \
-    }                                                                                          \
-    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Warning, cliName)
+    }                                                                                                          \
+    constexpr auto variableName =                                                                              \
+        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Warning, cliName)
 
 #define CREATE_WARNING_4(...) CREATE_WARNING_VAARG(__VA_ARGS__)
 #define CREATE_WARNING_5(...) CREATE_WARNING_VAARG(__VA_ARGS__)
@@ -55,21 +57,22 @@
 
 #define CREATE_WARNING(...) P99_PASTE2(CREATE_WARNING_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_WARNING_VAARG(variableName, cliName, format, ...)                               \
-    namespace detail                                                                           \
-    {\
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};          \
-    inline auto P99_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName); \
-    }                                                                                          \
-    constexpr auto variableName =                                                              \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Warning, cliName)
+#define CREATE_WARNING_VAARG(variableName, cliName, format, ...)                                                  \
+    namespace detail                                                                                              \
+    {                                                                                                             \
+    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
+    inline auto P99_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName);    \
+    }                                                                                                             \
+    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>( \
+        ::coral66::Severity::Warning, cliName)
 
-#define CREATE_ERROR_2(variableName, format)                                          \
-    namespace detail                                                                  \
-    {\
+#define CREATE_ERROR_2(variableName, format)                                                          \
+    namespace detail                                                                                  \
+    {                                                                                                 \
     constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                 \
-    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Error, "")
+    }                                                                                                 \
+    constexpr auto variableName =                                                                     \
+        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Error, "")
 
 #define CREATE_ERROR_3(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 #define CREATE_ERROR_4(...) CREATE_ERROR_VAARG(__VA_ARGS__)
@@ -80,12 +83,12 @@
 
 #define CREATE_ERROR(...) P99_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_ERROR_VAARG(variableName, format, ...)                                 \
-    namespace detail                                                                  \
-    {\
+#define CREATE_ERROR_VAARG(variableName, format, ...)                                                 \
+    namespace detail                                                                                  \
+    {                                                                                                 \
     constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                 \
-    constexpr auto variableName =                                                     \
+    }                                                                                                 \
+    constexpr auto variableName =                                                                     \
         ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Error, "")
 
 namespace coral66
@@ -153,27 +156,30 @@ CREATE_ERROR(ERRORS_PARSING_INVALID_UTF8_IN_N, "Errors parsing invalid utf8 in '
 
 namespace Lexer
 {
-    // Adding some Lexer errors that might be used by Lexer.cpp
-    CREATE_ERROR(INVALID_OCTAL_CHARACTER, "Invalid octal character '%0'", PointAt<1>);
-    CREATE_ERROR(CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, "Character too large for literal type", Underline<0>);
-    CREATE_ERROR(INVALID_ESCAPE_SEQUENCE_N, "Invalid escape sequence '%0'", PointAt<1>);
-    CREATE_ERROR(EXPECTED_CHARACTER_AFTER_BACKSLASH, "Expected character after backslash", PointAt<0>);
-    CREATE_ERROR(NEWLINE_IN_CHARACTER_LITERAL_USE_BACKLASH_N, "Newline in character literal. Use \\n instead", PointAt<0>);
-    CREATE_ERROR(NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, "Newline in string literal. Use \\n instead", PointAt<0>);
-    CREATE_ERROR(INVALID_UTF8_SEQUENCE, "Invalid UTF-8 Sequence", PointAt<0>);
-    CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, "Invalid universal character. Value mustn't be less than 0x00A0", Underline<0>);
-    CREATE_ERROR(INVALID_UC_VALUE_MUST_FIT_IN_UTF32, "Invalid universal character. Value must fit in UTF32", Underline<0>);
-    CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, "Invalid universal character. Value mustn't be in range of 0xD800 to 0xDFFF", Underline<0>);
-    CREATE_ERROR(INVALID_UC_EXPECTED_N_MORE_DIGITS, "Invalid universal character. Expected %0 more hex digit%s0", Underline<1>);
-    CREATE_ERROR(AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, "At least one hexadecimal digit required", PointAt<0>);
-    CREATE_ERROR(UNEXPECTED_CHARACTER, "Unexpected character", PointAt<0>);
-    CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<1>);
-    CREATE_ERROR(STRAY_N_IN_PROGRAM, "Stray %tokenType0 in program", PointAt<0>);
-    CREATE_ERROR(UNTERMINATED_BLOCK_COMMENT, "Unterminated block comment", Underline<0>);
-    CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underline<0>);
-    CREATE_ERROR(UNTERMINATED_CHARACTER_LITERAL, "Unterminated character literal", Underline<0>);
-    CREATE_ERROR(UNTERMINATED_INCLUDE_DIRECTIVE, "Unterminated include directive", Underline<0>);
-}
+// Adding some Lexer errors that might be used by Lexer.cpp
+CREATE_ERROR(INVALID_OCTAL_CHARACTER, "Invalid octal character '%0'", PointAt<1>);
+CREATE_ERROR(CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, "Character too large for literal type", Underline<0>);
+CREATE_ERROR(INVALID_ESCAPE_SEQUENCE_N, "Invalid escape sequence '%0'", PointAt<1>);
+CREATE_ERROR(EXPECTED_CHARACTER_AFTER_BACKSLASH, "Expected character after backslash", PointAt<0>);
+CREATE_ERROR(NEWLINE_IN_CHARACTER_LITERAL_USE_BACKLASH_N, "Newline in character literal. Use \\n instead", PointAt<0>);
+CREATE_ERROR(NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, "Newline in string literal. Use \\n instead", PointAt<0>);
+CREATE_ERROR(INVALID_UTF8_SEQUENCE, "Invalid UTF-8 Sequence", PointAt<0>);
+CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, "Invalid universal character. Value mustn't be less than 0x00A0",
+             Underline<0>);
+CREATE_ERROR(INVALID_UC_VALUE_MUST_FIT_IN_UTF32, "Invalid universal character. Value must fit in UTF32", Underline<0>);
+CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE,
+             "Invalid universal character. Value mustn't be in range of 0xD800 to 0xDFFF", Underline<0>);
+CREATE_ERROR(INVALID_UC_EXPECTED_N_MORE_DIGITS, "Invalid universal character. Expected %0 more hex digit%s0",
+             Underline<1>);
+CREATE_ERROR(AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, "At least one hexadecimal digit required", PointAt<0>);
+CREATE_ERROR(UNEXPECTED_CHARACTER, "Unexpected character", PointAt<0>);
+CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<1>);
+CREATE_ERROR(STRAY_N_IN_PROGRAM, "Stray %tokenType0 in program", PointAt<0>);
+CREATE_ERROR(UNTERMINATED_BLOCK_COMMENT, "Unterminated block comment", Underline<0>);
+CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underline<0>);
+CREATE_ERROR(UNTERMINATED_CHARACTER_LITERAL, "Unterminated character literal", Underline<0>);
+CREATE_ERROR(UNTERMINATED_INCLUDE_DIRECTIVE, "Unterminated include directive", Underline<0>);
+} // namespace Lexer
 
 } // namespace Errors
 
@@ -182,7 +188,8 @@ namespace Warnings
 namespace Semantics
 {
 CREATE_WARNING(UNUSED_VARIABLE_N, "unused-variable", "Unused variable %0", PointAt<0>);
-CREATE_WARNING(POSSIBLE_PRECISION_LOSS, "precision-loss", "Possible loss of precision in fixed point operation", Underline<0>);
+CREATE_WARNING(POSSIBLE_PRECISION_LOSS, "precision-loss", "Possible loss of precision in fixed point operation",
+               Underline<0>);
 } // namespace Semantics
 namespace CLI
 {

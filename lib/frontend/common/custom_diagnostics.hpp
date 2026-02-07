@@ -6,10 +6,10 @@
 
 #pragma once
 
+#include <type_traits>
+
 #include "lib/support/IntrusiveVariantValue.hpp"
 #include "lib/support/Text.hpp"
-
-#include <type_traits>
 
 namespace coral66
 {

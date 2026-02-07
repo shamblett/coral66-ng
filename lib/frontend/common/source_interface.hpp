@@ -71,7 +71,7 @@ class PPSourceInterface : virtual public source_interface
 {
 public:
     PPSourceInterface() = default;
-     ~PPSourceInterface()override = default;
+    ~PPSourceInterface() override = default;
     PPSourceInterface(const PPSourceInterface&) = default;
     PPSourceInterface& operator=(const PPSourceInterface&) = default;
     PPSourceInterface(PPSourceInterface&&) noexcept = default;

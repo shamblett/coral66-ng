@@ -42,7 +42,7 @@ coral66::LanguageOptions coral66::LanguageOptions::native(Language language)
         sizeof(long),
         alignof(long long),
         alignof(double),
- // ReSharper disable once CppDFAConstantFunctionResult
+        // ReSharper disable once CppDFAConstantFunctionResult
         []() -> std::uint8_t
         {
             switch (std::numeric_limits<long double>::digits)
@@ -53,7 +53,7 @@ coral66::LanguageOptions coral66::LanguageOptions::native(Language language)
         }(),
         alignof(long double),
         sizeof(void*),
- // ReSharper disable once CppCompileTimeConstantCanBeReplacedWithBooleanConstant
+        // ReSharper disable once CppCompileTimeConstantCanBeReplacedWithBooleanConstant
         0,
         underlyingType<ptrdiff_t>(),
         underlyingType<size_t>(),

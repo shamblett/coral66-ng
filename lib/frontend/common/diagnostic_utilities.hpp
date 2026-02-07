@@ -73,27 +73,26 @@ PointRange getPointRange(const T& arg)
     else if constexpr (IsVariant<U>{})
     {
         return coral66::match(arg,
-                          []<typename T0>(T0&& value)
-                          {
-                              using V = std::decay_t<T0>;
-                              if constexpr (std::is_pointer_v<V> || IsSmartPtr<V>{})
+                              []<typename T0>(T0&& value)
                               {
-                                  CORAL66_ASSERT(value);
-                                  return getPointRange(*value);
-                              }
-                              else
-                              {
-                                  return getPointRange(value);
-                              }
-                          });
+                                  using V = std::decay_t<T0>;
+                                  if constexpr (std::is_pointer_v<V> || IsSmartPtr<V>{})
+                                  {
+                                      CORAL66_ASSERT(value);
+                                      return getPointRange(*value);
+                                  }
+                                  else
+                                  {
+                                      return getPointRange(value);
+                                  }
+                              });
     }
     else if constexpr (std::tuple_size_v<U> == 2)
     {
         using T1 = std::decay_t<std::tuple_element_t<0, U>>;
         using T2 = std::decay_t<std::tuple_element_t<1, U>>;
-        if constexpr (std::is_base_of_v<
-                          Lexer::TokenBase,
-                          std::remove_pointer_t<T1>> && std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T2>>)
+        if constexpr (std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T1>>
+                      && std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T2>>)
         {
             auto& [arg1, arg2] = arg;
             PointLocation first, second;

@@ -177,7 +177,7 @@ constexpr bool checkForNoDuplicates()
     {
         std::array<bool, N> seen = {{false}};
         return ((
-                    [&seen]<typename T0>([[maybe_unused]]T0 value)
+                    [&seen]<typename T0>([[maybe_unused]] T0 value)
                     {
                         using T = T0;
                         if constexpr (IsInsertAfter<T>{})
@@ -439,7 +439,7 @@ private:
                 [](auto&&... values)
                 {
                     return (
-                        []<typename T0>([[maybe_unused]]T0 indexT)
+                        []<typename T0>([[maybe_unused]] T0 indexT)
                         {
                             constexpr auto index = T0::value;
                             // Don't usually allow pointers except in variants.
@@ -466,9 +466,8 @@ private:
                 return (std::is_base_of_v<Lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>)
                        || (std::is_base_of_v<Lexer::TokenBase, T2> && std::is_convertible_v<T1, std::uint64_t>)
                        || (std::is_convertible_v<T1, std::uint64_t> && std::is_convertible_v<T2, std::uint64_t>)
-                       || (std::is_base_of_v<Lexer::TokenBase,
-                                             std::remove_pointer_t<
-                                                 T1>> && std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T2>>)
+                       || (std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T1>>
+                           && std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T2>>)
                        || (locationConstraintCheck<T1>() && locationConstraintCheck<T2>());
             }
             else if constexpr (std::tuple_size_v<U> == 3)
@@ -476,12 +475,10 @@ private:
                 using T1 = std::decay_t<std::tuple_element_t<0, U>>;
                 using T2 = std::decay_t<std::tuple_element_t<1, U>>;
                 using T3 = std::decay_t<std::tuple_element_t<2, U>>;
-                return (std::is_base_of_v<
-                            Lexer::TokenBase,
-                            T1> && std::is_convertible_v<T2, std::uint64_t> && std::is_convertible_v<T3, std::uint64_t>)
-                       || (std::is_base_of_v<
-                               Lexer::TokenBase,
-                               T3> && std::is_convertible_v<T2, std::uint64_t> && std::is_convertible_v<T1, std::uint64_t>);
+                return (std::is_base_of_v<Lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>
+                        && std::is_convertible_v<T3, std::uint64_t>)
+                       || (std::is_base_of_v<Lexer::TokenBase, T3> && std::is_convertible_v<T2, std::uint64_t>
+                           && std::is_convertible_v<T1, std::uint64_t>);
             }
             else
             {
@@ -583,14 +580,11 @@ private:
                                                 Tuple& args)
     {
         constexpr std::tuple tuple = std::apply(
-            []<typename... T0>([[maybe_unused]]T0... stringIndices)
-            {
-                return std::make_tuple(
-                    std::integral_constant<char, allFormatModifiers[i1][i2][T0::value]>{}...);
-            },
+            []<typename... T0>([[maybe_unused]] T0... stringIndices)
+            { return std::make_tuple(std::integral_constant<char, allFormatModifiers[i1][i2][T0::value]>{}...); },
             Constexpr::integerSequenceToTuple(std::make_index_sequence<allFormatModifiers[i1][i2].size()>{}));
         result[i1].customModifiers[allFormatModifiers[i1][i2]] = std::apply(
-            [&args]<typename... T0>([[maybe_unused]]T0... chars) -> std::string
+            [&args]<typename... T0>([[maybe_unused]] T0... chars) -> std::string
             {
                 static_assert(
                     IsTypeCompleteV<diag::CustomFormat<T0::value...>>,
@@ -605,7 +599,8 @@ private:
     }
 
 public:
-    constexpr diagnostic(const Severity severity, const std::string_view name) : detail::Diagnostic::DiagnosticBase(severity, name)
+    constexpr diagnostic(const Severity severity, const std::string_view name)
+        : detail::Diagnostic::DiagnosticBase(severity, name)
     {
     }
 
@@ -683,8 +678,9 @@ Message diagnostic<N, format, Mods...>::args(const T& location, const source_int
                                              Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
-    [[maybe_unused]] auto* v = this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
-                                                                                // function to improve debug perf a lil
+    [[maybe_unused]] auto* v =
+        this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
+                                                                  // function to improve debug perf a lil
     static_assert(locationConstraintCheck<T>(), "First argument must denote a location");
     auto array = createArgumentArray(&sourceInterface, std::forward_as_tuple(std::forward<Args>(args)...),
                                      std::index_sequence_for<Args...>{});
@@ -696,7 +692,8 @@ template <class... Args>
 Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
-    [[maybe_unused]] auto* v = this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
+    [[maybe_unused]] auto* v =
+        this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
     // function to improve debug perf a lil
     // TODO: Instead of passing nullptr make it so that StringConverter may use const SourceInterface& as a second
     //  argument but make it a compiler error if such a string converter is used when using argsCLI instead of args
@@ -761,7 +758,7 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(const source_interface*
     (void)sourceInterface;
     std::array<Argument, N> result;
     (
-        [&result, &args, sourceInterface]<typename T0>([[maybe_unused]]T0 integer)
+        [&result, &args, sourceInterface]<typename T0>([[maybe_unused]] T0 integer)
         {
             using IntegerTy = T0;
             using ArgTy = std::decay_t<std::tuple_element_t<IntegerTy::value, Tuple>>;
@@ -776,8 +773,8 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(const source_interface*
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::StringConstraint))
             {
-                result[IntegerTy::value].inFormatText =
-                    ::coral66::diag::StringConverter<ArgTy>::inFormat(std::get<IntegerTy::value>(args), sourceInterface);
+                result[IntegerTy::value].inFormatText = ::coral66::diag::StringConverter<ArgTy>::inFormat(
+                    std::get<IntegerTy::value>(args), sourceInterface);
                 result[IntegerTy::value].inArgText =
                     ::coral66::diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), sourceInterface);
             }
@@ -804,7 +801,7 @@ constexpr auto diagnostic<N, format, Mods...>::getModifiers(std::index_sequence<
 {
     std::array<Modifiers, sizeof...(Mods)> result = {};
     (
-        [&result]<typename T0>([[maybe_unused]]T0 value)
+        [&result]<typename T0>([[maybe_unused]] T0 value)
         {
             constexpr std::size_t i = T0::value;
 #if __has_builtin(__type_pack_element)

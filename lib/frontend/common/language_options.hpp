@@ -11,12 +11,12 @@
  *
  */
 
-#include "lib/support/Triple.hpp"
-
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_set>
+
+#include "lib/support/Triple.hpp"
 
 namespace coral66
 {
@@ -151,6 +151,8 @@ LanguageOptions::UnderlyingType LanguageOptions::underlyingType()
         // Always false but it depends on type T
         static_assert(sizeof(T) < 0);
     }
-return UnderlyingType ::Int;;}
+    return UnderlyingType ::Int;
+    ;
+}
 
 } // namespace coral66

@@ -14,10 +14,10 @@
 
 namespace coral66
 {
- // ReSharper disable once CppClassNeedsConstructorBecauseOfUninitializedMember
+// ReSharper disable once CppClassNeedsConstructorBecauseOfUninitializedMember
 class x86_target_features final : public TargetFeatures
 {
-#define HANDLE_VALUE(x) bool m_## x;
+#define HANDLE_VALUE(x) bool m_##x;
 #include "x86_features.def"
 public:
     bool hasFeature(Features features) const override;

@@ -264,15 +264,15 @@ public:
         for (auto& iter : attributes)
         {
             coral66::match(std::move(iter),
-                       [&]<typename T0>(T0&& value)
-                       {
-                           using W = std::decay_t<T0>;
-                           static_assert(std::is_move_constructible_v<W>);
-                           if constexpr (std::is_constructible_v<T, W&&>)
+                           [&]<typename T0>(T0&& value)
                            {
-                               addAttribute(std::move(value));
-                           }
-                       });
+                               using W = std::decay_t<T0>;
+                               static_assert(std::is_move_constructible_v<W>);
+                               if constexpr (std::is_constructible_v<T, W&&>)
+                               {
+                                   addAttribute(std::move(value));
+                               }
+                           });
         }
     }
 
@@ -284,15 +284,15 @@ public:
         for (auto& iter : attributes)
         {
             coral66::match(iter,
-                       [&]<typename T0>(T0&& value)
-                       {
-                           using W = std::decay_t<T0>;
-                           static_assert(std::is_copy_constructible_v<W>);
-                           if constexpr (std::is_constructible_v<T, W>)
+                           [&]<typename T0>(T0&& value)
                            {
-                               addAttribute(std::move(value));
-                           }
-                       });
+                               using W = std::decay_t<T0>;
+                               static_assert(std::is_copy_constructible_v<W>);
+                               if constexpr (std::is_constructible_v<T, W>)
+                               {
+                                   addAttribute(std::move(value));
+                               }
+                           });
         }
     }
 };

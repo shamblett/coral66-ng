@@ -99,8 +99,8 @@ struct ModifierOfLine
     variant value;
 };
 
-void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t const lineStartOffset, const std::string_view text,
-               const std::uint64_t width, const std::span<ModifierOfLine> modifiersOfLine)
+void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t const lineStartOffset,
+               const std::string_view text, const std::uint64_t width, const std::span<ModifierOfLine> modifiersOfLine)
 {
     ss << llvm::format_decimal(line, width) << " | ";
     ss.write(text.data(), text.size()) << '\n';
@@ -191,7 +191,8 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                     extraAtEnd = std::string(width, ' ') + " > " + coral66::to_string(insertAfter.text);
                     return;
                 }
-                const auto indent = coral66::unsafeColumnWidth(text.substr(0, iter.fromToInLine.second - lineStartOffset));
+                const auto indent =
+                    coral66::unsafeColumnWidth(text.substr(0, iter.fromToInLine.second - lineStartOffset));
                 canvas.resize(std::max<std::size_t>(1, canvas.size()), std::string(widthOfText, ' '));
                 canvas[0].resize(std::max<std::size_t>(canvas[0].size(), indent + 1));
                 canvas[0][indent] = '^';
@@ -305,8 +306,8 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         {
             auto line = sourceInterface.getLineNumber(iter.first, iter.second);
             const auto& range = sourceInterface.getFiles()[iter.first].lineAndFileMapping;
-            auto map = llvm::upper_bound(range, line,
-                                        [](auto line, const auto& tuple) { return line < std::get<0>(tuple); });
+            auto map =
+                llvm::upper_bound(range, line, [](auto line, const auto& tuple) { return line < std::get<0>(tuple); });
             if (!range.empty() && map == range.end())
             {
                 --map;
@@ -332,10 +333,11 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     {
         return {};
     }
-    {const auto [line, column] = getLineCol(location.first, sourceInterface);
+    {
+        const auto [line, column] = getLineCol(location.first, sourceInterface);
         const auto& range = sourceInterface.getFiles()[location.first.fileId].lineAndFileMapping;
-        auto iter = llvm::upper_bound(range, line,
-                                     [](auto line, const auto& tuple) { return line < std::get<0>(tuple); });
+        auto iter =
+            llvm::upper_bound(range, line, [](auto line, const auto& tuple) { return line < std::get<0>(tuple); });
         if (!range.empty() && iter == range.end())
         {
             --iter;
@@ -404,10 +406,8 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                 {{std::max(arguments[index].range->first.offset, startOffset),
                   std::min(arguments[index].range->second.offset, endOffset)},
                  coral66::match(
-                     iter,
-                     [](const DiagnosticBase::Underline& underline) -> ModifierOfLine::variant {
-                         return ModifierOfLine::Underline{underline.character, underline.continuous};
-                     },
+                     iter, [](const DiagnosticBase::Underline& underline) -> ModifierOfLine::variant
+                     { return ModifierOfLine::Underline{underline.character, underline.continuous}; },
                      [&arguments](const DiagnosticBase::InsertAfter& insertAfter) -> ModifierOfLine::variant
                      {
                          if (insertAfter.text >= 0)
@@ -429,7 +429,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     }
 
     auto width = std::ranges::max_element(fileToMaxMinLine,
-                                  [](auto&& lhs, auto&& rhs) { return lhs.second.second < rhs.second.second; })
+                                          [](auto&& lhs, auto&& rhs) { return lhs.second.second < rhs.second.second; })
                      ->second.second;
     width = roundUpTo(1 + static_cast<std::size_t>(std::floor(log10f(width))), 4);
 
@@ -468,23 +468,23 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             }
 
             std::ranges::stable_sort(modifierForLine,
-                             [](const ModifierOfLine& lhs, const ModifierOfLine& rhs)
-                             {
-                                 if (std::holds_alternative<ModifierOfLine::Underline>(lhs.value)
-                                     && std::holds_alternative<ModifierOfLine::Underline>(rhs.value))
-                                 {
-                                     return coral66::get<ModifierOfLine::Underline>(lhs.value).continuous
-                                            > coral66::get<ModifierOfLine::Underline>(rhs.value).continuous;
-                                 }
-                                 if (std::holds_alternative<ModifierOfLine::Underline>(lhs.value)
-                                     || std::holds_alternative<ModifierOfLine::Underline>(rhs.value))
-                                 {
-                                     return lhs.value.index() < rhs.value.index();
-                                 }
-                                 // > because we want modifiers that appear further to the right to be printed
-                                 // first so that they have the lowest height
-                                 return lhs.fromToInLine.second > rhs.fromToInLine.second;
-                             });
+                                     [](const ModifierOfLine& lhs, const ModifierOfLine& rhs)
+                                     {
+                                         if (std::holds_alternative<ModifierOfLine::Underline>(lhs.value)
+                                             && std::holds_alternative<ModifierOfLine::Underline>(rhs.value))
+                                         {
+                                             return coral66::get<ModifierOfLine::Underline>(lhs.value).continuous
+                                                    > coral66::get<ModifierOfLine::Underline>(rhs.value).continuous;
+                                         }
+                                         if (std::holds_alternative<ModifierOfLine::Underline>(lhs.value)
+                                             || std::holds_alternative<ModifierOfLine::Underline>(rhs.value))
+                                         {
+                                             return lhs.value.index() < rhs.value.index();
+                                         }
+                                         // > because we want modifiers that appear further to the right to be printed
+                                         // first so that they have the lowest height
+                                         return lhs.fromToInLine.second > rhs.fromToInLine.second;
+                                     });
 
             printLine(ss, i, thisLineStartOffset,
                       view.substr(thisLineStartOffset - startOffset, thisLineEndOffset - thisLineStartOffset), width,
@@ -497,8 +497,8 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
 }
 
 void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const std::string_view message,
-                                                                       const std::span<Argument> arguments,
-                                                                       llvm::raw_string_ostream& ss) const
+                                                                           const std::span<Argument> arguments,
+                                                                           llvm::raw_string_ostream& ss) const
 {
     switch (this->m_severity)
     {
@@ -535,7 +535,7 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
 }
 
 coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(std::string_view message,
-                                                            std::span<Argument> arguments) const
+                                                                    std::span<Argument> arguments) const
 {
     std::string result;
     // TODO: Right now the colour is useless. Just putting it here to know what the colour when and were.

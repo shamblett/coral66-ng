@@ -38,10 +38,13 @@ public:
     constant_value(std::string string);
 
     constant_value castTo(const Type& type, const ProgramInterface* program, const LanguageOptions& options,
-                      Issue* issue = nullptr) const;
+                          Issue* issue = nullptr) const;
 
     // Add accessors if needed by other parts of the system
-    const ValueType& getValue() const { return m_value; }
+    const ValueType& getValue() const
+    {
+        return m_value;
+    }
 };
 
 } // namespace coral66::Semantics
