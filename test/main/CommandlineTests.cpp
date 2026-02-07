@@ -6,7 +6,7 @@
 
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/main/command_line.hpp"
-#include "test/common/TestConfig.hpp"
+#include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 namespace

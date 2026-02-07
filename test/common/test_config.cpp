@@ -4,9 +4,9 @@
  * Date   : 31/01/2026
  */
 
-#include "test/common/TestConfig.hpp"
-
 #include <llvm/Support/Process.h>
+
+#include "test/common/test_config.hpp"
 
 coral66::Tests::FileScope::~FileScope()
 {

@@ -6,10 +6,12 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
     name = "common",
-    srcs = ["TestConfig.cpp"],
+    srcs = [
+        "test_config.cpp",
+    ],
     hdrs = [
-        "TestConfig.hpp",
-        "TestTargets.hpp",
+        "test_config.hpp",
+        "test_targets.hpp",
     ],
     visibility = ["//test:__subpackages__"],
     deps = [
