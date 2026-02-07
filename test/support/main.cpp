@@ -46,4 +46,3 @@ extern "C" int lprofGetHostName(char* Name, int Len)
 }
 
 #endif
-

@@ -9,10 +9,11 @@
  * Date   : 31/01/2026
  */
 
+#include "lib/support/intrusive_variant_allocator.hpp"
+
 #include <queue>
 
 #include "lib/support/abstract_intrusive_variant.hpp"
-#include "lib/support/intrusive_variant_allocator.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 namespace
