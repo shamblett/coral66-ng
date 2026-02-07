@@ -33,14 +33,14 @@ class Preprocessor final : private coral66::PPSourceInterface
     std::uint32_t m_macroID = 0;
     std::vector<coral66::Lexer::PPToken> m_result;
     std::vector<coral66::Source::PPRecord> m_substitutions{1};
-    
+
     struct Macro
     {
         coral66::Lexer::PPTokenIterator identifierPos;
         std::span<const coral66::Lexer::PPToken> replacement;
     };
     std::unordered_map<std::string_view, Macro> m_defines;
-    
+
     std::vector<coral66::Source::File> m_files;
     std::vector<std::vector<coral66::Lexer::PPToken>> m_fileTokens;
     std::vector<coral66::Lexer::IntervalMap> m_intervalMaps;
@@ -75,7 +75,7 @@ class Preprocessor final : private coral66::PPSourceInterface
         }
         std::vector<coral66::Lexer::PPToken> output;
         auto* start = tokens.data();
-        
+
         for (auto* iter = tokens.data(); iter != tokens.data() + tokens.size();)
         {
             if (iter->getTokenType() == coral66::Lexer::TokenType::Newline)
@@ -107,21 +107,23 @@ class Preprocessor final : private coral66::PPSourceInterface
 
             // Expand Macro
             output.insert(output.end(), std::move_iterator(start), std::move_iterator(iter));
-            
+
             auto i = ++m_macroID;
-            m_substitutions.emplace_back(coral66::Source::Substitution{*result->second.identifierPos, *iter, {}, false});
-            
-            std::vector<coral66::Lexer::PPToken> replacement(result->second.replacement.begin(), result->second.replacement.end());
+            m_substitutions.emplace_back(
+                coral66::Source::Substitution{*result->second.identifierPos, *iter, {}, false});
+
+            std::vector<coral66::Lexer::PPToken> replacement(result->second.replacement.begin(),
+                                                             result->second.replacement.end());
             for (auto& tok : replacement)
             {
                 tok.setMacroId(i);
             }
-            
+
             // Recursive substitution (simple approach)
             // Ideally we should guard against infinite recursion
-            
+
             output.insert(output.end(), std::move_iterator(replacement.begin()), std::move_iterator(replacement.end()));
-            
+
             iter++;
             start = iter;
         }
@@ -134,8 +136,9 @@ class Preprocessor final : private coral66::PPSourceInterface
     {
         if (defineDirective.tokens.size() != 2)
         {
-            log(coral66::Errors::Parser::EXPECTED_N_AFTER_N.args(
-                *defineDirective.defineToken, *this, coral66::Lexer::TokenType::Identifier, *defineDirective.defineToken));
+            log(coral66::Errors::Parser::EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this,
+                                                                 coral66::Lexer::TokenType::Identifier,
+                                                                 *defineDirective.defineToken));
             return {};
         }
         if (defineDirective.tokens[0].getTokenType() != coral66::Lexer::TokenType::Identifier)
@@ -150,18 +153,19 @@ class Preprocessor final : private coral66::PPSourceInterface
                 defineDirective.tokens[1], *this, coral66::Lexer::TokenType::StringLiteral, defineDirective.tokens[1]));
             return {};
         }
-        
+
         const auto* identifierPos = &defineDirective.tokens[0];
         std::string replacementText(defineDirective.tokens[1].getValue());
-        
+
         bool errors = false;
-        auto scratchPadPP = coral66::Lexer::tokenize(std::move(replacementText), &m_languageOptions, m_reporter, &errors, "<Macro Expansion>");
+        auto scratchPadPP = coral66::Lexer::tokenize(std::move(replacementText), &m_languageOptions, m_reporter,
+                                                     &errors, "<Macro Expansion>");
         if (errors)
         {
             m_errorsOccurred = true;
             return {};
         }
-        
+
         m_fileTokens.push_back(std::move(scratchPadPP.data()));
         return Macro{identifierPos, {m_fileTokens.back().data(), m_fileTokens.back().size()}};
     }
@@ -180,7 +184,8 @@ class Preprocessor final : private coral66::PPSourceInterface
         return m_files[fileID].starts[line - 1];
     }
 
-    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID,
+                                                 std::uint64_t const line) const noexcept override
     {
         CORAL66_ASSERT(fileID < m_files.size());
         CORAL66_ASSERT(line < m_files[fileID].starts.size());
@@ -244,18 +249,18 @@ public:
                            {},
                            {}});
         m_intervalMaps.push_back(std::move(sourceObject.getIntervalMap()[0]));
-        
+
         coral66::PP::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
         auto tree = coral66::PP::parseFile(
             begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
-        
+
         if (context.getErrorCount() != 0)
         {
             m_errorsOccurred = true;
             return;
         }
-        
+
         visit(tree);
         m_fileTokens.push_back(std::move(sourceObject.data()));
     }
@@ -298,12 +303,12 @@ public:
             m_defines.emplace(macro->identifierPos->getValue(), *macro);
         }
     }
-    
+
     // Unused visitors
     static void visit(const coral66::PP::IfSection&) {}
     static void visit(const coral66::PP::UnknownDirective&) {}
     static void visit(const coral66::PP::NonDirective&) {}
-    
+
     // ControlLine variants
     static void visit(const coral66::PP::ControlLine::IncludeTag&) {}
     static void visit(const coral66::PP::ControlLine::LineTag&) {}
@@ -319,7 +324,7 @@ public:
 } // namespace
 
 coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& sourceObject, const Options& options,
-                                        llvm::raw_ostream* reporter, bool* errorsOccurred) noexcept
+                                                llvm::raw_ostream* reporter, bool* errorsOccurred) noexcept
 {
     auto& languageOptions = sourceObject.getLanguageOptions();
     Preprocessor preprocessor(reporter, options, languageOptions);
@@ -328,7 +333,9 @@ coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& source
     {
         *errorsOccurred = preprocessor.errorsOccurred();
     }
-    return {std::move(preprocessor.getResult()), std::move(preprocessor.getFiles()), &languageOptions,
-                          {preprocessor.getSubstitutionsVector().begin(), preprocessor.getSubstitutionsVector().end()},
-                          {std::move(preprocessor.getIntervalMaps())}};
+    return {std::move(preprocessor.getResult()),
+            std::move(preprocessor.getFiles()),
+            &languageOptions,
+            {preprocessor.getSubstitutionsVector().begin(), preprocessor.getSubstitutionsVector().end()},
+            {std::move(preprocessor.getIntervalMaps())}};
 }

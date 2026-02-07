@@ -50,7 +50,8 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
             {
                 tuple = coral66::match(
                     sourceInterface.getSubstitutions()[std::get<0>(tuple)],
-                    [](std::monostate) -> std::tuple<std::uint32_t, std::uint32_t, std::uint64_t> { CORAL66_UNREACHABLE; },
+                    [](std::monostate) -> std::tuple<std::uint32_t, std::uint32_t, std::uint64_t>
+                    { CORAL66_UNREACHABLE; },
                     [isPrev](const Source::Substitution& substitution)
                     {
                         if (isPrev && substitution.closeParentheses)
@@ -95,8 +96,7 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
                 1);
         }
         result.insert(result.size(), newLines, '\n');
-        if (newLines == 0
-            && (begin->hasLeadingWhitespace()))
+        if (newLines == 0 && (begin->hasLeadingWhitespace()))
         {
             result += " " + Lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
         }

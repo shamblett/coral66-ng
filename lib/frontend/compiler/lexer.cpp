@@ -731,8 +731,8 @@ public:
     {
         auto sourceStart = map(m_characterToSourceSpace, start).first;
         auto sourceEnd = map(m_characterToSourceSpace, end - 1).second;
-        auto& newToken = m_result.emplace_back(tokenType, sourceStart, sourceEnd - sourceStart, start, end - start, 0,
-                                               0, value);
+        auto& newToken =
+            m_result.emplace_back(tokenType, sourceStart, sourceEnd - sourceStart, start, end - start, 0, 0, value);
         newToken.setLeadingWhitespace(leadingWhitespace);
         leadingWhitespace = false;
     }
@@ -1102,7 +1102,8 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c, Context& context) noexcept // NOLINT(*-make-member-function-const)
+std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c,
+                                               Context& context) noexcept // NOLINT(*-make-member-function-const)
 {
     if (c == 'u' || c == 'U')
     {
@@ -1229,7 +1230,8 @@ std::pair<StateMachine, bool> Dot::advance(char const c, Context& context) // NO
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-std::pair<StateMachine, bool> Punctuation::advance(char const c, Context& context) // NOLINT(*-make-member-function-const)
+std::pair<StateMachine, bool> Punctuation::advance(char const c,
+                                                   Context& context) // NOLINT(*-make-member-function-const)
 {
     switch (first)
     {
@@ -2048,7 +2050,7 @@ coral66::CSourceObject coral66::Lexer::toCTokens(PPSourceObject&& sourceObject, 
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
     return {std::move(tokens), std::move(sourceObject.getFiles()), sourceObject.getLanguageOptions(),
-                         std::move(sourceObject.getSubstitutions())};
+            std::move(sourceObject.getSubstitutions())};
 }
 
 coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter,
@@ -2057,9 +2059,10 @@ coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObj
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
-    return {std::move(tokens), {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
-                         sourceObject.getLanguageOptions(),
-                         {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()}};
+    return {std::move(tokens),
+            {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
+            sourceObject.getLanguageOptions(),
+            {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()}};
 }
 
 std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,

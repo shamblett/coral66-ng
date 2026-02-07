@@ -4,23 +4,24 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/frontend/common/error_messages.hpp"
 #include "parser_utilities.hpp"
 
+#include "lib/frontend/common/error_messages.hpp"
+
 bool coral66::Parser::expectIdentifier(Lexer::CTokenIterator& begin, const Lexer::CTokenIterator end, Context& context,
-                                   std::string_view& value, const coral66::FunctionRef<Message()> additional)
+                                       std::string_view& value, const coral66::FunctionRef<Message()> additional)
 {
     if (begin == end || begin->getTokenType() != Lexer::TokenType::Identifier)
     {
         if (begin == end)
         {
             context.log(coral66::Errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
-                                                             Lexer::TokenType::Identifier, *(end - 1)));
+                                                                 Lexer::TokenType::Identifier, *(end - 1)));
         }
         else
         {
             context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
-                                                                          Lexer::TokenType::Identifier, *begin));
+                                                                              Lexer::TokenType::Identifier, *begin));
         }
         if (additional)
         {
@@ -34,19 +35,19 @@ bool coral66::Parser::expectIdentifier(Lexer::CTokenIterator& begin, const Lexer
 }
 
 bool coral66::Parser::expect(Lexer::TokenType expected, Lexer::CTokenIterator& begin, const Lexer::CTokenIterator end,
-                         Context& context, const coral66::FunctionRef<Message()> additional)
+                             Context& context, const coral66::FunctionRef<Message()> additional)
 {
     if (begin == end || begin->getTokenType() != expected)
     {
         if (begin == end)
         {
             context.log(coral66::Errors::Parser::EXPECTED_N.args(diag::after(*(end - 1)), context.getSourceInterface(),
-                                                             expected, *(end - 1)));
+                                                                 expected, *(end - 1)));
         }
         else
         {
             context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
-                                                                          expected, *begin));
+                                                                              expected, *begin));
         }
         if (additional)
         {
@@ -80,12 +81,10 @@ bool coral66::Parser::firstIsInDirectAbstractDeclarator(const Lexer::CToken& tok
            || token.getTokenType() == Lexer::TokenType::OpenSquareBracket;
 }
 
-
 bool coral66::Parser::firstIsInPointer(const Lexer::CToken& token, const coral66::Parser::Context&)
 {
     return token.getTokenType() == Lexer::TokenType::Asterisk;
 }
-
 
 bool coral66::Parser::firstIsInInitializer(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
@@ -93,7 +92,7 @@ bool coral66::Parser::firstIsInInitializer(const Lexer::CToken& token, const cor
 }
 
 [[maybe_unused]] bool coral66::Parser::firstIsInInitializerList(const Lexer::CToken& token,
-                                                            const coral66::Parser::Context& context)
+                                                                const coral66::Parser::Context& context)
 {
     return token.getTokenType() == Lexer::TokenType::OpenSquareBracket || token.getTokenType() == Lexer::TokenType::Dot
            || firstIsInInitializer(token, context);
@@ -119,7 +118,8 @@ bool coral66::Parser::firstIsInAssignmentExpression(const Lexer::CToken& token, 
     return firstIsInConditionalExpression(token, context);
 }
 
-bool coral66::Parser::firstIsInConditionalExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)
+bool coral66::Parser::firstIsInConditionalExpression(const Lexer::CToken& token,
+                                                     const coral66::Parser::Context& context)
 {
     return firstIsInLogicalOrExpression(token, context);
 }
@@ -181,8 +181,7 @@ bool coral66::Parser::firstIsInCastExpression(const Lexer::CToken& token, const 
 
 bool coral66::Parser::firstIsInUnaryExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
-    return firstIsInPostFixExpression(token, context) ||
-           token.getTokenType() == Lexer::TokenType::Ampersand
+    return firstIsInPostFixExpression(token, context) || token.getTokenType() == Lexer::TokenType::Ampersand
            || token.getTokenType() == Lexer::TokenType::Asterisk || token.getTokenType() == Lexer::TokenType::Plus
            || token.getTokenType() == Lexer::TokenType::Minus
            || token.getTokenType() == Lexer::TokenType::BitWiseNegation

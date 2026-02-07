@@ -46,7 +46,9 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     auto end = sourceObject.data().data() + sourceObject.data().size();
 
     // Consume optional PROGRAM/SEGMENT header
-    if (begin != end && (begin->getTokenType() == Lexer::TokenType::ProgramKeyword || begin->getTokenType() == Lexer::TokenType::SegmentKeyword))
+    if (begin != end
+        && (begin->getTokenType() == Lexer::TokenType::ProgramKeyword
+            || begin->getTokenType() == Lexer::TokenType::SegmentKeyword))
     {
         begin++;
         if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier)
@@ -60,7 +62,8 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     {
         if (begin != end)
         {
-             context.log(Errors::Parser::EXPECTED_N.args(*begin, context.getSourceInterface(), Lexer::TokenType::BeginKeyword, *begin));
+            context.log(Errors::Parser::EXPECTED_N.args(*begin, context.getSourceInterface(),
+                                                        Lexer::TokenType::BeginKeyword, *begin));
         }
     }
 
@@ -109,8 +112,8 @@ std::unique_ptr<Syntax::Block> parseBlock(Lexer::CTokenIterator& begin, Lexer::C
     return std::make_unique<Syntax::Block>(blockStart, begin, std::move(decls), std::move(stmts));
 }
 
-std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
-    Context& context)
+std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CTokenIterator& begin,
+                                                                   Lexer::CTokenIterator end, Context& context)
 {
     std::vector<std::unique_ptr<Syntax::Declaration>> result;
     if (begin == end)
@@ -123,12 +126,15 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
     {
         auto typeToken = begin;
         begin++;
-        
-        if (type == Lexer::TokenType::FixedKeyword && begin != end && begin->getTokenType() == Lexer::TokenType::OpenParentheses)
+
+        if (type == Lexer::TokenType::FixedKeyword && begin != end
+            && begin->getTokenType() == Lexer::TokenType::OpenParentheses)
         {
             begin++;
-            while (begin != end && begin->getTokenType() != Lexer::TokenType::CloseParentheses) begin++;
-            if (begin != end) begin++;
+            while (begin != end && begin->getTokenType() != Lexer::TokenType::CloseParentheses)
+                begin++;
+            if (begin != end)
+                begin++;
         }
 
         if (begin != end && begin->getTokenType() == Lexer::TokenType::ArrayKeyword)
@@ -156,10 +162,12 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
                         else
                             break;
                     }
-                    if (begin != end) begin++;
+                    if (begin != end)
+                        begin++;
                 }
-                result.push_back(std::make_unique<Syntax::ArrayDeclaration>(typeToken, begin, typeToken, id, std::move(dims)));
-                
+                result.push_back(
+                    std::make_unique<Syntax::ArrayDeclaration>(typeToken, begin, typeToken, id, std::move(dims)));
+
                 if (begin != end && begin->getTokenType() == Lexer::TokenType::Comma)
                     begin++;
                 else
@@ -183,9 +191,10 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
                 }
             }
             if (!identifiers.empty())
-                result.push_back(std::make_unique<Syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers)));
+                result.push_back(
+                    std::make_unique<Syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers)));
         }
-        
+
         if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon)
         {
             begin++;
@@ -199,58 +208,63 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
         begin++;
         if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier)
         {
-             auto id = begin;
-             begin++;
-             std::unique_ptr<Syntax::Expression> width, length;
-             if (begin != end && begin->getTokenType() == Lexer::TokenType::OpenSquareBracket)
-             {
-                 begin++;
-                 width = parseExpression(begin, end, context);
-                 if (begin != end && begin->getTokenType() == Lexer::TokenType::Comma)
-                 {
-                     begin++;
-                     length = parseExpression(begin, end, context);
-                 }
-                 if (begin != end && begin->getTokenType() == Lexer::TokenType::CloseSquareBracket) begin++;
-             }
-             
-             std::vector<std::unique_ptr<Syntax::Declaration>> elements;
-             if (begin != end && begin->getTokenType() == Lexer::TokenType::OpenSquareBracket)
-             {
-                 begin++;
-                 while (begin != end && begin->getTokenType() != Lexer::TokenType::CloseSquareBracket)
-                 {
-                     begin++; 
-                 }
-                 if (begin != end) begin++;
-             }
+            auto id = begin;
+            begin++;
+            std::unique_ptr<Syntax::Expression> width, length;
+            if (begin != end && begin->getTokenType() == Lexer::TokenType::OpenSquareBracket)
+            {
+                begin++;
+                width = parseExpression(begin, end, context);
+                if (begin != end && begin->getTokenType() == Lexer::TokenType::Comma)
+                {
+                    begin++;
+                    length = parseExpression(begin, end, context);
+                }
+                if (begin != end && begin->getTokenType() == Lexer::TokenType::CloseSquareBracket)
+                    begin++;
+            }
 
-             result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width), std::move(length), std::move(elements)));
-             if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon) begin++;
+            std::vector<std::unique_ptr<Syntax::Declaration>> elements;
+            if (begin != end && begin->getTokenType() == Lexer::TokenType::OpenSquareBracket)
+            {
+                begin++;
+                while (begin != end && begin->getTokenType() != Lexer::TokenType::CloseSquareBracket)
+                {
+                    begin++;
+                }
+                if (begin != end)
+                    begin++;
+            }
+
+            result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width),
+                                                                        std::move(length), std::move(elements)));
+            if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon)
+                begin++;
         }
         return result;
     }
 
     if (type == Lexer::TokenType::OverlayKeyword)
     {
-         auto start = begin;
-         begin++;
-         if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier)
-         {
-             auto base = begin;
-             begin++;
-             if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier && begin->getText() == "WITH")
-             {
-                 begin++;
-             }
-             
-             auto decls = parseDeclaration(begin, end, context);
-             if (!decls.empty())
-             {
-                 result.push_back(std::make_unique<Syntax::OverlayDeclaration>(start, begin, base, base, std::move(decls[0])));
-             }
-         }
-         return result;
+        auto start = begin;
+        begin++;
+        if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier)
+        {
+            auto base = begin;
+            begin++;
+            if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier && begin->getText() == "WITH")
+            {
+                begin++;
+            }
+
+            auto decls = parseDeclaration(begin, end, context);
+            if (!decls.empty())
+            {
+                result.push_back(
+                    std::make_unique<Syntax::OverlayDeclaration>(start, begin, base, base, std::move(decls[0])));
+            }
+        }
+        return result;
     }
 
     if (type == Lexer::TokenType::ProcedureKeyword)
@@ -268,13 +282,18 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
                 while (begin != end && begin->getTokenType() != Lexer::TokenType::CloseParentheses)
                 {
                     auto paramDecls = parseDeclaration(begin, end, context);
-                    for (auto& p : paramDecls) parameters.push_back(std::move(p));
-                    
-                    if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon) begin++; // NOLINT(*-branch-clone)
-                    else if (begin != end && begin->getTokenType() == Lexer::TokenType::Comma) begin++;
-                    else if (begin != end && begin->getTokenType() != Lexer::TokenType::CloseParentheses) begin++; 
+                    for (auto& p : paramDecls)
+                        parameters.push_back(std::move(p));
+
+                    if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon)
+                        begin++; // NOLINT(*-branch-clone)
+                    else if (begin != end && begin->getTokenType() == Lexer::TokenType::Comma)
+                        begin++;
+                    else if (begin != end && begin->getTokenType() != Lexer::TokenType::CloseParentheses)
+                        begin++;
                 }
-                if (begin != end) begin++;
+                if (begin != end)
+                    begin++;
             }
             if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon)
             {
@@ -284,8 +303,10 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CToken
             {
                 if (auto body = parseBlock(begin, end, context))
                 {
-                    if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon) begin++;
-                    result.push_back(std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters), std::move(body)));
+                    if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon)
+                        begin++;
+                    result.push_back(std::make_unique<Syntax::ProcedureDeclaration>(
+                        start, begin, name, std::move(parameters), std::move(body)));
                 }
             }
         }
@@ -307,8 +328,8 @@ std::unique_ptr<Syntax::Statement> parseStatement(Lexer::CTokenIterator& begin, 
         if (iter != end && iter->getTokenType() == Lexer::TokenType::Assignment)
         {
             auto id = begin;
-            begin++; 
-            begin++; 
+            begin++;
+            begin++;
             auto expr = parseExpression(begin, end, context);
             if (begin != end && begin->getTokenType() == Lexer::TokenType::SemiColon)
             {
@@ -319,7 +340,9 @@ std::unique_ptr<Syntax::Statement> parseStatement(Lexer::CTokenIterator& begin, 
                 return std::make_unique<Syntax::AssignmentStatement>(id, begin, id, std::move(expr));
             }
         }
-        else if (iter != end && (iter->getTokenType() == Lexer::TokenType::OpenParentheses || iter->getTokenType() == Lexer::TokenType::SemiColon))
+        else if (iter != end
+                 && (iter->getTokenType() == Lexer::TokenType::OpenParentheses
+                     || iter->getTokenType() == Lexer::TokenType::SemiColon))
         {
             // Call: id(...) or id;
             auto expr = parseExpression(begin, end, context);
@@ -338,7 +361,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(Lexer::CTokenIterator& begin, 
     {
         auto start = begin;
         begin++;
-        if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier) 
+        if (begin != end && begin->getTokenType() == Lexer::TokenType::Identifier)
         {
             auto label = begin;
             begin++;
@@ -387,7 +410,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(Lexer::CTokenIterator& begin, 
             return std::make_unique<Syntax::CodeStatement>(start, begin);
         }
     }
-    
+
     if (begin->getTokenType() == Lexer::TokenType::ForKeyword)
     {
         auto start = begin;
@@ -414,7 +437,9 @@ std::unique_ptr<Syntax::Statement> parseStatement(Lexer::CTokenIterator& begin, 
                             auto body = parseStatement(begin, end, context);
                             if (startExpr && stepExpr && untilExpr && body)
                             {
-                                return std::make_unique<Syntax::ForStatement>(start, begin, var, std::move(startExpr), std::move(stepExpr), std::move(untilExpr), std::move(body));
+                                return std::make_unique<Syntax::ForStatement>(start, begin, var, std::move(startExpr),
+                                                                              std::move(stepExpr), std::move(untilExpr),
+                                                                              std::move(body));
                             }
                         }
                     }
@@ -450,23 +475,26 @@ std::unique_ptr<Syntax::Expression> parseExpression(Lexer::CTokenIterator& begin
     {
         return nullptr;
     }
-    
+
     std::unique_ptr<Syntax::Expression> left;
-    
+
     if (begin->getTokenType() == Lexer::TokenType::Identifier)
     {
         auto id = begin;
         begin++;
         // Hack: consume () for procedure calls to allow parsing as expression
-        if (begin != end && begin->getTokenType() == Lexer::TokenType::OpenParentheses) {
+        if (begin != end && begin->getTokenType() == Lexer::TokenType::OpenParentheses)
+        {
             begin++;
-            if (begin != end && begin->getTokenType() == Lexer::TokenType::CloseParentheses) {
+            if (begin != end && begin->getTokenType() == Lexer::TokenType::CloseParentheses)
+            {
                 begin++;
             }
         }
         left = std::make_unique<Syntax::IdentifierExpression>(id, begin, id);
     }
-    else if (begin->getTokenType() == Lexer::TokenType::Literal || begin->getTokenType() == Lexer::TokenType::StringLiteral)
+    else if (begin->getTokenType() == Lexer::TokenType::Literal
+             || begin->getTokenType() == Lexer::TokenType::StringLiteral)
     {
         auto lit = begin;
         begin++;
@@ -490,23 +518,26 @@ std::unique_ptr<Syntax::Expression> parseExpression(Lexer::CTokenIterator& begin
                     auto base = parseExpression(begin, end, context);
                     if (s && w && base)
                     {
-                        return std::make_unique<Syntax::PartWordExpression>(start, begin, std::move(base), std::move(s), std::move(w));
+                        return std::make_unique<Syntax::PartWordExpression>(start, begin, std::move(base), std::move(s),
+                                                                            std::move(w));
                     }
                 }
             }
         }
     }
-    
+
     if (left && begin != end)
     {
         auto type = begin->getTokenType();
-        if (type == Lexer::TokenType::Plus || type == Lexer::TokenType::Minus || type == Lexer::TokenType::Asterisk || type == Lexer::TokenType::Division)
+        if (type == Lexer::TokenType::Plus || type == Lexer::TokenType::Minus || type == Lexer::TokenType::Asterisk
+            || type == Lexer::TokenType::Division)
         {
             auto op = begin;
             begin++;
             if (auto right = parseExpression(begin, end, context))
             {
-                return std::make_unique<Syntax::BinaryExpression>(left->begin(), right->end(), std::move(left), op, std::move(right));
+                return std::make_unique<Syntax::BinaryExpression>(left->begin(), right->end(), std::move(left), op,
+                                                                  std::move(right));
             }
         }
     }

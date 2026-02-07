@@ -50,7 +50,7 @@ inline bool isScalar(const Type& type)
 }
 
 // Stub for template specializations used in diagnostics
-}
+} // namespace coral66::Semantics
 
 namespace coral66::diag
 {

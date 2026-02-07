@@ -8,5 +8,5 @@
 
 namespace coral66::Semantics
 {
-    // Minimal implementation for now
+// Minimal implementation for now
 }

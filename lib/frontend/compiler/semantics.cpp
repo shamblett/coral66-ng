@@ -22,7 +22,8 @@ std::uint64_t Type::getAlignOf(const ProgramInterface& program) const
 
 bool Type::operator==(const Type& rhs) const
 {
-    if (index() != rhs.index()) return false;
+    if (index() != rhs.index())
+        return false;
     return match([&]<typename T0>(const T0& t) { return t.equalsImpl(rhs.as<std::decay_t<T0>>()); });
 }
 
@@ -33,14 +34,16 @@ bool Type::operator!=(const Type& rhs) const
 
 // PrimitiveType
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t PrimitiveType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
+std::uint64_t PrimitiveType::getSizeOfImpl(
+    [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     // Simplified: 4 bytes for Integer/Floating, 4 for Bits
     return 4;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t PrimitiveType::getAlignOfImpl(const ProgramInterface&) const // NOLINT(*-convert-member-functions-to-static)
+std::uint64_t
+    PrimitiveType::getAlignOfImpl(const ProgramInterface&) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
 }
@@ -48,13 +51,15 @@ std::uint64_t PrimitiveType::getAlignOfImpl(const ProgramInterface&) const // NO
 // FixedType
 std::uint64_t FixedType::getSizeOfImpl(const ProgramInterface&) const
 {
-    if (m_totalBits <= 32) return 4;
+    if (m_totalBits <= 32)
+        return 4;
     return 8;
 }
 
 std::uint64_t FixedType::getAlignOfImpl(const ProgramInterface&) const
 {
-    if (m_totalBits <= 32) return 4;
+    if (m_totalBits <= 32)
+        return 4;
     return 8;
 }
 
@@ -62,7 +67,8 @@ std::uint64_t FixedType::getAlignOfImpl(const ProgramInterface&) const
 std::uint64_t ArrayType::getSizeOfImpl(const ProgramInterface& program) const
 {
     std::uint64_t elements = 1;
-    for (auto d : m_dimensions) elements *= d;
+    for (auto d : m_dimensions)
+        elements *= d;
     return elements * m_elementType->getSizeOf(program);
 }
 
@@ -77,7 +83,7 @@ bool ArrayType::equalsImpl(const ArrayType& rhs) const
 }
 
 // TableType
-std::uint64_t TableType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const
+std::uint64_t TableType::getSizeOfImpl([[maybe_unused]] const ProgramInterface& program) const
 {
     if (auto* def = std::get_if<TableDefinition>(&m_info->type))
     {
@@ -87,7 +93,8 @@ std::uint64_t TableType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& p
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t TableType::getAlignOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
+std::uint64_t TableType::getAlignOfImpl(
+    [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
 }
@@ -99,13 +106,15 @@ bool TableType::equalsImpl(const TableType& rhs) const
 
 // OverlayType
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t OverlayType::getSizeOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
+std::uint64_t OverlayType::getSizeOfImpl(
+    [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 0;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t OverlayType::getAlignOfImpl([[maybe_unused]]const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
+std::uint64_t OverlayType::getAlignOfImpl(
+    [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
 }
@@ -116,14 +125,18 @@ bool OverlayType::equalsImpl(const OverlayType& rhs) const
 }
 
 // ProcedureType
-bool ProcedureType::equalsImpl([[maybe_unused]]const ProcedureType& rhs) const
+bool ProcedureType::equalsImpl([[maybe_unused]] const ProcedureType& rhs) const
 {
-    if (*m_returnType != *rhs.m_returnType) return false;
-    if (m_parameters.size() != rhs.m_parameters.size()) return false;
+    if (*m_returnType != *rhs.m_returnType)
+        return false;
+    if (m_parameters.size() != rhs.m_parameters.size())
+        return false;
     for (size_t i = 0; i < m_parameters.size(); ++i)
     {
-        if (*m_parameters[i].type != *rhs.m_parameters[i].type) return false;
-        if (m_parameters[i].isValue != rhs.m_parameters[i].isValue) return false;
+        if (*m_parameters[i].type != *rhs.m_parameters[i].type)
+            return false;
+        if (m_parameters[i].isValue != rhs.m_parameters[i].isValue)
+            return false;
     }
     return true;
 }

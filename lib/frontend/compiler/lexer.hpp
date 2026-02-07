@@ -30,7 +30,6 @@
 namespace coral66
 {
 
-
 template <class T>
 class SourceObject;
 
@@ -88,14 +87,7 @@ std::vector<CToken> toCTokens(PPTokenIterator begin, PPTokenIterator end, const 
 
 using IntervalMap = std::vector<std::tuple<std::uint64_t, std::uint64_t, std::uint64_t>>;
 
-
-
-
 static_assert(!std::is_polymorphic_v<PPToken>);
-
-
-
-
 
 static_assert(!std::is_polymorphic_v<CToken>);
 

@@ -26,4 +26,4 @@
  * (CompoundStatement, etc.).
  */
 
-//Empty for Coral66 at the moment
+// Empty for Coral66 at the moment

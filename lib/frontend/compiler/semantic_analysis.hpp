@@ -25,13 +25,18 @@ class SemanticAnalysis final : public ProgramInterface
     std::vector<coral66::IntrVarPtr<Useable>> m_globalDeclarations;
     bool m_isGlobalScope = true;
     std::unordered_map<std::string_view, const Useable*> m_symbolTable;
-    
+
 public:
-    SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);
+    SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(),
+                     bool* errors = nullptr);
 
-    [[nodiscard]] const LanguageOptions& getLanguageOptions() const override { return m_sourceInterface.getLanguageOptions(); }
+    [[nodiscard]] const LanguageOptions& getLanguageOptions() const override
+    {
+        return m_sourceInterface.getLanguageOptions();
+    }
 
-    friend Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors);
+    friend Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter,
+                           bool* errors);
 
     void visit(const Syntax::Program& node);
     void visit(const Syntax::Block& node);
