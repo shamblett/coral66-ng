@@ -8,8 +8,8 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "supporttest",
     srcs = [
-        "IntrusiveVariantAllocatorTests.cpp",
-        "IntrusiveVariantValueTests.cpp",
+        "intrusive_variant_allocator_tests.cpp",
+        "intrusive_variant_value_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
