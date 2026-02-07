@@ -8,11 +8,11 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "backendtest",
     srcs = [
-        "CodeGeneratorTests.cpp",
-        "Common.cpp",
+        "code_generator_tests.cpp",
+        "common.cpp",
     ],
     hdrs = [
-        "Common.hpp",
+        "common.hpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [

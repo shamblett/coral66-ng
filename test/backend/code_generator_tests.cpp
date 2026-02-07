@@ -7,7 +7,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
 
-#include "Common.hpp"
+#include "common.hpp"
 #include "lib/backend//code_generation.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
