@@ -267,7 +267,7 @@ public:
     void destroy(coral66::not_null<const Base> object)
     {
         Base* casted = const_cast<Base*>(object.get());
-        std::byte* pointerIntoObject = reinterpret_cast<std::byte*>(casted);
+        auto* pointerIntoObject = reinterpret_cast<std::byte*>(casted);
         auto slab = std::lower_bound(m_slabs.begin(), m_slabs.end(), pointerIntoObject,
                                      [](const std::unique_ptr<Slab>& slab1, std::byte* value)
                                      { return std::end(slab1->storage) < value; });

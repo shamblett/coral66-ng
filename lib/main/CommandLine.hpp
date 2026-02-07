@@ -68,17 +68,17 @@ public:
         return m_alternatives;
     }
 
-    constexpr CLIMultiArg getMultiArg() const
+    [[nodiscard]] constexpr CLIMultiArg getMultiArg() const
     {
         return m_multiArg;
     }
 
-    constexpr std::string_view getDescription() const
+    [[nodiscard]] constexpr std::string_view getDescription() const
     {
         return m_description;
     }
 
-    constexpr std::string_view getFirstOptionString() const
+    [[nodiscard]] constexpr std::string_view getFirstOptionString() const
     {
         return {m_firstOptionString.data(), m_firstOptionString.size()};
     }
@@ -490,7 +490,7 @@ template <class T, std::size_t size = 32>
 class SmallFunction;
 
 template <class Ret, class... Params, std::size_t size>
-class SmallFunction<Ret(Params...), size>
+class SmallFunction<Ret(Params...), size> // NOLINT(*-pro-type-member-init)
 {
     alignas(std::max_align_t) std::byte m_storage[size];
     Ret (*m_call)(std::byte*, Params...) = nullptr;
@@ -505,7 +505,7 @@ public:
     SmallFunction() = default;
 
     template <class F>
-    SmallFunction(F&& f) : m_call(call<std::remove_reference_t<F>>)
+    SmallFunction(F&& f) : m_call(call<std::remove_reference_t<F>>) // NOLINT(*-forwarding-reference-overload)
     {
         static_assert(std::is_trivially_destructible_v<
                           std::remove_reference_t<F>> && sizeof(std::remove_reference_t<F>) <= sizeof(m_storage));

@@ -460,7 +460,7 @@ public:
     }
 
     template <class V>
-    IntrusiveVariantValue(V&&) noexcept
+    IntrusiveVariantValue(V&&) noexcept // NOLINT(*-forwarding-reference-overload)
     {
         CLD_UNREACHABLE;
     }
@@ -500,7 +500,7 @@ public:
     template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
     IntrusiveVariantValue(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>)
     {
-        new (this->m_storage) T(std::move(value));
+        new (this->m_storage) T(std::forward<T>(value));
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
@@ -512,12 +512,12 @@ public:
         constexpr auto var = Base::template indexOf<T>();
         if (this->m_index == var)
         {
-            this->get().template as<T>() = std::move(value);
+            this->get().template as<T>() = std::forward<T>(value);
         }
         else
         {
             this->destruct();
-            new (this->m_storage) T(std::move(value));
+            new (this->m_storage) T(std::forward<T>(value));
             this->m_index = var;
         }
         return *this;
@@ -569,7 +569,7 @@ public:
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, Base &&), sizeof...(SubClasses)> moveConstructors = {
             +[](std::byte* storage, Base&& value) { new (storage) SubClasses(static_cast<SubClasses&&>(value)); }...};
-        moveConstructors[this->m_index](this->m_storage, std::move(value));
+        moveConstructors[this->m_index](this->m_storage, std::forward<U>(value));
     }
 
     template <class T, class... Args, std::enable_if_t<(std::is_same_v<T, SubClasses> || ...)>* = nullptr>

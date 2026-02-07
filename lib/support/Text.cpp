@@ -123,8 +123,8 @@ unsigned coral66::unsafeColumnWidth(std::string_view const text)
     for (size_t i = 0, e = text.size(); i < e; i += length)
     {
         length = llvm::getNumBytesForUTF8(text[i]);
-        std::array<llvm::UTF32, 1> buf;
-        const llvm::UTF8* start = reinterpret_cast<const llvm::UTF8*>(text.data() + i);
+        std::array<llvm::UTF32, 1> buf{};
+        const auto* start = reinterpret_cast<const llvm::UTF8*>(text.data() + i);
         llvm::UTF32* target = buf.data();
         if (llvm::conversionOK
             != ConvertUTF8toUTF32(&start, start + length, &target, target + 1, llvm::strictConversion))
@@ -144,5 +144,5 @@ std::string coral66::to_string(const llvm::APFloat& apFloat)
 {
     llvm::SmallString<25> number;
     apFloat.toString(number, 0, 3, false);
-    return std::string(number.begin(), number.end());
+    return {number.begin(), number.end()};
 }

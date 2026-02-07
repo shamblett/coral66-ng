@@ -40,7 +40,7 @@ coral66::Triple coral66::Triple::native()
 #if defined(__GNUC__)
     environment = Environment ::GNU;
 #endif
-    return Triple(architecture, operatingSystem, environment);
+    return {architecture, operatingSystem, environment};
 }
 
 coral66::Triple coral66::Triple::fromString(std::string_view string)
@@ -66,5 +66,5 @@ coral66::Triple coral66::Triple::fromString(std::string_view string)
     {
         environment = Environment::GNU;
     }
-    return Triple(architecture, platform, environment);
+    return {architecture, platform, environment};
 }

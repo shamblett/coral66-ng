@@ -706,7 +706,7 @@ using ordered_map = ::tsl::ordered_map<Key, Mapped, Hash, KeyEqual, Allocator, V
 } // namespace coral66
 
 template <class T>
-struct std::hash<coral66::not_null<T>>
+struct std::hash<coral66::not_null<T>> // NOLINT(*-dcl58-cpp)
 {
     std::size_t operator()(coral66::not_null<T> value) const
     {

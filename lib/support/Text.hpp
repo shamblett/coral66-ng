@@ -124,7 +124,7 @@ BackInserter stringOfSameWidth(std::string_view const original, char characterTo
 
 inline std::string to_string(std::string_view stringView)
 {
-    return std::string(stringView.begin(), stringView.end());
+    return {stringView.begin(), stringView.end()};
 }
 
 namespace Constexpr
@@ -133,9 +133,8 @@ template <std::size_t maxSize>
 constexpr MaxVector<char, maxSize> utf32ToUtf8(std::u32string_view const stringView)
 {
     MaxVector<char, maxSize> result;
-    for (std::size_t i = 0; i < stringView.size(); i++)
+    for (char32_t code : stringView)
     {
-        char32_t code = stringView[i];
         if (code <= 0x7F)
         {
             result.push_back(code);

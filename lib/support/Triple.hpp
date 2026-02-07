@@ -46,17 +46,17 @@ public:
 
     Triple(Architecture architecture, Platform operatingSystem, Environment environment);
 
-    Architecture getArchitecture() const
+    [[nodiscard]] Architecture getArchitecture() const
     {
         return m_architecture;
     }
 
-    Platform getPlatform() const
+    [[nodiscard]] Platform getPlatform() const
     {
         return m_operatingSystem;
     }
 
-    Environment getEnvironment() const
+    [[nodiscard]] Environment getEnvironment() const
     {
         return m_environment;
     }
