@@ -1,9 +1,9 @@
 
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #include "main.hpp"
 
@@ -41,15 +41,16 @@ CORAL66_CLI_OPT(SYNTAX_ONLY, ("-fsyntax-only"))("Stop after semantic analysis an
 CORAL66_CLI_OPT(TARGET, ("--target=<arg>", "-target <arg>"), (std::string_view, arg))("Compiler target triple to use");
 
 CORAL66_CLI_OPT(DEFINE_MACRO, ("-D<macro>=<value>", "-D<macro>", "--define-macro <macro>", "--define-macro=<macro>"),
-            (std::string_view, macro), (std::string_view, value))
+                (std::string_view, macro), (std::string_view, value))
 ("Define macro for the whole translation unit", coral66::CLIMultiArg::List);
 
 CORAL66_CLI_OPT(EMIT_LLVM, ("-emit-llvm"))("Use LLVM IR instead of machine code and assembly");
 
-CORAL66_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"), (std::uint8_t, level))("Optimization level");
+CORAL66_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"),
+                (std::uint8_t, level))("Optimization level");
 
 CORAL66_CLI_OPT(INCLUDES, ("-I<dir>", "-I <dir>", "--include-directory <dir>", "--include-directory=<dir>"),
-            (std::string_view, dir))
+                (std::string_view, dir))
 ("Additional include directories", coral66::CLIMultiArg::List);
 
 CORAL66_CLI_OPT(ISYSTEM, ("-isystem<dir>", "-isystem <dir>"), (std::string, dir))
@@ -73,7 +74,7 @@ CORAL66_CLI_OPT(STANDARD_VERSION, ("-std=<arg>", "--std=<arg>", "--std <arg>"), 
 ("C standard version");
 
 CORAL66_CLI_OPT(WARNINGS, ("-W[no-]<warning>", "--warn-[no-]<warning>", "--warn-=[no-]<warning>"),
-            (std::string_view, warning))
+                (std::string_view, warning))
 ("Enable/disable specified warning", coral66::CLIMultiArg::List);
 
 CORAL66_CLI_OPT(G0, ("-g0"))("No debug info");
@@ -146,7 +147,7 @@ CORAL66_CLI_OPT(CLZERO, ("-m[no-]mwaitx"))("Enable x86 CLZERO extensions");
 
 CORAL66_CLI_OPT(PKU, ("-m[no-]pku"))("Enable x86 PKU extensions");
 
- // ReSharper disable once CppRedundantNamespaceDefinition
+// ReSharper disable once CppRedundantNamespaceDefinition
 namespace coral66::cli
 {
 template <>
@@ -162,7 +163,8 @@ struct InitialStorage<WARNINGS>
 namespace
 {
 template <class CL>
-void addUnixMacroStyle(coral66::PP::Options& ppOptions, const coral66::LanguageOptions& languageOptions, std::string_view const name, // NOLINT(*-prefer-static-over-anonymous-namespace)
+void addUnixMacroStyle(coral66::PP::Options& ppOptions, const coral66::LanguageOptions& languageOptions,
+                       std::string_view const name, // NOLINT(*-prefer-static-over-anonymous-namespace)
                        const CL&)
 {
     auto alloc = coral66::to_string(name);
@@ -175,7 +177,7 @@ void addUnixMacroStyle(coral66::PP::Options& ppOptions, const coral66::LanguageO
 }
 
 template <class Integer>
- // ReSharper disable once CppDFAUnreachableFunctionCall
+// ReSharper disable once CppDFAUnreachableFunctionCall
 Integer safeShiftLeft(Integer number, std::size_t value) // NOLINT(*-prefer-static-over-anonymous-namespace)
 {
     if (value >= std::numeric_limits<Integer>::digits)
@@ -187,8 +189,9 @@ Integer safeShiftLeft(Integer number, std::size_t value) // NOLINT(*-prefer-stat
 }
 
 template <class CL>
-coral66::PP::Options getTargetSpecificPreprocessorOptions(const coral66::LanguageOptions& languageOptions, // NOLINT(*-prefer-static-over-anonymous-namespace)
-                                                      const coral66::Triple& triple, const CL& cli)
+coral66::PP::Options getTargetSpecificPreprocessorOptions(
+    const coral66::LanguageOptions& languageOptions, // NOLINT(*-prefer-static-over-anonymous-namespace)
+    const coral66::Triple& triple, const CL& cli)
 {
     coral66::PP::Options result;
     if (triple.getArchitecture() == coral66::Architecture::x86_64)
@@ -243,10 +246,10 @@ coral66::PP::Options getTargetSpecificPreprocessorOptions(const coral66::Languag
     result.additionalMacros.emplace_back("__SCHAR_MAX__", "127");
     result.additionalMacros.emplace_back(
         "__SHRT_MAX__", coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfShort - 1)) - 1));
-    result.additionalMacros.emplace_back("__INT_MAX__",
-                                         coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfInt - 1)) - 1));
-    result.additionalMacros.emplace_back("__LONG_MAX__",
-                                         coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfLong - 1)) - 1));
+    result.additionalMacros.emplace_back(
+        "__INT_MAX__", coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfInt - 1)) - 1));
+    result.additionalMacros.emplace_back(
+        "__LONG_MAX__", coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfLong - 1)) - 1));
     result.additionalMacros.emplace_back("__LONG_LONG_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * 8 - 1)) - 1));
     std::size_t const wcharSize = languageOptions.sizeOf(languageOptions.wcharUnderlyingType);
     bool const wcharSigned = coral66::LanguageOptions::isSigned(languageOptions.wcharUnderlyingType);
@@ -262,8 +265,8 @@ coral66::PP::Options getTargetSpecificPreprocessorOptions(const coral66::Languag
                                          coral66::to_string(safeShiftLeft(1ull, (8 * ptrDiffSize - 1)) - 1));
     result.additionalMacros.emplace_back(
         "__INTPTR_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * languageOptions.sizeOfVoidStar - 1)) - 1));
-    result.additionalMacros.emplace_back("__UNTPTR_MAX__",
-                                         coral66::to_string(safeShiftLeft(1ull, (8 * languageOptions.sizeOfVoidStar)) - 1));
+    result.additionalMacros.emplace_back(
+        "__UNTPTR_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * languageOptions.sizeOfVoidStar)) - 1));
 
     result.additionalMacros.emplace_back("__SIZEOF_DOUBLE__", "8");
     result.additionalMacros.emplace_back("__SIZEOF_FLOAT__", "4");
@@ -287,11 +290,11 @@ coral66::PP::Options getTargetSpecificPreprocessorOptions(const coral66::Languag
     result.additionalMacros.emplace_back("__UINTMAX_TYPE__", "unsigned long long");
     result.additionalMacros.emplace_back("__UINTMAX_C_SUFFIX__", "ULL");
     result.additionalMacros.emplace_back("__UINTMAX_WIDTH__", "64");
-    result.additionalMacros.emplace_back("__PTRDIFF_TYPE__",
-                                         coral66::to_string(coral66::LanguageOptions::string(languageOptions.ptrdiffType)));
+    result.additionalMacros.emplace_back(
+        "__PTRDIFF_TYPE__", coral66::to_string(coral66::LanguageOptions::string(languageOptions.ptrdiffType)));
     result.additionalMacros.emplace_back("__PTRDIFF_WIDTH__", coral66::to_string(ptrDiffSize * 8));
-    result.additionalMacros.emplace_back("__SIZE_TYPE__",
-                                         coral66::to_string(coral66::LanguageOptions::string(languageOptions.sizeTType)));
+    result.additionalMacros.emplace_back(
+        "__SIZE_TYPE__", coral66::to_string(coral66::LanguageOptions::string(languageOptions.sizeTType)));
     result.additionalMacros.emplace_back("__SIZE_WIDTH__", coral66::to_string(sizeTSize * 8));
     result.additionalMacros.emplace_back(
         "__WCHAR_TYPE__", coral66::to_string(coral66::LanguageOptions::string(languageOptions.wcharUnderlyingType)));
@@ -324,9 +327,10 @@ struct ValueIdentity
 };
 
 template <class CL>
-void setTargetFeatures(coral66::TargetFeatures& targetFeatures, const CL& cli, llvm::raw_ostream* reporter) // NOLINT(*-prefer-static-over-anonymous-namespace)
+void setTargetFeatures(coral66::TargetFeatures& targetFeatures, const CL& cli,
+                       llvm::raw_ostream* reporter) // NOLINT(*-prefer-static-over-anonymous-namespace)
 {
-    auto tryApply = [&]<typename T0>([[maybe_unused]]T0 opt, coral66::TargetFeatures::Features const feature)
+    auto tryApply = [&]<typename T0>([[maybe_unused]] T0 opt, coral66::TargetFeatures::Features const feature)
     {
         constexpr auto& Opt = std::decay_t<T0>::value;
         if (cli.template pos<Opt>() >= 0)
@@ -335,8 +339,8 @@ void setTargetFeatures(coral66::TargetFeatures& targetFeatures, const CL& cli, l
             {
                 if (reporter)
                 {
-                    *reporter << coral66::Warnings::CLI::FLAG_N_IS_NOT_APPLICABLE_FOR_CURRENT_TARGET_ARCHITECTURE.argsCLI(
-                        Opt.getFirstOptionString());
+                    *reporter << coral66::Warnings::CLI::FLAG_N_IS_NOT_APPLICABLE_FOR_CURRENT_TARGET_ARCHITECTURE
+                                     .argsCLI(Opt.getFirstOptionString());
                 }
             }
             else
@@ -462,9 +466,10 @@ enum class Action
 };
 
 template <class CL>
-std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path cSourceFile, const coral66::Triple& triple, // NOLINT(*-prefer-static-over-anonymous-namespace)
-                                          const coral66::LanguageOptions& languageOptions, const CL& cli,
-                                          llvm::raw_ostream* reporter)
+std::optional<coral66::fs::path>
+    compileCFile(Action action, coral66::fs::path cSourceFile,
+                 const coral66::Triple& triple, // NOLINT(*-prefer-static-over-anonymous-namespace)
+                 const coral66::LanguageOptions& languageOptions, const CL& cli, llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
     if (cli.template get<TIME>())
@@ -492,14 +497,16 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> ppTokenTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> ppTokenTimer;
+    {
+        std::optional<llvm::Timer> ppTokenTimer;
         ppTokenTimer.emplace("Lexing preprocessor tokens",
                              "Time it took to lex all preprocessor tokens in " + cSourceFile.string(), *timer);
         ppTokenTimeRegion.emplace(*ppTokenTimer);
     }
 
     bool errors = false;
-    auto pptokens = coral66::Lexer::tokenize(std::move(input), &languageOptions, reporter, &errors, cSourceFile.string());
+    auto pptokens =
+        coral66::Lexer::tokenize(std::move(input), &languageOptions, reporter, &errors, cSourceFile.string());
     if (errors)
     {
         return {};
@@ -508,7 +515,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> ppTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> ppTimer;
+    {
+        std::optional<llvm::Timer> ppTimer;
         ppTimer.emplace("Preprocessor", "Time it took to preprocess " + cSourceFile.string(), *timer);
         ppTimeRegion.emplace(*ppTimer);
     }
@@ -566,7 +574,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> cTokenTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> cTokenTimer;
+    {
+        std::optional<llvm::Timer> cTokenTimer;
         cTokenTimer.emplace("C Token", "Time it took turn PP Tokens into C Tokens " + cSourceFile.string(), *timer);
         cTokenTimeRegion.emplace(*cTokenTimer);
     }
@@ -580,7 +589,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> parserTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> parserTimer;
+    {
+        std::optional<llvm::Timer> parserTimer;
         parserTimer.emplace("Parser", "Time it took to parse " + cSourceFile.string(), *timer);
         parserTimeRegion.emplace(*parserTimer);
     }
@@ -594,7 +604,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> semanticsTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> semanticsTimer;
+    {
+        std::optional<llvm::Timer> semanticsTimer;
         semanticsTimer.emplace("Semantics", "Time it took to semantically analyze " + cSourceFile.string(), *timer);
         semanticsTimeRegion.emplace(*semanticsTimer);
     }
@@ -612,7 +623,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> codegenTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> codegenTimer;
+    {
+        std::optional<llvm::Timer> codegenTimer;
         codegenTimer.emplace("Codegen", "Time it took to generate LLVM IR for " + cSourceFile.string(), *timer);
         codegenTimeRegion.emplace(*codegenTimer);
     }
@@ -626,7 +638,7 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
     }
     if (cli.template get<OPT>())
     {
- // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
+        // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
         switch (cli.template get<OPT>()->value_or(1))
         {
             case 0: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
@@ -714,9 +726,10 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 
     std::optional<llvm::TimeRegion> compileTimeRegion;
     if (timer)
-    {std::optional<llvm::Timer> compileTimer;
-        compileTimer.emplace("Compile",
-                             "Time it took for LLVM to generate native object code " + cSourceFile.string(), *timer);
+    {
+        std::optional<llvm::Timer> compileTimer;
+        compileTimer.emplace("Compile", "Time it took for LLVM to generate native object code " + cSourceFile.string(),
+                             *timer);
         compileTimeRegion.emplace(*compileTimer);
     }
     llvm::PassBuilder passBuilder(targetMachine.get());
@@ -767,9 +780,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
         modulePassManager.run(module, moduleAnalysisManager);
         llvm::legacy::PassManager codegenPass;
         if (targetMachine->addPassesToEmitFile(codegenPass, os, nullptr,
-                                               action == Action::AssemblyOutput ?
-                                                   llvm::CodeGenFileType::AssemblyFile :
-                                                   llvm::CodeGenFileType::ObjectFile))
+                                               action == Action::AssemblyOutput ? llvm::CodeGenFileType::AssemblyFile :
+                                                                                  llvm::CodeGenFileType::ObjectFile))
         {
             return {};
         }
@@ -783,7 +795,8 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
 }
 
 template <class CL>
-int doActionOnAllFiles(Action action, const coral66::LanguageOptions& languageOptions, const coral66::Triple& triple, // NOLINT(*-prefer-static-over-anonymous-namespace)
+int doActionOnAllFiles(Action action, const coral66::LanguageOptions& languageOptions,
+                       const coral66::Triple& triple, // NOLINT(*-prefer-static-over-anonymous-namespace)
                        std::span<const std::string_view> files, const CL& cli, llvm::raw_ostream* reporter)
 {
     std::vector<coral66::fs::path> linkableFiles;
@@ -823,12 +836,13 @@ int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const
     llvm::InitializeAllAsmPrinters();
     llvm::InitializeAllAsmParsers();
 
-    auto cli = coral66::parseCommandLine<OUTPUT_FILE, COMPILE_ONLY, ASSEMBLY_OUTPUT, PREPROCESS_ONLY, TARGET, EMIT_LLVM,
-                                     OPT, DEFINE_MACRO, INCLUDES, PIE, PIC, FREESTANDING, HELP, VERSION,
-                                     STANDARD_VERSION, WARNINGS, ISYSTEM, EMIT_ALL_DECLS, G0, G1, G2, G3, SYNTAX_ONLY,
-                                     TIME, MMX, SSE, THREEDNOWA, SSE2, SSE3, SSSE3, SSE4_1, SSE4_2, AVX, AVX2, AES,
-                                     PCLMUL, FSGSBASE, RDRND, PTWRITE, SSE4A, XOPA, FMA4, LWP, BMI, BMI2, LZCNT, FXSR,
-                                     XSAVE, XSAVEOPT, TBM, THREEDNOW, RTM, MWAITX, CLZERO, PKU>(elements);
+    auto cli =
+        coral66::parseCommandLine<OUTPUT_FILE, COMPILE_ONLY, ASSEMBLY_OUTPUT, PREPROCESS_ONLY, TARGET, EMIT_LLVM, OPT,
+                                  DEFINE_MACRO, INCLUDES, PIE, PIC, FREESTANDING, HELP, VERSION, STANDARD_VERSION,
+                                  WARNINGS, ISYSTEM, EMIT_ALL_DECLS, G0, G1, G2, G3, SYNTAX_ONLY, TIME, MMX, SSE,
+                                  THREEDNOWA, SSE2, SSE3, SSSE3, SSE4_1, SSE4_2, AVX, AVX2, AES, PCLMUL, FSGSBASE,
+                                  RDRND, PTWRITE, SSE4A, XOPA, FMA4, LWP, BMI, BMI2, LZCNT, FXSR, XSAVE, XSAVEOPT, TBM,
+                                  THREEDNOW, RTM, MWAITX, CLZERO, PKU>(elements);
     if (cli.get<HELP>())
     {
         if (out)

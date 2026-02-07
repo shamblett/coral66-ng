@@ -1,8 +1,8 @@
 /*
-* Project: coral66
-* Author : Copyright S. Hamblett <steve.hamblett@linux.com>
-* Date   : 31/01/2026
-*/
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
 
 #pragma once
 
@@ -46,8 +46,8 @@ class CommandLineOption : public CommandLineOptionBase
 public:
     constexpr CommandLineOption(type_identity<ReturnType>, std::string_view const firstOptionString,
                                 std::tuple<Alternatives...> alternatives,
-                                std::array<std::string_view, args> argNameToRetTypePos, std::string_view const description,
-                                CLIMultiArg const multiArg)
+                                std::array<std::string_view, args> argNameToRetTypePos,
+                                std::string_view const description, CLIMultiArg const multiArg)
         : m_firstOptionString(firstOptionString),
           m_alternatives(std::move(alternatives)),
           m_argNameToRetTypePos(argNameToRetTypePos),
@@ -121,14 +121,15 @@ constexpr std::array<std::variant<Whitespace, Arg, Text, Ellipsis, NegationOptio
     tupleToArray(const std::tuple<Args...>& tuple)
 {
     return std::apply(
-        [](auto&&... values) {
+        [](auto&&... values)
+        {
             return std::array<std::variant<Whitespace, Arg, Text, Ellipsis, NegationOption>, sizeof...(Args)>{
                 values...};
         },
         tuple);
 }
 
- // ReSharper disable once CppDFAUnreachableFunctionCall
+// ReSharper disable once CppDFAUnreachableFunctionCall
 constexpr std::optional<std::string_view> findArg(std::string_view const arg)
 {
     std::size_t start = 0;
@@ -148,7 +149,7 @@ constexpr std::optional<std::string_view> findArg(std::string_view const arg)
     return arg.substr(start, end - start + 1);
 }
 
- // ReSharper disable once CppDFAUnreachableFunctionCall
+// ReSharper disable once CppDFAUnreachableFunctionCall
 constexpr const char* skipWhitespace(std::string_view const arg)
 {
     const char* start = arg.data();
@@ -156,11 +157,11 @@ constexpr const char* skipWhitespace(std::string_view const arg)
     {
         start++;
     }
- // ReSharper disable once CppDFALocalValueEscapesFunction
+    // ReSharper disable once CppDFALocalValueEscapesFunction
     return start;
 }
 
- // ReSharper disable once CppDFAUnreachableFunctionCall
+// ReSharper disable once CppDFAUnreachableFunctionCall
 constexpr const char* skipLetters(std::string_view arg)
 {
     while (!arg.empty()
@@ -168,11 +169,11 @@ constexpr const char* skipLetters(std::string_view arg)
     {
         arg.remove_prefix(1);
     }
- // ReSharper disable once CppDFALocalValueEscapesFunction
+    // ReSharper disable once CppDFALocalValueEscapesFunction
     return arg.data();
 }
 
- // ReSharper disable once CppDFAUnreachableFunctionCall
+// ReSharper disable once CppDFAUnreachableFunctionCall
 constexpr const char* findClosingSquareBracket(std::string_view const arg)
 {
     const char* start = arg.data();
@@ -180,7 +181,7 @@ constexpr const char* findClosingSquareBracket(std::string_view const arg)
     {
         start++;
     }
- // ReSharper disable once CppDFALocalValueEscapesFunction
+    // ReSharper disable once CppDFALocalValueEscapesFunction
     return start;
 }
 
@@ -291,8 +292,7 @@ constexpr std::array<std::pair<std::string_view, bool>, size> evaluateOptional(M
                             {
                                 auto argsFiltered = filterOutArgs(tokens...);
                                 return std::apply([arg](auto&&... inputArgs)
-                                                  { return ((arg == inputArgs.value) || ...); },
-                                                  argsFiltered);
+                                                  { return ((arg == inputArgs.value) || ...); }, argsFiltered);
                             },
                             args)
                         && ...);
@@ -377,9 +377,9 @@ struct Pack
         // libc++ until either version LLVM 11 or 12 does not support constexpr std::array<T,0>
         if constexpr (std::tuple_size_v<std::decay_t<decltype(allArgsTuple)>> != 0)
         {
-            constexpr auto allArgsSVArray = std::apply(
-                [](auto&&... input) { return std::array<std::string_view, sizeof...(input)>{input.value...}; },
-                allArgsTuple);
+            constexpr auto allArgsSVArray =
+                std::apply([](auto&&... input)
+                           { return std::array<std::string_view, sizeof...(input)>{input.value...}; }, allArgsTuple);
             constexpr auto uniqueSet = unique(allArgsSVArray);
             constexpr auto foundOptionals = evaluateOptional<uniqueSet.size()>(uniqueSet, tuple);
             return std::tuple{tuple, foundOptionals, firstString};
@@ -433,7 +433,7 @@ constexpr auto parseOptions(std::string_view description, CLIMultiArg multiArg =
         }
     }();
     constexpr auto value = std::apply(
-        [&]([[maybe_unused]]auto&&... values)
+        [&]([[maybe_unused]] auto&&... values)
         {
             constexpr auto arguments = std::get<1>(parsedTuple<T>);
             using Tuple = std::tuple<
@@ -453,7 +453,8 @@ constexpr auto parseOptions(std::string_view description, CLIMultiArg multiArg =
 
     return CommandLineOption(value, std::get<2>(parsedTuple<T>).view(), std::get<0>(parsedTuple<T>),
                              std::apply(
-                                 [](auto&&... values) {
+                                 [](auto&&... values)
+                                 {
                                      return std::array<std::string_view, sizeof...(values)>{
                                          std::decay_t<decltype(values.first)>::pointer->view()...};
                                  },
@@ -507,8 +508,8 @@ public:
     template <class F>
     SmallFunction(F&& f) : m_call(call<std::remove_reference_t<F>>) // NOLINT(*-forwarding-reference-overload)
     {
-        static_assert(std::is_trivially_destructible_v<
-                          std::remove_reference_t<F>> && sizeof(std::remove_reference_t<F>) <= sizeof(m_storage));
+        static_assert(std::is_trivially_destructible_v<std::remove_reference_t<F>>
+                      && sizeof(std::remove_reference_t<F>) <= sizeof(m_storage));
         constexpr std::size_t alignOfLambda = alignof(std::remove_reference_t<F>);
         static_assert(alignOfLambda <= alignof(std::max_align_t));
         new (m_storage) std::remove_reference_t<F>(std::forward<F>(f));
@@ -658,11 +659,11 @@ public:
 
         constexpr std::size_t storageIndex = indexOf(cliOption->getArgNames(), arg<cliOption, i, index>.value);
         constexpr bool isTupleVector = IsTuple<std::decay_t<typename ValueType<Storage>::type>>{};
-        using ArgTypeT = std::conditional_t<
-            isTupleVector, std::tuple_element<storageIndex, std::decay_t<typename ValueType<Storage>::type>>,
-            std::decay<typename ValueType<Storage>::type>>::type;
-        using ArgType =
-            std::conditional_t<IsOptional<ArgTypeT>{}, ValueType<ArgTypeT>, type_identity<ArgTypeT>>::type;
+        using ArgTypeT =
+            std::conditional_t<isTupleVector,
+                               std::tuple_element<storageIndex, std::decay_t<typename ValueType<Storage>::type>>,
+                               std::decay<typename ValueType<Storage>::type>>::type;
+        using ArgType = std::conditional_t<IsOptional<ArgTypeT>{}, ValueType<ArgTypeT>, type_identity<ArgTypeT>>::type;
 
         std::string_view text;
         if constexpr (std::is_same_v<cli::Char, ArgType>)
@@ -722,11 +723,7 @@ public:
                         {
                             m_queue.push_back([this] { m_storage.emplace_back(); });
                         }
-                        m_queue.push_back(
-                            [=, this]
-                            {
-                                std::get<storageIndex>(m_storage.back()) = value;
-                            });
+                        m_queue.push_back([=, this] { std::get<storageIndex>(m_storage.back()) = value; });
                     }
                     else
                     {
@@ -868,7 +865,7 @@ std::optional<Failure> checkAlternative(std::span<std::string_view>& commandLine
 {
     using AlternativeType = std::tuple_element_t<i, std::decay_t<decltype(cliOption->getAlternatives())>>;
     Mutator<cliOption, std::tuple_size_v<AlternativeType>, Storage> mutator(commandLine, storage);
-    auto failure = YComb{[&]<typename T0>(auto&& self, [[maybe_unused]]T0 indexT) -> std::optional<Failure>
+    auto failure = YComb{[&]<typename T0>(auto&& self, [[maybe_unused]] T0 indexT) -> std::optional<Failure>
                          {
                              constexpr std::size_t index = std::decay_t<T0>::value;
                              if (auto opt = evaluateArg<cliOption, i, index>(mutator))
@@ -939,9 +936,8 @@ bool checkAllAlternativesImpl(llvm::raw_ostream* reporter, std::span<std::string
     {
         return true;
     }
-    auto furthest =
-        std::max_element(failures.begin(), failures.end(),
-                         [](const Failure& lhs, const Failure& rhs) { return lhs.failedIndex < rhs.failedIndex; });
+    auto furthest = std::max_element(failures.begin(), failures.end(), [](const Failure& lhs, const Failure& rhs)
+                                     { return lhs.failedIndex < rhs.failedIndex; });
     if (furthest != failures.end() && reporter)
     {
         (*reporter) << (*furthest->message)();
@@ -1023,7 +1019,7 @@ public:
             [&](auto&&... values)
             {
                 (
-                    [&]<typename T0>([[maybe_unused]]T0&& tuple)
+                    [&]<typename T0>([[maybe_unused]] T0&& tuple)
                     {
                         using Tuple = std::decay_t<T0>;
                         using Pointer = std::tuple_element_t<0, Tuple>;
@@ -1052,7 +1048,7 @@ struct InitialStorage
 template <auto&... options>
 auto parseCommandLine(std::span<std::string_view> commandLine, llvm::raw_ostream* reporter = nullptr)
 {
-    [[maybe_unused]]constexpr auto tuple = std::make_tuple(detail::CommandLine::Pointer<&options>{}...);
+    [[maybe_unused]] constexpr auto tuple = std::make_tuple(detail::CommandLine::Pointer<&options>{}...);
     auto storage = std::make_tuple(std::tuple{
         detail::CommandLine::Pointer<&options>{},
         detail::CommandLine::OptionStorage<options>{::coral66::cli::InitialStorage<options>::getInitial()}, -1}...);
@@ -1064,19 +1060,20 @@ auto parseCommandLine(std::span<std::string_view> commandLine, llvm::raw_ostream
                 [&](auto&&... indices) -> bool
                 {
                     return (
-                        [&]<typename T0>([[maybe_unused]]T0 index) -> bool
-                                               {
-                                                   constexpr std::size_t i = T0::value;
-                                                   if (detail::CommandLine::checkAllAlternatives<
-                                                           std::tuple_element_t<i, decltype(tuple)>::pointer>(
-                                                           reporter, commandLine, std::get<1>(std::get<i>(storage))))
-                                                   {
-                                                       std::get<2>(std::get<i>(storage)) = counter;
-                                                       return true;
-                                                   }
-                                                   return false;
-                                               }(indices)
-                                               || ...);
+                        [&]<typename T0>([[maybe_unused]] T0 index)
+                            -> bool
+                                   {
+                                       constexpr std::size_t i = T0::value;
+                                       if (detail::CommandLine::checkAllAlternatives<
+                                               std::tuple_element_t<i, decltype(tuple)>::pointer>(
+                                               reporter, commandLine, std::get<1>(std::get<i>(storage))))
+                                       {
+                                           std::get<2>(std::get<i>(storage)) = counter;
+                                           return true;
+                                       }
+                                       return false;
+                                   }(indices)
+                                   || ...);
                 },
                 Constexpr::integerSequenceToTuple(std::make_index_sequence<sizeof...(options)>{})))
         {
@@ -1093,10 +1090,11 @@ auto parseCommandLine(std::span<std::string_view> commandLine, llvm::raw_ostream
 #define CORAL66_MACRO_NULL_SEP(NAME, i, REC, RES) REC RES
 
 #define CORAL66_MACRO_GEN_STRING(NAME, STRING, INDEX) \
-    constexpr static auto NAME## arg## INDEX = ::coral66::Constexpr::basic_fixed_string{STRING};
+    constexpr static auto NAME##arg##INDEX = ::coral66::Constexpr::basic_fixed_string{STRING};
 
-#define CORAL66_MACRO_GEN_STRINGS(NAME, ...) \
-    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_NULL_SEP, CORAL66_MACRO_GEN_STRING, __VA_ARGS__)
+#define CORAL66_MACRO_GEN_STRINGS(NAME, ...)                                                                    \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_NULL_SEP, CORAL66_MACRO_GEN_STRING, \
+            __VA_ARGS__)
 
 #define CORAL66_MACRO_REMOVE_PAREN(...) __VA_ARGS__
 
@@ -1104,35 +1102,40 @@ auto parseCommandLine(std::span<std::string_view> commandLine, llvm::raw_ostream
 
 #define CORAL66_MACRO_COMMA_SEP(NAME, i, REC, RES) REC, RES
 
-#define CORAL66_MACRO_LIST_STRING(NAME, STRING, INDEX) detail::NAME## arg## INDEX
+#define CORAL66_MACRO_LIST_STRING(NAME, STRING, INDEX) detail::NAME##arg##INDEX
 
-#define CORAL66_MACRO_LIST_STRINGS(NAME, ...) \
-    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_COMMA_SEP, CORAL66_MACRO_LIST_STRING, __VA_ARGS__)
+#define CORAL66_MACRO_LIST_STRINGS(NAME, ...)                                                                     \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_COMMA_SEP, CORAL66_MACRO_LIST_STRING, \
+            __VA_ARGS__)
 
 #define CORAL66_MACRO_LIST_STRINGS2(NAME, PACK) CORAL66_MACRO_LIST_STRINGS(NAME, CORAL66_MACRO_REMOVE_PAREN PACK)
 
 #define CORAL66_MACRO_STRINGIFY_SECOND(x, y) #y
 
 #define CORAL66_MACRO_GEN_BIND(NAME, STRING, INDEX) \
-    constexpr static auto NAME## bind## INDEX = ::coral66::Constexpr::basic_fixed_string{CORAL66_MACRO_STRINGIFY_SECOND STRING};
+    constexpr static auto NAME##bind##INDEX =       \
+        ::coral66::Constexpr::basic_fixed_string{CORAL66_MACRO_STRINGIFY_SECOND STRING};
 
-#define CORAL66_MACRO_GEN_BINDS(NAME, ...) \
-    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_NULL_SEP, CORAL66_MACRO_GEN_BIND, __VA_ARGS__)
+#define CORAL66_MACRO_GEN_BINDS(NAME, ...)                                                                    \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_NULL_SEP, CORAL66_MACRO_GEN_BIND, \
+            __VA_ARGS__)
 
-#define CORAL66_MACRO_LIST_BIND_DEFER(index, type, name) detail::name## bind## index, ::std::in_place_type<type>
+#define CORAL66_MACRO_LIST_BIND_DEFER(index, type, name) detail::name##bind##index, ::std::in_place_type<type>
 
 #define CORAL66_MACRO_GET_FIRST(x, y) x
 
-#define CORAL66_MACRO_LIST_BIND(NAME, ARG, INDEX) CORAL66_MACRO_LIST_BIND_DEFER(INDEX, CORAL66_MACRO_GET_FIRST ARG, NAME)
+#define CORAL66_MACRO_LIST_BIND(NAME, ARG, INDEX) \
+    CORAL66_MACRO_LIST_BIND_DEFER(INDEX, CORAL66_MACRO_GET_FIRST ARG, NAME)
 
-#define CORAL66_MACRO_LIST_BINDS(NAME, ...) \
-    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_COMMA_SEP, CORAL66_MACRO_LIST_BIND, __VA_ARGS__)
+#define CORAL66_MACRO_LIST_BINDS(NAME, ...)                                                                     \
+    P99_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), CORAL66_MACRO_COMMA_SEP, CORAL66_MACRO_LIST_BIND, \
+            __VA_ARGS__)
 
 #define CORAL66_MACRO_CLI_OPT_2(NAME, PACK)                                    \
-    namespace detail                                                       \
-    {                                                                      \
+    namespace detail                                                           \
+    {                                                                          \
     CORAL66_MACRO_GEN_STRINGS2(NAME, PACK)                                     \
-    }                                                                      \
+    }                                                                          \
     constexpr static auto NAME = ::coral66::detail::CommandLine::parseOptions< \
         ::coral66::detail::CommandLine::Pack<CORAL66_MACRO_LIST_STRINGS2(NAME, PACK)>>
 
@@ -1144,13 +1147,13 @@ auto parseCommandLine(std::span<std::string_view> commandLine, llvm::raw_ostream
 #define CORAL66_MACRO_CLI_OPT_8(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
 #define CORAL66_MACRO_CLI_OPT_9(...) CORAL66_CLI_OPT_VARARG(__VA_ARGS__)
 
-#define CORAL66_CLI_OPT_VARARG(NAME, PACK, ...)                                    \
-    namespace detail                                                           \
-    {                                                                          \
-    CORAL66_MACRO_GEN_STRINGS2(NAME, PACK)                                         \
-    CORAL66_MACRO_GEN_BINDS(NAME, __VA_ARGS__)                                     \
-    }                                                                          \
-    constexpr static auto NAME = ::coral66::detail::CommandLine::parseOptions<     \
+#define CORAL66_CLI_OPT_VARARG(NAME, PACK, ...)                                        \
+    namespace detail                                                                   \
+    {                                                                                  \
+    CORAL66_MACRO_GEN_STRINGS2(NAME, PACK)                                             \
+    CORAL66_MACRO_GEN_BINDS(NAME, __VA_ARGS__)                                         \
+    }                                                                                  \
+    constexpr static auto NAME = ::coral66::detail::CommandLine::parseOptions<         \
         ::coral66::detail::CommandLine::Pack<CORAL66_MACRO_LIST_STRINGS2(NAME, PACK)>, \
         CORAL66_MACRO_LIST_BINDS(NAME, __VA_ARGS__)>
 
