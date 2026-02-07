@@ -5,7 +5,7 @@
 * Date   : 31/01/2026
 */
 
-#include "Main.hpp"
+#include "main.hpp"
 
 #include <llvm/Bitcode/BitcodeWriterPass.h>
 #include <llvm/IR/IRPrintingPasses.h>
@@ -23,7 +23,7 @@
 #include "lib/frontend/compiler/parser.hpp"
 #include "lib/frontend/compiler/preprocessor.hpp"
 #include "lib/frontend/compiler/program.hpp"
-#include "lib/main/CommandLine.hpp"
+#include "lib/main/command_line.hpp"
 #include "lib/support/Filesystem.hpp"
 #include "lib/support/Triple.hpp"
 

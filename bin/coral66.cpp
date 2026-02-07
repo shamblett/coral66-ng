@@ -4,10 +4,10 @@
 * Date   : 31/01/2026
 */
 
-#include "lib/main/Main.hpp"
-
 #include <string_view>
 #include <vector>
+
+#include "lib/main/main.hpp"
 
 int main(const int argc, char** argv)
 {

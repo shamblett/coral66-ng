@@ -4,10 +4,9 @@
 * Date   : 31/01/2026
 */
 
-#include "CommandLine.hpp"
-
 #include <llvm/Support/raw_ostream.h>
 
+#include "command_line.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 
 void coral66::detail::CommandLine::printHelp(llvm::raw_ostream& os,

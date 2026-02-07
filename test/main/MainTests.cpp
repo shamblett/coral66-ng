@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/main/Main.hpp"
+#include "lib/main/main.hpp"
 
 #include "lib/frontend/common/error_messages.hpp"
 #include "test/common/TestConfig.hpp"

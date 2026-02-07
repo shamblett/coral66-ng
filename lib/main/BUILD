@@ -7,12 +7,12 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "main",
     srcs = [
-        "CommandLine.cpp",
-        "Main.cpp",
+        "command_line.cpp",
+        "main.cpp",
     ],
     hdrs = [
-        "CommandLine.hpp",
-        "Main.hpp",
+        "command_line.hpp",
+        "main.hpp",
     ],
     visibility = [
         "//bin:__pkg__",
