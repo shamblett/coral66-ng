@@ -16,7 +16,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "lib/support/Triple.hpp"
+#include "lib/support/triple.hpp"
 
 namespace coral66
 {

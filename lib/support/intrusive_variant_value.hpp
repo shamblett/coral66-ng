@@ -9,8 +9,8 @@
 #include <algorithm>
 #include <cstddef>
 
-#include "AbstractIntrusiveVariant.hpp"
-#include "Constexpr.hpp"
+#include "abstract_intrusive_variant.hpp"
+#include "constexpr.hpp"
 
 /**
  * IntrusiveVariantValue provides value semantics for AbstractIntrusiveVariant hierarchies, similar to std::variant.

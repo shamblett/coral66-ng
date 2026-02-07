@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "lib/support/Triple.hpp"
+#include "lib/support/triple.hpp"
 
 namespace coral66::Tests
 {

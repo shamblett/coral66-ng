@@ -14,9 +14,9 @@
 
 #include "custom_diagnostics.hpp"
 #include "diagnostic_utilities.hpp"
-#include "lib/support/Constexpr.hpp"
-#include "lib/support/Text.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lib/support/constexpr.hpp"
+#include "lib/support/text.hpp"
+#include "lib/support/utilities.hpp"
 #include "message.hpp"
 
 /**

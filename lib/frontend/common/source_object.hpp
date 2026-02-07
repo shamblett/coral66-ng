@@ -15,7 +15,7 @@
 #include "lexer_common.hpp"
 #include "lib/frontend/common/language_options.hpp"
 #include "lib/frontend/common/source_interface.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lib/support/utilities.hpp"
 
 /**
  * @file SourceObject.hpp

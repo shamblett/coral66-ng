@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "lib/frontend/common/error_messages.hpp"
-#include "lib/support/ScopeExit.hpp"
+#include "lib/support/scope_exit.hpp"
 #include "parser.hpp"
 #include "preprocessor_parser.hpp"
 

@@ -11,7 +11,7 @@
 #include <unordered_set>
 
 #include "lib/frontend/common/error_messages.hpp"
-#include "lib/support/ScopeExit.hpp"
+#include "lib/support/scope_exit.hpp"
 #include "parser_utilities.hpp"
 #include "semantic_utilities.hpp"
 #include "semantics.hpp"

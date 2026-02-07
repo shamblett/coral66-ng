@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "Text.hpp"
+#include "text.hpp"
 
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/SmallString.h>

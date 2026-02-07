@@ -12,7 +12,7 @@
  */
 
 #include "diagnostic.hpp"
-#include "lib/support/Constexpr.hpp"
+#include "lib/support/constexpr.hpp"
 
 #define CREATE_NOTE_2(variableName, format)                                                           \
     namespace detail                                                                                  \

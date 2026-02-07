@@ -12,8 +12,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "AbstractIntrusiveVariant.hpp"
-#include "Utilities.hpp"
+#include "abstract_intrusive_variant.hpp"
+#include "utilities.hpp"
 
 /**
  * IntrusiveVariantAllocator is a specialized slab allocator designed for subclasses of AbstractIntrusiveVariant.

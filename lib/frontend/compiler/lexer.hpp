@@ -16,7 +16,7 @@
 #include "lib/frontend/common/custom_diagnostics.hpp"
 #include "lib/frontend/common/language_options.hpp"
 #include "lib/frontend/common/lexer_common.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lib/support/utilities.hpp"
 
 /**
  * @file Lexer.hpp

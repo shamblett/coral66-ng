@@ -8,7 +8,7 @@
 
 #include <type_traits>
 
-#include "Utilities.hpp"
+#include "utilities.hpp"
 
 /**
  * FunctionRef is a non-owning reference to a callable object.

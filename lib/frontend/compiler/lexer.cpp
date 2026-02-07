@@ -19,8 +19,8 @@
 
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/common/source_object.hpp"
-#include "lib/support/ScopeExit.hpp"
-#include "lib/support/Text.hpp"
+#include "lib/support/scope_exit.hpp"
+#include "lib/support/text.hpp"
 
 using namespace coral66::Lexer;
 

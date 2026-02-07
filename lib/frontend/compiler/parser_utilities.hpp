@@ -13,7 +13,7 @@
 
 #include <string_view>
 
-#include "lib/support/FunctionRef.hpp"
+#include "lib/support/function_ref.hpp"
 #include "parser.hpp"
 
 namespace coral66::Parser

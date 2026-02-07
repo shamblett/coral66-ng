@@ -16,8 +16,8 @@
 #include "lib/frontend/common/diagnostic.hpp"
 #include "lib/frontend/compiler/preprocessor.hpp"
 #include "lib/frontend/compiler/semantics.hpp"
-#include "lib/support/Filesystem.hpp"
-#include "lib/support/Text.hpp"
+#include "lib/support/filesystem.hpp"
+#include "lib/support/text.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 namespace coral66::Tests

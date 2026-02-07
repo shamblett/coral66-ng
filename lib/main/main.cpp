@@ -24,8 +24,8 @@
 #include "lib/frontend/compiler/preprocessor.hpp"
 #include "lib/frontend/compiler/program.hpp"
 #include "lib/main/command_line.hpp"
-#include "lib/support/Filesystem.hpp"
-#include "lib/support/Triple.hpp"
+#include "lib/support/filesystem.hpp"
+#include "lib/support/triple.hpp"
 
 CORAL66_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
 ("Path of the output file");

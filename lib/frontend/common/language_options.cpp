@@ -10,7 +10,7 @@
 #include <numeric>
 
 #include "diagnostic.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lib/support/utilities.hpp"
 #include "targets/x86_target_features.hpp"
 
 namespace

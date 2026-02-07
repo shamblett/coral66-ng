@@ -15,7 +15,7 @@
 #include "lib/frontend/compiler/preprocessor.hpp"
 #include "lib/frontend/compiler/program.hpp"
 #include "lib/frontend/compiler/semantics.hpp"
-#include "lib/support/FunctionRef.hpp"
+#include "lib/support/function_ref.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 inline coral66::Semantics::Program generateProgram(std::string source)

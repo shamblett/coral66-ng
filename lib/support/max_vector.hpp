@@ -8,7 +8,7 @@
 
 #include <array>
 
-#include "Constexpr.hpp"
+#include "constexpr.hpp"
 
 namespace coral66
 {

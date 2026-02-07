@@ -16,10 +16,10 @@
 #include <vector>
 
 #include "lib/frontend/common/message.hpp"
-#include "lib/support/Constexpr.hpp"
-#include "lib/support/MaxVector.hpp"
-#include "lib/support/Text.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lib/support/constexpr.hpp"
+#include "lib/support/max_vector.hpp"
+#include "lib/support/text.hpp"
+#include "lib/support/utilities.hpp"
 
 namespace coral66
 {

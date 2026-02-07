@@ -8,8 +8,8 @@
 
 #include <type_traits>
 
-#include "lib/support/IntrusiveVariantValue.hpp"
-#include "lib/support/Text.hpp"
+#include "lib/support/intrusive_variant_value.hpp"
+#include "lib/support/text.hpp"
 
 namespace coral66
 {

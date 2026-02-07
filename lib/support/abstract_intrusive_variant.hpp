@@ -9,8 +9,8 @@
 #include <array>
 #include <memory>
 
-#include "Constexpr.hpp"
-#include "Utilities.hpp"
+#include "constexpr.hpp"
+#include "utilities.hpp"
 
 /**
  * AbstractIntrusiveVariant provides a facility for creating a closed set of polymorphic classes

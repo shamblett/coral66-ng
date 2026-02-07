@@ -14,7 +14,7 @@
 #include <string_view>
 #include <variant>
 
-#include "lib/support/Utilities.hpp"
+#include "lib/support/utilities.hpp"
 #include "source_interface.hpp"
 
 namespace coral66::Lexer

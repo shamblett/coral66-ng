@@ -19,9 +19,9 @@
 #include <string>
 #include <string_view>
 
-#include "Constexpr.hpp"
-#include "MaxVector.hpp"
-#include "Utilities.hpp"
+#include "constexpr.hpp"
+#include "max_vector.hpp"
+#include "utilities.hpp"
 
 namespace llvm
 {

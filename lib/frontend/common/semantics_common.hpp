@@ -12,9 +12,9 @@
 #include <tuple>
 #include <vector>
 
-#include "lib/support/AbstractIntrusiveVariant.hpp"
-#include "lib/support/IntrusiveVariantValue.hpp"
-#include "lib/support/Utilities.hpp"
+#include "lib/support/abstract_intrusive_variant.hpp"
+#include "lib/support/intrusive_variant_value.hpp"
+#include "lib/support/utilities.hpp"
 
 namespace coral66::Semantics
 {

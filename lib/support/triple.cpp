@@ -4,8 +4,9 @@
  * Date   : 31/01/2026
  */
 
-#include "Triple.hpp"
-#include "Utilities.hpp"
+#include "triple.hpp"
+
+#include "utilities.hpp"
 
 coral66::Triple::Triple(coral66::Architecture const architecture, coral66::Platform const operatingSystem, coral66::Environment const environment)
     : m_architecture(architecture), m_operatingSystem(operatingSystem), m_environment(environment)
