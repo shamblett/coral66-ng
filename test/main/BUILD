@@ -8,8 +8,8 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "maintest",
     srcs = [
-        "CommandlineTests.cpp",
-        "MainTests.cpp",
+        "command_line_tests.cpp",
+        "main_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
