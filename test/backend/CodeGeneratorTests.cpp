@@ -8,7 +8,7 @@
 #include <llvm/IR/Verifier.h>
 
 #include "Common.hpp"
-#include "lib/backend//CodeGeneration.hpp"
+#include "lib/backend//code_generation.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace Catch::Matchers;

@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "ABIImplementation.hpp"
+#include "abi_implementation.hpp"
 
 namespace coral66::CGLLVM
 {
 
-class X64ABI final : public ABIImplementation
+class x64_abi final : public abi_implementation
 {
 public:
     void applyPlatformABI(const Semantics::ProcedureType& procedureType, llvm::Type*& returnType,

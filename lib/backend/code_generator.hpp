@@ -7,9 +7,9 @@
 #pragma once
 
 #include <llvm/IR/IRBuilder.h>
-#include "lib/frontend/compiler/Semantics.hpp"
 
-#include "CodeGeneration.hpp"
+#include "code_generation.hpp"
+#include "lib/frontend/compiler/Semantics.hpp"
 
 namespace coral66::CGLLVM
 {
@@ -24,7 +24,7 @@ struct Value
     Value(std::nullptr_t) : value(nullptr) {}
 };
 
-class CodeGenerator final
+class code_generator final
 {
     llvm::Module& m_module;
     const Semantics::Program& m_program;
@@ -40,7 +40,7 @@ class CodeGenerator final
     std::unordered_map<const Semantics::LabelStatement*, llvm::BasicBlock*> m_labels;
 
 public:
-    explicit CodeGenerator(llvm::Module& module, const Semantics::Program& program,
+    explicit code_generator(llvm::Module& module, const Semantics::Program& program,
                            const SourceInterface& sourceInterface, const CGLLVM::Options& options);
 
     void generate();

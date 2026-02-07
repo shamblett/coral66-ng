@@ -12,10 +12,10 @@
 namespace coral66::CGLLVM
 {
 
-class ABIImplementation
+class abi_implementation
 {
 public:
-    virtual ~ABIImplementation() = default;
+    virtual ~abi_implementation() = default;
 
     // Placeholder for platform-specific ABI handling
     // For Coral 66, we might need simple calling conventions initially.

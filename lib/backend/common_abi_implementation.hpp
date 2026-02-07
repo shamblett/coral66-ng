@@ -15,14 +15,14 @@
 
 #include <unordered_map>
 
-#include "ABIImplementation.hpp"
-#include "TypeIdentity.hpp"
+#include "abi_implementation.hpp"
+#include "type_identity.hpp"
 
 /**
  * @file CommonABIImplementation.hpp
  * @brief Defines a common base class for ABI implementations with caching.
  *
- * This file provides the CommonABIImplementation template class, which extends ABIImplementation.
+ * This file provides the common_abi_implementation template class, which extends abi_implementation.
  * It implements a caching mechanism for platform-specific ABI adjustments to function
  * signatures, avoiding redundant calculations for repeatedly encountered function types.
  */
@@ -35,7 +35,7 @@ class AllocaInst;
 namespace coral66::CGLLVM
 {
 template <class T>
-class CommonABIImplementation : public ABIImplementation
+class common_abi_implementation : public abi_implementation
 {
     struct Cache
     {
@@ -48,7 +48,7 @@ class CommonABIImplementation : public ABIImplementation
         m_adjustments;
 
 protected:
-    CommonABIImplementation(const llvm::DataLayout& dataLayout) : ABIImplementation(dataLayout) {}
+    common_abi_implementation(const llvm::DataLayout& dataLayout) : abi_implementation(dataLayout) {}
 
     const T* m_currentFunctionABI = nullptr;
     llvm::AllocaInst* m_returnSlot = nullptr;

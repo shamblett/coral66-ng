@@ -17,15 +17,15 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Timer.h>
 
+#include "lib/backend/code_generation.hpp"
 #include "lib/frontend/common/ErrorMessages.hpp"
 #include "lib/frontend/common/LanguageOptions.hpp"
 #include "lib/frontend/compiler/Parser.hpp"
-#include "lib/frontend/compiler/Program.hpp"
 #include "lib/frontend/compiler/Preprocessor.hpp"
-#include "lib/backend/CodeGeneration.hpp"
+#include "lib/frontend/compiler/Program.hpp"
+#include "lib/main/CommandLine.hpp"
 #include "lib/support/Filesystem.hpp"
 #include "lib/support/Triple.hpp"
-#include "lib/main/CommandLine.hpp"
 
 CORAL66_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
 ("Path of the output file");

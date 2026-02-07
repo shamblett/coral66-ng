@@ -4,21 +4,22 @@
 * Date   : 31/01/2026
 */
 
-#include "CodeGenerator.hpp"
-#include <llvm/IR/Module.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/InlineAsm.h>
+#include <llvm/IR/Module.h>
+
+#include "code_generator.hpp"
 
 namespace coral66::CGLLVM
 {
 
-CodeGenerator::CodeGenerator(llvm::Module& module, const Semantics::Program& program,
+code_generator::code_generator(llvm::Module& module, const Semantics::Program& program,
                              const SourceInterface& sourceInterface, const CGLLVM::Options& options)
     : m_module(module), m_program(program), m_sourceInterface(sourceInterface), m_options(options)
 {
 }
 
-void CodeGenerator::generate()
+void code_generator::generate()
 {
     // Process globals
     for (const auto& global : m_program.getGlobals())
@@ -31,7 +32,7 @@ void CodeGenerator::generate()
     }
 }
 
-llvm::Type* CodeGenerator::convertType(const Semantics::Type& type)
+llvm::Type* code_generator::convertType(const Semantics::Type& type)
 {
     auto& ctx = m_module.getContext();
     if (auto* prim = type.tryAs<Semantics::PrimitiveType>())
@@ -74,7 +75,7 @@ llvm::Type* CodeGenerator::convertType(const Semantics::Type& type)
     return llvm::Type::getVoidTy(ctx);
 }
 
-llvm::BasicBlock* CodeGenerator::getOrCreateLabel(const Semantics::LabelStatement* label)
+llvm::BasicBlock* code_generator::getOrCreateLabel(const Semantics::LabelStatement* label)
 {
     if (!m_labels.contains(label))
     {
@@ -83,7 +84,7 @@ llvm::BasicBlock* CodeGenerator::getOrCreateLabel(const Semantics::LabelStatemen
     return m_labels[label];
 }
 
-llvm::Value* CodeGenerator::emitAddress(const Semantics::ExpressionBase& expr)
+llvm::Value* code_generator::emitAddress(const Semantics::ExpressionBase& expr)
 {
     if (auto* declRead = dynamic_cast<const Semantics::DeclarationRead*>(&expr))
     {
@@ -98,7 +99,7 @@ llvm::Value* CodeGenerator::emitAddress(const Semantics::ExpressionBase& expr)
     return nullptr;
 }
 
-void CodeGenerator::visit(const Semantics::Declaration& decl)
+void code_generator::visit(const Semantics::Declaration& decl)
 {
     if (auto* var = dynamic_cast<const Semantics::VariableDeclaration*>(&decl))
     {
@@ -114,7 +115,7 @@ void CodeGenerator::visit(const Semantics::Declaration& decl)
     }
 }
 
-void CodeGenerator::generateProcedure(const Semantics::ProcedureDeclaration& procDecl)
+void code_generator::generateProcedure(const Semantics::ProcedureDeclaration& procDecl)
 {
     m_currentProcedure = &procDecl;
     m_labels.clear();
@@ -158,7 +159,7 @@ void CodeGenerator::generateProcedure(const Semantics::ProcedureDeclaration& pro
     }
 }
 
-void CodeGenerator::visit(const Semantics::Statement& stmt)
+void code_generator::visit(const Semantics::Statement& stmt)
 {
     stmt.match(
         [&](const Semantics::AssignmentStatement& s) { visit(s); },
@@ -173,7 +174,7 @@ void CodeGenerator::visit(const Semantics::Statement& stmt)
     );
 }
 
-void CodeGenerator::visit(const Semantics::AssignmentStatement& stmt)
+void code_generator::visit(const Semantics::AssignmentStatement& stmt)
 {
     const auto& target = stmt.getTarget();
     llvm::Value* rhs = visit(stmt.getExpression());
@@ -265,7 +266,7 @@ void CodeGenerator::visit(const Semantics::AssignmentStatement& stmt)
     }
 }
 
-void CodeGenerator::visit(const Semantics::IfStatement& stmt)
+void code_generator::visit(const Semantics::IfStatement& stmt)
 {
     llvm::Value* cond = visit(stmt.getCondition());
     if (!cond) return;
@@ -300,7 +301,7 @@ void CodeGenerator::visit(const Semantics::IfStatement& stmt)
     m_builder.SetInsertPoint(mergeBB);
 }
 
-void CodeGenerator::visit(const Semantics::GotoStatement& stmt)
+void code_generator::visit(const Semantics::GotoStatement& stmt)
 {
     if (stmt.getLabel())
     {
@@ -309,7 +310,7 @@ void CodeGenerator::visit(const Semantics::GotoStatement& stmt)
     }
 }
 
-void CodeGenerator::visit(const Semantics::LabelStatement& stmt)
+void code_generator::visit(const Semantics::LabelStatement& stmt)
 {
     llvm::BasicBlock* bb = getOrCreateLabel(&stmt);
     if (!bb->getParent())
@@ -332,7 +333,7 @@ void CodeGenerator::visit(const Semantics::LabelStatement& stmt)
     }
 }
 
-void CodeGenerator::visit(const Semantics::ForStatement& stmt)
+void code_generator::visit(const Semantics::ForStatement& stmt)
 {
     llvm::Value* startVal = visit(stmt.getStart());
     llvm::Value* loopVarAddr = emitAddress(stmt.getVariable());
@@ -367,7 +368,7 @@ void CodeGenerator::visit(const Semantics::ForStatement& stmt)
     m_builder.SetInsertPoint(endBB);
 }
 
-void CodeGenerator::visit(const Semantics::AnswerStatement& stmt)
+void code_generator::visit(const Semantics::AnswerStatement& stmt)
 {
     llvm::Value* val = visit(stmt.getExpression());
     if (val && m_currentFunction->getReturnType()->isIntegerTy())
@@ -377,19 +378,19 @@ void CodeGenerator::visit(const Semantics::AnswerStatement& stmt)
     m_builder.CreateRet(val);
 }
 
-void CodeGenerator::visit(const Semantics::CodeStatement& stmt) 
+void code_generator::visit(const Semantics::CodeStatement& stmt) 
 {
     llvm::FunctionType* ft = llvm::FunctionType::get(llvm::Type::getVoidTy(m_module.getContext()), {}, false);
     llvm::InlineAsm* ia = llvm::InlineAsm::get(ft, stmt.getCode(), "", true);
     m_builder.CreateCall(ft, ia, {});
 }
 
-void CodeGenerator::visit(const Semantics::ProcedureCallStatement& stmt)
+void code_generator::visit(const Semantics::ProcedureCallStatement& stmt)
 {
     visit(stmt.getCallExpr());
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::ExpressionBase& expr)
+llvm::Value* code_generator::visit(const Semantics::ExpressionBase& expr)
 {
     return expr.match(
         [&](const Semantics::Constant& e) { return visit(e); },
@@ -403,7 +404,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::ExpressionBase& expr)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-llvm::Value* CodeGenerator::visit(const Semantics::Constant& expr)
+llvm::Value* code_generator::visit(const Semantics::Constant& expr)
 {
     auto& val = expr.getValue();
     if (std::holds_alternative<llvm::APSInt>(val))
@@ -417,7 +418,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::Constant& expr)
     return nullptr;
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::DeclarationRead& expr)
+llvm::Value* code_generator::visit(const Semantics::DeclarationRead& expr)
 {
     llvm::Value* addr = emitAddress(expr);
     if (!addr) return nullptr;
@@ -425,7 +426,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::DeclarationRead& expr)
     return m_builder.CreateLoad(convertType(expr.getType()), addr);
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::BinaryOperator& expr)
+llvm::Value* code_generator::visit(const Semantics::BinaryOperator& expr)
 {
     llvm::Value* L = visit(expr.getLeftExpression());
     llvm::Value* R = visit(expr.getRightExpression());
@@ -473,7 +474,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::BinaryOperator& expr)
     }
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::UnaryOperator& expr)
+llvm::Value* code_generator::visit(const Semantics::UnaryOperator& expr)
 {
     llvm::Value* operand = visit(expr.getOperand());
     if (!operand) return nullptr;
@@ -487,7 +488,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::UnaryOperator& expr)
     return nullptr; 
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::CallExpression& expr)
+llvm::Value* code_generator::visit(const Semantics::CallExpression& expr)
 {
     llvm::Value* funcVal = visit(expr.getFunctionExpression());
     
@@ -527,7 +528,7 @@ llvm::Value* CodeGenerator::visit(const Semantics::CallExpression& expr)
     return nullptr;
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::PartWordAccess& expr)
+llvm::Value* code_generator::visit(const Semantics::PartWordAccess& expr)
 {
     // Read: (val >> start) & ((1 << width) - 1)
     llvm::Value* baseVal = visit(expr.getBase());
@@ -544,6 +545,6 @@ llvm::Value* CodeGenerator::visit(const Semantics::PartWordAccess& expr)
     return m_builder.CreateAnd(shifted, mask, "partWord");
 }
 
-llvm::Value* CodeGenerator::visit(const Semantics::ErrorExpression&) { return nullptr; }
+llvm::Value* code_generator::visit(const Semantics::ErrorExpression&) { return nullptr; }
 
 } // namespace coral66::CGLLVM
