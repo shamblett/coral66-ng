@@ -4,9 +4,8 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/frontend/compiler/preprocessor.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
 
-#include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

@@ -10,10 +10,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "lib/frontend/common/error_messages.hpp"
-#include "lib/support/scope_exit.hpp"
-#include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
+#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/parser/parser.hpp"
+#include "lib/support/scope_exit.hpp"
 
 namespace
 {

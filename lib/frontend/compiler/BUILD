@@ -7,9 +7,6 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "compiler",
     srcs = [
-        "preprocessor.cpp",
-        "preprocessor_parser.cpp",
-        "preprocessor_syntax.cpp",
         "program.cpp",
         "program_interface.cpp",
         "semantic_analysis.cpp",
@@ -22,9 +19,6 @@ cc_library(
         "semantics.cpp",
     ],
     hdrs = [
-        "preprocessor.hpp",
-        "preprocessor_parser.hpp",
-        "preprocessor_syntax.hpp",
         "program.hpp",
         "program_interface.hpp",
         "semantic_analysis.hpp",
@@ -40,6 +34,7 @@ cc_library(
         "//lib/frontend/common",
         "//lib/frontend/lexer",
         "//lib/frontend/parser",
+        "//lib/frontend/preprocessor",
         "//lib/frontend/syntax",
         "//lib/support",
     ],

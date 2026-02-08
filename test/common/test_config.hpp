@@ -11,9 +11,9 @@
 
 #include <numeric>
 
+#include "../../lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/common/custom_diagnostics.hpp"
 #include "lib/frontend/common/diagnostic.hpp"
-#include "lib/frontend/compiler/preprocessor.hpp"
 #include "lib/frontend/compiler/semantics.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/text.hpp"
