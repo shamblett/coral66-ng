@@ -4,18 +4,6 @@
  * Date   : 31/01/2026
  */
 
-#include "parser.hpp"
-
-#include <algorithm>
-#include <span>
-#include <unordered_set>
-
-#include "lib/frontend/common/error_messages.hpp"
-#include "lib/support/scope_exit.hpp"
-#include "parser_utilities.hpp"
-#include "semantic_utilities.hpp"
-#include "semantics.hpp"
-
 /**
  * @file ParserDeclarations.cpp
  * @brief Implements parsing functions for C declarations and statements.

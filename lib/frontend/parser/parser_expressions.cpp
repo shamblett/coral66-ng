@@ -7,7 +7,6 @@
 #include "parser.hpp"
 
 /**
- * @file ParserExpressions.cpp
  * @brief Implements parsing functions for C expressions.
  *
  * This file contains the implementations of the recursive descent parser for
@@ -19,7 +18,6 @@
 #include <algorithm>
 
 #include "lib/frontend/common/error_messages.hpp"
-#include "parser_utilities.hpp"
 
 using namespace coral66::Syntax;
 

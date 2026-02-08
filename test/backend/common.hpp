@@ -10,10 +10,9 @@
 
 #include <regex>
 
-#include "../../lib/frontend/lexer/lexer.hpp"
-#include "lib/frontend/compiler/parser.hpp"
+#include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/compiler/preprocessor.hpp"
-#include "lib/frontend/compiler/program.hpp"
 #include "lib/frontend/compiler/semantics.hpp"
 #include "lib/support/function_ref.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

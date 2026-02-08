@@ -6,9 +6,9 @@
 
 #include "lib/frontend/compiler/semantics.hpp"
 
+#include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/common/source_object.hpp"
-#include "lib/frontend/compiler/parser.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 

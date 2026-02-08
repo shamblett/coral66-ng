@@ -12,7 +12,7 @@
 
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/support/scope_exit.hpp"
-#include "parser.hpp"
+#include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
 
 namespace
