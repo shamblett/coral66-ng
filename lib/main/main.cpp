@@ -17,11 +17,11 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Timer.h>
 
-#include "../frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/program.hpp"
 #include "lib/backend/code_generation.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/common/language_options.hpp"
-#include "lib/frontend/compiler/program.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/main/command_line.hpp"
 #include "lib/support/filesystem.hpp"

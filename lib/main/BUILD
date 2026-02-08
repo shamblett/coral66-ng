@@ -21,7 +21,8 @@ cc_library(
     deps = [
         "//lib/backend",
         "//lib/frontend/common",
-        "//lib/frontend/compiler",
+        "//lib/frontend/preprocessor",
+        "//lib/frontend/semantics",
         "//lib/support",
     ],
 )

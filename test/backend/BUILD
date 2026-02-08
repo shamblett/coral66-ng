@@ -18,7 +18,6 @@ cc_library(
     deps = [
         "//lib/backend",
         "//lib/frontend/common",
-        "//lib/frontend/compiler",
         "//lib/support",
         "//test/common",
         "//test/vendor/catch2v3",

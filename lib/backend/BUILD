@@ -29,7 +29,7 @@ cc_library(
     ],
     deps = [
         "//lib/frontend/common",
-        "//lib/frontend/compiler",
+        "//lib/frontend/semantics",
         "//lib/support",
     ],
 )

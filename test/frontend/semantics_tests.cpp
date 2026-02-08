@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/frontend/compiler/semantics.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
 
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/common/error_messages.hpp"

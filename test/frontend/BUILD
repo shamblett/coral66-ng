@@ -16,7 +16,9 @@ cc_library(
     visibility = ["//test:__pkg__"],
     deps = [
         "//lib/frontend/common",
-        "//lib/frontend/compiler",
+        "//lib/frontend/parser",
+        "//lib/frontend/preprocessor",
+        "//lib/frontend/semantics",
         "//lib/support",
         "//test/common",
         "//test/vendor/catch2v3",

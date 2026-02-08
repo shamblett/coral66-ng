@@ -11,14 +11,12 @@
 
 #include <numeric>
 
-#include "../../lib/frontend/preprocessor/preprocessor.hpp"
-#include "lib/frontend/common/custom_diagnostics.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
 #include "lib/frontend/common/diagnostic.hpp"
-#include "lib/frontend/compiler/semantics.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/text.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
-#include "test_targets.hpp"
 
 namespace coral66::Tests
 {

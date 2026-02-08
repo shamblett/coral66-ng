@@ -21,7 +21,6 @@
 #include "lib/support/vendor/tsl/ordered_map.h"
 
 /**
- * @file Semantics.hpp
  * @brief Defines the classes and structures for the Semantic Abstract Syntax Tree (AST) for Coral 66.
  */
 
