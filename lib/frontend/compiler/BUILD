@@ -24,7 +24,6 @@ cc_library(
         "semantic_analysis_statements.cpp",
         "semantic_analysis_types.cpp",
         "semantics.cpp",
-        "syntax.cpp",
     ],
     hdrs = [
         "parser.hpp",
@@ -37,7 +36,6 @@ cc_library(
         "semantic_analysis.hpp",
         "semantic_utilities.hpp",
         "semantics.hpp",
-        "syntax.hpp",
     ],
     visibility = [
         "//lib/backend:__subpackages__",
@@ -47,6 +45,7 @@ cc_library(
     deps = [
         "//lib/frontend/common",
         "//lib/frontend/lexer",
+        "//lib/frontend/syntax",
         "//lib/support",
     ],
 )

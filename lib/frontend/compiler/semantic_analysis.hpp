@@ -8,9 +8,9 @@
 
 #include <functional>
 
+#include "lib/frontend/syntax/syntax.hpp"
 #include "program_interface.hpp"
 #include "semantics.hpp"
-#include "syntax.hpp"
 
 namespace coral66::Semantics
 {
