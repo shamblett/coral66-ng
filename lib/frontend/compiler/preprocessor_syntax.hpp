@@ -12,7 +12,7 @@
 #include <variant>
 #include <vector>
 
-#include "lexer.hpp"
+#include "lib/frontend/lexer/lexer.hpp"
 
 namespace coral66::PP
 {

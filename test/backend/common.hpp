@@ -10,7 +10,7 @@
 
 #include <regex>
 
-#include "lib/frontend/compiler/lexer.hpp"
+#include "../../lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/compiler/parser.hpp"
 #include "lib/frontend/compiler/preprocessor.hpp"
 #include "lib/frontend/compiler/program.hpp"

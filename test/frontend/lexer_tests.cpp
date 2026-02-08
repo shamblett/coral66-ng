@@ -4,7 +4,7 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/frontend/compiler/lexer.hpp"
+#include "lib/frontend/lexer/lexer.hpp"
 
 #include <llvm/Support/Format.h>
 
