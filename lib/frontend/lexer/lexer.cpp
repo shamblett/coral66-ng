@@ -26,7 +26,7 @@ using namespace coral66::Lexer;
 
 namespace
 {
-bool isKeyword(std::string_view characters, const coral66::LanguageOptions&)
+bool isKeyword(std::string_view characters)
 {
     return characters == "BEGIN" || characters == "END" || characters == "PROCEDURE" || characters == "PROGRAM"
            || characters == "SEGMENT" || characters == "IF" || characters == "THEN" || characters == "ELSE"
@@ -610,7 +610,8 @@ class Context : private coral66::source_interface
     const IntervalMap& m_characterToSourceSpace;
     bool m_errorsOccurred = false;
     coral66::Source::File m_fakeFile;
-    const coral66::LanguageOptions& m_languageOptions;
+
+
 
     [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t offset) const noexcept override
     {
@@ -645,19 +646,13 @@ class Context : private coral66::source_interface
         return {};
     }
 
-    [[nodiscard]] const coral66::LanguageOptions& getLanguageOptions() const noexcept override
-    {
-        return m_languageOptions;
-    }
-
 public:
     std::uint64_t tokenStartOffset;
     bool leadingWhitespace = false;
 
     Context(std::string_view const sourceSpace, const IntervalMap& characterToSourceSpace,
             std::string_view const characterSpace, std::uint64_t& offset, std::vector<std::uint64_t> lineStarts,
-            llvm::raw_ostream* reporter, std::string_view const path,
-            const coral66::LanguageOptions& languageOptions) noexcept
+            llvm::raw_ostream* reporter, std::string_view const path) noexcept
         : m_reporter(reporter),
           m_sourceSpace(sourceSpace),
           m_characterSpace(characterSpace),
@@ -665,7 +660,6 @@ public:
           m_lineStarts(std::move(lineStarts)),
           m_characterToSourceSpace(characterToSourceSpace),
           m_fakeFile{coral66::to_string(path), coral66::to_string(sourceSpace), {}, false},
-          m_languageOptions(languageOptions),
           tokenStartOffset(0)
     {
     }
@@ -1102,7 +1096,7 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c,
+std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c, // NOLINT(*-make-member-function-const)
                                                Context& context) noexcept // NOLINT(*-make-member-function-const)
 {
     if (c == 'u' || c == 'U')
@@ -1230,7 +1224,7 @@ std::pair<StateMachine, bool> Dot::advance(char const c, Context& context) // NO
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-std::pair<StateMachine, bool> Punctuation::advance(char const c,
+std::pair<StateMachine, bool> Punctuation::advance(char const c, // NOLINT(*-make-member-function-const)
                                                    Context& context) // NOLINT(*-make-member-function-const)
 {
     switch (first)
@@ -1379,7 +1373,6 @@ struct [[maybe_unused]] FirstArgOfMethod<R (*)(U, Args...) noexcept>
 } // namespace
 
 coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
-                                                 const not_null<const LanguageOptions> languageOptions,
                                                  llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath)
 {
@@ -1499,8 +1492,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
     }
     charactersSpace.shrink_to_fit();
 
-    Context context(source, characterToSourceSpace, charactersSpace, offset, starts, reporter, sourcePath,
-                    *languageOptions);
+    Context context(source, characterToSourceSpace, charactersSpace, offset, starts, reporter, sourcePath);
     const auto* end = charactersSpace.data() + charactersSpace.size();
     for (const auto* iter = charactersSpace.data(); iter != end;)
     {
@@ -1684,8 +1676,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
     }
 
     return PPSourceObject(std::move(context.getResult()),
-                          {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}},
-                          languageOptions, {}, {{std::move(characterToSourceSpace)}});
+                          {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {}, {{std::move(characterToSourceSpace)}});
 }
 
 [[nodiscard]] std::string_view coral66::Lexer::TokenBase::getRepresentation(const source_interface& sourceObject) const
@@ -1807,14 +1798,9 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                                                             ConversionContext& context, bool wide,
                                                             Literal const literalType)
 {
-    const std::uint32_t largestCharacter = [&context, wide]() -> std::uint32_t
+    constexpr std::uint32_t largestCharacter = []() -> std::uint32_t
     {
         std::uint8_t size = 1;
-        if (wide)
-        {
-            size = context.sourceInterface.getLanguageOptions().sizeOf(
-                context.sourceInterface.getLanguageOptions().wcharUnderlyingType);
-        }
         return 0xFFFFFFFFu >> (32 - 8 * size);
     }();
     std::vector<llvm::UTF32> result;
@@ -2049,7 +2035,7 @@ coral66::CSourceObject coral66::Lexer::toCTokens(PPSourceObject&& sourceObject, 
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
-    return {std::move(tokens), std::move(sourceObject.getFiles()), sourceObject.getLanguageOptions(),
+    return {std::move(tokens), std::move(sourceObject.getFiles()),
             std::move(sourceObject.getSubstitutions())};
 }
 
@@ -2061,7 +2047,6 @@ coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObj
     tokens.shrink_to_fit();
     return {std::move(tokens),
             {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
-            sourceObject.getLanguageOptions(),
             {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()}};
 }
 
@@ -2104,7 +2089,7 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
             case TokenType::Newline: break;
             case TokenType::Identifier:
                 // Identifiers need to always be valid
-                if (isKeyword(iter->getValue(), sourceInterface.getLanguageOptions()))
+                if (isKeyword(iter->getValue()))
                 {
                     result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
                                         iter->getFileId(), iter->getMacroId());
@@ -2197,31 +2182,8 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
                       ppToken.getMacroId(), std::string(utf8.data(), dest));
     }
 
-    std::uint8_t size =
-        sourceInterface.getLanguageOptions().sizeOf(sourceInterface.getLanguageOptions().wcharUnderlyingType);
-    switch (size)
-    {
-        case 4:
-        {
-            return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
-                          ppToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
-        }
-        case 2:
-        {
-            const auto* start = chars.data();
-            std::vector<llvm::UTF16> utf16(chars.size() * 2);
-            auto* dest = utf16.data();
-            if (llvm::ConvertUTF32toUTF16(&start, start + chars.size(), &dest, dest + utf16.size(),
-                                          llvm::strictConversion)
-                != llvm::conversionOK)
-            {
-                CORAL66_UNREACHABLE;
-            }
-            return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
-                          ppToken.getMacroId(), NonCharString{{utf16.data(), dest}, NonCharString::Wide});
-        }
-        default: CORAL66_UNREACHABLE;
-    }
+    return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
+                         ppToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
 }
 
 std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const tokenType)

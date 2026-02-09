@@ -21,13 +21,12 @@ using namespace Catch::Matchers;
 namespace
 {
 
-coral66::CSourceObject lexes(std::string code,
-                             const coral66::LanguageOptions& options = coral66::LanguageOptions::native())
+coral66::CSourceObject lexes(const std::string& code)
 {
     std::string buffer;
     llvm::raw_string_ostream ss(buffer);
     bool errors;
-    auto result = coral66::Lexer::tokenize(std::move(code), &options, &ss, &errors);
+    auto result = coral66::Lexer::tokenize(code, &ss, &errors);
     UNSCOPED_INFO(buffer);
     REQUIRE_FALSE(errors);
     auto tokens = coral66::Lexer::toCTokens(std::move(result), &ss, &errors);

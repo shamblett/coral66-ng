@@ -28,8 +28,6 @@ std::vector<T>& append(std::vector<T>& lhs, std::vector<T>&& rhs)
 class Preprocessor final : private coral66::PPSourceInterface
 {
     llvm::raw_ostream* m_reporter;
-    const coral66::LanguageOptions& m_languageOptions;
-    const coral66::PP::Options& m_ppOptions;
     std::uint32_t m_macroID = 0;
     std::vector<coral66::Lexer::PPToken> m_result;
     std::vector<coral66::Source::PPRecord> m_substitutions{1};
@@ -158,7 +156,7 @@ class Preprocessor final : private coral66::PPSourceInterface
         std::string replacementText(defineDirective.tokens[1].getValue());
 
         bool errors = false;
-        auto scratchPadPP = coral66::Lexer::tokenize(std::move(replacementText), &m_languageOptions, m_reporter,
+        auto scratchPadPP = coral66::Lexer::tokenize(std::move(replacementText), m_reporter,
                                                      &errors, "<Macro Expansion>");
         if (errors)
         {
@@ -202,20 +200,14 @@ class Preprocessor final : private coral66::PPSourceInterface
         return m_substitutions;
     }
 
-    const coral66::LanguageOptions& getLanguageOptions() const noexcept override
-    {
-        return m_languageOptions;
-    }
-
     std::span<const coral66::Lexer::IntervalMap> getIntervalMaps() const noexcept override
     {
         return m_intervalMaps;
     }
 
 public:
-    Preprocessor(llvm::raw_ostream* report, const coral66::PP::Options& ppOptions,
-                 const coral66::LanguageOptions& languageOptions) noexcept
-        : m_reporter(report), m_languageOptions(languageOptions), m_ppOptions(ppOptions)
+    Preprocessor(llvm::raw_ostream* report) noexcept
+        : m_reporter(report)
     {
     }
 
@@ -323,11 +315,10 @@ public:
 };
 } // namespace
 
-coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& sourceObject, const Options& options,
+coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& sourceObject,
                                                 llvm::raw_ostream* reporter, bool* errorsOccurred) noexcept
 {
-    auto& languageOptions = sourceObject.getLanguageOptions();
-    Preprocessor preprocessor(reporter, options, languageOptions);
+    Preprocessor preprocessor(reporter);
     preprocessor.process(std::move(sourceObject));
     if (errorsOccurred)
     {
@@ -335,7 +326,6 @@ coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& source
     }
     return {std::move(preprocessor.getResult()),
             std::move(preprocessor.getFiles()),
-            &languageOptions,
             {preprocessor.getSubstitutionsVector().begin(), preprocessor.getSubstitutionsVector().end()},
             {std::move(preprocessor.getIntervalMaps())}};
 }

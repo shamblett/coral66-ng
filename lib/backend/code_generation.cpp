@@ -48,11 +48,6 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const Se
         {
             return {};
         }
-        [[nodiscard]] const LanguageOptions& getLanguageOptions() const noexcept override
-        {
-            static LanguageOptions opts = LanguageOptions::native();
-            return opts;
-        }
     } stubSource;
 
     code_generator generator(module, program, stubSource, options);

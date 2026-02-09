@@ -4,6 +4,8 @@
  * Date   : 31/01/2026
  */
 
+#include <utility>
+
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 
 #include "lib/frontend/common/source_object.hpp"
@@ -17,11 +19,10 @@ coral66::PPSourceObject preprocess(std::string source)
     std::string storage;
     llvm::raw_string_ostream ss(storage);
     bool errorsOccurred = false;
-    auto options = coral66::LanguageOptions::native();
-    auto tokens = coral66::Lexer::tokenize(source, &options, &ss, &errorsOccurred);
+    auto tokens = coral66::Lexer::tokenize(std::move(source), &ss, &errorsOccurred);
     UNSCOPED_INFO(ss.str());
     REQUIRE_FALSE(errorsOccurred);
-    auto result = coral66::PP::preprocess(std::move(tokens), {}, &ss, &errorsOccurred);
+    auto result = coral66::PP::preprocess(std::move(tokens), &ss, &errorsOccurred);
     UNSCOPED_INFO(ss.str());
     REQUIRE_FALSE(errorsOccurred);
     return result;
@@ -41,8 +42,7 @@ public:
     bool match(const coral66::PPSourceObject& arg) const override
     {
         bool errors = false;
-        auto options = coral66::LanguageOptions::native();
-        auto ret = coral66::Lexer::tokenize(m_source, &options, nullptr, &errors);
+        auto ret = coral66::Lexer::tokenize(m_source, nullptr, &errors);
         if (errors)
             return false;
 

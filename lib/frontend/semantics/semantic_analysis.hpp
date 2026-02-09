@@ -30,11 +30,6 @@ public:
     SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(),
                      bool* errors = nullptr);
 
-    [[nodiscard]] const LanguageOptions& getLanguageOptions() const override
-    {
-        return m_sourceInterface.getLanguageOptions();
-    }
-
     friend Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter,
                            bool* errors);
 

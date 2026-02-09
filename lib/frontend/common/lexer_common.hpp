@@ -299,21 +299,6 @@ public:
         Fixed
     };
 
-    static Type fromUnderlyingType(LanguageOptions::UnderlyingType const underlyingType)
-    {
-        switch (underlyingType)
-        {
-            case LanguageOptions::UnderlyingType::UnsignedShort:
-            case LanguageOptions::UnderlyingType::Int:
-            case LanguageOptions::UnderlyingType::UnsignedInt:
-            case LanguageOptions::UnderlyingType::Long:
-            case LanguageOptions::UnderlyingType::UnsignedLong:
-            case LanguageOptions::UnderlyingType::LongLong:
-            case LanguageOptions::UnderlyingType::UnsignedLongLong: return Integer;
-        }
-        CORAL66_UNREACHABLE;
-    }
-
 private:
     Type m_type;
 

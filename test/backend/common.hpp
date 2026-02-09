@@ -20,27 +20,9 @@
 inline coral66::Semantics::Program generateProgram(std::string source)
 {
     bool errors = false;
-    auto options = coral66::LanguageOptions::fromTriple(coral66::Triple::native());
-    auto pptokens = coral66::Lexer::tokenize(std::move(source), &options, &llvm::errs(), &errors);
+    auto pptokens = coral66::Lexer::tokenize(std::move(source), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    pptokens = coral66::PP::preprocess(std::move(pptokens), {}, &llvm::errs(), &errors);
-    REQUIRE_FALSE(errors);
-    auto ctokens = coral66::Lexer::toCTokens(pptokens, &llvm::errs(), &errors);
-    REQUIRE_FALSE(errors);
-    auto tree = coral66::Parser::parseProgram(ctokens, &llvm::errs(), &errors);
-    REQUIRE_FALSE(errors);
-    auto program = coral66::Semantics::analyse(tree, std::move(ctokens), &llvm::errs(), &errors);
-    REQUIRE_FALSE(errors);
-    return program;
-}
-
-inline coral66::Semantics::Program generateProgramWithOptions(std::string source,
-                                                              const coral66::LanguageOptions& options)
-{
-    bool errors = false;
-    auto pptokens = coral66::Lexer::tokenize(std::move(source), &options, &llvm::errs(), &errors);
-    REQUIRE_FALSE(errors);
-    pptokens = coral66::PP::preprocess(std::move(pptokens), {}, &llvm::errs(), &errors);
+    pptokens = coral66::PP::preprocess(std::move(pptokens), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
     auto ctokens = coral66::Lexer::toCTokens(pptokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);

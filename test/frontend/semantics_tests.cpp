@@ -18,9 +18,8 @@
         std::string string;                                                  \
         llvm::raw_string_ostream ss(string);                                 \
         coral66::PPSourceObject tokens;                                      \
-        auto options = coral66::LanguageOptions::native();                   \
         bool errors = false;                                                 \
-        tokens = coral66::Lexer::tokenize(source, &options, &ss, &errors);   \
+        tokens = coral66::Lexer::tokenize(source, &ss, &errors);   \
         REQUIRE_FALSE(errors);                                               \
         auto ctokens = coral66::Lexer::toCTokens(tokens, &ss, &errors);      \
         REQUIRE_FALSE(errors);                                               \

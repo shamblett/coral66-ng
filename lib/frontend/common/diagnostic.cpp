@@ -282,8 +282,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
     std::span<Argument> arguments, std::span<const Modifiers> modifiers, const source_interface& sourceInterface) const
 {
-    if (m_severity == Severity::Warning
-        && !sourceInterface.getLanguageOptions().enabledWarnings.contains(to_string(m_name)))
+    if (m_severity == Severity::Warning)
     {
         return {};
     }

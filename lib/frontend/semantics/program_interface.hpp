@@ -16,8 +16,6 @@ class ProgramInterface
 public:
     virtual ~ProgramInterface() = default;
 
-    [[nodiscard]] virtual const LanguageOptions& getLanguageOptions() const = 0;
-
     // Add methods if needed for symbol lookup or size calculations
     // For now, minimal interface to satisfy getSizeOf signature
 };

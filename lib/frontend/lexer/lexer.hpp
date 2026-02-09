@@ -14,12 +14,10 @@
 #include <vector>
 
 #include "lib/frontend/common/custom_diagnostics.hpp"
-#include "lib/frontend/common/language_options.hpp"
 #include "lib/frontend/common/lexer_common.hpp"
 #include "lib/support/utilities.hpp"
 
 /**
- * @file Lexer.hpp
  * @brief Defines the Lexer and Token interfaces.
  *
  * This file contains the definitions for token types, the base Token class,
@@ -46,13 +44,12 @@ using PPTokenIterator = const PPToken* CORAL66_NON_NULL;
  * @brief Tokenizes a raw source string into a stream of Preprocessor Tokens (PPTokens).
  *
  * @param source The source code string.
- * @param languageOptions Options controlling the lexing behavior (e.g., C version).
  * @param reporter Stream to report lexing errors to.
  * @param errorsOccurred Pointer to a bool set to true if errors occur.
  * @param sourcePath Path to the source file (for diagnostics).
  * @return A SourceObject containing the PPTokens.
  */
-PPSourceObject tokenize(std::string source, not_null<const LanguageOptions> languageOptions,
+PPSourceObject tokenize(std::string source,
                         llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr,
                         std::string_view sourcePath = "<stdin>");
 

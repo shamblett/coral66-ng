@@ -27,7 +27,7 @@ struct Options
     std::vector<std::pair<std::string, std::string>> additionalMacros;
 };
 
-PPSourceObject preprocess(PPSourceObject&& sourceObject, const Options& options = {},
+PPSourceObject preprocess(PPSourceObject&& sourceObject,
                           llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr) noexcept;
 
 template <class T>

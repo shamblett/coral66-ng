@@ -17,12 +17,12 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Timer.h>
 
-#include "lib/frontend/preprocessor/preprocessor.hpp"
-#include "lib/frontend/semantics/program.hpp"
 #include "lib/backend/code_generation.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/common/language_options.hpp"
 #include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/program.hpp"
 #include "lib/main/command_line.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/triple.hpp"
@@ -38,44 +38,24 @@ CORAL66_CLI_OPT(PREPROCESS_ONLY, ("-E", "--preprocess"))("Preprocess to stdout o
 
 CORAL66_CLI_OPT(SYNTAX_ONLY, ("-fsyntax-only"))("Stop after semantic analysis and produce no output file");
 
-CORAL66_CLI_OPT(TARGET, ("--target=<arg>", "-target <arg>"), (std::string_view, arg))("Compiler target triple to use");
-
-CORAL66_CLI_OPT(DEFINE_MACRO, ("-D<macro>=<value>", "-D<macro>", "--define-macro <macro>", "--define-macro=<macro>"),
-                (std::string_view, macro), (std::string_view, value))
-("Define macro for the whole translation unit", coral66::CLIMultiArg::List);
-
 CORAL66_CLI_OPT(EMIT_LLVM, ("-emit-llvm"))("Use LLVM IR instead of machine code and assembly");
 
 CORAL66_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"),
                 (std::uint8_t, level))("Optimization level");
 
-CORAL66_CLI_OPT(INCLUDES, ("-I<dir>", "-I <dir>", "--include-directory <dir>", "--include-directory=<dir>"),
+CORAL66_CLI_OPT(LIBRARY_PATH, ("-L<dir>", "-L <dir>", "--library-directory <dir>", "--library-directory=<dir>"),
                 (std::string_view, dir))
-("Additional include directories", coral66::CLIMultiArg::List);
-
-CORAL66_CLI_OPT(ISYSTEM, ("-isystem<dir>", "-isystem <dir>"), (std::string, dir))
-("Append to system include directories", coral66::CLIMultiArg::List);
+("Library directories", coral66::CLIMultiArg::List);
 
 CORAL66_CLI_OPT(PIE, ("-f[no-]PIE"))("Build a position independent executable");
 
 CORAL66_CLI_OPT(PIC, ("-f[no-]PIC"))("Build position independent code");
-
-CORAL66_CLI_OPT(FREESTANDING, ("-ffreestanding"))("Compile in a freestanding environment");
-
-CORAL66_CLI_OPT(EMIT_ALL_DECLS, ("-femit-all-decls"))("Compile in a freestanding environment");
 
 CORAL66_CLI_OPT(VERSION, ("--version"))("Print version");
 
 CORAL66_CLI_OPT(HELP, ("--help", "-help"))("Display all options");
 
 CORAL66_CLI_OPT(TIME, ("-time"))("Time individual components");
-
-CORAL66_CLI_OPT(STANDARD_VERSION, ("-std=<arg>", "--std=<arg>", "--std <arg>"), (std::string_view, arg))
-("C standard version");
-
-CORAL66_CLI_OPT(WARNINGS, ("-W[no-]<warning>", "--warn-[no-]<warning>", "--warn-=[no-]<warning>"),
-                (std::string_view, warning))
-("Enable/disable specified warning", coral66::CLIMultiArg::List);
 
 CORAL66_CLI_OPT(G0, ("-g0"))("No debug info");
 
@@ -85,377 +65,8 @@ CORAL66_CLI_OPT(G2, ("-g2", "-g", "--debug"))("Generated debugging info");
 
 CORAL66_CLI_OPT(G3, ("-g3"))("Generated extded debugging info");
 
-CORAL66_CLI_OPT(MMX, ("-m[no-]mx"))("Enable x86 MMX extensions");
-
-CORAL66_CLI_OPT(SSE, ("-m[no-]sse"))("Enable x86 SSE extensions");
-
-CORAL66_CLI_OPT(THREEDNOWA, ("-m[no-]3dnowa"))("Enable x86 3DNowA! extensions");
-
-CORAL66_CLI_OPT(SSE2, ("-m[no-]sse2"))("Enable x86 SSE 2 extensions");
-
-CORAL66_CLI_OPT(SSE3, ("-m[no-]sse3"))("Enable x86 SSE 3 extensions");
-
-CORAL66_CLI_OPT(SSSE3, ("-m[no-]ssse3"))("Enable x86 SSSE 3 extensions");
-
-CORAL66_CLI_OPT(SSE4_1, ("-m[no-]sse4.1"))("Enable x86 SSE 4.1 extensions");
-
-CORAL66_CLI_OPT(SSE4_2, ("-m[no-]sse4.2"))("Enable x86 SSE 4.2 extensions");
-
-CORAL66_CLI_OPT(AVX, ("-m[no-]avx"))("Enable x86 AVX extensions");
-
-CORAL66_CLI_OPT(AVX2, ("-m[no-]avx2"))("Enable x86 AVX 2 extensions");
-
-CORAL66_CLI_OPT(AES, ("-m[no-]aes"))("Enable x86 AES extensions");
-
-CORAL66_CLI_OPT(PCLMUL, ("-m[no-]pclmul"))("Enable x86 PCLMUL extensions");
-
-CORAL66_CLI_OPT(FSGSBASE, ("-m[no-]fsgsbase"))("Enable x86 FSGSBASE extensions");
-
-CORAL66_CLI_OPT(RDRND, ("-m[no-]frdrnd"))("Enable x86 RDRND extensions");
-
-CORAL66_CLI_OPT(PTWRITE, ("-m[no-]ptwrite"))("Enable x86 PTWRITE extensions");
-
-CORAL66_CLI_OPT(SSE4A, ("-m[no-]sse4a"))("Enable x86 SSE 4a extensions");
-
-CORAL66_CLI_OPT(XOPA, ("-m[no-]xop"))("Enable x86 XOP extensions");
-
-CORAL66_CLI_OPT(FMA4, ("-m[no-]fma4"))("Enable x86 FMA4 extensions");
-
-CORAL66_CLI_OPT(LWP, ("-m[no-]lwp"))("Enable x86 LWP extensions");
-
-CORAL66_CLI_OPT(BMI, ("-m[no-]bmi"))("Enable x86 BMI extensions");
-
-CORAL66_CLI_OPT(BMI2, ("-m[no-]bmi2"))("Enable x86 BMI 2 extensions");
-
-CORAL66_CLI_OPT(LZCNT, ("-m[no-]lzcnt"))("Enable x86 LZCNT extensions");
-
-CORAL66_CLI_OPT(FXSR, ("-m[no-]fxsr"))("Enable x86 FXSR extensions");
-
-CORAL66_CLI_OPT(XSAVE, ("-m[no-]xsave"))("Enable x86 XSAVE extensions");
-
-CORAL66_CLI_OPT(XSAVEOPT, ("-m[no-]xsaveopt"))("Enable x86 XSAVEOPT extensions");
-
-CORAL66_CLI_OPT(TBM, ("-m[no-]tbm"))("Enable x86 TBM extensions");
-
-CORAL66_CLI_OPT(THREEDNOW, ("-m[no-]3dnow"))("Enable x86 3DNow! extensions");
-
-CORAL66_CLI_OPT(RTM, ("-m[no-]rtm"))("Enable x86 RTM extensions");
-
-CORAL66_CLI_OPT(MWAITX, ("-m[no-]mwaitx"))("Enable x86 MWAITX extensions");
-
-CORAL66_CLI_OPT(CLZERO, ("-m[no-]mwaitx"))("Enable x86 CLZERO extensions");
-
-CORAL66_CLI_OPT(PKU, ("-m[no-]pku"))("Enable x86 PKU extensions");
-
-// ReSharper disable once CppRedundantNamespaceDefinition
-namespace coral66::cli
-{
-template <>
-struct InitialStorage<WARNINGS>
-{
-    static auto getInitial()
-    {
-        return coral66::diag::getAllWarnings();
-    }
-};
-}; // namespace coral66::cli
-
 namespace
 {
-template <class CL>
-void addUnixMacroStyle(coral66::PP::Options& ppOptions, const coral66::LanguageOptions& languageOptions,
-                       std::string_view const name, // NOLINT(*-prefer-static-over-anonymous-namespace)
-                       const CL&)
-{
-    auto alloc = coral66::to_string(name);
-    ppOptions.additionalMacros.emplace_back("__" + alloc, "1");
-    ppOptions.additionalMacros.emplace_back("__" + alloc + "__", "1");
-    if (languageOptions.extension == coral66::LanguageOptions::Extension::GNU)
-    {
-        ppOptions.additionalMacros.emplace_back(alloc, "1");
-    }
-}
-
-template <class Integer>
-// ReSharper disable once CppDFAUnreachableFunctionCall
-Integer safeShiftLeft(Integer number, std::size_t value) // NOLINT(*-prefer-static-over-anonymous-namespace)
-{
-    if (value >= std::numeric_limits<Integer>::digits)
-    {
-        return 0;
-    }
-
-    return number << value;
-}
-
-template <class CL>
-coral66::PP::Options getTargetSpecificPreprocessorOptions(
-    const coral66::LanguageOptions& languageOptions, // NOLINT(*-prefer-static-over-anonymous-namespace)
-    const coral66::Triple& triple, const CL& cli)
-{
-    coral66::PP::Options result;
-    if (triple.getArchitecture() == coral66::Architecture::x86_64)
-    {
-        result.additionalMacros.emplace_back("__amd64__", "1");
-        result.additionalMacros.emplace_back("__amd64", "1");
-        result.additionalMacros.emplace_back("__x86_64", "1");
-        result.additionalMacros.emplace_back("__x86_64__", "1");
-        result.additionalMacros.emplace_back("__NO_MATH_INLINES", "1");
-    }
-    if (triple.getPlatform() == coral66::Platform::Linux)
-    {
-        addUnixMacroStyle(result, languageOptions, "unix", cli);
-        addUnixMacroStyle(result, languageOptions, "linux", cli);
-        result.additionalMacros.emplace_back("__ELF__", "1");
-        result.additionalMacros.emplace_back("__gnu_linux__", "1");
-    }
-
-    result.additionalMacros.emplace_back("__llvm__", "1");
-    result.additionalMacros.emplace_back("__coral66__", "1");
-    // TODO: Command line option for this
-    result.additionalMacros.emplace_back("__GNUC__", "4");
-    result.additionalMacros.emplace_back("__GNUC_MINOR__", "2");
-    result.additionalMacros.emplace_back("__GNUC_PATCHLEVEL__", "1");
-    if (cli.template get<OPT>() && *cli.template get<OPT>() > 0)
-    {
-        result.additionalMacros.emplace_back("__OPTIMIZE__", "1");
-    }
-
-    // TODO: Macro definitions that follow should be more generalized and not depend on hard coded known values of
-    // targets
-
-    result.additionalMacros.emplace_back("__ORDER_LITTLE_ENDIAN__", "1234");
-    result.additionalMacros.emplace_back("__ORDER_BIG_ENDIAN__", "4321");
-
-    result.additionalMacros.emplace_back("__BYTE_ORDER__", "__ORDER_LITTLE_ENDIAN__");
-    result.additionalMacros.emplace_back("__LITTLE_ENDIAN__", "1");
-
-    if (languageOptions.sizeOfInt == 4 && languageOptions.sizeOfLong == 8 && languageOptions.sizeOfVoidStar == 8)
-    {
-        result.additionalMacros.emplace_back("_LP64", "1");
-        result.additionalMacros.emplace_back("__LP64__", "1");
-    }
-    else if (languageOptions.sizeOfVoidStar == 4 && languageOptions.sizeOfInt == 4 && languageOptions.sizeOfLong == 4)
-    {
-        result.additionalMacros.emplace_back("_ILP32", "1");
-        result.additionalMacros.emplace_back("__ILP32__", "1");
-    }
-
-    result.additionalMacros.emplace_back("__CHAR_BIT__", "8");
-
-    result.additionalMacros.emplace_back("__SCHAR_MAX__", "127");
-    result.additionalMacros.emplace_back(
-        "__SHRT_MAX__", coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfShort - 1)) - 1));
-    result.additionalMacros.emplace_back(
-        "__INT_MAX__", coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfInt - 1)) - 1));
-    result.additionalMacros.emplace_back(
-        "__LONG_MAX__", coral66::to_string(safeShiftLeft(1uLL, (8 * languageOptions.sizeOfLong - 1)) - 1));
-    result.additionalMacros.emplace_back("__LONG_LONG_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * 8 - 1)) - 1));
-    std::size_t const wcharSize = languageOptions.sizeOf(languageOptions.wcharUnderlyingType);
-    bool const wcharSigned = coral66::LanguageOptions::isSigned(languageOptions.wcharUnderlyingType);
-    result.additionalMacros.emplace_back("__WCHAR_MAX__",
-                                         coral66::to_string(safeShiftLeft(1uLL, (8 * wcharSize - wcharSigned)) - 1));
-    result.additionalMacros.emplace_back("__INTMAX_MAX__", "__LONG_LONG_MAX__");
-    result.additionalMacros.emplace_back("__UINTMAX_MAX__", coral66::to_string(~0ull));
-
-    std::size_t const sizeTSize = languageOptions.sizeOf(languageOptions.sizeTType);
-    result.additionalMacros.emplace_back("__SIZE_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * sizeTSize)) - 1));
-    std::size_t const ptrDiffSize = languageOptions.sizeOf(languageOptions.ptrdiffType);
-    result.additionalMacros.emplace_back("__PTRDIFF_MAX___",
-                                         coral66::to_string(safeShiftLeft(1ull, (8 * ptrDiffSize - 1)) - 1));
-    result.additionalMacros.emplace_back(
-        "__INTPTR_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * languageOptions.sizeOfVoidStar - 1)) - 1));
-    result.additionalMacros.emplace_back(
-        "__UNTPTR_MAX__", coral66::to_string(safeShiftLeft(1ull, (8 * languageOptions.sizeOfVoidStar)) - 1));
-
-    result.additionalMacros.emplace_back("__SIZEOF_DOUBLE__", "8");
-    result.additionalMacros.emplace_back("__SIZEOF_FLOAT__", "4");
-    result.additionalMacros.emplace_back("__SIZEOF_INT__", coral66::to_string(languageOptions.sizeOfInt));
-    result.additionalMacros.emplace_back("__SIZEOF_LONG__", coral66::to_string(languageOptions.sizeOfLong));
-    result.additionalMacros.emplace_back("__SIZEOF_LONG_DOUBLE__", coral66::to_string(16));
-    result.additionalMacros.emplace_back("__SIZEOF_LONG_LONG__", "64");
-    result.additionalMacros.emplace_back("__SIZEOF_POINTER__", coral66::to_string(languageOptions.sizeOfVoidStar));
-    result.additionalMacros.emplace_back("__SIZEOF_SHORT__", coral66::to_string(languageOptions.sizeOfShort));
-    result.additionalMacros.emplace_back("__SIZEOF_PTRDIFF_T__", coral66::to_string(ptrDiffSize));
-    result.additionalMacros.emplace_back("__SIZEOF_SIZE_T__", coral66::to_string(sizeTSize));
-    result.additionalMacros.emplace_back("__SIZEOF_WCHAR_T__", coral66::to_string(wcharSize));
-    if (languageOptions.int128Enabled)
-    {
-        result.additionalMacros.emplace_back("__SIZEOF_INT128__", "128");
-    }
-
-    result.additionalMacros.emplace_back("__INTMAX_TYPE__", "long long");
-    result.additionalMacros.emplace_back("__INTMAX_C_SUFFIX__", "LL");
-    result.additionalMacros.emplace_back("__INTMAX_WIDTH____", "64");
-    result.additionalMacros.emplace_back("__UINTMAX_TYPE__", "unsigned long long");
-    result.additionalMacros.emplace_back("__UINTMAX_C_SUFFIX__", "ULL");
-    result.additionalMacros.emplace_back("__UINTMAX_WIDTH__", "64");
-    result.additionalMacros.emplace_back(
-        "__PTRDIFF_TYPE__", coral66::to_string(coral66::LanguageOptions::string(languageOptions.ptrdiffType)));
-    result.additionalMacros.emplace_back("__PTRDIFF_WIDTH__", coral66::to_string(ptrDiffSize * 8));
-    result.additionalMacros.emplace_back(
-        "__SIZE_TYPE__", coral66::to_string(coral66::LanguageOptions::string(languageOptions.sizeTType)));
-    result.additionalMacros.emplace_back("__SIZE_WIDTH__", coral66::to_string(sizeTSize * 8));
-    result.additionalMacros.emplace_back(
-        "__WCHAR_TYPE__", coral66::to_string(coral66::LanguageOptions::string(languageOptions.wcharUnderlyingType)));
-    result.additionalMacros.emplace_back("__WCHAR_WIDTH__", coral66::to_string(wcharSize * 8));
-
-    result.additionalMacros.emplace_back("__POINTER__WIDTH__", coral66::to_string(8 * languageOptions.sizeOfVoidStar));
-    if (!languageOptions.charIsSigned)
-    {
-        result.additionalMacros.emplace_back("__CHAR_UNSIGNED__", "1");
-    }
-
-    if (!coral66::LanguageOptions::isSigned(languageOptions.wcharUnderlyingType))
-    {
-        result.additionalMacros.emplace_back("__WCHAR_UNSIGNED__", "1");
-    }
-
-    result.additionalMacros.emplace_back("__FINITE_MATH_ONLY__", "0");
-    result.additionalMacros.emplace_back("__GNUC_STDC_INLINE__", "1");
-    if (languageOptions.extension == coral66::LanguageOptions::Extension::None)
-    {
-        result.additionalMacros.emplace_back("__STRICT_ANSI__", "1");
-    }
-    return result;
-}
-
-template <auto& Value>
-struct ValueIdentity
-{
-    constexpr static auto& value = Value;
-};
-
-template <class CL>
-void setTargetFeatures(coral66::TargetFeatures& targetFeatures, const CL& cli,
-                       llvm::raw_ostream* reporter) // NOLINT(*-prefer-static-over-anonymous-namespace)
-{
-    auto tryApply = [&]<typename T0>([[maybe_unused]] T0 opt, coral66::TargetFeatures::Features const feature)
-    {
-        constexpr auto& Opt = std::decay_t<T0>::value;
-        if (cli.template pos<Opt>() >= 0)
-        {
-            if (!targetFeatures.setFeature(feature, cli.template get<Opt>()))
-            {
-                if (reporter)
-                {
-                    *reporter << coral66::Warnings::CLI::FLAG_N_IS_NOT_APPLICABLE_FOR_CURRENT_TARGET_ARCHITECTURE
-                                     .argsCLI(Opt.getFirstOptionString());
-                }
-            }
-            else
-            {
-                return cli.template get<Opt>();
-            }
-        }
-        return false;
-    };
-
-    tryApply(ValueIdentity<MMX>{}, coral66::TargetFeatures::MMX);
-    tryApply(ValueIdentity<SSE>{}, coral66::TargetFeatures::SSE);
-    if (tryApply(ValueIdentity<THREEDNOWA>{}, coral66::TargetFeatures::ThreeDNowA))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::ThreeDNow, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::MMX, true);
-    }
-    if (tryApply(ValueIdentity<SSE2>{}, coral66::TargetFeatures::SSE2))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-    }
-    if (tryApply(ValueIdentity<SSE3>{}, coral66::TargetFeatures::SSE3)
-        || tryApply(ValueIdentity<AES>{}, coral66::TargetFeatures::AES)
-        || tryApply(ValueIdentity<AES>{}, coral66::TargetFeatures::PCLMUL))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-    }
-    if (tryApply(ValueIdentity<SSSE3>{}, coral66::TargetFeatures::SSSE3)
-        || tryApply(ValueIdentity<SSSE3>{}, coral66::TargetFeatures::SSE4a))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-    }
-    if (tryApply(ValueIdentity<SSE4_1>{}, coral66::TargetFeatures::SSE4_1))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSSE3, true);
-    }
-    if (tryApply(ValueIdentity<SSE4_2>{}, coral66::TargetFeatures::SSE4_2))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_1, true);
-    }
-    if (tryApply(ValueIdentity<AVX>{}, coral66::TargetFeatures::AVX))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_1, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_2, true);
-    }
-    if (tryApply(ValueIdentity<AVX>{}, coral66::TargetFeatures::AVX2))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_1, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::AVX, true);
-    }
-    if (tryApply(ValueIdentity<FMA4>{}, coral66::TargetFeatures::Fma4))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_1, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4a, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::AVX, true);
-    }
-    if (tryApply(ValueIdentity<XOPA>{}, coral66::TargetFeatures::XOP))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSSE3, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_1, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4_2, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::SSE4a, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::AVX, true);
-        targetFeatures.setFeature(coral66::TargetFeatures::Fma4, true);
-    }
-    if (tryApply(ValueIdentity<XSAVEOPT>{}, coral66::TargetFeatures::XSaveOpt))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::XSave, true);
-    }
-    if (tryApply(ValueIdentity<THREEDNOW>{}, coral66::TargetFeatures::ThreeDNow))
-    {
-        targetFeatures.setFeature(coral66::TargetFeatures::MMX, true);
-    }
-    tryApply(ValueIdentity<FSGSBASE>{}, coral66::TargetFeatures::FSGSBase);
-    tryApply(ValueIdentity<RDRND>{}, coral66::TargetFeatures::RDrnd);
-    tryApply(ValueIdentity<PTWRITE>{}, coral66::TargetFeatures::PTWrite);
-    tryApply(ValueIdentity<LWP>{}, coral66::TargetFeatures::LWP);
-    tryApply(ValueIdentity<BMI>{}, coral66::TargetFeatures::BMI);
-    tryApply(ValueIdentity<BMI2>{}, coral66::TargetFeatures::BMI2);
-    tryApply(ValueIdentity<LZCNT>{}, coral66::TargetFeatures::LZCnt);
-    tryApply(ValueIdentity<FXSR>{}, coral66::TargetFeatures::FXSr);
-    tryApply(ValueIdentity<XSAVE>{}, coral66::TargetFeatures::XSave);
-    tryApply(ValueIdentity<TBM>{}, coral66::TargetFeatures::TBM);
-    tryApply(ValueIdentity<RTM>{}, coral66::TargetFeatures::RTM);
-    tryApply(ValueIdentity<MWAITX>{}, coral66::TargetFeatures::MWaitX);
-    tryApply(ValueIdentity<CLZERO>{}, coral66::TargetFeatures::CLZero);
-    tryApply(ValueIdentity<PKU>{}, coral66::TargetFeatures::PKU);
-}
 
 enum class Action
 {
@@ -466,10 +77,8 @@ enum class Action
 };
 
 template <class CL>
-std::optional<coral66::fs::path>
-    compileCFile(Action action, coral66::fs::path cSourceFile,
-                 const coral66::Triple& triple, // NOLINT(*-prefer-static-over-anonymous-namespace)
-                 const coral66::LanguageOptions& languageOptions, const CL& cli, llvm::raw_ostream* reporter)
+std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path cSourceFile, const CL& cli,
+                                              llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
     if (cli.template get<TIME>())
@@ -505,8 +114,7 @@ std::optional<coral66::fs::path>
     }
 
     bool errors = false;
-    auto pptokens =
-        coral66::Lexer::tokenize(std::move(input), &languageOptions, reporter, &errors, cSourceFile.string());
+    auto pptokens = coral66::Lexer::tokenize(std::move(input), reporter, &errors, cSourceFile.string());
     if (errors)
     {
         return {};
@@ -521,26 +129,7 @@ std::optional<coral66::fs::path>
         ppTimeRegion.emplace(*ppTimer);
     }
 
-    coral66::PP::Options ppOptions = getTargetSpecificPreprocessorOptions(languageOptions, triple, cli);
-    for (auto& iter : cli.template get<INCLUDES>())
-    {
-        if (std::none_of(cli.template get<ISYSTEM>().begin(), cli.template get<ISYSTEM>().end(),
-                         [&iter](const coral66::fs::path& path)
-                         {
-                             std::error_code ec;
-                             auto res = coral66::fs::equivalent(path, coral66::fs::path(iter), ec);
-                             return res && !ec;
-                         }))
-        {
-            ppOptions.includeDirectories.emplace_back(iter);
-        }
-    }
-    ppOptions.systemDirectories = cli.template get<ISYSTEM>();
-    for (auto& [name, maybeValue] : cli.template get<DEFINE_MACRO>())
-    {
-        ppOptions.additionalMacros.emplace_back(name, maybeValue.value_or("1"));
-    }
-    pptokens = coral66::PP::preprocess(std::move(pptokens), ppOptions, reporter, &errors);
+    pptokens = coral66::PP::preprocess(std::move(pptokens), reporter, &errors);
     if (errors)
     {
         return {};
@@ -647,7 +236,6 @@ std::optional<coral66::fs::path>
             default: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
         }
     }
-    codegenOptions.emitAllDecls = cli.template get<EMIT_ALL_DECLS>();
     auto* debugOption = cli.template lastSpecified<G0, G1, G2, G3>();
     if (!debugOption)
     {
@@ -795,9 +383,8 @@ std::optional<coral66::fs::path>
 }
 
 template <class CL>
-int doActionOnAllFiles(Action action, const coral66::LanguageOptions& languageOptions,
-                       const coral66::Triple& triple, // NOLINT(*-prefer-static-over-anonymous-namespace)
-                       std::span<const std::string_view> files, const CL& cli, llvm::raw_ostream* reporter)
+int doActionOnAllFiles(Action action, std::span<const std::string_view> files, const CL& cli,
+                       llvm::raw_ostream* reporter)
 {
     std::vector<coral66::fs::path> linkableFiles;
     for (auto& iter : files)
@@ -806,7 +393,7 @@ int doActionOnAllFiles(Action action, const coral66::LanguageOptions& languageOp
         auto extension = path.extension();
         if (extension == ".c")
         {
-            auto objectFile = compileCFile(action, iter, triple, languageOptions, cli, reporter);
+            auto objectFile = compileCFile(action, iter, cli, reporter);
             if (!objectFile)
             {
                 return -1;
@@ -837,12 +424,8 @@ int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const
     llvm::InitializeAllAsmParsers();
 
     auto cli =
-        coral66::parseCommandLine<OUTPUT_FILE, COMPILE_ONLY, ASSEMBLY_OUTPUT, PREPROCESS_ONLY, TARGET, EMIT_LLVM, OPT,
-                                  DEFINE_MACRO, INCLUDES, PIE, PIC, FREESTANDING, HELP, VERSION, STANDARD_VERSION,
-                                  WARNINGS, ISYSTEM, EMIT_ALL_DECLS, G0, G1, G2, G3, SYNTAX_ONLY, TIME, MMX, SSE,
-                                  THREEDNOWA, SSE2, SSE3, SSSE3, SSE4_1, SSE4_2, AVX, AVX2, AES, PCLMUL, FSGSBASE,
-                                  RDRND, PTWRITE, SSE4A, XOPA, FMA4, LWP, BMI, BMI2, LZCNT, FXSR, XSAVE, XSAVEOPT, TBM,
-                                  THREEDNOW, RTM, MWAITX, CLZERO, PKU>(elements);
+        coral66::parseCommandLine<OUTPUT_FILE, COMPILE_ONLY, ASSEMBLY_OUTPUT, PREPROCESS_ONLY, EMIT_LLVM, OPT,
+                                  LIBRARY_PATH, PIE, PIC, HELP, VERSION, G0, G1, G2, G3, SYNTAX_ONLY, TIME>(elements);
     if (cli.get<HELP>())
     {
         if (out)
@@ -859,43 +442,6 @@ int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const
         }
         return 0;
     }
-    auto triple = coral66::Triple::defaultTarget();
-    if (cli.get<TARGET>())
-    {
-        triple = coral66::Triple::fromString(*cli.get<TARGET>());
-    }
-    bool gnuExtensions = false;
-    auto language = coral66::LanguageOptions::Language::C99;
-    if (cli.get<STANDARD_VERSION>())
-    {
-        auto str = *cli.get<STANDARD_VERSION>();
-        if (str == "gnu99")
-        {
-            language = coral66::LanguageOptions::Language ::C99;
-            gnuExtensions = true;
-        }
-        else if (str == "c99")
-        {
-            language = coral66::LanguageOptions::Language ::C99;
-            gnuExtensions = false;
-        }
-        else
-        {
-            if (reporter)
-            {
-                *reporter << Errors::CLI::UNKNOWN_LANGUAGE_STANDARD_N.argsCLI(str);
-            }
-            return -1;
-        }
-    }
-    auto options = coral66::LanguageOptions::fromTriple(triple, language);
-    if (gnuExtensions)
-    {
-        options.extension = coral66::LanguageOptions::Extension::GNU;
-    }
-    options.enabledWarnings = cli.get<WARNINGS>();
-    options.freeStanding = cli.get<FREESTANDING>();
-    setTargetFeatures(*options.targetFeatures, cli, reporter);
 
     if (cli.getUnrecognized().empty())
     {
@@ -921,7 +467,7 @@ int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return doActionOnAllFiles(Action::Compile, options, triple, cli.getUnrecognized(), cli, reporter);
+        return doActionOnAllFiles(Action::Compile, cli.getUnrecognized(), cli, reporter);
     }
     if (cli.get<ASSEMBLY_OUTPUT>())
     {
@@ -932,11 +478,11 @@ int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return doActionOnAllFiles(Action::AssemblyOutput, options, triple, cli.getUnrecognized(), cli, reporter);
+        return doActionOnAllFiles(Action::AssemblyOutput, cli.getUnrecognized(), cli, reporter);
     }
     if (cli.get<PREPROCESS_ONLY>())
     {
-        return doActionOnAllFiles(Action::Preprocess, options, triple, cli.getUnrecognized(), cli, reporter);
+        return doActionOnAllFiles(Action::Preprocess, cli.getUnrecognized(), cli, reporter);
     }
-    return doActionOnAllFiles(Action::Compile, options, triple, cli.getUnrecognized(), cli, reporter);
+    return doActionOnAllFiles(Action::Compile, cli.getUnrecognized(), cli, reporter);
 }

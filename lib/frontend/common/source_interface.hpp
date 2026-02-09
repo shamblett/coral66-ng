@@ -10,10 +10,7 @@
 #include <span>
 #include <variant>
 
-#include "language_options.hpp"
-
 /**
- * @file SourceInterface.hpp
  * @brief Defines the abstract interface for accessing source code information.
  *
  * The SourceInterface (and PPSourceInterface) provides an abstraction layer for
@@ -63,8 +60,6 @@ public:
     [[nodiscard]] virtual std::span<const Source::File> getFiles() const noexcept = 0;
 
     [[nodiscard]] virtual std::span<const Source::PPRecord> getSubstitutions() const noexcept = 0;
-
-    [[nodiscard]] virtual const LanguageOptions& getLanguageOptions() const noexcept = 0;
 };
 
 class PPSourceInterface : virtual public source_interface
