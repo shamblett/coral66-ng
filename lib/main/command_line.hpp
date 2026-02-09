@@ -506,7 +506,8 @@ public:
     SmallFunction() = default;
 
     template <class F>
-    SmallFunction(F&& f) : m_call(call<std::remove_reference_t<F>>)  // NOLINT(*-forwarding-reference-overload, *-pro-type-member-init)
+    SmallFunction(F&& f)
+        : m_call(call<std::remove_reference_t<F>>) // NOLINT(*-forwarding-reference-overload, *-pro-type-member-init)
     {
         static_assert(std::is_trivially_destructible_v<std::remove_reference_t<F>>
                       && sizeof(std::remove_reference_t<F>) <= sizeof(m_storage));

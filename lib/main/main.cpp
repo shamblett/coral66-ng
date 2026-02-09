@@ -79,7 +79,7 @@ enum class Action
 
 template <class CL>
 std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::path cSourceFile, const CL& cli,
-                                              llvm::raw_ostream* reporter)
+                                                    llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
     if (cli.template get<TIME>())
