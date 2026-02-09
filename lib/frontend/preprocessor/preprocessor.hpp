@@ -27,8 +27,8 @@ struct Options
     std::vector<std::pair<std::string, std::string>> additionalMacros;
 };
 
-PPSourceObject preprocess(PPSourceObject&& sourceObject,
-                          llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr) noexcept;
+PPSourceObject preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
+                          bool* errorsOccurred = nullptr) noexcept;
 
 template <class T>
 std::string reconstruct(const T* begin, const T* end, const source_interface& sourceInterface) noexcept

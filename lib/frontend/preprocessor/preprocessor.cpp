@@ -10,10 +10,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "preprocessor_parser.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/support/scope_exit.hpp"
+#include "preprocessor_parser.hpp"
 
 namespace
 {
@@ -156,8 +156,8 @@ class Preprocessor final : private coral66::PPSourceInterface
         std::string replacementText(defineDirective.tokens[1].getValue());
 
         bool errors = false;
-        auto scratchPadPP = coral66::Lexer::tokenize(std::move(replacementText), m_reporter,
-                                                     &errors, "<Macro Expansion>");
+        auto scratchPadPP =
+            coral66::Lexer::tokenize(std::move(replacementText), m_reporter, &errors, "<Macro Expansion>");
         if (errors)
         {
             m_errorsOccurred = true;
@@ -206,10 +206,7 @@ class Preprocessor final : private coral66::PPSourceInterface
     }
 
 public:
-    Preprocessor(llvm::raw_ostream* report) noexcept
-        : m_reporter(report)
-    {
-    }
+    Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
 
     std::vector<coral66::Lexer::PPToken>& getResult() noexcept
     {
@@ -315,8 +312,8 @@ public:
 };
 } // namespace
 
-coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& sourceObject,
-                                                llvm::raw_ostream* reporter, bool* errorsOccurred) noexcept
+coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
+                                                bool* errorsOccurred) noexcept
 {
     Preprocessor preprocessor(reporter);
     preprocessor.process(std::move(sourceObject));

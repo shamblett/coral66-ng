@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "semantics.hpp"
 #include "program_interface.hpp"
+#include "semantics.hpp"
 
 namespace coral66::Semantics
 {

@@ -49,8 +49,7 @@ using PPTokenIterator = const PPToken* CORAL66_NON_NULL;
  * @param sourcePath Path to the source file (for diagnostics).
  * @return A SourceObject containing the PPTokens.
  */
-PPSourceObject tokenize(std::string source,
-                        llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr,
+PPSourceObject tokenize(std::string source, llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr,
                         std::string_view sourcePath = "<stdin>");
 
 /**

@@ -611,8 +611,6 @@ class Context : private coral66::source_interface
     bool m_errorsOccurred = false;
     coral66::Source::File m_fakeFile;
 
-
-
     [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t offset) const noexcept override
     {
         auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
@@ -1096,7 +1094,7 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c, // NOLINT(*-make-member-function-const)
+std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c,           // NOLINT(*-make-member-function-const)
                                                Context& context) noexcept // NOLINT(*-make-member-function-const)
 {
     if (c == 'u' || c == 'U')
@@ -1224,7 +1222,7 @@ std::pair<StateMachine, bool> Dot::advance(char const c, Context& context) // NO
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-std::pair<StateMachine, bool> Punctuation::advance(char const c, // NOLINT(*-make-member-function-const)
+std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*-make-member-function-const)
                                                    Context& context) // NOLINT(*-make-member-function-const)
 {
     switch (first)
@@ -1372,8 +1370,7 @@ struct [[maybe_unused]] FirstArgOfMethod<R (*)(U, Args...) noexcept>
 };
 } // namespace
 
-coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
-                                                 llvm::raw_ostream* reporter, bool* errorsOccurred,
+coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath)
 {
     if (errorsOccurred)
@@ -1676,7 +1673,8 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source,
     }
 
     return PPSourceObject(std::move(context.getResult()),
-                          {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {}, {{std::move(characterToSourceSpace)}});
+                          {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {},
+                          {{std::move(characterToSourceSpace)}});
 }
 
 [[nodiscard]] std::string_view coral66::Lexer::TokenBase::getRepresentation(const source_interface& sourceObject) const
@@ -2035,8 +2033,7 @@ coral66::CSourceObject coral66::Lexer::toCTokens(PPSourceObject&& sourceObject, 
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
-    return {std::move(tokens), std::move(sourceObject.getFiles()),
-            std::move(sourceObject.getSubstitutions())};
+    return {std::move(tokens), std::move(sourceObject.getFiles()), std::move(sourceObject.getSubstitutions())};
 }
 
 coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter,
@@ -2183,7 +2180,7 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
     }
 
     return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
-                         ppToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
+                  ppToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
 }
 
 std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const tokenType)

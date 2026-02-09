@@ -12,10 +12,10 @@
 #include <string>
 #include <vector>
 
-#include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/common/attributes.hpp"
 #include "lib/frontend/common/semantics_common.hpp"
 #include "lib/frontend/common/source_object.hpp"
+#include "lib/frontend/lexer/lexer.hpp"
 #include "lib/support/abstract_intrusive_variant.hpp"
 #include "lib/support/intrusive_variant_value.hpp"
 #include "lib/support/vendor/tsl/ordered_map.h"

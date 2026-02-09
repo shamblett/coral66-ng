@@ -8,8 +8,8 @@
 
 #include <llvm/IR/IRBuilder.h>
 
-#include "lib/frontend/semantics/semantics.hpp"
 #include "code_generation.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
 
 namespace coral66::CGLLVM
 {
