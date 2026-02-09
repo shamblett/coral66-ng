@@ -77,7 +77,7 @@ enum class Action
 };
 
 template <class CL>
-std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path cSourceFile, const CL& cli,
+std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::path cSourceFile, const CL& cli,
                                               llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
@@ -95,7 +95,7 @@ std::optional<coral66::fs::path> compileCFile(Action action, coral66::fs::path c
         return {};
     }
 
-    std::size_t const size = file.tellg();
+    std::streamsize const size = file.tellg();
     file.seekg(0);
     std::string input(size, '\0');
     file.read(input.data(), size);
@@ -393,7 +393,7 @@ int doActionOnAllFiles(Action action, std::span<const std::string_view> files, c
         auto extension = path.extension();
         if (extension == ".c")
         {
-            auto objectFile = compileCFile(action, iter, cli, reporter);
+            auto objectFile = compileCoral66File(action, iter, cli, reporter);
             if (!objectFile)
             {
                 return -1;
