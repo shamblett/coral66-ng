@@ -410,7 +410,7 @@ int doActionOnAllFiles(Action action, std::span<const std::string_view> files, c
 
 void printVersion(llvm::raw_ostream& os) // NOLINT(*-prefer-static-over-anonymous-namespace)
 {
-    os << "coral66 version " << version << '\n';
+    os << "coral66 version " << coral66::version << '\n';
     os.flush();
 }
 

@@ -7,4 +7,7 @@
 
 #include <string>
 
+namespace coral66
+{
 inline const std::string version = "1.0-beta";
+}
