@@ -26,6 +26,7 @@
 #include "lib/main/command_line.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/triple.hpp"
+#include "version.hpp"
 
 CORAL66_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
 ("Path of the output file");
@@ -409,7 +410,7 @@ int doActionOnAllFiles(Action action, std::span<const std::string_view> files, c
 
 void printVersion(llvm::raw_ostream& os) // NOLINT(*-prefer-static-over-anonymous-namespace)
 {
-    os << "coral66 version " << "1.0-beta" << '\n';
+    os << "coral66 version " << version << '\n';
     os.flush();
 }
 

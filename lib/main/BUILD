@@ -13,6 +13,7 @@ cc_library(
     hdrs = [
         "command_line.hpp",
         "main.hpp",
+        "version.hpp",
     ],
     visibility = [
         "//bin:__pkg__",
