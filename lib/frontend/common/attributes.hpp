@@ -8,6 +8,8 @@
 
 #include <variant>
 
+#include "lib/support/constexpr.hpp"
+
 namespace coral66::Semantics
 {
 /**
