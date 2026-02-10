@@ -1,0 +1,17 @@
+-o <file>           Path of the output file
+-c                  Stop after compiling object files
+-S                  Stop after compiling and output assembly files
+-E                  Preprocess to stdout or output file
+-emit-llvm          Use LLVM IR instead of machine code and assembly
+-O<level>           Optimization level
+-L<dir>             Library directories
+-f[no-]PIE          Build a position independent executable
+-f[no-]PIC          Build position independent code
+--help              Display all options
+--version           Print version
+-g0                 No debug info
+-g1                 Lines only
+-g2                 Generated debugging info
+-g3                 Generated extded debugging info
+-fsyntax-only       Stop after semantic analysis and produce no output file
+-time               Time individual components
