@@ -5,7 +5,7 @@
  */
 
 #include <wordexp.h>
-
+#include <print>
 
 #include "lib/main/command_line_arguments.hpp"
 #include "lib/main/command_line_processor.hpp"
@@ -37,11 +37,13 @@ TEST_CASE("Initial state", "[cli]")
     CHECK(DebugLevel == DebugLevel::NoDebug);
     CHECK(SyntaxOnly == false);
     CHECK(Time == false);
+    CHECK(SourceFilename.empty());
 }
 TEST_CASE("Commandline without args", "[cli]")
 {
     auto [argc, argv] = createArgs("main.cor");
     CommandLineProcessor::ParseCommandLine(argc, argv);
+    print(SourceFilename);
     CHECK(SourceFilename == "main.cor");
 }
 

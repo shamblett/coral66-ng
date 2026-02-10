@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "llvm/Support/CommandLine.h"
+
 /**
  * @brief The command line processor
  *
@@ -18,7 +20,10 @@ class CommandLineProcessor {
 
 public:
 
-  static void ParseCommandLine(int argc, char **argv);
+  static void ParseCommandLine(int argc, char **argv)
+  {
+      llvm::cl::ParseCommandLineOptions(argc, argv);
+  }
 
 };
 
