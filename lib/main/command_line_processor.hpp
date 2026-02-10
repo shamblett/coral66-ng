@@ -6,10 +6,6 @@
 
 #pragma once
 
-#include "llvm/Support/CommandLine.h"
-
-#include "command_line_arguments.hpp"
-
 /**
  * @brief The command line processor
  *
@@ -20,10 +16,9 @@ namespace coral66 {
 
 class CommandLineProcessor {
 
-  CommandLineProcessor();
-
-  void ParseCommandLine(int argc, char **argv);
+  static void ParseCommandLine(int argc, char **argv);
 
 };
 
-}
+
+} // namespace coral66
