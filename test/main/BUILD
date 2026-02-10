@@ -29,5 +29,6 @@ cc_test(
     visibility = ["//test:__pkg__"],
     deps = [
         "maintest",
+        "//lib/llvm:llvm-21",
     ],
 )

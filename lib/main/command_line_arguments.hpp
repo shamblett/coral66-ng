@@ -33,6 +33,7 @@ namespace coral66
 
 enum OptLevel
 {
+    None,
     O1,
     O2,
     O3
@@ -40,6 +41,7 @@ enum OptLevel
 
 enum DebugLevel
 {
+    NoDebug,
     g1,
     g2,
     g3
@@ -63,7 +65,7 @@ inline llvm::cl::opt<bool> Version("v", llvm::cl::desc("Version"));
 inline llvm::cl::opt<DebugLevel> DebugLevel(llvm::cl::desc("Debug level:"),
                                             llvm::cl::values(clEnumVal(g1, "Lines only"),
                                                              clEnumVal(g2, "Generate debugging info"),
-                                                             clEnumVal(O3, "Generated extended debugging info")));
+                                                             clEnumVal(g3, "Generated extended debugging info")));
 inline llvm::cl::opt<bool> SyntaxOnly("syntax-only",
                                       llvm::cl::desc("Stop after semantic analysis and produce no output file"));
 inline llvm::cl::opt<bool> Time("time", llvm::cl::desc("Output time taken for each stage"));

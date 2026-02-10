@@ -16,6 +16,8 @@ namespace coral66 {
 
 class CommandLineProcessor {
 
+public:
+
   static void ParseCommandLine(int argc, char **argv);
 
 };
