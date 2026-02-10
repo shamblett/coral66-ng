@@ -11,6 +11,5 @@ cc_library(
     ],
     visibility = [
         "//lib/support:__pkg__",
-        "//test",
     ],
 )
