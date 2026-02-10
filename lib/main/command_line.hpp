@@ -984,6 +984,11 @@ public:
         return m_unrecognized;
     }
 
+    [[nodiscard]] const Storage& getStorage() const noexcept
+    {
+        return m_storage;
+    }
+
     template <auto& option>
     [[nodiscard]] const auto& get() const noexcept
     {

@@ -252,8 +252,6 @@ public:
     FileScope& operator=(FileScope&&) = delete;
 };
 
-[[nodiscard]] FileScope createInclude(std::string_view path, std::string_view content);
-
 struct EndTest
 {
     coral66::fs::path path;

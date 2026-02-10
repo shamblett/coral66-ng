@@ -6,6 +6,10 @@
 
 #include "lib/main/main.hpp"
 
+#include <unistd.h>
+#include <pwd.h>
+#include <print>
+
 #include "lib/frontend/common/error_messages.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
@@ -33,15 +37,24 @@ TEST_CASE("Commandline options", "[coral66]")
         std::vector<std::string_view> vector = {"--version"};
         std::string s;
         llvm::raw_string_ostream ss(s);
-        auto ret = coral66::main(vector, nullptr, &ss);
+        const auto ret = coral66::main(vector, nullptr, &ss);
         CHECK(ret == 0);
         ss.flush();
         REQUIRE(s == "coral66 version 1.0-beta\n");
     }
-    auto dummyFile = createInclude("main.cor", "CORAL TEST RESPONDER INTEGER A END");
-    coral66_MAIN_PRODUCES(ProducesError(NO_SOURCE_FILES_SPECIFIED), {"-c"});
-    coral66_MAIN_PRODUCES(ProducesError(FAILED_TO_OPEN_C_SOURCE_FILE_N, "missing.c"), {"missing.c", "-c"});
-    coral66_MAIN_PRODUCES(
-        ProducesError(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"),
-        {"main.cor", "-c", "-o", "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"});
+
+    SECTION("Compile")
+    {
+        const passwd *pw = getpwuid(getuid());
+        const char *homedir = pw->pw_dir;
+        const std::string homeDir = std::string(homedir);
+        std::println("Home: {}", homeDir);
+        const std::string mainFile = homeDir + "/Development/c++/coral/coral66-ng/test/main/data/main/main.cor";
+        std::println("Name: {}", mainFile);
+        coral66_MAIN_PRODUCES(ProducesError(NO_SOURCE_FILES_SPECIFIED), {"-c"});
+        coral66_MAIN_PRODUCES(ProducesError(FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N, "missing.cor"), {"missing.cor", "-c"});
+        coral66_MAIN_PRODUCES(ProducesError(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"),
+            {mainFile, "-c", "-o", "/PleaseDoNotExitThatWouldBeSuperAwkward/main.o"});
+    }
+
 }

@@ -136,8 +136,9 @@ namespace CLI
 {
 CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE_N, "Failed to open source file '%0'");
 CREATE_ERROR(NO_SOURCE_FILES_SPECIFIED, "No source files specified");
+CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .cor '%0'");
 CREATE_ERROR(UNKNOWN_ARGUMENT_N, "Unknown argument '%0'");
-CREATE_ERROR(FAILED_TO_OPEN_C_SOURCE_FILE_N, "Failed to open C source file '%0'");
+CREATE_ERROR(FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N, "Failed to open Coral66 source file '%0'");
 CREATE_ERROR(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "Failed to open file '%0' for output");
 CREATE_ERROR(UNKNOWN_LANGUAGE_STANDARD_N, "Unknown language standard '%0'");
 CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME,

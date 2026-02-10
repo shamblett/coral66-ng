@@ -91,7 +91,7 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     {
         if (reporter)
         {
-            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_C_SOURCE_FILE_N.argsCLI(cSourceFile.string());
+            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N.argsCLI(cSourceFile.string());
         }
         return {};
     }
@@ -391,8 +391,7 @@ int doActionOnAllFiles(Action action, std::span<const std::string_view> files, c
     for (auto& iter : files)
     {
         auto path = coral66::fs::path(iter);
-        auto extension = path.extension();
-        if (extension == ".c")
+        if (auto extension = path.extension(); extension == ".cor")
         {
             auto objectFile = compileCoral66File(action, iter, cli, reporter);
             if (!objectFile)
@@ -403,6 +402,9 @@ int doActionOnAllFiles(Action action, std::span<const std::string_view> files, c
             {
                 linkableFiles.push_back(*objectFile);
             }
+        } else
+        {
+            *reporter << coral66::Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(iter);
         }
     }
     return 0;
@@ -446,6 +448,8 @@ int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const
 
     if (cli.getUnrecognized().empty())
     {
+        // HACK for now, check for a source file that does not end in .cor
+        const auto cl = cli.getStorage();
         if (reporter)
         {
             *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
