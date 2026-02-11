@@ -260,6 +260,8 @@ struct EndTest
 
 [[nodiscard]] EndTest enableParallelization();
 
+std::tuple<int, char**> createArgs(const std::string& commandLine);
+
 } // namespace coral66::Tests
 
 // IT'S ONLY FOR TESTS I SWEAR. It's in a namepspace for mangling

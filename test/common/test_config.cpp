@@ -6,6 +6,9 @@
 
 #include "test/common/test_config.hpp"
 
+#include <tuple>
+#include <wordexp.h>
+
 #include <llvm/Support/Process.h>
 
 coral66::Tests::FileScope::~FileScope()
@@ -26,4 +29,14 @@ EndTest::~EndTest()
 {
     coral66::fs::current_path(path / "..");
     coral66::fs::remove_all(path);
+}
+
+std::tuple<int, char**> coral66::Tests::createArgs(const std::string& commandLine)
+{
+    const char* programName = "coral66";
+    wordexp_t p;
+    p.we_offs = 1;
+    wordexp(commandLine.c_str(), &p, WRDE_DOOFFS);
+    p.we_wordv[0] = const_cast<char*>(programName);
+    return std::make_tuple(p.we_wordc, p.we_wordv);
 }
