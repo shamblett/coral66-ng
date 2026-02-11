@@ -25,8 +25,8 @@
  * -g1                 Lines only
  * -g2                 Generated debugging info
  * -g3                 Generated extended debugging info
- * -fsyntax-only       Stop after semantic analysis and produce no output file
- *-time                Output time taken for each stage
+ * -syntax-only       Stop after semantic analysis and produce no output file
+ * -time                Output time taken for each stage
  */
 namespace coral66
 {

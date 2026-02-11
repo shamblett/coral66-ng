@@ -123,3 +123,20 @@ TEST_CASE("Version", "[cli]") {
     CHECK(os.str() == "1.0-beta");
 }
 
+TEST_CASE("String options")
+{
+    SECTION("Output file")
+    {
+        auto [argc, argv] = createArgs("-o main.o");
+        CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(OutputFilename == "main.o");
+    }
+
+    SECTION("Library directory")
+    {
+        auto [argc, argv] = createArgs("-L path/to/libs");
+        CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(LibraryDirectory == "path/to/libs");
+    }
+}
+
