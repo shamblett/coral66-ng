@@ -40,6 +40,5 @@ TEST_CASE("Commandline with just source file name", "[cli]")
     auto [argc, argv] = createArgs("main.cor");
     CommandLineProcessor::ParseCommandLine(argc, argv);
     CHECK(SourceFilename == "main.cor");
-    SourceFilename = "";
 }
 
