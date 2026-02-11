@@ -30,13 +30,16 @@ TEST_CASE("Initial state", "[cli]")
 }
 TEST_CASE("Commandline without args", "[cli]")
 {
+    auto [argc, argv] = createArgs("");
+    CommandLineProcessor::ParseCommandLine(argc, argv);
+    CHECK(SourceFilename.empty());
+}
+
+TEST_CASE("Commandline with just source file name", "[cli]")
+{
     auto [argc, argv] = createArgs("main.cor");
     CommandLineProcessor::ParseCommandLine(argc, argv);
     CHECK(SourceFilename == "main.cor");
-}
-
-TEST_CASE("Commandline arg types", "[cli]")
-{
-
+    SourceFilename = "";
 }
 

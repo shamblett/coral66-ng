@@ -33,10 +33,8 @@ EndTest::~EndTest()
 
 std::tuple<int, char**> coral66::Tests::createArgs(const std::string& commandLine)
 {
-    const char* programName = "coral66";
+    std::string cl = "coral66 " + commandLine;
     wordexp_t p;
-    p.we_offs = 1;
-    wordexp(commandLine.c_str(), &p, WRDE_DOOFFS);
-    p.we_wordv[0] = const_cast<char*>(programName);
+    wordexp(cl.c_str(), &p, 0);
     return std::make_tuple(p.we_wordc, p.we_wordv);
 }
