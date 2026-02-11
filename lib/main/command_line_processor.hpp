@@ -8,6 +8,8 @@
 
 #include "llvm/Support/CommandLine.h"
 
+#include "version.hpp"
+
 /**
  * @brief The command line processor
  *
@@ -20,8 +22,14 @@ class CommandLineProcessor {
 
 public:
 
+  static void PrintVersion(llvm::raw_ostream &OS)
+  {
+      OS << version;
+  }
+
   static void ParseCommandLine(int argc, char **argv)
   {
+      llvm::cl::SetVersionPrinter([](llvm::raw_ostream &OS){PrintVersion(OS);});
       llvm::cl::ParseCommandLineOptions(argc, argv);
   }
 

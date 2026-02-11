@@ -42,7 +42,7 @@ TEST_CASE("Commandline with just source file name", "[cli]")
     CHECK(SourceFilename == "main.cor");
 }
 
-TEST_CASE("Commandline options", "[cli]")
+TEST_CASE("Boolean options", "[cli]")
 {
     SECTION("Compile")
     {
@@ -100,3 +100,26 @@ TEST_CASE("Commandline options", "[cli]")
         CHECK(Time == true);
     }
 }
+
+TEST_CASE("Alternative options", "[cli]") {
+
+    SECTION("Optimisation level") {
+        auto [argc, argv] = createArgs("-O2 main.cor");
+        CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(OptimizationLevel == coral66::OptLevel::O2);
+    }
+
+    SECTION("Debug level") {
+        auto [argc, argv] = createArgs("-g2 main.cor");
+        CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(DebugLevel == coral66::DebugLevel::g2);
+    }
+}
+
+TEST_CASE("Version", "[cli]") {
+    std::string str;
+    llvm::raw_string_ostream os(str);
+    CommandLineProcessor::PrintVersion(os);
+    CHECK(os.str() == "1.0-beta");
+}
+
