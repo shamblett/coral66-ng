@@ -13,6 +13,6 @@
 
 namespace coral66
 {
-int main(std::span<std::string_view> ref, llvm::raw_ostream* err = &llvm::errs(),
+int main(int argc, char** argv, llvm::raw_ostream* err = &llvm::errs(),
          llvm::raw_ostream* out = &llvm::outs());
 } // namespace coral66

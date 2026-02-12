@@ -11,12 +11,7 @@
 
 int main(const int argc, char** argv)
 {
-    std::vector<std::string_view> elements(argc - 1);
-    for (int i = 1; i < argc; i++)
-    {
-        elements[i - 1] = argv[i];
-    }
-    return coral66::main(elements);
+    return coral66::main(argc, argv);
 }
 
 #ifdef __clang__

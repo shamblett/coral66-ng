@@ -26,45 +26,9 @@
 #include "lib/main/command_line.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/triple.hpp"
+#include "command_line_processor.hpp"
+#include "command_line_arguments.hpp"
 #include "version.hpp"
-
-CORAL66_CLI_OPT(OUTPUT_FILE, ("-o <file>", "--output=<file>", "--output <file>"), (std::string_view, file))
-("Path of the output file");
-
-CORAL66_CLI_OPT(COMPILE_ONLY, ("-c", "--compile"))("Stop after compiling object files");
-
-CORAL66_CLI_OPT(ASSEMBLY_OUTPUT, ("-S", "--assemble"))("Stop after compiling and output assembly files");
-
-CORAL66_CLI_OPT(PREPROCESS_ONLY, ("-E", "--preprocess"))("Preprocess to stdout or output file");
-
-CORAL66_CLI_OPT(SYNTAX_ONLY, ("-fsyntax-only"))("Stop after semantic analysis and produce no output file");
-
-CORAL66_CLI_OPT(EMIT_LLVM, ("-emit-llvm"))("Use LLVM IR instead of machine code and assembly");
-
-CORAL66_CLI_OPT(OPT, ("-O<level>", "-O", "--optimize", "--optimize=<level>"),
-                (std::uint8_t, level))("Optimization level");
-
-CORAL66_CLI_OPT(LIBRARY_PATH, ("-L<dir>", "-L <dir>", "--library-directory <dir>", "--library-directory=<dir>"),
-                (std::string_view, dir))
-("Library directories", coral66::CLIMultiArg::List);
-
-CORAL66_CLI_OPT(PIE, ("-f[no-]PIE"))("Build a position independent executable");
-
-CORAL66_CLI_OPT(PIC, ("-f[no-]PIC"))("Build position independent code");
-
-CORAL66_CLI_OPT(VERSION, ("--version"))("Print version");
-
-CORAL66_CLI_OPT(HELP, ("--help", "-help"))("Display all options");
-
-CORAL66_CLI_OPT(TIME, ("-time"))("Time individual components");
-
-CORAL66_CLI_OPT(G0, ("-g0"))("No debug info");
-
-CORAL66_CLI_OPT(G1, ("-g1", "-gline-tables-only", "-gmlt"))("Lines only");
-
-CORAL66_CLI_OPT(G2, ("-g2", "-g", "--debug"))("Generated debugging info");
-
-CORAL66_CLI_OPT(G3, ("-g3"))("Generated extded debugging info");
 
 namespace
 {
@@ -77,21 +41,20 @@ enum class Action
     Link [[maybe_unused]]
 };
 
-template <class CL>
-std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::path cSourceFile, const CL& cli,
+std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::path sourceFile,
                                                     llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
-    if (cli.template get<TIME>())
+    if (coral66::Time)
     {
-        timer.emplace("Compilation", "Time it took for the whole compilation of " + cSourceFile.string());
+        timer.emplace("Compilation", "Time it took for the whole compilation of " + sourceFile.string());
     }
-    coral66::fs::ifstream file(cSourceFile, std::ios_base::binary | std::ios_base::ate | std::ios_base::in);
+    coral66::fs::ifstream file(sourceFile, std::ios_base::binary | std::ios_base::ate | std::ios_base::in);
     if (!file.is_open())
     {
         if (reporter)
         {
-            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N.argsCLI(cSourceFile.string());
+            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N.argsCLI(sourceFile.string());
         }
         return {};
     }
@@ -102,20 +65,20 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     file.read(input.data(), size);
     file.close();
 
-    cSourceFile = coral66::fs::absolute(cSourceFile);
-    cSourceFile = cSourceFile.lexically_normal();
+    sourceFile = coral66::fs::absolute(sourceFile);
+    sourceFile = sourceFile.lexically_normal();
 
     std::optional<llvm::TimeRegion> ppTokenTimeRegion;
     if (timer)
     {
         std::optional<llvm::Timer> ppTokenTimer;
         ppTokenTimer.emplace("Lexing preprocessor tokens",
-                             "Time it took to lex all preprocessor tokens in " + cSourceFile.string(), *timer);
+                             "Time it took to lex all preprocessor tokens in " + sourceFile.string(), *timer);
         ppTokenTimeRegion.emplace(*ppTokenTimer);
     }
 
     bool errors = false;
-    auto pptokens = coral66::Lexer::tokenize(std::move(input), reporter, &errors, cSourceFile.string());
+    auto ppTokens = coral66::Lexer::tokenize(std::move(input), reporter, &errors, sourceFile.string());
     if (errors)
     {
         return {};
@@ -126,11 +89,11 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     if (timer)
     {
         std::optional<llvm::Timer> ppTimer;
-        ppTimer.emplace("Preprocessor", "Time it took to preprocess " + cSourceFile.string(), *timer);
+        ppTimer.emplace("Preprocessor", "Time it took to preprocess " + sourceFile.string(), *timer);
         ppTimeRegion.emplace(*ppTimer);
     }
 
-    pptokens = coral66::PP::preprocess(std::move(pptokens), reporter, &errors);
+    ppTokens = coral66::PP::preprocess(std::move(ppTokens), reporter, &errors);
     if (errors)
     {
         return {};
@@ -139,38 +102,38 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     if (action == Action::Preprocess)
     {
         auto reconstruction =
-            coral66::PP::reconstruct(pptokens.data().data(), pptokens.data().data() + pptokens.data().size(), pptokens);
-        if (!cli.template get<OUTPUT_FILE>())
+            coral66::PP::reconstruct(ppTokens.data().data(), ppTokens.data().data() + ppTokens.data().size(), ppTokens);
+        if (!coral66::OutputFilename.empty())
         {
             llvm::outs() << reconstruction;
             llvm::outs().flush();
             return coral66::fs::path{};
         }
 
-        coral66::fs::ofstream outputFile(coral66::to_string(*cli.template get<OUTPUT_FILE>()), std::ios_base::out);
+        coral66::fs::ofstream outputFile(coral66::to_string(coral66::OutputFilename), std::ios_base::out);
         if (!outputFile.is_open())
         {
             if (reporter)
             {
                 *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(
-                    *cli.template get<OUTPUT_FILE>());
+                    coral66::OutputFilename);
             }
             return {};
         }
         outputFile << reconstruction;
         outputFile.close();
-        return coral66::fs::path(*cli.template get<OUTPUT_FILE>());
+        return coral66::fs::path(coral66::OutputFilename);
     }
 
     std::optional<llvm::TimeRegion> cTokenTimeRegion;
     if (timer)
     {
         std::optional<llvm::Timer> cTokenTimer;
-        cTokenTimer.emplace("C Token", "Time it took turn PP Tokens into C Tokens " + cSourceFile.string(), *timer);
+        cTokenTimer.emplace("C Token", "Time it took turn PP Tokens into C Tokens " + sourceFile.string(), *timer);
         cTokenTimeRegion.emplace(*cTokenTimer);
     }
 
-    auto ctokens = coral66::Lexer::toCTokens(std::move(pptokens), reporter, &errors);
+    auto cTokens = coral66::Lexer::toCTokens(std::move(ppTokens), reporter, &errors);
     if (errors)
     {
         return {};
@@ -181,11 +144,11 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     if (timer)
     {
         std::optional<llvm::Timer> parserTimer;
-        parserTimer.emplace("Parser", "Time it took to parse " + cSourceFile.string(), *timer);
+        parserTimer.emplace("Parser", "Time it took to parse " + sourceFile.string(), *timer);
         parserTimeRegion.emplace(*parserTimer);
     }
 
-    coral66::Syntax::Program tree = coral66::Parser::parseProgram(ctokens, reporter, &errors);
+    coral66::Syntax::Program tree = coral66::Parser::parseProgram(cTokens, reporter, &errors);
     if (errors)
     {
         return {};
@@ -196,16 +159,16 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     if (timer)
     {
         std::optional<llvm::Timer> semanticsTimer;
-        semanticsTimer.emplace("Semantics", "Time it took to semantically analyze " + cSourceFile.string(), *timer);
+        semanticsTimer.emplace("Semantics", "Time it took to semantically analyze " + sourceFile.string(), *timer);
         semanticsTimeRegion.emplace(*semanticsTimer);
     }
 
-    auto program = coral66::Semantics::analyse(tree, std::move(ctokens), reporter, &errors);
+    auto program = coral66::Semantics::analyse(tree, std::move(cTokens), reporter, &errors);
     if (errors)
     {
         return {};
     }
-    if (cli.template get<SYNTAX_ONLY>())
+    if (coral66::SyntaxOnly)
     {
         return std::optional<coral66::fs::path>{std::in_place};
     }
@@ -215,28 +178,26 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     if (timer)
     {
         std::optional<llvm::Timer> codegenTimer;
-        codegenTimer.emplace("Codegen", "Time it took to generate LLVM IR for " + cSourceFile.string(), *timer);
+        codegenTimer.emplace("Codegen", "Time it took to generate LLVM IR for " + sourceFile.string(), *timer);
         codegenTimeRegion.emplace(*codegenTimer);
     }
 
     coral66::CGLLVM::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
-    if (cli.template get<PIE>() || cli.template get<PIC>())
+    if (coral66::Pie || coral66::Pic )
     {
         codegenOptions.reloc = llvm::Reloc::Model::PIC_;
     }
-    if (cli.template get<OPT>())
-    {
-        // ReSharper disable once CppDefaultCaseNotHandledInSwitchStatement
-        switch (cli.template get<OPT>()->value_or(1))
+
+        switch (coral66::OptimizationLevel)
         {
-            case 0: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
-            case 1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
-            case 2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
-            default: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
+        case coral66::OptLevel::None: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
+        case coral66::OptLevel::O1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
+        case coral66::OptLevel::O2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
+        case coral66::OptLevel::O3: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
+        default: llvm::CodeGenOpt::parseLevel('0').value(); break;;
         }
-    }
     auto* debugOption = cli.template lastSpecified<G0, G1, G2, G3>();
     if (!debugOption)
     {
@@ -276,7 +237,7 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     }
     else
     {
-        auto path = cSourceFile;
+        auto path = sourceFile;
         if (action == Action::AssemblyOutput)
         {
             if (cli.template get<EMIT_LLVM>())
@@ -317,7 +278,7 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     if (timer)
     {
         std::optional<llvm::Timer> compileTimer;
-        compileTimer.emplace("Compile", "Time it took for LLVM to generate native object code " + cSourceFile.string(),
+        compileTimer.emplace("Compile", "Time it took for LLVM to generate native object code " + sourceFile.string(),
                              *timer);
         compileTimeRegion.emplace(*compileTimer);
     }
@@ -383,31 +344,15 @@ std::optional<coral66::fs::path> compileCoral66File(Action action, coral66::fs::
     return coral66::fs::path(outputFile);
 }
 
-template <class CL>
-int doActionOnAllFiles(Action action, std::span<const std::string_view> files, const CL& cli,
-                       llvm::raw_ostream* reporter)
+void performAction(Action action, std::string file, llvm::raw_ostream* reporter)
 {
-    std::vector<coral66::fs::path> linkableFiles;
-    for (auto& iter : files)
-    {
-        auto path = coral66::fs::path(iter);
-        if (auto extension = path.extension(); extension == ".cor")
-        {
-            auto objectFile = compileCoral66File(action, iter, cli, reporter);
-            if (!objectFile)
+    auto path = coral66::fs::path(file);
+    const auto objectFile = compileCoral66File(action, file, reporter);
+            if (action == Action::Compile && !coral66::SyntaxOnly)
             {
-                return -1;
+               std::vector<coral66::fs::path> linkableFiles;
+               linkableFiles.push_back(*objectFile);
             }
-            if (action == Action::Compile && !cli.template get<SYNTAX_ONLY>())
-            {
-                linkableFiles.push_back(*objectFile);
-            }
-        } else
-        {
-            *reporter << coral66::Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(iter);
-        }
-    }
-    return 0;
 }
 
 void printVersion(llvm::raw_ostream& os) // NOLINT(*-prefer-static-over-anonymous-namespace)
@@ -418,76 +363,68 @@ void printVersion(llvm::raw_ostream& os) // NOLINT(*-prefer-static-over-anonymou
 
 } // namespace
 
-int coral66::main(std::span<std::string_view> elements, llvm::raw_ostream* const reporter, llvm::raw_ostream* out)
+int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter, llvm::raw_ostream* out)
 {
+    // Parse the command line
+    CommandLineProcessor::ParseCommandLine(argc, argv);
+
+    // Initialise LLVM
     llvm::InitializeAllTargetInfos();
     llvm::InitializeAllTargets();
     llvm::InitializeAllTargetMCs();
     llvm::InitializeAllAsmPrinters();
     llvm::InitializeAllAsmParsers();
 
-    auto cli =
-        coral66::parseCommandLine<OUTPUT_FILE, COMPILE_ONLY, ASSEMBLY_OUTPUT, PREPROCESS_ONLY, EMIT_LLVM, OPT,
-                                  LIBRARY_PATH, PIE, PIC, HELP, VERSION, G0, G1, G2, G3, SYNTAX_ONLY, TIME>(elements);
-    if (cli.get<HELP>())
+    // Check for a source filename with an extension of .cor
+    if (SourceFilename.empty())
     {
-        if (out)
-        {
-            cli.printHelp(*out);
-        }
-        return 0;
-    }
-    if (cli.get<VERSION>())
-    {
-        if (out)
-        {
-            printVersion(*out);
-        }
-        return 0;
-    }
-
-    if (cli.getUnrecognized().empty())
-    {
-        // HACK for now, check for a source file that does not end in .cor
-        const auto cl = cli.getStorage();
         if (reporter)
         {
             *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
         }
         return -1;
     }
-    if (cli.get<COMPILE_ONLY>())
+    if (SourceFilename.substr(SourceFilename.find_last_of(".") + 1) != ".cor")
     {
-        if (cli.get<ASSEMBLY_OUTPUT>())
+        if ( reporter )
+        {
+                *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI();
+        }
+    }
+
+    // Check option sanity
+    if (CompileOnly)
+    {
+        if (CompileAndAssembly )
         {
             if (reporter)
             {
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        if (cli.get<PREPROCESS_ONLY>())
+        if (PreprocessOutput)
         {
             if (reporter)
             {
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return doActionOnAllFiles(Action::Compile, cli.getUnrecognized(), cli, reporter);
+        return performAction(Action::Compile, SourceFilename, reporter);
     }
-    if (cli.get<ASSEMBLY_OUTPUT>())
+    if (CompileAndAssembly)
     {
-        if (cli.get<PREPROCESS_ONLY>())
+        if (PreprocessOutput)
         {
             if (reporter)
             {
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return doActionOnAllFiles(Action::AssemblyOutput, cli.getUnrecognized(), cli, reporter);
+        return performAction(Action::AssemblyOutput, SourceFilename,reporter);
     }
-    if (cli.get<PREPROCESS_ONLY>())
+    if (PreprocessOutput)
     {
-        return doActionOnAllFiles(Action::Preprocess, cli.getUnrecognized(), cli, reporter);
+        return performAction(Action::Preprocess, SourceFilename, reporter);
     }
-    return doActionOnAllFiles(Action::Compile, cli.getUnrecognized(), cli, reporter);
+    return performAction(Action::Compile, SourceFilename, reporter);
 }
