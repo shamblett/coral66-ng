@@ -117,7 +117,8 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         {
             if (reporter)
             {
-                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
+                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(
+                    coral66::cl::OutputFilename);
             }
             return {};
         }
@@ -207,10 +208,14 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     // Debug level
     switch (coral66::cl::DebugLevel)
     {
-        case coral66::cl::DebugLevel::NoDebug: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None; break;
+        case coral66::cl::DebugLevel::NoDebug:
+            codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None;
+            break;
         case coral66::cl::DebugLevel::g1: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Line; break;
         case coral66::cl::DebugLevel::g2: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Default; break;
-        case coral66::cl::DebugLevel::g3: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Extended; break;
+        case coral66::cl::DebugLevel::g3:
+            codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Extended;
+            break;
         default:
             codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None;
             break;
@@ -369,21 +374,19 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     llvm::InitializeAllAsmPrinters();
     llvm::InitializeAllAsmParsers();
 
+    // Set and Enable colours. default for errors is red.
+    reporter->changeColor(llvm::raw_ostream::RED);
+    reporter->enable_colors(true);
+
     // Check for a source filename with an extension of .cor
     if (cl::SourceFilename.empty())
     {
-        if (reporter)
-        {
-            *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
-        }
+        *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
         return -1;
     }
     if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".") + 1) != ".cor")
     {
-        if (reporter)
-        {
-            *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::cl::OutputFilename);
-        }
+        *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::cl::OutputFilename);
     }
 
     // Check option sanity
@@ -398,10 +401,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
         }
         if (cl::PreprocessOutput)
         {
-            if (reporter)
-            {
-                *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
-            }
+            *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
         }
         return performAction(Action::Compile, cl::SourceFilename, reporter);
     }
@@ -409,10 +409,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     {
         if (cl::PreprocessOutput)
         {
-            if (reporter)
-            {
-                *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
-            }
+            *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
         }
         return performAction(Action::AssemblyOutput, cl::SourceFilename, reporter);
     }
