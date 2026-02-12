@@ -28,9 +28,9 @@
  * -syntax-only       Stop after semantic analysis and produce no output file
  * -time                Output time taken for each stage
  */
-namespace coral66
-{
 
+namespace coral66::cl
+{
 enum OptLevel
 {
     None,
@@ -73,4 +73,4 @@ inline llvm::cl::opt<bool> Time("time", llvm::cl::desc("Output time taken for ea
 // The source file name
 inline llvm::cl::opt<std::string> SourceFilename(llvm::cl::Positional, llvm::cl::desc("<input source file>"));
 
-} // namespace coral66
+} // namespace coral66::cl

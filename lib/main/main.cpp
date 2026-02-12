@@ -48,7 +48,7 @@ enum class Action
 std::optional<std::string> compileCoral66File(Action action, coral66::fs::path sourceFile, llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
-    if (coral66::Time)
+    if (coral66::cl::Time)
     {
         timer.emplace("Compilation", "Time it took for the whole compilation of " + sourceFile.string());
     }
@@ -106,25 +106,25 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     {
         auto reconstruction =
             coral66::PP::reconstruct(ppTokens.data().data(), ppTokens.data().data() + ppTokens.data().size(), ppTokens);
-        if (!coral66::OutputFilename.empty())
+        if (!coral66::cl::OutputFilename.empty())
         {
             llvm::outs() << reconstruction;
             llvm::outs().flush();
             return coral66::fs::path{};
         }
 
-        coral66::fs::ofstream outputFile(coral66::to_string(coral66::OutputFilename), std::ios_base::out);
+        coral66::fs::ofstream outputFile(coral66::to_string(coral66::cl::OutputFilename), std::ios_base::out);
         if (!outputFile.is_open())
         {
             if (reporter)
             {
-                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(coral66::OutputFilename);
+                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
             }
             return {};
         }
         outputFile << reconstruction;
         outputFile.close();
-        return coral66::OutputFilename;
+        return coral66::cl::OutputFilename;
     }
 
     std::optional<llvm::TimeRegion> cTokenTimeRegion;
@@ -170,7 +170,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     {
         return {};
     }
-    if (coral66::SyntaxOnly)
+    if (coral66::cl::SyntaxOnly)
     {
         return std::optional<coral66::fs::path>{std::in_place};
     }
@@ -187,18 +187,18 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     coral66::CGLLVM::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
-    if (coral66::Pie || coral66::Pic)
+    if (coral66::cl::Pie || coral66::cl::Pic)
     {
         codegenOptions.reloc = llvm::Reloc::Model::PIC_;
     }
 
     // Optimisation level
-    switch (coral66::OptimizationLevel)
+    switch (coral66::cl::OptimizationLevel)
     {
-        case coral66::OptLevel::None: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
-        case coral66::OptLevel::O1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
-        case coral66::OptLevel::O2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
-        case coral66::OptLevel::O3: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
+        case coral66::cl::OptLevel::None: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
+        case coral66::cl::OptLevel::O1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
+        case coral66::cl::OptLevel::O2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
+        case coral66::cl::OptLevel::O3: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
         default:
             llvm::CodeGenOpt::parseLevel('0').value();
             break;
@@ -206,12 +206,12 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     }
 
     // Debug level
-    switch (coral66::DebugLevel)
+    switch (coral66::cl::DebugLevel)
     {
-        case coral66::DebugLevel::NoDebug: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None; break;
-        case coral66::DebugLevel::g1: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Line; break;
-        case coral66::DebugLevel::g2: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Default; break;
-        case coral66::DebugLevel::g3: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Extended; break;
+        case coral66::cl::DebugLevel::NoDebug: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None; break;
+        case coral66::cl::DebugLevel::g1: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Line; break;
+        case coral66::cl::DebugLevel::g2: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Default; break;
+        case coral66::cl::DebugLevel::g3: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Extended; break;
         default:
             codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None;
             break;
@@ -227,16 +227,16 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         std::terminate();
     }
     std::string outputFile;
-    if (!coral66::OutputFilename.empty())
+    if (!coral66::cl::OutputFilename.empty())
     {
-        outputFile = static_cast<std::string>(coral66::OutputFilename);
+        outputFile = static_cast<std::string>(coral66::cl::OutputFilename);
     }
     else
     {
         auto path = sourceFile;
         if (action == Action::AssemblyOutput)
         {
-            if (coral66::EmitLLVM)
+            if (coral66::cl::EmitLLVM)
             {
                 path.replace_extension("ll");
             }
@@ -247,7 +247,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         }
         else
         {
-            if (coral66::EmitLLVM)
+            if (coral66::cl::EmitLLVM)
             {
                 path.replace_extension("bc");
             }
@@ -309,7 +309,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         modulePassManager = passBuilder.buildPerModuleDefaultPipeline(level);
     }
 
-    if (coral66::EmitLLVM)
+    if (coral66::cl::EmitLLVM)
     {
         if (action == Action::AssemblyOutput)
         {
@@ -348,7 +348,7 @@ int performAction(const Action action, const std::string& file, llvm::raw_ostrea
     {
         return -1;
     }
-    if (action == Action::Compile && !coral66::SyntaxOnly)
+    if (action == Action::Compile && !coral66::cl::SyntaxOnly)
     {
         std::vector<coral66::fs::path> linkableFiles;
         linkableFiles.push_back(*objectFile);
@@ -371,7 +371,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     llvm::InitializeAllAsmParsers();
 
     // Check for a source filename with an extension of .cor
-    if (SourceFilename.empty())
+    if (cl::SourceFilename.empty())
     {
         if (reporter)
         {
@@ -379,47 +379,47 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
         }
         return -1;
     }
-    if (SourceFilename.substr(SourceFilename.find_last_of(".") + 1) != ".cor")
+    if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".") + 1) != ".cor")
     {
         if (reporter)
         {
-            *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::OutputFilename);
+            *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::cl::OutputFilename);
         }
     }
 
     // Check option sanity
-    if (CompileOnly)
+    if (cl::CompileOnly)
     {
-        if (CompileAndAssembly)
+        if (cl::CompileAndAssembly)
         {
             if (reporter)
             {
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        if (PreprocessOutput)
+        if (cl::PreprocessOutput)
         {
             if (reporter)
             {
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return performAction(Action::Compile, SourceFilename, reporter);
+        return performAction(Action::Compile, cl::SourceFilename, reporter);
     }
-    if (CompileAndAssembly)
+    if (cl::CompileAndAssembly)
     {
-        if (PreprocessOutput)
+        if (cl::PreprocessOutput)
         {
             if (reporter)
             {
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return performAction(Action::AssemblyOutput, SourceFilename, reporter);
+        return performAction(Action::AssemblyOutput, cl::SourceFilename, reporter);
     }
-    if (PreprocessOutput)
+    if (cl::PreprocessOutput)
     {
-        return performAction(Action::Preprocess, SourceFilename, reporter);
+        return performAction(Action::Preprocess, cl::SourceFilename, reporter);
     }
-    return performAction(Action::Compile, SourceFilename, reporter);
+    return performAction(Action::Compile, cl::SourceFilename, reporter);
 }

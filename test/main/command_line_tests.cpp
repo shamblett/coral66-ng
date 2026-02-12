@@ -9,7 +9,7 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-using namespace coral66;
+using namespace coral66::cl;
 
 TEST_CASE("Initial state", "[cli]")
 {
@@ -31,14 +31,14 @@ TEST_CASE("Initial state", "[cli]")
 TEST_CASE("Commandline without args", "[cli]")
 {
     auto [argc, argv] = createArgs("");
-    CommandLineProcessor::ParseCommandLine(argc, argv);
+    coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
     CHECK(SourceFilename.empty());
 }
 
 TEST_CASE("Commandline with just source file name", "[cli]")
 {
     auto [argc, argv] = createArgs("main.cor");
-    CommandLineProcessor::ParseCommandLine(argc, argv);
+    coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
     CHECK(SourceFilename == "main.cor");
 }
 
@@ -47,56 +47,56 @@ TEST_CASE("Boolean options", "[cli]")
     SECTION("Compile")
     {
         auto [argc, argv] = createArgs("-c main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(CompileOnly == true);
     }
 
     SECTION("Compile and Assemble")
     {
         auto [argc, argv] = createArgs("-s main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(CompileAndAssembly == true);
     }
 
     SECTION("Preprocess output")
     {
         auto [argc, argv] = createArgs("-e main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(PreprocessOutput == true);
     }
 
     SECTION("Emit LLVM")
     {
         auto [argc, argv] = createArgs("-emit-llvm main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(EmitLLVM == true);
     }
 
     SECTION("PIC")
     {
         auto [argc, argv] = createArgs("-pic main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(Pic == true);
     }
 
     SECTION("PIE")
     {
         auto [argc, argv] = createArgs("-pie main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(Pie == true);
     }
 
     SECTION("Syntax Only")
     {
         auto [argc, argv] = createArgs("-syntax-only main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(SyntaxOnly == true);
     }
 
     SECTION("Time")
     {
         auto [argc, argv] = createArgs("-time main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(Time == true);
     }
 }
@@ -105,21 +105,21 @@ TEST_CASE("Alternative options", "[cli]") {
 
     SECTION("Optimisation level") {
         auto [argc, argv] = createArgs("-O2 main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
-        CHECK(OptimizationLevel == coral66::OptLevel::O2);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(OptimizationLevel == OptLevel::O2);
     }
 
     SECTION("Debug level") {
         auto [argc, argv] = createArgs("-g2 main.cor");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
-        CHECK(DebugLevel == coral66::DebugLevel::g2);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(DebugLevel == DebugLevel::g2);
     }
 }
 
 TEST_CASE("Version", "[cli]") {
     std::string str;
     llvm::raw_string_ostream os(str);
-    CommandLineProcessor::PrintVersion(os);
+    coral66::CommandLineProcessor::PrintVersion(os);
     CHECK(os.str() == "1.0-beta");
 }
 
@@ -128,14 +128,14 @@ TEST_CASE("String options")
     SECTION("Output file")
     {
         auto [argc, argv] = createArgs("-o main.o");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(OutputFilename == "main.o");
     }
 
     SECTION("Library directory")
     {
         auto [argc, argv] = createArgs("-L path/to/libs");
-        CommandLineProcessor::ParseCommandLine(argc, argv);
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(LibraryDirectory == "path/to/libs");
     }
 }
