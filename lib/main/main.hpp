@@ -13,6 +13,5 @@
 
 namespace coral66
 {
-int main(int argc, char** argv, llvm::raw_ostream* err = &llvm::errs(),
-         llvm::raw_ostream* out = &llvm::outs());
+int main(int argc, char** argv, llvm::raw_ostream* err = &llvm::errs(), llvm::raw_ostream* out = &llvm::outs());
 } // namespace coral66
