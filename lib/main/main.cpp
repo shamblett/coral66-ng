@@ -379,7 +379,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     reporter->enable_colors(true);
 
     // Check for a source filename with an extension of .cor
-    if (!cl::SourceFilename.empty())
+    if (cl::SourceFilename.empty())
     {
         *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
         return EXIT_FAILURE;
