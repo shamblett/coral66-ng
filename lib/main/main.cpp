@@ -24,7 +24,6 @@
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
-#include "lib/main/command_line.hpp"
 #include "lib/support/filesystem.hpp"
 
 /**
