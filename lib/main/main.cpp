@@ -17,6 +17,8 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Timer.h>
 
+#include <iostream>
+
 #include "command_line_arguments.hpp"
 #include "command_line_processor.hpp"
 #include "lib/backend/code_generation.hpp"
@@ -25,13 +27,6 @@
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/support/filesystem.hpp"
-
-/**
- * @brief The main processing functionality.
- *
- * Parses the command line and sanity checks the options before invoking
- * the relevant processing.
- */
 
 namespace
 {
@@ -56,7 +51,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     {
         if (reporter)
         {
-            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N.argsCLI(sourceFile.string());
+            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_SOURCE_FILE.argsCLI(sourceFile.string());
         }
         return {};
     }
@@ -117,7 +112,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         {
             if (reporter)
             {
-                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(
+                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(
                     coral66::cl::OutputFilename);
             }
             return {};
@@ -233,7 +228,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     std::string outputFile;
     if (!coral66::cl::OutputFilename.empty())
     {
-        outputFile = static_cast<std::string>(coral66::cl::OutputFilename);
+        outputFile = coral66::cl::OutputFilename.getValue();
     }
     else
     {
@@ -269,7 +264,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     {
         if (reporter)
         {
-            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(outputFile);
+            *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(outputFile);
         }
         return {};
     }
@@ -346,23 +341,28 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
 
 int performAction(const Action action, const std::string& file, llvm::raw_ostream* reporter)
 {
+    // Check for no action
+    if ( coral66::cl::NoAction)
+    {
+        return EXIT_SUCCESS;
+    }
     auto path = coral66::fs::path(file);
     const auto objectFile = compileCoral66File(action, file, reporter);
     if (!objectFile)
     {
-        return -1;
+        return EXIT_FAILURE;
     }
     if (action == Action::Compile && !coral66::cl::SyntaxOnly)
     {
         std::vector<coral66::fs::path> linkableFiles;
-        linkableFiles.push_back(*objectFile);
+        linkableFiles.emplace_back(*objectFile);
     }
     return 0;
 }
 
 } // namespace
 
-int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter, llvm::raw_ostream* out)
+int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter)
 {
     // Parse the command line
     CommandLineProcessor::ParseCommandLine(argc, argv);
@@ -379,15 +379,15 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     reporter->enable_colors(true);
 
     // Check for a source filename with an extension of .cor
-    if (cl::SourceFilename.empty())
+    if (!cl::SourceFilename.empty())
     {
         *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
-        return -1;
+        return EXIT_FAILURE;
     }
     if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".") + 1) != ".cor")
     {
-        *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::cl::SourceFilename);
-        return -1;
+        *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(cl::SourceFilename);
+        return EXIT_FAILURE;
     }
 
     // Check option sanity

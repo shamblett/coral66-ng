@@ -24,7 +24,7 @@ public:
 
   static void PrintVersion(llvm::raw_ostream &OS)
   {
-      OS << version;
+      OS << version << "\n";
   }
 
   static void ParseCommandLine(int argc, char **argv)

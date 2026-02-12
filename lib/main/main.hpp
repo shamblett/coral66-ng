@@ -11,7 +11,16 @@
 #include <span>
 #include <string_view>
 
+/**
+ * @brief The main processing functionality.
+ *
+ * Parses the command line and sanity checks the options before invoking
+ * the relevant processing.
+ */
+
 namespace coral66
 {
-int main(int argc, char** argv, llvm::raw_ostream* reporter = &llvm::errs(), llvm::raw_ostream* out = &llvm::outs());
+
+// Main compiler entry point
+int main(int argc, char** argv, llvm::raw_ostream* reporter = &llvm::errs());
 } // namespace coral66

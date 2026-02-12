@@ -134,25 +134,16 @@ CREATE_ERROR(INVALID_SCALE_FOR_FIXED, "Invalid scale for FIXED point operation",
 
 namespace CLI
 {
-CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE_N, "Failed to open source file '%0'");
+CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE, "Failed to open source file '%0'");
 CREATE_ERROR(NO_SOURCE_FILES_SPECIFIED, "No source files specified");
 CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .cor '%0'");
-CREATE_ERROR(UNKNOWN_ARGUMENT_N, "Unknown argument '%0'");
-CREATE_ERROR(FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N, "Failed to open Coral66 source file '%0'");
-CREATE_ERROR(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "Failed to open file '%0' for output");
-CREATE_ERROR(UNKNOWN_LANGUAGE_STANDARD_N, "Unknown language standard '%0'");
+CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for output");
 CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME,
              "Cannot compile to object file and assembly at the same time - ignoring option");
 CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME,
              "Cannot compile to object file and preprocess at the same time - ignoring option");
 CREATE_ERROR(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME,
              "Cannot compile to assembly and preprocess at the same time - ignoring option");
-CREATE_ERROR(EXPECTED_WHITESPACE_AFTER_N, "Expected whitespace after '%0'");
-CREATE_ERROR(EXPECTED_N_AFTER_N, "Expected '%0' after '%1'");
-CREATE_ERROR(EXPECTED_ARGUMENT_AFTER_N, "Expected argument after '%0'");
-CREATE_ERROR(EXPECTED_ARGUMENT_IMMEDIATELY_AFTER_N, "Expected argument immediately after '%0'");
-CREATE_ERROR(ERRORS_PARSING_INTEGER_ARGUMENT_IN_N, "Errors parsing integer argument in '%0'");
-CREATE_ERROR(ERRORS_PARSING_INVALID_UTF8_IN_N, "Errors parsing invalid utf8 in '%0'");
 } // namespace CLI
 
 namespace Lexer

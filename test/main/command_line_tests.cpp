@@ -26,6 +26,7 @@ TEST_CASE("Initial state", "[cli]")
     CHECK(DebugLevel == DebugLevel::NoDebug);
     CHECK(SyntaxOnly == false);
     CHECK(Time == false);
+    CHECK(NoAction == false);
     CHECK(SourceFilename.empty());
 }
 TEST_CASE("Commandline without args", "[cli]")
@@ -99,6 +100,13 @@ TEST_CASE("Boolean options", "[cli]")
         coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(Time == true);
     }
+
+    SECTION("No Action")
+    {
+        auto [argc, argv] = createArgs("-c -noact main.cor");
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(NoAction == true);
+    }
 }
 
 TEST_CASE("Alternative options", "[cli]")
@@ -137,7 +145,7 @@ TEST_CASE("Version", "[cli]")
     std::string str;
     llvm::raw_string_ostream os(str);
     coral66::CommandLineProcessor::PrintVersion(os);
-    CHECK(os.str() == "1.0-beta");
+    CHECK(os.str() == "1.0-beta\n");
 }
 
 TEST_CASE("String options")

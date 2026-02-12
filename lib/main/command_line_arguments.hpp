@@ -25,8 +25,9 @@
  * -g1                 Lines only
  * -g2                 Generated debugging info
  * -g3                 Generated extended debugging info
- * -syntax-only       Stop after semantic analysis and produce no output file
- * -time                Output time taken for each stage
+ * -syntax-only        Stop after semantic analysis and produce no output file
+ * -time               Output time taken for each stage
+ * -noact              Check command line only, take no further action
  */
 
 namespace coral66::cl
@@ -69,6 +70,7 @@ inline llvm::cl::opt<DebugLevel> DebugLevel(llvm::cl::desc("Debug level:"),
 inline llvm::cl::opt<bool> SyntaxOnly("syntax-only",
                                       llvm::cl::desc("Stop after semantic analysis and produce no output file"));
 inline llvm::cl::opt<bool> Time("time", llvm::cl::desc("Output time taken for each stage"));
+inline llvm::cl::opt<bool> NoAction("noact", llvm::cl::desc("Check command line parameter validity, take no further action"));
 
 // The source file name
 inline llvm::cl::opt<std::string> SourceFilename(llvm::cl::Positional, llvm::cl::desc("<input source file>"));

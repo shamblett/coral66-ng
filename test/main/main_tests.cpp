@@ -24,14 +24,16 @@ TEST_CASE("Commandline actions", "[cli]")
     SECTION("Compile no source file")
     {
         auto [argc, argv] = createArgs("-c");
-        coral66::main(argc, argv, &reporter);
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
+        reporter.flush();
         CHECK(buffer == "coral66: error: No source files specified\n");
     }
 
     SECTION("Compile wrong source file extension")
     {
         auto [argc, argv] = createArgs("-c main.cpp");
-        coral66::main(argc, argv, &reporter);
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
+        reporter.flush();
         CHECK(buffer == "coral66: error: The source file extension is not .cor 'main.cpp'\n");
     }
 
