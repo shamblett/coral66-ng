@@ -8,15 +8,17 @@
 #include "main.hpp"
 
 #include <llvm/Bitcode/BitcodeWriterPass.h>
-#include <llvm/IRPrinter/IRPrintingPasses.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/IRPrinter/IRPrintingPasses.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/Timer.h>
 
+#include "command_line_arguments.hpp"
+#include "command_line_processor.hpp"
 #include "lib/backend/code_generation.hpp"
 #include "lib/frontend/common/error_messages.hpp"
 #include "lib/frontend/parser/parser.hpp"
@@ -24,8 +26,13 @@
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/main/command_line.hpp"
 #include "lib/support/filesystem.hpp"
-#include "command_line_processor.hpp"
-#include "command_line_arguments.hpp"
+
+/**
+ * @brief The main processing functionality.
+ *
+ * Parses the command line and sanity checks the options before invoking
+ * the relevant processing.
+ */
 
 namespace
 {
@@ -38,8 +45,7 @@ enum class Action
     Link [[maybe_unused]]
 };
 
-std::optional<std::string> compileCoral66File(Action action, coral66::fs::path sourceFile,
-                                                    llvm::raw_ostream* reporter)
+std::optional<std::string> compileCoral66File(Action action, coral66::fs::path sourceFile, llvm::raw_ostream* reporter)
 {
     std::optional<llvm::TimerGroup> timer;
     if (coral66::Time)
@@ -112,8 +118,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         {
             if (reporter)
             {
-                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(
-                    coral66::OutputFilename);
+                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_N_FOR_OUTPUT.argsCLI(coral66::OutputFilename);
             }
             return {};
         }
@@ -182,27 +187,35 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
     coral66::CGLLVM::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
-    if (coral66::Pie || coral66::Pic )
+    if (coral66::Pie || coral66::Pic)
     {
         codegenOptions.reloc = llvm::Reloc::Model::PIC_;
     }
 
-        switch (coral66::OptimizationLevel)
-        {
+    // Optimisation level
+    switch (coral66::OptimizationLevel)
+    {
         case coral66::OptLevel::None: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
         case coral66::OptLevel::O1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
         case coral66::OptLevel::O2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
         case coral66::OptLevel::O3: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
-        default: llvm::CodeGenOpt::parseLevel('0').value(); break;;
-        }
+        default:
+            llvm::CodeGenOpt::parseLevel('0').value();
+            break;
+            ;
+    }
 
+    // Debug level
     switch (coral66::DebugLevel)
     {
         case coral66::DebugLevel::NoDebug: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None; break;
         case coral66::DebugLevel::g1: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Line; break;
         case coral66::DebugLevel::g2: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Default; break;
         case coral66::DebugLevel::g3: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::Extended; break;
-        default: codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None; break;;
+        default:
+            codegenOptions.debugEmission = coral66::CGLLVM::DebugEmission::None;
+            break;
+            ;
     }
 
     auto targetMachine = coral66::CGLLVM::generateLLVM(module, program, codegenOptions);
@@ -234,7 +247,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         }
         else
         {
-            if ( coral66::EmitLLVM)
+            if (coral66::EmitLLVM)
             {
                 path.replace_extension("bc");
             }
@@ -335,11 +348,11 @@ int performAction(const Action action, const std::string& file, llvm::raw_ostrea
     {
         return -1;
     }
-            if (action == Action::Compile && !coral66::SyntaxOnly)
-            {
-               std::vector<coral66::fs::path> linkableFiles;
-               linkableFiles.push_back(*objectFile);
-            }
+    if (action == Action::Compile && !coral66::SyntaxOnly)
+    {
+        std::vector<coral66::fs::path> linkableFiles;
+        linkableFiles.push_back(*objectFile);
+    }
     return 0;
 }
 
@@ -368,16 +381,16 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     }
     if (SourceFilename.substr(SourceFilename.find_last_of(".") + 1) != ".cor")
     {
-        if ( reporter )
+        if (reporter)
         {
-                *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::OutputFilename);
+            *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::OutputFilename);
         }
     }
 
     // Check option sanity
     if (CompileOnly)
     {
-        if (CompileAndAssembly )
+        if (CompileAndAssembly)
         {
             if (reporter)
             {
@@ -402,7 +415,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
                 *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             }
         }
-        return performAction(Action::AssemblyOutput, SourceFilename,reporter);
+        return performAction(Action::AssemblyOutput, SourceFilename, reporter);
     }
     if (PreprocessOutput)
     {
