@@ -112,8 +112,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
         {
             if (reporter)
             {
-                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(
-                    coral66::cl::OutputFilename);
+                *reporter << coral66::Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
             }
             return {};
         }
@@ -342,7 +341,7 @@ std::optional<std::string> compileCoral66File(Action action, coral66::fs::path s
 int performAction(const Action action, const std::string& file, llvm::raw_ostream* reporter)
 {
     // Check for no action
-    if ( coral66::cl::NoAction)
+    if (coral66::cl::NoAction)
     {
         return EXIT_SUCCESS;
     }
@@ -379,12 +378,12 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     reporter->enable_colors(true);
 
     // Check for a source filename with an extension of .cor
-    if (cl::SourceFilename.empty())
+    if (cl::SourceFilename.getNumOccurrences() == 0)
     {
         *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
         return EXIT_FAILURE;
     }
-    if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".") + 1) != ".cor")
+    if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".")) != ".cor")
     {
         *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(cl::SourceFilename);
         return EXIT_FAILURE;
