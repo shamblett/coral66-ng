@@ -101,22 +101,39 @@ TEST_CASE("Boolean options", "[cli]")
     }
 }
 
-TEST_CASE("Alternative options", "[cli]") {
-
-    SECTION("Optimisation level") {
+TEST_CASE("Alternative options", "[cli]")
+{
+    SECTION("Optimisation level")
+    {
         auto [argc, argv] = createArgs("-O2 main.cor");
         coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(OptimizationLevel == OptLevel::O2);
     }
 
-    SECTION("Debug level") {
+    SECTION("Optimisation level - multi")
+    {
+        auto [argc, argv] = createArgs("-O2 -O3 -O1 main.cor");
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(OptimizationLevel == OptLevel::O1);
+    }
+
+    SECTION("Debug level")
+    {
         auto [argc, argv] = createArgs("-g2 main.cor");
         coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(DebugLevel == DebugLevel::g2);
     }
+
+    SECTION("Debug level - multi")
+    {
+        auto [argc, argv] = createArgs("-g2 -g1 -g3 main.cor");
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(DebugLevel == DebugLevel::g3);
+    }
 }
 
-TEST_CASE("Version", "[cli]") {
+TEST_CASE("Version", "[cli]")
+{
     std::string str;
     llvm::raw_string_ostream os(str);
     coral66::CommandLineProcessor::PrintVersion(os);
@@ -139,4 +156,3 @@ TEST_CASE("String options")
         CHECK(LibraryDirectory == "path/to/libs");
     }
 }
-
