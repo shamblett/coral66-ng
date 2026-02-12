@@ -142,11 +142,11 @@ CREATE_ERROR(FAILED_TO_OPEN_CORAL66_SOURCE_FILE_N, "Failed to open Coral66 sourc
 CREATE_ERROR(FAILED_TO_OPEN_FILE_N_FOR_OUTPUT, "Failed to open file '%0' for output");
 CREATE_ERROR(UNKNOWN_LANGUAGE_STANDARD_N, "Unknown language standard '%0'");
 CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME,
-             "Cannot compile to object file and assembly at the same time");
+             "Cannot compile to object file and assembly at the same time - ignoring option");
 CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME,
-             "Cannot compile to object file and preprocess at the same time");
+             "Cannot compile to object file and preprocess at the same time - ignoring option");
 CREATE_ERROR(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME,
-             "Cannot compile to assembly and preprocess at the same time");
+             "Cannot compile to assembly and preprocess at the same time - ignoring option");
 CREATE_ERROR(EXPECTED_WHITESPACE_AFTER_N, "Expected whitespace after '%0'");
 CREATE_ERROR(EXPECTED_N_AFTER_N, "Expected '%0' after '%1'");
 CREATE_ERROR(EXPECTED_ARGUMENT_AFTER_N, "Expected argument after '%0'");

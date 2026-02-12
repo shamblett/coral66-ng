@@ -374,7 +374,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     llvm::InitializeAllAsmPrinters();
     llvm::InitializeAllAsmParsers();
 
-    // Set and Enable colours. default for errors is red.
+    // Set and Enable colours. default for errors is red, warnings yellow.
     reporter->changeColor(llvm::raw_ostream::RED);
     reporter->enable_colors(true);
 
@@ -386,7 +386,8 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     }
     if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".") + 1) != ".cor")
     {
-        *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::cl::OutputFilename);
+        *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(coral66::cl::SourceFilename);
+        return -1;
     }
 
     // Check option sanity
@@ -394,14 +395,15 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     {
         if (cl::CompileAndAssembly)
         {
-            if (reporter)
-            {
-                *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
-            }
+            reporter->changeColor(llvm::raw_ostream::YELLOW);
+            *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
+            reporter->changeColor(llvm::raw_ostream::RED);
         }
         if (cl::PreprocessOutput)
         {
+            reporter->changeColor(llvm::raw_ostream::YELLOW);
             *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
+            reporter->changeColor(llvm::raw_ostream::RED);
         }
         return performAction(Action::Compile, cl::SourceFilename, reporter);
     }
@@ -409,7 +411,9 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     {
         if (cl::PreprocessOutput)
         {
+            reporter->changeColor(llvm::raw_ostream::YELLOW);
             *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
+            reporter->changeColor(llvm::raw_ostream::RED);
         }
         return performAction(Action::AssemblyOutput, cl::SourceFilename, reporter);
     }
