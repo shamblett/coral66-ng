@@ -20,7 +20,8 @@ void CommandLineProcessor::PrintVersion(llvm::raw_ostream& OS)
 void CommandLineProcessor::ParseCommandLine(int argc, char** argv)
 {
     // Reset all options to their default values before parsing
-    // This is needed for running tests in the same process where global state persists
+    // As all these variables are global any users that run this multiple times in
+    // a single process such as the unit test suite need this.
     llvm::cl::ResetAllOptionOccurrences();
 
     cl::OutputFilename = "";
