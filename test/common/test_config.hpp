@@ -11,9 +11,9 @@
 
 #include <numeric>
 
+#include "lib/frontend/common/diagnostic.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
-#include "lib/frontend/common/diagnostic.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/text.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
@@ -261,6 +261,8 @@ struct EndTest
 [[nodiscard]] EndTest enableParallelization();
 
 std::tuple<int, char**> createArgs(const std::string& commandLine);
+
+std::string getTestDataPath(const std::string& relativePath);
 
 } // namespace coral66::Tests
 

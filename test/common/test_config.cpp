@@ -6,10 +6,11 @@
 
 #include "test/common/test_config.hpp"
 
-#include <tuple>
-#include <wordexp.h>
-
 #include <llvm/Support/Process.h>
+
+#include <tuple>
+
+#include <wordexp.h>
 
 coral66::Tests::FileScope::~FileScope()
 {
@@ -37,4 +38,18 @@ std::tuple<int, char**> coral66::Tests::createArgs(const std::string& commandLin
     wordexp_t p;
     wordexp(cl.c_str(), &p, 0);
     return std::make_tuple(p.we_wordc, p.we_wordv);
+}
+
+std::string coral66::Tests::getTestDataPath(const std::string& relativePath)
+{
+    auto srcDir = llvm::sys::Process::GetEnv("TEST_SRCDIR");
+    auto workspace = llvm::sys::Process::GetEnv("TEST_WORKSPACE");
+    if (srcDir)
+    {
+        fs::path path = *srcDir;
+        path /= workspace.value_or("coral66");
+        path /= relativePath;
+        return path.string();
+    }
+    return relativePath;
 }
