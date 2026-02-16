@@ -5,11 +5,21 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "data/*.cor",
+    ]),
+)
+
 cc_library(
     name = "maintest",
     srcs = [
         "command_line_tests.cpp",
         "main_tests.cpp",
+    ],
+    data = [
+        "//test/main:testdata",
     ],
     visibility = ["//test:__pkg__"],
     deps = [

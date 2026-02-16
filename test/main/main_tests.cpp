@@ -16,6 +16,11 @@
 using namespace coral66::Errors::CLI;
 using namespace coral66::Warnings::CLI;
 
+// Data support function
+const std::string dataPath(std::string const& suite)
+{
+    return "${TEST_SRCDIR}/_" + suite + "/test/" + suite + "/data/";
+}
 TEST_CASE("Commandline actions", "[cli]")
 {
     std::string buffer;
@@ -72,10 +77,10 @@ TEST_CASE("Commandline actions", "[cli]")
 
     SECTION("Failed to open output file")
     {
-        auto [argc, argv] = createArgs("-c main.cor -o /nosuch/dir/billy");
+        auto [argc, argv] = createArgs("-c " + dataPath("main") + "main.cor" + " -o /nosuch/dir/billy");
         CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
         reporter.flush();
-        auto errorMessage = FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(std::string("billy"));
+        auto errorMessage = FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(std::string("/nosuch/dir/billy"));
         CHECK(buffer == errorMessage.getText());
     }
 }
