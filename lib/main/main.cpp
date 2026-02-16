@@ -344,6 +344,9 @@ int performAction(const Action action, const std::string& file, llvm::raw_ostrea
     // Check for no action
     if (coral66::cl::NoAction)
     {
+        reporter->changeColor(llvm::raw_ostream::YELLOW);
+        *reporter << coral66::Warnings::CLI::NO_ACTION_SPEFIFIED.argsCLI();
+        reporter->changeColor(llvm::raw_ostream::RED);
         return EXIT_SUCCESS;
     }
     auto path = coral66::fs::path(file);

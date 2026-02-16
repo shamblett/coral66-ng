@@ -14,7 +14,7 @@
  * -o <file>           Path of the output file
  * -c                  Stop after compiling object files
  * -s                  Stop after compiling and output assembly files
- * -e                  Preprocess to stdout or output file
+ * -e                  Preprocess to stdout
  * -emit-llvm          Emit LLVM IR instead of machine code and assembly
  * -O<level>           Optimization level, 1,2 or 3
  * -L<dir>             Library directory path

@@ -7,17 +7,17 @@
 #include "lib/main/main.hpp"
 
 #include <iostream>
-#include <print>
 
 #include "lib/frontend/common/errors.hpp"
+#include "lib/frontend/common/warnings.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66::Errors::CLI;
+using namespace coral66::Warnings::CLI;
 
 TEST_CASE("Commandline actions", "[cli]")
 {
-
     std::string buffer;
     llvm::raw_string_ostream reporter(buffer);
 
@@ -26,7 +26,7 @@ TEST_CASE("Commandline actions", "[cli]")
         auto [argc, argv] = createArgs("-c");
         CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
         reporter.flush();
-        CHECK(buffer == "coral66: error: No source files specified\n");
+        CHECK(ProducesError(NO_SOURCE_FILES_SPECIFIED).match(buffer));
     }
 
     SECTION("Compile wrong source file extension")
@@ -34,7 +34,48 @@ TEST_CASE("Commandline actions", "[cli]")
         auto [argc, argv] = createArgs("-c main.cpp");
         CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
         reporter.flush();
-        CHECK(buffer == "coral66: error: The source file extension is not .cor 'main.cpp'\n");
+        auto errorMessage = SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(std::string("main.cpp"));
+        CHECK(buffer == errorMessage.getText());
     }
 
+    SECTION("No Action")
+    {
+        auto [argc, argv] = createArgs("-noact -c main.cor");
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_SUCCESS);
+        reporter.flush();
+        CHECK(ProducesWarning(NO_ACTION_SPEFIFIED).match(buffer));
+    }
+
+    SECTION("Compile to object file and assembly")
+    {
+        auto [argc, argv] = createArgs("-c -s -o out.o -noact main.cor");
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_SUCCESS);
+        reporter.flush();
+        CHECK(ProducesWarning(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME).match(buffer));
+    }
+
+    SECTION("Compile to object file and preprocessor")
+    {
+        auto [argc, argv] = createArgs("-c -e -noact main.cor");
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_SUCCESS);
+        reporter.flush();
+        CHECK(ProducesWarning(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME).match(buffer));
+    }
+
+    SECTION("Assemble and preprocess")
+    {
+        auto [argc, argv] = createArgs("-s -e -noact main.cor");
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_SUCCESS);
+        reporter.flush();
+        CHECK(ProducesWarning(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME).match(buffer));
+    }
+
+    SECTION("Failed to open output file")
+    {
+        auto [argc, argv] = createArgs("-c main.cor -o /nosuch/dir/billy");
+        CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
+        reporter.flush();
+        auto errorMessage = FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(std::string("billy"));
+        CHECK(buffer == errorMessage.getText());
+    }
 }

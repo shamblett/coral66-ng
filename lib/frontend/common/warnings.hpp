@@ -51,14 +51,14 @@ CREATE_WARNING(POSSIBLE_PRECISION_LOSS, "precision-loss", "Possible loss of prec
 } // namespace Semantics
 namespace CLI
 {
-CREATE_WARNING(FLAG_N_IS_NOT_APPLICABLE_FOR_CURRENT_TARGET_ARCHITECTURE, "unused-command-line-argument",
-               "Flag '%0' is not applicable for current target architecture");
 CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME, "command-line-argument-combination",
                "Cannot compile to object file and assembly at the same time - ignoring option");
 CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME, "command-line-argument-combination",
                "Cannot compile to object file and preprocess at the same time - ignoring option");
 CREATE_WARNING(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME, "command-line-argument-combination",
                "Cannot compile to assembly and preprocess at the same time - ignoring option");
+CREATE_WARNING(NO_ACTION_SPEFIFIED, "command-line-noaction",
+               "No action specified - command line checked");
 } // namespace CLI
 } // namespace coral66::Warnings
 
