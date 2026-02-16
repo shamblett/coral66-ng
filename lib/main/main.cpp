@@ -19,11 +19,11 @@
 
 #include <iostream>
 
+#include "../frontend/common/messages/warnings.hpp"
 #include "command_line_arguments.hpp"
 #include "command_line_processor.hpp"
 #include "lib/backend/code_generation.hpp"
-#include "lib/frontend/common/errors.hpp"
-#include "lib/frontend/common/warnings.hpp"
+#include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"

@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * Error/Warning message definition
+ * Base  message definition
  *
  */
 
@@ -35,12 +35,12 @@ public:
 
     Message(Severity severity, std::string text) : m_severity(severity), m_text(std::move(text)) {}
 
-    Severity getSeverity() const
+    [[nodiscard]] Severity getSeverity() const
     {
         return m_severity;
     }
 
-    const std::string& getText() const
+    [[nodiscard]] const std::string& getText() const
     {
         return m_text;
     }

@@ -8,8 +8,8 @@
 
 #include <iostream>
 
-#include "lib/frontend/common/errors.hpp"
-#include "lib/frontend/common/warnings.hpp"
+#include "../../lib/frontend/common/messages/errors.hpp"
+#include "../../lib/frontend/common/messages/warnings.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 

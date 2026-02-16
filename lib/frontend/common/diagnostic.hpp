@@ -17,7 +17,7 @@
 #include "lib/support/constexpr.hpp"
 #include "lib/support/text.hpp"
 #include "lib/support/utilities.hpp"
-#include "message.hpp"
+#include "messages/message.hpp"
 
 /**
  * @file Diagnostic.hpp

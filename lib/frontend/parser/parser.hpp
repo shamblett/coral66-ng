@@ -7,7 +7,7 @@
 
 #include <vector>
 
-#include "lib/frontend/common/message.hpp"
+#include "../common/messages/message.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 
 namespace coral66::Parser

@@ -17,7 +17,7 @@
 
 #include <algorithm>
 
-#include "lib/frontend/common/errors.hpp"
+#include "../common/messages/errors.hpp"
 
 using namespace coral66::Syntax;
 

@@ -11,7 +11,7 @@
  *
  */
 
-#include "diagnostic.hpp"
+#include "lib/frontend/common/diagnostic.hpp"
 #include "lib/support/constexpr.hpp"
 
 #define CREATE_WARNING_3(variableName, cliName, format)                                                        \

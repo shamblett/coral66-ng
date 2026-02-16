@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "lib/frontend/common/errors.hpp"
+#include "../common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/support/scope_exit.hpp"
 #include "lib/support/text.hpp"
