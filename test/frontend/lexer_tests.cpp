@@ -10,7 +10,7 @@
 
 #include <array>
 
-#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

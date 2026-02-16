@@ -14,57 +14,6 @@
 #include "diagnostic.hpp"
 #include "lib/support/constexpr.hpp"
 
-#define CREATE_NOTE_2(variableName, format)                                                           \
-    namespace detail                                                                                  \
-    {                                                                                                 \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                                 \
-    constexpr auto variableName =                                                                     \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Note, "")
-
-#define CREATE_NOTE_3(...) CREATE_NOTE_VAARG(__VA_ARGS__)
-#define CREATE_NOTE_4(...) CREATE_NOTE_VAARG(__VA_ARGS__)
-#define CREATE_NOTE_5(...) CREATE_NOTE_VAARG(__VA_ARGS__)
-#define CREATE_NOTE_6(...) CREATE_NOTE_VAARG(__VA_ARGS__)
-#define CREATE_NOTE_7(...) CREATE_NOTE_VAARG(__VA_ARGS__)
-#define CREATE_NOTE_8(...) CREATE_NOTE_VAARG(__VA_ARGS__)
-
-#define CREATE_NOTE(...) P99_PASTE2(CREATE_NOTE_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
-
-#define CREATE_NOTE_VAARG(variableName, format, ...)                                                  \
-    namespace detail                                                                                  \
-    {                                                                                                 \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                                 \
-    constexpr auto variableName =                                                                     \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Note, "")
-
-#define CREATE_WARNING_3(variableName, cliName, format)                                                        \
-    namespace detail                                                                                           \
-    {                                                                                                          \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};          \
-    inline auto P99_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName); \
-    }                                                                                                          \
-    constexpr auto variableName =                                                                              \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Warning, cliName)
-
-#define CREATE_WARNING_4(...) CREATE_WARNING_VAARG(__VA_ARGS__)
-#define CREATE_WARNING_5(...) CREATE_WARNING_VAARG(__VA_ARGS__)
-#define CREATE_WARNING_6(...) CREATE_WARNING_VAARG(__VA_ARGS__)
-#define CREATE_WARNING_7(...) CREATE_WARNING_VAARG(__VA_ARGS__)
-#define CREATE_WARNING_8(...) CREATE_WARNING_VAARG(__VA_ARGS__)
-#define CREATE_WARNING_9(...) CREATE_WARNING_VAARG(__VA_ARGS__)
-
-#define CREATE_WARNING(...) P99_PASTE2(CREATE_WARNING_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
-
-#define CREATE_WARNING_VAARG(variableName, cliName, format, ...)                                                  \
-    namespace detail                                                                                              \
-    {                                                                                                             \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
-    inline auto P99_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName);    \
-    }                                                                                                             \
-    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>( \
-        ::coral66::Severity::Warning, cliName)
 
 #define CREATE_ERROR_2(variableName, format)                                                          \
     namespace detail                                                                                  \
@@ -138,12 +87,6 @@ CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE, "Failed to open source file '%0'");
 CREATE_ERROR(NO_SOURCE_FILES_SPECIFIED, "No source files specified");
 CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .cor '%0'");
 CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for output");
-CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME,
-             "Cannot compile to object file and assembly at the same time - ignoring option");
-CREATE_ERROR(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME,
-             "Cannot compile to object file and preprocess at the same time - ignoring option");
-CREATE_ERROR(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME,
-             "Cannot compile to assembly and preprocess at the same time - ignoring option");
 } // namespace CLI
 
 namespace Lexer
@@ -175,37 +118,7 @@ CREATE_ERROR(UNTERMINATED_INCLUDE_DIRECTIVE, "Unterminated include directive", U
 
 } // namespace Errors
 
-namespace Warnings
-{
-namespace Semantics
-{
-CREATE_WARNING(UNUSED_VARIABLE_N, "unused-variable", "Unused variable %0", PointAt<0>);
-CREATE_WARNING(POSSIBLE_PRECISION_LOSS, "precision-loss", "Possible loss of precision in fixed point operation",
-               Underline<0>);
-} // namespace Semantics
-namespace CLI
-{
-CREATE_WARNING(FLAG_N_IS_NOT_APPLICABLE_FOR_CURRENT_TARGET_ARCHITECTURE, "unused-command-line-argument",
-               "Flag '%0' is not applicable for current target architecture");
-} // namespace CLI
-} // namespace Warnings
-
-namespace Notes
-{
-CREATE_NOTE(PREVIOUSLY_DECLARED_HERE, "Previously declared here:", Underline<0>);
-} // namespace Notes
-
-} // namespace coral66
-
-#undef CREATE_WARNING
-#undef CREATE_WARNING_3
-#undef CREATE_WARNING_4
-#undef CREATE_WARNING_5
-#undef CREATE_WARNING_6
-#undef CREATE_WARNING_7
-#undef CREATE_WARNING_8
-#undef CREATE_WARNING_9
-#undef CREATE_WARNING_VAARG
+} // coral66
 
 #undef CREATE_ERROR
 #undef CREATE_ERROR_2
@@ -217,12 +130,3 @@ CREATE_NOTE(PREVIOUSLY_DECLARED_HERE, "Previously declared here:", Underline<0>)
 #undef CREATE_ERROR_8
 #undef CREATE_ERROR_VAARG
 
-#undef CREATE_NOTE
-#undef CREATE_NOTE_2
-#undef CREATE_NOTE_3
-#undef CREATE_NOTE_4
-#undef CREATE_NOTE_5
-#undef CREATE_NOTE_6
-#undef CREATE_NOTE_7
-#undef CREATE_NOTE_8
-#undef CREATE_NOTE_VAARG

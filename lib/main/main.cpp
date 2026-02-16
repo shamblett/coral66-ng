@@ -22,7 +22,8 @@
 #include "command_line_arguments.hpp"
 #include "command_line_processor.hpp"
 #include "lib/backend/code_generation.hpp"
-#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/errors.hpp"
+#include "lib/frontend/common/warnings.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
@@ -395,13 +396,13 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
         if (cl::CompileAndAssembly)
         {
             reporter->changeColor(llvm::raw_ostream::YELLOW);
-            *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
+            *reporter << Warnings::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
             reporter->changeColor(llvm::raw_ostream::RED);
         }
         if (cl::PreprocessOutput)
         {
             reporter->changeColor(llvm::raw_ostream::YELLOW);
-            *reporter << Errors::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
+            *reporter << Warnings::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             reporter->changeColor(llvm::raw_ostream::RED);
         }
         return performAction(Action::Compile, cl::SourceFilename, reporter);
@@ -411,7 +412,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
         if (cl::PreprocessOutput)
         {
             reporter->changeColor(llvm::raw_ostream::YELLOW);
-            *reporter << Errors::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
+            *reporter << Warnings::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             reporter->changeColor(llvm::raw_ostream::RED);
         }
         return performAction(Action::AssemblyOutput, cl::SourceFilename, reporter);

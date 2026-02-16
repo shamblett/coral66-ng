@@ -6,7 +6,7 @@
 
 #include "preprocessor_parser.hpp"
 
-#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 
 namespace

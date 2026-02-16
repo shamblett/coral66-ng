@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <ranges>
 
-#include "lib/frontend/common/error_messages.hpp"
+#include "lib/frontend/common/errors.hpp"
 
 namespace coral66::Semantics
 {
