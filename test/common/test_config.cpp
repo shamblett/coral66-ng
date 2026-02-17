@@ -40,7 +40,7 @@ std::tuple<int, char**> coral66::Tests::createArgs(const std::string& commandLin
     return std::make_tuple(p.we_wordc, p.we_wordv);
 }
 
-std::string coral66::Tests::getTestDataPath(const std::string& relativePath)
+std::string coral66::Tests::getTestDataPath(const std::string& relativePath, const std::string& suite)
 {
     auto srcDir = llvm::sys::Process::GetEnv("TEST_SRCDIR");
     auto workspace = llvm::sys::Process::GetEnv("TEST_WORKSPACE");
@@ -48,7 +48,8 @@ std::string coral66::Tests::getTestDataPath(const std::string& relativePath)
     {
         fs::path path = *srcDir;
         path /= workspace.value_or("coral66");
-        path /= relativePath;
+        const std::string rPath = "test/" + suite + "/data/" + relativePath;
+        path /= rPath;
         return path.string();
     }
     return relativePath;

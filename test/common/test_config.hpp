@@ -262,11 +262,11 @@ struct EndTest
 
 std::tuple<int, char**> createArgs(const std::string& commandLine);
 
-std::string getTestDataPath(const std::string& relativePath);
+std::string getTestDataPath(const std::string& relativePath, const std::string& suite);
 
 } // namespace coral66::Tests
 
-// IT'S ONLY FOR TESTS I SWEAR. It's in a namepspace for mangling
+// IT'S ONLY FOR TESTS I SWEAR. It's in a namespace for mangling
 using namespace coral66::Tests;
 
 namespace Catch
