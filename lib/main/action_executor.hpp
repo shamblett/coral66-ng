@@ -13,7 +13,7 @@
 /**
  * @brief Main processing action executor functionality.
  *
- * Carries out the actions as selected by the user, e.e. compile.
+ * Executes the actions as selected by the user, e.g. compile.
  */
 
 namespace coral66
@@ -32,10 +32,10 @@ class ActionExecutor
     std::vector<fs::path> m_linkableFiles;
 
 public:
+
     explicit ActionExecutor(llvm::raw_ostream* reporter) : m_reporter(reporter) {}
 
     ~ActionExecutor() = default;
-
     ActionExecutor(const ActionExecutor& other) = delete;
     ActionExecutor(ActionExecutor&& other) noexcept = delete;
 
