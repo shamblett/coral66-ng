@@ -32,13 +32,6 @@
 namespace
 {
 
-enum class Action
-{
-    Compile,
-    Preprocess,
-    AssemblyOutput,
-    Link [[maybe_unused]]
-};
 
 std::optional<std::string> compileCoral66File(Action action, coral66::fs::path sourceFile, llvm::raw_ostream* reporter)
 {

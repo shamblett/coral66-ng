@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include "llvm/Support/CommandLine.h"
-#include "version.hpp"
-
 /**
  * @brief The command line processor
  *

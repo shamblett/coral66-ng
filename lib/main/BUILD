@@ -7,10 +7,12 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "main",
     srcs = [
+        "action_executor.cpp",
         "command_line_processor.cpp",
         "main.cpp",
     ],
     hdrs = [
+        "action_executor.hpp",
         "command_line_arguments.hpp",
         "command_line_processor.hpp",
         "main.hpp",
