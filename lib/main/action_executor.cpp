@@ -1,28 +1,41 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 17/02/2026
  */
 
 #include "action_executor.hpp"
 
-#include "command_line_arguments.hpp"
+#include <llvm/Bitcode/BitcodeWriterPass.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/Verifier.h>
+#include <llvm/IRPrinter/IRPrintingPasses.h>
+#include <llvm/Passes/PassBuilder.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Timer.h>
 
+#include "command_line_arguments.hpp"
+#include "lib/backend/code_generation.hpp"
+#include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/warnings.hpp"
+#include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/program.hpp"
+#include "lib/support/filesystem.hpp"
 
 int coral66::ActionExecutor::execute(const Action action, const std::string& file)
 {
-
     // Check for no action
-    if (coral66::cl::NoAction)
+    if (cl::NoAction)
     {
         m_reporter->changeColor(llvm::raw_ostream::YELLOW);
-        *m_reporter << coral66::Warnings::CLI::NO_ACTION_SPEFIFIED.argsCLI();
+        *m_reporter << Warnings::CLI::NO_ACTION_SPEFIFIED.argsCLI();
         m_reporter->changeColor(llvm::raw_ostream::RED);
         return EXIT_SUCCESS;
     }
     auto path = fs::path(file);
-    const auto objectFile = compileCoral66File(action, file);
+    const auto objectFile = compileCoral66File(action, path);
     if (!objectFile)
     {
         return EXIT_FAILURE;
@@ -34,4 +47,288 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
     return EXIT_SUCCESS;
 }
 
-std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Action action, const fs::path& sourceFile) {}
+std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Action action, fs::path& sourceFile) const
+{
+    std::optional<llvm::TimerGroup> timer;
+    if (cl::Time)
+    {
+        timer.emplace("Compilation", "Time it took for the whole compilation of " + sourceFile.string());
+    }
+    fs::ifstream file(sourceFile, std::ios_base::binary | std::ios_base::ate | std::ios_base::in);
+    if (!file.is_open())
+    {
+        *m_reporter << Errors::CLI::FAILED_TO_OPEN_SOURCE_FILE.argsCLI(sourceFile.string());
+        return {};
+    }
+
+    std::streamsize const size = file.tellg();
+    file.seekg(0);
+    std::string input(size, '\0');
+    file.read(input.data(), size);
+    file.close();
+
+    sourceFile = fs::absolute(sourceFile);
+    sourceFile = sourceFile.lexically_normal();
+
+    std::optional<llvm::TimeRegion> ppTokenTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> ppTokenTimer;
+        ppTokenTimer.emplace("Lexing preprocessor tokens",
+                             "Time it took to lex all preprocessor tokens in " + sourceFile.string(), *timer);
+        ppTokenTimeRegion.emplace(*ppTokenTimer);
+    }
+
+    bool errors = false;
+    auto ppTokens = Lexer::tokenize(std::move(input), m_reporter, &errors, sourceFile.string());
+    if (errors)
+    {
+        return {};
+    }
+    ppTokenTimeRegion.reset();
+
+    std::optional<llvm::TimeRegion> ppTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> ppTimer;
+        ppTimer.emplace("Preprocessor", "Time it took to preprocess " + sourceFile.string(), *timer);
+        ppTimeRegion.emplace(*ppTimer);
+    }
+
+    ppTokens = PP::preprocess(std::move(ppTokens), m_reporter, &errors);
+    if (errors)
+    {
+        return {};
+    }
+    ppTimeRegion.reset();
+    if (action == Action::Preprocess)
+    {
+        auto reconstruction =
+            PP::reconstruct(ppTokens.data().data(), ppTokens.data().data() + ppTokens.data().size(), ppTokens);
+        if (!cl::OutputFilename.empty())
+        {
+            llvm::outs() << reconstruction;
+            llvm::outs().flush();
+            return fs::path{};
+        }
+
+        fs::ofstream outputFile(coral66::to_string(coral66::cl::OutputFilename), std::ios_base::out);
+        if (!outputFile.is_open())
+        {
+            *m_reporter << Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
+            return {};
+        }
+        outputFile << reconstruction;
+        outputFile.close();
+        return cl::OutputFilename;
+    }
+
+    std::optional<llvm::TimeRegion> cTokenTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> cTokenTimer;
+        cTokenTimer.emplace("C Token", "Time it took turn PP Tokens into C Tokens " + sourceFile.string(), *timer);
+        cTokenTimeRegion.emplace(*cTokenTimer);
+    }
+
+    auto cTokens = coral66::Lexer::toCTokens(std::move(ppTokens), m_reporter, &errors);
+    if (errors)
+    {
+        return {};
+    }
+    cTokenTimeRegion.reset();
+
+    std::optional<llvm::TimeRegion> parserTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> parserTimer;
+        parserTimer.emplace("Parser", "Time it took to parse " + sourceFile.string(), *timer);
+        parserTimeRegion.emplace(*parserTimer);
+    }
+
+    Syntax::Program tree = coral66::Parser::parseProgram(cTokens, m_reporter, &errors);
+    if (errors)
+    {
+        return {};
+    }
+    parserTimeRegion.reset();
+
+    std::optional<llvm::TimeRegion> semanticsTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> semanticsTimer;
+        semanticsTimer.emplace("Semantics", "Time it took to semantically analyze " + sourceFile.string(), *timer);
+        semanticsTimeRegion.emplace(*semanticsTimer);
+    }
+
+    auto program = Semantics::analyse(tree, std::move(cTokens), m_reporter, &errors);
+    if (errors)
+    {
+        return {};
+    }
+    if (cl::SyntaxOnly)
+    {
+        return std::optional<coral66::fs::path>{std::in_place};
+    }
+    semanticsTimeRegion.reset();
+
+    std::optional<llvm::TimeRegion> codegenTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> codegenTimer;
+        codegenTimer.emplace("Codegen", "Time it took to generate LLVM IR for " + sourceFile.string(), *timer);
+        codegenTimeRegion.emplace(*codegenTimer);
+    }
+
+    CGLLVM::Options codegenOptions;
+    llvm::LLVMContext context;
+    llvm::Module module("", context);
+    if (cl::Pie || cl::Pic)
+    {
+        codegenOptions.reloc = llvm::Reloc::Model::PIC_;
+    }
+
+    // Optimisation level
+    switch (cl::OptimizationLevel)
+    {
+        case cl::OptLevel::None: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('0').value(); break;
+        case cl::OptLevel::O1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
+        case cl::OptLevel::O2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
+        case cl::OptLevel::O3: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
+        default:
+            llvm::CodeGenOpt::parseLevel('0').value();
+            break;
+            ;
+    }
+
+    // Debug level
+    switch (cl::DebugLevel)
+    {
+        case cl::DebugLevel::NoDebug: codegenOptions.debugEmission = CGLLVM::DebugEmission::None; break;
+        case cl::DebugLevel::g1: codegenOptions.debugEmission = CGLLVM::DebugEmission::Line; break;
+        case cl::DebugLevel::g2: codegenOptions.debugEmission = CGLLVM::DebugEmission::Default; break;
+        case cl::DebugLevel::g3: codegenOptions.debugEmission = CGLLVM::DebugEmission::Extended; break;
+        default:
+            codegenOptions.debugEmission = CGLLVM::DebugEmission::None;
+            break;
+            ;
+    }
+
+    auto targetMachine = coral66::CGLLVM::generateLLVM(module, program, codegenOptions);
+    codegenTimeRegion.reset();
+    if (llvm::verifyModule(module, &llvm::errs()))
+    {
+        llvm::errs().flush();
+        module.print(llvm::outs(), nullptr);
+        std::terminate();
+    }
+    std::string outputFile;
+    if (!cl::OutputFilename.empty())
+    {
+        outputFile = cl::OutputFilename.getValue();
+    }
+    else
+    {
+        auto path = sourceFile;
+        if (action == Action::AssemblyOutput)
+        {
+            if (cl::EmitLLVM)
+            {
+                path.replace_extension("ll");
+            }
+            else
+            {
+                path.replace_extension("s");
+            }
+        }
+        else
+        {
+            if (cl::EmitLLVM)
+            {
+                path.replace_extension("bc");
+            }
+            else
+            {
+                path.replace_extension("o");
+            }
+        }
+        outputFile = path.string();
+    }
+
+    std::error_code ec;
+    llvm::raw_fd_ostream os(outputFile, ec, llvm::sys::fs::OpenFlags::OF_None);
+    if (ec)
+    {
+        *m_reporter << Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(outputFile);
+        return {};
+    }
+
+    std::optional<llvm::TimeRegion> compileTimeRegion;
+    if (timer)
+    {
+        std::optional<llvm::Timer> compileTimer;
+        compileTimer.emplace("Compile", "Time it took for LLVM to generate native object code " + sourceFile.string(),
+                             *timer);
+        compileTimeRegion.emplace(*compileTimer);
+    }
+    llvm::PassBuilder passBuilder(targetMachine.get());
+    llvm::LoopAnalysisManager loopAnalysisManager;
+    llvm::FunctionAnalysisManager functionAnalysisManager;
+    llvm::CGSCCAnalysisManager cgsccAnalysisManager;
+    llvm::ModuleAnalysisManager moduleAnalysisManager;
+
+    passBuilder.registerModuleAnalyses(moduleAnalysisManager);
+    passBuilder.registerCGSCCAnalyses(cgsccAnalysisManager);
+    passBuilder.registerFunctionAnalyses(functionAnalysisManager);
+    passBuilder.registerLoopAnalyses(loopAnalysisManager);
+    passBuilder.crossRegisterProxies(loopAnalysisManager, functionAnalysisManager, cgsccAnalysisManager,
+                                     moduleAnalysisManager);
+
+    llvm::ModulePassManager modulePassManager;
+    if (codegenOptions.ol == llvm::CodeGenOptLevel::None)
+    {
+        modulePassManager = passBuilder.buildO0DefaultPipeline(llvm::OptimizationLevel::O0);
+    }
+    else
+    {
+        llvm::OptimizationLevel level = llvm::OptimizationLevel::O2;
+        switch (codegenOptions.ol)
+        {
+            case llvm::CodeGenOptLevel::Less: level = llvm::OptimizationLevel::O1; break;
+            case llvm::CodeGenOptLevel::Default: level = llvm::OptimizationLevel::O2; break;
+            case llvm::CodeGenOptLevel::Aggressive: level = llvm::OptimizationLevel::O3; break;
+            default: break;
+        }
+        modulePassManager = passBuilder.buildPerModuleDefaultPipeline(level);
+    }
+
+    if (cl::EmitLLVM)
+    {
+        if (action == Action::AssemblyOutput)
+        {
+            modulePassManager.addPass(llvm::PrintModulePass(os));
+        }
+        else
+        {
+            modulePassManager.addPass(llvm::BitcodeWriterPass(os));
+        }
+        modulePassManager.run(module, moduleAnalysisManager);
+    }
+    else
+    {
+        modulePassManager.run(module, moduleAnalysisManager);
+        llvm::legacy::PassManager codegenPass;
+        if (targetMachine->addPassesToEmitFile(codegenPass, os, nullptr,
+                                               action == Action::AssemblyOutput ? llvm::CodeGenFileType::AssemblyFile :
+                                                                                  llvm::CodeGenFileType::ObjectFile))
+        {
+            return {};
+        }
+        codegenPass.run(module);
+    }
+
+    compileTimeRegion.reset();
+    os.flush();
+
+    return fs::path(outputFile);
+}

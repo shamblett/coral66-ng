@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <llvm/Support/raw_ostream.h>
+
 /**
  * @brief The command line processor
  *
