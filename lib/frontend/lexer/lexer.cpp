@@ -920,20 +920,13 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
             return PreprocessingNumber{{static_cast<char>(c)}};
         }
         case '<': return Punctuation{static_cast<int>(TokenType::LessThan)};
-        case '#': return Punctuation{static_cast<int>(TokenType::Pound)};
         case ':': return Punctuation{static_cast<int>(TokenType::Colon)};
         case '-': return Punctuation{static_cast<int>(TokenType::Minus)};
         case '>': return Punctuation{static_cast<int>(TokenType::GreaterThan)};
-        case '&': return Punctuation{static_cast<int>(TokenType::Ampersand)};
-        case '|': return Punctuation{static_cast<int>(TokenType::BitOr)};
         case '+': return Punctuation{static_cast<int>(TokenType::Plus)};
         case '=': context.push(context.getOffset() - 1, context.getOffset(), TokenType::Equal); return *this;
-        case '!': return Punctuation{static_cast<int>(TokenType::LogicalNegation)};
         case '*': return Punctuation{static_cast<int>(TokenType::Asterisk)};
         case '/': return Punctuation{static_cast<int>(TokenType::Division)};
-        case '%': return Punctuation{static_cast<int>(TokenType::Percent)};
-        case '^': return Punctuation{static_cast<int>(TokenType::BitXor)};
-        case '~': context.push(context.getOffset() - 1, context.getOffset(), TokenType::BitWiseNegation); return *this;
         case '(': context.push(context.getOffset() - 1, context.getOffset(), TokenType::OpenParentheses); return *this;
         case ')': context.push(context.getOffset() - 1, context.getOffset(), TokenType::CloseParentheses); return *this;
         case '{': context.push(context.getOffset() - 1, context.getOffset(), TokenType::OpenBrace); return *this;
@@ -946,7 +939,6 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
             return *this;
         case ';': context.push(context.getOffset() - 1, context.getOffset(), TokenType::SemiColon); return *this;
         case ',': context.push(context.getOffset() - 1, context.getOffset(), TokenType::Comma); return *this;
-        case '?': context.push(context.getOffset() - 1, context.getOffset(), TokenType::QuestionMark); return *this;
         case '\n': context.push(context.getOffset() - 1, context.getOffset(), TokenType::Newline); return *this;
         default:
         {
@@ -1249,8 +1241,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
             } // Coral <> for Not Equal
             context.push(1, TokenType::LessThan);
             return {Start{}, false};
-        case static_cast<int>(TokenType::Ampersand): context.push(1, TokenType::Ampersand); return {Start{}, false};
-        case static_cast<int>(TokenType::BitOr): context.push(1, TokenType::BitOr); return {Start{}, false};
         case static_cast<int>(TokenType::Plus): context.push(1, TokenType::Plus); return {Start{}, false};
         case static_cast<int>(TokenType::Assignment):
             if (c == '=')
@@ -1259,9 +1249,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
                 return {Start{}, true};
             }
             context.push(1, TokenType::Assignment);
-            return {Start{}, false};
-        case static_cast<int>(TokenType::LogicalNegation):
-            context.push(1, TokenType::LogicalNegation);
             return {Start{}, false};
         case static_cast<int>(TokenType::Asterisk): context.push(1, TokenType::Asterisk); return {Start{}, false};
         case static_cast<int>(TokenType::Division):
@@ -1272,7 +1259,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
                 return {BlockComment{}, true};
             context.push(1, TokenType::Division);
             return {Start{}, false};
-        case static_cast<int>(TokenType::Percent): context.push(1, TokenType::Percent); return {Start{}, false};
         case static_cast<int>(TokenType::Colon):
             if (c == '=')
             {
@@ -1281,7 +1267,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
             } // :=
             context.push(1, TokenType::Colon);
             return {Start{}, false};
-        case static_cast<int>(TokenType::BitXor): context.push(1, TokenType::BitXor); return {Start{}, false};
         case static_cast<int>(TokenType::Pound):
             context.push(context.tokenStartOffset,
                          context.tokenStartOffset + (context.currentView().front() == '#' ? 1 : 2), TokenType::Pound);
@@ -2187,77 +2172,78 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
 {
     switch (tokenType)
     {
+        // Symbols from Appendix 2 of the specification
         case TokenType::Identifier: return "identifier";
         case TokenType::OpenParentheses: return "'('";
         case TokenType::CloseParentheses: return "')'";
-        case TokenType::OpenBrace: return "'{'";
-        case TokenType::CloseBrace: return "'}'";
         case TokenType::StringLiteral: return "string literal";
         case TokenType::Literal: return "literal";
         case TokenType::SemiColon: return "';'";
         case TokenType::Comma: return "','";
         case TokenType::Minus: return "'-'";
-        case TokenType::BitWiseNegation: return "'~'";
-        case TokenType::LogicalNegation: return "'!'";
         case TokenType::Plus: return "'+'";
         case TokenType::Asterisk: return "'*'";
         case TokenType::Division: return "'/'";
-        case TokenType::Percent: return "'%'";
-        case TokenType::LogicAnd: return "'&&'";
-        case TokenType::LogicOr: return "'||'";
-        case TokenType::Ampersand: return "'&'";
-        case TokenType::BitOr: return "'|'";
-        case TokenType::BitXor: return "'^'";
-        case TokenType::Equal: return "'=='";
+        case TokenType::Equal: return "'='";
         case TokenType::NotEqual: return "'!='";
         case TokenType::LessThan: return "'<'";
         case TokenType::LessThanOrEqual: return "'<='";
         case TokenType::GreaterThan: return "'>'";
         case TokenType::GreaterThanOrEqual: return "'>='";
-        case TokenType::Assignment: return "'='";
+        case TokenType::Assignment: return "':='";
         case TokenType::Colon: return "':'";
-        case TokenType::QuestionMark: return "'?'";
 
-        // Coral Keywords
-        case TokenType::BeginKeyword: return "'BEGIN'";
-        case TokenType::EndKeyword: return "'END'";
-        case TokenType::ProcedureKeyword: return "'PROCEDURE'";
-        case TokenType::ProgramKeyword: return "'PROGRAM'";
-        case TokenType::SegmentKeyword: return "'SEGMENT'";
-        case TokenType::IfKeyword: return "'IF'";
-        case TokenType::ThenKeyword: return "'THEN'";
-        case TokenType::ElseKeyword: return "'ELSE'";
-        case TokenType::ForKeyword: return "'FOR'";
-        case TokenType::StepKeyword: return "'STEP'";
-        case TokenType::UntilKeyword: return "'UNTIL'";
-        case TokenType::DoKeyword: return "'DO'";
-        case TokenType::GotoKeyword: return "'GOTO'";
-        case TokenType::AnswerKeyword: return "'ANSWER'";
-        case TokenType::IntegerKeyword: return "'INTEGER'";
-        case TokenType::FloatingKeyword: return "'FLOATING'";
-        case TokenType::FixedKeyword: return "'FIXED'";
-        case TokenType::BitsKeyword: return "'BITS'";
-        case TokenType::ArrayKeyword: return "'ARRAY'";
-        case TokenType::TableKeyword: return "'TABLE'";
-        case TokenType::PresetKeyword: return "'PRESET'";
-        case TokenType::OverlayKeyword: return "'OVERLAY'";
-        case TokenType::ValueKeyword: return "'VALUE'";
-        case TokenType::LocationKeyword: return "'LOCATION'";
-        case TokenType::CommonKeyword: return "'COMMON'";
-        case TokenType::CommentKeyword: return "'COMMENT'";
-        case TokenType::DefineKeyword: return "'DEFINE'";
-        case TokenType::CodeKeyword: return "'CODE'";
+        // Coral Keywords, not stropped, from Appendix 2 of the specification
+        case TokenType::AbsoluteKeyword: return "ABSOLUTE";
+        case TokenType::AndKeyword: return "AND";
+        case TokenType::AnswerKeyword: return "ANSWER";
+        case TokenType::ArrayKeyword: return "ARRAY";
+        case TokenType::BeginKeyword: return "BEGIN'";
+        case TokenType::BitKeyword: return "BIT";
+        case TokenType::BitsKeyword: return "BITS";
+        case TokenType::CodeKeyword: return "CODE";
+        case TokenType::CommentKeyword: return "COMMENT";
+        case TokenType::CommonKeyword: return "COMMON";
+        case TokenType::DefineKeyword: return "DEFINE";
+        case TokenType::DeleteKeyword: return "DELETE";
+        case TokenType::DifferKeyword: return "DIFFER";
+        case TokenType::DoKeyword: return "DO";
+        case TokenType::ElseKeyword: return "ELSE";
+        case TokenType::EndKeyword: return "END";
+        case TokenType::ExternalKeyword: return "EXTERNAL";
+        case TokenType::FixedKeyword: return "FIXED";
+        case TokenType::FloatingKeyword: return "FLOATING";
+        case TokenType::ForKeyword: return "FOR";
+        case TokenType::GotoKeyword: return "GOTO";
+        case TokenType::IfKeyword: return "IF";
+        case TokenType::IntegerKeyword: return "INTEGER";
+        case TokenType::LabelKeyword: return "LABEL";
+        case TokenType::LibraryKeyword: return "LIBRARY";
+        case TokenType::LiteralKeyword: return "LITERAL";
+        case TokenType::LocationKeyword: return "LOCATION";
+        case TokenType::MaskKeyword: return "MASK";
+        case TokenType::OctalKeyword: return "OCTAL";
+        case TokenType::OrKeyword: return "OR";
+        case TokenType::OverlayKeyword: return "OVERLAY";
+        case TokenType::PresetKeyword: return "PRESET";
+        case TokenType::ProcedureKeyword: return "PROCEDURE";
+        case TokenType::RecursiveKeyword: return "RECURSIVE";
+        case TokenType::StepKeyword: return "STEP";
+        case TokenType::SwitchKeyword: return "SWITCH";
+        case TokenType::TableKeyword: return "TABLE";
+        case TokenType::ThenKeyword: return "THEN";
+        case TokenType::UnionKeyword: return "UNION";
+        case TokenType::UnsignedKeyword: return "UNSIGNED";
+        case TokenType::UntilKeyword: return "UNTIL";
+        case TokenType::ValueKeyword: return "VALUE";
+        case TokenType::WhileKeyword: return "WHILE";
+        case TokenType::WithKeyword: return "WiTH";
 
         case TokenType::OpenSquareBracket: return "'['";
         case TokenType::CloseSquareBracket: return "']'";
         case TokenType::Dot: return "'.'";
-
-        case TokenType::Pound: return "'#'";
-        case TokenType::DoublePound: return "'##'";
         case TokenType::Newline: return "newline";
         case TokenType::PPNumber: return "preprocessing number";
-        case TokenType::Miscellaneous: CORAL66_UNREACHABLE;
-        case TokenType::Backslash: return "'\\'";
     }
     CORAL66_UNREACHABLE;
 }
@@ -2266,77 +2252,74 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
 {
     switch (tokenType)
     {
+        // Symbols from Appendix 2 of the specification
         case TokenType::Identifier: return "identifier";
         case TokenType::OpenParentheses: return "(";
         case TokenType::CloseParentheses: return ")";
-        case TokenType::OpenBrace: return "{";
-        case TokenType::CloseBrace: return "}";
+        case TokenType::OpenSquareBracket: return "[";
+        case TokenType::CloseSquareBracket: return "]";
         case TokenType::StringLiteral: return "string literal";
         case TokenType::Literal: return "literal";
         case TokenType::SemiColon: return ";";
         case TokenType::Comma: return ",";
         case TokenType::Minus: return "-";
-        case TokenType::BitWiseNegation: return "~";
-        case TokenType::LogicalNegation: return "!";
         case TokenType::Plus: return "+";
         case TokenType::Asterisk: return "*";
         case TokenType::Division: return "/";
-        case TokenType::Percent: return "%";
-        case TokenType::LogicAnd: return "&&";
-        case TokenType::LogicOr: return "||";
-        case TokenType::Ampersand: return "&";
-        case TokenType::BitOr: return "|";
-        case TokenType::BitXor: return "^";
-        case TokenType::Equal: return "==";
+        case TokenType::Equal: return "=";
         case TokenType::NotEqual: return "!=";
         case TokenType::LessThan: return "<";
         case TokenType::LessThanOrEqual: return "<=";
         case TokenType::GreaterThan: return ">";
         case TokenType::GreaterThanOrEqual: return ">=";
-        case TokenType::Assignment: return "=";
+        case TokenType::Assignment: return ":=";
         case TokenType::Colon: return ":";
-        case TokenType::QuestionMark: return "?";
 
-        // Coral Keywords
-        case TokenType::BeginKeyword: return "BEGIN";
-        case TokenType::EndKeyword: return "END";
-        case TokenType::ProcedureKeyword: return "PROCEDURE";
-        case TokenType::ProgramKeyword: return "PROGRAM";
-        case TokenType::SegmentKeyword: return "SEGMENT";
-        case TokenType::IfKeyword: return "IF";
-        case TokenType::ThenKeyword: return "THEN";
-        case TokenType::ElseKeyword: return "ELSE";
-        case TokenType::ForKeyword: return "FOR";
-        case TokenType::StepKeyword: return "STEP";
-        case TokenType::UntilKeyword: return "UNTIL";
-        case TokenType::DoKeyword: return "DO";
-        case TokenType::GotoKeyword: return "GOTO";
+        // Coral Keywords, not stropped, from Appendix 2 of the specification
+        case TokenType::AbsoluteKeyword: return "ABSOLUTE";
+        case TokenType::AndKeyword: return "AND";
         case TokenType::AnswerKeyword: return "ANSWER";
-        case TokenType::IntegerKeyword: return "INTEGER";
-        case TokenType::FloatingKeyword: return "FLOATING";
-        case TokenType::FixedKeyword: return "FIXED";
-        case TokenType::BitsKeyword: return "BITS";
         case TokenType::ArrayKeyword: return "ARRAY";
-        case TokenType::TableKeyword: return "TABLE";
-        case TokenType::PresetKeyword: return "PRESET";
-        case TokenType::OverlayKeyword: return "OVERLAY";
-        case TokenType::ValueKeyword: return "VALUE";
-        case TokenType::LocationKeyword: return "LOCATION";
-        case TokenType::CommonKeyword: return "COMMON";
-        case TokenType::CommentKeyword: return "COMMENT";
-        case TokenType::DefineKeyword: return "DEFINE";
+        case TokenType::BeginKeyword: return "BEGIN'";
+        case TokenType::BitKeyword: return "BIT";
+        case TokenType::BitsKeyword: return "BITS";
         case TokenType::CodeKeyword: return "CODE";
-
-        case TokenType::OpenSquareBracket: return "[";
-        case TokenType::CloseSquareBracket: return "]";
-        case TokenType::Dot: return ".";
-
-        case TokenType::Pound: return "#";
-        case TokenType::DoublePound: return "##";
-        case TokenType::Newline: return "newline";
-        case TokenType::PPNumber: return "preprocessing number";
-        case TokenType::Miscellaneous: CORAL66_UNREACHABLE;
-        case TokenType::Backslash: return "\\";
+        case TokenType::CommentKeyword: return "COMMENT";
+        case TokenType::CommonKeyword: return "COMMON";
+        case TokenType::DefineKeyword: return "DEFINE";
+        case TokenType::DeleteKeyword: return "DELETE";
+        case TokenType::DifferKeyword: return "DIFFER";
+        case TokenType::DoKeyword: return "DO";
+        case TokenType::ElseKeyword: return "ELSE";
+        case TokenType::EndKeyword: return "END";
+        case TokenType::ExternalKeyword: return "EXTERNAL";
+        case TokenType::FixedKeyword: return "FIXED";
+        case TokenType::FloatingKeyword: return "FLOATING";
+        case TokenType::ForKeyword: return "FOR";
+        case TokenType::GotoKeyword: return "GOTO";
+        case TokenType::IfKeyword: return "IF";
+        case TokenType::IntegerKeyword: return "INTEGER";
+        case TokenType::LabelKeyword: return "LABEL";
+        case TokenType::LibraryKeyword: return "LIBRARY";
+        case TokenType::LiteralKeyword: return "LITERAL";
+        case TokenType::LocationKeyword: return "LOCATION";
+        case TokenType::MaskKeyword: return "MASK";
+        case TokenType::OctalKeyword: return "OCTAL";
+        case TokenType::OrKeyword: return "OR";
+        case TokenType::OverlayKeyword: return "OVERLAY";
+        case TokenType::PresetKeyword: return "PRESET";
+        case TokenType::ProcedureKeyword: return "PROCEDURE";
+        case TokenType::RecursiveKeyword: return "RECURSIVE";
+        case TokenType::StepKeyword: return "STEP";
+        case TokenType::SwitchKeyword: return "SWITCH";
+        case TokenType::TableKeyword: return "TABLE";
+        case TokenType::ThenKeyword: return "THEN";
+        case TokenType::UnionKeyword: return "UNION";
+        case TokenType::UnsignedKeyword: return "UNSIGNED";
+        case TokenType::UntilKeyword: return "UNTIL";
+        case TokenType::ValueKeyword: return "VALUE";
+        case TokenType::WhileKeyword: return "WHILE";
+        case TokenType::WithKeyword: return "WiTH";
     }
     CORAL66_UNREACHABLE;
 }

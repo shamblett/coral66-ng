@@ -181,11 +181,8 @@ bool coral66::Parser::firstIsInCastExpression(const Lexer::CToken& token, const 
 
 bool coral66::Parser::firstIsInUnaryExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)
 {
-    return firstIsInPostFixExpression(token, context) || token.getTokenType() == Lexer::TokenType::Ampersand
-           || token.getTokenType() == Lexer::TokenType::Asterisk || token.getTokenType() == Lexer::TokenType::Plus
-           || token.getTokenType() == Lexer::TokenType::Minus
-           || token.getTokenType() == Lexer::TokenType::BitWiseNegation
-           || token.getTokenType() == Lexer::TokenType::LogicalNegation;
+    return firstIsInPostFixExpression(token, context) || token.getTokenType() == Lexer::TokenType::Asterisk
+           || token.getTokenType() == Lexer::TokenType::Plus || token.getTokenType() == Lexer::TokenType::Minus;
 }
 
 bool coral66::Parser::firstIsInPostFixExpression(const Lexer::CToken& token, const coral66::Parser::Context& context)

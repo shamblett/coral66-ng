@@ -21,7 +21,7 @@
  * @brief Defines the Lexer and Token interfaces.
  *
  * This file contains the definitions for token types, the base Token class,
- * and specialized token classes for the Preprocessor (PPToken) and the C language (CToken).
+ * and specialized token classes for the Preprocessor (PPToken) and the Coral66 language (CToken).
  * It also declares the main entry points for tokenizing source code.
  */
 
