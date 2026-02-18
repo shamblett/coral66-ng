@@ -21,7 +21,7 @@ using namespace Catch::Matchers;
 namespace
 {
 
-coral66::CSourceObject lexes(const std::string& code)
+coral66::CSourceObject lex(const std::string& code)
 {
     std::string buffer;
     llvm::raw_string_ostream ss(buffer);
@@ -40,13 +40,13 @@ coral66::CSourceObject lexes(const std::string& code)
 TEST_CASE("Coral Lexing Keywords", "[lexer]")
 {
     using namespace coral66::Lexer;
-    auto result = lexes("ABSOLUTE AND ANSWER ARRAY BEGIN BIT BITS CODE COMMENT "
+    auto result = lex("ABSOLUTE AND ANSWER ARRAY BEGIN BIT BITS CODE COMMENT "
                         "COMMON DEFINE DELETE DIFFER DO ELSE END EXTERNAL FIXED FLOATING "
                         "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
                         "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
                         "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
 
-    std::vector correct = {
+    const std::vector correct = {
         TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,    TokenType::ArrayKeyword,
         TokenType::BeginKeyword,     TokenType::BitKeyword,      TokenType::BitsKeyword,      TokenType::CodeKeyword,
         TokenType::CommentKeyword,   TokenType::CommonKeyword,   TokenType::DefineKeyword,    TokenType::DeleteKeyword,
@@ -60,7 +60,7 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
         TokenType::UnionKeyword,     TokenType::UnsignedKeyword, TokenType::UntilKeyword,     TokenType::ValueKeyword,
         TokenType::WhileKeyword,     TokenType::WithKeyword};
 
-    std::vector<coral66::Lexer::TokenType> tokens;
+    std::vector<TokenType> tokens;
     tokens.reserve(result.data().size());
     std::ranges::transform(result.data(), std::back_inserter(tokens),
                            [](const CToken& token) { return token.getTokenType(); });
@@ -69,7 +69,7 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
 
 TEST_CASE("Coral Lexing Identifiers", "[lexer]")
 {
-    auto result = lexes("MyIdentifier var123 _start");
+    auto result = lex("MyIdentifier var123 _start");
     REQUIRE(result.data().size() == 3);
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "MyIdentifier");
@@ -83,7 +83,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
 {
     SECTION("Integers")
     {
-        auto result = lexes("123 0 9999");
+        auto result = lex("123 0 9999");
         REQUIRE(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Integer);
@@ -95,7 +95,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
 
     SECTION("Floating Point")
     {
-        auto result = lexes("3.14 0.0 .5 1.2e3");
+        auto result = lex("3.14 0.0 .5 1.2e3");
         REQUIRE(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Floating);
@@ -109,7 +109,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
 
     SECTION("Strings")
     {
-        auto result = lexes("'Hello World' 'It''s me' ''");
+        auto result = lex("'Hello World' 'It''s me' ''");
         REQUIRE(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
@@ -118,14 +118,14 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         CHECK(std::get<std::string>(result.data()[1].getValue()) == "It's me");
 
         CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
-        CHECK(std::get<std::string>(result.data()[2].getValue()) == "");
+        CHECK(std::get<std::string>(result.data()[2].getValue()).empty());
     }
 }
 
 TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
 {
     using namespace coral66::Lexer;
-    auto result = lexes("+ - * / = ( ) [ ] . : , ; <= >= <> := <-");
+    auto result = lex("+ - * / = ( ) [ ] . : , ; <= >= <> := <-");
     // Note: := and <- might parse as two tokens depending on lexer implementation in Punctuation::advance
     // My previous edit to Punctuation::advance handled := as Assignment.
     // <- was not explicitly handled in Punctuation::advance (case '<' checks for '=' and '>'), so it will be LessThan
