@@ -26,76 +26,117 @@ using namespace coral66::Lexer;
 
 namespace
 {
-bool isKeyword(std::string_view characters)
+bool isKeyword(const std::string_view characters)
 {
-    return characters == "BEGIN" || characters == "END" || characters == "PROCEDURE" || characters == "PROGRAM"
-           || characters == "SEGMENT" || characters == "IF" || characters == "THEN" || characters == "ELSE"
-           || characters == "FOR" || characters == "STEP" || characters == "UNTIL" || characters == "DO"
-           || characters == "GOTO" || characters == "ANSWER" || characters == "INTEGER" || characters == "FLOATING"
-           || characters == "FIXED" || characters == "BITS" || characters == "ARRAY" || characters == "TABLE"
-           || characters == "PRESET" || characters == "OVERLAY" || characters == "VALUE" || characters == "LOCATION"
-           || characters == "COMMON" || characters == "COMMENT" || characters == "DEFINE" || characters == "CODE";
+    return characters == "ABSOLUTE" || characters == "AND" || characters == "ANSWER" || characters == "ARRAY"
+           || characters == "BEGIN" || characters == "BIT" || characters == "BITS" || characters == "CODE"
+           || characters == "COMMENT" || characters == "COMMON" || characters == "DEFINE" || characters == "DELETE"
+           || characters == "DIFFER" || characters == "DO" || characters == "ELSE" || characters == "END"
+           || characters == "EXTERNAL" || characters == "FIXED" || characters == "FLOATING" || characters == "FOR"
+           || characters == "GOTO" || characters == "IF" || characters == "INTEGER" || characters == "LABEL"
+           || characters == "LIBRARY" || characters == "LITERAL" || characters == "LOCATION" || characters == "MASK"
+           || characters == "OCTAL" || characters == "OR" || characters == "OVERLAY" || characters == "PRESET"
+           || characters == "PROCEDURE" || characters == "PROGRAM" || characters == "RECURSIVE"
+           || characters == "SEGMENT" || characters == "STEP" || characters == "SWITCH" || characters == "TABLE"
+           || characters == "THEN" || characters == "UNION" || characters == "UNSIGNED" || characters == "UNTIL"
+           || characters == "VALUE" || characters == "WHILE" || characters == "WITH";
 }
 
-TokenType charactersToKeyword(std::string_view characters)
+TokenType charactersToKeyword(const std::string_view characters)
 {
     using namespace coral66::Lexer;
+    if (characters == "ABSOLUTE")
+        return TokenType::AbsoluteKeyword;
+    if (characters == "AND")
+        return TokenType::AndKeyword;
+    if (characters == "ANSWER")
+        return TokenType::AnswerKeyword;
+    if (characters == "ARRAY")
+        return TokenType::ArrayKeyword;
     if (characters == "BEGIN")
         return TokenType::BeginKeyword;
+    if (characters == "BIT")
+        return TokenType::BitKeyword;
+    if (characters == "BITS")
+        return TokenType::BitsKeyword;
+    if (characters == "CODE")
+        return TokenType::CodeKeyword;
+    if (characters == "COMMENT")
+        return TokenType::CommentKeyword;
+    if (characters == "COMMON")
+        return TokenType::CommonKeyword;
+    if (characters == "DEFINE")
+        return TokenType::DefineKeyword;
+    if (characters == "DELETE")
+        return TokenType::DeleteKeyword;
+    if (characters == "DIFFER")
+        return TokenType::DifferKeyword;
+    if (characters == "DO")
+        return TokenType::DoKeyword;
+    if (characters == "ELSE")
+        return TokenType::ElseKeyword;
     if (characters == "END")
         return TokenType::EndKeyword;
+    if (characters == "EXTERNAL")
+        return TokenType::ExternalKeyword;
+    if (characters == "FIXED")
+        return TokenType::FixedKeyword;
+    if (characters == "FLOATING")
+        return TokenType::FloatingKeyword;
+    if (characters == "FOR")
+        return TokenType::ForKeyword;
+    if (characters == "GOTO")
+        return TokenType::GotoKeyword;
+    if (characters == "IF")
+        return TokenType::IfKeyword;
+    if (characters == "INTEGER")
+        return TokenType::IntegerKeyword;
+    if (characters == "LABEL")
+        return TokenType::LabelKeyword;
+    if (characters == "LIBRARY")
+        return TokenType::LibraryKeyword;
+    if (characters == "LITERAL")
+        return TokenType::LiteralKeyword;
+    if (characters == "LOCATION")
+        return TokenType::LocationKeyword;
+    if (characters == "MASK")
+        return TokenType::MaskKeyword;
+    if (characters == "OCTAL")
+        return TokenType::OctalKeyword;
+    if (characters == "OR")
+        return TokenType::OrKeyword;
+    if (characters == "OVERLAY")
+        return TokenType::OverlayKeyword;
+    if (characters == "PRESET")
+        return TokenType::PresetKeyword;
     if (characters == "PROCEDURE")
         return TokenType::ProcedureKeyword;
     if (characters == "PROGRAM")
         return TokenType::ProgramKeyword;
+    if (characters == "RECURSIVE")
+        return TokenType::RecursiveKeyword;
     if (characters == "SEGMENT")
         return TokenType::SegmentKeyword;
-    if (characters == "IF")
-        return TokenType::IfKeyword;
-    if (characters == "THEN")
-        return TokenType::ThenKeyword;
-    if (characters == "ELSE")
-        return TokenType::ElseKeyword;
-    if (characters == "FOR")
-        return TokenType::ForKeyword;
     if (characters == "STEP")
         return TokenType::StepKeyword;
-    if (characters == "UNTIL")
-        return TokenType::UntilKeyword;
-    if (characters == "DO")
-        return TokenType::DoKeyword;
-    if (characters == "GOTO")
-        return TokenType::GotoKeyword;
-    if (characters == "ANSWER")
-        return TokenType::AnswerKeyword;
-    if (characters == "INTEGER")
-        return TokenType::IntegerKeyword;
-    if (characters == "FLOATING")
-        return TokenType::FloatingKeyword;
-    if (characters == "FIXED")
-        return TokenType::FixedKeyword;
-    if (characters == "BITS")
-        return TokenType::BitsKeyword;
-    if (characters == "ARRAY")
-        return TokenType::ArrayKeyword;
+    if (characters == "SWITCH")
+        return TokenType::SwitchKeyword;
     if (characters == "TABLE")
         return TokenType::TableKeyword;
-    if (characters == "PRESET")
-        return TokenType::PresetKeyword;
-    if (characters == "OVERLAY")
-        return TokenType::OverlayKeyword;
+    if (characters == "THEN")
+        return TokenType::ThenKeyword;
+    if (characters == "UNION")
+        return TokenType::UnionKeyword;
+    if (characters == "UNSIGNED")
+        return TokenType::UnsignedKeyword;
+    if (characters == "UNTIL")
+        return TokenType::UntilKeyword;
     if (characters == "VALUE")
         return TokenType::ValueKeyword;
-    if (characters == "LOCATION")
-        return TokenType::LocationKeyword;
-    if (characters == "COMMON")
-        return TokenType::CommonKeyword;
-    if (characters == "COMMENT")
-        return TokenType::CommentKeyword;
-    if (characters == "DEFINE")
-        return TokenType::DefineKeyword;
-    if (characters == "CODE")
-        return TokenType::CodeKeyword;
+    if (characters == "WHILE")
+        return TokenType::WhileKeyword;
+    if (characters == "WITH")
+        return TokenType::WithKeyword;
 
     CORAL66_UNREACHABLE;
 }
@@ -1116,8 +1157,6 @@ std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c,           // NOL
         context.withOffset(context.getOffset() - getNumUTF8ForUTF32(c),
                            [&] { coral66::match(*prevState, [&](auto&& value) { value.advance(' ', context); }); });
     }
-    context.push(context.getOffset() - getNumUTF8ForUTF32(c) - 1, context.getOffset() - getNumUTF8ForUTF32(c),
-                 TokenType::Backslash);
     return {Start{}, false};
 }
 
@@ -1134,8 +1173,6 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
             context.withOffset(result + 1, [&]
                                { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
         }
-        context.push(result, result + 1, TokenType::Backslash);
-        context.tokenStartOffset++;
         return {Text{(big ? "U" : "u") + characters}, false};
     }
 
@@ -1175,11 +1212,6 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
 
         if (suspHolder)
         {
-            // TODO: Warning that the universal character is treated as backslash followed by identifier
-            context.withOffset(ucStart + 1, [&]
-                               { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
-            context.push(ucStart, ucStart + 1, TokenType::Backslash);
-            context.tokenStartOffset++;
             return {Text{(big ? "U" : "u") + characters}, true};
         }
 
@@ -1266,10 +1298,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
                 return {Start{}, true};
             } // :=
             context.push(1, TokenType::Colon);
-            return {Start{}, false};
-        case static_cast<int>(TokenType::Pound):
-            context.push(context.tokenStartOffset,
-                         context.tokenStartOffset + (context.currentView().front() == '#' ? 1 : 2), TokenType::Pound);
             return {Start{}, false};
         default: CORAL66_UNREACHABLE;
     }
@@ -2056,18 +2084,6 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                     *reporter << Errors::Lexer::UNEXPECTED_CHARACTER.args(*iter, sourceInterface, *iter);
                 }
                 break;
-            case TokenType::Pound:
-            case TokenType::DoublePound:
-            case TokenType::Backslash:
-                if (errorsOccurred)
-                {
-                    *errorsOccurred = true;
-                }
-                if (reporter)
-                {
-                    *reporter << Errors::Lexer::STRAY_N_IN_PROGRAM.args(*iter, sourceInterface, *iter);
-                }
-                break;
             case TokenType::Newline: break;
             case TokenType::Identifier:
                 // Identifiers need to always be valid
@@ -2192,6 +2208,12 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::GreaterThanOrEqual: return "'>='";
         case TokenType::Assignment: return "':='";
         case TokenType::Colon: return "':'";
+        case TokenType::OpenSquareBracket: return "'['";
+        case TokenType::CloseSquareBracket: return "']'";
+        case TokenType::Dot: return "'.'";
+        case TokenType::Newline: return "newline";
+        case TokenType::CloseBrace: break;
+        case TokenType::OpenBrace: break;
 
         // Coral Keywords, not stropped, from Appendix 2 of the specification
         case TokenType::AbsoluteKeyword: return "ABSOLUTE";
@@ -2227,7 +2249,9 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::OverlayKeyword: return "OVERLAY";
         case TokenType::PresetKeyword: return "PRESET";
         case TokenType::ProcedureKeyword: return "PROCEDURE";
+        case TokenType::ProgramKeyword: return "PROGRAM";
         case TokenType::RecursiveKeyword: return "RECURSIVE";
+        case TokenType::SegmentKeyword: return "SEGMENT";
         case TokenType::StepKeyword: return "STEP";
         case TokenType::SwitchKeyword: return "SWITCH";
         case TokenType::TableKeyword: return "TABLE";
@@ -2239,11 +2263,6 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::WhileKeyword: return "WHILE";
         case TokenType::WithKeyword: return "WiTH";
 
-        case TokenType::OpenSquareBracket: return "'['";
-        case TokenType::CloseSquareBracket: return "']'";
-        case TokenType::Dot: return "'.'";
-        case TokenType::Newline: return "newline";
-        case TokenType::PPNumber: return "preprocessing number";
     }
     CORAL66_UNREACHABLE;
 }
@@ -2274,6 +2293,10 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
         case TokenType::GreaterThanOrEqual: return ">=";
         case TokenType::Assignment: return ":=";
         case TokenType::Colon: return ":";
+        case TokenType::CloseBrace: break;
+        case TokenType::Dot: break;
+        case TokenType::Newline: break;
+        case TokenType::OpenBrace: break;
 
         // Coral Keywords, not stropped, from Appendix 2 of the specification
         case TokenType::AbsoluteKeyword: return "ABSOLUTE";
@@ -2308,8 +2331,10 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
         case TokenType::OrKeyword: return "OR";
         case TokenType::OverlayKeyword: return "OVERLAY";
         case TokenType::PresetKeyword: return "PRESET";
+        case TokenType::ProgramKeyword: return "PROGRAM";
         case TokenType::ProcedureKeyword: return "PROCEDURE";
         case TokenType::RecursiveKeyword: return "RECURSIVE";
+        case TokenType::SegmentKeyword: return "SEGMENT";
         case TokenType::StepKeyword: return "STEP";
         case TokenType::SwitchKeyword: return "SWITCH";
         case TokenType::TableKeyword: return "TABLE";
@@ -2320,6 +2345,8 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
         case TokenType::ValueKeyword: return "VALUE";
         case TokenType::WhileKeyword: return "WHILE";
         case TokenType::WithKeyword: return "WiTH";
+
+
     }
     CORAL66_UNREACHABLE;
 }
@@ -2375,7 +2402,6 @@ bool coral66::Lexer::needsWhitespaceInBetween(TokenType const left, TokenType co
     {
         switch (right)
         {
-            case TokenType::Backslash:
             case TokenType::StringLiteral:
             case TokenType::Literal:
             case TokenType::PPNumber: return true;
