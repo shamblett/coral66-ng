@@ -52,6 +52,7 @@ enum class TokenType : std::uint8_t
     OpenBrace,
     OpenParentheses,
     OpenSquareBracket,
+    PPNumber,
     PPToken,
     Plus,
     SemiColon,

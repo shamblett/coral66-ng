@@ -2212,8 +2212,11 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::CloseSquareBracket: return "']'";
         case TokenType::Dot: return "'.'";
         case TokenType::Newline: return "newline";
-        case TokenType::CloseBrace: break;
-        case TokenType::OpenBrace: break;
+        case TokenType::CloseBrace: return "'}'";
+        case TokenType::OpenBrace: return "'{'";
+        case TokenType::Miscellaneous: return "Miscellaneous";
+        case TokenType::PPNumber: return "PPNumber";
+        case TokenType::PPToken: return "PPToken";
 
         // Coral Keywords, not stropped, from Appendix 2 of the specification
         case TokenType::AbsoluteKeyword: return "ABSOLUTE";
@@ -2293,10 +2296,13 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
         case TokenType::GreaterThanOrEqual: return ">=";
         case TokenType::Assignment: return ":=";
         case TokenType::Colon: return ":";
-        case TokenType::CloseBrace: break;
-        case TokenType::Dot: break;
-        case TokenType::Newline: break;
-        case TokenType::OpenBrace: break;
+        case TokenType::CloseBrace: return "}";
+        case TokenType::Dot: return ".";
+        case TokenType::Newline: return "\n";
+        case TokenType::OpenBrace: return "{";
+        case TokenType::Miscellaneous: return "Miscellaneous";
+        case TokenType::PPNumber: return "PPNumber";
+        case TokenType::PPToken: return "PPToken";
 
         // Coral Keywords, not stropped, from Appendix 2 of the specification
         case TokenType::AbsoluteKeyword: return "ABSOLUTE";
@@ -2345,7 +2351,6 @@ std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const toke
         case TokenType::ValueKeyword: return "VALUE";
         case TokenType::WhileKeyword: return "WHILE";
         case TokenType::WithKeyword: return "WiTH";
-
 
     }
     CORAL66_UNREACHABLE;
