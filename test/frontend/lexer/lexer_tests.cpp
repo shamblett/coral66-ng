@@ -40,22 +40,30 @@ coral66::CSourceObject lexes(const std::string& code)
 TEST_CASE("Coral Lexing Keywords", "[lexer]")
 {
     using namespace coral66::Lexer;
-    auto result = lexes(
-        "BEGIN END PROCEDURE PROGRAM SEGMENT IF THEN ELSE FOR STEP UNTIL DO GOTO ANSWER INTEGER FLOATING FIXED BITS ARRAY TABLE PRESET OVERLAY VALUE LOCATION COMMON COMMENT DEFINE CODE");
+    auto result = lexes("ABSOLUTE AND ANSWER ARRAY BEGIN BIT BITS CODE COMMENT "
+                        "COMMON DEFINE DELETE DIFFER DO ELSE END EXTERNAL FIXED FLOATING "
+                        "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
+                        "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
+                        "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
 
     std::vector correct = {
-        TokenType::BeginKeyword,   TokenType::EndKeyword,     TokenType::ProcedureKeyword, TokenType::ProgramKeyword,
-        TokenType::SegmentKeyword, TokenType::IfKeyword,      TokenType::ThenKeyword,      TokenType::ElseKeyword,
-        TokenType::ForKeyword,     TokenType::StepKeyword,    TokenType::UntilKeyword,     TokenType::DoKeyword,
-        TokenType::GotoKeyword,    TokenType::AnswerKeyword,  TokenType::IntegerKeyword,   TokenType::FloatingKeyword,
-        TokenType::FixedKeyword,   TokenType::BitsKeyword,    TokenType::ArrayKeyword,     TokenType::TableKeyword,
-        TokenType::PresetKeyword,  TokenType::OverlayKeyword, TokenType::ValueKeyword,     TokenType::LocationKeyword,
-        TokenType::CommonKeyword,  TokenType::CommentKeyword, TokenType::DefineKeyword,    TokenType::CodeKeyword};
+        TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,    TokenType::ArrayKeyword,
+        TokenType::BeginKeyword,     TokenType::BitKeyword,      TokenType::BitsKeyword,      TokenType::CodeKeyword,
+        TokenType::CommentKeyword,   TokenType::CommonKeyword,   TokenType::DefineKeyword,    TokenType::DeleteKeyword,
+        TokenType::DifferKeyword,    TokenType::DoKeyword,       TokenType::ElseKeyword,      TokenType::EndKeyword,
+        TokenType::ExternalKeyword,  TokenType::FixedKeyword,    TokenType::FloatingKeyword,  TokenType::ForKeyword,
+        TokenType::GotoKeyword,      TokenType::IfKeyword,       TokenType::IntegerKeyword,   TokenType::LabelKeyword,
+        TokenType::LibraryKeyword,   TokenType::LiteralKeyword,  TokenType::LocationKeyword,  TokenType::MaskKeyword,
+        TokenType::OctalKeyword,     TokenType::OrKeyword,       TokenType::OverlayKeyword,   TokenType::PresetKeyword,
+        TokenType::ProcedureKeyword, TokenType::ProgramKeyword,  TokenType::RecursiveKeyword, TokenType::SegmentKeyword,
+        TokenType::StepKeyword,      TokenType::SwitchKeyword,   TokenType::TableKeyword,     TokenType::ThenKeyword,
+        TokenType::UnionKeyword,     TokenType::UnsignedKeyword, TokenType::UntilKeyword,     TokenType::ValueKeyword,
+        TokenType::WhileKeyword,     TokenType::WithKeyword};
 
     std::vector<coral66::Lexer::TokenType> tokens;
     tokens.reserve(result.data().size());
-    std::transform(result.data().begin(), result.data().end(), std::back_inserter(tokens),
-                   [](const CToken& token) { return token.getTokenType(); });
+    std::ranges::transform(result.data(), std::back_inserter(tokens),
+                           [](const CToken& token) { return token.getTokenType(); });
     CHECK_THAT(tokens, Catch::Matchers::Equals(correct));
 }
 
