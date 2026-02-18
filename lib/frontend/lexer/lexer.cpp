@@ -2184,36 +2184,36 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
                   ppToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
 }
 
-std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const tokenType)
+std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const tokenType, bool const quote)
 {
     switch (tokenType)
     {
         // Symbols from Appendix 2 of the specification
         case TokenType::Identifier: return "identifier";
-        case TokenType::OpenParentheses: return "'('";
-        case TokenType::CloseParentheses: return "')'";
+        case TokenType::OpenParentheses: return quote ? "'('" : "(";
+        case TokenType::CloseParentheses: return quote ? "')'" : ")";
         case TokenType::StringLiteral: return "string literal";
         case TokenType::Literal: return "literal";
-        case TokenType::SemiColon: return "';'";
-        case TokenType::Comma: return "','";
-        case TokenType::Minus: return "'-'";
-        case TokenType::Plus: return "'+'";
-        case TokenType::Asterisk: return "'*'";
-        case TokenType::Division: return "'/'";
-        case TokenType::Equal: return "'='";
-        case TokenType::NotEqual: return "'!='";
-        case TokenType::LessThan: return "'<'";
-        case TokenType::LessThanOrEqual: return "'<='";
-        case TokenType::GreaterThan: return "'>'";
-        case TokenType::GreaterThanOrEqual: return "'>='";
-        case TokenType::Assignment: return "':='";
-        case TokenType::Colon: return "':'";
-        case TokenType::OpenSquareBracket: return "'['";
-        case TokenType::CloseSquareBracket: return "']'";
-        case TokenType::Dot: return "'.'";
-        case TokenType::Newline: return "newline";
-        case TokenType::CloseBrace: return "'}'";
-        case TokenType::OpenBrace: return "'{'";
+        case TokenType::SemiColon: return quote ? "';'" : ";";
+        case TokenType::Comma: return quote ? "','" : ",";
+        case TokenType::Minus: return quote ? "'-'" : "-";
+        case TokenType::Plus: return quote ? "'+'" : "+";
+        case TokenType::Asterisk: return quote ? "'*'" : "*";
+        case TokenType::Division: return quote ? "'/'" : "/";
+        case TokenType::Equal: return quote ? "'='" : "=";
+        case TokenType::NotEqual: return quote ? "'!='" : "!=";
+        case TokenType::LessThan: return quote ? "'<'" : "<";
+        case TokenType::LessThanOrEqual: return quote ? "'<='" : "<=";
+        case TokenType::GreaterThan: return quote ? "'>'" : ">";
+        case TokenType::GreaterThanOrEqual: return quote ? "'>='" : ">=";
+        case TokenType::Assignment: return quote ? "':='" : ":=";
+        case TokenType::Colon: return quote ? "':'" : ":";
+        case TokenType::OpenSquareBracket: return quote ? "'['" : "[";
+        case TokenType::CloseSquareBracket: return quote ? "']'" : "]";
+        case TokenType::Dot: return quote ? "'.'" : ".";
+        case TokenType::Newline: return quote ? "newline" : "\n";
+        case TokenType::CloseBrace: return quote ? "'}'" : "}";
+        case TokenType::OpenBrace: return quote ? "'{'" : "{";
         case TokenType::Miscellaneous: return "Miscellaneous";
         case TokenType::PPNumber: return "PPNumber";
         case TokenType::PPToken: return "PPToken";
@@ -2223,7 +2223,7 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::AndKeyword: return "AND";
         case TokenType::AnswerKeyword: return "ANSWER";
         case TokenType::ArrayKeyword: return "ARRAY";
-        case TokenType::BeginKeyword: return "BEGIN'";
+        case TokenType::BeginKeyword: return "BEGIN";
         case TokenType::BitKeyword: return "BIT";
         case TokenType::BitsKeyword: return "BITS";
         case TokenType::CodeKeyword: return "CODE";
@@ -2264,94 +2264,7 @@ std::string_view coral66::Lexer::tokenName(coral66::Lexer::TokenType const token
         case TokenType::UntilKeyword: return "UNTIL";
         case TokenType::ValueKeyword: return "VALUE";
         case TokenType::WhileKeyword: return "WHILE";
-        case TokenType::WithKeyword: return "WiTH";
-
-    }
-    CORAL66_UNREACHABLE;
-}
-
-std::string_view coral66::Lexer::tokenValue(coral66::Lexer::TokenType const tokenType)
-{
-    switch (tokenType)
-    {
-        // Symbols from Appendix 2 of the specification
-        case TokenType::Identifier: return "identifier";
-        case TokenType::OpenParentheses: return "(";
-        case TokenType::CloseParentheses: return ")";
-        case TokenType::OpenSquareBracket: return "[";
-        case TokenType::CloseSquareBracket: return "]";
-        case TokenType::StringLiteral: return "string literal";
-        case TokenType::Literal: return "literal";
-        case TokenType::SemiColon: return ";";
-        case TokenType::Comma: return ",";
-        case TokenType::Minus: return "-";
-        case TokenType::Plus: return "+";
-        case TokenType::Asterisk: return "*";
-        case TokenType::Division: return "/";
-        case TokenType::Equal: return "=";
-        case TokenType::NotEqual: return "!=";
-        case TokenType::LessThan: return "<";
-        case TokenType::LessThanOrEqual: return "<=";
-        case TokenType::GreaterThan: return ">";
-        case TokenType::GreaterThanOrEqual: return ">=";
-        case TokenType::Assignment: return ":=";
-        case TokenType::Colon: return ":";
-        case TokenType::CloseBrace: return "}";
-        case TokenType::Dot: return ".";
-        case TokenType::Newline: return "\n";
-        case TokenType::OpenBrace: return "{";
-        case TokenType::Miscellaneous: return "Miscellaneous";
-        case TokenType::PPNumber: return "PPNumber";
-        case TokenType::PPToken: return "PPToken";
-
-        // Coral Keywords, not stropped, from Appendix 2 of the specification
-        case TokenType::AbsoluteKeyword: return "ABSOLUTE";
-        case TokenType::AndKeyword: return "AND";
-        case TokenType::AnswerKeyword: return "ANSWER";
-        case TokenType::ArrayKeyword: return "ARRAY";
-        case TokenType::BeginKeyword: return "BEGIN'";
-        case TokenType::BitKeyword: return "BIT";
-        case TokenType::BitsKeyword: return "BITS";
-        case TokenType::CodeKeyword: return "CODE";
-        case TokenType::CommentKeyword: return "COMMENT";
-        case TokenType::CommonKeyword: return "COMMON";
-        case TokenType::DefineKeyword: return "DEFINE";
-        case TokenType::DeleteKeyword: return "DELETE";
-        case TokenType::DifferKeyword: return "DIFFER";
-        case TokenType::DoKeyword: return "DO";
-        case TokenType::ElseKeyword: return "ELSE";
-        case TokenType::EndKeyword: return "END";
-        case TokenType::ExternalKeyword: return "EXTERNAL";
-        case TokenType::FixedKeyword: return "FIXED";
-        case TokenType::FloatingKeyword: return "FLOATING";
-        case TokenType::ForKeyword: return "FOR";
-        case TokenType::GotoKeyword: return "GOTO";
-        case TokenType::IfKeyword: return "IF";
-        case TokenType::IntegerKeyword: return "INTEGER";
-        case TokenType::LabelKeyword: return "LABEL";
-        case TokenType::LibraryKeyword: return "LIBRARY";
-        case TokenType::LiteralKeyword: return "LITERAL";
-        case TokenType::LocationKeyword: return "LOCATION";
-        case TokenType::MaskKeyword: return "MASK";
-        case TokenType::OctalKeyword: return "OCTAL";
-        case TokenType::OrKeyword: return "OR";
-        case TokenType::OverlayKeyword: return "OVERLAY";
-        case TokenType::PresetKeyword: return "PRESET";
-        case TokenType::ProgramKeyword: return "PROGRAM";
-        case TokenType::ProcedureKeyword: return "PROCEDURE";
-        case TokenType::RecursiveKeyword: return "RECURSIVE";
-        case TokenType::SegmentKeyword: return "SEGMENT";
-        case TokenType::StepKeyword: return "STEP";
-        case TokenType::SwitchKeyword: return "SWITCH";
-        case TokenType::TableKeyword: return "TABLE";
-        case TokenType::ThenKeyword: return "THEN";
-        case TokenType::UnionKeyword: return "UNION";
-        case TokenType::UnsignedKeyword: return "UNSIGNED";
-        case TokenType::UntilKeyword: return "UNTIL";
-        case TokenType::ValueKeyword: return "VALUE";
-        case TokenType::WhileKeyword: return "WHILE";
-        case TokenType::WithKeyword: return "WiTH";
-
+        case TokenType::WithKeyword: return "WITH";
     }
     CORAL66_UNREACHABLE;
 }

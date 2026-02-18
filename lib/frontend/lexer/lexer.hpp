@@ -118,7 +118,7 @@ struct StringConverter<Lexer::TokenType>
 
     static std::string inArg(Lexer::TokenType arg, const source_interface*)
     {
-        return coral66::to_string(tokenValue(arg));
+        return coral66::to_string(tokenName(arg, false));
     }
 };
 

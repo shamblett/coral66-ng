@@ -113,15 +113,11 @@ bool isText(TokenType tokenType);
 
 /**
  * @param tokenType Token
- * @return name of the token. If the token is a punctuation it's surrounded in '
+ * @param quote If true, punctuations are quoted and special characters are named (e.g. "newline").
+ *              If false, returns raw string (e.g. "\n", "+").
+ * @return name/value of the token.
  */
-std::string_view tokenName(TokenType tokenType);
-
-/**
- * @param tokenType Token
- * @return generic value of the token. For non punctuations this is just a description. e.g. identifier
- */
-std::string_view tokenValue(TokenType tokenType);
+std::string_view tokenName(TokenType tokenType, bool quote = true);
 
 /**
  * Normalises the spelling of a token by removing backslash newline pairs and replacing trigraphs
