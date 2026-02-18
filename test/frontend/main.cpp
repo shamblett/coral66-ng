@@ -15,6 +15,9 @@ int main(int argc, char* argv[])
     // writing to session.configData() here sets defaults
     // this is the preferred way to set them
 
+    // Set the run order as declaration order
+    session.configData().runOrder = Catch::TestRunOrder::Declared;
+
     int returnCode = session.applyCommandLine(argc, argv);
     if (returnCode != 0) // Indicates a command line error
         return returnCode;
