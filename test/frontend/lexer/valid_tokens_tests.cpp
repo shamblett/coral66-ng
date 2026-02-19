@@ -126,13 +126,9 @@ TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
 {
     using namespace coral66::Lexer;
     auto result = lex("+ - * / = ( ) [ ] . : , ; <= >= <> := <-");
-    // Note: := and <- might parse as two tokens depending on lexer implementation in Punctuation::advance
-    // My previous edit to Punctuation::advance handled := as Assignment.
-    // <- was not explicitly handled in Punctuation::advance (case '<' checks for '=' and '>'), so it will be LessThan
-    // followed by Minus.
 
     // Let's verify standard operators
-    std::vector correct = {TokenType::Plus,
+    const std::vector correct = {TokenType::Plus,
                            TokenType::Minus,
                            TokenType::Asterisk,
                            TokenType::Division,
@@ -157,7 +153,7 @@ TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
     }
 
     // Check <- which should be LessThan, Minus
-    size_t offset = correct.size();
+    const size_t offset = correct.size();
     CHECK(result.data()[offset].getTokenType() == TokenType::LessThan);
     CHECK(result.data()[offset + 1].getTokenType() == TokenType::Minus);
 }
