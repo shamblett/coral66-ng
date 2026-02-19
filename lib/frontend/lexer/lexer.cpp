@@ -2095,26 +2095,26 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                 // Starts with a letter
                 if (!isalpha(iter->getValue()[0]))
                 {
-                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                    result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
                                         iter->getFileId(), iter->getMacroId());
                     break;
                 }
                 // Not alphanumeric or contains spaces
-                if (std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
-                                         [](char c) { return !(isalnum(c) || (c == ' ')); })
-                    == iter->getValue().end())
-                    break;
+                if (auto res = std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
+                                                    [](char c) { return (!isalnum(c) || (c == ' ')); });
+                    res != iter->getValue().end())
                 {
-                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                    result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
                                         iter->getFileId(), iter->getMacroId());
+                    break;
                 }
 
                 // Not lowercase
-                if (std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
-                                         [](char c) { return (llvm::isUpper(c)); })
-                    == iter->getValue().end())
+                if (auto res = std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
+                                                    [](char c) { return (std::isupper(c)); });
+                    res != iter->getValue().end())
                 {
-                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                    result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
                                         iter->getFileId(), iter->getMacroId());
                     break;
                 }
