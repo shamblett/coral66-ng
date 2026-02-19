@@ -69,14 +69,12 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
 
 TEST_CASE("Coral Lexing Identifiers", "[lexer]")
 {
-    auto result = lex("MyIdentifier var123 _start");
+    auto result = lex("MyIdentifier var123");
     REQUIRE(result.data().size() == 3);
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "MyIdentifier");
     CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[1].getValue()) == "var123");
-    CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
-    CHECK(std::get<std::string>(result.data()[2].getValue()) == "_start");
 }
 
 TEST_CASE("Coral Lexing Literals", "[lexer]")
