@@ -1,0 +1,5 @@
+Variations from the Coral spec :-
+
+10.1 Identifiers
+
+Identifiers cnnot comprise of spaces.

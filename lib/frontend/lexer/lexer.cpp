@@ -6,6 +6,7 @@
 
 #include "lexer.hpp"
 
+#include <llvm/ADT/StringExtras.h>
 #include <llvm/Support/ConvertUTF.h>
 #include <llvm/Support/Error.h>
 #include <llvm/Support/UnicodeCharRanges.h>
@@ -2086,7 +2087,39 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                 break;
             case TokenType::Newline: break;
             case TokenType::Identifier:
-                // Identifiers need to always be valid
+                // An identifier consists of an
+                // arbitrary sequence of lower case letters and digits,
+                // starting with a letter.
+                // It cannot be a keyword or contain spaces.
+
+                // Starts with a letter
+                if (!isalpha(iter->getValue()[0]))
+                {
+                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                                        iter->getFileId(), iter->getMacroId());
+                    break;
+                }
+                // Not alphanumeric or contains spaces
+                if (std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
+                                         [](char c) { return !(isalnum(c) || (c == ' ')); })
+                    == iter->getValue().end())
+                    break;
+                {
+                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                                        iter->getFileId(), iter->getMacroId());
+                }
+
+                // Not lowercase
+                if (std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
+                                         [](char c) { return (llvm::isUpper(c)); })
+                    == iter->getValue().end())
+                {
+                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                                        iter->getFileId(), iter->getMacroId());
+                    break;
+                }
+
+                // Not a keyword
                 if (isKeyword(iter->getValue()))
                 {
                     result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
