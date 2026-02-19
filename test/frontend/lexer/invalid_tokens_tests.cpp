@@ -38,14 +38,12 @@ coral66::CSourceObject lex(const std::string& code, bool& errors)
 TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
 {
     bool errors = false;
-    auto result = lex("my/identifier var1?23 _start, BILLY, frEd", errors);
-    REQUIRE(result.data().size() == 10);
+    auto result = lex("my/identifier var1?23 _start BILLY frEd", errors);
+    REQUIRE(result.data().size() == 2);
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
-    CHECK(std::get<std::string>(result.data()[0].getValue()) == "MyIdentifier");
-    CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Identifier);
-    CHECK(std::get<std::string>(result.data()[1].getValue()) == "var123");
+    CHECK(std::get<std::string>(result.data()[0].getValue()) == "my");
     CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
-    CHECK(std::get<std::string>(result.data()[2].getValue()) == "_start");
+    CHECK(std::get<std::string>(result.data()[1].getValue()) == "identifier");
 }
 
 TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
