@@ -8,9 +8,11 @@ cc_library(
     name = "lexer",
     srcs = [
         "lexer.cpp",
+        "lexer_support.cpp",
     ],
     hdrs = [
         "lexer.hpp",
+        "lexer_support.hpp",
     ],
     visibility = [
         "//lib/backend:__subpackages__",

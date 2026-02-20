@@ -11,7 +11,7 @@
 #include <charconv>
 
 #include "lexer_support.hpp"
-#include "lib/frontend/common/messages/errors.hpp"
+
 
 namespace coral66::Lexer
 {
@@ -165,141 +165,9 @@ std::uint32_t hexToValue(std::string_view const value)
     return result;
 }
 
-constexpr auto UTF32_MAX = 0x10FFFF;
 
-/**
- * Callee responsible for right format
- * @param value string that either consist of 4 or 8 hex digits
- * @param location the location
- * @param arg arguments
- * @param context the context
- * @return Unicode value
- */
-template <class T, class PosArg>
-std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
-                                                       PosArg&& arg, T& context)
-{
-    CORAL66_ASSERT(value.size() == 4 || value.size() == 8);
-    auto result = hexToValue(value);
-    if (result < 0xA0)
-    {
-        if (result != '$' && result != '@' && result != '`')
-        {
-            context.report(coral66::Errors::Lexer::INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, location,
-                           std::forward<PosArg>(arg));
-            return {};
-        }
-    }
-    else if (result > UTF32_MAX)
-    {
-        context.report(coral66::Errors::Lexer::INVALID_UC_VALUE_MUST_FIT_IN_UTF32, location, std::forward<PosArg>(arg));
-        return {};
-    }
-    else if ((result >= 0xD800 && result <= 0xDFFF))
-    {
-        context.report(coral66::Errors::Lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location,
-                       std::forward<PosArg>(arg));
-        return {};
-    }
-    return result;
-}
 
-struct Start final
-{
-    StateMachine advance(std::uint32_t c, Context& context);
-};
 
-struct CharacterLiteral final
-{
-    [[maybe_unused]] bool wide = false;
-    std::string characters;
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct StringLiteral final
-{
-    [[maybe_unused]] bool wide = false;
-    std::string characters;
-    bool sawQuote = false;
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct Text final
-{
-    std::string characters;
-
-    std::pair<StateMachine, bool> advance(std::uint32_t c, Context& context);
-};
-
-struct PreprocessingNumber final
-{
-    std::string characters{};
-
-    std::pair<StateMachine, bool> advance(std::uint32_t c, Context& context);
-};
-
-struct MaybeUC final
-{
-    std::unique_ptr<StateMachine> prevState{};
-    [[maybe_unused]] bool error = false;
-
-    std::pair<StateMachine, bool> advance(std::uint32_t c, Context& context) noexcept;
-};
-
-struct UniversalCharacter final
-{
-    bool big;
-    std::optional<std::variant<Text, PreprocessingNumber>> suspHolder{};
-    std::string characters{};
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct LineComment final
-{
-    std::pair<StateMachine, bool> advance(char c, Context& context) noexcept;
-};
-
-struct BlockComment final
-{
-    std::optional<char> lastChar{};
-
-    StateMachine advance(char c, Context& context) noexcept;
-};
-
-struct Dot final
-{
-    std::uint8_t dotCount = 1;
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct Punctuation final
-{
-    std::underlying_type_t<TokenType> first;
-
-private:
-    [[maybe_unused]] static constexpr std::underlying_type_t<TokenType> POUND_PERCENT =
-        std::numeric_limits<std::underlying_type_t<TokenType>>::max() - 1;
-
-public:
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct AfterInclude final
-{
-    char delimiter;
-    std::string characters{};
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct L final
-{
-    static std::pair<StateMachine, bool> advance(char c, Context& context) noexcept;
-};
 
 StateMachine Start::advance(std::uint32_t const c, Context& context)
 {

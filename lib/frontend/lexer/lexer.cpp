@@ -20,7 +20,6 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lexer_support.hpp"
 #include "lib/frontend/common/source_object.hpp"
-#include "lib/support/scope_exit.hpp"
 #include "lib/support/text.hpp"
 
 using namespace coral66::Lexer;
