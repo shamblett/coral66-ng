@@ -43,7 +43,13 @@ TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "my");
     CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Division);
-    CHECK(std::get<std::string>(result.data()[1].getValue()) == "identifier");
+    CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(std::get<std::string>(result.data()[2].getValue()) == "identifier");
+    CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(std::get<std::string>(result.data()[3].getValue()) == "var1");
+    CHECK(result.data()[4].getTokenType() == coral66::Lexer::TokenType::Literal);
+    CHECK(std::get<std::string>(result.data()[4].getValue()) == "23");
+    
 }
 
 TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
@@ -52,10 +58,9 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
     {
         bool errors = false;
         auto result = lex("\t/yBEGIIIIIIIIIIIII/&&&HHHFFFFABSOLUTEhhhhhhhhhhhhhhh", errors);
-        const std::vector correct = {TokenType::Division, TokenType::Identifier, TokenType::Division,
-                                     TokenType::Identifier};
+        const std::vector correct = {TokenType::Division, TokenType::Division,};
         std::vector<TokenType> tokens;
-        CHECK(result.data().size() == 4);
+        CHECK(result.data().size() == correct.size());
         tokens.reserve(result.data().size());
         std::ranges::transform(result.data(), std::back_inserter(tokens),
                                [](const CToken& token) { return token.getTokenType(); });
@@ -67,10 +72,10 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
     {
         bool errors = false;
         auto result = lex("\t/yBEGIIIIIIIIIIIII/&&&HHHFFFF ABSOLUTE hhhhhhhhhhhhhhh", errors);
-        const std::vector correct = {TokenType::Division,   TokenType::Identifier,      TokenType::Division,
-                                     TokenType::Identifier, TokenType::AbsoluteKeyword, TokenType::Identifier};
+        const std::vector correct = {TokenType::Division, TokenType::Division,
+                                     TokenType::AbsoluteKeyword, TokenType::Identifier};
         std::vector<TokenType> tokens;
-        CHECK(result.data().size() == 6);
+        CHECK(result.data().size() == correct.size());
         tokens.reserve(result.data().size());
         std::ranges::transform(result.data(), std::back_inserter(tokens),
                                [](const CToken& token) { return token.getTokenType(); });
@@ -83,10 +88,9 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
         using namespace coral66::Lexer;
         bool errors = false;
         auto result = lex("BEGI HHHH AND COMMM COMMENT", errors);
-        const std::vector correct = {TokenType::Identifier, TokenType::Identifier, TokenType::AndKeyword,
-                                     TokenType::Identifier, TokenType::CommentKeyword};
+        const std::vector correct = {TokenType::AndKeyword, TokenType::CommentKeyword};
         std::vector<TokenType> tokens;
-        CHECK(result.data().size() == 5);
+        CHECK(result.data().size() == correct.size());
         tokens.reserve(result.data().size());
         std::ranges::transform(result.data(), std::back_inserter(tokens),
                                [](const CToken& token) { return token.getTokenType(); });
