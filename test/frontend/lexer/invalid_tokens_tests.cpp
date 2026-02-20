@@ -49,6 +49,7 @@ TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
     CHECK(std::get<std::string>(result.data()[3].getValue()) == "var1");
     CHECK(result.data()[4].getTokenType() == coral66::Lexer::TokenType::Literal);
     CHECK(result.data()[4].getType() == coral66::Lexer::CToken::Integer);
+    CHECK(std::get<llvm::APSInt>(result.data()[4].getValue()).getExtValue() == 23);
     CHECK(result.data()[5].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[5].getValue()) == "st");
     CHECK(result.data()[6].getTokenType() == coral66::Lexer::TokenType::Plus);
