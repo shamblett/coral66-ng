@@ -2092,6 +2092,14 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                 // starting with a letter.
                 // It cannot be a keyword or contain spaces.
 
+                // Filter keywords
+                if (isKeyword(iter->getValue()))
+                {
+                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
+                                        iter->getFileId(), iter->getMacroId());
+                    break;
+                }
+
                 // Starts with a letter
                 if (!isalpha(iter->getValue()[0]))
                 {
@@ -2099,9 +2107,10 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                                         iter->getFileId(), iter->getMacroId());
                     break;
                 }
-                // Not alphanumeric or contains spaces
-                if (auto res = std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
-                                                    [](char c) { return (!isalnum(c) || (c == ' ')); });
+                // Not alphanumeric or contains spaces or uppercase characters
+                if (const auto res =
+                        std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(), [](const char c)
+                                             { return (!isalnum(c) || (c == ' ' || std::isupper(c))); });
                     res != iter->getValue().end())
                 {
                     result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
@@ -2109,23 +2118,6 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                     break;
                 }
 
-                // Not lowercase
-                if (auto res = std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(),
-                                                    [](char c) { return (std::isupper(c)); });
-                    res != iter->getValue().end())
-                {
-                    result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
-                                        iter->getFileId(), iter->getMacroId());
-                    break;
-                }
-
-                // Not a keyword
-                if (isKeyword(iter->getValue()))
-                {
-                    result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
-                                        iter->getFileId(), iter->getMacroId());
-                    break;
-                }
                 result.emplace_back(TokenType::Identifier, iter->getOffset(), iter->getLength(), iter->getFileId(),
                                     iter->getMacroId(), coral66::to_string(iter->getValue()));
                 break;
