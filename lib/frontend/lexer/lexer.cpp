@@ -571,7 +571,6 @@ std::pair<std::uint64_t, std::uint64_t> map(const IntervalMap& intervalMap, std:
     if (next == intervalMap.end())
     {
         CORAL66_ASSERT(intervalMap.size() >= 2);
-        // does this make sense?
         return {std::get<2>(intervalMap[intervalMap.size() - 2]), std::get<2>(intervalMap[intervalMap.size() - 2])};
     }
     const auto denominator = std::get<0>(*next) - std::get<0>(*result);
@@ -603,9 +602,9 @@ decltype(auto) mapArgument(const IntervalMap& intervalMap, Arg&& arg)
         {
             using T1 = std::tuple_element_t<0, T>;
             using T3 = std::tuple_element_t<2, T>;
-            static_assert(std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T3>>
-                          || std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T1>>);
-            if constexpr (std::is_base_of_v<coral66::Lexer::TokenBase, std::decay_t<T1>>)
+            static_assert(std::is_base_of_v<TokenBase, std::decay_t<T3>>
+                          || std::is_base_of_v<TokenBase, std::decay_t<T1>>);
+            if constexpr (std::is_base_of_v<TokenBase, std::decay_t<T1>>)
             {
                 return std::make_tuple(std::get<0>(arg), map(intervalMap, std::get<1>(arg)).first,
                                        map(intervalMap, std::get<2>(arg)).second);
@@ -641,7 +640,7 @@ auto mapArguments(const Diag&, const IntervalMap& intervalMap, Tuple&& tuple, st
         }(std::integral_constant<std::size_t, ints>{})...);
 }
 
-class Context : private coral66::source_interface
+class Context : coral66::source_interface
 {
     llvm::raw_ostream* m_reporter;
     std::vector<PPToken> m_result;
@@ -653,20 +652,20 @@ class Context : private coral66::source_interface
     bool m_errorsOccurred = false;
     coral66::Source::File m_fakeFile;
 
-    [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t offset) const noexcept override
+    [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, const std::uint64_t offset) const noexcept override
     {
         auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
         CORAL66_ASSERT(result != m_lineStarts.end());
         return std::distance(m_lineStarts.begin(), result) + (*result == offset ? 1 : 0);
     }
 
-    [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t, std::uint64_t line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineStartOffset(std::uint32_t, const std::uint64_t line) const noexcept override
     {
         CORAL66_ASSERT(line - 1 < m_lineStarts.size());
         return m_lineStarts[line - 1];
     }
 
-    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t, std::uint64_t line) const noexcept override
+    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t, const std::uint64_t line) const noexcept override
     {
         CORAL66_ASSERT(line - 1 < m_lineStarts.size());
         if (line != m_lineStarts.size())
@@ -771,12 +770,12 @@ public:
         leadingWhitespace = false;
     }
 
-    void push(TokenType tokenType, const std::string& value = {})
+    void push(const TokenType tokenType, const std::string& value = {})
     {
         push(tokenStartOffset, m_offset, tokenType, value);
     }
 
-    void push(std::uint64_t diff, TokenType tokenType, const std::string& value = {})
+    void push(const std::uint64_t diff, const TokenType tokenType, const std::string& value = {})
     {
         push(tokenStartOffset, m_offset - diff, tokenType, value);
     }
@@ -946,7 +945,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
     switch (c)
     {
         case '.': return Dot{};
-        case '\'': return StringLiteral{}; // Coral uses single quotes for strings
+        case '\'': return StringLiteral{};
         case '\\': return MaybeUC{};
         case '0':
         case '1':
@@ -984,8 +983,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
         case '\n': context.push(context.getOffset() - 1, context.getOffset(), TokenType::Newline); return *this;
         default:
         {
-            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'
-                || (C99AllowedIDChar.contains(c) && !C99DisallowedInitialIDChar.contains(c)))
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
             {
                 std::string buffer(4, ' ');
                 auto* start = buffer.data();
@@ -1022,7 +1020,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
 std::pair<StateMachine, bool> CharacterLiteral::advance(char const c, Context& context)
 {
     if (c == '\''
-        && (std::find_if_not(characters.rbegin(), characters.rend(), [](char c) { return c == '\\'; })
+        && (std::find_if_not(characters.rbegin(), characters.rend(), [](const char c) { return c == '\\'; })
             - characters.rbegin())
                    % 2
                == 0)
@@ -1070,13 +1068,9 @@ std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& cont
 
 std::pair<StateMachine, bool> L::advance(char const c, Context&) noexcept
 {
-    if (c == '"')
-    {
-        return {StringLiteral{true, {}}, true};
-    }
     if (c == '\'')
     {
-        return {CharacterLiteral{true, {}}, true};
+        return {StringLiteral{true, {}}, true};
     }
     if (c == '\\')
     {
@@ -1093,8 +1087,7 @@ std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& cont
         return {MaybeUC{std::make_unique<StateMachine>(std::move(*this))}, true};
     }
 
-    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '_'
-        && !C99AllowedIDChar.contains(c))
+    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9'))
     {
         context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, characters);
         return {Start{}, false};
@@ -1114,9 +1107,8 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
         return {MaybeUC{std::make_unique<StateMachine>(std::move(*this))}, true};
     }
 
-    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '_' && c != '.'
-        && (((characters.back() | toLower) != 'e' && (characters.back() | toLower) != 'p') || (c != '+' && c != '-'))
-        && !C99AllowedIDChar.contains(c))
+    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '.'
+        && (((characters.back() | toLower) != 'e' && (characters.back() | toLower) != 'p') || (c != '+' && c != '-')))
     {
         context.push(1, TokenType::PPNumber, characters);
         return {Start{}, false};
@@ -1168,7 +1160,6 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
         std::size_t result = context.view(context.tokenStartOffset, context.getOffset() - 1).rfind('\\');
         CORAL66_ASSERT(result != std::string_view::npos);
         result += context.tokenStartOffset;
-        // TODO: Warning that the universal character is treated as backslash followed by identifier
         if (suspHolder)
         {
             context.withOffset(result + 1, [&]
@@ -1201,24 +1192,6 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
         return {std::move(pp), true};
     }
 
-    // suspHolder is either empty or a Text from here on
-
-    // According to 6.4.2.1 Paragraph 3 of the C99 Standard these restrictions apply only to an identifier.
-    // This means even if an identifier-nondigit element is allowed in a PP Number it doesn't have to meet those
-    // requirements per my interpretation
-    if (!C99AllowedIDChar.contains(*result) || !(suspHolder || !C99DisallowedInitialIDChar.contains(*result)))
-    {
-        // The value of the universal character cannot continue the Text that we have or is not able to start a new
-        // Text. We therefore push Text if it's in suspHolder, push a backslash and push the rest as a new Text
-
-        if (suspHolder)
-        {
-            return {Text{(big ? "U" : "u") + characters}, true};
-        }
-
-        context.report(coral66::Errors::Lexer::UNEXPECTED_CHARACTER, ucStart, std::pair{ucStart, context.getOffset()});
-        return {Start{}, true};
-    }
     // This line is needed because a text can start with a universal character. Luckily a Preprocessing number can't
     // So we only reach this line if suspHolder is either empty or contains a Text
     auto newText = suspHolder ? coral66::get<Text>(std::move(*suspHolder)) : Text{};
@@ -1275,14 +1248,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
             context.push(1, TokenType::LessThan);
             return {Start{}, false};
         case static_cast<int>(TokenType::Plus): context.push(1, TokenType::Plus); return {Start{}, false};
-        case static_cast<int>(TokenType::Assignment):
-            if (c == '=')
-            {
-                context.push(TokenType::Equal);
-                return {Start{}, true};
-            }
-            context.push(1, TokenType::Assignment);
-            return {Start{}, false};
         case static_cast<int>(TokenType::Asterisk): context.push(1, TokenType::Asterisk); return {Start{}, false};
         case static_cast<int>(TokenType::Division):
             // Keep comment handling?
@@ -1714,7 +1679,7 @@ struct ConversionContext
 {
     llvm::raw_ostream* reporter;
     const coral66::PPSourceInterface& sourceInterface;
-    const coral66::Lexer::PPToken& token;
+    const PPToken& token;
     bool* errorsOccurred;
 
     template <class Diag, class Location, class... Args>
@@ -1821,7 +1786,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
     auto* resultEnd = result.data() + result.size();
 
     const auto* end = characters.data() + characters.size();
-    bool errorOccured = false;
+    bool errorOccurred = false;
     for (const auto* iter = characters.data(); iter != end;)
     {
         auto offset = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data());
@@ -1838,7 +1803,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                                std::forward_as_tuple(context.token, offset));
             }
             iter++;
-            errorOccured = true;
+            errorOccurred = true;
             continue;
         }
         if (*iter != '\\')
@@ -1855,7 +1820,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 auto invalidEnd = invalidStart + coral66::getNumBytesForUTF8(start, end) - 1;
                 context.report(coral66::Errors::Lexer::INVALID_UTF8_SEQUENCE, invalidStart,
                                std::make_tuple(context.token, invalidStart, invalidEnd));
-                errorOccured = true;
+                errorOccurred = true;
             }
             continue;
         }
@@ -1874,7 +1839,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
 
         if (iter[1] == 'u' || iter[1] == 'U')
         {
-            bool big = iter[1] == 'U';
+            const bool big = iter[1] == 'U';
             iter += 2;
             if (iter == end
                 || (!(*iter >= '0' && *iter <= '9') && !(*iter >= 'a' && *iter <= 'f')
@@ -1886,7 +1851,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 context.report(coral66::Errors::Lexer::INVALID_ESCAPE_SEQUENCE_N, start,
                                std::string_view(big ? "\\U" : "\\u"),
                                std::forward_as_tuple(context.token, start, start + 1));
-                errorOccured = true;
+                errorOccurred = true;
                 continue;
             }
 
@@ -1901,7 +1866,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                     coral66::Errors::Lexer::INVALID_UC_EXPECTED_N_MORE_DIGITS, start,
                     (big ? 8 : 4) - std::distance(hexStart, hexEnd),
                     std::forward_as_tuple(context.token, start, start + std::distance(hexStart, hexEnd) + 1));
-                errorOccured = true;
+                errorOccurred = true;
                 iter = hexEnd;
                 continue;
             }
@@ -1915,7 +1880,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             }
             else
             {
-                errorOccured = true;
+                errorOccurred = true;
             }
             iter = hexEnd;
             continue;
@@ -1931,7 +1896,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 2);
                 context.report(coral66::Errors::Lexer::AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, start,
                                std::forward_as_tuple(context.token, start, start + 1));
-                errorOccured = true;
+                errorOccurred = true;
                 continue;
             }
 
@@ -1951,7 +1916,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 // here.
                 context.report(coral66::Errors::Lexer::INVALID_OCTAL_CHARACTER, offset, std::string_view(lastOctal, 1),
                                std::forward_as_tuple(context.token, offset, offset + 1));
-                errorOccured = true;
+                errorOccurred = true;
                 continue;
             }
 
@@ -1961,7 +1926,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 1);
                 context.report(coral66::Errors::Lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, start,
                                std::forward_as_tuple(context.token, start, start + lastOctal - iter));
-                errorOccured = true;
+                errorOccurred = true;
                 iter = lastOctal;
                 continue;
             }
@@ -1980,7 +1945,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             }
             else
             {
-                errorOccured = true;
+                errorOccurred = true;
             }
             iter += 2;
         }
@@ -1994,12 +1959,12 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             {
                 context.report(coral66::Errors::Lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, context.token,
                                context.token);
-                errorOccured = true;
+                errorOccurred = true;
             }
         }
     }
     result.resize(std::distance(result.data(), resultStart));
-    return {result, errorOccured};
+    return {result, errorOccurred};
 }
 
 std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const char* begin, const char* end,
@@ -2168,7 +2133,7 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
     return result;
 }
 
-std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const PPToken& ppToken,
+std::optional<CToken> coral66::Lexer::parseStringLiteral(const PPToken& ppToken,
                                                                          const PPSourceInterface& sourceInterface,
                                                                          llvm::raw_ostream* reporter)
 {
@@ -2176,8 +2141,8 @@ std::optional<coral66::Lexer::CToken> coral66::Lexer::parseStringLiteral(const P
     bool errorsOccurred = false;
     ConversionContext context{reporter, sourceInterface, ppToken, &errorsOccurred};
     bool wide = ppToken.getRepresentation(sourceInterface)[0] == 'L';
-    auto [chars, errorOccured] = processCharacters(ppToken.getValue(), context, wide, Literal::StringLiteral);
-    if (errorOccured)
+    auto [chars, errorOccurred] = processCharacters(ppToken.getValue(), context, wide, Literal::StringLiteral);
+    if (errorOccurred)
     {
         return {};
     }
