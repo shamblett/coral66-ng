@@ -740,7 +740,6 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                                         iter->getFileId(), iter->getMacroId());
                     break;
                 }
-
                 // Starts with a letter
                 if (!isalpha(iter->getValue()[0]))
                 {

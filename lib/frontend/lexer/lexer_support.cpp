@@ -1,5 +1,5 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -11,7 +11,6 @@
 #include <charconv>
 
 #include "lexer_support.hpp"
-
 
 namespace coral66::Lexer
 {
@@ -164,10 +163,6 @@ std::uint32_t hexToValue(std::string_view const value)
     CORAL66_ASSERT(errors.ec == std::errc{});
     return result;
 }
-
-
-
-
 
 StateMachine Start::advance(std::uint32_t const c, Context& context)
 {
@@ -550,6 +545,4 @@ StateMachine BlockComment::advance(char c, Context& context) noexcept
     return *this;
 }
 
-
 } // namespace coral66::Lexer
-

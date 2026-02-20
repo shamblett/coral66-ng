@@ -1,15 +1,19 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
 
 #pragma once
 
-#include "lib/frontend/common/messages/message.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
+#include "lib/frontend/common/messages/message.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/support/scope_exit.hpp"
+
+/**
+ * Lexer support functions
+ */
 
 namespace coral66::Lexer
 {
@@ -39,14 +43,6 @@ constexpr auto UTF32_MAX = 0x10FFFF;
 using StateMachine = std::variant<Start, CharacterLiteral, StringLiteral, Text, PreprocessingNumber, MaybeUC,
                                   UniversalCharacter, LineComment, BlockComment, Dot, Punctuation, AfterInclude, L>;
 
-/**
- * Callee responsible for right format
- * @param value string that either consist of 4 or 8 hex digits
- * @param location the location
- * @param arg arguments
- * @param context the context
- * @return Unicode value
- */
 template <class T, class PosArg>
 std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
                                                        PosArg&& arg, T& context)
@@ -75,7 +71,6 @@ std::optional<std::uint32_t> universalCharacterToValue(std::string_view const va
     }
     return result;
 }
-
 
 inline std::pair<std::uint64_t, std::uint64_t> map(const IntervalMap& intervalMap, std::uint64_t const offset)
 {
@@ -159,9 +154,7 @@ auto mapArguments(const Diag&, const IntervalMap& intervalMap, Tuple&& tuple, st
         }(std::integral_constant<std::size_t, ints>{})...);
 }
 
-
-
-class Context : coral66::source_interface
+class Context : source_interface
 {
     llvm::raw_ostream* m_reporter;
     std::vector<PPToken> m_result;
@@ -441,4 +434,4 @@ struct L final
     static std::pair<StateMachine, bool> advance(char c, Context& context) noexcept;
 };
 
-}
+} // namespace coral66::Lexer
