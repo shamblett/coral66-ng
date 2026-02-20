@@ -26,9 +26,9 @@ coral66::CSourceObject lex(const std::string& code, bool& errors)
 {
     std::string buffer;
     llvm::raw_string_ostream ss(buffer);
-    auto result = coral66::Lexer::tokenize(code, &ss, &errors);
+    auto result = tokenize(code, &ss, &errors);
     UNSCOPED_INFO(buffer);
-    auto tokens = coral66::Lexer::toCTokens(std::move(result), &ss, &errors);
+    auto tokens = toCTokens(std::move(result), &ss, &errors);
     UNSCOPED_INFO(buffer);
     return tokens;
 }
@@ -39,10 +39,10 @@ TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
 {
     bool errors = false;
     auto result = lex("my/identifier var1?23 _start BILLY frEd", errors);
-    REQUIRE(result.data().size() == 2);
+    REQUIRE(result.data().size() == 5);
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "my");
-    CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Division);
     CHECK(std::get<std::string>(result.data()[1].getValue()) == "identifier");
 }
 

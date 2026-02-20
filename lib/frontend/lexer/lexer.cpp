@@ -2103,8 +2103,6 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                 // Starts with a letter
                 if (!isalpha(iter->getValue()[0]))
                 {
-                    result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
-                                        iter->getFileId(), iter->getMacroId());
                     break;
                 }
                 // Not alphanumeric or contains spaces or uppercase characters
@@ -2113,8 +2111,6 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                                              { return (!isalnum(c) || (c == ' ' || std::isupper(c))); });
                     res != iter->getValue().end())
                 {
-                    result.emplace_back(TokenType::Miscellaneous, iter->getOffset(), iter->getLength(),
-                                        iter->getFileId(), iter->getMacroId());
                     break;
                 }
 

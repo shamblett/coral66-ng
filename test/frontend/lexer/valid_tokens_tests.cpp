@@ -70,9 +70,9 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
 TEST_CASE("Coral Lexing Identifiers", "[lexer]")
 {
     auto result = lex("myidentifier var123");
-    REQUIRE(result.data().size() == 3);
+    REQUIRE(result.data().size() == 2);
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
-    CHECK(std::get<std::string>(result.data()[0].getValue()) == "MyIdentifier");
+    CHECK(std::get<std::string>(result.data()[0].getValue()) == "myidentifier");
     CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[1].getValue()) == "var123");
 }
