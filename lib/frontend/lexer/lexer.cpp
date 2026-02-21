@@ -17,13 +17,12 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "lib/frontend/common/messages/errors.hpp"
 #include "lexer_support.hpp"
+#include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/support/text.hpp"
 
 using namespace coral66::Lexer;
-
 
 coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath)
@@ -221,14 +220,14 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_o
                 return !proceed;
             }
         };
-        while (coral66::match(stateMachine, visitor))
+        while (match(stateMachine, visitor))
         {
             offset = prevOffset;
         }
         offset = prevOffset + step;
         iter += step;
     }
-    bool needNewline = coral66::match(
+    const bool needNewline = match(
         stateMachine,
         [&context](BlockComment&)
         {
@@ -236,6 +235,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_o
                            std::pair{context.tokenStartOffset, context.getOffset()});
             return false;
         },
+        // ReSharper disable once CppDFAConstantFunctionResult
         [&context](const StringLiteral& s)
         {
             if (s.sawQuote)
@@ -317,7 +317,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_o
                 return !proceed;
             }
         };
-        while (coral66::match(stateMachine, visitor))
+        while (match(stateMachine, visitor))
             ;
     }
     characterToSourceSpace.shrink_to_fit();
@@ -332,18 +332,18 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_o
                           {{std::move(characterToSourceSpace)}});
 }
 
-[[nodiscard]] std::string_view coral66::Lexer::TokenBase::getRepresentation(const source_interface& sourceObject) const
+[[nodiscard]] std::string_view TokenBase::getRepresentation(const source_interface& sourceObject) const
 {
     return std::string_view(sourceObject.getFiles()[static_cast<std::uint64_t>(m_fileID)].source)
         .substr(m_offset, m_length);
 }
 
-[[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getLine(const source_interface& sourceObject) const noexcept
+[[nodiscard]] std::uint64_t TokenBase::getLine(const source_interface& sourceObject) const noexcept
 {
     return sourceObject.getLineNumber(m_fileID, m_offset);
 }
 
-[[nodiscard]] std::uint64_t coral66::Lexer::TokenBase::getColumn(const source_interface& sourceObject) const noexcept
+[[nodiscard]] std::uint64_t TokenBase::getColumn(const source_interface& sourceObject) const noexcept
 {
     auto line = sourceObject.getLineNumber(m_fileID, m_offset);
     return m_offset - sourceObject.getLineStartOffset(m_fileID, line) + 1;
@@ -487,9 +487,9 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             const auto* start = iter;
             iter = std::find_if(iter, end, [](char c) { return c == '\\' || c == '\n'; });
 
-            auto res = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
-                                                reinterpret_cast<const llvm::UTF8*>(iter), &resultStart, resultEnd,
-                                                llvm::strictConversion);
+            const auto res = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
+                                                      reinterpret_cast<const llvm::UTF8*>(iter), &resultStart,
+                                                      resultEnd, llvm::strictConversion);
             if (res != llvm::conversionOK)
             {
                 auto invalidStart = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (start - characters.data());
@@ -665,7 +665,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
     {
         // Integer (Decimal)
         // Coral 66 integers are decimal. OCTAL is handled via OCTAL().
-        llvm::StringRef ref(text);
+        const llvm::StringRef ref(text);
         llvm::APInt value;
         if (ref.getAsInteger(10, value))
         {
@@ -702,9 +702,9 @@ coral66::CSourceObject coral66::Lexer::toCTokens(const PPSourceObject& sourceObj
             {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()}};
 }
 
-std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,
-                                                              const PPSourceInterface& sourceInterface,
-                                                              llvm::raw_ostream* reporter, bool* errorsOccurred)
+std::vector<CToken> coral66::Lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,
+                                              const PPSourceInterface& sourceInterface, llvm::raw_ostream* reporter,
+                                              bool* errorsOccurred)
 {
     if (errorsOccurred)
     {
@@ -728,29 +728,12 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
                 break;
             case TokenType::Newline: break;
             case TokenType::Identifier:
-                // An identifier consists of an
-                // arbitrary sequence of lower case letters and digits,
-                // starting with a letter.
-                // It cannot be a keyword or contain spaces.
 
                 // Filter keywords
                 if (isKeyword(iter->getValue()))
                 {
                     result.emplace_back(charactersToKeyword(iter->getValue()), iter->getOffset(), iter->getLength(),
                                         iter->getFileId(), iter->getMacroId());
-                    break;
-                }
-                // Starts with a letter
-                if (!isalpha(iter->getValue()[0]))
-                {
-                    break;
-                }
-                // Not alphanumeric or contains spaces or uppercase characters
-                if (const auto res =
-                        std::ranges::find_if(iter->getValue().begin(), iter->getValue().end(), [](const char c)
-                                             { return (!isalnum(c) || (c == ' ' || std::isupper(c))); });
-                    res != iter->getValue().end())
-                {
                     break;
                 }
 
@@ -789,7 +772,7 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
             {
                 // Should not be reached with current lexer changes, but kept for safety/compatibility
                 ConversionContext context{reporter, sourceInterface, *iter, errorsOccurred};
-                bool wide = false; // No wide support
+                constexpr bool wide = false; // No wide support
                 auto [chars, errorOccurred] = processCharacters(iter->getValue(), context, wide, Literal::CharLiteral);
                 if (chars.empty())
                 {
@@ -809,8 +792,8 @@ std::vector<coral66::Lexer::CToken> coral66::Lexer::toCTokens(PPTokenIterator be
 }
 
 std::optional<CToken> coral66::Lexer::parseStringLiteral(const PPToken& ppToken,
-                                                                         const PPSourceInterface& sourceInterface,
-                                                                         llvm::raw_ostream* reporter)
+                                                         const PPSourceInterface& sourceInterface,
+                                                         llvm::raw_ostream* reporter)
 {
     CORAL66_ASSERT(ppToken.getTokenType() == coral66::Lexer::TokenType::StringLiteral);
     bool errorsOccurred = false;
@@ -832,11 +815,6 @@ std::optional<CToken> coral66::Lexer::parseStringLiteral(const PPToken& ppToken,
             CORAL66_UNREACHABLE;
         }
 
-        if (wide)
-        {
-            return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
-                          ppToken.getMacroId(), NonCharString{{utf8.data(), dest}, NonCharString::Wide});
-        }
         return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
                       ppToken.getMacroId(), std::string(utf8.data(), dest));
     }

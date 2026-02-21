@@ -4,14 +4,13 @@
  * Date   : 31/01/2026
  */
 
-#include "lib/frontend/lexer/lexer.hpp"
-
 #include <llvm/Support/Format.h>
 
 #include <array>
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
+#include "lib/frontend/lexer/lexer.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
@@ -41,10 +40,10 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
 {
     using namespace coral66::Lexer;
     auto result = lex("ABSOLUTE AND ANSWER ARRAY BEGIN BIT BITS CODE COMMENT "
-                        "COMMON DEFINE DELETE DIFFER DO ELSE END EXTERNAL FIXED FLOATING "
-                        "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
-                        "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
-                        "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
+                      "COMMON DEFINE DELETE DIFFER DO ELSE END EXTERNAL FIXED FLOATING "
+                      "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
+                      "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
+                      "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
 
     const std::vector correct = {
         TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,    TokenType::ArrayKeyword,
@@ -69,12 +68,19 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
 
 TEST_CASE("Coral Lexing Identifiers", "[lexer]")
 {
-    auto result = lex("myidentifier var123");
-    REQUIRE(result.data().size() == 2);
+    // Although Coral66 does not allow identifiers that contain uppercase characters,
+    // or start with a number or are not alphanumeric these are valid at this stage of
+    // lexing
+    auto result = lex("myidentifier var123 BILLY frEd 124rrr");
+    REQUIRE(result.data().size() == 4);
     CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "myidentifier");
     CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[1].getValue()) == "var123");
+    CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(std::get<std::string>(result.data()[2].getValue()) == "BILLY");
+    CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(std::get<std::string>(result.data()[3].getValue()) == "frEd");
 }
 
 TEST_CASE("Coral Lexing Literals", "[lexer]")
@@ -127,22 +133,22 @@ TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
 
     // Let's verify standard operators
     const std::vector correct = {TokenType::Plus,
-                           TokenType::Minus,
-                           TokenType::Asterisk,
-                           TokenType::Division,
-                           TokenType::Equal,
-                           TokenType::OpenParentheses,
-                           TokenType::CloseParentheses,
-                           TokenType::OpenSquareBracket,
-                           TokenType::CloseSquareBracket,
-                           TokenType::Dot,
-                           TokenType::Colon,
-                           TokenType::Comma,
-                           TokenType::SemiColon,
-                           TokenType::LessThanOrEqual,
-                           TokenType::GreaterThanOrEqual,
-                           TokenType::NotEqual,
-                           TokenType::Assignment};
+                                 TokenType::Minus,
+                                 TokenType::Asterisk,
+                                 TokenType::Division,
+                                 TokenType::Equal,
+                                 TokenType::OpenParentheses,
+                                 TokenType::CloseParentheses,
+                                 TokenType::OpenSquareBracket,
+                                 TokenType::CloseSquareBracket,
+                                 TokenType::Dot,
+                                 TokenType::Colon,
+                                 TokenType::Comma,
+                                 TokenType::SemiColon,
+                                 TokenType::LessThanOrEqual,
+                                 TokenType::GreaterThanOrEqual,
+                                 TokenType::NotEqual,
+                                 TokenType::Assignment};
 
     // Check first batch
     for (size_t i = 0; i < correct.size(); ++i)
