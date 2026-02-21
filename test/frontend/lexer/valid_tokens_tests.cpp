@@ -91,10 +91,13 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         REQUIRE(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 123);
         CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[1].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[1].getValue()) == 0);
         CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[2].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 9999);
     }
 
     SECTION("Floating Point")
@@ -103,12 +106,16 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         REQUIRE(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[0].getValue()) == llvm::APFloat(3.14));
         CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[1].getType() == coral66::Lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[1].getValue()) == llvm::APFloat(0.0));
         CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[2].getType() == coral66::Lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[2].getValue()) == llvm::APFloat(0.5));
         CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[3].getType() == coral66::Lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[3].getValue()) == llvm::APFloat(1.2e3));
     }
 
     SECTION("Strings")

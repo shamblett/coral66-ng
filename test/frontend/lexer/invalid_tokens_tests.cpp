@@ -120,80 +120,43 @@ TEST_CASE("Coral Lexing Literals - mixed strings", "[lexer]")
     SECTION("Integers")
     {
         bool errors = false;
-        auto result = lex("123 0 9999", errors);
+        auto result = lex("12#3 !0 9999g", errors);
         REQUIRE(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 12);
         CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[1].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[1].getValue()) == 3);
         CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[2].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 0);
     }
 
     SECTION("Floating Point")
     {
         bool errors = false;
-        auto result = lex("3.14 0.0 .5 1.2e3", errors);
-        REQUIRE(result.data().size() == 4);
-        CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Floating);
+        auto result = lex("3.14h 0.gg0 rr.5 1.2eo", errors);
+        REQUIRE(result.data().size() == 2);
+        CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
+        CHECK(std::get<std::string>(result.data()[0].getValue()) == "rr");
         CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Literal);
         CHECK(result.data()[1].getType() == coral66::Lexer::CToken::Floating);
-        CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[2].getType() == coral66::Lexer::CToken::Floating);
-        CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[3].getType() == coral66::Lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[1].getValue()).isNonZero());
     }
 
     SECTION("Strings")
     {
         bool errors = false;
-        auto result = lex("'Hello World' 'It''s me' ''", errors);
-        REQUIRE(result.data().size() == 3);
+        auto result = lex("'Hello World' 'It's me' ''", errors);
+        REQUIRE(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
-
         CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
-        CHECK(std::get<std::string>(result.data()[1].getValue()) == "It's me");
-
-        CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
-        CHECK(std::get<std::string>(result.data()[2].getValue()).empty());
+        CHECK(std::get<std::string>(result.data()[1].getValue()) == "It");
+        CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
+        CHECK(std::get<std::string>(result.data()[2].getValue()) == "s");
+        CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Identifier);
+        CHECK(std::get<std::string>(result.data()[3].getValue()) == "me");
     }
-}
-
-TEST_CASE("Coral Lexing Operators and Punctuation - mixed strings", "[lexer]")
-{
-    bool errors = false;
-    using namespace coral66::Lexer;
-    auto result = lex("+ - * / = ( ) [ ] . : , ; <= >= <> := <-", errors);
-
-    // Let's verify standard operators
-    const std::vector correct = {TokenType::Plus,
-                                 TokenType::Minus,
-                                 TokenType::Asterisk,
-                                 TokenType::Division,
-                                 TokenType::Equal,
-                                 TokenType::OpenParentheses,
-                                 TokenType::CloseParentheses,
-                                 TokenType::OpenSquareBracket,
-                                 TokenType::CloseSquareBracket,
-                                 TokenType::Dot,
-                                 TokenType::Colon,
-                                 TokenType::Comma,
-                                 TokenType::SemiColon,
-                                 TokenType::LessThanOrEqual,
-                                 TokenType::GreaterThanOrEqual,
-                                 TokenType::NotEqual,
-                                 TokenType::Assignment};
-
-    // Check first batch
-    for (size_t i = 0; i < correct.size(); ++i)
-    {
-        CHECK(result.data()[i].getTokenType() == correct[i]);
-    }
-
-    // Check <- which should be LessThan, Minus
-    const size_t offset = correct.size();
-    CHECK(result.data()[offset].getTokenType() == TokenType::LessThan);
-    CHECK(result.data()[offset + 1].getTokenType() == TokenType::Minus);
 }
