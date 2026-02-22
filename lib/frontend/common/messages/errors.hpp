@@ -14,7 +14,6 @@
 #include "lib/frontend/common/diagnostic.hpp"
 #include "lib/support/constexpr.hpp"
 
-
 #define CREATE_ERROR_2(variableName, format)                                                          \
     namespace detail                                                                                  \
     {                                                                                                 \
@@ -40,9 +39,7 @@
     constexpr auto variableName =                                                                     \
         ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Error, "")
 
-namespace coral66
-{
-namespace Errors
+namespace coral66::Errors
 {
 namespace Parser
 {
@@ -110,15 +107,13 @@ CREATE_ERROR(AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, "At least one hexadecimal 
 CREATE_ERROR(UNEXPECTED_CHARACTER, "Unexpected character", PointAt<0>);
 CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<1>);
 CREATE_ERROR(STRAY_N_IN_PROGRAM, "Stray %tokenType0 in program", PointAt<0>);
-CREATE_ERROR(UNTERMINATED_BLOCK_COMMENT, "Unterminated block comment", Underline<0>);
 CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underline<0>);
 CREATE_ERROR(UNTERMINATED_CHARACTER_LITERAL, "Unterminated character literal", Underline<0>);
-CREATE_ERROR(UNTERMINATED_INCLUDE_DIRECTIVE, "Unterminated include directive", Underline<0>);
 } // namespace Lexer
 
-} // namespace Errors
+} // namespace coral66::Errors
 
-} // coral66
+// coral66
 
 #undef CREATE_ERROR
 #undef CREATE_ERROR_2
@@ -129,4 +124,3 @@ CREATE_ERROR(UNTERMINATED_INCLUDE_DIRECTIVE, "Unterminated include directive", U
 #undef CREATE_ERROR_7
 #undef CREATE_ERROR_8
 #undef CREATE_ERROR_VAARG
-

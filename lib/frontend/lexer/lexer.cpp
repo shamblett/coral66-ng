@@ -229,12 +229,6 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_o
     }
     const bool needNewline = match(
         stateMachine,
-        [&context](BlockComment&)
-        {
-            context.report(Errors::Lexer::UNTERMINATED_BLOCK_COMMENT, context.tokenStartOffset,
-                           std::pair{context.tokenStartOffset, context.getOffset()});
-            return false;
-        },
         // ReSharper disable once CppDFAConstantFunctionResult
         [&context](const StringLiteral& s)
         {
@@ -253,13 +247,7 @@ coral66::PPSourceObject coral66::Lexer::tokenize(std::string source, llvm::raw_o
                            std::pair{context.tokenStartOffset, context.getOffset()});
             return false;
         },
-        [&context](AfterInclude&)
-        {
-            context.report(Errors::Lexer::UNTERMINATED_INCLUDE_DIRECTIVE, context.tokenStartOffset,
-                           std::pair{context.tokenStartOffset, context.getOffset()});
-            return false;
-        },
-        [](Start&) { return false; }, [](LineComment&) { return false; }, [](auto&&) { return true; });
+        [](Start&) { return false; }, [](auto&&) { return true; });
     if (needNewline)
     {
         offset++;

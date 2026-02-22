@@ -27,9 +27,6 @@ struct MaybeUC;
 struct UniversalCharacter;
 struct Dot;
 struct Punctuation;
-struct LineComment;
-struct BlockComment;
-struct AfterInclude;
 struct L;
 
 bool isKeyword(std::string_view characters);
@@ -41,7 +38,7 @@ std::uint32_t hexToValue(std::string_view value);
 constexpr auto UTF32_MAX = 0x10FFFF;
 
 using StateMachine = std::variant<Start, CharacterLiteral, StringLiteral, Text, PreprocessingNumber, MaybeUC,
-                                  UniversalCharacter, LineComment, BlockComment, Dot, Punctuation, AfterInclude, L>;
+                                  UniversalCharacter, Dot, Punctuation, L>;
 
 template <class T, class PosArg>
 std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
@@ -390,18 +387,6 @@ struct UniversalCharacter final
     std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 
-struct LineComment final
-{
-    std::pair<StateMachine, bool> advance(char c, Context& context) noexcept;
-};
-
-struct BlockComment final
-{
-    std::optional<char> lastChar{};
-
-    StateMachine advance(char c, Context& context) noexcept;
-};
-
 struct Dot final
 {
     std::uint8_t dotCount = 1;
@@ -418,14 +403,6 @@ private:
         std::numeric_limits<std::underlying_type_t<TokenType>>::max() - 1;
 
 public:
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
-struct AfterInclude final
-{
-    char delimiter;
-    std::string characters{};
-
     std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 

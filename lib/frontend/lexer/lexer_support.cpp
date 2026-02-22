@@ -473,14 +473,7 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
             return {Start{}, false};
         case static_cast<int>(TokenType::Plus): context.push(1, TokenType::Plus); return {Start{}, false};
         case static_cast<int>(TokenType::Asterisk): context.push(1, TokenType::Asterisk); return {Start{}, false};
-        case static_cast<int>(TokenType::Division):
-            // Keep comment handling?
-            if (c == '/')
-                return {LineComment{}, true};
-            if (c == '*')
-                return {BlockComment{}, true};
-            context.push(1, TokenType::Division);
-            return {Start{}, false};
+        case static_cast<int>(TokenType::Division): context.push(1, TokenType::Division); return {Start{}, false};
         case static_cast<int>(TokenType::Colon):
             if (c == '=')
             {
@@ -491,58 +484,6 @@ std::pair<StateMachine, bool> Punctuation::advance(char const c,     // NOLINT(*
             return {Start{}, false};
         default: CORAL66_UNREACHABLE;
     }
-}
-
-std::pair<StateMachine, bool> AfterInclude::advance(char const c, Context& context)
-{
-    if (c != delimiter && c != '\n')
-    {
-        characters += c;
-        return {std::move(*this), true};
-    }
-
-    if (c != '\n')
-    {
-        context.push(TokenType::StringLiteral, characters);
-        return {Start{}, true};
-    }
-
-    // c is '\n' at this point
-
-    if (delimiter == '"')
-    {
-        // If the delimiter is an " it means that the whole token would otherwise be interpreted as a string literal
-        // if there wasn't an include directive in front. Therefore, no macro expansion could make this a valid include
-        // directive
-
-        context.report(coral66::Errors::Lexer::UNTERMINATED_INCLUDE_DIRECTIVE, context.tokenStartOffset,
-                       std::pair{context.tokenStartOffset, context.getOffset() - 1});
-
-        // if the delimiter is a < however then subsequent tokens will later be retokenized in the preprocessor
-        // which might form a valid include after macro substitution
-    }
-    context.push(1, TokenType::StringLiteral, characters);
-    return {Start{}, false};
-}
-
-std::pair<StateMachine, bool> LineComment::advance(char const c, Context&) noexcept
-{
-    if (c == '\n')
-    {
-        return {Start{}, false};
-    }
-    return {*this, true};
-}
-
-StateMachine BlockComment::advance(char c, Context& context) noexcept
-{
-    if (lastChar && *lastChar == '*' && c == '/')
-    {
-        context.leadingWhitespace = true;
-        return Start{};
-    }
-    lastChar = c;
-    return *this;
 }
 
 } // namespace coral66::Lexer
