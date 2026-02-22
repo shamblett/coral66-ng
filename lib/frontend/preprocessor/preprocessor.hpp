@@ -21,9 +21,6 @@ namespace PP
 {
 struct Options
 {
-    std::vector<std::string> includeDirectories;
-    std::vector<std::string> includeQuoteDirectories;
-    std::vector<std::string> systemDirectories;
     std::vector<std::pair<std::string, std::string>> additionalMacros;
 };
 

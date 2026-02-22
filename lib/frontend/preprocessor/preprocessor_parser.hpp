@@ -35,20 +35,5 @@ public:
     [[nodiscard]] const source_interface& getSourceInterface() const;
 };
 
-File buildTree(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(), bool* errors = nullptr);
-
-File parseFile(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
-
-Group parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context, bool inIf = false);
-
-ControlLine parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
-
-IfSection parseIfSection(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
-
-ElseGroup parseElseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
-
-ElIfGroup parseElIfGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
-
-IfGroup parseIfGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
 } // namespace PP
 } // namespace coral66

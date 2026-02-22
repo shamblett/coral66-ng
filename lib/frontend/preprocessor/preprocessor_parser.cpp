@@ -37,7 +37,6 @@ namespace
     return true;
 }
 
-// ReSharper disable once CppDFAUnreachableFunctionCall
 coral66::Lexer::PPTokenIterator findNewline(coral66::Lexer::PPTokenIterator const begin,
                                             coral66::Lexer::PPTokenIterator const end)
 {
@@ -46,7 +45,7 @@ coral66::Lexer::PPTokenIterator findNewline(coral66::Lexer::PPTokenIterator cons
                                          &coral66::Lexer::PPToken::getTokenType));
 }
 
-[[maybe_unused]] void skipLine(coral66::Lexer::PPTokenIterator& begin, coral66::Lexer::PPTokenIterator end)
+[[maybe_unused]] void skipLine(coral66::Lexer::PPTokenIterator& begin, const coral66::Lexer::PPTokenIterator end)
 {
     begin = findNewline(begin, end);
     begin = begin == end ? begin : begin + 1;
@@ -81,86 +80,3 @@ const coral66::source_interface& coral66::PP::Context::getSourceInterface() cons
     return m_sourceInterface;
 }
 
-coral66::PP::File coral66::PP::buildTree(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter, bool* errors)
-{
-    Context context(sourceObject, reporter);
-    const auto* begin = sourceObject.data().data();
-    auto file = parseFile(begin, sourceObject.data().data() + sourceObject.data().size(), context);
-    if (errors)
-    {
-        *errors = context.getErrorCount();
-    }
-    return file;
-}
-
-coral66::PP::File coral66::PP::parseFile(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
-                                         Context& context)
-{
-    std::vector<Group> result;
-    while (begin != end)
-    {
-        result.push_back(parseGroup(begin, end, context));
-    }
-    return File{std::move(result)};
-}
-
-coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
-                                           Context& context, bool const)
-{
-    CORAL66_ASSERT(begin != end);
-    std::vector<GroupPart> parts;
-    do
-    {
-        if (begin->getTokenType() == Lexer::TokenType::Identifier
-            && begin->getValue() == Lexer::tokenName(Lexer::TokenType::DefineKeyword))
-        {
-            parts.emplace_back(parseControlLine(begin, end, context));
-            continue;
-        }
-
-        // TextBlock
-        const auto* start = begin;
-        while (begin != end)
-        {
-            if (begin->getTokenType() == Lexer::TokenType::Identifier
-                && begin->getValue() == Lexer::tokenName(Lexer::TokenType::DefineKeyword))
-            {
-                break;
-            }
-            begin++;
-        }
-        if (start != begin)
-        {
-            parts.emplace_back(TextBlock{{start, begin}});
-        }
-    } while (begin != end);
-    return Group{std::move(parts)};
-}
-
-coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
-                                                       Context& context)
-{
-    CORAL66_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::Identifier
-                   && begin->getValue() == Lexer::tokenName(Lexer::TokenType::DefineKeyword));
-    const auto* defineToken = begin;
-    begin++;
-
-    // Find SemiColon
-    const auto* semi = std::find_if(begin, end, [](const Lexer::PPToken& t)
-                                    { return t.getTokenType() == Lexer::TokenType::SemiColon; });
-
-    if (semi == end)
-    {
-        context.log(coral66::Errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
-                                                             coral66::Lexer::TokenType::SemiColon, *(end - 1)));
-        // Consume rest
-        begin = end;
-        return {DefineDirective{defineToken, {}}};
-    }
-
-    // Tokens between DEFINE and ;
-    const std::span tokens(begin, semi);
-    begin = semi + 1; // Consume ;
-
-    return {DefineDirective{defineToken, tokens}};
-}
