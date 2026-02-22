@@ -39,10 +39,10 @@ private:
 public:
     ProducesPP(std::string source) : m_source(std::move(source)) {}
 
-    bool match(const coral66::PPSourceObject& arg) const override
+    bool match(const PPSourceObject& arg) const override
     {
         bool errors = false;
-        auto ret = coral66::Lexer::tokenize(m_source, nullptr, &errors);
+        auto ret = Lexer::tokenize(m_source, nullptr, &errors);
         if (errors)
             return false;
 

@@ -117,9 +117,7 @@ class Preprocessor final : private coral66::PPSourceInterface
                 tok.setMacroId(i);
             }
 
-            // Recursive substitution (simple approach)
-            // Ideally we should guard against infinite recursion
-
+            // Recursive substitution
             output.insert(output.end(), std::move_iterator(replacement.begin()), std::move_iterator(replacement.end()));
 
             iter++;
@@ -241,7 +239,7 @@ public:
 
         coral66::PP::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
-        auto tree = coral66::PP::parseFile(
+        const auto tree = coral66::PP::parseFile(
             begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
 
         if (context.getErrorCount() != 0)
@@ -312,7 +310,7 @@ public:
 };
 } // namespace
 
-coral66::PPSourceObject coral66::PP::preprocess(coral66::PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
+coral66::PPSourceObject coral66::PP::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
                                                 bool* errorsOccurred) noexcept
 {
     Preprocessor preprocessor(reporter);
