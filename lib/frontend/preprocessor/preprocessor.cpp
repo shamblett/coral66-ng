@@ -17,14 +17,6 @@
 namespace
 {
 
-template <class T>
-std::vector<T>& append(std::vector<T>& lhs, std::vector<T>&& rhs)
-{
-    lhs.insert(lhs.end(), std::move_iterator(rhs.begin()), std::move_iterator(rhs.end()));
-    return lhs;
-}
-
-
 } // namespace
 
 coral66::PPSourceObject coral66::PP::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,

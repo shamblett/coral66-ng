@@ -206,8 +206,8 @@ public:
 
         coral66::PP::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
-        const auto tree = coral66::PP::parseFile(
-            begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
+       // TODO const auto tree = coral66::PP::parseFile(
+           // begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
 
         if (context.getErrorCount() != 0)
         {
@@ -215,7 +215,7 @@ public:
             return;
         }
 
-        visit(tree);
+       //TODO  visit(tree);
         m_fileTokens.push_back(std::move(sourceObject.data()));
     }
     void visit(const coral66::PP::TextBlock& text)
