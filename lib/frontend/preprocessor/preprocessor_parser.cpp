@@ -98,7 +98,8 @@ coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer:
     std::vector<GroupPart> parts;
     do
     {
-        if (begin->getTokenType() == Lexer::TokenType::Identifier && begin->getValue() == "DEFINE")
+        if (begin->getTokenType() == Lexer::TokenType::Identifier &&
+            (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
         {
             parts.emplace_back(parseControlLine(begin, end, context));
             continue;
@@ -108,7 +109,8 @@ coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer:
         const auto* start = begin;
         while (begin != end)
         {
-            if (begin->getTokenType() == Lexer::TokenType::Identifier && begin->getValue() == "DEFINE")
+            if (begin->getTokenType() == Lexer::TokenType::Identifier &&
+                (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
             {
                 break;
             }
@@ -126,8 +128,9 @@ coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& b
                                                        Context& context)
 {
     CORAL66_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::Identifier
-                   && begin->getValue() == "DEFINE");
-    const auto* defineToken = begin;
+                   && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"));
+    const auto* directiveToken = begin;
+    bool isDefine = begin->getValue() == "DEFINE";
     begin++;
 
     // Find SemiColon
@@ -140,14 +143,46 @@ coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& b
                                                              coral66::Lexer::TokenType::SemiColon, *(end - 1)));
         // Consume rest
         begin = end;
-        return {DefineDirective{defineToken, {}}};
+        if (isDefine)
+            return {DefineDirective{directiveToken, {}}};
+        else
+            return {directiveToken};
     }
 
-    // Tokens between DEFINE and ;
+    // Tokens between directive and ;
     std::span<const Lexer::PPToken> tokens(begin, semi);
     begin = semi + 1; // Consume ;
 
-    return {DefineDirective{defineToken, tokens}};
+    if (isDefine)
+    {
+        auto iter = tokens.begin();
+        if (iter == tokens.end() || iter->getTokenType() != Lexer::TokenType::Identifier)
+        {
+            context.log(coral66::Errors::Parser::EXPECTED_N.args(
+                iter == tokens.end() ? *semi : *iter, context.getSourceInterface(),
+                coral66::Lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
+        }
+        return {DefineDirective{directiveToken, tokens}};
+    }
+    else
+    {
+        auto iter = tokens.begin();
+        if (iter != tokens.end() && iter->getTokenType() == Lexer::TokenType::Identifier)
+        {
+            const auto* macroName = &(*iter);
+            iter++;
+            if (iter != tokens.end())
+            {
+                // Optional: warn/error about extra tokens after Macroname in DELETE
+            }
+            return {macroName};
+        }
+        else
+        {
+            context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(
+                iter == tokens.end() ? *semi : *iter, context.getSourceInterface(),
+                coral66::Lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
+            return {directiveToken};
+        }
+    }
 }
-
-

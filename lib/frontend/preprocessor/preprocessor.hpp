@@ -239,6 +239,25 @@ public:
         }
     }
 
+    void visit(const coral66::PP::ControlLine& controlLine)
+    {
+        coral66::match(controlLine.variant, [this](auto&& value) { this->visit(value); });
+    }
+
+    void visit(const coral66::PP::DefineDirective& define)
+    {
+        if (define.tokens.empty() || define.tokens.front().getTokenType() != Lexer::TokenType::Identifier) {
+             return;
+        }
+        
+        auto iter = define.tokens.begin();
+        const auto* macroName = &(*iter);
+        iter++;
+        
+        std::span<const coral66::Lexer::PPToken> body(iter, define.tokens.end());
+        m_defines[macroName->getValue()] = Macro{macroName, body};
+    }
+
     void visit(const coral66::PP::GroupPart& groupPart)
     {
         coral66::match(groupPart, [this](auto&& value) { this->visit(value); });
