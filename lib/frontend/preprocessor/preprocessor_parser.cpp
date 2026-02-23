@@ -80,7 +80,7 @@ const coral66::source_interface& coral66::PP::Context::getSourceInterface() cons
     return m_sourceInterface;
 }
 
-coral66::PP::File coral66::PP::parseFile(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
+coral66::PP::File coral66::PP::parseMacro(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
                                          Context& context)
 {
     std::vector<Group> result;

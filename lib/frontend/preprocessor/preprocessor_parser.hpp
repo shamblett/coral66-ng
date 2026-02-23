@@ -35,9 +35,11 @@ public:
     [[nodiscard]] const source_interface& getSourceInterface() const;
 };
 
-File parseFile(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
+File parseMacro(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
 
 Group parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context, bool inIf = false);
+
+ControlLine parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
 
 } // namespace PP
 } // namespace coral66

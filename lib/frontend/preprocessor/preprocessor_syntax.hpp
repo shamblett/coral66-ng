@@ -18,19 +18,30 @@ namespace coral66::PP
 {
 struct Group;
 
+struct DefineDirective final
+{
+    Lexer::PPTokenIterator defineToken;
+    std::span<const Lexer::PPToken> tokens;
+};
+
+
+struct ControlLine final {
+
+    std::variant<Lexer::PPTokenIterator, DefineDirective> variant;
+};
 
 /**
  * <TextBlock> ::= <TOKEN> <TokenType::Newline> { <TOKEN> <TokenType::Newline> }
  */
 struct TextBlock final
 {
-    std::span<const Lexer::PPToken> tokens;
+    std::span<const coral66::Lexer::PPToken> tokens;
 };
 
 /**
  * <GroupPart> == <TextBlock>
  */
-using GroupPart = std::variant<TextBlock>;
+using GroupPart = std::variant<TextBlock, ControlLine>;
 
 /**
  * <Group> ::= <GroupPart> { <GroupPart> }
