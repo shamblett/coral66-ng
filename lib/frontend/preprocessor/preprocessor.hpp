@@ -206,8 +206,8 @@ public:
 
         coral66::PP::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
-       // TODO const auto tree = coral66::PP::parseFile(
-           // begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
+       const auto tree = coral66::PP::parseFile(
+           begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
 
         if (context.getErrorCount() != 0)
         {
@@ -215,7 +215,7 @@ public:
             return;
         }
 
-       //TODO  visit(tree);
+       visit(tree);
         m_fileTokens.push_back(std::move(sourceObject.data()));
     }
     void visit(const coral66::PP::TextBlock& text)
@@ -223,13 +223,34 @@ public:
         macroSubstitute({text.tokens.begin(), text.tokens.end()}, coral66::bind_front(&Preprocessor::pushLine, this));
     }
 
+    void visit(const coral66::PP::File& file)
+    {
+        for (auto& iter : file.groups)
+        {
+            visit(iter);
+        }
+    }
 
-    static void visit(const coral66::Lexer::PPTokenIterator&) {} // undef
+    void visit(const coral66::PP::Group& group)
+    {
+        for (auto& iter : group.groupPart)
+        {
+            visit(iter);
+        }
+    }
+
+    void visit(const coral66::PP::GroupPart& groupPart)
+    {
+        coral66::match(groupPart, [this](auto&& value) { this->visit(value); });
+    }
+
+    static void visit(const coral66::Lexer::PPTokenIterator&) {}
 
     bool errorsOccurred() const
     {
         return m_errorsOccurred;
     }
+
 };
 
 //

@@ -80,3 +80,74 @@ const coral66::source_interface& coral66::PP::Context::getSourceInterface() cons
     return m_sourceInterface;
 }
 
+coral66::PP::File coral66::PP::parseFile(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
+                                         Context& context)
+{
+    std::vector<Group> result;
+    while (begin != end)
+    {
+        result.push_back(parseGroup(begin, end, context));
+    }
+    return File{std::move(result)};
+}
+
+coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
+                                           Context& context, bool const)
+{
+    CORAL66_ASSERT(begin != end);
+    std::vector<GroupPart> parts;
+    do
+    {
+        if (begin->getTokenType() == Lexer::TokenType::Identifier && begin->getValue() == "DEFINE")
+        {
+            parts.emplace_back(parseControlLine(begin, end, context));
+            continue;
+        }
+
+        // TextBlock
+        const auto* start = begin;
+        while (begin != end)
+        {
+            if (begin->getTokenType() == Lexer::TokenType::Identifier && begin->getValue() == "DEFINE")
+            {
+                break;
+            }
+            begin++;
+        }
+        if (start != begin)
+        {
+            parts.emplace_back(TextBlock{{start, begin}});
+        }
+    } while (begin != end);
+    return Group{std::move(parts)};
+}
+
+coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
+                                                       Context& context)
+{
+    CORAL66_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::Identifier
+                   && begin->getValue() == "DEFINE");
+    const auto* defineToken = begin;
+    begin++;
+
+    // Find SemiColon
+    const auto* semi = std::find_if(begin, end, [](const Lexer::PPToken& t)
+                                    { return t.getTokenType() == Lexer::TokenType::SemiColon; });
+
+    if (semi == end)
+    {
+        context.log(coral66::Errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
+                                                             coral66::Lexer::TokenType::SemiColon, *(end - 1)));
+        // Consume rest
+        begin = end;
+        return {DefineDirective{defineToken, {}}};
+    }
+
+    // Tokens between DEFINE and ;
+    std::span<const Lexer::PPToken> tokens(begin, semi);
+    begin = semi + 1; // Consume ;
+
+    return {DefineDirective{defineToken, tokens}};
+}
+
+

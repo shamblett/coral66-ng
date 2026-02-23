@@ -27,4 +27,25 @@ struct TextBlock final
     std::span<const Lexer::PPToken> tokens;
 };
 
+/**
+ * <GroupPart> == <TextBlock>
+ */
+using GroupPart = std::variant<TextBlock>;
+
+/**
+ * <Group> ::= <GroupPart> { <GroupPart> }
+ */
+struct Group final
+{
+    std::vector<GroupPart> groupPart;
+};
+
+/**
+ * <File> := { <Group> }
+ */
+struct File final
+{
+    std::vector<Group> groups;
+};
+
 } // namespace coral66::PP
