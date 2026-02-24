@@ -14,10 +14,10 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-using namespace coral66::Errors::Lexer;
+using namespace coral66::Errors::lexer;
 using namespace Catch::Matchers;
 
-using namespace coral66::Lexer;
+using namespace coral66::lexer;
 
 namespace
 {
@@ -40,20 +40,20 @@ TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
     bool errors = false;
     auto result = lex("my/identifier var1?23 st+art", errors);
     REQUIRE(result.data().size() == 8);
-    CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "my");
-    CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Division);
-    CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Division);
+    CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[2].getValue()) == "identifier");
-    CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[3].getValue()) == "var1");
-    CHECK(result.data()[4].getTokenType() == coral66::Lexer::TokenType::Literal);
-    CHECK(result.data()[4].getType() == coral66::Lexer::CToken::Integer);
+    CHECK(result.data()[4].getTokenType() == coral66::lexer::TokenType::Literal);
+    CHECK(result.data()[4].getType() == coral66::lexer::CToken::Integer);
     CHECK(std::get<llvm::APSInt>(result.data()[4].getValue()).getExtValue() == 23);
-    CHECK(result.data()[5].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(result.data()[5].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[5].getValue()) == "st");
-    CHECK(result.data()[6].getTokenType() == coral66::Lexer::TokenType::Plus);
-    CHECK(result.data()[7].getTokenType() == coral66::Lexer::TokenType::Identifier);
+    CHECK(result.data()[6].getTokenType() == coral66::lexer::TokenType::Plus);
+    CHECK(result.data()[7].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[7].getValue()) == "art");
 }
 
@@ -95,7 +95,7 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
 
     SECTION("Multiple invalid Keyword")
     {
-        using namespace coral66::Lexer;
+        using namespace coral66::lexer;
         bool errors = false;
         auto result = lex("BEGI HHHH AND COMMM COMMENT", errors);
         const std::vector correct = {TokenType::Identifier, TokenType::Identifier, TokenType::AndKeyword,
@@ -117,14 +117,14 @@ TEST_CASE("Coral Lexing Literals - mixed strings", "[lexer]")
         bool errors = false;
         auto result = lex("12#3 !0 9999g", errors);
         REQUIRE(result.data().size() == 3);
-        CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[0].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[0].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 12);
-        CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[1].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[1].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[1].getValue()) == 3);
-        CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[2].getType() == coral66::Lexer::CToken::Integer);
+        CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[2].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 0);
     }
 
@@ -133,10 +133,10 @@ TEST_CASE("Coral Lexing Literals - mixed strings", "[lexer]")
         bool errors = false;
         auto result = lex("3.14h 0.gg0 rr.5 1.2eo", errors);
         REQUIRE(result.data().size() == 2);
-        CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::Identifier);
+        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "rr");
-        CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::Literal);
-        CHECK(result.data()[1].getType() == coral66::Lexer::CToken::Floating);
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[1].getType() == coral66::lexer::CToken::Floating);
         CHECK(std::get<llvm::APFloat>(result.data()[1].getValue()).isNonZero());
     }
 
@@ -145,13 +145,13 @@ TEST_CASE("Coral Lexing Literals - mixed strings", "[lexer]")
         bool errors = false;
         auto result = lex("'Hello World' 'It's me' ''", errors);
         REQUIRE(result.data().size() == 4);
-        CHECK(result.data()[0].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
+        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
-        CHECK(result.data()[1].getTokenType() == coral66::Lexer::TokenType::StringLiteral);
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[1].getValue()) == "It");
-        CHECK(result.data()[2].getTokenType() == coral66::Lexer::TokenType::Identifier);
+        CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(std::get<std::string>(result.data()[2].getValue()) == "s");
-        CHECK(result.data()[3].getTokenType() == coral66::Lexer::TokenType::Identifier);
+        CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(std::get<std::string>(result.data()[3].getValue()) == "me");
     }
 }

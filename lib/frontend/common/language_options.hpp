@@ -48,7 +48,6 @@ public:
 
 struct LanguageOptions
 {
-
     std::shared_ptr<TargetFeatures> targetFeatures = std::make_shared<DefaultTargetFeatures>();
     std::unordered_set<std::string_view> enabledWarnings{};
     bool freeStanding{};

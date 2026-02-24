@@ -19,7 +19,7 @@ coral66::PPSourceObject preprocess(std::string source)
     std::string storage;
     llvm::raw_string_ostream ss(storage);
     bool errorsOccurred = false;
-    auto tokens = coral66::Lexer::tokenize(std::move(source), &ss, &errorsOccurred);
+    auto tokens = coral66::lexer::tokenize(std::move(source), &ss, &errorsOccurred);
     UNSCOPED_INFO(ss.str());
     REQUIRE_FALSE(errorsOccurred);
     auto result = coral66::PP::preprocess(std::move(tokens), &ss, &errorsOccurred);
@@ -42,7 +42,7 @@ public:
     bool match(const PPSourceObject& arg) const override
     {
         bool errors = false;
-        auto ret = Lexer::tokenize(m_source, nullptr, &errors);
+        auto ret = lexer::tokenize(m_source, nullptr, &errors);
         if (errors)
             return false;
 

@@ -20,14 +20,13 @@ struct Group;
 
 struct DefineDirective final
 {
-    Lexer::PPTokenIterator defineToken;
-    std::span<const Lexer::PPToken> tokens;
+    lexer::PPTokenIterator defineToken;
+    std::span<const lexer::PPToken> tokens;
 };
 
-
-struct ControlLine final {
-
-    std::variant<Lexer::PPTokenIterator, DefineDirective> variant;
+struct ControlLine final
+{
+    std::variant<lexer::PPTokenIterator, DefineDirective> variant;
 };
 
 /**
@@ -35,7 +34,7 @@ struct ControlLine final {
  */
 struct TextBlock final
 {
-    std::span<const coral66::Lexer::PPToken> tokens;
+    std::span<const coral66::lexer::PPToken> tokens;
 };
 
 /**

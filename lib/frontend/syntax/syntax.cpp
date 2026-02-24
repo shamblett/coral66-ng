@@ -9,19 +9,19 @@
 namespace coral66::Syntax
 {
 
-Node::Node(Lexer::CTokenIterator begin, Lexer::CTokenIterator end) : m_begin(begin), m_end(end) {}
+Node::Node(lexer::CTokenIterator begin, lexer::CTokenIterator end) : m_begin(begin), m_end(end) {}
 
-Lexer::CTokenIterator Node::begin() const
+lexer::CTokenIterator Node::begin() const
 {
     return m_begin;
 }
-Lexer::CTokenIterator Node::end() const
+lexer::CTokenIterator Node::end() const
 {
     return m_end;
 }
 
 // Program
-Program::Program(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end, std::unique_ptr<Block>&& block)
+Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block)
     : Node(begin, end), m_block(std::move(block))
 {
 }
@@ -32,7 +32,7 @@ const Block& Program::getBlock() const
 }
 
 // Block
-Block::Block(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
+Block::Block(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
              std::vector<std::unique_ptr<Declaration>>&& declarations,
              std::vector<std::unique_ptr<Statement>>&& statements)
     : Node(begin, end), m_declarations(std::move(declarations)), m_statements(std::move(statements))
@@ -49,32 +49,32 @@ const std::vector<std::unique_ptr<Statement>>& Block::getStatements() const
 }
 
 // VariableDeclaration
-VariableDeclaration::VariableDeclaration(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                         const Lexer::CTokenIterator type,
-                                         std::vector<Lexer::CTokenIterator>&& identifiers)
+VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                         const lexer::CTokenIterator type,
+                                         std::vector<lexer::CTokenIterator>&& identifiers)
     : Declaration(begin, end), m_type(type), m_identifiers(std::move(identifiers))
 {
 }
 
-Lexer::CTokenIterator VariableDeclaration::getType() const
+lexer::CTokenIterator VariableDeclaration::getType() const
 {
     return m_type;
 }
-const std::vector<Lexer::CTokenIterator>& VariableDeclaration::getIdentifiers() const
+const std::vector<lexer::CTokenIterator>& VariableDeclaration::getIdentifiers() const
 {
     return m_identifiers;
 }
 
 // ProcedureDeclaration
-ProcedureDeclaration::ProcedureDeclaration(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                           const Lexer::CTokenIterator name,
+ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const lexer::CTokenIterator name,
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
                                            std::unique_ptr<Block>&& body)
     : Declaration(begin, end), m_name(name), m_parameters(std::move(parameters)), m_body(std::move(body))
 {
 }
 
-Lexer::CTokenIterator ProcedureDeclaration::getName() const
+lexer::CTokenIterator ProcedureDeclaration::getName() const
 {
     return m_name;
 }
@@ -89,18 +89,18 @@ const Block& ProcedureDeclaration::getBody() const
 
 // ArrayDeclaration
 ArrayDeclaration::ArrayDeclaration(
-    const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end, const Lexer::CTokenIterator type,
-    const Lexer::CTokenIterator identifier,
+    const lexer::CTokenIterator begin, const lexer::CTokenIterator end, const lexer::CTokenIterator type,
+    const lexer::CTokenIterator identifier,
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions)
     : Declaration(begin, end), m_type(type), m_identifier(identifier), m_dimensions(std::move(dimensions))
 {
 }
 
-Lexer::CTokenIterator ArrayDeclaration::getType() const
+lexer::CTokenIterator ArrayDeclaration::getType() const
 {
     return m_type;
 }
-Lexer::CTokenIterator ArrayDeclaration::getIdentifier() const
+lexer::CTokenIterator ArrayDeclaration::getIdentifier() const
 {
     return m_identifier;
 }
@@ -111,8 +111,8 @@ const std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Express
 }
 
 // TableDeclaration
-TableDeclaration::TableDeclaration(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                   const Lexer::CTokenIterator identifier, std::unique_ptr<Expression>&& width,
+TableDeclaration::TableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                   const lexer::CTokenIterator identifier, std::unique_ptr<Expression>&& width,
                                    std::unique_ptr<Expression>&& length,
                                    std::vector<std::unique_ptr<Declaration>>&& elements)
     : Declaration(begin, end),
@@ -123,7 +123,7 @@ TableDeclaration::TableDeclaration(const Lexer::CTokenIterator begin, const Lexe
 {
 }
 
-Lexer::CTokenIterator TableDeclaration::getIdentifier() const
+lexer::CTokenIterator TableDeclaration::getIdentifier() const
 {
     return m_identifier;
 }
@@ -141,18 +141,18 @@ const std::vector<std::unique_ptr<Declaration>>& TableDeclaration::getElements()
 }
 
 // OverlayDeclaration
-OverlayDeclaration::OverlayDeclaration(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                       const Lexer::CTokenIterator base, const Lexer::CTokenIterator offset,
+OverlayDeclaration::OverlayDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                       const lexer::CTokenIterator base, const lexer::CTokenIterator offset,
                                        std::unique_ptr<Declaration>&& overlayedDeclaration)
     : Declaration(begin, end), m_base(base), m_offset(offset), m_overlayedDeclaration(std::move(overlayedDeclaration))
 {
 }
 
-Lexer::CTokenIterator OverlayDeclaration::getBase() const
+lexer::CTokenIterator OverlayDeclaration::getBase() const
 {
     return m_base;
 }
-Lexer::CTokenIterator OverlayDeclaration::getOffset() const
+lexer::CTokenIterator OverlayDeclaration::getOffset() const
 {
     return m_offset;
 }
@@ -162,14 +162,14 @@ const Declaration& OverlayDeclaration::getOverlayedDeclaration() const
 }
 
 // AssignmentStatement
-AssignmentStatement::AssignmentStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                         const Lexer::CTokenIterator identifier,
+AssignmentStatement::AssignmentStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                         const lexer::CTokenIterator identifier,
                                          std::unique_ptr<Expression>&& expression)
     : Statement(begin, end), m_identifier(identifier), m_expression(std::move(expression))
 {
 }
 
-Lexer::CTokenIterator AssignmentStatement::getIdentifier() const
+lexer::CTokenIterator AssignmentStatement::getIdentifier() const
 {
     return m_identifier;
 }
@@ -179,7 +179,7 @@ const Expression& AssignmentStatement::getExpression() const
 }
 
 // IfStatement
-IfStatement::IfStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
+IfStatement::IfStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                          std::unique_ptr<Expression>&& condition, std::unique_ptr<Statement>&& thenBranch,
                          std::unique_ptr<Statement>&& elseBranch)
     : Statement(begin, end),
@@ -203,20 +203,20 @@ const Statement* IfStatement::getElseBranch() const
 }
 
 // GotoStatement
-GotoStatement::GotoStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                             const Lexer::CTokenIterator label)
+GotoStatement::GotoStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                             const lexer::CTokenIterator label)
     : Statement(begin, end), m_label(label)
 {
 }
 
-Lexer::CTokenIterator GotoStatement::getLabel() const
+lexer::CTokenIterator GotoStatement::getLabel() const
 {
     return m_label;
 }
 
 // ForStatement
-ForStatement::ForStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                           Lexer::CTokenIterator variable, std::unique_ptr<Expression>&& start,
+ForStatement::ForStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                           lexer::CTokenIterator variable, std::unique_ptr<Expression>&& start,
                            std::unique_ptr<Expression>&& step, std::unique_ptr<Expression>&& until,
                            std::unique_ptr<Statement>&& body)
     : Statement(begin, end),
@@ -228,7 +228,7 @@ ForStatement::ForStatement(const Lexer::CTokenIterator begin, const Lexer::CToke
 {
 }
 
-Lexer::CTokenIterator ForStatement::getVariable() const
+lexer::CTokenIterator ForStatement::getVariable() const
 {
     return m_variable;
 }
@@ -250,7 +250,7 @@ const Statement& ForStatement::getBody() const
 }
 
 // AnswerStatement
-AnswerStatement::AnswerStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
+AnswerStatement::AnswerStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                  std::unique_ptr<Expression>&& expression)
     : Statement(begin, end), m_expression(std::move(expression))
 {
@@ -262,7 +262,7 @@ const Expression& AnswerStatement::getExpression() const
 }
 
 // ProcedureCallStatement
-ProcedureCallStatement::ProcedureCallStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
+ProcedureCallStatement::ProcedureCallStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                                std::unique_ptr<Expression>&& expression)
     : Statement(begin, end), m_expression(std::move(expression))
 {
@@ -274,37 +274,37 @@ const Expression& ProcedureCallStatement::getExpression() const
 }
 
 // CodeStatement
-CodeStatement::CodeStatement(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end) : Statement(begin, end)
+CodeStatement::CodeStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end) : Statement(begin, end)
 {
 }
 
 // LiteralExpression
-LiteralExpression::LiteralExpression(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                     const Lexer::CTokenIterator literal)
+LiteralExpression::LiteralExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                     const lexer::CTokenIterator literal)
     : Expression(begin, end), m_literal(literal)
 {
 }
 
-Lexer::CTokenIterator LiteralExpression::getLiteral() const
+lexer::CTokenIterator LiteralExpression::getLiteral() const
 {
     return m_literal;
 }
 
 // IdentifierExpression
-IdentifierExpression::IdentifierExpression(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                           const Lexer::CTokenIterator identifier)
+IdentifierExpression::IdentifierExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const lexer::CTokenIterator identifier)
     : Expression(begin, end), m_identifier(identifier)
 {
 }
 
-Lexer::CTokenIterator IdentifierExpression::getIdentifier() const
+lexer::CTokenIterator IdentifierExpression::getIdentifier() const
 {
     return m_identifier;
 }
 
 // BinaryExpression
-BinaryExpression::BinaryExpression(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
-                                   std::unique_ptr<Expression>&& left, const Lexer::CTokenIterator op,
+BinaryExpression::BinaryExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                   std::unique_ptr<Expression>&& left, const lexer::CTokenIterator op,
                                    std::unique_ptr<Expression>&& right)
     : Expression(begin, end), m_left(std::move(left)), m_op(op), m_right(std::move(right))
 {
@@ -314,7 +314,7 @@ const Expression& BinaryExpression::getLeft() const
 {
     return *m_left;
 }
-Lexer::CTokenIterator BinaryExpression::getOp() const
+lexer::CTokenIterator BinaryExpression::getOp() const
 {
     return m_op;
 }
@@ -324,7 +324,7 @@ const Expression& BinaryExpression::getRight() const
 }
 
 // PartWordExpression
-PartWordExpression::PartWordExpression(const Lexer::CTokenIterator begin, const Lexer::CTokenIterator end,
+PartWordExpression::PartWordExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                        std::unique_ptr<Expression>&& base, std::unique_ptr<Expression>&& startBit,
                                        std::unique_ptr<Expression>&& width)
     : Expression(begin, end), m_base(std::move(base)), m_startBit(std::move(startBit)), m_width(std::move(width))

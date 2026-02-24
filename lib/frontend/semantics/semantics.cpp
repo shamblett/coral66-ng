@@ -144,7 +144,7 @@ bool ProcedureType::equalsImpl([[maybe_unused]] const ProcedureType& rhs) const
 // Declaration
 std::string_view Declaration::getName() const
 {
-    if (m_nameToken->getTokenType() == Lexer::TokenType::Identifier)
+    if (m_nameToken->getTokenType() == lexer::TokenType::Identifier)
     {
         return std::get<std::string>(m_nameToken->getValue());
     }
@@ -152,35 +152,35 @@ std::string_view Declaration::getName() const
 }
 
 // Expression Base
-Lexer::CTokenIterator ExpressionBase::begin() const
+lexer::CTokenIterator ExpressionBase::begin() const
 {
     return match([](const auto& e) { return e.begin(); });
 }
 
-Lexer::CTokenIterator ExpressionBase::end() const
+lexer::CTokenIterator ExpressionBase::end() const
 {
     return match([](const auto& e) { return e.end(); });
 }
 
 // BinaryOperator
-Lexer::CTokenIterator BinaryOperator::begin() const
+lexer::CTokenIterator BinaryOperator::begin() const
 {
     return m_leftOperand->begin();
 }
 
-Lexer::CTokenIterator BinaryOperator::end() const
+lexer::CTokenIterator BinaryOperator::end() const
 {
     return m_rightOperand->end();
 }
 
 // UnaryOperator
-Lexer::CTokenIterator UnaryOperator::begin() const
+lexer::CTokenIterator UnaryOperator::begin() const
 {
     // Operator is before operand (prefix)
     return m_operatorToken;
 }
 
-Lexer::CTokenIterator UnaryOperator::end() const
+lexer::CTokenIterator UnaryOperator::end() const
 {
     return m_operand->end();
 }

@@ -197,8 +197,8 @@ public:
     {
         return is<ErrorExpression>();
     }
-    [[nodiscard]] virtual Lexer::CTokenIterator begin() const;
-    [[nodiscard]] virtual Lexer::CTokenIterator end() const;
+    [[nodiscard]] virtual lexer::CTokenIterator begin() const;
+    [[nodiscard]] virtual lexer::CTokenIterator end() const;
     virtual ~ExpressionBase() = default;
 };
 
@@ -209,11 +209,11 @@ public:
 
 private:
     Variant m_value;
-    Lexer::CTokenIterator m_begin;
-    Lexer::CTokenIterator m_end;
+    lexer::CTokenIterator m_begin;
+    lexer::CTokenIterator m_end;
 
 public:
-    Constant(IntrusiveVariantValue<Type> type, Variant value, Lexer::CTokenIterator begin, Lexer::CTokenIterator end)
+    Constant(IntrusiveVariantValue<Type> type, Variant value, lexer::CTokenIterator begin, lexer::CTokenIterator end)
         : ExpressionBase(std::in_place_type<Constant>, std::move(type), ValueCategory::Rvalue),
           m_value(std::move(value)),
           m_begin(begin),
@@ -225,11 +225,11 @@ public:
     {
         return m_value;
     }
-    [[nodiscard]] Lexer::CTokenIterator begin() const override
+    [[nodiscard]] lexer::CTokenIterator begin() const override
     {
         return m_begin;
     }
-    [[nodiscard]] Lexer::CTokenIterator end() const override
+    [[nodiscard]] lexer::CTokenIterator end() const override
     {
         return m_end;
     }
@@ -241,10 +241,10 @@ class Useable;
 class DeclarationRead final : public ExpressionBase
 {
     const Useable* CORAL66_NON_NULL m_declRead;
-    Lexer::CTokenIterator m_identifierToken;
+    lexer::CTokenIterator m_identifierToken;
 
 public:
-    DeclarationRead(IntrusiveVariantValue<Type> type, const Useable& useable, Lexer::CTokenIterator identifierToken)
+    DeclarationRead(IntrusiveVariantValue<Type> type, const Useable& useable, lexer::CTokenIterator identifierToken)
         : ExpressionBase(std::in_place_type<DeclarationRead>, std::move(type), ValueCategory::Lvalue),
           m_declRead(&useable),
           m_identifierToken(identifierToken)
@@ -255,11 +255,11 @@ public:
     {
         return *m_declRead;
     }
-    [[nodiscard]] Lexer::CTokenIterator begin() const override
+    [[nodiscard]] lexer::CTokenIterator begin() const override
     {
         return m_identifierToken;
     }
-    [[nodiscard]] Lexer::CTokenIterator end() const override
+    [[nodiscard]] lexer::CTokenIterator end() const override
     {
         return m_identifierToken + 1;
     }
@@ -289,12 +289,12 @@ public:
 
 private:
     Kind m_kind;
-    Lexer::CTokenIterator m_operatorToken;
+    lexer::CTokenIterator m_operatorToken;
     coral66::IntrVarPtr<ExpressionBase> m_rightOperand;
 
 public:
     BinaryOperator(IntrusiveVariantValue<Type> type, coral66::IntrVarPtr<ExpressionBase>&& left, Kind kind,
-                   Lexer::CTokenIterator opToken, coral66::IntrVarPtr<ExpressionBase>&& right)
+                   lexer::CTokenIterator opToken, coral66::IntrVarPtr<ExpressionBase>&& right)
         : ExpressionBase(std::in_place_type<BinaryOperator>, std::move(type), ValueCategory::Rvalue),
           m_leftOperand(std::move(left)),
           m_kind(kind),
@@ -315,8 +315,8 @@ public:
     {
         return m_kind;
     }
-    [[nodiscard]] Lexer::CTokenIterator begin() const override;
-    [[nodiscard]] Lexer::CTokenIterator end() const override;
+    [[nodiscard]] lexer::CTokenIterator begin() const override;
+    [[nodiscard]] lexer::CTokenIterator end() const override;
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(BinaryOperator)
 };
 
@@ -332,11 +332,11 @@ public:
 
 private:
     Kind m_kind;
-    Lexer::CTokenIterator m_operatorToken;
+    lexer::CTokenIterator m_operatorToken;
     coral66::IntrVarPtr<ExpressionBase> m_operand;
 
 public:
-    UnaryOperator(IntrusiveVariantValue<Type> type, Kind kind, Lexer::CTokenIterator opToken,
+    UnaryOperator(IntrusiveVariantValue<Type> type, Kind kind, lexer::CTokenIterator opToken,
                   coral66::IntrVarPtr<ExpressionBase>&& operand)
         : ExpressionBase(std::in_place_type<UnaryOperator>, std::move(type), ValueCategory::Rvalue),
           m_kind(kind),
@@ -353,8 +353,8 @@ public:
     {
         return *m_operand;
     }
-    [[nodiscard]] Lexer::CTokenIterator begin() const override;
-    [[nodiscard]] Lexer::CTokenIterator end() const override;
+    [[nodiscard]] lexer::CTokenIterator begin() const override;
+    [[nodiscard]] lexer::CTokenIterator end() const override;
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(UnaryOperator)
 };
 
@@ -363,12 +363,12 @@ class PartWordAccess final : public ExpressionBase
     coral66::IntrVarPtr<ExpressionBase> m_base;
     std::uint32_t m_startBit;
     std::uint32_t m_width;
-    Lexer::CTokenIterator m_begin;
-    Lexer::CTokenIterator m_end;
+    lexer::CTokenIterator m_begin;
+    lexer::CTokenIterator m_end;
 
 public:
     PartWordAccess(IntrusiveVariantValue<Type> type, coral66::IntrVarPtr<ExpressionBase>&& base, std::uint32_t start,
-                   std::uint32_t width, Lexer::CTokenIterator beginLoc, Lexer::CTokenIterator endLoc)
+                   std::uint32_t width, lexer::CTokenIterator beginLoc, lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<PartWordAccess>, std::move(type), ValueCategory::Lvalue),
           m_base(std::move(base)),
           m_startBit(start),
@@ -378,11 +378,11 @@ public:
     {
     }
 
-    [[nodiscard]] Lexer::CTokenIterator begin() const override
+    [[nodiscard]] lexer::CTokenIterator begin() const override
     {
         return m_begin;
     }
-    [[nodiscard]] Lexer::CTokenIterator end() const override
+    [[nodiscard]] lexer::CTokenIterator end() const override
     {
         return m_end;
     }
@@ -405,13 +405,13 @@ class CallExpression final : public ExpressionBase
 {
     coral66::IntrVarPtr<ExpressionBase> m_functionExpression;
     std::vector<coral66::IntrVarPtr<ExpressionBase>> m_arguments;
-    Lexer::CTokenIterator m_begin;
-    Lexer::CTokenIterator m_end;
+    lexer::CTokenIterator m_begin;
+    lexer::CTokenIterator m_end;
 
 public:
     CallExpression(IntrusiveVariantValue<Type> type, coral66::IntrVarPtr<ExpressionBase>&& func,
-                   std::vector<coral66::IntrVarPtr<ExpressionBase>>&& args, Lexer::CTokenIterator beginLoc,
-                   Lexer::CTokenIterator endLoc)
+                   std::vector<coral66::IntrVarPtr<ExpressionBase>>&& args, lexer::CTokenIterator beginLoc,
+                   lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<CallExpression>, std::move(type), ValueCategory::Rvalue),
           m_functionExpression(std::move(func)),
           m_arguments(std::move(args)),
@@ -428,11 +428,11 @@ public:
     {
         return m_arguments;
     }
-    [[nodiscard]] Lexer::CTokenIterator begin() const override
+    [[nodiscard]] lexer::CTokenIterator begin() const override
     {
         return m_begin;
     }
-    [[nodiscard]] Lexer::CTokenIterator end() const override
+    [[nodiscard]] lexer::CTokenIterator end() const override
     {
         return m_end;
     }
@@ -441,19 +441,19 @@ public:
 
 class ErrorExpression final : public ExpressionBase
 {
-    Lexer::CTokenIterator m_begin;
-    Lexer::CTokenIterator m_end;
+    lexer::CTokenIterator m_begin;
+    lexer::CTokenIterator m_end;
 
 public:
-    ErrorExpression(IntrusiveVariantValue<Type> type, Lexer::CTokenIterator begin, Lexer::CTokenIterator end)
+    ErrorExpression(IntrusiveVariantValue<Type> type, lexer::CTokenIterator begin, lexer::CTokenIterator end)
         : ExpressionBase(std::in_place_type<ErrorExpression>, std::move(type), {}), m_begin(begin), m_end(end)
     {
     }
-    [[nodiscard]] Lexer::CTokenIterator begin() const override
+    [[nodiscard]] lexer::CTokenIterator begin() const override
     {
         return m_begin;
     }
-    [[nodiscard]] Lexer::CTokenIterator end() const override
+    [[nodiscard]] lexer::CTokenIterator end() const override
     {
         return m_end;
     }
@@ -548,11 +548,11 @@ public:
 
 class LabelStatement final : public Statement
 {
-    Lexer::CTokenIterator m_name;
+    lexer::CTokenIterator m_name;
     const Statement* m_target;
 
 public:
-    LabelStatement(Lexer::CTokenIterator name, const Statement* target) // NOLINT(*-pro-type-member-init)
+    LabelStatement(lexer::CTokenIterator name, const Statement* target) // NOLINT(*-pro-type-member-init)
         : Statement(ScopePoint{0}, std::in_place_type<LabelStatement>), m_name(name), m_target(target)
     {
     }
@@ -705,18 +705,18 @@ public:
 
 class Declaration : public Useable
 {
-    Lexer::CTokenIterator m_nameToken;
+    lexer::CTokenIterator m_nameToken;
 
 protected:
     template <class T>
-    Declaration(std::in_place_type_t<T>, Lexer::CTokenIterator nameToken)
+    Declaration(std::in_place_type_t<T>, lexer::CTokenIterator nameToken)
         : Useable(std::in_place_type<T>), m_nameToken(nameToken)
     {
     }
 
 public:
     virtual ~Declaration() = default;
-    [[nodiscard]] Lexer::CTokenIterator getNameToken() const
+    [[nodiscard]] lexer::CTokenIterator getNameToken() const
     {
         return m_nameToken;
     }
@@ -728,7 +728,7 @@ class VariableDeclaration final : public Declaration
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    VariableDeclaration(Lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    VariableDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<VariableDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -745,7 +745,7 @@ class ProcedureDeclaration final : public Declaration
     std::vector<coral66::IntrVarPtr<Statement>> m_body;
 
 public:
-    ProcedureDeclaration(Lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    ProcedureDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<ProcedureDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -771,11 +771,11 @@ public:
 class Program
 {
     coral66::CSourceObject m_source;
-    std::vector<coral66::Lexer::CToken> m_syntheticTokens;
+    std::vector<coral66::lexer::CToken> m_syntheticTokens;
     std::vector<coral66::IntrVarPtr<Useable>> m_globals;
 
 public:
-    Program(coral66::CSourceObject&& source, std::vector<coral66::Lexer::CToken> synthetic,
+    Program(coral66::CSourceObject&& source, std::vector<coral66::lexer::CToken> synthetic,
             std::vector<coral66::IntrVarPtr<Useable>> globals)
         : m_source(std::move(source)), m_syntheticTokens(std::move(synthetic)), m_globals(std::move(globals))
     {

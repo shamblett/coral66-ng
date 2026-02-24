@@ -32,7 +32,6 @@ class ActionExecutor
     std::vector<fs::path> m_linkableFiles;
 
 public:
-
     explicit ActionExecutor(llvm::raw_ostream* reporter) : m_reporter(reporter) {}
 
     ~ActionExecutor() = default;

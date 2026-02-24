@@ -165,9 +165,9 @@ void SemanticAnalysis::visit(const Syntax::VariableDeclaration& node)
     auto typeToken = node.getType();
     IntrusiveVariantValue<Type> type(PrimitiveType{PrimitiveType::Integer});
 
-    if (typeToken->getTokenType() == Lexer::TokenType::FloatingKeyword)
+    if (typeToken->getTokenType() == lexer::TokenType::FloatingKeyword)
         type = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating});
-    else if (typeToken->getTokenType() == Lexer::TokenType::FixedKeyword)
+    else if (typeToken->getTokenType() == lexer::TokenType::FixedKeyword)
         type = IntrusiveVariantValue<Type>(FixedType{16, 8});
 
     for (auto id : node.getIdentifiers())
@@ -235,9 +235,9 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
             // back. But VariableDeclaration can add multiple. Simplified: iterate identifiers of var decl
             auto typeToken = var->getType();
             const Type* pType = &integerType;
-            if (typeToken->getTokenType() == Lexer::TokenType::FloatingKeyword)
+            if (typeToken->getTokenType() == lexer::TokenType::FloatingKeyword)
                 pType = &floatingType;
-            else if (typeToken->getTokenType() == Lexer::TokenType::FixedKeyword)
+            else if (typeToken->getTokenType() == lexer::TokenType::FixedKeyword)
                 pType = &fixedType;
 
             for (auto id : var->getIdentifiers())
@@ -284,9 +284,9 @@ void SemanticAnalysis::visit(const Syntax::ArrayDeclaration& node)
 {
     auto typeToken = node.getType();
     const Type* elemTypePtr = &integerType;
-    if (typeToken->getTokenType() == Lexer::TokenType::FloatingKeyword)
+    if (typeToken->getTokenType() == lexer::TokenType::FloatingKeyword)
         elemTypePtr = &floatingType;
-    else if (typeToken->getTokenType() == Lexer::TokenType::FixedKeyword)
+    else if (typeToken->getTokenType() == lexer::TokenType::FixedKeyword)
         elemTypePtr = &fixedType;
 
     std::vector<std::uint64_t> dims;
@@ -479,7 +479,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureCallStatement& node)
 void SemanticAnalysis::visit(const Syntax::LiteralExpression& node)
 {
     IntrusiveVariantValue<Type> type(PrimitiveType{PrimitiveType::Integer});
-    if (node.getLiteral()->getType() == Lexer::CToken::Floating)
+    if (node.getLiteral()->getType() == lexer::CToken::Floating)
         type = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating});
 
     Semantics::Constant::Variant val;
@@ -514,11 +514,11 @@ void SemanticAnalysis::visit(const Syntax::BinaryExpression& node)
 
     using BinOp = Semantics::BinaryOperator;
     BinOp::Kind kind = BinOp::Addition;
-    if (node.getOp()->getTokenType() == Lexer::TokenType::Minus)
+    if (node.getOp()->getTokenType() == lexer::TokenType::Minus)
         kind = BinOp::Subtraction;
-    else if (node.getOp()->getTokenType() == Lexer::TokenType::Asterisk)
+    else if (node.getOp()->getTokenType() == lexer::TokenType::Asterisk)
         kind = BinOp::Multiply;
-    else if (node.getOp()->getTokenType() == Lexer::TokenType::Division)
+    else if (node.getOp()->getTokenType() == lexer::TokenType::Division)
         kind = BinOp::Divide;
 
     IntrusiveVariantValue<Type> type = cloneType(left->getType());
@@ -558,7 +558,7 @@ Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
     SemanticAnalysis analysis(cTokens, reporter, errors);
     analysis.visit(parseTree);
 
-    std::vector<Lexer::CToken> syntheticTokens;
+    std::vector<lexer::CToken> syntheticTokens;
 
     bool mainExists = false;
     for (const auto& g : analysis.m_globalDeclarations)
@@ -573,10 +573,10 @@ Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
 
     if (!mainExists)
     {
-        syntheticTokens.emplace_back(Lexer::TokenType::Identifier, 0, 4, 0, 0, std::string("main"));
+        syntheticTokens.emplace_back(lexer::TokenType::Identifier, 0, 4, 0, 0, std::string("main"));
         // Use Integer return type
         IntrusiveVariantValue<Type> type(ProcedureType{&integerType, {}});
-        const Lexer::CToken* mainToken = &syntheticTokens.back();
+        const lexer::CToken* mainToken = &syntheticTokens.back();
 
         auto proc = makeIntr<ProcedureDeclaration>(mainToken, std::move(type));
         proc->setBody(std::move(analysis.m_currentBlockStatements));

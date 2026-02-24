@@ -273,7 +273,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
 
 } // namespace
 
-auto coral66::diag::after(const Lexer::TokenBase& token) -> std::tuple<const Lexer::TokenBase&, std::uint64_t>
+auto coral66::diag::after(const lexer::TokenBase& token) -> std::tuple<const lexer::TokenBase&, std::uint64_t>
 {
     return std::make_tuple(std::cref(token), token.getOffset() + token.getLength());
 }

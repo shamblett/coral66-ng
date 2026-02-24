@@ -80,7 +80,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     }
 
     bool errors = false;
-    auto ppTokens = Lexer::tokenize(std::move(input), m_reporter, &errors, sourceFile.string());
+    auto ppTokens = lexer::tokenize(std::move(input), m_reporter, &errors, sourceFile.string());
     if (errors)
     {
         return {};
@@ -131,7 +131,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         cTokenTimeRegion.emplace(*cTokenTimer);
     }
 
-    auto cTokens = coral66::Lexer::toCTokens(std::move(ppTokens), m_reporter, &errors);
+    auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), m_reporter, &errors);
     if (errors)
     {
         return {};

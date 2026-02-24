@@ -23,13 +23,13 @@ using namespace coral66::Syntax;
 
 namespace
 {
-[[maybe_unused]] bool isPostFixOperator(const coral66::Lexer::CToken& token)
+[[maybe_unused]] bool isPostFixOperator(const coral66::lexer::CToken& token)
 {
     switch (token.getTokenType())
     {
-        case coral66::Lexer::TokenType::Dot:
-        case coral66::Lexer::TokenType::OpenSquareBracket:
-        case coral66::Lexer::TokenType::OpenParentheses:
+        case coral66::lexer::TokenType::Dot:
+        case coral66::lexer::TokenType::OpenSquareBracket:
+        case coral66::lexer::TokenType::OpenParentheses:
         default: break;
     }
     return false;

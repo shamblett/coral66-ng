@@ -7,12 +7,10 @@
 #include "preprocessor.hpp"
 
 #include <algorithm>
-
 #include <vector>
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/support/scope_exit.hpp"
-
 
 namespace
 {
