@@ -6,7 +6,7 @@
 
 #include "preprocessor_parser.hpp"
 
-#include "../common/messages/errors.hpp"
+#include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 
 namespace
@@ -99,7 +99,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     do
     {
         if (begin->getTokenType() == lexer::TokenType::Identifier
-            && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
+            && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword) || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
         {
             parts.emplace_back(parseControlLine(begin, end, context));
             continue;
@@ -110,7 +110,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
         while (begin != end)
         {
             if (begin->getTokenType() == lexer::TokenType::Identifier
-                && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
+                && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword) || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
             {
                 break;
             }
@@ -170,7 +170,7 @@ coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& b
         if (iter != tokens.end() && iter->getTokenType() == lexer::TokenType::Identifier)
         {
             const auto* macroName = &(*iter);
-            iter++;
+            ++iter;
             if (iter != tokens.end())
             {
                 // Optional: warn/error about extra tokens after Macroname in DELETE

@@ -11,7 +11,7 @@
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/TargetSelect.h>
 
-#include "../frontend/common/messages/warnings.hpp"
+#include "lib/frontend/common/messages/warnings.hpp"
 #include "action_executor.hpp"
 #include "command_line_arguments.hpp"
 #include "command_line_processor.hpp"
