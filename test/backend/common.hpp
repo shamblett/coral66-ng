@@ -20,11 +20,11 @@
 inline coral66::Semantics::Program generateProgram(std::string source)
 {
     bool errors = false;
-    auto pptokens = coral66::Lexer::tokenize(std::move(source), &llvm::errs(), &errors);
+    auto pptokens = coral66::lexer::tokenize(std::move(source), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    pptokens = coral66::PP::preprocess(std::move(pptokens), &llvm::errs(), &errors);
+    pptokens = coral66::pp::preprocess(std::move(pptokens), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    auto ctokens = coral66::Lexer::toCTokens(pptokens, &llvm::errs(), &errors);
+    auto ctokens = coral66::lexer::toCTokens(pptokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
     auto tree = coral66::Parser::parseProgram(ctokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);

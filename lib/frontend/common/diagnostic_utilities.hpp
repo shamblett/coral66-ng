@@ -47,7 +47,7 @@ PointRange getPointRange(const T& arg)
     {
         return arg;
     }
-    else if constexpr (std::is_base_of_v<Lexer::TokenBase, U>)
+    else if constexpr (std::is_base_of_v<lexer::TokenBase, U>)
     {
         return {{arg.getOffset(), arg.getFileId(), arg.getMacroId()},
                 {arg.getOffset() + arg.getLength(), arg.getFileId(), arg.getMacroId()}};
@@ -91,8 +91,8 @@ PointRange getPointRange(const T& arg)
     {
         using T1 = std::decay_t<std::tuple_element_t<0, U>>;
         using T2 = std::decay_t<std::tuple_element_t<1, U>>;
-        if constexpr (std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T1>>
-                      && std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T2>>)
+        if constexpr (std::is_base_of_v<lexer::TokenBase, std::remove_pointer_t<T1>>
+                      && std::is_base_of_v<lexer::TokenBase, std::remove_pointer_t<T2>>)
         {
             auto& [arg1, arg2] = arg;
             PointLocation first, second;
@@ -116,13 +116,13 @@ PointRange getPointRange(const T& arg)
             }
             return {first, second};
         }
-        else if constexpr (std::is_base_of_v<Lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>)
+        else if constexpr (std::is_base_of_v<lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>)
         {
             auto& [arg1, arg2] = arg;
             return {{static_cast<std::uint64_t>(arg2), arg1.getFileId(), arg1.getMacroId()},
                     {static_cast<std::uint64_t>(arg2) + 1, arg1.getFileId(), arg1.getMacroId()}};
         }
-        else if constexpr (std::is_base_of_v<Lexer::TokenBase, T2> && std::is_convertible_v<T1, std::uint64_t>)
+        else if constexpr (std::is_base_of_v<lexer::TokenBase, T2> && std::is_convertible_v<T1, std::uint64_t>)
         {
             auto& [arg1, arg2] = arg;
             return {{static_cast<std::uint64_t>(arg1), arg2.getFileId(), arg2.getMacroId()},
@@ -144,7 +144,7 @@ PointRange getPointRange(const T& arg)
     else
     {
         using T1 = std::decay_t<std::tuple_element_t<0, U>>;
-        if constexpr (std::is_base_of_v<Lexer::TokenBase, T1>)
+        if constexpr (std::is_base_of_v<lexer::TokenBase, T1>)
         {
             auto& [arg1, arg2, arg3] = arg;
             return {{static_cast<std::uint64_t>(arg2), arg1.getFileId(), arg1.getMacroId()},

@@ -70,7 +70,8 @@ inline llvm::cl::opt<DebugLevel> DebugLevel(llvm::cl::desc("Debug level:"),
 inline llvm::cl::opt<bool> SyntaxOnly("syntax-only",
                                       llvm::cl::desc("Stop after semantic analysis and produce no output file"));
 inline llvm::cl::opt<bool> Time("time", llvm::cl::desc("Output time taken for each stage"));
-inline llvm::cl::opt<bool> NoAction("noact", llvm::cl::desc("Check command line parameter validity, take no further action"));
+inline llvm::cl::opt<bool> NoAction("noact",
+                                    llvm::cl::desc("Check command line parameter validity, take no further action"));
 
 // The source file name
 inline llvm::cl::opt<std::string> SourceFilename(llvm::cl::Positional, llvm::cl::desc("<input source file>"));

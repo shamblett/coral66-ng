@@ -304,7 +304,7 @@ struct StringMaker<coral66::PPSourceObject>
     static std::string convert(const coral66::PPSourceObject& sourceObject)
     {
         return "'"
-               + coral66::PP::reconstruct(sourceObject.data().data(),
+               + coral66::pp::reconstruct(sourceObject.data().data(),
                                           sourceObject.data().data() + sourceObject.data().size(), sourceObject)
                + "'";
     }

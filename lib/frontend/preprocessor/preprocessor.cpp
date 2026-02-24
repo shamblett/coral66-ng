@@ -7,19 +7,17 @@
 #include "preprocessor.hpp"
 
 #include <algorithm>
-
 #include <vector>
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/support/scope_exit.hpp"
-
 
 namespace
 {
 
 } // namespace
 
-coral66::PPSourceObject coral66::PP::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
+coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
                                                 bool* errorsOccurred) noexcept
 {
     Preprocessor preprocessor(reporter);

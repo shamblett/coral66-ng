@@ -57,8 +57,7 @@ CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME, "c
                "Cannot compile to object file and preprocess at the same time - ignoring option");
 CREATE_WARNING(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME, "command-line-argument-combination",
                "Cannot compile to assembly and preprocess at the same time - ignoring option");
-CREATE_WARNING(NO_ACTION_SPEFIFIED, "command-line-noaction",
-               "No action specified - command line checked");
+CREATE_WARNING(NO_ACTION_SPEFIFIED, "command-line-noaction", "No action specified - command line checked");
 } // namespace CLI
 } // namespace coral66::Warnings
 

@@ -86,7 +86,7 @@ CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .c
 CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for output");
 } // namespace CLI
 
-namespace Lexer
+namespace lexer
 {
 // Adding some Lexer errors that might be used by Lexer.cpp
 CREATE_ERROR(INVALID_OCTAL_CHARACTER, "Invalid octal character '%0'", PointAt<1>);
@@ -109,7 +109,7 @@ CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<
 CREATE_ERROR(STRAY_N_IN_PROGRAM, "Stray %tokenType0 in program", PointAt<0>);
 CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underline<0>);
 CREATE_ERROR(UNTERMINATED_CHARACTER_LITERAL, "Unterminated character literal", Underline<0>);
-} // namespace Lexer
+} // namespace lexer
 
 } // namespace coral66::Errors
 

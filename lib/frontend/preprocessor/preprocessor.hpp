@@ -9,16 +9,14 @@
 #include <llvm/Support/raw_ostream.h>
 
 #include <string>
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
 
-
-
-namespace coral66::PP
+namespace coral66::pp
 {
 struct Options
 {
@@ -36,22 +34,22 @@ class Preprocessor final : coral66::PPSourceInterface
 {
     llvm::raw_ostream* m_reporter;
     std::uint32_t m_macroID = 0;
-    std::vector<coral66::Lexer::PPToken> m_result;
+    std::vector<coral66::lexer::PPToken> m_result;
     std::vector<coral66::Source::PPRecord> m_substitutions{1};
 
     struct Macro
     {
-        coral66::Lexer::PPTokenIterator identifierPos;
-        std::span<const coral66::Lexer::PPToken> replacement;
+        coral66::lexer::PPTokenIterator identifierPos;
+        std::span<const coral66::lexer::PPToken> replacement;
     };
     std::unordered_map<std::string_view, Macro> m_defines;
 
     std::vector<coral66::Source::File> m_files;
-    std::vector<std::vector<coral66::Lexer::PPToken>> m_fileTokens;
-    std::vector<coral66::Lexer::IntervalMap> m_intervalMaps;
+    std::vector<std::vector<coral66::lexer::PPToken>> m_fileTokens;
+    std::vector<coral66::lexer::IntervalMap> m_intervalMaps;
     bool m_errorsOccurred = false;
 
-    void pushLine(std::vector<coral66::Lexer::PPToken>&& tokens)
+    void pushLine(std::vector<coral66::lexer::PPToken>&& tokens)
     {
         append(m_result, std::move(tokens));
     }
@@ -71,18 +69,18 @@ class Preprocessor final : coral66::PPSourceInterface
     }
 
     template <class F>
-    void macroSubstitute(std::vector<coral66::Lexer::PPToken>&& tokens, F lineOutput)
+    void macroSubstitute(std::vector<coral66::lexer::PPToken>&& tokens, F lineOutput)
     {
         if (tokens.empty())
         {
             return;
         }
-        std::vector<coral66::Lexer::PPToken> output;
+        std::vector<coral66::lexer::PPToken> output;
         auto* start = tokens.data();
 
         for (auto* iter = tokens.data(); iter != tokens.data() + tokens.size();)
         {
-            if (iter->getTokenType() == coral66::Lexer::TokenType::Newline)
+            if (iter->getTokenType() == coral66::lexer::TokenType::Newline)
             {
                 iter++;
                 if (iter == tokens.data() + tokens.size())
@@ -95,7 +93,7 @@ class Preprocessor final : coral66::PPSourceInterface
                 output.clear();
                 continue;
             }
-            if (iter->getTokenType() != coral66::Lexer::TokenType::Identifier)
+            if (iter->getTokenType() != coral66::lexer::TokenType::Identifier)
             {
                 iter++;
                 continue;
@@ -116,7 +114,7 @@ class Preprocessor final : coral66::PPSourceInterface
             m_substitutions.emplace_back(
                 coral66::Source::Substitution{*result->second.identifierPos, *iter, {}, false});
 
-            std::vector<coral66::Lexer::PPToken> replacement(result->second.replacement.begin(),
+            std::vector<coral66::lexer::PPToken> replacement(result->second.replacement.begin(),
                                                              result->second.replacement.end());
             for (auto& tok : replacement)
             {
@@ -165,7 +163,7 @@ class Preprocessor final : coral66::PPSourceInterface
         return m_substitutions;
     }
 
-    std::span<const coral66::Lexer::IntervalMap> getIntervalMaps() const noexcept override
+    std::span<const coral66::lexer::IntervalMap> getIntervalMaps() const noexcept override
     {
         return m_intervalMaps;
     }
@@ -173,7 +171,7 @@ class Preprocessor final : coral66::PPSourceInterface
 public:
     Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
 
-    std::vector<coral66::Lexer::PPToken>& getResult() noexcept
+    std::vector<coral66::lexer::PPToken>& getResult() noexcept
     {
         return m_result;
     }
@@ -183,7 +181,7 @@ public:
         return m_files;
     }
 
-    std::vector<coral66::Lexer::IntervalMap>& getIntervalMaps() noexcept
+    std::vector<coral66::lexer::IntervalMap>& getIntervalMaps() noexcept
     {
         return m_intervalMaps;
     }
@@ -204,10 +202,10 @@ public:
                            {}});
         m_intervalMaps.push_back(std::move(sourceObject.getIntervalMap()[0]));
 
-        coral66::PP::Context context(*this, m_reporter);
+        coral66::pp::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
-       const auto tree = coral66::PP::parseMacro(
-           begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
+        const auto tree = coral66::pp::parseMacro(
+            begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
 
         if (context.getErrorCount() != 0)
         {
@@ -215,15 +213,15 @@ public:
             return;
         }
 
-       visit(tree);
+        visit(tree);
         m_fileTokens.push_back(std::move(sourceObject.data()));
     }
-    void visit(const coral66::PP::TextBlock& text)
+    void visit(const coral66::pp::TextBlock& text)
     {
         macroSubstitute({text.tokens.begin(), text.tokens.end()}, coral66::bind_front(&Preprocessor::pushLine, this));
     }
 
-    void visit(const coral66::PP::File& file)
+    void visit(const coral66::pp::File& file)
     {
         for (auto& iter : file.groups)
         {
@@ -231,7 +229,7 @@ public:
         }
     }
 
-    void visit(const coral66::PP::Group& group)
+    void visit(const coral66::pp::Group& group)
     {
         for (auto& iter : group.groupPart)
         {
@@ -239,37 +237,37 @@ public:
         }
     }
 
-    void visit(const coral66::PP::ControlLine& controlLine)
+    void visit(const coral66::pp::ControlLine& controlLine)
     {
         coral66::match(controlLine.variant, [this](auto&& value) { this->visit(value); });
     }
 
-    void visit(const coral66::PP::DefineDirective& define)
+    void visit(const coral66::pp::DefineDirective& define)
     {
-        if (define.tokens.empty() || define.tokens.front().getTokenType() != Lexer::TokenType::Identifier) {
-             return;
+        if (define.tokens.empty() || define.tokens.front().getTokenType() != lexer::TokenType::Identifier)
+        {
+            return;
         }
-        
+
         auto iter = define.tokens.begin();
         const auto* macroName = &(*iter);
         iter++;
-        
-        std::span<const coral66::Lexer::PPToken> body(iter, define.tokens.end());
+
+        std::span<const coral66::lexer::PPToken> body(iter, define.tokens.end());
         m_defines[macroName->getValue()] = Macro{macroName, body};
     }
 
-    void visit(const coral66::PP::GroupPart& groupPart)
+    void visit(const coral66::pp::GroupPart& groupPart)
     {
         coral66::match(groupPart, [this](auto&& value) { this->visit(value); });
     }
 
-    static void visit(const coral66::Lexer::PPTokenIterator&) {}
+    static void visit(const coral66::lexer::PPTokenIterator&) {}
 
     bool errorsOccurred() const
     {
         return m_errorsOccurred;
     }
-
 };
 
 //
@@ -281,12 +279,12 @@ PPSourceObject preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* repo
 template <class T>
 std::string reconstruct(const T* begin, const T* end, const source_interface& sourceInterface) noexcept
 {
-    static_assert(std::is_base_of_v<Lexer::TokenBase, T>);
+    static_assert(std::is_base_of_v<lexer::TokenBase, T>);
     if (begin == end)
     {
         return {};
     }
-    std::string result = Lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
+    std::string result = lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
     const auto* prev = begin++;
     while (begin != end)
     {
@@ -346,16 +344,15 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
         result.insert(result.size(), newLines, '\n');
         if (newLines == 0 && (begin->hasLeadingWhitespace()))
         {
-            result += " " + Lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
+            result += " " + lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
         }
         else
         {
-            result += Lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
+            result += lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
         }
         prev = begin++;
     }
     return result;
 }
 
-} // namespace coral66::PP
-
+} // namespace coral66::pp

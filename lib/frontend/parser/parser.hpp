@@ -30,12 +30,12 @@ public:
 Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                              bool* errors = nullptr);
 
-std::unique_ptr<Syntax::Block> parseBlock(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end, Context& context);
-std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(Lexer::CTokenIterator& begin,
-                                                                   Lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Syntax::Statement> parseStatement(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
+std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
+                                                                   lexer::CTokenIterator end, Context& context);
+std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context);
-std::unique_ptr<Syntax::Expression> parseExpression(Lexer::CTokenIterator& begin, Lexer::CTokenIterator end,
+std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                     Context& context);
 
 } // namespace coral66::Parser

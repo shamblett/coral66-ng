@@ -17,7 +17,7 @@
 #include "lib/support/utilities.hpp"
 #include "source_interface.hpp"
 
-namespace coral66::Lexer
+namespace coral66::lexer
 {
 struct NonCharString;
 class CToken;
@@ -340,4 +340,4 @@ public:
         m_value = value;
     }
 };
-} // namespace coral66::Lexer
+} // namespace coral66::lexer

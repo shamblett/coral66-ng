@@ -11,13 +11,13 @@
 
 namespace
 {
-[[maybe_unused]] bool expect(coral66::Lexer::TokenType tokenType, coral66::Lexer::PPTokenIterator& begin,
-                             coral66::Lexer::PPTokenIterator const end, coral66::PP::Context& context,
+[[maybe_unused]] bool expect(coral66::lexer::TokenType tokenType, coral66::lexer::PPTokenIterator& begin,
+                             coral66::lexer::PPTokenIterator const end, coral66::pp::Context& context,
                              const std::optional<coral66::Message>& additional = {})
 {
     if (begin == end || begin->getTokenType() != tokenType)
     {
-        if (begin == end || begin->getTokenType() == coral66::Lexer::TokenType::Newline)
+        if (begin == end || begin->getTokenType() == coral66::lexer::TokenType::Newline)
         {
             context.log(coral66::Errors::Parser::EXPECTED_N.args(*(begin - 1), context.getSourceInterface(), tokenType,
                                                                  *(begin - 1)));
@@ -37,15 +37,15 @@ namespace
     return true;
 }
 
-coral66::Lexer::PPTokenIterator findNewline(coral66::Lexer::PPTokenIterator const begin,
-                                            coral66::Lexer::PPTokenIterator const end)
+coral66::lexer::PPTokenIterator findNewline(coral66::lexer::PPTokenIterator const begin,
+                                            coral66::lexer::PPTokenIterator const end)
 {
     return std::find_if(begin, end,
-                        coral66::compose(coral66::bind_front(std::equal_to<>{}, coral66::Lexer::TokenType::Newline),
-                                         &coral66::Lexer::PPToken::getTokenType));
+                        coral66::compose(coral66::bind_front(std::equal_to<>{}, coral66::lexer::TokenType::Newline),
+                                         &coral66::lexer::PPToken::getTokenType));
 }
 
-[[maybe_unused]] void skipLine(coral66::Lexer::PPTokenIterator& begin, const coral66::Lexer::PPTokenIterator end)
+[[maybe_unused]] void skipLine(coral66::lexer::PPTokenIterator& begin, const coral66::lexer::PPTokenIterator end)
 {
     begin = findNewline(begin, end);
     begin = begin == end ? begin : begin + 1;
@@ -53,12 +53,12 @@ coral66::Lexer::PPTokenIterator findNewline(coral66::Lexer::PPTokenIterator cons
 
 } // namespace
 
-coral66::PP::Context::Context(const coral66::source_interface& sourceInterface, llvm::raw_ostream* reporter)
+coral66::pp::Context::Context(const coral66::source_interface& sourceInterface, llvm::raw_ostream* reporter)
     : m_sourceInterface(sourceInterface), m_reporter(reporter)
 {
 }
 
-void coral66::PP::Context::log(const Message& message)
+void coral66::pp::Context::log(const Message& message)
 {
     if (message.getSeverity() == Severity::Error)
     {
@@ -70,18 +70,18 @@ void coral66::PP::Context::log(const Message& message)
     }
 }
 
-std::size_t coral66::PP::Context::getErrorCount() const
+std::size_t coral66::pp::Context::getErrorCount() const
 {
     return m_errorCount;
 }
 
-const coral66::source_interface& coral66::PP::Context::getSourceInterface() const
+const coral66::source_interface& coral66::pp::Context::getSourceInterface() const
 {
     return m_sourceInterface;
 }
 
-coral66::PP::File coral66::PP::parseMacro(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
-                                         Context& context)
+coral66::pp::File coral66::pp::parseMacro(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
+                                          Context& context)
 {
     std::vector<Group> result;
     while (begin != end)
@@ -91,15 +91,15 @@ coral66::PP::File coral66::PP::parseMacro(Lexer::PPTokenIterator& begin, Lexer::
     return File{std::move(result)};
 }
 
-coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
+coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
                                            Context& context, bool const)
 {
     CORAL66_ASSERT(begin != end);
     std::vector<GroupPart> parts;
     do
     {
-        if (begin->getTokenType() == Lexer::TokenType::Identifier &&
-            (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
+        if (begin->getTokenType() == lexer::TokenType::Identifier
+            && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
         {
             parts.emplace_back(parseControlLine(begin, end, context));
             continue;
@@ -109,8 +109,8 @@ coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer:
         const auto* start = begin;
         while (begin != end)
         {
-            if (begin->getTokenType() == Lexer::TokenType::Identifier &&
-                (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
+            if (begin->getTokenType() == lexer::TokenType::Identifier
+                && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"))
             {
                 break;
             }
@@ -124,23 +124,23 @@ coral66::PP::Group coral66::PP::parseGroup(Lexer::PPTokenIterator& begin, Lexer:
     return Group{std::move(parts)};
 }
 
-coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator const end,
+coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
                                                        Context& context)
 {
-    CORAL66_ASSERT(begin != end && begin->getTokenType() == Lexer::TokenType::Identifier
+    CORAL66_ASSERT(begin != end && begin->getTokenType() == lexer::TokenType::Identifier
                    && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"));
     const auto* directiveToken = begin;
     bool isDefine = begin->getValue() == "DEFINE";
     begin++;
 
     // Find SemiColon
-    const auto* semi = std::find_if(begin, end, [](const Lexer::PPToken& t)
-                                    { return t.getTokenType() == Lexer::TokenType::SemiColon; });
+    const auto* semi = std::find_if(begin, end, [](const lexer::PPToken& t)
+                                    { return t.getTokenType() == lexer::TokenType::SemiColon; });
 
     if (semi == end)
     {
         context.log(coral66::Errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
-                                                             coral66::Lexer::TokenType::SemiColon, *(end - 1)));
+                                                             coral66::lexer::TokenType::SemiColon, *(end - 1)));
         // Consume rest
         begin = end;
         if (isDefine)
@@ -150,24 +150,24 @@ coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& b
     }
 
     // Tokens between directive and ;
-    std::span<const Lexer::PPToken> tokens(begin, semi);
+    std::span<const lexer::PPToken> tokens(begin, semi);
     begin = semi + 1; // Consume ;
 
     if (isDefine)
     {
         auto iter = tokens.begin();
-        if (iter == tokens.end() || iter->getTokenType() != Lexer::TokenType::Identifier)
+        if (iter == tokens.end() || iter->getTokenType() != lexer::TokenType::Identifier)
         {
             context.log(coral66::Errors::Parser::EXPECTED_N.args(
                 iter == tokens.end() ? *semi : *iter, context.getSourceInterface(),
-                coral66::Lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
+                coral66::lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
         }
         return {DefineDirective{directiveToken, tokens}};
     }
     else
     {
         auto iter = tokens.begin();
-        if (iter != tokens.end() && iter->getTokenType() == Lexer::TokenType::Identifier)
+        if (iter != tokens.end() && iter->getTokenType() == lexer::TokenType::Identifier)
         {
             const auto* macroName = &(*iter);
             iter++;
@@ -181,7 +181,7 @@ coral66::PP::ControlLine coral66::PP::parseControlLine(Lexer::PPTokenIterator& b
         {
             context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(
                 iter == tokens.end() ? *semi : *iter, context.getSourceInterface(),
-                coral66::Lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
+                coral66::lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
             return {directiveToken};
         }
     }

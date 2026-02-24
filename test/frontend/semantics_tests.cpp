@@ -19,9 +19,9 @@
         llvm::raw_string_ostream ss(string);                                 \
         coral66::PPSourceObject tokens;                                      \
         bool errors = false;                                                 \
-        tokens = coral66::Lexer::tokenize(source, &ss, &errors);   \
+        tokens = coral66::lexer::tokenize(source, &ss, &errors);   \
         REQUIRE_FALSE(errors);                                               \
-        auto ctokens = coral66::Lexer::toCTokens(tokens, &ss, &errors);      \
+        auto ctokens = coral66::lexer::toCTokens(tokens, &ss, &errors);      \
         REQUIRE_FALSE(errors);                                               \
         auto tree = coral66::Parser::parseProgram(ctokens, &ss, &errors);    \
         REQUIRE_FALSE(errors);                                               \

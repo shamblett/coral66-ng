@@ -31,10 +31,10 @@
 
 namespace coral66
 {
-namespace Lexer
+namespace lexer
 {
 class TokenBase;
-} // namespace Lexer
+} // namespace lexer
 
 template <std::size_t index, std::int64_t text = -1>
 struct InsertAfter;
@@ -463,11 +463,11 @@ private:
             {
                 using T1 = std::decay_t<std::tuple_element_t<0, U>>;
                 using T2 = std::decay_t<std::tuple_element_t<1, U>>;
-                return (std::is_base_of_v<Lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>)
-                       || (std::is_base_of_v<Lexer::TokenBase, T2> && std::is_convertible_v<T1, std::uint64_t>)
+                return (std::is_base_of_v<lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>)
+                       || (std::is_base_of_v<lexer::TokenBase, T2> && std::is_convertible_v<T1, std::uint64_t>)
                        || (std::is_convertible_v<T1, std::uint64_t> && std::is_convertible_v<T2, std::uint64_t>)
-                       || (std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T1>>
-                           && std::is_base_of_v<Lexer::TokenBase, std::remove_pointer_t<T2>>)
+                       || (std::is_base_of_v<lexer::TokenBase, std::remove_pointer_t<T1>>
+                           && std::is_base_of_v<lexer::TokenBase, std::remove_pointer_t<T2>>)
                        || (locationConstraintCheck<T1>() && locationConstraintCheck<T2>());
             }
             else if constexpr (std::tuple_size_v<U> == 3)
@@ -475,9 +475,9 @@ private:
                 using T1 = std::decay_t<std::tuple_element_t<0, U>>;
                 using T2 = std::decay_t<std::tuple_element_t<1, U>>;
                 using T3 = std::decay_t<std::tuple_element_t<2, U>>;
-                return (std::is_base_of_v<Lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>
+                return (std::is_base_of_v<lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>
                         && std::is_convertible_v<T3, std::uint64_t>)
-                       || (std::is_base_of_v<Lexer::TokenBase, T3> && std::is_convertible_v<T2, std::uint64_t>
+                       || (std::is_base_of_v<lexer::TokenBase, T3> && std::is_convertible_v<T2, std::uint64_t>
                            && std::is_convertible_v<T1, std::uint64_t>);
             }
             else
@@ -499,7 +499,7 @@ private:
         }
         else
         {
-            return std::is_base_of_v<Lexer::TokenBase, U> || std::is_convertible_v<U, std::uint64_t>;
+            return std::is_base_of_v<lexer::TokenBase, U> || std::is_convertible_v<U, std::uint64_t>;
         }
     }
 
@@ -647,7 +647,7 @@ private:
 
 namespace diag
 {
-std::tuple<const Lexer::TokenBase&, std::uint64_t> after(const Lexer::TokenBase& token);
+std::tuple<const lexer::TokenBase&, std::uint64_t> after(const lexer::TokenBase& token);
 
 const std::unordered_set<std::string_view>& getAllWarnings();
 } // namespace diag

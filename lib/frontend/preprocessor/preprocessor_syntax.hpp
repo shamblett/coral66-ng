@@ -14,20 +14,19 @@
 
 #include "lib/frontend/lexer/lexer.hpp"
 
-namespace coral66::PP
+namespace coral66::pp
 {
 struct Group;
 
 struct DefineDirective final
 {
-    Lexer::PPTokenIterator defineToken;
-    std::span<const Lexer::PPToken> tokens;
+    lexer::PPTokenIterator defineToken;
+    std::span<const lexer::PPToken> tokens;
 };
 
-
-struct ControlLine final {
-
-    std::variant<Lexer::PPTokenIterator, DefineDirective> variant;
+struct ControlLine final
+{
+    std::variant<lexer::PPTokenIterator, DefineDirective> variant;
 };
 
 /**
@@ -35,7 +34,7 @@ struct ControlLine final {
  */
 struct TextBlock final
 {
-    std::span<const coral66::Lexer::PPToken> tokens;
+    std::span<const coral66::lexer::PPToken> tokens;
 };
 
 /**
@@ -59,4 +58,4 @@ struct File final
     std::vector<Group> groups;
 };
 
-} // namespace coral66::PP
+} // namespace coral66::pp

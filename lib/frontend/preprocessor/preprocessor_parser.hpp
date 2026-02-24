@@ -12,7 +12,7 @@ namespace coral66
 {
 class Message;
 
-namespace PP
+namespace pp
 {
 class Context final
 {
@@ -35,11 +35,11 @@ public:
     [[nodiscard]] const source_interface& getSourceInterface() const;
 };
 
-File parseMacro(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
+File parseMacro(lexer::PPTokenIterator& begin, lexer::PPTokenIterator end, Context& context);
 
-Group parseGroup(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context, bool inIf = false);
+Group parseGroup(lexer::PPTokenIterator& begin, lexer::PPTokenIterator end, Context& context, bool inIf = false);
 
-ControlLine parseControlLine(Lexer::PPTokenIterator& begin, Lexer::PPTokenIterator end, Context& context);
+ControlLine parseControlLine(lexer::PPTokenIterator& begin, lexer::PPTokenIterator end, Context& context);
 
-} // namespace PP
+} // namespace pp
 } // namespace coral66

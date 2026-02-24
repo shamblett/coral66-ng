@@ -45,22 +45,22 @@ struct File
 
 struct Substitution
 {
-    Lexer::PPToken macroIdentifier;
-    Lexer::PPToken replacedIdentifier;
-    std::optional<Lexer::PPToken> closeParentheses;
+    lexer::PPToken macroIdentifier;
+    lexer::PPToken replacedIdentifier;
+    std::optional<lexer::PPToken> closeParentheses;
     bool empty;
 };
 
 struct Stringification
 {
-    std::vector<Lexer::PPToken> stringified;
-    Lexer::PPToken replacedIdentifier;
+    std::vector<lexer::PPToken> stringified;
+    lexer::PPToken replacedIdentifier;
 };
 
 struct TokenConcatenation
 {
-    Lexer::PPToken leftToken;
-    Lexer::PPToken rightToken;
+    lexer::PPToken leftToken;
+    lexer::PPToken rightToken;
 };
 } // namespace Source
 
@@ -70,28 +70,28 @@ template <class T>
 class SourceObjectStorage;
 
 template <>
-class SourceObjectStorage<Lexer::CToken> : public source_interface
+class SourceObjectStorage<lexer::CToken> : public source_interface
 {
 public:
     SourceObjectStorage() = default;
 };
 
 template <>
-class SourceObjectStorage<Lexer::PPToken> : public PPSourceInterface
+class SourceObjectStorage<lexer::PPToken> : public PPSourceInterface
 {
-    std::vector<Lexer::IntervalMap> m_intervalMap;
+    std::vector<lexer::IntervalMap> m_intervalMap;
 
 public:
     SourceObjectStorage() = default;
 
-    explicit SourceObjectStorage(std::vector<Lexer::IntervalMap> intervalMap) : m_intervalMap(std::move(intervalMap)) {}
+    explicit SourceObjectStorage(std::vector<lexer::IntervalMap> intervalMap) : m_intervalMap(std::move(intervalMap)) {}
 
-    [[nodiscard]] std::span<const Lexer::IntervalMap> getIntervalMaps() const noexcept override
+    [[nodiscard]] std::span<const lexer::IntervalMap> getIntervalMaps() const noexcept override
     {
         return m_intervalMap;
     }
 
-    std::vector<Lexer::IntervalMap>& getIntervalMap()
+    std::vector<lexer::IntervalMap>& getIntervalMap()
     {
         return m_intervalMap;
     }
@@ -108,15 +108,15 @@ class SourceObject final : public detail::SourceObjectStorage<T>
 public:
     SourceObject() = default;
 
-    template <class U = T, std::enable_if_t<!std::is_same_v<Lexer::PPToken, U>>* = nullptr>
+    template <class U = T, std::enable_if_t<!std::is_same_v<lexer::PPToken, U>>* = nullptr>
     SourceObject(std::vector<T> tokens, std::vector<Source::File> files, std::vector<Source::PPRecord> substitutions)
         : m_tokens(std::move(tokens)), m_files(std::move(files)), m_substitutions(std::move(substitutions))
     {
     }
 
-    template <class U = T, std::enable_if_t<std::is_same_v<Lexer::PPToken, U>>* = nullptr>
+    template <class U = T, std::enable_if_t<std::is_same_v<lexer::PPToken, U>>* = nullptr>
     SourceObject(std::vector<T> tokens, std::vector<Source::File> files, std::vector<Source::PPRecord> substitutions,
-                 std::vector<Lexer::IntervalMap> intervalMaps)
+                 std::vector<lexer::IntervalMap> intervalMaps)
         : detail::SourceObjectStorage<T>(std::move(intervalMaps)),
           m_tokens(std::move(tokens)),
           m_files(std::move(files)),
@@ -194,11 +194,11 @@ public:
     }
 };
 
-using CSourceObject = SourceObject<Lexer::CToken>;
-using PPSourceObject = SourceObject<Lexer::PPToken>;
+using CSourceObject = SourceObject<lexer::CToken>;
+using PPSourceObject = SourceObject<lexer::PPToken>;
 
-extern template class SourceObject<Lexer::CToken>;
+extern template class SourceObject<lexer::CToken>;
 
-extern template class SourceObject<Lexer::PPToken>;
+extern template class SourceObject<lexer::PPToken>;
 
 } // namespace coral66

@@ -25,11 +25,11 @@
 
 namespace coral66
 {
-namespace Lexer
+namespace lexer
 {
 class TokenBase;
 using IntervalMap = std::vector<std::tuple<std::uint64_t, std::uint64_t, std::uint64_t>>;
-} // namespace Lexer
+} // namespace lexer
 
 namespace Source
 {
@@ -72,6 +72,6 @@ public:
     PPSourceInterface(PPSourceInterface&&) noexcept = default;
     PPSourceInterface& operator=(PPSourceInterface&&) noexcept = default;
 
-    [[nodiscard]] virtual std::span<const Lexer::IntervalMap> getIntervalMaps() const noexcept = 0;
+    [[nodiscard]] virtual std::span<const lexer::IntervalMap> getIntervalMaps() const noexcept = 0;
 };
 } // namespace coral66

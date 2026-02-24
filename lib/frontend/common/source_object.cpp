@@ -6,5 +6,5 @@
 
 #include "source_object.hpp"
 
-template class coral66::SourceObject<coral66::Lexer::CToken>;
-template class coral66::SourceObject<coral66::Lexer::PPToken>;
+template class coral66::SourceObject<coral66::lexer::CToken>;
+template class coral66::SourceObject<coral66::lexer::PPToken>;

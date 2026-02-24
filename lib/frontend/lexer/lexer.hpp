@@ -31,10 +31,10 @@ namespace coral66
 template <class T>
 class SourceObject;
 
-using CSourceObject = SourceObject<Lexer::CToken>;
-using PPSourceObject = SourceObject<Lexer::PPToken>;
+using CSourceObject = SourceObject<lexer::CToken>;
+using PPSourceObject = SourceObject<lexer::PPToken>;
 
-namespace Lexer
+namespace lexer
 {
 using TokenIterator = const TokenBase* CORAL66_NON_NULL;
 using CTokenIterator = const CToken* CORAL66_NON_NULL;
@@ -87,12 +87,12 @@ static_assert(!std::is_polymorphic_v<PPToken>);
 
 static_assert(!std::is_polymorphic_v<CToken>);
 
-std::optional<CToken> parseStringLiteral(const PPToken& ppToken, const PPSourceInterface& sourceInterface,
+std::optional<CToken> parseStringLiteral(const PPToken& PPToken, const PPSourceInterface& sourceInterface,
                                          llvm::raw_ostream* reporter = nullptr);
 
 bool needsWhitespaceInBetween(TokenType left, TokenType right) noexcept;
 
-} // namespace Lexer
+} // namespace lexer
 
 namespace diag
 {
@@ -102,33 +102,33 @@ struct CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'>
     template <class T>
     std::string operator()(const T& token) const
     {
-        static_assert(std::is_base_of_v<Lexer::TokenBase, T>, "Argument to %tokenType must be a token class");
-        auto view = Lexer::tokenName(token.getTokenType());
+        static_assert(std::is_base_of_v<lexer::TokenBase, T>, "Argument to %tokenType must be a token class");
+        auto view = lexer::tokenName(token.getTokenType());
         return std::string(view.begin(), view.end());
     }
 };
 
 template <>
-struct StringConverter<Lexer::TokenType>
+struct StringConverter<lexer::TokenType>
 {
-    static std::string inFormat(Lexer::TokenType arg, const source_interface*)
+    static std::string inFormat(lexer::TokenType arg, const source_interface*)
     {
         return coral66::to_string(tokenName(arg));
     }
 
-    static std::string inArg(Lexer::TokenType arg, const source_interface*)
+    static std::string inArg(lexer::TokenType arg, const source_interface*)
     {
         return coral66::to_string(tokenName(arg, false));
     }
 };
 
 template <>
-struct StringConverter<Lexer::TokenBase>
+struct StringConverter<lexer::TokenBase>
 {
-    static std::string inFormat(const Lexer::TokenBase& arg, const source_interface* sourceInterface)
+    static std::string inFormat(const lexer::TokenBase& arg, const source_interface* sourceInterface)
     {
         CORAL66_ASSERT(sourceInterface);
-        auto spelling = Lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
+        auto spelling = lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {
             if (spelling[i] != '\n')
@@ -140,10 +140,10 @@ struct StringConverter<Lexer::TokenBase>
         return "'" + spelling + "'";
     }
 
-    static std::string inArg(const Lexer::TokenBase& arg, const source_interface* sourceInterface)
+    static std::string inArg(const lexer::TokenBase& arg, const source_interface* sourceInterface)
     {
         CORAL66_ASSERT(sourceInterface);
-        auto spelling = Lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
+        auto spelling = lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {
             if (spelling[i] != '\n')
@@ -157,12 +157,12 @@ struct StringConverter<Lexer::TokenBase>
 };
 
 template <>
-struct StringConverter<Lexer::CToken> : StringConverter<Lexer::TokenBase>
+struct StringConverter<lexer::CToken> : StringConverter<lexer::TokenBase>
 {
 };
 
 template <>
-struct StringConverter<Lexer::PPToken> : StringConverter<Lexer::TokenBase>
+struct StringConverter<lexer::PPToken> : StringConverter<lexer::TokenBase>
 {
 };
 
