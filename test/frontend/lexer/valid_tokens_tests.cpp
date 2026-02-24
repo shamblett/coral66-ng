@@ -168,3 +168,69 @@ TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
     CHECK(result.data()[offset].getTokenType() == TokenType::LessThan);
     CHECK(result.data()[offset + 1].getTokenType() == TokenType::Minus);
 }
+
+TEST_CASE("Coral Lexing code strings ", "[lexer]")
+{
+    SECTION("Code fragment")
+    {
+        using namespace coral66::lexer;
+        auto result = lex("PROGRAM The Coral Program; "
+                          "BEGIN "
+                          "  DEFINE M1 1 + 2;"
+                          "  INTEGER A;"
+                          "  INTEGER B; "
+                          "END;");
+
+        const std::vector correct = {
+            TokenType::ProgramKeyword, TokenType::Identifier,   TokenType::Identifier,    TokenType::Identifier,
+            TokenType::SemiColon,      TokenType::BeginKeyword, TokenType::DefineKeyword, TokenType::Identifier,
+            TokenType::Literal,        TokenType::Plus,         TokenType::Literal,       TokenType::SemiColon,
+            TokenType::IntegerKeyword, TokenType::Identifier,   TokenType::SemiColon,     TokenType::IntegerKeyword,
+            TokenType::Identifier,     TokenType::SemiColon,    TokenType::EndKeyword,    TokenType::SemiColon};
+
+        // Check first batch
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+
+    SECTION("Maths sequence")
+    {
+        using namespace coral66::lexer;
+        auto result = lex("1 + 2 + 3 := 6");
+
+        const std::vector correct = {TokenType::Literal, TokenType::Plus,       TokenType::Literal, TokenType::Plus,
+                                     TokenType::Literal, TokenType::Assignment, TokenType::Literal};
+
+        // Check first batch
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+
+    SECTION("Maths sequence with identifiers")
+    {
+        using namespace coral66::lexer;
+        auto result = lex("INTEGER A;"
+                          "INTEGER B;"
+                          "INTEGER C;"
+                          "A := 1; B := 2; C := 3 + A + B;");
+
+        const std::vector correct = {
+            TokenType::IntegerKeyword, TokenType::Identifier, TokenType::SemiColon,      TokenType::IntegerKeyword,
+            TokenType::Identifier,     TokenType::SemiColon,  TokenType::IntegerKeyword, TokenType::Identifier,
+            TokenType::SemiColon,      TokenType::Identifier, TokenType::Assignment,     TokenType::Literal,
+            TokenType::SemiColon,      TokenType::Identifier, TokenType::Assignment,     TokenType::Literal,
+            TokenType::SemiColon,      TokenType::Identifier, TokenType::Assignment,     TokenType::Literal,
+            TokenType::Plus,           TokenType::Identifier, TokenType::Plus,           TokenType::Identifier,
+            TokenType::SemiColon};
+
+        // Check first batch
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+}
