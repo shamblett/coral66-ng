@@ -99,7 +99,8 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     do
     {
         if (begin->getTokenType() == lexer::TokenType::Identifier
-            && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword) || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
+            && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword)
+                || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
         {
             parts.emplace_back(parseControlLine(begin, end, context));
             continue;
@@ -110,7 +111,8 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
         while (begin != end)
         {
             if (begin->getTokenType() == lexer::TokenType::Identifier
-                && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword) || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
+                && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword)
+                    || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
             {
                 break;
             }
@@ -128,9 +130,10 @@ coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& b
                                                        Context& context)
 {
     CORAL66_ASSERT(begin != end && begin->getTokenType() == lexer::TokenType::Identifier
-                   && (begin->getValue() == "DEFINE" || begin->getValue() == "DELETE"));
+                   && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword)
+                       || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)));
     const auto* directiveToken = begin;
-    bool isDefine = begin->getValue() == "DEFINE";
+    bool isDefine = begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword);
     begin++;
 
     // Find SemiColon
