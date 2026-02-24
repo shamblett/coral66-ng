@@ -11,7 +11,7 @@ cc_library(
         "lexer/invalid_tokens_tests.cpp",
         "lexer/valid_tokens_tests.cpp",
         "parser_tests.cpp",
-        "preprocessor_tests.cpp",
+        "preprocessor/macro_tests.cpp",
         "semantics_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],

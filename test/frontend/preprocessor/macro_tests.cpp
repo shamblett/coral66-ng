@@ -37,7 +37,7 @@ private:
     std::string m_source;
 
 public:
-    ProducesPP(std::string source) : m_source(std::move(source)) {}
+    explicit ProducesPP(std::string source) : m_source(std::move(source)) {}
 
     bool match(const PPSourceObject& arg) const override
     {
