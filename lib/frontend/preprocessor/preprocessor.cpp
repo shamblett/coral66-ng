@@ -17,7 +17,7 @@ namespace
 
 } // namespace
 
-coral66::PPSourceObject coral66::PP::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
+coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
                                                 bool* errorsOccurred) noexcept
 {
     Preprocessor preprocessor(reporter);

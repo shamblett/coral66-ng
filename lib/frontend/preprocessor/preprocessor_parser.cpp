@@ -12,7 +12,7 @@
 namespace
 {
 [[maybe_unused]] bool expect(coral66::lexer::TokenType tokenType, coral66::lexer::PPTokenIterator& begin,
-                             coral66::lexer::PPTokenIterator const end, coral66::PP::Context& context,
+                             coral66::lexer::PPTokenIterator const end, coral66::pp::Context& context,
                              const std::optional<coral66::Message>& additional = {})
 {
     if (begin == end || begin->getTokenType() != tokenType)
@@ -53,12 +53,12 @@ coral66::lexer::PPTokenIterator findNewline(coral66::lexer::PPTokenIterator cons
 
 } // namespace
 
-coral66::PP::Context::Context(const coral66::source_interface& sourceInterface, llvm::raw_ostream* reporter)
+coral66::pp::Context::Context(const coral66::source_interface& sourceInterface, llvm::raw_ostream* reporter)
     : m_sourceInterface(sourceInterface), m_reporter(reporter)
 {
 }
 
-void coral66::PP::Context::log(const Message& message)
+void coral66::pp::Context::log(const Message& message)
 {
     if (message.getSeverity() == Severity::Error)
     {
@@ -70,17 +70,17 @@ void coral66::PP::Context::log(const Message& message)
     }
 }
 
-std::size_t coral66::PP::Context::getErrorCount() const
+std::size_t coral66::pp::Context::getErrorCount() const
 {
     return m_errorCount;
 }
 
-const coral66::source_interface& coral66::PP::Context::getSourceInterface() const
+const coral66::source_interface& coral66::pp::Context::getSourceInterface() const
 {
     return m_sourceInterface;
 }
 
-coral66::PP::File coral66::PP::parseMacro(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
+coral66::pp::File coral66::pp::parseMacro(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
                                           Context& context)
 {
     std::vector<Group> result;
@@ -91,7 +91,7 @@ coral66::PP::File coral66::PP::parseMacro(lexer::PPTokenIterator& begin, lexer::
     return File{std::move(result)};
 }
 
-coral66::PP::Group coral66::PP::parseGroup(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
+coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
                                            Context& context, bool const)
 {
     CORAL66_ASSERT(begin != end);
@@ -124,7 +124,7 @@ coral66::PP::Group coral66::PP::parseGroup(lexer::PPTokenIterator& begin, lexer:
     return Group{std::move(parts)};
 }
 
-coral66::PP::ControlLine coral66::PP::parseControlLine(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
+coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
                                                        Context& context)
 {
     CORAL66_ASSERT(begin != end && begin->getTokenType() == lexer::TokenType::Identifier

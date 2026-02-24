@@ -87,7 +87,7 @@ static_assert(!std::is_polymorphic_v<PPToken>);
 
 static_assert(!std::is_polymorphic_v<CToken>);
 
-std::optional<CToken> parseStringLiteral(const PPToken& ppToken, const PPSourceInterface& sourceInterface,
+std::optional<CToken> parseStringLiteral(const PPToken& PPToken, const PPSourceInterface& sourceInterface,
                                          llvm::raw_ostream* reporter = nullptr);
 
 bool needsWhitespaceInBetween(TokenType left, TokenType right) noexcept;

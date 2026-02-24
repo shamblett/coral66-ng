@@ -70,22 +70,22 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     sourceFile = fs::absolute(sourceFile);
     sourceFile = sourceFile.lexically_normal();
 
-    std::optional<llvm::TimeRegion> ppTokenTimeRegion;
+    std::optional<llvm::TimeRegion> PPTokenTimeRegion;
     if (timer)
     {
-        std::optional<llvm::Timer> ppTokenTimer;
-        ppTokenTimer.emplace("Lexing preprocessor tokens",
+        std::optional<llvm::Timer> PPTokenTimer;
+        PPTokenTimer.emplace("Lexing preprocessor tokens",
                              "Time it took to lex all preprocessor tokens in " + sourceFile.string(), *timer);
-        ppTokenTimeRegion.emplace(*ppTokenTimer);
+        PPTokenTimeRegion.emplace(*PPTokenTimer);
     }
 
     bool errors = false;
-    auto ppTokens = lexer::tokenize(std::move(input), m_reporter, &errors, sourceFile.string());
+    auto PPTokens = lexer::tokenize(std::move(input), m_reporter, &errors, sourceFile.string());
     if (errors)
     {
         return {};
     }
-    ppTokenTimeRegion.reset();
+    PPTokenTimeRegion.reset();
 
     std::optional<llvm::TimeRegion> ppTimeRegion;
     if (timer)
@@ -95,7 +95,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         ppTimeRegion.emplace(*ppTimer);
     }
 
-    ppTokens = PP::preprocess(std::move(ppTokens), m_reporter, &errors);
+    PPTokens = pp::preprocess(std::move(PPTokens), m_reporter, &errors);
     if (errors)
     {
         return {};
@@ -104,7 +104,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     if (action == Action::Preprocess)
     {
         auto reconstruction =
-            PP::reconstruct(ppTokens.data().data(), ppTokens.data().data() + ppTokens.data().size(), ppTokens);
+            pp::reconstruct(PPTokens.data().data(), PPTokens.data().data() + PPTokens.data().size(), PPTokens);
         if (!cl::OutputFilename.empty())
         {
             llvm::outs() << reconstruction;
@@ -131,7 +131,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         cTokenTimeRegion.emplace(*cTokenTimer);
     }
 
-    auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), m_reporter, &errors);
+    auto cTokens = coral66::lexer::toCTokens(std::move(PPTokens), m_reporter, &errors);
     if (errors)
     {
         return {};

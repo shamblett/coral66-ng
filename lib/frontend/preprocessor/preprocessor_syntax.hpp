@@ -14,7 +14,7 @@
 
 #include "lib/frontend/lexer/lexer.hpp"
 
-namespace coral66::PP
+namespace coral66::pp
 {
 struct Group;
 
@@ -58,4 +58,4 @@ struct File final
     std::vector<Group> groups;
 };
 
-} // namespace coral66::PP
+} // namespace coral66::pp

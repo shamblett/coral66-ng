@@ -12,7 +12,7 @@ namespace coral66
 {
 class Message;
 
-namespace PP
+namespace pp
 {
 class Context final
 {
@@ -41,5 +41,5 @@ Group parseGroup(lexer::PPTokenIterator& begin, lexer::PPTokenIterator end, Cont
 
 ControlLine parseControlLine(lexer::PPTokenIterator& begin, lexer::PPTokenIterator end, Context& context);
 
-} // namespace PP
+} // namespace pp
 } // namespace coral66

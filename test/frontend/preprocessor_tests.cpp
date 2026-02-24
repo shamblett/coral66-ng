@@ -22,7 +22,7 @@ coral66::PPSourceObject preprocess(std::string source)
     auto tokens = coral66::lexer::tokenize(std::move(source), &ss, &errorsOccurred);
     UNSCOPED_INFO(ss.str());
     REQUIRE_FALSE(errorsOccurred);
-    auto result = coral66::PP::preprocess(std::move(tokens), &ss, &errorsOccurred);
+    auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errorsOccurred);
     UNSCOPED_INFO(ss.str());
     REQUIRE_FALSE(errorsOccurred);
     return result;

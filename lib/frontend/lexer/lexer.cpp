@@ -779,15 +779,15 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
     return result;
 }
 
-std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& ppToken,
+std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
                                                          const PPSourceInterface& sourceInterface,
                                                          llvm::raw_ostream* reporter)
 {
-    CORAL66_ASSERT(ppToken.getTokenType() == coral66::lexer::TokenType::StringLiteral);
+    CORAL66_ASSERT(PPToken.getTokenType() == coral66::lexer::TokenType::StringLiteral);
     bool errorsOccurred = false;
-    ConversionContext context{reporter, sourceInterface, ppToken, &errorsOccurred};
-    bool wide = ppToken.getRepresentation(sourceInterface)[0] == 'L';
-    auto [chars, errorOccurred] = processCharacters(ppToken.getValue(), context, wide, Literal::StringLiteral);
+    ConversionContext context{reporter, sourceInterface, PPToken, &errorsOccurred};
+    bool wide = PPToken.getRepresentation(sourceInterface)[0] == 'L';
+    auto [chars, errorOccurred] = processCharacters(PPToken.getValue(), context, wide, Literal::StringLiteral);
     if (errorOccurred)
     {
         return {};
@@ -803,12 +803,12 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& ppToken,
             CORAL66_UNREACHABLE;
         }
 
-        return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
-                      ppToken.getMacroId(), std::string(utf8.data(), dest));
+        return CToken(TokenType::StringLiteral, PPToken.getOffset(), PPToken.getLength(), PPToken.getFileId(),
+                      PPToken.getMacroId(), std::string(utf8.data(), dest));
     }
 
-    return CToken(TokenType::StringLiteral, ppToken.getOffset(), ppToken.getLength(), ppToken.getFileId(),
-                  ppToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
+    return CToken(TokenType::StringLiteral, PPToken.getOffset(), PPToken.getLength(), PPToken.getFileId(),
+                  PPToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
 }
 
 std::string_view coral66::lexer::tokenName(coral66::lexer::TokenType const tokenType, bool const quote)

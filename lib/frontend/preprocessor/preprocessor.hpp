@@ -16,7 +16,7 @@
 #include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
 
-namespace coral66::PP
+namespace coral66::pp
 {
 struct Options
 {
@@ -202,9 +202,9 @@ public:
                            {}});
         m_intervalMaps.push_back(std::move(sourceObject.getIntervalMap()[0]));
 
-        coral66::PP::Context context(*this, m_reporter);
+        coral66::pp::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
-        const auto tree = coral66::PP::parseMacro(
+        const auto tree = coral66::pp::parseMacro(
             begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
 
         if (context.getErrorCount() != 0)
@@ -216,12 +216,12 @@ public:
         visit(tree);
         m_fileTokens.push_back(std::move(sourceObject.data()));
     }
-    void visit(const coral66::PP::TextBlock& text)
+    void visit(const coral66::pp::TextBlock& text)
     {
         macroSubstitute({text.tokens.begin(), text.tokens.end()}, coral66::bind_front(&Preprocessor::pushLine, this));
     }
 
-    void visit(const coral66::PP::File& file)
+    void visit(const coral66::pp::File& file)
     {
         for (auto& iter : file.groups)
         {
@@ -229,7 +229,7 @@ public:
         }
     }
 
-    void visit(const coral66::PP::Group& group)
+    void visit(const coral66::pp::Group& group)
     {
         for (auto& iter : group.groupPart)
         {
@@ -237,12 +237,12 @@ public:
         }
     }
 
-    void visit(const coral66::PP::ControlLine& controlLine)
+    void visit(const coral66::pp::ControlLine& controlLine)
     {
         coral66::match(controlLine.variant, [this](auto&& value) { this->visit(value); });
     }
 
-    void visit(const coral66::PP::DefineDirective& define)
+    void visit(const coral66::pp::DefineDirective& define)
     {
         if (define.tokens.empty() || define.tokens.front().getTokenType() != lexer::TokenType::Identifier)
         {
@@ -257,7 +257,7 @@ public:
         m_defines[macroName->getValue()] = Macro{macroName, body};
     }
 
-    void visit(const coral66::PP::GroupPart& groupPart)
+    void visit(const coral66::pp::GroupPart& groupPart)
     {
         coral66::match(groupPart, [this](auto&& value) { this->visit(value); });
     }
@@ -355,4 +355,4 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
     return result;
 }
 
-} // namespace coral66::PP
+} // namespace coral66::pp
