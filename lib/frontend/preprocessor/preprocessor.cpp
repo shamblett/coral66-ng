@@ -6,13 +6,12 @@
 
 #include "preprocessor.hpp"
 
-#include <llvm/Support/WithColor.h>
-
 #include <algorithm>
 #include <vector>
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/notes.hpp"
+#include "lib/frontend/semantics/semantic_analysis.hpp"
 #include "lib/support/scope_exit.hpp"
 
 std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileID,
@@ -142,12 +141,12 @@ std::optional<coral66::pp::Preprocessor::Macro>
     return Macro{identifierPos, std::move(argumentList), ellipse, {curr, end}};
 }
 
-std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(coral66::lexer::PPTokenIterator ifToken,
-                                                                  std::span<const coral66::lexer::PPToken> tokens)
+std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPTokenIterator ifToken,
+                                                                  std::span<const lexer::PPToken> tokens)
 {
     std::vector<coral66::lexer::PPToken> result;
     macroSubstitute({tokens.begin(), tokens.end()},
-                    coral66::bind_front(&append<coral66::lexer::PPToken>, std::ref(result)), true);
+                    coral66::bind_front(&append<coral66::lexer::PPToken>, std::ref(result)));
     bool errorsOccurred = false;
     auto ctokens =
         coral66::lexer::toCTokens(result.data(), result.data() + result.size(), *this, m_reporter, &errorsOccurred);
@@ -217,18 +216,18 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(coral66::lexer
     {
         if (ifToken->getValue() == "if")
         {
-            CLD_ASSERT(!tokens.empty());
-            log(coral66::Errors::PP::EXPECTED_AN_EXPRESSION_AFTER_IF.args(tokens, *this, tokens));
+            CORAL66_ASSERT(!tokens.empty());
+            log(coral66::Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_IF.args(tokens, *this, tokens));
         }
         else
         {
             if (tokens.empty())
             {
-                log(coral66::Errors::PP::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
+                log(coral66::Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
             }
             else
             {
-                log(coral66::Errors::PP::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
+                log(coral66::Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
             }
         }
         return {};
