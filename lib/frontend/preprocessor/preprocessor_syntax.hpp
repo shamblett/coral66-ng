@@ -24,6 +24,20 @@ struct DefineDirective final
     std::span<const lexer::PPToken> tokens;
 };
 
+/**
+ * <NonDirective> ::= <TokenType::Pound> <TOKEN> { <TOKEN> } <TokenType::Newline>
+ */
+struct NonDirective final
+{
+    lexer::PPTokenIterator begin;
+    lexer::PPTokenIterator end;
+};
+
+struct UnknownDirective
+{
+    lexer::PPTokenIterator identifier;
+};
+
 struct ControlLine final
 {
     std::variant<lexer::PPTokenIterator, DefineDirective> variant;
@@ -40,7 +54,7 @@ struct TextBlock final
 /**
  * <GroupPart> == <TextBlock>
  */
-using GroupPart = std::variant<TextBlock, ControlLine>;
+using GroupPart = std::variant<TextBlock, ControlLine, UnknownDirective, NonDirective>;
 
 /**
  * <Group> ::= <GroupPart> { <GroupPart> }

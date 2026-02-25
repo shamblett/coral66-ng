@@ -98,29 +98,40 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     std::vector<GroupPart> parts;
     do
     {
-        if (begin->getTokenType() == lexer::TokenType::Identifier
-            && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword)
-                || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
+        if (begin->getTokenType() != lexer::TokenType::SemiColon)
         {
-            parts.emplace_back(parseControlLine(begin, end, context));
+            // TextBlock
+            const auto* start = begin;
+            while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon)
+            {
+                const auto* eol = findNewline(begin, end);
+                begin = eol == end ? eol : eol + 1;
+            }
+            parts.emplace_back(TextBlock{{start, begin == end ? begin : begin - 1}});
             continue;
         }
-
-        // TextBlock
-        const auto* start = begin;
-        while (begin != end)
+        begin++;
+        if (begin == end || begin->getTokenType() == lexer::TokenType::Newline)
         {
-            if (begin->getTokenType() == lexer::TokenType::Identifier
-                && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword)
-                    || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)))
-            {
-                break;
-            }
-            begin++;
+            continue;
         }
-        if (start != begin)
+        if (begin->getTokenType() != lexer::TokenType::Identifier)
         {
-            parts.emplace_back(TextBlock{{start, begin}});
+            const auto* eol = findNewline(begin, end);
+            parts.emplace_back(NonDirective{begin, eol});
+            begin = eol == end ? eol : eol + 1;
+            continue;
+        }
+        auto value = begin->getValue();
+        if (value == lexer::tokenName(lexer::TokenType::DefineKeyword)
+            || value == tokenName(lexer::TokenType::DeleteKeyword))
+        {
+            parts.emplace_back(parseControlLine(begin, end, context));
+        }
+        else
+        {
+            parts.emplace_back(UnknownDirective{begin});
+            skipLine(begin, end);
         }
     } while (begin != end);
     return Group{std::move(parts)};
@@ -129,63 +140,32 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
 coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& begin, lexer::PPTokenIterator const end,
                                                        Context& context)
 {
-    CORAL66_ASSERT(begin != end && begin->getTokenType() == lexer::TokenType::Identifier
-                   && (begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword)
-                       || begin->getValue() == lexer::tokenName(lexer::TokenType::DeleteKeyword)));
-    const auto* directiveToken = begin;
-    bool isDefine = begin->getValue() == lexer::tokenName(lexer::TokenType::DefineKeyword);
-    begin++;
-
-    // Find SemiColon
-    const auto* semi = std::find_if(begin, end, [](const lexer::PPToken& t)
-                                    { return t.getTokenType() == lexer::TokenType::SemiColon; });
-
-    if (semi == end)
+    CORAL66_ASSERT(begin != end && begin->getTokenType() == lexer::TokenType::Identifier);
+    auto value = begin->getValue();
+    if (value == lexer::tokenName(lexer::TokenType::DefineKeyword))
     {
-        context.log(coral66::Errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
-                                                             coral66::lexer::TokenType::SemiColon, *(end - 1)));
-        // Consume rest
-        begin = end;
-        if (isDefine)
-            return {DefineDirective{directiveToken, {}}};
-        else
-            return {directiveToken};
+        begin++;
+        const auto* eol = findNewline(begin, end);
+        expect(lexer::TokenType::Newline, eol, end, context);
+        const auto* lineStart = begin;
+        begin = eol;
+        return {DefineDirective{lineStart - 1, {lineStart, eol - 1}}};
     }
-
-    // Tokens between directive and ;
-    std::span<const lexer::PPToken> tokens(begin, semi);
-    begin = semi + 1; // Consume ;
-
-    if (isDefine)
+    if (value == lexer::tokenName(lexer::TokenType::DeleteKeyword))
     {
-        auto iter = tokens.begin();
-        if (iter == tokens.end() || iter->getTokenType() != lexer::TokenType::Identifier)
+        begin++;
+        if (!expect(lexer::TokenType::Identifier, begin, end, context))
         {
-            context.log(coral66::Errors::Parser::EXPECTED_N.args(
-                iter == tokens.end() ? *semi : *iter, context.getSourceInterface(),
-                coral66::lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
+            skipLine(begin, end);
+            return {};
         }
-        return {DefineDirective{directiveToken, tokens}};
+        const auto* name = begin - 1;
+        if (!expect(lexer::TokenType::Newline, begin, end, context))
+        {
+            skipLine(begin, end);
+            return {};
+        }
+        return {name};
     }
-    else
-    {
-        auto iter = tokens.begin();
-        if (iter != tokens.end() && iter->getTokenType() == lexer::TokenType::Identifier)
-        {
-            const auto* macroName = &(*iter);
-            ++iter;
-            if (iter != tokens.end())
-            {
-                // Optional: warn/error about extra tokens after Macroname in DELETE
-            }
-            return {macroName};
-        }
-        else
-        {
-            context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(
-                iter == tokens.end() ? *semi : *iter, context.getSourceInterface(),
-                coral66::lexer::TokenType::Identifier, iter == tokens.end() ? *semi : *iter));
-            return {directiveToken};
-        }
-    }
+    CORAL66_UNREACHABLE;
 }
