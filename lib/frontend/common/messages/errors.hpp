@@ -111,6 +111,79 @@ CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underli
 CREATE_ERROR(UNTERMINATED_CHARACTER_LITERAL, "Unterminated character literal", Underline<0>);
 } // namespace lexer
 
+namespace pp
+{
+CREATE_ERROR(N_IS_AN_INVALID_PREPROCESSOR_DIRECTIVE, "%0 is an invalid preprocessor directive", Underline<0>);
+
+CREATE_ERROR(REDEFINITION_OF_MACRO_PARAMETER_N, "Redefinition of macro parameter %0", Underline<0>);
+
+CREATE_ERROR(WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION, "Whitespace required after object macro definition",
+             Underline<0>);
+
+CREATE_ERROR(DEFINED_CANNOT_BE_USED_AS_MACRO_NAME, "'defined' cannot be used as macro name", Underline<0>);
+
+CREATE_ERROR(REDEFINITION_OF_MACRO_N, "Redefinition of macro %0", Underline<0>);
+
+CREATE_ERROR(VA_ARGS_NOT_ALLOWED_IN_REPLACEMENT_LIST, "__VA_ARGS__ not allowed in replacement list", Underline<0>);
+
+CREATE_ERROR(DEFINING_BUILTIN_MACRO_N_IS_NOT_ALLOWED, "Defining builtin macro %0 is not allowed", Underline<0>);
+
+CREATE_ERROR(UNDEFINING_BUILTIN_MACRO_N_IS_NOT_ALLOWED, "Undefining builtin macro %0 is not allowed", Underline<0>);
+
+CREATE_ERROR(NOT_ENOUGH_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N, "Not enough arguments for macro %0. Expected %1 got %2",
+             Underline<0>);
+
+CREATE_ERROR(NOT_ENOUGH_ARGUMENTS_FOR_MACRO_N_EXPECTED_AT_LEAST_N_GOT_N,
+             "Not enough arguments for macro %0. Expected at least %1 got %2", Underline<0>);
+
+CREATE_ERROR(TOO_MANY_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N, "Too many arguments for macro %0. Expected %1 got %2",
+             Underline<0>, PointAt<3>);
+
+CREATE_ERROR(EXPECTED_AN_ARGUMENT_AFTER_POUND,
+             "Expected an argument after '#' in replacement list of function like macro", PointAt<0>, Underline<1>);
+
+CREATE_ERROR(OPERATOR_DOUBLE_POUND_NOT_ALLOWED_AT_BEGINNING_OF_REPLACEMENT_LIST,
+             "Operator '##' not allowed at beginning of replacement list", Underline<0>);
+
+CREATE_ERROR(OPERATOR_DOUBLE_POUND_NOT_ALLOWED_AT_END_OF_REPLACEMENT_LIST,
+             "Operator '##' not allowed at end of replacement list", Underline<0>);
+
+CREATE_ERROR(EXPECTED_A_FILENAME_AFTER_INCLUDE, "Expected a <FILENAME> or \"FILENAME\" after #include", InsertAfter<0>);
+
+CREATE_ERROR(EXPECTED_A_FILENAME_AFTER_INCLUDE_2, "Expected a <FILENAME> or \"FILENAME\" after #include", Underline<0>);
+
+CREATE_ERROR(EXPECTED_AN_EXPRESSION_AFTER_IF, "Expected an expression after #if", Underline<0>);
+
+CREATE_ERROR(EXPECTED_AN_EXPRESSION_AFTER_ELIF, "Expected an expression after #elif", InsertAfter<0>);
+
+CREATE_ERROR(EXPECTED_AN_EXPRESSION_AFTER_ELIF_2, "Expected an expression after #elif", Underline<0>);
+
+CREATE_ERROR(EXTRA_TOKENS_AFTER_INCLUDE, "Extra tokens after '#include'", Underline<0>);
+
+CREATE_ERROR(FILE_NOT_FOUND, "'%0' file not found", Underline<1>);
+
+CREATE_ERROR(COULD_NOT_OPEN_FILE, "Could not open '%0'", Underline<1>);
+
+CREATE_ERROR(EXPECTED_A_NUMBER_AFTER_LINE, "Expected a number after '#line'", InsertAfter<0>);
+
+CREATE_ERROR(EXPECTED_END_OF_LINE_OR_STRING_AFTER_NUMBER_IN_LINE,
+             "Expected end of line or string after number in '#line' directive", Underline<0>);
+
+CREATE_ERROR(EXTRA_TOKENS_AFTER_LINE, "Extra tokens after '#line'", Underline<0>);
+
+CREATE_ERROR(STRING_MUST_BE_NORMAL_IN_LINE_DIRECTIVE, "String must be normal in '#line' directive", Underline<0>);
+
+CREATE_ERROR(NUMBER_MUST_BE_IN_DECIMAL_IN_LINE_DIRECTIVE, "Number must be in decimal in '#line' directive",
+             Underline<0>);
+
+CREATE_ERROR(NUMBER_MUST_NOT_BE_ZERO_IN_LINE_DIRECTIVE, "Number must not be zero in '#line' directive", Underline<0>);
+
+CREATE_ERROR(NUMBER_MUST_NOT_BE_GREATER_THAN_X_IN_LINE_DIRECTIVE,
+             "Number must not be greater than 2147483647 in '#line' directive", Underline<0>);
+
+CREATE_ERROR(ERROR_ENCOUNTERED, "'#error' encountered", Underline<0>);
+} // namespace pp
+
 } // namespace coral66::Errors
 
 // coral66
