@@ -11,7 +11,6 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/notes.hpp"
-#include "lib/frontend/semantics/semantic_analysis.hpp"
 #include "lib/support/scope_exit.hpp"
 
 std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileID,
@@ -99,7 +98,6 @@ std::optional<coral66::pp::Preprocessor::Macro>
     }
     std::vector argumentList = {*curr};
     curr++;
-    bool ellipse = false;
     while (curr != end && curr->getTokenType() == lexer::TokenType::Comma)
     {
         curr++;
@@ -138,7 +136,7 @@ std::optional<coral66::pp::Preprocessor::Macro>
         return {};
     }
     curr++;
-    return Macro{identifierPos, std::move(argumentList), ellipse, {curr, end}};
+    return Macro{identifierPos, std::move(argumentList), false, {curr, end}};
 }
 
 std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPTokenIterator ifToken,
@@ -157,33 +155,16 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
     }
     for (auto iter = ctokens.begin(); iter != ctokens.end(); ++iter)
     {
-        if (iter->getTokenType() == coral66::lexer::TokenType::Literal)
+        if (iter->getTokenType() == lexer::TokenType::Literal)
         {
-            switch (iter->getType())
-            {
-                case coral66::lexer::CToken::Type::Int:
-                case coral66::lexer::CToken::Type::Long:
-                case coral66::lexer::CToken::Type::LongLong:
-                    iter->setType(coral66::lexer::CToken::Type::LongLong);
-                    break;
-                case coral66::lexer::CToken::Type::UnsignedInt:
-                case coral66::lexer::CToken::Type::UnsignedLong:
-                case coral66::lexer::CToken::Type::UnsignedLongLong:
-                    iter->setType(coral66::lexer::CToken::Type::UnsignedLongLong);
-                    break;
-                default: break;
-            }
-            if (!std::holds_alternative<llvm::APSInt>(iter->getValue()))
-            {
-                continue;
-            }
             auto integer = coral66::get<llvm::APSInt>(iter->getValue());
             integer = integer.extOrTrunc(64);
             iter->setValue(integer);
         }
         else if (coral66::lexer::isText(iter->getTokenType()))
         {
-            if (iter->getTokenType() == coral66::lexer::TokenType::Identifier && iter->getText() == "defined")
+            if (iter->getTokenType() == lexer::TokenType::Identifier
+                && iter->getText() == lexer::tokenName(lexer::TokenType::DefineKeyword))
             {
                 // Neither defined nor the identifier following it (with optionally an opening parentheses
                 // in between) should be converted to 0
@@ -191,14 +172,13 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
                 {
                     continue;
                 }
-                if ((iter + 1)->getTokenType() == coral66::lexer::TokenType::Identifier)
+                if ((iter + 1)->getTokenType() == lexer::TokenType::Identifier)
                 {
                     ++iter;
                 }
-                else if ((iter + 1)->getTokenType() == coral66::lexer::TokenType::OpenParentheses)
+                else if ((iter + 1)->getTokenType() == lexer::TokenType::OpenParentheses)
                 {
-                    if (iter + 2 != ctokens.end()
-                        && (iter + 2)->getTokenType() == coral66::lexer::TokenType::Identifier)
+                    if (iter + 2 != ctokens.end() && (iter + 2)->getTokenType() == lexer::TokenType::Identifier)
                     {
                         iter += 2;
                     }
@@ -206,57 +186,24 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
                 continue;
             }
             bool hasLeadingWhitespace = iter->hasLeadingWhitespace();
-            *iter = coral66::lexer::CToken(coral66::lexer::TokenType::Literal, iter->getOffset(), iter->getLength(),
-                                           iter->getFileId(), iter->getMacroId(), llvm::APSInt(64, false),
-                                           coral66::lexer::CToken::Type::LongLong);
+            *iter = lexer::CToken(lexer::TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
+                                  iter->getMacroId(), llvm::APSInt(64, false), lexer::CToken::Type::Integer);
             iter->setLeadingWhitespace(hasLeadingWhitespace);
         }
     }
     if (ctokens.empty())
     {
-        if (ifToken->getValue() == "if")
+        if (tokens.empty())
         {
-            CORAL66_ASSERT(!tokens.empty());
-            log(coral66::Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_IF.args(tokens, *this, tokens));
+            log(Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
         }
         else
         {
-            if (tokens.empty())
-            {
-                log(coral66::Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
-            }
-            else
-            {
-                log(coral66::Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
-            }
+            log(Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
         }
         return {};
     }
-    const auto* begin = std::as_const(ctokens).data();
-    auto context = coral66::Parser::Context(*this, m_reporter, true);
-    auto tree = coral66::Parser::parseConditionalExpression(begin, ctokens.data() + ctokens.size(), context);
-    if (context.getCurrentErrorCount() != 0 || !tree)
-    {
-        m_errorsOccurred = true;
-        return {};
-    }
-    coral66::Semantics::SemanticAnalysis analysis(
-        *this, m_reporter, &errorsOccurred, [this](std::string_view macro)
-        { return macro == "__FILE__" || macro == "__LINE__" || m_defines.contains(macro); });
-    auto exp = analysis.visit(*tree);
-    if (errorsOccurred)
-    {
-        m_errorsOccurred = true;
-        return {};
-    }
-    auto value = analysis.evaluateConstantExpression(*exp);
-    if (!value)
-    {
-        std::ranges::for_each(value.error(), coral66::bind_front(&Preprocessor::log, this));
-        return {};
-    }
-    return static_cast<bool>(*value);
-}
+    return true; // TODO SJH
 }
 
 coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,

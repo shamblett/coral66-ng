@@ -266,7 +266,7 @@ public:
         ++iter;
 
         std::span body(iter, define.tokens.end());
-        m_defines[macroName->getValue()] = Macro{macroName, body};
+       // TODO SJH  m_defines[macroName->getValue()] = Macro{macroName, body};
     }
 
     void visit(const coral66::pp::GroupPart& groupPart)
