@@ -37,27 +37,26 @@ class Preprocessor final : coral66::PPSourceInterface
 {
     llvm::raw_ostream* m_reporter;
     std::uint32_t m_macroID = 0;
-    const coral66::pp::Options& m_ppOptions;
-    std::vector<coral66::lexer::PPToken> m_result;
-    std::vector<coral66::Source::PPRecord> m_substitutions{1};
+    std::vector<lexer::PPToken> m_result;
+    std::vector<Source::PPRecord> m_substitutions{1};
 
     struct Macro
     {
-        coral66::lexer::PPTokenIterator identifierPos;
+        lexer::PPTokenIterator identifierPos;
         std::optional<std::vector<coral66::lexer::PPToken>> argumentList;
         bool hasEllipse;
-        std::span<const coral66::lexer::PPToken> replacement;
+        std::span<const lexer::PPToken> replacement;
     };
     std::unordered_map<std::string_view, Macro> m_defines;
 
-    std::vector<std::unordered_set<coral66::lexer::PPTokenIterator>> m_disabledMacros{1};
-    std::vector<coral66::Source::File> m_files;
-    std::vector<std::vector<coral66::lexer::PPToken>> m_fileTokens;
-    std::vector<coral66::lexer::IntervalMap> m_intervalMaps;
+    std::vector<std::unordered_set<lexer::PPTokenIterator>> m_disabledMacros{1};
+    std::vector<Source::File> m_files;
+    std::vector<std::vector<lexer::PPToken>> m_fileTokens;
+    std::vector<lexer::IntervalMap> m_intervalMaps;
     bool m_errorsOccurred = false;
     bool m_visitingScratchPad = true;
 
-    void pushLine(std::vector<coral66::lexer::PPToken>&& tokens)
+    void pushLine(std::vector<lexer::PPToken>&& tokens)
     {
         if (m_visitingScratchPad)
         {
@@ -67,27 +66,27 @@ class Preprocessor final : coral66::PPSourceInterface
     }
 
     // ReSharper disable once CppDFAUnreachableFunctionCall
-    bool log(const coral66::Message& message)
+    bool log(const Message& message)
     {
         if (m_reporter)
         {
             *m_reporter << message;
         }
-        if (message.getSeverity() == coral66::Severity::Error)
+        if (message.getSeverity() == Severity::Error)
         {
             m_errorsOccurred = true;
         }
-        return message.getSeverity() != coral66::Severity::None;
+        return message.getSeverity() != Severity::None;
     }
 
     template <class F>
-    void macroSubstitute(std::vector<coral66::lexer::PPToken>&& tokens, F lineOutput)
+    void macroSubstitute(std::vector<lexer::PPToken>&& tokens, F lineOutput)
     {
         if (tokens.empty())
         {
             return;
         }
-        std::vector<coral66::lexer::PPToken> output;
+        std::vector<lexer::PPToken> output;
         auto* start = tokens.data();
 
         for (auto* iter = tokens.data(); iter != tokens.data() + tokens.size();)
@@ -122,12 +121,10 @@ class Preprocessor final : coral66::PPSourceInterface
             // Expand Macro
             output.insert(output.end(), std::move_iterator(start), std::move_iterator(iter));
 
-            auto i = ++m_macroID;
-            m_substitutions.emplace_back(
-                coral66::Source::Substitution{*result->second.identifierPos, *iter, {}, false});
+            const auto i = ++m_macroID;
+            m_substitutions.emplace_back(Source::Substitution{*result->second.identifierPos, *iter, {}, false});
 
-            std::vector<coral66::lexer::PPToken> replacement(result->second.replacement.begin(),
-                                                             result->second.replacement.end());
+            std::vector replacement(result->second.replacement.begin(), result->second.replacement.end());
             for (auto& tok : replacement)
             {
                 tok.setMacroId(i);
@@ -160,30 +157,27 @@ class Preprocessor final : coral66::PPSourceInterface
         return {input.begin(), input.end()};
     }
 
-    std::optional<Macro> parseDefineDirective(const coral66::pp::DefineDirective& defineDirective);
+    std::optional<Macro> parseDefineDirective(const DefineDirective& defineDirective);
 
-    std::optional<bool> evaluateExpression(coral66::lexer::PPTokenIterator ifToken,
-                                           std::span<const coral66::lexer::PPToken> tokens);
+    std::optional<bool> evaluateExpression(lexer::PPTokenIterator ifToken, std::span<const lexer::PPToken> tokens);
 
-    std::uint64_t getLineNumber(std::uint32_t const fileID, std::uint64_t const offset) const noexcept override;
+    std::uint64_t getLineNumber(std::uint32_t fileID, std::uint64_t offset) const noexcept override;
 
+    std::uint64_t getLineStartOffset(std::uint32_t fileID, std::uint64_t line) const noexcept override;
 
-    std::uint64_t getLineStartOffset(std::uint32_t const fileID, std::uint64_t const line) const noexcept override;
+    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t fileID, std::uint64_t line) const noexcept override;
 
-    [[nodiscard]] std::uint64_t getLineEndOffset(std::uint32_t const fileID,
-                                                 std::uint64_t const line) const noexcept override;
-
-    std::span<const coral66::Source::File> getFiles() const noexcept override
+    std::span<const Source::File> getFiles() const noexcept override
     {
         return m_files;
     }
 
-    std::span<const coral66::Source::PPRecord> getSubstitutions() const noexcept override
+    std::span<const Source::PPRecord> getSubstitutions() const noexcept override
     {
         return m_substitutions;
     }
 
-    std::span<const coral66::lexer::IntervalMap> getIntervalMaps() const noexcept override
+    std::span<const lexer::IntervalMap> getIntervalMaps() const noexcept override
     {
         return m_intervalMaps;
     }
@@ -191,27 +185,27 @@ class Preprocessor final : coral66::PPSourceInterface
 public:
     Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
 
-    std::vector<coral66::lexer::PPToken>& getResult() noexcept
+    std::vector<lexer::PPToken>& getResult() noexcept
     {
         return m_result;
     }
 
-    std::vector<coral66::Source::File>& getFiles() noexcept
+    std::vector<Source::File>& getFiles() noexcept
     {
         return m_files;
     }
 
-    std::vector<coral66::lexer::IntervalMap>& getIntervalMaps() noexcept
+    std::vector<lexer::IntervalMap>& getIntervalMaps() noexcept
     {
         return m_intervalMaps;
     }
 
-    const std::vector<coral66::Source::PPRecord>& getSubstitutionsVector() const
+    const std::vector<Source::PPRecord>& getSubstitutionsVector() const
     {
         return m_substitutions;
     }
 
-    void process(coral66::PPSourceObject&& sourceObject)
+    void process(PPSourceObject&& sourceObject)
     {
         CORAL66_ASSERT(sourceObject.getFiles().size() == 1);
         m_files.push_back({std::move(sourceObject.getFiles()[0].path),
@@ -224,7 +218,7 @@ public:
 
         coral66::pp::Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
-        const auto tree = coral66::pp::parseMacro(
+        const auto tree = parseMacro(
             begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
 
         if (context.getErrorCount() != 0)
@@ -236,12 +230,12 @@ public:
         visit(tree);
         m_fileTokens.push_back(std::move(sourceObject.data()));
     }
-    void visit(const coral66::pp::TextBlock& text)
+    void visit(const TextBlock& text)
     {
         macroSubstitute({text.tokens.begin(), text.tokens.end()}, coral66::bind_front(&Preprocessor::pushLine, this));
     }
 
-    void visit(const coral66::pp::File& file)
+    void visit(const File& file)
     {
         for (auto& iter : file.groups)
         {
@@ -249,7 +243,7 @@ public:
         }
     }
 
-    void visit(const coral66::pp::Group& group)
+    void visit(const Group& group)
     {
         for (auto& iter : group.groupPart)
         {
@@ -257,12 +251,12 @@ public:
         }
     }
 
-    void visit(const coral66::pp::ControlLine& controlLine)
+    void visit(const ControlLine& controlLine)
     {
-        coral66::match(controlLine.variant, [this](auto&& value) { this->visit(value); });
+        match(controlLine.variant, [this](auto&& value) { this->visit(value); });
     }
 
-    void visit(const coral66::pp::DefineDirective& define)
+    void visit(const DefineDirective& define)
     {
         if (define.tokens.empty() || define.tokens.front().getTokenType() != lexer::TokenType::Identifier)
         {
@@ -271,15 +265,15 @@ public:
 
         auto iter = define.tokens.begin();
         const auto* macroName = &(*iter);
-        iter++;
+        ++iter;
 
-        std::span<const coral66::lexer::PPToken> body(iter, define.tokens.end());
+        std::span body(iter, define.tokens.end());
         m_defines[macroName->getValue()] = Macro{macroName, body};
     }
 
     void visit(const coral66::pp::GroupPart& groupPart)
     {
-        coral66::match(groupPart, [this](auto&& value) { this->visit(value); });
+        match(groupPart, [this](auto&& value) { this->visit(value); });
     }
 
     static void visit(const coral66::lexer::PPTokenIterator&) {}
