@@ -40,33 +40,33 @@ coral66::pp::Preprocessor::getLineEndOffset(std::uint32_t const fileID,
 
 std::optional<llvm::HighlightColor::Macro> coral66::pp::Preprocessor::parseDefineDirective(const coral66::pp::DefineDirective& defineDirective)
 {
-        if (defineDirective.tokens.empty())
-        {
-            log(coral66::Errors::Parser::EXPECTED_N_AFTER_N.args(
-                *defineDirective.defineToken, *this, coral66::lexer::TokenType::Identifier, *defineDirective.defineToken));
-            return {};
-        }
-        if (defineDirective.tokens[0].getTokenType() != coral66::lexer::TokenType::Identifier)
-        {
-            log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(
-                defineDirective.tokens[0], *this, coral66::lexer::TokenType::Identifier, defineDirective.tokens[0]));
-            return {};
-        }
-        const auto* identifierPos = &defineDirective.tokens[0];
-        const auto* curr = identifierPos + 1;
-        const auto* end = defineDirective.tokens.data() + defineDirective.tokens.size();
-        if (curr == end)
-        {
-            return Macro{identifierPos, std::nullopt, false, {}};
-        }
+    if (defineDirective.tokens.empty())
+    {
+        log(coral66::Errors::Parser::EXPECTED_N_AFTER_N.args(
+            *defineDirective.defineToken, *this, coral66::lexer::TokenType::Identifier, *defineDirective.defineToken));
+        return {};
+    }
+    if (defineDirective.tokens[0].getTokenType() != coral66::lexer::TokenType::Identifier)
+    {
+        log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(
+            defineDirective.tokens[0], *this, coral66::lexer::TokenType::Identifier, defineDirective.tokens[0]));
+        return {};
+    }
+    const auto* identifierPos = &defineDirective.tokens[0];
+    const auto* curr = identifierPos + 1;
+    const auto* end = defineDirective.tokens.data() + defineDirective.tokens.size();
+    if (curr == end)
+    {
+        return Macro{identifierPos, std::nullopt, false, {}};
+    }
 
-        if (curr->getTokenType() != coral66::lexer::TokenType::OpenParentheses
-            || curr->getOffset() != identifierPos->getOffset() + identifierPos->getLength())
+    if (curr->getTokenType() != coral66::lexer::TokenType::OpenParentheses
+        || curr->getOffset() != identifierPos->getOffset() + identifierPos->getLength())
+    {
+        if (curr->getTokenType() != coral66::lexer::TokenType::Newline
+            && curr->getOffset() == identifierPos->getOffset() + identifierPos->getLength())
         {
-            if (curr->getTokenType() != coral66::lexer::TokenType::Newline
-                && curr->getOffset() == identifierPos->getOffset() + identifierPos->getLength())
-            {
-                log(coral66::Errors::pp::WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION.args(*curr, *this, *curr));
+            log(coral66::Errors::pp::WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION.args(*curr, *this, *curr));
             return Macro{identifierPos, std::nullopt, false, {curr, end}};
         }
 
@@ -146,7 +146,7 @@ std::optional<llvm::HighlightColor::Macro> coral66::pp::Preprocessor::parseDefin
 
     std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(coral66::lexer::PPTokenIterator ifToken,
                                            std::span<const coral66::lexer::PPToken> tokens)
-{
+    {
         std::vector<coral66::lexer::PPToken> result;
         macroSubstitute({tokens.begin(), tokens.end()}, coral66::bind_front(&append<coral66::lexer::PPToken>, std::ref(result)),
                         true);
@@ -260,6 +260,7 @@ std::optional<llvm::HighlightColor::Macro> coral66::pp::Preprocessor::parseDefin
         }
         return static_cast<bool>(*value);
     }
+}
 
 coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
                                                 bool* errorsOccurred) noexcept
