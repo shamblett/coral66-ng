@@ -4,7 +4,9 @@
  * Date   : 31/01/2026
  */
 
-#include "preprocessor.hpp"
+
+
+#include <llvm/Support/WithColor.h>
 
 #include <algorithm>
 #include <vector>
@@ -12,21 +14,23 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/support/scope_exit.hpp"
 
-coral66::pp::Preprocessor std::uint64_t getLineNumber(std::uint32_t const fileID, std::uint64_t const offset)
+#include "preprocessor.hpp"
+
+std::uint64_t coral66::pp::Preprocessor::getLineNumber(std::uint32_t fileID, std::uint64_t offset)
 {
     CORAL66_ASSERT(fileID < m_files.size());
     auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
     return std::distance(m_files[fileID].starts.begin(), result) + (*result == offset ? 1 : 0);
 }
 
- std::uint64_t getLineStartOffset(std::uint32_t const fileID, std::uint64_t const line)
+ std::uint64_t coral66::pp::Preprocessor::getLineStartOffset(std::uint32_t const fileID, std::uint64_t const line)
 {
     CORAL66_ASSERT(fileID < m_files.size());
     CORAL66_ASSERT(line - 1 < m_files[fileID].starts.size());
     return m_files[fileID].starts[line - 1];
 }
 
-coral66::pp::Preprocessor getLineEndOffset(std::uint32_t const fileID,
+coral66::pp::Preprocessor::getLineEndOffset(std::uint32_t const fileID,
                                                  std::uint64_t const line)
 {
     CORAL66_ASSERT(fileID < m_files.size());
@@ -34,7 +38,7 @@ coral66::pp::Preprocessor getLineEndOffset(std::uint32_t const fileID,
     return m_files[fileID].starts[line] - 1;
 }
 
-coral66::pp::Preprocessor:: std::optional<Macro> parseDefineDirective(const coral66::pp::DefineDirective& defineDirective)
+std::optional<llvm::HighlightColor::Macro> coral66::pp::Preprocessor::parseDefineDirective(const coral66::pp::DefineDirective& defineDirective)
 {
         if (defineDirective.tokens.empty())
         {
@@ -140,7 +144,7 @@ coral66::pp::Preprocessor:: std::optional<Macro> parseDefineDirective(const cora
         return Macro{identifierPos, std::move(argumentList), ellipse, {curr, end}};
     }
 
-coral66::pp::Preprocessor:: std::optional<bool> evaluateExpression(coral66::lexer::PPTokenIterator ifToken,
+    std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(coral66::lexer::PPTokenIterator ifToken,
                                            std::span<const coral66::lexer::PPToken> tokens)
 {
         std::vector<coral66::lexer::PPToken> result;

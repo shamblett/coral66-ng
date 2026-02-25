@@ -33,7 +33,7 @@ std::vector<T>& append(std::vector<T>& lhs, std::vector<T>&& rhs)
     return lhs;
 }
 
-class Preprocessor final : coral66::PPSourceInterface
+class Preprocessor final : PPSourceInterface
 {
     llvm::raw_ostream* m_reporter;
     std::uint32_t m_macroID = 0;
@@ -183,7 +183,7 @@ class Preprocessor final : coral66::PPSourceInterface
     }
 
 public:
-    Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
+    explicit Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
 
     std::vector<lexer::PPToken>& getResult() noexcept
     {
