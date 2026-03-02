@@ -40,9 +40,8 @@ class Preprocessor final : PPSourceInterface
 
     struct Macro
     {
-        lexer::PPTokenIterator identifierPos;
-        std::optional<std::vector<coral66::lexer::PPToken>> argumentList;
-        bool hasEllipse;
+        lexer::PPTokenIterator identifierPos{};
+        std::optional<std::vector<lexer::PPToken>> argumentList;
         std::span<const lexer::PPToken> replacement;
     };
     std::unordered_map<std::string_view, Macro> m_defines;
@@ -214,7 +213,7 @@ public:
                            {}});
         m_intervalMaps.push_back(std::move(sourceObject.getIntervalMap()[0]));
 
-        coral66::pp::Context context(*this, m_reporter);
+        Context context(*this, m_reporter);
         const auto* begin = std::as_const(sourceObject).data().data();
         const auto tree = parseMacro(
             begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
@@ -265,11 +264,10 @@ public:
         const auto* macroName = &(*iter);
         ++iter;
 
-        std::span body(iter, define.tokens.end());
-       // TODO SJH  m_defines[macroName->getValue()] = Macro{macroName, body};
+        m_defines[macroName->getValue()] = Macro{macroName};
     }
 
-    void visit(const coral66::pp::GroupPart& groupPart)
+    void visit(const GroupPart& groupPart)
     {
         match(groupPart, [this](auto&& value) { this->visit(value); });
     }
