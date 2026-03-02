@@ -202,7 +202,7 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
         }
         return {};
     }
-    return true; // TODO SJH
+    return {};
 }
 
 coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
