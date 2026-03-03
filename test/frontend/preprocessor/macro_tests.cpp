@@ -6,9 +6,8 @@
 
 #include <utility>
 
-#include "lib/frontend/preprocessor/preprocessor.hpp"
-
 #include "lib/frontend/common/source_object.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
@@ -42,18 +41,17 @@ public:
     bool match(const PPSourceObject& arg) const override
     {
         bool errors = false;
-        auto ret = lexer::tokenize(m_source, nullptr, &errors);
+        auto ret = coral66::lexer::tokenize(m_source, nullptr, &errors);
         if (errors)
             return false;
-        auto argRet = lexer::tokenize(arg.data()[0].getValue().data(), nullptr, &errors);
 
         // Simple token comparison ignoring locations
-        if (ret.data().size() != argRet.data().size())
+        if (ret.data().size() != arg.data().size())
             return false;
 
-        for (size_t i = 0; i < argRet.data().size(); ++i)
+        for (size_t i = 0; i < ret.data().size(); ++i)
         {
-            if (ret.data()[i].getValue() != argRet.data()[i].getValue())
+            if (ret.data()[i].getValue() != arg.data()[i].getValue())
                 return false;
         }
         return true;
@@ -72,7 +70,8 @@ TEST_CASE("Coral DEFINE Macro", "[PP]")
 {
     SECTION("Simple Substitution")
     {
-        auto ret = preprocess("DEFINE ID '5'; ID");
+        auto ret = preprocess("DEFINE ID '5'; "
+                              "ID");
         CHECK_THAT(ret, ProducesPP("5"));
     }
 
@@ -81,14 +80,14 @@ TEST_CASE("Coral DEFINE Macro", "[PP]")
         auto ret = preprocess("DEFINE A '10'; "
                               "DEFINE B '20'; "
                               "A B");
-       CHECK_THAT(ret, ProducesPP("10 20"));
+        CHECK_THAT(ret, ProducesPP("10 20"));
     }
 
     SECTION("Replacement is tokenized")
     {
         // "1 + 2" should be tokenized to '1', '+', '2'
-        auto ret = preprocess("DEFINE EXPR '1 + 2'; "
-                              "EXPR;");
+        auto ret = preprocess("DEFINE EXPR \"1 + 2\"; "
+                              "EXPR ");
         CHECK_THAT(ret, ProducesPP("1 + 2"));
     }
 }

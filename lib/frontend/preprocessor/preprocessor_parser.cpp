@@ -98,23 +98,6 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     std::vector<GroupPart> parts;
     do
     {
-        if (begin->getTokenType() != lexer::TokenType::SemiColon)
-        {
-            // TextBlock
-            const auto* start = begin;
-            while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon)
-            {
-                const auto* eol = findNewline(begin, end);
-                begin = eol == end ? eol : eol + 1;
-            }
-            parts.emplace_back(TextBlock{{start, begin == end ? begin : begin - 1}});
-            continue;
-        }
-        begin++;
-        if (begin == end || begin->getTokenType() == lexer::TokenType::Newline)
-        {
-            continue;
-        }
         if (begin->getTokenType() != lexer::TokenType::Identifier)
         {
             const auto* eol = findNewline(begin, end);
@@ -130,8 +113,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
         }
         else
         {
-            parts.emplace_back(UnknownDirective{begin});
-            skipLine(begin, end);
+            ++begin;
         }
     } while (begin != end);
     return Group{std::move(parts)};
