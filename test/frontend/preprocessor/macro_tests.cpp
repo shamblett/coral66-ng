@@ -107,7 +107,8 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
     SECTION("Simple Substitution")
     {
         auto ret = preprocess("DEFINE ID '5'; "
-                              "ID");
+                              "INTEGER A; "
+                              "A := ID;");
         CHECK_THAT(ret, ProducesPP("5"));
     }
 
