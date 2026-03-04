@@ -4,6 +4,7 @@
  * Date   : 31/01/2026
  */
 
+#include <iostream>
 #include <utility>
 
 #include "lib/frontend/common/source_object.hpp"
@@ -66,7 +67,42 @@ public:
 
 using namespace coral66::Tests;
 
-TEST_CASE("Coral DEFINE Macro", "[PP]")
+TEST_CASE("Coral DEFINE Macro Syntax", "[PP]")
+{
+    SECTION("No Semicolon")
+    {
+        std::string source = "DEFINE ID '5' "
+                             "ID";
+        std::string storage;
+        llvm::raw_string_ostream ss(storage);
+        bool errorsOccurred = false;
+        auto tokens = coral66::lexer::tokenize(std::move(source), &ss, &errorsOccurred);
+        UNSCOPED_INFO(ss.str());
+        REQUIRE_FALSE(errorsOccurred);
+        auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errorsOccurred);
+        CHECK(errorsOccurred);
+        CHECK(ss.str().contains(";"));
+    }
+}
+
+TEST_CASE("Coral DELETE Macro Syntax", "[PP]")
+{
+    SECTION("No Semicolon")
+    {
+        std::string source = "DELETE ID ";
+        std::string storage;
+        llvm::raw_string_ostream ss(storage);
+        bool errorsOccurred = false;
+        auto tokens = coral66::lexer::tokenize(std::move(source), &ss, &errorsOccurred);
+        UNSCOPED_INFO(ss.str());
+        REQUIRE_FALSE(errorsOccurred);
+        auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errorsOccurred);
+        CHECK(errorsOccurred);
+        CHECK(ss.str().contains(";"));
+    }
+}
+
+TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
     SECTION("Simple Substitution")
     {

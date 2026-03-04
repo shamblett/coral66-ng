@@ -45,6 +45,14 @@ coral66::lexer::PPTokenIterator findNewline(coral66::lexer::PPTokenIterator cons
                                          &coral66::lexer::PPToken::getTokenType));
 }
 
+coral66::lexer::PPTokenIterator findSemicolon(coral66::lexer::PPTokenIterator const begin,
+                                              coral66::lexer::PPTokenIterator const end)
+{
+    return std::find_if(begin, end,
+                        coral66::compose(coral66::bind_front(std::equal_to<>{}, coral66::lexer::TokenType::SemiColon),
+                                         &coral66::lexer::PPToken::getTokenType));
+}
+
 [[maybe_unused]] void skipLine(coral66::lexer::PPTokenIterator& begin, const coral66::lexer::PPTokenIterator end)
 {
     begin = findNewline(begin, end);
@@ -127,8 +135,8 @@ coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& b
     if (value == lexer::tokenName(lexer::TokenType::DefineKeyword))
     {
         begin++;
-        const auto* eol = findNewline(begin, end);
-        expect(lexer::TokenType::Newline, eol, end, context);
+        const auto* eol = findSemicolon(begin, end);
+        expect(lexer::TokenType::SemiColon, eol, end, context);
         const auto* lineStart = begin;
         begin = eol;
         return {DefineDirective{lineStart - 1, {lineStart, eol - 1}}};
@@ -142,7 +150,7 @@ coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& b
             return {};
         }
         const auto* name = begin - 1;
-        if (!expect(lexer::TokenType::Newline, begin, end, context))
+        if (!expect(lexer::TokenType::SemiColon, begin, end, context))
         {
             skipLine(begin, end);
             return {};
