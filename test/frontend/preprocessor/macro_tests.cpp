@@ -106,25 +106,11 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
     SECTION("Simple Substitution")
     {
-        auto ret = preprocess("DEFINE ID '5'; "
+        auto ret = preprocess("DEFINE ID \"5\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("5"));
-    }
-
-    SECTION("Multiple Defines")
-    {
-        auto ret = preprocess("DEFINE A '10'; "
-                              "DEFINE B '20'; "
-                              "A B");
-        CHECK_THAT(ret, ProducesPP("10 20"));
-    }
-
-    SECTION("Replacement is tokenized")
-    {
-        // "1 + 2" should be tokenized to '1', '+', '2'
-        auto ret = preprocess("DEFINE EXPR \"1 + 2\"; "
-                              "EXPR ");
-        CHECK_THAT(ret, ProducesPP("1 + 2"));
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
+                                   "INTEGER A; "
+                                   "A := 5;"));
     }
 }

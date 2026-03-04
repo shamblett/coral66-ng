@@ -104,26 +104,34 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
 {
     CORAL66_ASSERT(begin != end);
     std::vector<GroupPart> parts;
-    do
+    auto startText = begin;
+
+    auto flushText = [&]()
     {
-        if (begin->getTokenType() != lexer::TokenType::Identifier)
+        if (startText != begin)
         {
-            const auto* eol = findNewline(begin, end);
-            parts.emplace_back(NonDirective{begin, eol});
-            begin = eol == end ? eol : eol + 1;
-            continue;
+            parts.emplace_back(TextBlock{{startText, begin}});
+            startText = begin;
         }
-        auto value = begin->getValue();
-        if (value == lexer::tokenName(lexer::TokenType::DefineKeyword)
-            || value == tokenName(lexer::TokenType::DeleteKeyword))
+    };
+
+    while (begin != end)
+    {
+        if (begin->getTokenType() == lexer::TokenType::Identifier)
         {
-            parts.emplace_back(parseControlLine(begin, end, context));
+            auto value = begin->getValue();
+            if (value == lexer::tokenName(lexer::TokenType::DefineKeyword)
+                || value == tokenName(lexer::TokenType::DeleteKeyword))
+            {
+                flushText();
+                parts.emplace_back(parseControlLine(begin, end, context));
+                startText = begin;
+                continue;
+            }
         }
-        else
-        {
-            ++begin;
-        }
-    } while (begin != end);
+        ++begin;
+    }
+    flushText();
     return Group{std::move(parts)};
 }
 

@@ -51,7 +51,7 @@ class Preprocessor final : PPSourceInterface
     std::vector<std::vector<lexer::PPToken>> m_fileTokens;
     std::vector<lexer::IntervalMap> m_intervalMaps;
     bool m_errorsOccurred = false;
-    bool m_visitingScratchPad = true;
+    bool m_visitingScratchPad = false;
 
     void pushLine(std::vector<lexer::PPToken>&& tokens)
     {
@@ -264,7 +264,38 @@ public:
         const auto* macroName = &(*iter);
         ++iter;
 
-        m_defines[macroName->getValue()] = Macro{macroName};
+        std::vector<lexer::PPToken> replacementTokens;
+        if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::Miscellaneous)
+        {
+            ++iter;
+            auto last = define.tokens.end();
+            if (last - iter >= 1 && (last - 1)->getTokenType() == lexer::TokenType::Miscellaneous)
+            {
+                replacementTokens.assign(iter, last - 1);
+            }
+            else
+            {
+                replacementTokens.assign(iter, last);
+            }
+        }
+        else
+        {
+            replacementTokens.assign(iter, define.tokens.end());
+        }
+
+        m_fileTokens.push_back(std::move(replacementTokens));
+        std::span<const lexer::PPToken> replacementSpan(m_fileTokens.back().data(), m_fileTokens.back().size());
+
+        m_defines[macroName->getValue()] = Macro{macroName, std::nullopt, replacementSpan};
+
+        if (define.defineToken != lexer::PPTokenIterator{})
+        {
+            std::vector<lexer::PPToken> outputTokens;
+            outputTokens.push_back(*define.defineToken);
+            outputTokens.insert(outputTokens.end(), define.tokens.begin(), define.tokens.end());
+            outputTokens.push_back(*define.tokens.end()); // The semicolon
+            pushLine(std::move(outputTokens));
+        }
     }
 
     void visit(const GroupPart& groupPart)
