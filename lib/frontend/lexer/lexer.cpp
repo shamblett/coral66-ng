@@ -488,14 +488,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             }
             continue;
         }
-        // Normally we could assume that if *iter == '\\' that iter + 1 != end. That is because if *iter == '\\' and
-        // iter + 1 == end the last character would be '\\' and following that '\'' or '\"'.
-        // Therefore, the character literal wouldn't have ended, and we wouldn't be here.
 
-        // But if we didn't go through a preprocessor a #include followed by a string literal could be present and
-        // therefore contain such a character. For now, we will just break at such an occurrence but in the future
-        // we might simply want to disable the special handling of string literals after #include for API consumers
-        // that do not want to preprocess
         if (iter + 1 == end)
         {
             break;
@@ -509,8 +502,6 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 || (!(*iter >= '0' && *iter <= '9') && !(*iter >= 'a' && *iter <= 'f')
                     && !(*iter >= 'A' && *iter <= 'F')))
             {
-                // First character followed after \u or \U is not a hex digit, or it's the end of string
-                // Let's assume the user thought \u might be an escape character
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 2);
                 context.report(coral66::Errors::lexer::INVALID_ESCAPE_SEQUENCE_N, start,
                                std::string_view(big ? "\\U" : "\\u"),
@@ -959,9 +950,7 @@ bool coral66::lexer::needsWhitespaceInBetween(TokenType const left, TokenType co
         }
         return false;
     }
-    // Simplified for Coral: most punctuation separates itself.
-    // But we might want to prevent accidental merging if we have ambiguous multi-char operators.
-    // For now, minimal logic:
+
     if (left == TokenType::PPNumber && isText(right))
         return true;
     if (left == TokenType::PPNumber && right == TokenType::PPNumber)

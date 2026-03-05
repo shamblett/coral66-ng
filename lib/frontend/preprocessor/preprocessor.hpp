@@ -85,7 +85,7 @@ class Preprocessor final : PPSourceInterface
         }
         std::vector<lexer::PPToken> output;
 
-        for (size_t idx = 0; idx < tokens.size();)
+        for (long idx = 0; idx < tokens.size();)
         {
             if (tokens[idx].getTokenType() == coral66::lexer::TokenType::Newline)
             {
@@ -125,14 +125,14 @@ class Preprocessor final : PPSourceInterface
                 tok.setMacroId(i);
             }
 
-            size_t end_idx = idx + 1;
+            long end_idx = idx + 1;
 
             if (result->second.back().argumentList.has_value())
             {
                 auto params = result->second.back().argumentList.value();
                 auto param_count = params.size();
 
-                size_t arg_idx = idx + 1;
+                long arg_idx = idx + 1;
                 while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Newline)
                     arg_idx++;
 
@@ -486,9 +486,6 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
         };
         auto beginValues = toMacroId0(begin->getMacroId(), begin->getFileId(), begin->getOffset(), false);
         auto prevValues = toMacroId0(prev->getMacroId(), prev->getFileId(), prev->getOffset(), true);
-        // Both prev and begin are part of a function like macro then it can happen that prev will end up
-        // pointing at the ) of the macro call while begin points at the identifier. For that case as
-        // they are part of the same macro there cannot be a newline in between
         if (std::get<2>(beginValues) >= std::get<2>(prevValues))
         {
             newLines = std::min<std::size_t>(

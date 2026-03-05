@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include <memory>
-#include <optional>
 #include <span>
 #include <variant>
 #include <vector>
@@ -24,9 +22,6 @@ struct DefineDirective final
     std::span<const lexer::PPToken> tokens;
 };
 
-/**
- * <NonDirective> ::= <TokenType::Pound> <TOKEN> { <TOKEN> } <TokenType::Newline>
- */
 struct NonDirective final
 {
     lexer::PPTokenIterator begin;
@@ -43,30 +38,18 @@ struct ControlLine final
     std::variant<lexer::PPTokenIterator, DefineDirective> variant;
 };
 
-/**
- * <TextBlock> ::= <TOKEN> <TokenType::Newline> { <TOKEN> <TokenType::Newline> }
- */
 struct TextBlock final
 {
     std::span<const coral66::lexer::PPToken> tokens;
 };
 
-/**
- * <GroupPart> == <TextBlock>
- */
 using GroupPart = std::variant<TextBlock, ControlLine, UnknownDirective, NonDirective>;
 
-/**
- * <Group> ::= <GroupPart> { <GroupPart> }
- */
 struct Group final
 {
     std::vector<GroupPart> groupPart;
 };
 
-/**
- * <File> := { <Group> }
- */
 struct File final
 {
     std::vector<Group> groups;

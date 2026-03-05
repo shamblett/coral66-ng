@@ -18,7 +18,7 @@
 #include "lib/support/utilities.hpp"
 
 /**
- * @brief Defines the Lexer and Token interfaces.
+ * Defines the Lexer and Token interfaces.
  *
  * This file contains the definitions for token types, the base Token class,
  * and specialized token classes for the Preprocessor (PPToken) and the Coral66 language (CToken).
@@ -41,7 +41,7 @@ using CTokenIterator = const CToken* CORAL66_NON_NULL;
 using PPTokenIterator = const PPToken* CORAL66_NON_NULL;
 
 /**
- * @brief Tokenizes a raw source string into a stream of Preprocessor Tokens (PPTokens).
+ * Tokenizes a raw source string into a stream of Preprocessor Tokens (PPTokens).
  *
  * @param source The source code string.
  * @param reporter Stream to report lexing errors to.
@@ -53,7 +53,7 @@ PPSourceObject tokenize(std::string source, llvm::raw_ostream* reporter = &llvm:
                         std::string_view sourcePath = "<stdin>");
 
 /**
- * @brief Converts a stream of PPTokens into a stream of CTokens.
+ * Converts a stream of PPTokens into a stream of CTokens.
  *
  * This typically involves running the preprocessor (macro expansion, etc.).
  *
@@ -69,7 +69,7 @@ CSourceObject toCTokens(const PPSourceObject& sourceObject, llvm::raw_ostream* r
                         bool* errorsOccurred = nullptr);
 
 /**
- * @brief Converts a range of PPTokens to CTokens.
+ * Converts a range of PPTokens to CTokens.
  *
  * @param begin Iterator to the start of the PPToken range.
  * @param end Iterator to the end of the PPToken range.

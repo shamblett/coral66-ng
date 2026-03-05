@@ -165,8 +165,6 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
             if (iter->getTokenType() == lexer::TokenType::Identifier
                 && iter->getText() == lexer::tokenName(lexer::TokenType::DefineKeyword))
             {
-                // Neither defined nor the identifier following it (with optionally an opening parentheses
-                // in between) should be converted to 0
                 if (iter + 1 == ctokens.end())
                 {
                     continue;
