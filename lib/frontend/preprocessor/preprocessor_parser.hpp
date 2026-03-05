@@ -8,6 +8,13 @@
 
 #include "preprocessor_syntax.hpp"
 
+/**
+ * Defines the Preprocessor Parser interface.
+ *
+ * This file contains the definitions for parsing preprocessor directives,
+ * extracting macro definitions, and forming preprocessor groups from the token stream.
+ */
+
 namespace coral66
 {
 class Message;

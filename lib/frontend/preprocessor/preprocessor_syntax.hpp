@@ -12,6 +12,13 @@
 
 #include "lib/frontend/lexer/lexer.hpp"
 
+/**
+ * Defines the Preprocessor Syntax interface.
+ *
+ * This file contains the data structures representing the abstract syntax tree
+ * for preprocessor directives, macro definitions, and text blocks.
+ */
+
 namespace coral66::pp
 {
 struct Group;

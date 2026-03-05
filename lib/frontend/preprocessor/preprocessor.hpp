@@ -17,6 +17,15 @@
 #include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
 
+/**
+ * Defines the Preprocessor interface.
+ *
+ * This file contains the definition of the Preprocessor class, which is responsible
+ * for executing preprocessor directives and expanding macro definitions in the source code.
+ *
+ * For Coral 66 this encompasses the processing for the Macro DEFINE and DELETE keywords.
+ */
+
 namespace coral66::pp
 {
 struct Options
@@ -425,9 +434,14 @@ public:
     }
 };
 
-//
-// Preprocessor entry point
-//
+/**
+* Preprocessor entry point.
+*
+* @param sourceObject The source input
+* @param reporter Stream to report errors to.
+* @param errorsOccurred Pointer to a bool set to true if errors occur.
+* @return A PPSourceObject containing the processed PPTokens.
+*/
 PPSourceObject preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                           bool* errorsOccurred = nullptr) noexcept;
 
