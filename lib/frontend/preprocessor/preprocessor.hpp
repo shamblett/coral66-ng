@@ -127,6 +127,89 @@ class Preprocessor final : PPSourceInterface
                 tok.setMacroId(i);
             }
 
+            if (result->second.argumentList.has_value())
+            {
+                auto params = result->second.argumentList.value();
+                auto param_count = params.size();
+                
+                auto arg_iter = iter + 1;
+                while (arg_iter != tokens.data() + tokens.size() && arg_iter->getTokenType() == coral66::lexer::TokenType::Newline)
+                    arg_iter++;
+                
+                if (arg_iter == tokens.data() + tokens.size() || arg_iter->getTokenType() != coral66::lexer::TokenType::OpenParentheses)
+                {
+                    iter++;
+                    continue; // Skip expansion, wait for parens or treat as not a macro invocation
+                }
+
+                arg_iter++;
+                std::vector<std::vector<lexer::PPToken>> actual_args;
+                std::vector<lexer::PPToken> current_arg;
+                int paren_depth = 0;
+                int square_depth = 0;
+                
+                while (arg_iter != tokens.data() + tokens.size())
+                {
+                    if (arg_iter->getTokenType() == coral66::lexer::TokenType::OpenParentheses) paren_depth++;
+                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                    {
+                        if (paren_depth == 0) break;
+                        paren_depth--;
+                    }
+                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::OpenSquareBracket) square_depth++;
+                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::CloseSquareBracket) square_depth--;
+                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::Comma && paren_depth == 0 && square_depth == 0)
+                    {
+                        actual_args.push_back(current_arg);
+                        current_arg.clear();
+                        arg_iter++;
+                        continue;
+                    }
+                    
+                    current_arg.push_back(*arg_iter);
+                    arg_iter++;
+                }
+                actual_args.push_back(current_arg);
+                if (arg_iter != tokens.data() + tokens.size() && arg_iter->getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                    arg_iter++;
+                
+                if (actual_args.size() != param_count && !(param_count == 0 && actual_args.size() == 1 && actual_args[0].empty()))
+                {
+                    // Parameter count mismatch or syntax error. We log error or just skip expansion.
+                    // For now, let's just skip expansion like C preprocessor might if arguments don't match or whatever.
+                    // Actually, if it's an error, maybe log it? We don't have an easy way to log here without context,
+                    // but skipping expansion is safer than partial expansion.
+                    iter++;
+                    continue;
+                }
+
+                std::vector<lexer::PPToken> new_replacement;
+                for (auto& tok : replacement)
+                {
+                    if (tok.getTokenType() == coral66::lexer::TokenType::Identifier)
+                    {
+                        auto tok_val = tok.getValue();
+                        bool substituted = false;
+                        for (size_t p = 0; p < param_count; ++p)
+                        {
+                            if (tok_val == params[p].getValue())
+                            {
+                                new_replacement.insert(new_replacement.end(), actual_args[p].begin(), actual_args[p].end());
+                                substituted = true;
+                                break;
+                            }
+                        }
+                        if (!substituted) new_replacement.push_back(tok);
+                    }
+                    else
+                    {
+                        new_replacement.push_back(tok);
+                    }
+                }
+                replacement = new_replacement;
+                iter = arg_iter - 1; // iter will be incremented at the end of loop
+            }
+
             // Recursive substitution
             output.insert(output.end(), std::move_iterator(replacement.begin()), std::move_iterator(replacement.end()));
 
@@ -154,7 +237,7 @@ class Preprocessor final : PPSourceInterface
         return {input.begin(), input.end()};
     }
 
-    std::optional<Macro> parseDefineDirective(const DefineDirective& defineDirective);
+    std::pair<std::optional<Macro>, const lexer::PPToken*> parseDefineDirective(const DefineDirective& defineDirective);
 
     std::optional<bool> evaluateExpression(lexer::PPTokenIterator ifToken, std::span<const lexer::PPToken> tokens);
 
@@ -255,14 +338,12 @@ public:
 
     void visit(const DefineDirective& define)
     {
-        if (define.tokens.empty() || define.tokens.front().getTokenType() != lexer::TokenType::Identifier)
-        {
-            return;
-        }
+        auto parse_res = parseDefineDirective(define);
+        if (!parse_res.first) return;
+        auto optMacro = *parse_res.first;
+        auto iterPtr = parse_res.second;
 
-        auto iter = define.tokens.begin();
-        const auto* macroName = &(*iter);
-        ++iter;
+        auto iter = define.tokens.begin() + (iterPtr - define.tokens.data());
 
         std::vector<lexer::PPToken> replacementTokens;
         if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::Miscellaneous)
@@ -286,7 +367,8 @@ public:
         m_fileTokens.push_back(std::move(replacementTokens));
         std::span<const lexer::PPToken> replacementSpan(m_fileTokens.back().data(), m_fileTokens.back().size());
 
-        m_defines[macroName->getValue()] = Macro{macroName, std::nullopt, replacementSpan};
+        optMacro.replacement = replacementSpan;
+        m_defines[optMacro.identifierPos->getValue()] = optMacro;
 
         if (define.defineToken != lexer::PPTokenIterator{})
         {

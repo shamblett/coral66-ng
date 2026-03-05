@@ -103,7 +103,7 @@ TEST_CASE("Coral DELETE Macro Syntax", "[PP]")
 }
 
 //
-// Section 11.2.2
+// Section 11.2.1
 //
 TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
@@ -147,3 +147,21 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
                                    "A := 5 + \"1\";"));
     }
 }
+
+//
+// Section 11.2.2
+//
+TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
+{
+    SECTION("Single Parameter")
+    {
+        auto ret = preprocess("DEFINE ID(p1) \"5 + p1\"; "
+                              "INTEGER A; "
+                              "A := ID(1);");
+        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1) \"5 + p1\"; "
+                                   "INTEGER A; "
+                                   "A := 5 + 1;"));
+    }
+
+}
+

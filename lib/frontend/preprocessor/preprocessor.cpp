@@ -37,27 +37,27 @@ std::uint64_t coral66::pp::Preprocessor::getLineEndOffset(std::uint32_t const fi
     return m_files[fileID].starts[line] - 1;
 }
 
-std::optional<coral66::pp::Preprocessor::Macro>
+std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer::PPToken*>
     coral66::pp::Preprocessor::parseDefineDirective(const DefineDirective& defineDirective)
 {
     if (defineDirective.tokens.empty())
     {
         log(Errors::Parser::EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this, lexer::TokenType::Identifier,
                                                     *defineDirective.defineToken));
-        return {};
+        return {{}, nullptr};
     }
     if (defineDirective.tokens[0].getTokenType() != lexer::TokenType::Identifier)
     {
         log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
                                                          defineDirective.tokens[0]));
-        return {};
+        return {{}, nullptr};
     }
     const auto* identifierPos = &defineDirective.tokens[0];
     const auto* curr = identifierPos + 1;
     const auto* end = defineDirective.tokens.data() + defineDirective.tokens.size();
     if (curr == end)
     {
-        return Macro{identifierPos, {}};
+        return {Macro{identifierPos, {}}, curr};
     }
 
     if (curr->getTokenType() != lexer::TokenType::OpenParentheses
@@ -68,7 +68,7 @@ std::optional<coral66::pp::Preprocessor::Macro>
         {
             log(Errors::pp::WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION.args(*curr, *this, *curr));
         }
-        return Macro{identifierPos, std::nullopt};
+        return {Macro{identifierPos, std::nullopt}, curr};
     }
 
     // We are a function like macro from here on
@@ -77,14 +77,14 @@ std::optional<coral66::pp::Preprocessor::Macro>
     {
         log(Errors::Parser::EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
-        return {};
+        return {{}, nullptr};
     }
 
     switch (curr->getTokenType())
     {
         case lexer::TokenType::CloseParentheses:
         {
-            return Macro{identifierPos, {std::vector<lexer::PPToken>{}}};
+            return {Macro{identifierPos, {std::vector<lexer::PPToken>{}}}, curr + 1};
         }
 
         default: break;
@@ -93,7 +93,7 @@ std::optional<coral66::pp::Preprocessor::Macro>
     if (curr->getTokenType() != lexer::TokenType::Identifier)
     {
         log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
-        return {};
+        return {{}, nullptr};
     }
     std::vector argumentList = {*curr};
     curr++;
@@ -103,12 +103,12 @@ std::optional<coral66::pp::Preprocessor::Macro>
         if (curr == end)
         {
             log(Errors::Parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::Identifier, *(curr - 1)));
-            return {};
+            return {{}, nullptr};
         }
         if (curr->getTokenType() != lexer::TokenType::Identifier)
         {
             log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
-            return {};
+            return {{}, nullptr};
         }
         auto string = curr->getValue();
         auto result = std::ranges::find_if(
@@ -126,16 +126,16 @@ std::optional<coral66::pp::Preprocessor::Macro>
     {
         log(Errors::Parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
-        return {};
+        return {{}, nullptr};
     }
     if (curr->getTokenType() != lexer::TokenType::CloseParentheses)
     {
         log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
-        return {};
+        return {{}, nullptr};
     }
 
-    return Macro{identifierPos, std::move(argumentList)};
+    return {Macro{identifierPos, std::move(argumentList)}, curr + 1};
 }
 
 std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPTokenIterator ifToken,

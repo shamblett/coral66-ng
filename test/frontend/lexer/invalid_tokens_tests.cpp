@@ -35,7 +35,7 @@ coral66::CSourceObject lex(const std::string& code, bool& errors)
 
 } // namespace
 
-TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
+TEST_CASE("Coral Lexing Identifiers - Invalid Identifier Strings", "[lexer]")
 {
     bool errors = false;
     auto result = lex("my/identifier var1?23 st+art", errors);
@@ -57,7 +57,7 @@ TEST_CASE("Coral Lexing Identifiers - invalid identifier strings", "[lexer]")
     CHECK(std::get<std::string>(result.data()[7].getValue()) == "art");
 }
 
-TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
+TEST_CASE("Coral Lexing Keyword = Invalid Strings", "[lexer]")
 {
     SECTION("Single Keyword not found")
     {
@@ -78,7 +78,7 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
         CHECK(errors);
     }
 
-    SECTION("Single Keyword found")
+    SECTION("Single Keyword Found")
     {
         bool errors = false;
         auto result = lex("\t/yBEGIIIIIIIIIIIII/&&&HHHFFFF ABSOLUTE hhhhhhhhhhhhhhh", errors);
@@ -93,7 +93,7 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
         CHECK(errors);
     }
 
-    SECTION("Multiple invalid Keyword")
+    SECTION("Multiple Invalid Keyword")
     {
         using namespace coral66::lexer;
         bool errors = false;
@@ -110,7 +110,7 @@ TEST_CASE("Coral Lexing Keyword = invalid strings", "[lexer]")
     }
 }
 
-TEST_CASE("Coral Lexing Literals - mixed strings", "[lexer]")
+TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
 {
     SECTION("Integers")
     {

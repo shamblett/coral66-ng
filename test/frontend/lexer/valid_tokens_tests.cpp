@@ -133,7 +133,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
     }
 }
 
-TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
+TEST_CASE("Coral Lexing Operators And Punctuation", "[lexer]")
 {
     using namespace coral66::lexer;
     auto result = lex("+ - * / = ( ) [ ] . : , ; <= >= <> := <-");
@@ -169,7 +169,7 @@ TEST_CASE("Coral Lexing Operators and Punctuation", "[lexer]")
     CHECK(result.data()[offset + 1].getTokenType() == TokenType::Minus);
 }
 
-TEST_CASE("Coral Lexing code strings ", "[lexer]")
+TEST_CASE("Coral Lexing Code Strings ", "[lexer]")
 {
     SECTION("Code fragment")
     {
@@ -195,7 +195,7 @@ TEST_CASE("Coral Lexing code strings ", "[lexer]")
         }
     }
 
-    SECTION("Maths sequence")
+    SECTION("Maths Sequence")
     {
         using namespace coral66::lexer;
         auto result = lex("1 + 2 + 3 := 6");
@@ -210,7 +210,7 @@ TEST_CASE("Coral Lexing code strings ", "[lexer]")
         }
     }
 
-    SECTION("Maths sequence with identifiers")
+    SECTION("Maths Sequence With Identifiers")
     {
         using namespace coral66::lexer;
         auto result = lex("INTEGER A;"
