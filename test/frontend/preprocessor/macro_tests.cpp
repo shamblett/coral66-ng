@@ -186,9 +186,23 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
                               "INTEGER A; "
                               "A := OUTER;");
         CHECK_THAT(ret, ProducesPP("DEFINE INNER \"5 + 1\"; "
+                                   "DEFINE OUTER \"3 + INNER\"; "
+                                   "INTEGER A; "
+                                   "A := 3 + 5 + 1;"));
+    }
+
+    SECTION("Multi Level")
+    {
+        auto ret = preprocess("DEFINE INNER1 \"1\"; "
+                              "DEFINE INNER \"5 + INNER1\"; "
                               "DEFINE OUTER \"3 + INNER\"; "
                               "INTEGER A; "
-                              "A := 3 + 5 + 1;"));
+                              "A := OUTER;");
+        CHECK_THAT(ret, ProducesPP("DEFINE INNER1 \"1\"; "
+                                   "DEFINE INNER \"5 + INNER1\"; "
+                                   "DEFINE OUTER \"3 + INNER\"; "
+                                   "INTEGER A; "
+                                   "A := 3 + 5 + 1;"));
     }
 
     SECTION("Deferred Expansion")
@@ -198,8 +212,8 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
                               "INTEGER A; "
                               "A := OUTER;");
         CHECK_THAT(ret, ProducesPP("DEFINE OUTER \"3 + INNER\"; "
-                              "DEFINE INNER \"5 + 1\"; "
-                              "INTEGER A; "
-                              "A := 3 + 5 + 1;"));
+                                   "DEFINE INNER \"5 + 1\"; "
+                                   "INTEGER A; "
+                                   "A := 3 + 5 + 1;"));
     }
 }
