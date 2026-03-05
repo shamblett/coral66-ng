@@ -163,5 +163,43 @@ TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
                                    "A := 5 + 1;"));
     }
 
+    SECTION("Multiple Parameters")
+    {
+        auto ret = preprocess("DEFINE ID(p1, p2) \"p2 + p1\"; "
+                              "INTEGER A; "
+                              "A := ID(1, 5);");
+        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1, p2) \"p2 + p1\"; "
+                                   "INTEGER A; "
+                                   "A := 5 + 1;"));
+    }
 }
 
+//
+// Section 11.2.3
+//
+TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
+{
+    SECTION("Single Level")
+    {
+        auto ret = preprocess("DEFINE INNER \"5 + 1\"; "
+                              "DEFINE OUTER \"3 + INNER\"; "
+                              "INTEGER A; "
+                              "A := OUTER;");
+        CHECK_THAT(ret, ProducesPP("DEFINE INNER \"5 + 1\"; "
+                              "DEFINE OUTER \"3 + INNER\"; "
+                              "INTEGER A; "
+                              "A := 3 + 5 + 1;"));
+    }
+
+    SECTION("Deferred Expansion")
+    {
+        auto ret = preprocess("DEFINE OUTER \"3 + INNER\"; "
+                              "DEFINE INNER \"5 + 1\"; "
+                              "INTEGER A; "
+                              "A := OUTER;");
+        CHECK_THAT(ret, ProducesPP("DEFINE OUTER \"3 + INNER\"; "
+                              "DEFINE INNER \"5 + 1\"; "
+                              "INTEGER A; "
+                              "A := 3 + 5 + 1;"));
+    }
+}

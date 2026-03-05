@@ -77,49 +77,46 @@ class Preprocessor final : PPSourceInterface
     }
 
     template <class F>
-    void macroSubstitute(std::vector<lexer::PPToken>&& tokens, F lineOutput)
+        void macroSubstitute(std::vector<lexer::PPToken>&& tokens, F lineOutput)
     {
         if (tokens.empty())
         {
             return;
         }
         std::vector<lexer::PPToken> output;
-        auto* start = tokens.data();
-
-        for (auto* iter = tokens.data(); iter != tokens.data() + tokens.size();)
+        
+        for (size_t idx = 0; idx < tokens.size(); )
         {
-            if (iter->getTokenType() == coral66::lexer::TokenType::Newline)
+            if (tokens[idx].getTokenType() == coral66::lexer::TokenType::Newline)
             {
-                iter++;
-                if (iter == tokens.data() + tokens.size())
+                idx++;
+                if (idx == tokens.size())
                 {
                     break;
                 }
-                output.insert(output.end(), std::move_iterator(start), std::move_iterator(iter - 1));
-                start = iter;
                 lineOutput(std::move(output));
                 output.clear();
                 continue;
             }
-            if (iter->getTokenType() != coral66::lexer::TokenType::Identifier)
+            if (tokens[idx].getTokenType() != coral66::lexer::TokenType::Identifier)
             {
-                iter++;
+                output.push_back(std::move(tokens[idx]));
+                idx++;
                 continue;
             }
 
-            auto name = iter->getValue();
+            auto name = tokens[idx].getValue();
             auto result = m_defines.find(name);
             if (result == m_defines.end())
             {
-                iter++;
+                output.push_back(std::move(tokens[idx]));
+                idx++;
                 continue;
             }
 
             // Expand Macro
-            output.insert(output.end(), std::move_iterator(start), std::move_iterator(iter));
-
             const auto i = ++m_macroID;
-            m_substitutions.emplace_back(Source::Substitution{*result->second.identifierPos, *iter, {}, false});
+            m_substitutions.emplace_back(Source::Substitution{*result->second.identifierPos, tokens[idx], {}, false});
 
             std::vector replacement(result->second.replacement.begin(), result->second.replacement.end());
             for (auto& tok : replacement)
@@ -127,59 +124,59 @@ class Preprocessor final : PPSourceInterface
                 tok.setMacroId(i);
             }
 
+            size_t end_idx = idx + 1;
+
             if (result->second.argumentList.has_value())
             {
                 auto params = result->second.argumentList.value();
                 auto param_count = params.size();
                 
-                auto arg_iter = iter + 1;
-                while (arg_iter != tokens.data() + tokens.size() && arg_iter->getTokenType() == coral66::lexer::TokenType::Newline)
-                    arg_iter++;
+                size_t arg_idx = idx + 1;
+                while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Newline)
+                    arg_idx++;
                 
-                if (arg_iter == tokens.data() + tokens.size() || arg_iter->getTokenType() != coral66::lexer::TokenType::OpenParentheses)
+                if (arg_idx == tokens.size() || tokens[arg_idx].getTokenType() != coral66::lexer::TokenType::OpenParentheses)
                 {
-                    iter++;
+                    output.push_back(std::move(tokens[idx]));
+                    idx++;
                     continue; // Skip expansion, wait for parens or treat as not a macro invocation
                 }
 
-                arg_iter++;
+                arg_idx++;
                 std::vector<std::vector<lexer::PPToken>> actual_args;
                 std::vector<lexer::PPToken> current_arg;
                 int paren_depth = 0;
                 int square_depth = 0;
                 
-                while (arg_iter != tokens.data() + tokens.size())
+                while (arg_idx < tokens.size())
                 {
-                    if (arg_iter->getTokenType() == coral66::lexer::TokenType::OpenParentheses) paren_depth++;
-                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                    if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenParentheses) paren_depth++;
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
                     {
                         if (paren_depth == 0) break;
                         paren_depth--;
                     }
-                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::OpenSquareBracket) square_depth++;
-                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::CloseSquareBracket) square_depth--;
-                    else if (arg_iter->getTokenType() == coral66::lexer::TokenType::Comma && paren_depth == 0 && square_depth == 0)
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenSquareBracket) square_depth++;
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseSquareBracket) square_depth--;
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Comma && paren_depth == 0 && square_depth == 0)
                     {
                         actual_args.push_back(current_arg);
                         current_arg.clear();
-                        arg_iter++;
+                        arg_idx++;
                         continue;
                     }
                     
-                    current_arg.push_back(*arg_iter);
-                    arg_iter++;
+                    current_arg.push_back(tokens[arg_idx]);
+                    arg_idx++;
                 }
                 actual_args.push_back(current_arg);
-                if (arg_iter != tokens.data() + tokens.size() && arg_iter->getTokenType() == coral66::lexer::TokenType::CloseParentheses)
-                    arg_iter++;
+                if (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                    arg_idx++;
                 
                 if (actual_args.size() != param_count && !(param_count == 0 && actual_args.size() == 1 && actual_args[0].empty()))
                 {
-                    // Parameter count mismatch or syntax error. We log error or just skip expansion.
-                    // For now, let's just skip expansion like C preprocessor might if arguments don't match or whatever.
-                    // Actually, if it's an error, maybe log it? We don't have an easy way to log here without context,
-                    // but skipping expansion is safer than partial expansion.
-                    iter++;
+                    output.push_back(std::move(tokens[idx]));
+                    idx++;
                     continue;
                 }
 
@@ -207,16 +204,18 @@ class Preprocessor final : PPSourceInterface
                     }
                 }
                 replacement = new_replacement;
-                iter = arg_iter - 1; // iter will be incremented at the end of loop
+                end_idx = arg_idx;
             }
 
-            // Recursive substitution
-            output.insert(output.end(), std::move_iterator(replacement.begin()), std::move_iterator(replacement.end()));
-
-            iter++;
-            start = iter;
+            // Recursive substitution: Replace the macro invocation with its replacement tokens
+            tokens.erase(tokens.begin() + idx, tokens.begin() + end_idx);
+            tokens.insert(tokens.begin() + idx, std::move_iterator(replacement.begin()), std::move_iterator(replacement.end()));
+            // DO NOT idx++; Let the loop process the newly inserted tokens
         }
-        output.insert(output.end(), std::move_iterator(start), std::move_iterator(tokens.data() + tokens.size()));
+        
+        // Append any remaining trailing newlines to be consistent with original behavior?
+        // Actually, the original did output.insert(..., start, size()) which would include the trailing newline if any.
+        // Let's just output whatever is left.
         lineOutput(std::move(output));
     }
 
