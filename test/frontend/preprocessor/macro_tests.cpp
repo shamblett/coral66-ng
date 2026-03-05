@@ -102,9 +102,12 @@ TEST_CASE("Coral DELETE Macro Syntax", "[PP]")
     }
 }
 
+//
+// Section 11.2.2
+//
 TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
-    SECTION("Simple Substitution")
+    SECTION("Simple Value Substitution")
     {
         auto ret = preprocess("DEFINE ID \"5\"; "
                               "INTEGER A; "
@@ -112,5 +115,35 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
         CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
                                    "INTEGER A; "
                                    "A := 5;"));
+    }
+
+    SECTION("Simple Value Substitution Lowercase Identifiers")
+    {
+        auto ret = preprocess("DEFINE id \"5\"; "
+                              "INTEGER a; "
+                              "a := id;");
+        CHECK_THAT(ret, ProducesPP("DEFINE id \"5\"; "
+                                   "INTEGER a; "
+                                   "a := 5;"));
+    }
+
+    SECTION("Simple String Substitution")
+    {
+        auto ret = preprocess("DEFINE ID \"5 + 1\"; "
+                              "INTEGER A; "
+                              "A := ID;");
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5 + 1\"; "
+                                   "INTEGER A; "
+                                   "A := 5 + 1;"));
+    }
+
+    SECTION("Simple String Substitution Nested Strings")
+    {
+        auto ret = preprocess("DEFINE ID \"5 + \"1\"\"; "
+                              "INTEGER A; "
+                              "A := ID;");
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5 + \"1\"\"; "
+                                   "INTEGER A; "
+                                   "A := 5 + \"1\";"));
     }
 }
