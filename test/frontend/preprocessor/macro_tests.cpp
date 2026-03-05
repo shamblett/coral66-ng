@@ -217,3 +217,43 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
                                    "A := 3 + 5 + 1;"));
     }
 }
+
+//
+// Section 11.2.4
+//
+TEST_CASE("Coral DELETE Macro Substitution", "[PP]")
+{
+    SECTION("Simple Deletion")
+    {
+        auto ret = preprocess("DEFINE ID \"5\"; "
+                              "INTEGER A; "
+                              "DELETE ID; "
+                              "A := ID;");
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
+                                   "INTEGER A; "
+                                   "DELETE ID; "
+                                   "A := ID;"));
+    }
+
+    SECTION("Redefinition And Stacking")
+    {
+        auto ret = preprocess("DEFINE ID \"5\"; "
+                              "INTEGER A; "
+                              "A := ID; "
+                              "DEFINE ID \"10\"; "
+                              "A := ID; "
+                              "DELETE ID; "
+                              "A := ID; "
+                              "DELETE ID; "
+                              "A := ID; ");
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
+                                   "INTEGER A; "
+                                   "A := 5; "
+                                   "DEFINE ID \"10\"; "
+                                   "A := 10; "
+                                   "DELETE ID; "
+                                   "A := 5; "
+                                   "DELETE ID; "
+                                   "A := ID; "));
+    }
+}

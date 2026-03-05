@@ -44,7 +44,7 @@ class Preprocessor final : PPSourceInterface
         std::optional<std::vector<lexer::PPToken>> argumentList;
         std::span<const lexer::PPToken> replacement;
     };
-    std::unordered_map<std::string_view, Macro> m_defines;
+    std::unordered_map<std::string_view, std::vector<Macro>> m_defines;
 
     std::vector<std::unordered_set<lexer::PPTokenIterator>> m_disabledMacros{1};
     std::vector<Source::File> m_files;
@@ -77,15 +77,15 @@ class Preprocessor final : PPSourceInterface
     }
 
     template <class F>
-        void macroSubstitute(std::vector<lexer::PPToken>&& tokens, F lineOutput)
+    void macroSubstitute(std::vector<lexer::PPToken>&& tokens, F lineOutput)
     {
         if (tokens.empty())
         {
             return;
         }
         std::vector<lexer::PPToken> output;
-        
-        for (size_t idx = 0; idx < tokens.size(); )
+
+        for (size_t idx = 0; idx < tokens.size();)
         {
             if (tokens[idx].getTokenType() == coral66::lexer::TokenType::Newline)
             {
@@ -107,7 +107,7 @@ class Preprocessor final : PPSourceInterface
 
             auto name = tokens[idx].getValue();
             auto result = m_defines.find(name);
-            if (result == m_defines.end())
+            if (result == m_defines.end() || result->second.empty())
             {
                 output.push_back(std::move(tokens[idx]));
                 idx++;
@@ -116,9 +116,10 @@ class Preprocessor final : PPSourceInterface
 
             // Expand Macro
             const auto i = ++m_macroID;
-            m_substitutions.emplace_back(Source::Substitution{*result->second.identifierPos, tokens[idx], {}, false});
+            m_substitutions.emplace_back(
+                Source::Substitution{*result->second.back().identifierPos, tokens[idx], {}, false});
 
-            std::vector replacement(result->second.replacement.begin(), result->second.replacement.end());
+            std::vector replacement(result->second.back().replacement.begin(), result->second.back().replacement.end());
             for (auto& tok : replacement)
             {
                 tok.setMacroId(i);
@@ -126,16 +127,17 @@ class Preprocessor final : PPSourceInterface
 
             size_t end_idx = idx + 1;
 
-            if (result->second.argumentList.has_value())
+            if (result->second.back().argumentList.has_value())
             {
-                auto params = result->second.argumentList.value();
+                auto params = result->second.back().argumentList.value();
                 auto param_count = params.size();
-                
+
                 size_t arg_idx = idx + 1;
                 while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Newline)
                     arg_idx++;
-                
-                if (arg_idx == tokens.size() || tokens[arg_idx].getTokenType() != coral66::lexer::TokenType::OpenParentheses)
+
+                if (arg_idx == tokens.size()
+                    || tokens[arg_idx].getTokenType() != coral66::lexer::TokenType::OpenParentheses)
                 {
                     output.push_back(std::move(tokens[idx]));
                     idx++;
@@ -147,33 +149,40 @@ class Preprocessor final : PPSourceInterface
                 std::vector<lexer::PPToken> current_arg;
                 int paren_depth = 0;
                 int square_depth = 0;
-                
+
                 while (arg_idx < tokens.size())
                 {
-                    if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenParentheses) paren_depth++;
+                    if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenParentheses)
+                        paren_depth++;
                     else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
                     {
-                        if (paren_depth == 0) break;
+                        if (paren_depth == 0)
+                            break;
                         paren_depth--;
                     }
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenSquareBracket) square_depth++;
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseSquareBracket) square_depth--;
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Comma && paren_depth == 0 && square_depth == 0)
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenSquareBracket)
+                        square_depth++;
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseSquareBracket)
+                        square_depth--;
+                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Comma && paren_depth == 0
+                             && square_depth == 0)
                     {
                         actual_args.push_back(current_arg);
                         current_arg.clear();
                         arg_idx++;
                         continue;
                     }
-                    
+
                     current_arg.push_back(tokens[arg_idx]);
                     arg_idx++;
                 }
                 actual_args.push_back(current_arg);
-                if (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                if (arg_idx < tokens.size()
+                    && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
                     arg_idx++;
-                
-                if (actual_args.size() != param_count && !(param_count == 0 && actual_args.size() == 1 && actual_args[0].empty()))
+
+                if (actual_args.size() != param_count
+                    && !(param_count == 0 && actual_args.size() == 1 && actual_args[0].empty()))
                 {
                     output.push_back(std::move(tokens[idx]));
                     idx++;
@@ -191,12 +200,14 @@ class Preprocessor final : PPSourceInterface
                         {
                             if (tok_val == params[p].getValue())
                             {
-                                new_replacement.insert(new_replacement.end(), actual_args[p].begin(), actual_args[p].end());
+                                new_replacement.insert(new_replacement.end(), actual_args[p].begin(),
+                                                       actual_args[p].end());
                                 substituted = true;
                                 break;
                             }
                         }
-                        if (!substituted) new_replacement.push_back(tok);
+                        if (!substituted)
+                            new_replacement.push_back(tok);
                     }
                     else
                     {
@@ -209,10 +220,11 @@ class Preprocessor final : PPSourceInterface
 
             // Recursive substitution: Replace the macro invocation with its replacement tokens
             tokens.erase(tokens.begin() + idx, tokens.begin() + end_idx);
-            tokens.insert(tokens.begin() + idx, std::move_iterator(replacement.begin()), std::move_iterator(replacement.end()));
+            tokens.insert(tokens.begin() + idx, std::move_iterator(replacement.begin()),
+                          std::move_iterator(replacement.end()));
             // DO NOT idx++; Let the loop process the newly inserted tokens
         }
-        
+
         // Append any remaining trailing newlines to be consistent with original behavior?
         // Actually, the original did output.insert(..., start, size()) which would include the trailing newline if any.
         // Let's just output whatever is left.
@@ -338,7 +350,8 @@ public:
     void visit(const DefineDirective& define)
     {
         auto parse_res = parseDefineDirective(define);
-        if (!parse_res.first) return;
+        if (!parse_res.first)
+            return;
         auto optMacro = *parse_res.first;
         auto iterPtr = parse_res.second;
 
@@ -367,7 +380,7 @@ public:
         std::span<const lexer::PPToken> replacementSpan(m_fileTokens.back().data(), m_fileTokens.back().size());
 
         optMacro.replacement = replacementSpan;
-        m_defines[optMacro.identifierPos->getValue()] = optMacro;
+        m_defines[optMacro.identifierPos->getValue()].push_back(optMacro);
 
         if (define.defineToken != lexer::PPTokenIterator{})
         {
@@ -384,7 +397,27 @@ public:
         match(groupPart, [this](auto&& value) { this->visit(value); });
     }
 
-    static void visit(const coral66::lexer::PPTokenIterator&) {}
+    void visit(const lexer::PPTokenIterator& name)
+    {
+        if (name == lexer::PPTokenIterator{})
+            return;
+
+        std::vector<lexer::PPToken> outputTokens;
+        outputTokens.push_back(*(name - 1)); // DELETE keyword
+        outputTokens.push_back(*name);       // Macroname
+        outputTokens.push_back(*(name + 1)); // Semicolon
+        pushLine(std::move(outputTokens));
+
+        auto it = m_defines.find(name->getValue());
+        if (it != m_defines.end() && !it->second.empty())
+        {
+            it->second.pop_back();
+            if (it->second.empty())
+            {
+                m_defines.erase(it);
+            }
+        }
+    }
 
     bool errorsOccurred() const
     {
