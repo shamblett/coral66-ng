@@ -8,7 +8,7 @@ This document describes the main data structures, flow of control, and specific 
    The preprocessor parses the raw token stream into a lightweight abstract syntax tree (AST) to distinguish between macro definitions and normal code text.
    - **`File`**: The root node representing the entire source unit being preprocessed. It holds a sequence of `Group`s.
    - **`Group`**: A structural container holding a sequence of `GroupPart`s.
-   - **`GroupPart`**: A `std::variant` representing a segment of the source. It can be a `TextBlock` (code to be evaluated and macro-expanded), a `ControlLine` (a macro directive), an `UnknownDirective`, or a `NonDirective`.
+   - **`GroupPart`**: A `std::variant` representing a segment of the source. It can be a `TextBlock` (code to be evaluated and macro-expanded), a `ControlLine` (a macro directive).
    - **`TextBlock`**: Represents a contiguous span of `PPToken`s that are not part of a preprocessor directive.
    - **`ControlLine`**: Represents a macro directive, holding variants like `DefineDirective`.
    - **`DefineDirective`**: Captures a Coral66 `DEFINE` statement. It stores the identifier token and the sequence of tokens forming the replacement body.
