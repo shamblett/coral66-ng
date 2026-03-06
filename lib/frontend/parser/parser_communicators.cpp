@@ -12,8 +12,8 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 
-using namespace coral66::Syntax;
-
+namespace coral66::Parser
+{
 /*
  * Section 9
  *
@@ -28,3 +28,11 @@ using namespace coral66::Syntax;
  * Absolute
  *
  */
+
+std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+                                                        Context& context)
+{
+    std::unique_ptr<Syntax::Communicator> result;
+    return result;
+}
+} // namespace coral66::Parser

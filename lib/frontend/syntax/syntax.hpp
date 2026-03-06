@@ -273,4 +273,9 @@ public:
     [[nodiscard]] const Expression& getWidth() const;
 };
 
+// Statements
+class Communicator : public Node
+{
+    using Node::Node;
+};
 } // namespace coral66::Syntax

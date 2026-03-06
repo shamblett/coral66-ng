@@ -27,15 +27,24 @@ public:
     [[nodiscard]] std::size_t getErrorCount() const;
 };
 
+/*
+ * Main parse entry point
+ */
 Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                              bool* errors = nullptr);
 
+/*
+ * Program structure parsers
+ */
+
 std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+
 std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
                                                                    lexer::CTokenIterator end, Context& context);
 std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context);
 std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                     Context& context);
-
+std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+                                                        Context& context);
 } // namespace coral66::Parser
