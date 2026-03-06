@@ -94,7 +94,7 @@ class Preprocessor final : PPSourceInterface
         }
         std::vector<lexer::PPToken> output;
 
-        for (long idx = 0; idx < tokens.size();)
+        for (long unsigned idx = 0; idx < tokens.size();)
         {
             if (tokens[idx].getTokenType() == coral66::lexer::TokenType::Newline)
             {
@@ -141,7 +141,7 @@ class Preprocessor final : PPSourceInterface
                 auto params = result->second.back().argumentList.value();
                 auto param_count = params.size();
 
-                long arg_idx = idx + 1;
+                long unsigned arg_idx = idx + 1;
                 while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Newline)
                     arg_idx++;
 
