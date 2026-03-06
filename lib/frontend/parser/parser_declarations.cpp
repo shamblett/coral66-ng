@@ -4,14 +4,23 @@
  * Date   : 31/01/2026
  */
 
-/**
- * @file ParserDeclarations.cpp
- * @brief Implements parsing functions for C declarations and statements.
+/*
+ * Section 4
  *
- * This file contains the implementations of the recursive descent parser for
- * top-level declarations (TranslationUnit, ExternalDeclaration), function
- * definitions, struct/union/enum specifiers, declarators, and statements
- * (CompoundStatement, etc.).
+ * Coral 66 declarations comprise  :-
+ *
+ * Numeric types
+ *
+ * Simple References
+ *
+ * Array References
+ *
+ * Packed Data
+ *
+ * Storage Allocation
+ *
+ * Presets
+ *
+ * Overlay
+ *
  */
-
-// Empty for Coral66 at the moment

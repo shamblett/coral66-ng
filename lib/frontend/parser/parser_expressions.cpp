@@ -6,13 +6,6 @@
 
 #include "parser.hpp"
 
-/**
- * @brief Implements parsing functions for C expressions.
- *
- * This file contains the implementations of the recursive descent parser for
- * all Coral expression types, including assignment and primary expressions (literals, identifiers).
- */
-
 #include <llvm/Support/ConvertUTF.h>
 
 #include <algorithm>
@@ -20,6 +13,21 @@
 #include "lib/frontend/common/messages/errors.hpp"
 
 using namespace coral66::Syntax;
+
+/*
+ * Section 6
+ *
+ * Coral 66 expressions comprise  :-
+ *
+ * Simple expressions
+ *
+ * Primaries
+ *
+ * Word Logic
+ *
+ * Conditional Expressions
+ *
+ */
 
 namespace
 {

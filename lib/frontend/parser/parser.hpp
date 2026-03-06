@@ -20,7 +20,7 @@ class Context
     std::size_t m_errorCount = 0;
 
 public:
-    Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
+    explicit Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
 
     void log(const Message& message);
     [[nodiscard]] const source_interface& getSourceInterface() const;

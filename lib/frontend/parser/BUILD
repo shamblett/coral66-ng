@@ -8,8 +8,10 @@ cc_library(
     name = "parser",
     srcs = [
         "parser.cpp",
+        "parser_communicators.cpp",
         "parser_declarations.cpp",
         "parser_expressions.cpp",
+        "parser_statements.cpp",
         "parser_utilities.cpp",
     ],
     hdrs = [
