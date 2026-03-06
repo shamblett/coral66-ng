@@ -12,7 +12,7 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 /*
  * Section 9
@@ -35,4 +35,4 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
     std::unique_ptr<Syntax::Communicator> result;
     return result;
 }
-} // namespace coral66::Parser
+} // namespace coral66::parser

@@ -11,20 +11,20 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-#define treeProduces(source, matches)                             \
-    do                                                            \
-    {                                                             \
-        std::string string;                                       \
-        llvm::raw_string_ostream ss(string);                      \
-        coral66::PPSourceObject tokens;                           \
-        tokens = coral66::lexer::tokenize(source, &ss); \
-        CHECK_THAT(string, Catch::Matchers::Equals(""));          \
-        string.clear();                                           \
-        auto ctokens = coral66::lexer::toCTokens(tokens, &ss);    \
-        CHECK_THAT(string, Catch::Matchers::Equals(""));          \
-        string.clear();                                           \
-        auto tree = coral66::Parser::parseProgram(ctokens, &ss);  \
-        CHECK_THAT(string, matches);                              \
+#define treeProduces(source, matches)                            \
+    do                                                           \
+    {                                                            \
+        std::string string;                                      \
+        llvm::raw_string_ostream ss(string);                     \
+        coral66::PPSourceObject tokens;                          \
+        tokens = coral66::lexer::tokenize(source, &ss);          \
+        CHECK_THAT(string, Catch::Matchers::Equals(""));         \
+        string.clear();                                          \
+        auto ctokens = coral66::lexer::toCTokens(tokens, &ss);   \
+        CHECK_THAT(string, Catch::Matchers::Equals(""));         \
+        string.clear();                                          \
+        auto tree = coral66::parser::parseProgram(ctokens, &ss); \
+        CHECK_THAT(string, matches);                             \
     } while (0)
 
 using namespace coral66::Errors::Parser;

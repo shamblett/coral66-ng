@@ -16,7 +16,7 @@
 #include "lib/support/function_ref.hpp"
 #include "parser.hpp"
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 bool isAssignment(lexer::TokenType type);
 
@@ -26,61 +26,61 @@ bool expectIdentifier(lexer::CTokenIterator& begin, lexer::CTokenIterator end, C
 bool expect(lexer::TokenType expected, lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context,
             coral66::FunctionRef<Message()> additional = {});
 
-bool firstIsInExternalDeclaration(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInExternalDeclaration(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInDeclarator(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInDeclarator(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInDirectDeclarator(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInDirectDeclarator(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInParameterTypeList(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInParameterTypeList(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInAbstractDeclarator(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInAbstractDeclarator(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInDirectAbstractDeclarator(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInDirectAbstractDeclarator(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInPointer(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInPointer(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInCompoundItem(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInCompoundItem(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInInitializer(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInInitializer(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInInitializerList(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInInitializerList(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInStatement(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInStatement(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInAssignmentExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInAssignmentExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInConditionalExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInConditionalExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInLogicalOrExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInLogicalOrExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInLogicalAndExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInLogicalAndExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInBitOrExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInBitOrExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInBitXorExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInBitXorExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInBitAndExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInBitAndExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInEqualityExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInEqualityExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInRelationalExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInRelationalExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInShiftExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInShiftExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInAdditiveExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInAdditiveExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInTerm(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInTerm(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInTypeName(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInTypeName(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInCastExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInCastExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInUnaryExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInUnaryExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInPostFixExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
+bool firstIsInPostFixExpression(const lexer::CToken& token, const coral66::parser::Context& context);
 
-bool firstIsInPrimaryExpression(const lexer::CToken& token, const coral66::Parser::Context& context);
-} // namespace coral66::Parser
+bool firstIsInPrimaryExpression(const lexer::CToken& token, const coral66::parser::Context& context);
+} // namespace coral66::parser

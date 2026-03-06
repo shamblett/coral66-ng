@@ -12,7 +12,7 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 /*
  * Section 5 and 7
@@ -195,4 +195,4 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
 
     return nullptr;
 }
-} // namespace coral66::Parser
+} // namespace coral66::parser

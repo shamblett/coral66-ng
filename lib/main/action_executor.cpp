@@ -146,7 +146,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         parserTimeRegion.emplace(*parserTimer);
     }
 
-    Syntax::Program tree = coral66::Parser::parseProgram(cTokens, m_reporter, &errors);
+    Syntax::Program tree = coral66::parser::parseProgram(cTokens, m_reporter, &errors);
     if (errors)
     {
         return {};

@@ -9,7 +9,7 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 
 Context::Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter)
@@ -112,4 +112,4 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
     return std::make_unique<Syntax::Block>(blockStart, begin, std::move(decls), std::move(stmts));
 }
 
-} // namespace coral66::Parser
+} // namespace coral66::parser

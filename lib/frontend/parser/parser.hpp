@@ -10,7 +10,7 @@
 #include "lib/frontend/common/messages/message.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 
 class Context
@@ -47,4 +47,4 @@ std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin
                                                     Context& context);
 std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                         Context& context);
-} // namespace coral66::Parser
+} // namespace coral66::parser

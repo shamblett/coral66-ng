@@ -10,10 +10,10 @@
 
 #include <regex>
 
-#include "lib/frontend/preprocessor/preprocessor.hpp"
-#include "lib/frontend/semantics/semantics.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/function_ref.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
@@ -26,7 +26,7 @@ inline coral66::Semantics::Program generateProgram(std::string source)
     REQUIRE_FALSE(errors);
     auto ctokens = coral66::lexer::toCTokens(pptokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    auto tree = coral66::Parser::parseProgram(ctokens, &llvm::errs(), &errors);
+    auto tree = coral66::parser::parseProgram(ctokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
     auto program = coral66::Semantics::analyse(tree, std::move(ctokens), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);

@@ -44,7 +44,7 @@ namespace
 }
 } // namespace
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                     Context& context)
@@ -122,4 +122,4 @@ std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin
 
     return left;
 }
-} // namespace coral66::Parser
+} // namespace coral66::parser

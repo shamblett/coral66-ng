@@ -19,11 +19,11 @@
         llvm::raw_string_ostream ss(string);                                 \
         coral66::PPSourceObject tokens;                                      \
         bool errors = false;                                                 \
-        tokens = coral66::lexer::tokenize(source, &ss, &errors);   \
+        tokens = coral66::lexer::tokenize(source, &ss, &errors);             \
         REQUIRE_FALSE(errors);                                               \
         auto ctokens = coral66::lexer::toCTokens(tokens, &ss, &errors);      \
         REQUIRE_FALSE(errors);                                               \
-        auto tree = coral66::Parser::parseProgram(ctokens, &ss, &errors);    \
+        auto tree = coral66::parser::parseProgram(ctokens, &ss, &errors);    \
         REQUIRE_FALSE(errors);                                               \
         coral66::Semantics::analyse(tree, std::move(ctokens), &ss, &errors); \
         CHECK_THAT(string, matches);                                         \

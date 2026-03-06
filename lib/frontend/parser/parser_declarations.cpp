@@ -30,7 +30,7 @@
  *
  */
 
-namespace coral66::Parser
+namespace coral66::parser
 {
 std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
                                                                    lexer::CTokenIterator end, Context& context)
@@ -233,4 +233,4 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
     }
     return result;
 }
-} // namespace coral66::Parser
+} // namespace coral66::parser
