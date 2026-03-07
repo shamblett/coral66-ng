@@ -10,7 +10,7 @@ cc_library(
     srcs = [
         "lexer/invalid_tokens_tests.cpp",
         "lexer/valid_tokens_tests.cpp",
-        "parser_tests.cpp",
+        "parser/parser_tests.cpp",
         "preprocessor/macro_tests.cpp",
         "semantics_tests.cpp",
     ],
