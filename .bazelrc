@@ -11,3 +11,7 @@ build --sandbox_writable_path=/home/steve/.cache/ccache
 build --color=yes
 query --color=yes
 test --color=yes
+
+# No fission for builds
+build --fission=no
+build --features=-per_object_debug_info
