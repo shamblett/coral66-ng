@@ -12,6 +12,12 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
+/*
+ *
+ * Tests cover section 11.2 of the specification.
+ *
+ */
+
 namespace
 {
 coral66::PPSourceObject preprocess(std::string source)
@@ -102,9 +108,9 @@ TEST_CASE("Coral DELETE Macro Syntax", "[PP]")
     }
 }
 
-//
-// Section 11.2.1
-//
+/*
+ * Section 11.2.1
+ */
 TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
     SECTION("Simple Value Substitution")
@@ -148,9 +154,9 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
     }
 }
 
-//
-// Section 11.2.2
-//
+/*
+ * Section 11.2.2
+ */
 TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
 {
     SECTION("Single Parameter")
@@ -174,9 +180,9 @@ TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
     }
 }
 
-//
-// Section 11.2.3
-//
+/*
+ * Section 11.2.3
+ */
 TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
 {
     SECTION("Single Level")

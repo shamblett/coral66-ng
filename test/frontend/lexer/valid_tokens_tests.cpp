@@ -14,6 +14,12 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
+/*
+ *
+ * Tests cover section 10 and Appendix 2 of the specification.
+ *
+ */
+
 using namespace coral66::Errors::lexer;
 using namespace Catch::Matchers;
 
