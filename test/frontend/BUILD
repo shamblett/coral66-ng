@@ -10,9 +10,12 @@ cc_library(
     srcs = [
         "lexer/invalid_tokens_tests.cpp",
         "lexer/valid_tokens_tests.cpp",
-        "parser/parser_tests.cpp",
+        "parser/expression_tests.cpp",
         "preprocessor/macro_tests.cpp",
         "semantics_tests.cpp",
+    ],
+    hdrs = [
+        "parser/common.hpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [

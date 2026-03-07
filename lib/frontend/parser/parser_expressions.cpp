@@ -6,8 +6,6 @@
 
 #include "parser.hpp"
 
-#include <llvm/Support/ConvertUTF.h>
-
 #include <algorithm>
 
 #include "lib/frontend/common/messages/errors.hpp"
@@ -46,7 +44,7 @@ namespace
 
 namespace coral66::parser
 {
-std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                                     Context& context)
 {
     if (begin == end)
@@ -54,7 +52,7 @@ std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin
         return nullptr;
     }
 
-    std::unique_ptr<Syntax::Expression> left;
+    std::unique_ptr<Expression> left;
 
     if (begin->getTokenType() == lexer::TokenType::Identifier)
     {
@@ -106,15 +104,14 @@ std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin
 
     if (left && begin != end)
     {
-        auto type = begin->getTokenType();
-        if (type == lexer::TokenType::Plus || type == lexer::TokenType::Minus || type == lexer::TokenType::Asterisk
+        if (const auto type = begin->getTokenType(); type == lexer::TokenType::Plus || type == lexer::TokenType::Minus || type == lexer::TokenType::Asterisk
             || type == lexer::TokenType::Division)
         {
             auto op = begin;
             begin++;
             if (auto right = parseExpression(begin, end, context))
             {
-                return std::make_unique<Syntax::BinaryExpression>(left->begin(), right->end(), std::move(left), op,
+                return std::make_unique<BinaryExpression>(left->begin(), right->end(), std::move(left), op,
                                                                   std::move(right));
             }
         }
