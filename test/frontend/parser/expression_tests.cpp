@@ -5,138 +5,227 @@
  */
 
 #include "common.hpp"
-
-#include "lib/frontend/common/messages/errors.hpp"
-#include "test/common/test_config.hpp"
+#include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/syntax/syntax.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-/*
- * Tests section 6 of the specification.
- */
+using namespace coral66;
+using namespace coral66::Syntax;
 
-using namespace coral66::Errors::Parser;
-
-TEST_CASE("Coral Parse Program Structure", "[parser]")
+struct ParsedExpr
 {
-    treeProduces("PROGRAM BEGIN END", Catch::Matchers::Equals(""));
-    // treeProduces("PROGRAM", Catch::Matchers::Contains("Expected 'BEGIN'")); // Parser expects BEGIN
-}
+    std::string source;
+    std::string outStr;
+    llvm::raw_string_ostream ss;
+    PPSourceObject ppTokens;
+    CSourceObject cTokens;
+    std::unique_ptr<parser::Context> context;
+    std::unique_ptr<Expression> expr;
 
-TEST_CASE("Coral Parse Declarations", "[parser]")
-{
-    treeProduces("PROGRAM BEGIN INTEGER a; END", Catch::Matchers::Equals(""));
-    treeProduces("PROGRAM BEGIN FLOATING x, y; END", Catch::Matchers::Equals(""));
-    treeProduces("PROGRAM BEGIN FIXED f; END", Catch::Matchers::Equals(""));
-    treeProduces("PROGRAM BEGIN INTEGER a, b, c; FLOATING d; END", Catch::Matchers::Equals(""));
-}
-
-TEST_CASE("Coral Parse Statements", "[parser]")
-{
-    SECTION("Assignment")
+    ParsedExpr(const std::string& src) : source(src), ss(outStr)
     {
-        treeProduces("PROGRAM BEGIN a := 5; END", Catch::Matchers::Equals(""));
-        treeProduces("PROGRAM BEGIN a := b; END", Catch::Matchers::Equals(""));
-    }
+        ppTokens = lexer::tokenize(source, &ss);
+        cTokens = lexer::toCTokens(ppTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
 
-    SECTION("Goto")
+        auto& tokens = cTokens.data();
+        const lexer::CToken* begin = tokens.data();
+        const lexer::CToken* end = tokens.data() + tokens.size();
+
+        while (begin != end && (end - 1)->getTokenType() == lexer::TokenType::Newline)
+        {
+            end--;
+        }
+
+        expr = parser::parseExpression(begin, end, *context);
+        REQUIRE(expr != nullptr);
+        REQUIRE(begin == end);
+    }
+};
+
+TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
+{
+    SECTION("Literals")
     {
-        treeProduces("PROGRAM BEGIN GOTO label; END", Catch::Matchers::Equals(""));
+        ParsedExpr p("42");
+        REQUIRE(dynamic_cast<LiteralExpression*>(p.expr.get()) != nullptr);
     }
-
-    SECTION("If")
+    SECTION("Identifiers")
     {
-        // Simple IF THEN
-        treeProduces("PROGRAM BEGIN IF a THEN b := 1; END", Catch::Matchers::Equals(""));
-        // IF THEN ELSE
-        treeProduces("PROGRAM BEGIN IF a THEN b := 1 ELSE b := 0; END", Catch::Matchers::Equals(""));
+        ParsedExpr p("myVar");
+        REQUIRE(dynamic_cast<IdentifierExpression*>(p.expr.get()) != nullptr);
+    }
+    SECTION("Parenthesized Expression")
+    {
+        ParsedExpr p("(42)");
+        REQUIRE(dynamic_cast<LiteralExpression*>(p.expr.get()) != nullptr);
     }
 }
 
-TEST_CASE("Coral Parse Mixed", "[parser]")
+TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
 {
-    treeProduces(R"(
-        PROGRAM
-        BEGIN
-            INTEGER i;
-            FLOATING f;
-            i := 0;
-            f := 1.5;
-            IF i THEN GOTO end;
-            i := 1;
-            end:;
-        END
-    )",
-                 Catch::Matchers::Equals(""));
+    SECTION("Addition")
+    {
+        ParsedExpr p("a + b");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
+    }
+    SECTION("Unary Minus")
+    {
+        ParsedExpr p("-x");
+        auto unOp = dynamic_cast<UnaryExpression*>(p.expr.get());
+        REQUIRE(unOp != nullptr);
+        REQUIRE(unOp->getOp()->getTokenType() == lexer::TokenType::Minus);
+    }
+    SECTION("Precedence")
+    {
+        ParsedExpr p("a + b * c");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
+
+        auto right = dynamic_cast<const BinaryExpression*>(&binOp->getRight());
+        REQUIRE(right != nullptr);
+        REQUIRE(right->getOp()->getTokenType() == lexer::TokenType::Asterisk);
+    }
 }
 
-TEST_CASE("Coral Parse Fixed Type", "[parser]")
+TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
 {
-    treeProduces("PROGRAM BEGIN FIXED(16,8) f; END", Catch::Matchers::Equals(""));
-    treeProduces("PROGRAM BEGIN FIXED(32,16) f1, f2; END", Catch::Matchers::Equals(""));
+    SECTION("MASK")
+    {
+        ParsedExpr p("a MASK b");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::MaskKeyword);
+    }
+    SECTION("UNION")
+    {
+        ParsedExpr p("a UNION b");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::UnionKeyword);
+    }
+    SECTION("DIFFER")
+    {
+        ParsedExpr p("a DIFFER b");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
+    }
+    SECTION("Bitwise Precedence")
+    {
+        ParsedExpr p("a DIFFER b UNION c MASK d");
+        auto diffOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(diffOp != nullptr);
+        REQUIRE(diffOp->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
+    }
 }
 
-TEST_CASE("Coral Parse Table", "[parser]")
+TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
 {
-    treeProduces(R"(
-        PROGRAM
-        BEGIN
-            TABLE T[10]
-            [
-                INTEGER x;
-                FIXED(16,8) y
-            ];
-        END
-    )",
-                 Catch::Matchers::Equals(""));
-
-    // Anonymous table?
-    treeProduces(R"(
-        PROGRAM
-        BEGIN
-            TABLE [10]
-            [
-                INTEGER x
-            ] T;
-        END
-    )",
-                 Catch::Matchers::Equals(""));
+    SECTION("IF THEN ELSE")
+    {
+        ParsedExpr p("IF a < b THEN c ELSE d");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
+        REQUIRE(dynamic_cast<const BinaryExpression*>(&condExpr->getCondition()) != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getThenBranch()) != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getElseBranch()) != nullptr);
+    }
+    SECTION("Nested Conditionals")
+    {
+        ParsedExpr p("IF a THEN IF b THEN c ELSE d ELSE e");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
+    }
 }
 
-TEST_CASE("Coral Parse Overlay", "[parser]")
+TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
 {
-    treeProduces(R"(
-        PROGRAM
-        BEGIN
-            OVERLAY T
-            [
-                INTEGER x;
-                FIXED(16,8) y
-            ];
-        END
-    )",
-                 Catch::Matchers::Equals(""));
+    SECTION("Type Change")
+    {
+        ParsedExpr p("INTEGER ( 3.14 )");
+        auto tc = dynamic_cast<TypeChangeExpression*>(p.expr.get());
+        REQUIRE(tc != nullptr);
+        REQUIRE(tc->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
+    }
+    SECTION("Location")
+    {
+        ParsedExpr p("LOCATION ( x )");
+        auto loc = dynamic_cast<LocationExpression*>(p.expr.get());
+        REQUIRE(loc != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&loc->getWordReference()) != nullptr);
+    }
+    SECTION("Part Word")
+    {
+        ParsedExpr p("BITS [ 8, 4 ] x");
+        auto pw = dynamic_cast<PartWordExpression*>(p.expr.get());
+        REQUIRE(pw != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&pw->getBase()) != nullptr);
+    }
 }
 
-TEST_CASE("Coral Parse Answer Statement", "[parser]")
+TEST_CASE("Coral Parse Expression - Word References", "[parser][expression]")
 {
-    treeProduces("PROGRAM BEGIN ANSWER 42; END", Catch::Matchers::Equals(""));
-    treeProduces("PROGRAM BEGIN ANSWER x + 1; END", Catch::Matchers::Equals(""));
+    SECTION("Array Access Single Index")
+    {
+        ParsedExpr p("arr [ i ]");
+        auto arr = dynamic_cast<ArrayAccessExpression*>(p.expr.get());
+        REQUIRE(arr != nullptr);
+        REQUIRE(arr->getArray() != nullptr);
+        REQUIRE(arr->getIndices().size() == 1);
+    }
+    SECTION("Array Access Double Index")
+    {
+        ParsedExpr p("arr [ i, j ]");
+        auto arr = dynamic_cast<ArrayAccessExpression*>(p.expr.get());
+        REQUIRE(arr != nullptr);
+        REQUIRE(arr->getArray() != nullptr);
+        REQUIRE(arr->getIndices().size() == 2);
+    }
+    SECTION("Anonymous Reference")
+    {
+        ParsedExpr p("[ 10 ]");
+        auto arr = dynamic_cast<ArrayAccessExpression*>(p.expr.get());
+        REQUIRE(arr != nullptr);
+        REQUIRE(arr->getArray() == nullptr);
+        REQUIRE(arr->getIndices().size() == 1);
+    }
 }
 
-TEST_CASE("Coral Parse Code Statement", "[parser]")
+TEST_CASE("Coral Parse Expression - Function Calls", "[parser][expression]")
 {
-    treeProduces("PROGRAM BEGIN CODE 'nop'; END", Catch::Matchers::Equals(""));
+    SECTION("No Args Function Call Equivalent (Identifier)")
+    {
+        ParsedExpr p("func");
+        auto id = dynamic_cast<IdentifierExpression*>(p.expr.get());
+        REQUIRE(id != nullptr);
+    }
+    SECTION("Function Call with arguments")
+    {
+        ParsedExpr p("func(a, b + 1)");
+        auto fc = dynamic_cast<FunctionCallExpression*>(p.expr.get());
+        REQUIRE(fc != nullptr);
+        REQUIRE(fc->getArguments().size() == 2);
+    }
 }
 
-TEST_CASE("Coral Parse Procedures", "[parser]")
+TEST_CASE("Coral Parse Expression - More Conditions", "[parser][expression]")
 {
-    treeProduces("PROGRAM BEGIN PROCEDURE p; BEGIN END; END", Catch::Matchers::Equals(""));
-    treeProduces("PROGRAM BEGIN PROCEDURE p(x); BEGIN END; END", Catch::Matchers::Equals(""));
-}
+    SECTION("Different Comparators")
+    {
+        ParsedExpr p("IF a >= b AND c <> d OR e <= f THEN x ELSE y");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
 
-TEST_CASE("Coral Parse Loops", "[parser]")
-{
-    treeProduces("PROGRAM BEGIN FOR i := 0 STEP 1 UNTIL 10 DO x := x + 1; END", Catch::Matchers::Equals(""));
-    // While loop (existing?)
-    treeProduces("PROGRAM BEGIN WHILE i < 10 DO i := i + 1; END", Catch::Matchers::Equals(""));
+        auto orExpr = dynamic_cast<const BinaryExpression*>(&condExpr->getCondition());
+        REQUIRE(orExpr != nullptr);
+        REQUIRE(orExpr->getOp()->getTokenType() == lexer::TokenType::OrKeyword);
+
+        auto andExpr = dynamic_cast<const BinaryExpression*>(&orExpr->getLeft());
+        REQUIRE(andExpr != nullptr);
+        REQUIRE(andExpr->getOp()->getTokenType() == lexer::TokenType::AndKeyword);
+    }
 }
