@@ -273,7 +273,80 @@ public:
     [[nodiscard]] const Expression& getWidth() const;
 };
 
-// Statements
+class UnaryExpression final : public Expression
+{
+    lexer::CTokenIterator m_op;
+    std::unique_ptr<Expression> m_operand;
+
+public:
+    UnaryExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator op,
+                    std::unique_ptr<Expression>&& operand);
+    [[nodiscard]] lexer::CTokenIterator getOp() const;
+    [[nodiscard]] const Expression& getOperand() const;
+};
+
+class ConditionalExpression final : public Expression
+{
+    std::unique_ptr<Expression> m_condition;
+    std::unique_ptr<Expression> m_thenBranch;
+    std::unique_ptr<Expression> m_elseBranch;
+
+public:
+    ConditionalExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                          std::unique_ptr<Expression>&& condition, std::unique_ptr<Expression>&& thenBranch,
+                          std::unique_ptr<Expression>&& elseBranch);
+    [[nodiscard]] const Expression& getCondition() const;
+    [[nodiscard]] const Expression& getThenBranch() const;
+    [[nodiscard]] const Expression& getElseBranch() const;
+};
+
+class FunctionCallExpression final : public Expression
+{
+    lexer::CTokenIterator m_function;
+    std::vector<std::unique_ptr<Expression>> m_arguments;
+
+public:
+    FunctionCallExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator function,
+                           std::vector<std::unique_ptr<Expression>>&& arguments);
+    [[nodiscard]] lexer::CTokenIterator getFunction() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<Expression>>& getArguments() const;
+};
+
+class ArrayAccessExpression final : public Expression
+{
+    lexer::CTokenIterator m_array; // Can be nullptr for anonymous reference
+    std::vector<std::unique_ptr<Expression>> m_indices;
+
+public:
+    ArrayAccessExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator array,
+                          std::vector<std::unique_ptr<Expression>>&& indices);
+    [[nodiscard]] lexer::CTokenIterator getArray() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<Expression>>& getIndices() const;
+};
+
+class LocationExpression final : public Expression
+{
+    std::unique_ptr<Expression> m_wordReference;
+
+public:
+    LocationExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                       std::unique_ptr<Expression>&& wordReference);
+    [[nodiscard]] const Expression& getWordReference() const;
+};
+
+class TypeChangeExpression final : public Expression
+{
+    lexer::CTokenIterator m_type;
+    std::unique_ptr<Expression> m_expression;
+
+public:
+    TypeChangeExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
+                         std::unique_ptr<Expression>&& expression);
+    [[nodiscard]] lexer::CTokenIterator getType() const;
+    [[nodiscard]] const Expression& getExpression() const;
+};
+
+// Communicators
 class Communicator : public Node
 {
     using Node::Node;

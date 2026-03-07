@@ -344,4 +344,107 @@ const Expression& PartWordExpression::getWidth() const
     return *m_width;
 }
 
+// UnaryExpression
+UnaryExpression::UnaryExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                 const lexer::CTokenIterator op, std::unique_ptr<Expression>&& operand)
+    : Expression(begin, end), m_op(op), m_operand(std::move(operand))
+{
+}
+
+lexer::CTokenIterator UnaryExpression::getOp() const
+{
+    return m_op;
+}
+const Expression& UnaryExpression::getOperand() const
+{
+    return *m_operand;
+}
+
+// ConditionalExpression
+ConditionalExpression::ConditionalExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                             std::unique_ptr<Expression>&& condition,
+                                             std::unique_ptr<Expression>&& thenBranch,
+                                             std::unique_ptr<Expression>&& elseBranch)
+    : Expression(begin, end),
+      m_condition(std::move(condition)),
+      m_thenBranch(std::move(thenBranch)),
+      m_elseBranch(std::move(elseBranch))
+{
+}
+
+const Expression& ConditionalExpression::getCondition() const
+{
+    return *m_condition;
+}
+const Expression& ConditionalExpression::getThenBranch() const
+{
+    return *m_thenBranch;
+}
+const Expression& ConditionalExpression::getElseBranch() const
+{
+    return *m_elseBranch;
+}
+
+// FunctionCallExpression
+FunctionCallExpression::FunctionCallExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                               const lexer::CTokenIterator function,
+                                               std::vector<std::unique_ptr<Expression>>&& arguments)
+    : Expression(begin, end), m_function(function), m_arguments(std::move(arguments))
+{
+}
+
+lexer::CTokenIterator FunctionCallExpression::getFunction() const
+{
+    return m_function;
+}
+const std::vector<std::unique_ptr<Expression>>& FunctionCallExpression::getArguments() const
+{
+    return m_arguments;
+}
+
+// ArrayAccessExpression
+ArrayAccessExpression::ArrayAccessExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                             const lexer::CTokenIterator array,
+                                             std::vector<std::unique_ptr<Expression>>&& indices)
+    : Expression(begin, end), m_array(array), m_indices(std::move(indices))
+{
+}
+
+lexer::CTokenIterator ArrayAccessExpression::getArray() const
+{
+    return m_array;
+}
+const std::vector<std::unique_ptr<Expression>>& ArrayAccessExpression::getIndices() const
+{
+    return m_indices;
+}
+
+// LocationExpression
+LocationExpression::LocationExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                       std::unique_ptr<Expression>&& wordReference)
+    : Expression(begin, end), m_wordReference(std::move(wordReference))
+{
+}
+
+const Expression& LocationExpression::getWordReference() const
+{
+    return *m_wordReference;
+}
+
+// TypeChangeExpression
+TypeChangeExpression::TypeChangeExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const lexer::CTokenIterator type, std::unique_ptr<Expression>&& expression)
+    : Expression(begin, end), m_type(type), m_expression(std::move(expression))
+{
+}
+
+lexer::CTokenIterator TypeChangeExpression::getType() const
+{
+    return m_type;
+}
+const Expression& TypeChangeExpression::getExpression() const
+{
+    return *m_expression;
+}
+
 } // namespace coral66::Syntax
