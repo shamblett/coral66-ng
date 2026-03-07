@@ -14,30 +14,26 @@ namespace coral66::parser
 {
 
 // Forward declarations
-std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                        Context& context);
-std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                          Context& context);
-std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                           Context& context);
-std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                               Context& context);
-std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                            Context& context);
-std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context);
-std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                        Context& context);
-std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                Context& context);
-std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                               Context& context);
-std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                             Context& context);
-std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                               Context& context);
-std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                Context& context);
 
 bool isComparator(lexer::TokenType t)
@@ -63,8 +59,7 @@ bool isNumberType(lexer::TokenType t)
            || t == lexer::TokenType::FixedKeyword;
 }
 
-std::unique_ptr<Expression> parseExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                            Context& context)
+std::unique_ptr<Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     if (begin == end)
     {
@@ -78,7 +73,7 @@ std::unique_ptr<Expression> parseExpression(lexer::CTokenIterator& begin, const 
     return parseUnconditionalExpression(begin, end, context);
 }
 
-std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                        Context& context)
 {
     auto startToken = begin++; // IF
@@ -108,7 +103,7 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
                                                    std::move(thenExpr), std::move(elseExpr));
 }
 
-std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                          Context& context)
 {
     if (begin->getTokenType() == lexer::TokenType::StringLiteral)
@@ -119,8 +114,7 @@ std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& 
     return parseSimpleExpression(begin, end, context);
 }
 
-std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                           Context& context)
+std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     auto expr = parseSubcondition(begin, end, context);
     if (!expr)
@@ -136,8 +130,7 @@ std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, const l
     return expr;
 }
 
-std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                              Context& context)
+std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     auto expr = parseComparison(begin, end, context);
     if (!expr)
@@ -153,8 +146,7 @@ std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, cons
     return expr;
 }
 
-std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                            Context& context)
+std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     auto expr = parseSimpleExpression(begin, end, context);
     if (!expr)
@@ -170,7 +162,7 @@ std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, const 
     return expr;
 }
 
-std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context)
 {
     std::unique_ptr<Expression> expr;
@@ -199,7 +191,7 @@ std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, 
     return expr;
 }
 
-std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
+std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     auto expr = parseFactor(begin, end, context);
     if (!expr)
@@ -215,7 +207,7 @@ std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, const lexer:
     return expr;
 }
 
-std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
+std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     if (begin == end)
         return nullptr;
@@ -246,7 +238,7 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
     return parseBitwiseDiffer(begin, end, context);
 }
 
-std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                Context& context)
 {
     auto expr = parseBitwiseUnion(begin, end, context);
@@ -263,8 +255,7 @@ std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, con
     return expr;
 }
 
-std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                              Context& context)
+std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     auto expr = parseBitwiseMask(begin, end, context);
     if (!expr)
@@ -280,8 +271,7 @@ std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, cons
     return expr;
 }
 
-std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                             Context& context)
+std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     auto expr = parseTypedPrimary(begin, end, context);
     if (!expr)
@@ -297,8 +287,7 @@ std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, const
     return expr;
 }
 
-std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                              Context& context)
+std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     if (begin == end)
         return nullptr;
@@ -416,7 +405,7 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
     return nullptr;
 }
 
-std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                Context& context)
 {
     if (begin == end)
