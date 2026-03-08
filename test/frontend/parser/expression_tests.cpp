@@ -11,6 +11,14 @@
 using namespace coral66;
 using namespace coral66::Syntax;
 
+/*
+ * Tests cover section 6 of the specification
+ */
+
+
+/*
+ * 6.1.1
+ */
 TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
 {
     SECTION("Literals")
@@ -30,6 +38,34 @@ TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
     }
 }
 
+TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
+{
+    SECTION("Type Change")
+    {
+        ParsedExpr p("INTEGER ( 3.14 )");
+        auto tc = dynamic_cast<TypeChangeExpression*>(p.expr.get());
+        REQUIRE(tc != nullptr);
+        REQUIRE(tc->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
+    }
+    SECTION("Location")
+    {
+        ParsedExpr p("LOCATION ( x )");
+        auto loc = dynamic_cast<LocationExpression*>(p.expr.get());
+        REQUIRE(loc != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&loc->getWordReference()) != nullptr);
+    }
+    SECTION("Part Word")
+    {
+        ParsedExpr p("BITS [ 8, 4 ] x");
+        auto pw = dynamic_cast<PartWordExpression*>(p.expr.get());
+        REQUIRE(pw != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&pw->getBase()) != nullptr);
+    }
+}
+
+/*
+ * 6.1.3
+ */
 TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
 {
     SECTION("Addition")
@@ -59,6 +95,9 @@ TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
     }
 }
 
+/*
+ * 6.1.2
+ */
 TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
 {
     SECTION("MASK")
@@ -91,6 +130,9 @@ TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
     }
 }
 
+/*
+ * 6.2.1
+ */
 TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
 {
     SECTION("IF THEN ELSE")
@@ -110,31 +152,27 @@ TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
     }
 }
 
-TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - More Conditions", "[parser][expression]")
 {
-    SECTION("Type Change")
+    SECTION("Different Comparators")
     {
-        ParsedExpr p("INTEGER ( 3.14 )");
-        auto tc = dynamic_cast<TypeChangeExpression*>(p.expr.get());
-        REQUIRE(tc != nullptr);
-        REQUIRE(tc->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
-    }
-    SECTION("Location")
-    {
-        ParsedExpr p("LOCATION ( x )");
-        auto loc = dynamic_cast<LocationExpression*>(p.expr.get());
-        REQUIRE(loc != nullptr);
-        REQUIRE(dynamic_cast<const IdentifierExpression*>(&loc->getWordReference()) != nullptr);
-    }
-    SECTION("Part Word")
-    {
-        ParsedExpr p("BITS [ 8, 4 ] x");
-        auto pw = dynamic_cast<PartWordExpression*>(p.expr.get());
-        REQUIRE(pw != nullptr);
-        REQUIRE(dynamic_cast<const IdentifierExpression*>(&pw->getBase()) != nullptr);
+        ParsedExpr p("IF a >= b AND c <> d OR e <= f THEN x ELSE y");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
+
+        auto orExpr = dynamic_cast<const BinaryExpression*>(&condExpr->getCondition());
+        REQUIRE(orExpr != nullptr);
+        REQUIRE(orExpr->getOp()->getTokenType() == lexer::TokenType::OrKeyword);
+
+        auto andExpr = dynamic_cast<const BinaryExpression*>(&orExpr->getLeft());
+        REQUIRE(andExpr != nullptr);
+        REQUIRE(andExpr->getOp()->getTokenType() == lexer::TokenType::AndKeyword);
     }
 }
 
+/*
+ * 6.1.1.2.1
+ */
 TEST_CASE("Coral Parse Expression - Word References", "[parser][expression]")
 {
     SECTION("Array Access Single Index")
@@ -163,6 +201,9 @@ TEST_CASE("Coral Parse Expression - Word References", "[parser][expression]")
     }
 }
 
+/*
+ * 6.1.1.2.5
+ */
 TEST_CASE("Coral Parse Expression - Function Calls", "[parser][expression]")
 {
     SECTION("No Args Function Call Equivalent (Identifier)")
@@ -177,23 +218,5 @@ TEST_CASE("Coral Parse Expression - Function Calls", "[parser][expression]")
         auto fc = dynamic_cast<FunctionCallExpression*>(p.expr.get());
         REQUIRE(fc != nullptr);
         REQUIRE(fc->getArguments().size() == 2);
-    }
-}
-
-TEST_CASE("Coral Parse Expression - More Conditions", "[parser][expression]")
-{
-    SECTION("Different Comparators")
-    {
-        ParsedExpr p("IF a >= b AND c <> d OR e <= f THEN x ELSE y");
-        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
-        REQUIRE(condExpr != nullptr);
-
-        auto orExpr = dynamic_cast<const BinaryExpression*>(&condExpr->getCondition());
-        REQUIRE(orExpr != nullptr);
-        REQUIRE(orExpr->getOp()->getTokenType() == lexer::TokenType::OrKeyword);
-
-        auto andExpr = dynamic_cast<const BinaryExpression*>(&orExpr->getLeft());
-        REQUIRE(andExpr != nullptr);
-        REQUIRE(andExpr->getOp()->getTokenType() == lexer::TokenType::AndKeyword);
     }
 }
