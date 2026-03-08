@@ -155,7 +155,7 @@ TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
     }
     SECTION("Nested Conditionals")
     {
-        ParsedExpr p("IF a THEN IF b THEN c ELSE d ELSE e");
+        ParsedExpr p("IF a <> 0 THEN IF b = 1 THEN c ELSE d ELSE e");
         auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
         REQUIRE(condExpr != nullptr);
     }

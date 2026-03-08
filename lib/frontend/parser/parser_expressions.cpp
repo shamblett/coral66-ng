@@ -159,6 +159,11 @@ std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, lexer:
             return nullptr;
         expr = std::make_unique<BinaryExpression>(expr->begin(), right->end(), std::move(expr), op, std::move(right));
     }
+    else
+    {
+        // Coral 66 requires a comparator for a comparison
+        return nullptr;
+    }
     return expr;
 }
 
