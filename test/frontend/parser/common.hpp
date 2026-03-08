@@ -8,6 +8,8 @@
 
 #include <llvm/Support/raw_ostream.h>
 
+#include <utility>
+
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/parser/parser.hpp"
@@ -26,7 +28,7 @@ struct ParsedExpr
     std::unique_ptr<parser::Context> context;
     std::unique_ptr<Expression> expr;
 
-    explicit ParsedExpr(const std::string& src) : source(src), ss(outStr)
+    explicit ParsedExpr(std::string  src) : source(std::move(src)), ss(outStr)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);

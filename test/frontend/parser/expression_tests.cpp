@@ -15,9 +15,8 @@ using namespace coral66::Syntax;
  * Tests cover section 6 of the specification
  */
 
-
 /*
- * 6.1.1
+ * 6.1.1.1
  */
 TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
 {
@@ -38,6 +37,9 @@ TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
     }
 }
 
+/*
+ * 6.1.1.2
+ */
 TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
 {
     SECTION("Type Change")
@@ -73,38 +75,6 @@ TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
 }
 
 /*
- * 6.1.3
- */
-TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
-{
-    SECTION("Addition")
-    {
-        ParsedExpr p("a + b");
-        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
-        REQUIRE(binOp != nullptr);
-        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
-    }
-    SECTION("Unary Minus")
-    {
-        ParsedExpr p("-x");
-        auto unOp = dynamic_cast<UnaryExpression*>(p.expr.get());
-        REQUIRE(unOp != nullptr);
-        REQUIRE(unOp->getOp()->getTokenType() == lexer::TokenType::Minus);
-    }
-    SECTION("Precedence")
-    {
-        ParsedExpr p("a + b * c");
-        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
-        REQUIRE(binOp != nullptr);
-        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
-
-        auto right = dynamic_cast<const BinaryExpression*>(&binOp->getRight());
-        REQUIRE(right != nullptr);
-        REQUIRE(right->getOp()->getTokenType() == lexer::TokenType::Asterisk);
-    }
-}
-
-/*
  * 6.1.2
  */
 TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
@@ -136,46 +106,6 @@ TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
         auto diffOp = dynamic_cast<BinaryExpression*>(p.expr.get());
         REQUIRE(diffOp != nullptr);
         REQUIRE(diffOp->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
-    }
-}
-
-/*
- * 6.2.1
- */
-TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
-{
-    SECTION("IF THEN ELSE")
-    {
-        ParsedExpr p("IF a < b THEN c ELSE d");
-        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
-        REQUIRE(condExpr != nullptr);
-        REQUIRE(dynamic_cast<const BinaryExpression*>(&condExpr->getCondition()) != nullptr);
-        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getThenBranch()) != nullptr);
-        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getElseBranch()) != nullptr);
-    }
-    SECTION("Nested Conditionals")
-    {
-        ParsedExpr p("IF a <> 0 THEN IF b = 1 THEN c ELSE d ELSE e");
-        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
-        REQUIRE(condExpr != nullptr);
-    }
-}
-
-TEST_CASE("Coral Parse Expression - More Conditions", "[parser][expression]")
-{
-    SECTION("Different Comparators")
-    {
-        ParsedExpr p("IF a >= b AND c <> d OR e <= f THEN x ELSE y");
-        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
-        REQUIRE(condExpr != nullptr);
-
-        auto orExpr = dynamic_cast<const BinaryExpression*>(&condExpr->getCondition());
-        REQUIRE(orExpr != nullptr);
-        REQUIRE(orExpr->getOp()->getTokenType() == lexer::TokenType::OrKeyword);
-
-        auto andExpr = dynamic_cast<const BinaryExpression*>(&orExpr->getLeft());
-        REQUIRE(andExpr != nullptr);
-        REQUIRE(andExpr->getOp()->getTokenType() == lexer::TokenType::AndKeyword);
     }
 }
 
@@ -227,5 +157,74 @@ TEST_CASE("Coral Parse Expression - Function Calls", "[parser][expression]")
         auto fc = dynamic_cast<FunctionCallExpression*>(p.expr.get());
         REQUIRE(fc != nullptr);
         REQUIRE(fc->getArguments().size() == 2);
+    }
+}
+
+/*
+ * 6.1.3
+ */
+TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
+{
+    SECTION("Addition")
+    {
+        ParsedExpr p("a + b");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
+    }
+    SECTION("Unary Minus")
+    {
+        ParsedExpr p("-x");
+        auto unOp = dynamic_cast<UnaryExpression*>(p.expr.get());
+        REQUIRE(unOp != nullptr);
+        REQUIRE(unOp->getOp()->getTokenType() == lexer::TokenType::Minus);
+    }
+    SECTION("Precedence")
+    {
+        ParsedExpr p("a + b * c");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expr.get());
+        REQUIRE(binOp != nullptr);
+        REQUIRE(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
+
+        auto right = dynamic_cast<const BinaryExpression*>(&binOp->getRight());
+        REQUIRE(right != nullptr);
+        REQUIRE(right->getOp()->getTokenType() == lexer::TokenType::Asterisk);
+    }
+}
+
+/*
+ * 6.2.1
+ */
+TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
+{
+    SECTION("IF THEN ELSE")
+    {
+        ParsedExpr p("IF a < b THEN c ELSE d");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
+        REQUIRE(dynamic_cast<const BinaryExpression*>(&condExpr->getCondition()) != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getThenBranch()) != nullptr);
+        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getElseBranch()) != nullptr);
+    }
+    SECTION("Nested Conditionals")
+    {
+        ParsedExpr p("IF a <> 0 THEN IF b = 1 THEN c ELSE d ELSE e");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
+    }
+
+    SECTION("Different Comparators")
+    {
+        ParsedExpr p("IF a >= b AND c <> d OR e <= f THEN x ELSE y");
+        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
+        REQUIRE(condExpr != nullptr);
+
+        auto orExpr = dynamic_cast<const BinaryExpression*>(&condExpr->getCondition());
+        REQUIRE(orExpr != nullptr);
+        REQUIRE(orExpr->getOp()->getTokenType() == lexer::TokenType::OrKeyword);
+
+        auto andExpr = dynamic_cast<const BinaryExpression*>(&orExpr->getLeft());
+        REQUIRE(andExpr != nullptr);
+        REQUIRE(andExpr->getOp()->getTokenType() == lexer::TokenType::AndKeyword);
     }
 }
