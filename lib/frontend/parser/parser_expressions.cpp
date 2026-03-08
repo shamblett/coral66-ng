@@ -320,16 +320,70 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
     if (isNumberType(tType))
     {
         auto typeToken = begin++;
-        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+        std::unique_ptr<Expression> totalBits;
+        std::unique_ptr<Expression> fractionBits;
+
+        if (tType == lexer::TokenType::FixedKeyword)
         {
-            begin++;
-            auto expr = parseExpression(begin, end, context);
-            if (!expr)
-                return nullptr;
-            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+            if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
             {
-                auto endToken = begin++;
-                return std::make_unique<TypeChangeExpression>(typeToken, endToken, typeToken, std::move(expr));
+                // To support both FIXED(Total, Fraction)(Expression) and FIXED(Expression)
+                // Wait, Coral 66 requires Scale for FIXED? "FIXED Scale".
+                // We parse Scale if there is a comma inside the parentheses.
+                // But it's easier to just parse Expression. If the next token is Comma, it's a Scale!
+                // Let's implement this logic:
+                begin++; // skip (
+                auto firstExpr = parseExpression(begin, end, context);
+                if (!firstExpr)
+                    return nullptr;
+                
+                if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                {
+                    begin++; // skip ,
+                    fractionBits = parseExpression(begin, end, context);
+                    if (!fractionBits) return nullptr;
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                    {
+                        begin++; // skip )
+                        totalBits = std::move(firstExpr);
+                        // Now expect ( Expression )
+                        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                        {
+                            begin++; // skip (
+                            auto expr = parseExpression(begin, end, context);
+                            if (!expr) return nullptr;
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                            {
+                                auto endToken = begin++; // skip )
+                                return std::make_unique<TypeChangeExpression>(typeToken, endToken, typeToken, std::move(totalBits), std::move(fractionBits), std::move(expr));
+                            }
+                        }
+                        return nullptr;
+                    }
+                    return nullptr;
+                }
+                else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                {
+                    // It was FIXED ( Expression )
+                    auto endToken = begin++; // skip )
+                    return std::make_unique<TypeChangeExpression>(typeToken, endToken, typeToken, std::move(firstExpr));
+                }
+                return nullptr;
+            }
+        }
+        else
+        {
+            if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+            {
+                begin++; // skip (
+                auto expr = parseExpression(begin, end, context);
+                if (!expr)
+                    return nullptr;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                {
+                    auto endToken = begin++; // skip )
+                    return std::make_unique<TypeChangeExpression>(typeToken, endToken, typeToken, std::move(expr));
+                }
             }
         }
         return nullptr;

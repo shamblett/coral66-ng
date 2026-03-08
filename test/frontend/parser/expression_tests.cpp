@@ -47,6 +47,15 @@ TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
         REQUIRE(tc != nullptr);
         REQUIRE(tc->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
     }
+    SECTION("Type Change FIXED with scale")
+    {
+        ParsedExpr p("FIXED (10, 2) (3.14)");
+        auto tc = dynamic_cast<TypeChangeExpression*>(p.expr.get());
+        REQUIRE(tc != nullptr);
+        REQUIRE(tc->getType()->getTokenType() == lexer::TokenType::FixedKeyword);
+        REQUIRE(tc->getTotalBits() != nullptr);
+        REQUIRE(tc->getFractionBits() != nullptr);
+    }
     SECTION("Location")
     {
         ParsedExpr p("LOCATION ( x )");

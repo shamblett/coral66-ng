@@ -438,10 +438,28 @@ TypeChangeExpression::TypeChangeExpression(const lexer::CTokenIterator begin, co
 {
 }
 
+TypeChangeExpression::TypeChangeExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const lexer::CTokenIterator type, std::unique_ptr<Expression>&& totalBits,
+                                           std::unique_ptr<Expression>&& fractionBits, std::unique_ptr<Expression>&& expression)
+    : Expression(begin, end), m_type(type), m_totalBits(std::move(totalBits)), m_fractionBits(std::move(fractionBits)), m_expression(std::move(expression))
+{
+}
+
 lexer::CTokenIterator TypeChangeExpression::getType() const
 {
     return m_type;
 }
+
+const Expression* TypeChangeExpression::getTotalBits() const
+{
+    return m_totalBits.get();
+}
+
+const Expression* TypeChangeExpression::getFractionBits() const
+{
+    return m_fractionBits.get();
+}
+
 const Expression& TypeChangeExpression::getExpression() const
 {
     return *m_expression;

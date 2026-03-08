@@ -337,12 +337,20 @@ public:
 class TypeChangeExpression final : public Expression
 {
     lexer::CTokenIterator m_type;
+    std::unique_ptr<Expression> m_totalBits;
+    std::unique_ptr<Expression> m_fractionBits;
     std::unique_ptr<Expression> m_expression;
 
 public:
     TypeChangeExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
                          std::unique_ptr<Expression>&& expression);
+    TypeChangeExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
+                         std::unique_ptr<Expression>&& totalBits,
+                         std::unique_ptr<Expression>&& fractionBits,
+                         std::unique_ptr<Expression>&& expression);
     [[nodiscard]] lexer::CTokenIterator getType() const;
+    [[nodiscard]] const Expression* getTotalBits() const;
+    [[nodiscard]] const Expression* getFractionBits() const;
     [[nodiscard]] const Expression& getExpression() const;
 };
 
