@@ -13,7 +13,10 @@ using namespace coral66::Syntax;
 namespace coral66::parser
 {
 
-// Forward declarations
+/*
+ * Parser expression sub parsers
+ * */
+
 std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                        Context& context);
 std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
@@ -217,7 +220,7 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTo
     if (begin == end)
         return nullptr;
 
-    // Untypedprimary
+    // Untyped Primary
     if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
         begin++;
@@ -325,8 +328,6 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
     if (isNumberType(tType))
     {
         auto typeToken = begin++;
-        std::unique_ptr<Expression> totalBits;
-        std::unique_ptr<Expression> fractionBits;
 
         if (tType == lexer::TokenType::FixedKeyword)
         {
@@ -345,12 +346,12 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 {
                     begin++; // skip ,
-                    fractionBits = parseExpression(begin, end, context);
+                    std::unique_ptr<Expression> fractionBits = parseExpression(begin, end, context);
                     if (!fractionBits) return nullptr;
                     if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
                     {
                         begin++; // skip )
-                        totalBits = std::move(firstExpr);
+                        std::unique_ptr<Expression> totalBits = std::move(firstExpr);
                         // Now expect ( Expression )
                         if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
                         {

@@ -28,7 +28,7 @@ public:
 };
 
 /*
- * Main parse entry point
+ * Main parser entry point
  */
 Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                              bool* errors = nullptr);
