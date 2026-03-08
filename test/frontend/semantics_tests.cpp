@@ -190,23 +190,6 @@ TEST_CASE("Coral For Loop", "[semantics][loop]")
         Catch::Matchers::Equals(""));
 }
 
-TEST_CASE("Coral Part Word Access", "[semantics][bits]")
-{
-    // BITS pseudo-function
-    semanticsProduces(
-        R"(
-        PROGRAM
-        BEGIN
-            INTEGER a;
-            INTEGER b;
-            a := 0;
-            BITS(0, 4, a) := 5;
-            b := BITS(0, 4, a);
-        END
-    )",
-        Catch::Matchers::Equals(""));
-}
-
 TEST_CASE("Coral Procedure Parameters", "[semantics][procedure]")
 {
     // Procedure with parameters

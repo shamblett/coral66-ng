@@ -44,14 +44,28 @@ namespace coral66::Errors
 namespace Parser
 {
 CREATE_ERROR(EXPECTED_N, "Expected %0", InsertAfter<1, 0>);
+CREATE_ERROR(EXPECTED_CONDITION, "Expected Condition %0", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_BEGIN, "Expected 'BEGIN' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_END, "Expected 'END' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_IDENTIFIER, "Expected identifier", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_EXPRESSION, "Expected expression", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_SIMPLE_EXPRESSION, "Expected simple expression", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_TERM, "Expected term", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_FACTOR, "Expected factor", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_CLOSED_PARENTHESIS, "Expected closed parenthesis", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_OPEN_PARENTHESIS, "Expected open parenthesis", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_OPEN_SQUARE_BRACKET, "Expected open square backet", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_TYPED_PRIMARY, "Expected typed primary", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_WORD_REFERENCE, "Expected word reference", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_FRACTION_BITS, "Expected fraction bits", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_UNION, "Expected union", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_MASK, "Expected mask", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_STATEMENT, "Expected statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_DECLARATION, "Expected declaration", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_COMPARATOR, "Expected comparator", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_ASSIGNMENT, "Expected assignment ':='", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_THEN, "Expected 'THEN' in IF statement", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_ELSE, "Expected 'ELSE' in IF statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_DO, "Expected 'DO' in FOR statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_UNTIL, "Expected 'UNTIL' in FOR statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_STEP, "Expected 'STEP' in FOR statement", InsertAfter<0>);
