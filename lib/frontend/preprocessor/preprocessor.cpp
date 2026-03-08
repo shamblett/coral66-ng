@@ -188,18 +188,6 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
             iter->setLeadingWhitespace(hasLeadingWhitespace);
         }
     }
-    if (ctokens.empty())
-    {
-        if (tokens.empty())
-        {
-            log(errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
-        }
-        else
-        {
-            log(errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
-        }
-        return {};
-    }
     return {};
 }
 
