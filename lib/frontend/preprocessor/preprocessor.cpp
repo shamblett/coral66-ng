@@ -42,13 +42,13 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
 {
     if (defineDirective.tokens.empty())
     {
-        log(Errors::Parser::EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this, lexer::TokenType::Identifier,
+        log(errors::Parser::EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this, lexer::TokenType::Identifier,
                                                     *defineDirective.defineToken));
         return {{}, nullptr};
     }
     if (defineDirective.tokens[0].getTokenType() != lexer::TokenType::Identifier)
     {
-        log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
+        log(errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
                                                          defineDirective.tokens[0]));
         return {{}, nullptr};
     }
@@ -66,7 +66,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         if (curr->getTokenType() != lexer::TokenType::Newline
             && curr->getOffset() == identifierPos->getOffset() + identifierPos->getLength())
         {
-            log(Errors::pp::WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION.args(*curr, *this, *curr));
+            log(errors::pp::WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION.args(*curr, *this, *curr));
         }
         return {Macro{identifierPos, std::nullopt}, curr};
     }
@@ -75,7 +75,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     const auto* openP = curr++;
     if (curr == end)
     {
-        log(Errors::Parser::EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
+        log(errors::Parser::EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
         return {{}, nullptr};
     }
@@ -92,7 +92,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
 
     if (curr->getTokenType() != lexer::TokenType::Identifier)
     {
-        log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
+        log(errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
         return {{}, nullptr};
     }
     std::vector argumentList = {*curr};
@@ -102,12 +102,12 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         curr++;
         if (curr == end)
         {
-            log(Errors::Parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::Identifier, *(curr - 1)));
+            log(errors::Parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::Identifier, *(curr - 1)));
             return {{}, nullptr};
         }
         if (curr->getTokenType() != lexer::TokenType::Identifier)
         {
-            log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
+            log(errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
             return {{}, nullptr};
         }
         auto string = curr->getValue();
@@ -118,19 +118,19 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
             argumentList.push_back(*(curr++));
             continue;
         }
-        log(Errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N.args(*curr, *this, *curr));
+        log(errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N.args(*curr, *this, *curr));
         log(notes::PREVIOUSLY_DECLARED_HERE.args(*result, *this, *result));
         curr++;
     }
     if (curr == end)
     {
-        log(Errors::Parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
+        log(errors::Parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
         return {{}, nullptr};
     }
     if (curr->getTokenType() != lexer::TokenType::CloseParentheses)
     {
-        log(Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
+        log(errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
         return {{}, nullptr};
     }
@@ -192,11 +192,11 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
     {
         if (tokens.empty())
         {
-            log(Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
+            log(errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF.args(*ifToken, *this, *ifToken));
         }
         else
         {
-            log(Errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
+            log(errors::pp::EXPECTED_AN_EXPRESSION_AFTER_ELIF_2.args(tokens, *this, tokens));
         }
         return {};
     }

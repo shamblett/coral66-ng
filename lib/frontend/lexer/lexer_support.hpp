@@ -50,19 +50,19 @@ std::optional<std::uint32_t> universalCharacterToValue(std::string_view const va
     {
         if (result != '$' && result != '@' && result != '`')
         {
-            context.report(coral66::Errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, location,
+            context.report(coral66::errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, location,
                            std::forward<PosArg>(arg));
             return {};
         }
     }
     else if (result > UTF32_MAX)
     {
-        context.report(coral66::Errors::lexer::INVALID_UC_VALUE_MUST_FIT_IN_UTF32, location, std::forward<PosArg>(arg));
+        context.report(coral66::errors::lexer::INVALID_UC_VALUE_MUST_FIT_IN_UTF32, location, std::forward<PosArg>(arg));
         return {};
     }
     else if ((result >= 0xD800 && result <= 0xDFFF))
     {
-        context.report(coral66::Errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location,
+        context.report(coral66::errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location,
                        std::forward<PosArg>(arg));
         return {};
     }

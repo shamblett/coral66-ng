@@ -39,7 +39,7 @@
     constexpr auto variableName =                                                                     \
         ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Error, "")
 
-namespace coral66::Errors
+namespace coral66::errors
 {
 namespace Parser
 {
@@ -198,7 +198,7 @@ CREATE_ERROR(NUMBER_MUST_NOT_BE_GREATER_THAN_X_IN_LINE_DIRECTIVE,
 CREATE_ERROR(ERROR_ENCOUNTERED, "'#error' encountered", Underline<0>);
 } // namespace pp
 
-} // namespace coral66::Errors
+} // namespace coral66::errors
 
 // coral66
 

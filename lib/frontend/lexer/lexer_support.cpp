@@ -228,7 +228,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
                 ss << llvm::format_hex_no_prefix(c, 8);
                 ss.flush();
                 auto size = getNumUTF8ForUTF32(c);
-                context.report(coral66::Errors::lexer::NON_PRINTABLE_CHARACTER_N, context.getOffset() - size, buffer,
+                context.report(coral66::errors::lexer::NON_PRINTABLE_CHARACTER_N, context.getOffset() - size, buffer,
                                std::pair{context.getOffset() - size, context.getOffset()});
             }
             else

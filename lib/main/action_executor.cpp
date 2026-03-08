@@ -57,7 +57,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     fs::ifstream file(sourceFile, std::ios_base::binary | std::ios_base::ate | std::ios_base::in);
     if (!file.is_open())
     {
-        *m_reporter << Errors::CLI::FAILED_TO_OPEN_SOURCE_FILE.argsCLI(sourceFile.string());
+        *m_reporter << errors::CLI::FAILED_TO_OPEN_SOURCE_FILE.argsCLI(sourceFile.string());
         return {};
     }
 
@@ -115,7 +115,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         fs::ofstream outputFile(coral66::to_string(coral66::cl::OutputFilename), std::ios_base::out);
         if (!outputFile.is_open())
         {
-            *m_reporter << Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
+            *m_reporter << errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
             return {};
         }
         outputFile << reconstruction;
@@ -259,7 +259,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     llvm::raw_fd_ostream os(outputFile, ec, llvm::sys::fs::OpenFlags::OF_None);
     if (ec)
     {
-        *m_reporter << Errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(outputFile);
+        *m_reporter << errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(outputFile);
         return {};
     }
 

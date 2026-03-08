@@ -20,7 +20,7 @@
  *
  */
 
-using namespace coral66::Errors::lexer;
+using namespace coral66::errors::lexer;
 using namespace Catch::Matchers;
 
 namespace

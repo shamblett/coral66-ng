@@ -29,7 +29,7 @@
         CHECK_THAT(string, matches);                                         \
     } while (0)
 
-using namespace coral66::Errors::Semantics;
+using namespace coral66::errors::Semantics;
 
 TEST_CASE("Coral Semantic Analysis - Declarations", "[semantics]")
 {

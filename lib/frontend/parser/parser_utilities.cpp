@@ -15,12 +15,12 @@ bool coral66::parser::expectIdentifier(lexer::CTokenIterator& begin, const lexer
     {
         if (begin == end)
         {
-            context.log(coral66::Errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
+            context.log(coral66::errors::Parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
                                                                  lexer::TokenType::Identifier, *(end - 1)));
         }
         else
         {
-            context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
+            context.log(coral66::errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
                                                                               lexer::TokenType::Identifier, *begin));
         }
         if (additional)
@@ -41,12 +41,12 @@ bool coral66::parser::expect(lexer::TokenType expected, lexer::CTokenIterator& b
     {
         if (begin == end)
         {
-            context.log(coral66::Errors::Parser::EXPECTED_N.args(diag::after(*(end - 1)), context.getSourceInterface(),
+            context.log(coral66::errors::Parser::EXPECTED_N.args(diag::after(*(end - 1)), context.getSourceInterface(),
                                                                  expected, *(end - 1)));
         }
         else
         {
-            context.log(coral66::Errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
+            context.log(coral66::errors::Parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
                                                                               expected, *begin));
         }
         if (additional)

@@ -42,12 +42,12 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     // Check for a source filename with an extension of .cor
     if (cl::SourceFilename.getNumOccurrences() == 0)
     {
-        *reporter << Errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
+        *reporter << errors::CLI::NO_SOURCE_FILES_SPECIFIED.argsCLI();
         return EXIT_FAILURE;
     }
     if (cl::SourceFilename.substr(cl::SourceFilename.find_last_of(".")) != ".cor")
     {
-        *reporter << Errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(cl::SourceFilename);
+        *reporter << errors::CLI::SOURCE_FILE_EXTENSION_NOT_COR.argsCLI(cl::SourceFilename);
         return EXIT_FAILURE;
     }
 

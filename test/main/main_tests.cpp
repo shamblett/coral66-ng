@@ -13,7 +13,7 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-using namespace coral66::Errors::CLI;
+using namespace coral66::errors::CLI;
 using namespace coral66::Warnings::CLI;
 
 TEST_CASE("Commandline actions", "[cli]")
