@@ -29,7 +29,7 @@
 #define CREATE_ERROR_7(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 #define CREATE_ERROR_8(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 
-#define CREATE_ERROR(...) P99_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
+#define CREATE_ERROR(eName, ...)P99_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
 #define CREATE_ERROR_VAARG(variableName, format, uniquename, ...)                                                 \
     namespace detail                                                                                  \
@@ -43,7 +43,7 @@ namespace coral66::errors
 {
 namespace Parser
 {
-CREATE_ERROR(EXPECTED_N, "Expected %0", "Parser-01", InsertAfter<1, 0>);
+CREATE_ERROR("gg", EXPECTED_N, "Expected %0", "Parser-01", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_CONDITION, "Expected Condition %0", "Parser-02", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_BEGIN, "Expected 'BEGIN' keyword", "Parser-03", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_END, "Expected 'END' keyword", "Parser-04", InsertAfter<0>);
@@ -94,7 +94,7 @@ CREATE_ERROR(INVALID_SCALE_FOR_FIXED, "Invalid scale for FIXED point operation",
 
 namespace CLI
 {
-CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE, "Failed to open source file '%0'");
+namespace detail { constexpr auto FAILED_TO_OPEN_SOURCE_FILEText = ::coral66::Constexpr::basic_fixed_string{"Failed to open source file '%0'"}; } constexpr auto FAILED_TO_OPEN_SOURCE_FILE = ::coral66::makeDiagnostic<detail::FAILED_TO_OPEN_SOURCE_FILEText>(::coral66::Severity::Error, "");
 CREATE_ERROR(NO_SOURCE_FILES_SPECIFIED, "No source files specified");
 CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .cor '%0'");
 CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for output");
