@@ -14,7 +14,7 @@
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66::errors::CLI;
-using namespace coral66::Warnings::CLI;
+using namespace coral66::warnings::CLI;
 
 TEST_CASE("Commandline actions", "[cli]")
 {

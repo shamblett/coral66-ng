@@ -57,13 +57,13 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
         if (cl::CompileAndAssembly)
         {
             reporter->changeColor(llvm::raw_ostream::YELLOW);
-            *reporter << Warnings::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
+            *reporter << warnings::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME.argsCLI();
             reporter->changeColor(llvm::raw_ostream::RED);
         }
         if (cl::PreprocessOutput)
         {
             reporter->changeColor(llvm::raw_ostream::YELLOW);
-            *reporter << Warnings::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
+            *reporter << warnings::CLI::CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             reporter->changeColor(llvm::raw_ostream::RED);
         }
         return executor.execute(Action::Compile, cl::SourceFilename.data());
@@ -73,7 +73,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
         if (cl::PreprocessOutput)
         {
             reporter->changeColor(llvm::raw_ostream::YELLOW);
-            *reporter << Warnings::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
+            *reporter << warnings::CLI::CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME.argsCLI();
             reporter->changeColor(llvm::raw_ostream::RED);
         }
         return executor.execute(Action::AssemblyOutput, cl::SourceFilename.data());

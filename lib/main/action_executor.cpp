@@ -30,7 +30,7 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
     if (cl::NoAction)
     {
         m_reporter->changeColor(llvm::raw_ostream::YELLOW);
-        *m_reporter << Warnings::CLI::NO_ACTION_SPEFIFIED.argsCLI();
+        *m_reporter << warnings::CLI::NO_ACTION_SPEFIFIED.argsCLI();
         m_reporter->changeColor(llvm::raw_ostream::RED);
         return EXIT_SUCCESS;
     }
