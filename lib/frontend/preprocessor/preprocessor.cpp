@@ -42,13 +42,13 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
 {
     if (defineDirective.tokens.empty())
     {
-        log(errors::parser::EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this, lexer::TokenType::Identifier,
+        log(errors::pp::PP_EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this, lexer::TokenType::Identifier,
                                                     *defineDirective.defineToken));
         return {{}, nullptr};
     }
     if (defineDirective.tokens[0].getTokenType() != lexer::TokenType::Identifier)
     {
-        log(errors::parser::EXPECTED_N_INSTEAD_OF_N.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
+        log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
                                                          defineDirective.tokens[0]));
         return {{}, nullptr};
     }
@@ -75,7 +75,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     const auto* openP = curr++;
     if (curr == end)
     {
-        log(errors::parser::EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
+        log(errors::pp::PP_EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
         return {{}, nullptr};
     }
@@ -92,7 +92,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
 
     if (curr->getTokenType() != lexer::TokenType::Identifier)
     {
-        log(errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
+        log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
         return {{}, nullptr};
     }
     std::vector argumentList = {*curr};
@@ -102,17 +102,17 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         curr++;
         if (curr == end)
         {
-            log(errors::parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::Identifier, *(curr - 1)));
+            log(errors::pp::PP_EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::Identifier, *(curr - 1)));
             return {{}, nullptr};
         }
         if (curr->getTokenType() != lexer::TokenType::Identifier)
         {
-            log(errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
+            log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::Identifier, *curr));
             return {{}, nullptr};
         }
         auto string = curr->getValue();
         auto result = std::ranges::find_if(
-            argumentList, coral66::compose(coral66::bind_front(std::equal_to<>{}, string), &lexer::PPToken::getValue));
+            argumentList, compose(coral66::bind_front(std::equal_to<>{}, string), &lexer::PPToken::getValue));
         if (result == argumentList.end())
         {
             argumentList.push_back(*(curr++));
@@ -124,13 +124,13 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     }
     if (curr == end)
     {
-        log(errors::parser::EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
+        log(errors::pp::PP_EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
         return {{}, nullptr};
     }
     if (curr->getTokenType() != lexer::TokenType::CloseParentheses)
     {
-        log(errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
+        log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
         return {{}, nullptr};
     }
@@ -145,14 +145,14 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
     macroSubstitute({tokens.begin(), tokens.end()},
                     coral66::bind_front(&append<coral66::lexer::PPToken>, std::ref(result)));
     bool errorsOccurred = false;
-    auto ctokens =
+    auto cTokens =
         coral66::lexer::toCTokens(result.data(), result.data() + result.size(), *this, m_reporter, &errorsOccurred);
     if (errorsOccurred)
     {
         m_errorsOccurred = true;
         return {};
     }
-    for (auto iter = ctokens.begin(); iter != ctokens.end(); ++iter)
+    for (auto iter = cTokens.begin(); iter != cTokens.end(); ++iter)
     {
         if (iter->getTokenType() == lexer::TokenType::Literal)
         {
@@ -165,7 +165,7 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
             if (iter->getTokenType() == lexer::TokenType::Identifier
                 && iter->getText() == lexer::tokenName(lexer::TokenType::DefineKeyword))
             {
-                if (iter + 1 == ctokens.end())
+                if (iter + 1 == cTokens.end())
                 {
                     continue;
                 }
@@ -175,7 +175,7 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
                 }
                 else if ((iter + 1)->getTokenType() == lexer::TokenType::OpenParentheses)
                 {
-                    if (iter + 2 != ctokens.end() && (iter + 2)->getTokenType() == lexer::TokenType::Identifier)
+                    if (iter + 2 != cTokens.end() && (iter + 2)->getTokenType() == lexer::TokenType::Identifier)
                     {
                         iter += 2;
                     }

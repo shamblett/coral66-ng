@@ -170,24 +170,6 @@ CREATE_ERROR(OPERATOR_DOUBLE_POUND_NOT_ALLOWED_AT_BEGINNING_OF_REPLACEMENT_LIST,
 CREATE_ERROR(OPERATOR_DOUBLE_POUND_NOT_ALLOWED_AT_END_OF_REPLACEMENT_LIST,
              "Operator '##' not allowed at end of replacement list", Underline<0>);
 
-CREATE_ERROR(EXPECTED_A_FILENAME_AFTER_INCLUDE, "Expected a <FILENAME> or \"FILENAME\" after #include", InsertAfter<0>);
-
-CREATE_ERROR(EXPECTED_A_FILENAME_AFTER_INCLUDE_2, "Expected a <FILENAME> or \"FILENAME\" after #include", Underline<0>);
-
-CREATE_ERROR(EXPECTED_AN_EXPRESSION_AFTER_IF, "Expected an expression after #if", Underline<0>);
-
-CREATE_ERROR(EXPECTED_AN_EXPRESSION_AFTER_ELIF, "Expected an expression after #elif", InsertAfter<0>);
-
-CREATE_ERROR(EXPECTED_AN_EXPRESSION_AFTER_ELIF_2, "Expected an expression after #elif", Underline<0>);
-
-CREATE_ERROR(EXTRA_TOKENS_AFTER_INCLUDE, "Extra tokens after '#include'", Underline<0>);
-
-CREATE_ERROR(FILE_NOT_FOUND, "'%0' file not found", Underline<1>);
-
-CREATE_ERROR(COULD_NOT_OPEN_FILE, "Could not open '%0'", Underline<1>);
-
-CREATE_ERROR(EXPECTED_A_NUMBER_AFTER_LINE, "Expected a number after '#line'", InsertAfter<0>);
-
 CREATE_ERROR(EXPECTED_END_OF_LINE_OR_STRING_AFTER_NUMBER_IN_LINE,
              "Expected end of line or string after number in '#line' directive", Underline<0>);
 
@@ -200,10 +182,11 @@ CREATE_ERROR(NUMBER_MUST_BE_IN_DECIMAL_IN_LINE_DIRECTIVE, "Number must be in dec
 
 CREATE_ERROR(NUMBER_MUST_NOT_BE_ZERO_IN_LINE_DIRECTIVE, "Number must not be zero in '#line' directive", Underline<0>);
 
-CREATE_ERROR(NUMBER_MUST_NOT_BE_GREATER_THAN_X_IN_LINE_DIRECTIVE,
-             "Number must not be greater than 2147483647 in '#line' directive", Underline<0>);
-
 CREATE_ERROR(ERROR_ENCOUNTERED, "'#error' encountered", Underline<0>);
+
+CREATE_ERROR(PP_EXPECTED_N_INSTEAD_OF_N, "Expected %0 instead of %1", PointAt<1>);
+CREATE_ERROR(PP_EXPECTED_N_AFTER_N, "Expected %0 after %1", InsertAfter<1, 0>);
+CREATE_ERROR(PP_EXPECTED_N, "Expected %0", InsertAfter<1, 0>);
 } // namespace pp
 
 } // namespace coral66::errors

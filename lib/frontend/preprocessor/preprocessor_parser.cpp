@@ -19,12 +19,12 @@ namespace
     {
         if (begin == end || begin->getTokenType() == coral66::lexer::TokenType::Newline)
         {
-            context.log(coral66::errors::parser::EXPECTED_N.args(*(begin - 1), context.getSourceInterface(), tokenType,
+            context.log(coral66::errors::pp::PP_EXPECTED_N.args(*(begin - 1), context.getSourceInterface(), tokenType,
                                                                  *(begin - 1)));
         }
         else
         {
-            context.log(coral66::errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
+            context.log(coral66::errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
                                                                               tokenType, *begin));
         }
         if (additional)
