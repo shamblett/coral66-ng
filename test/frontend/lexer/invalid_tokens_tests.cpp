@@ -174,8 +174,8 @@ TEST_CASE("Coral Lexing Errors", "[lexer]")
         bool errors = false;
         std::string buffer;
         llvm::raw_string_ostream ss(buffer);
-        lex_errors("\"Hello World", ss, errors);
+        lex_errors("'Hello World", ss, errors);
         CHECK(errors);
-
+        CHECK_THAT(buffer, Catch::Matchers::ContainsSubstring("Unterminated string literal"));
     }
 }

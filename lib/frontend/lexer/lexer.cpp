@@ -230,7 +230,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     const bool needNewline = match(
         stateMachine,
         // ReSharper disable once CppDFAConstantFunctionResult
-        [&context](const StringLiteral& s)
+        [&context](StringLiteral& s)
         {
             if (s.sawQuote)
             {
