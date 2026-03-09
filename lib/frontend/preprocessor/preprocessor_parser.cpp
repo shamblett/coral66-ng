@@ -119,8 +119,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     {
         if (begin->getTokenType() == lexer::TokenType::Identifier)
         {
-            auto value = begin->getValue();
-            if (value == lexer::tokenName(lexer::TokenType::DefineKeyword)
+            if (auto value = begin->getValue(); value == lexer::tokenName(lexer::TokenType::DefineKeyword)
                 || value == tokenName(lexer::TokenType::DeleteKeyword))
             {
                 flushText();
