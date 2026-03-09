@@ -31,13 +31,13 @@
 
 #define CREATE_ERROR(...) P99_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_ERROR_VAARG(variableName, format, ...)                                                 \
-    namespace detail                                                                                  \
-    {                                                                                                 \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                                 \
-    constexpr auto variableName =                                                                     \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Error, #variableName)
+#define CREATE_ERROR_VAARG(variableName, format, ...)                                                             \
+    namespace detail                                                                                              \
+    {                                                                                                             \
+    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
+    }                                                                                                             \
+    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>( \
+        ::coral66::Severity::Error, #variableName)
 
 #define CREATE_UNIQUE_ERROR_3(variableName, name, format)                                             \
     namespace detail                                                                                  \
@@ -46,23 +46,6 @@
     }                                                                                                 \
     constexpr auto variableName =                                                                     \
         ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Error, name)
-
-#define CREATE_UNIQUE_ERROR_4(...) CREATE_UNIQUE_ERROR_VAARG(__VA_ARGS__)
-#define CREATE_UNIQUE_ERROR_5(...) CREATE_UNIQUE_ERROR_VAARG(__VA_ARGS__)
-#define CREATE_UNIQUE_ERROR_6(...) CREATE_UNIQUE_ERROR_VAARG(__VA_ARGS__)
-#define CREATE_UNIQUE_ERROR_7(...) CREATE_UNIQUE_ERROR_VAARG(__VA_ARGS__)
-#define CREATE_UNIQUE_ERROR_8(...) CREATE_UNIQUE_ERROR_VAARG(__VA_ARGS__)
-#define CREATE_UNIQUE_ERROR_9(...) CREATE_UNIQUE_ERROR_VAARG(__VA_ARGS__)
-
-#define CREATE_UNIQUE_ERROR(...) P99_PASTE2(CREATE_UNIQUE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
-
-#define CREATE_UNIQUE_ERROR_VAARG(variableName, name, format, ...)                                    \
-    namespace detail                                                                                  \
-    {                                                                                                 \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                                 \
-    constexpr auto variableName =                                                                     \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Error, name)
 
 namespace coral66::errors
 {
@@ -98,7 +81,7 @@ CREATE_ERROR(INVALID_FIXED_FORMAT, "Invalid format for FIXED type. Expected (tot
 CREATE_ERROR(INVALID_BITS_FORMAT, "Invalid format for BITS type", Underline<0>);
 CREATE_ERROR(EXPECTED_N_INSTEAD_OF_N, "Expected %0 instead of %1", PointAt<1>);
 CREATE_ERROR(EXPECTED_N_AFTER_N, "Expected %0 after %1", InsertAfter<1, 0>);
-} // namespace Parser
+} // namespace parser
 
 namespace Semantics
 {
@@ -120,7 +103,7 @@ CREATE_ERROR(INVALID_SCALE_FOR_FIXED, "Invalid scale for FIXED point operation",
 namespace CLI
 {
 CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE, "Failed to open source file '%0'");
-CREATE_UNIQUE_ERROR(NO_SOURCE_FILES_SPECIFIED, "NO_SOURCE_FILES_SPECIFIED", "No source files specified");
+CREATE_ERROR(NO_SOURCE_FILES_SPECIFIED, "No source files specified");
 CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .cor '%0'");
 CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for output");
 } // namespace CLI
@@ -223,7 +206,7 @@ CREATE_ERROR(NUMBER_MUST_NOT_BE_GREATER_THAN_X_IN_LINE_DIRECTIVE,
 CREATE_ERROR(ERROR_ENCOUNTERED, "'#error' encountered", Underline<0>);
 } // namespace pp
 
-} // namespace coral66::Errors
+} // namespace coral66::errors
 
 // coral66
 
