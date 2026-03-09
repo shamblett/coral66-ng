@@ -575,7 +575,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 continue;
             }
 
-            auto value = octalToValue({iter, static_cast<std::size_t>(lastOctal - iter)});
+            const auto value = octalToValue({iter, static_cast<std::size_t>(lastOctal - iter)});
             if (value > largestCharacter)
             {
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 1);
@@ -608,7 +608,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
 
     if (literalType == Literal::CharLiteral)
     {
-        for (auto* iter = result.data(); iter != resultStart; iter++)
+        for (const auto* iter = result.data(); iter != resultStart; iter++)
         {
             if (*iter > largestCharacter)
             {
@@ -626,14 +626,13 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
                                                                         std::uint64_t, ConversionContext&)
 {
     std::string text(begin, end);
-    bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos
+    const bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos
                    || text.find('E') != std::string::npos;
 
     if (isFloat)
     {
         llvm::APFloat number(llvm::APFloat::IEEEdouble());
-        auto result = number.convertFromString(text, llvm::APFloat::rmNearestTiesToEven);
-        if (!result)
+        if (auto result = number.convertFromString(text, llvm::APFloat::rmNearestTiesToEven); !result)
         {
             // Fallback or error
             return {};
@@ -777,7 +776,7 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
     CORAL66_ASSERT(PPToken.getTokenType() == coral66::lexer::TokenType::StringLiteral);
     bool errorsOccurred = false;
     ConversionContext context{reporter, sourceInterface, PPToken, &errorsOccurred};
-    bool wide = PPToken.getRepresentation(sourceInterface)[0] == 'L';
+    const bool wide = PPToken.getRepresentation(sourceInterface)[0] == 'L';
     auto [chars, errorOccurred] = processCharacters(PPToken.getValue(), context, wide, Literal::StringLiteral);
     if (errorOccurred)
     {
