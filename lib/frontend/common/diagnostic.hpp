@@ -23,7 +23,7 @@
  * @file Diagnostic.hpp
  * @brief Defines the compile-time safe diagnostic engine.
  *
- * This file contains the infrastructure for defining compiler diagnostics (warnings and errors).
+ * This file contains the infrastructure for defining compiler diagnostics (warnings, errors and notes).
  * It uses extensive template metaprogramming to validate format strings and argument types
  * at compile time, ensuring that diagnostics are invoked with correct arguments matching
  * their format specifiers.
