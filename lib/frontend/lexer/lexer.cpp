@@ -473,7 +473,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
         if (*iter != '\\')
         {
             const auto* start = iter;
-            iter = std::find_if(iter, end, [](char c) { return c == '\\' || c == '\n'; });
+            iter = std::find_if(iter, end, [](const char c) { return c == '\\' || c == '\n'; });
 
             const auto res = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
                                                       reinterpret_cast<const llvm::UTF8*>(iter), &resultStart,
@@ -748,7 +748,6 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
             }
             case TokenType::Literal:
             {
-                // Should not be reached with current lexer changes, but kept for safety/compatibility
                 ConversionContext context{reporter, sourceInterface, *iter, errorsOccurred};
                 constexpr bool wide = false; // No wide support
                 auto [chars, errorOccurred] = processCharacters(iter->getValue(), context, wide, Literal::CharLiteral);
@@ -758,7 +757,7 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 }
                 result.emplace_back(
                     TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(), iter->getMacroId(),
-                    llvm::APSInt(llvm::APInt(64, static_cast<std::uint64_t>(chars[0]), true), false), CToken::Integer);
+                    llvm::APSInt(llvm::APInt(64, chars[0], true), false), CToken::Integer);
                 break;
             }
             default:
