@@ -9,7 +9,6 @@ cc_library(
     srcs = [
         "preprocessor.cpp",
         "preprocessor_parser.cpp",
-        "preprocessor_syntax.cpp",
     ],
     hdrs = [
         "preprocessor.hpp",
