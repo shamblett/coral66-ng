@@ -176,6 +176,6 @@ TEST_CASE("Coral Lexing Errors", "[lexer]")
         llvm::raw_string_ostream ss(buffer);
         lex_errors("'Hello World", ss, errors);
         CHECK(errors);
-        CHECK_THAT(buffer, Catch::Matchers::ContainsSubstring("Unterminated string literal"));
+        CHECK_THAT(buffer, Catch::Matchers::ContainsSubstring("Unterminated string lia"));
     }
 }

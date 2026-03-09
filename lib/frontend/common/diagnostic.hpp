@@ -20,7 +20,7 @@
 #include "messages/message.hpp"
 
 /**
- * @file Diagnostic.hpp
+ * @file diagnostic.hpp
  * @brief Defines the compile-time safe diagnostic engine.
  *
  * This file contains the infrastructure for defining compiler diagnostics (warnings, errors and notes).
