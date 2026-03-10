@@ -27,6 +27,8 @@ using namespace coral66::lexer;
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath)
 {
+    std::vector<detail::Diagnostic::DiagnosticBase> diagnostics;
+
     if (errorsOccurred)
     {
         *errorsOccurred = false;
@@ -230,7 +232,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     const bool needNewline = match(
         stateMachine,
         // ReSharper disable once CppDFAConstantFunctionResult
-        [&context](StringLiteral& s)
+        [&context, &diagnostics](StringLiteral& s)
         {
             if (s.sawQuote)
             {
@@ -239,6 +241,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
             }
             context.report(errors::lexer::UNTERMINATED_STRING_LITERAL, context.tokenStartOffset,
                            std::pair{context.tokenStartOffset, context.getOffset()});
+            diagnostics.emplace_back(errors::lexer::UNTERMINATED_STRING_LITERAL);
             return false;
         },
         [&context](CharacterLiteral&)
@@ -315,9 +318,11 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
         *errorsOccurred = context.errorsOccurred();
     }
 
-    return PPSourceObject(std::move(context.getResult()),
-                          {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {},
-                          {{std::move(characterToSourceSpace)}});
+    auto result = PPSourceObject(std::move(context.getResult()),
+                                 {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {},
+                                 {{std::move(characterToSourceSpace)}});
+    result.addDiagnostics(diagnostics);
+    return result;
 }
 
 [[nodiscard]] std::string_view TokenBase::getRepresentation(const source_interface& sourceObject) const
@@ -627,7 +632,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
 {
     std::string text(begin, end);
     const bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos
-                   || text.find('E') != std::string::npos;
+                         || text.find('E') != std::string::npos;
 
     if (isFloat)
     {
@@ -755,9 +760,9 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 {
                     break;
                 }
-                result.emplace_back(
-                    TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(), iter->getMacroId(),
-                    llvm::APSInt(llvm::APInt(64, chars[0], true), false), CToken::Integer);
+                result.emplace_back(TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
+                                    iter->getMacroId(), llvm::APSInt(llvm::APInt(64, chars[0], true), false),
+                                    CToken::Integer);
                 break;
             }
             default:

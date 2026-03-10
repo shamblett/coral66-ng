@@ -201,11 +201,19 @@ public:
         m_diagnostics.emplace_back(diagnostic);
     }
 
+    template <typename Diagnostics>
+    void addDiagnostics(Diagnostics& diagnostics)
+    {
+        m_diagnostics.insert(m_diagnostics.end(), std::make_move_iterator(diagnostics.begin()),
+                             std::make_move_iterator(diagnostics.end()));
+    }
+
     template <typename DiagnosticType>
     bool findDiagnostic(const DiagnosticType& diagnostic) const
     {
-        if (auto result = std::ranges::find_if(m_diagnostics.begin(), m_diagnostics.end(), [&diagnostic](auto const& item)
-                                               { return item.getName() == diagnostic.getName(); });
+        if (auto result =
+                std::ranges::find_if(m_diagnostics.begin(), m_diagnostics.end(), [&diagnostic](auto const& item)
+                                     { return item.getName() == diagnostic.getName(); });
             result != m_diagnostics.end())
         {
             return true;
