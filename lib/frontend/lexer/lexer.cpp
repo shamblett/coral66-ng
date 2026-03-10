@@ -425,6 +425,8 @@ std::optional<std::uint32_t> escapeCharToValue(char const escape, std::uint64_t 
         {
             context.report(coral66::errors::lexer::EXPECTED_CHARACTER_AFTER_BACKSLASH, backslash + 1,
                            std::forward_as_tuple(context.token, backslash, backslash + 2));
+            DiagnosticCollector::addDiagnostic(coral66::errors::lexer::EXPECTED_CHARACTER_AFTER_BACKSLASH);
+
 
             return {};
         }
@@ -432,6 +434,8 @@ std::optional<std::uint32_t> escapeCharToValue(char const escape, std::uint64_t 
         {
             context.report(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N, backslash + 1, std::string("\\") + escape,
                            std::forward_as_tuple(context.token, backslash, backslash + 1));
+            DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N);
+
 
             return {};
         }
@@ -477,11 +481,13 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             {
                 context.report(coral66::errors::lexer::NEWLINE_IN_CHARACTER_LITERAL_USE_BACKLASH_N, offset,
                                std::forward_as_tuple(context.token, offset));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::NEWLINE_IN_CHARACTER_LITERAL_USE_BACKLASH_N);
             }
             else
             {
                 context.report(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, offset,
                                std::forward_as_tuple(context.token, offset));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N);
             }
             iter++;
             errorOccurred = true;
@@ -501,6 +507,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 auto invalidEnd = invalidStart + coral66::getNumBytesForUTF8(start, end) - 1;
                 context.report(coral66::errors::lexer::INVALID_UTF8_SEQUENCE, invalidStart,
                                std::make_tuple(context.token, invalidStart, invalidEnd));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_UTF8_SEQUENCE);
                 errorOccurred = true;
             }
             continue;
@@ -523,6 +530,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 context.report(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N, start,
                                std::string_view(big ? "\\U" : "\\u"),
                                std::forward_as_tuple(context.token, start, start + 1));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N);
                 errorOccurred = true;
                 continue;
             }
@@ -538,6 +546,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                     coral66::errors::lexer::INVALID_UC_EXPECTED_N_MORE_DIGITS, start,
                     (big ? 8 : 4) - std::distance(hexStart, hexEnd),
                     std::forward_as_tuple(context.token, start, start + std::distance(hexStart, hexEnd) + 1));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_UC_EXPECTED_N_MORE_DIGITS);
                 errorOccurred = true;
                 iter = hexEnd;
                 continue;
@@ -568,6 +577,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 2);
                 context.report(coral66::errors::lexer::AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, start,
                                std::forward_as_tuple(context.token, start, start + 1));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED);
                 errorOccurred = true;
                 continue;
             }
@@ -588,6 +598,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 // here.
                 context.report(coral66::errors::lexer::INVALID_OCTAL_CHARACTER, offset, std::string_view(lastOctal, 1),
                                std::forward_as_tuple(context.token, offset, offset + 1));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_OCTAL_CHARACTER);
                 errorOccurred = true;
                 continue;
             }
@@ -598,6 +609,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 1);
                 context.report(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, start,
                                std::forward_as_tuple(context.token, start, start + lastOctal - iter));
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE);
                 errorOccurred = true;
                 iter = lastOctal;
                 continue;
@@ -631,6 +643,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
             {
                 context.report(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, context.token,
                                context.token);
+                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE);
                 errorOccurred = true;
             }
         }
@@ -719,6 +732,8 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 if (reporter)
                 {
                     *reporter << errors::lexer::UNEXPECTED_CHARACTER.args(*iter, sourceInterface, *iter);
+                    DiagnosticCollector::addDiagnostic(coral66::errors::lexer::UNEXPECTED_CHARACTER);
+
                 }
                 break;
             case TokenType::Newline: break;
