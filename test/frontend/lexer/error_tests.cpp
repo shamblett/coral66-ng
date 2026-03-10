@@ -46,4 +46,13 @@ TEST_CASE("Coral Lexing Literals - Errors", "[lexer]")
         CHECK(errors);
         CHECK(result.findDiagnostic(UNTERMINATED_STRING_LITERAL));
     }
+
+    SECTION("Invalid UTF8 Sequence")
+    {
+        bool errors = false;
+        std::string source = "\xFF";
+        auto result = lex(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(INVALID_UTF8_SEQUENCE));
+    }
 }

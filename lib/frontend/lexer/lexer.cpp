@@ -30,16 +30,20 @@ class DiagnosticCollector
     inline static std::vector<Diagnostic::DiagnosticBase> m_diagnostics;
 
 public:
-
     template <typename DiagnosticType>
     static void addDiagnostic(const DiagnosticType& diagnostic)
     {
         m_diagnostics.emplace_back(diagnostic);
     }
 
-    static std::vector<Diagnostic::DiagnosticBase>& getDiagnostics() { return m_diagnostics; }
-    static void clearDiagnostics() { m_diagnostics.clear(); }
-
+    static std::vector<Diagnostic::DiagnosticBase>& getDiagnostics()
+    {
+        return m_diagnostics;
+    }
+    static void clearDiagnostics()
+    {
+        m_diagnostics.clear();
+    }
 };
 
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
@@ -185,6 +189,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
                 {
                     step = getNumBytesForUTF8(start, end);
                     context.report(errors::lexer::INVALID_UTF8_SEQUENCE, offset, std::pair{offset, offset + step});
+                    DiagnosticCollector::addDiagnostic(errors::lexer::INVALID_UTF8_SEQUENCE);
                     return false;
                 }
                 c = result;
@@ -427,7 +432,6 @@ std::optional<std::uint32_t> escapeCharToValue(char const escape, std::uint64_t 
                            std::forward_as_tuple(context.token, backslash, backslash + 2));
             DiagnosticCollector::addDiagnostic(coral66::errors::lexer::EXPECTED_CHARACTER_AFTER_BACKSLASH);
 
-
             return {};
         }
         default:
@@ -435,7 +439,6 @@ std::optional<std::uint32_t> escapeCharToValue(char const escape, std::uint64_t 
             context.report(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N, backslash + 1, std::string("\\") + escape,
                            std::forward_as_tuple(context.token, backslash, backslash + 1));
             DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N);
-
 
             return {};
         }
@@ -733,7 +736,6 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 {
                     *reporter << errors::lexer::UNEXPECTED_CHARACTER.args(*iter, sourceInterface, *iter);
                     DiagnosticCollector::addDiagnostic(coral66::errors::lexer::UNEXPECTED_CHARACTER);
-
                 }
                 break;
             case TokenType::Newline: break;
