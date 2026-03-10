@@ -6,7 +6,6 @@
 
 #include <llvm/Support/Format.h>
 
-#include <array>
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
