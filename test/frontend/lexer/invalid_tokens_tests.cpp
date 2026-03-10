@@ -39,11 +39,6 @@ coral66::CSourceObject lex(const std::string& code, bool& errors)
     return tokens;
 }
 
-void lex_errors(const std::string& code, llvm::raw_string_ostream& ss, bool& errors)
-{
-    tokenize(code, &ss, &errors);
-}
-
 } // namespace
 
 TEST_CASE("Coral Lexing Identifiers - Invalid Identifier Strings", "[lexer]")
@@ -166,4 +161,3 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
         CHECK(std::get<std::string>(result.data()[3].getValue()) == "me");
     }
 }
-
