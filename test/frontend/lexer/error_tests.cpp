@@ -42,7 +42,8 @@ TEST_CASE("Coral Lexing Literals - Errors", "[lexer]")
     SECTION("Unterminated String Literal")
     {
         bool errors = false;
-        lex("'Hello World", errors);
+        auto result = lex("'Hello World", errors);
         CHECK(errors);
+        CHECK(result.findDiagnostic(UNTERMINATED_STRING_LITERAL));
     }
 }

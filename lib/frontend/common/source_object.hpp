@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "diagnostic.hpp"
 #include "lexer_common.hpp"
 #include "lib/frontend/common/source_interface.hpp"
 #include "lib/support/utilities.hpp"
@@ -104,6 +105,7 @@ class SourceObject final : public detail::SourceObjectStorage<T>
     std::vector<T> m_tokens;
     std::vector<Source::File> m_files;
     std::vector<Source::PPRecord> m_substitutions;
+    std::vector<detail::Diagnostic::DiagnosticBase> m_diagnostics;
 
 public:
     SourceObject() = default;
@@ -191,6 +193,24 @@ public:
     [[nodiscard]] std::vector<Source::File>& getFiles() noexcept
     {
         return m_files;
+    }
+
+    template <typename DiagnosticType>
+    void addDiagnostic(const DiagnosticType& diagnostic)
+    {
+        m_diagnostics.emplace_back(diagnostic);
+    }
+
+    template <typename DiagnosticType>
+    bool findDiagnostic(const DiagnosticType& diagnostic) const
+    {
+        if (auto result = std::ranges::find_if(m_diagnostics.begin(), m_diagnostics.end(), [&diagnostic](auto const& item)
+                                               { return item.getName() == diagnostic.getName(); });
+            result != m_diagnostics.end())
+        {
+            return true;
+        }
+        return false;
     }
 };
 
