@@ -6,7 +6,6 @@
 
 #include <llvm/Support/Format.h>
 
-
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
@@ -42,7 +41,8 @@ TEST_CASE("Coral Lexing Literals - Errors", "[lexer]")
     SECTION("Unterminated String Literal")
     {
         bool errors = false;
-        auto result = lex("'Hello World", errors);
+        std::string source = "'Hello World";
+        auto result = lex(source, errors);
         CHECK(errors);
         CHECK(result.findDiagnostic(UNTERMINATED_STRING_LITERAL));
     }

@@ -244,12 +244,6 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
             diagnostics.emplace_back(errors::lexer::UNTERMINATED_STRING_LITERAL);
             return false;
         },
-        [&context](CharacterLiteral&)
-        {
-            context.report(errors::lexer::UNTERMINATED_CHARACTER_LITERAL, context.tokenStartOffset,
-                           std::pair{context.tokenStartOffset, context.getOffset()});
-            return false;
-        },
         [](Start&) { return false; }, [](auto&&) { return true; });
     if (needNewline)
     {
