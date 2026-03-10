@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "lib/frontend/common/custom_diagnostics.hpp"
+#include "lib/frontend/common/diagnostic.hpp"
 #include "lib/frontend/common/lexer_common.hpp"
 #include "lib/support/utilities.hpp"
 

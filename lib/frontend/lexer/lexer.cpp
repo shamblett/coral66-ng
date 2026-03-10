@@ -23,11 +23,29 @@
 #include "lib/support/text.hpp"
 
 using namespace coral66::lexer;
+using namespace coral66::detail;
+
+class DiagnosticCollector
+{
+    inline static std::vector<Diagnostic::DiagnosticBase> m_diagnostics;
+
+public:
+
+    template <typename DiagnosticType>
+    static void addDiagnostic(const DiagnosticType& diagnostic)
+    {
+        m_diagnostics.emplace_back(diagnostic);
+    }
+
+    static std::vector<Diagnostic::DiagnosticBase>& getDiagnostics() { return m_diagnostics; }
+    static void clearDiagnostics() { m_diagnostics.clear(); }
+
+};
 
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath)
 {
-    std::vector<detail::Diagnostic::DiagnosticBase> diagnostics;
+    DiagnosticCollector::clearDiagnostics();
 
     if (errorsOccurred)
     {
@@ -232,7 +250,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     const bool needNewline = match(
         stateMachine,
         // ReSharper disable once CppDFAConstantFunctionResult
-        [&context, &diagnostics](StringLiteral& s)
+        [&context](StringLiteral& s)
         {
             if (s.sawQuote)
             {
@@ -241,7 +259,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
             }
             context.report(errors::lexer::UNTERMINATED_STRING_LITERAL, context.tokenStartOffset,
                            std::pair{context.tokenStartOffset, context.getOffset()});
-            diagnostics.emplace_back(errors::lexer::UNTERMINATED_STRING_LITERAL);
+            DiagnosticCollector::addDiagnostic(errors::lexer::UNTERMINATED_STRING_LITERAL);
             return false;
         },
         [](Start&) { return false; }, [](auto&&) { return true; });
@@ -315,7 +333,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     auto result = PPSourceObject(std::move(context.getResult()),
                                  {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {},
                                  {{std::move(characterToSourceSpace)}});
-    result.addDiagnostics(diagnostics);
+    result.addDiagnostics(DiagnosticCollector::getDiagnostics());
     return result;
 }
 
