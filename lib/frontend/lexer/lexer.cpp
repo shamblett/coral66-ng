@@ -710,9 +710,10 @@ coral66::CSourceObject coral66::lexer::toCTokens(const PPSourceObject& sourceObj
     auto tokens = toCTokens(sourceObject.data().data(), sourceObject.data().data() + sourceObject.data().size(),
                             sourceObject, reporter, errorsOccurred);
     tokens.shrink_to_fit();
-    return {std::move(tokens),
-            {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
-            {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()}};
+    auto result = CSourceObject(std::move(tokens), {sourceObject.getFiles().begin(), sourceObject.getFiles().end()},
+                                {sourceObject.getSubstitutions().begin(), sourceObject.getSubstitutions().end()});
+    result.addDiagnostics(DiagnosticCollector::getDiagnostics());
+    return result;
 }
 
 std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,

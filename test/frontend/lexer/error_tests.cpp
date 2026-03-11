@@ -34,9 +34,17 @@ coral66::PPSourceObject lex(const std::string& code, bool& errors)
     return tokenize(code, &ss, &errors);
 }
 
+coral66::CSourceObject lexToCTokens(const std::string& code, bool& errors)
+{
+    std::string buffer;
+    llvm::raw_string_ostream ss(buffer);
+    const auto result = tokenize(code, &ss, &errors);
+    return toCTokens(result, &ss, &errors);
+}
+
 } // namespace
 
-TEST_CASE("Coral Lexing Literals - Errors", "[lexer]")
+TEST_CASE("Tokenize - Errors", "[lexer]")
 {
     SECTION("Unterminated String Literal")
     {
@@ -54,5 +62,14 @@ TEST_CASE("Coral Lexing Literals - Errors", "[lexer]")
         auto result = lex(source, errors);
         CHECK(errors);
         CHECK(result.findDiagnostic(INVALID_UTF8_SEQUENCE));
+    }
+
+    SECTION("Expected Character After Backslash")
+    {
+        bool errors = false;
+        std::string source = "'\\ '";
+        auto result = lexToCTokens(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(EXPECTED_CHARACTER_AFTER_BACKSLASH));
     }
 }
