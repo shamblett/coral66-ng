@@ -72,4 +72,13 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(errors);
         CHECK(result.findDiagnostic(EXPECTED_CHARACTER_AFTER_BACKSLASH));
     }
+
+    SECTION("Invalid Escape Sequence")
+    {
+        bool errors = false;
+        std::string source = "'\\z'";
+        auto result = lexToCTokens(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(INVALID_ESCAPE_SEQUENCE_N));
+    }
 }
