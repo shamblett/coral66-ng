@@ -19,7 +19,6 @@ namespace coral66::lexer
 {
 
 struct Start;
-struct CharacterLiteral;
 struct StringLiteral;
 struct Text;
 struct PreprocessingNumber;
@@ -37,8 +36,8 @@ std::uint32_t hexToValue(std::string_view value);
 
 constexpr auto UTF32_MAX = 0x10FFFF;
 
-using StateMachine = std::variant<Start, CharacterLiteral, StringLiteral, Text, PreprocessingNumber, MaybeUC,
-                                  UniversalCharacter, Dot, Punctuation, L>;
+using StateMachine =
+    std::variant<Start, StringLiteral, Text, PreprocessingNumber, MaybeUC, UniversalCharacter, Dot, Punctuation, L>;
 
 template <class T, class PosArg>
 std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
@@ -337,14 +336,6 @@ struct [[maybe_unused]] FirstArgOfMethod<R (*)(U, Args...) noexcept>
 struct Start final
 {
     StateMachine advance(std::uint32_t c, Context& context);
-};
-
-struct CharacterLiteral final
-{
-    [[maybe_unused]] bool wide = false;
-    std::string characters;
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 
 struct StringLiteral final

@@ -241,26 +241,6 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
     }
 }
 
-std::pair<StateMachine, bool> CharacterLiteral::advance(char const c, Context& context)
-{
-    if (c == '\''
-        && (std::find_if_not(characters.rbegin(), characters.rend(), [](const char c) { return c == '\\'; })
-            - characters.rbegin())
-                   % 2
-               == 0)
-    {
-        context.push(TokenType::Literal, characters);
-        return {Start{}, true};
-    }
-    characters += c;
-    if ((c == '\n' || c == '\r'))
-    {
-        context.push(TokenType::Literal, characters);
-        return {Start{}, false};
-    }
-    return {std::move(*this), true};
-}
-
 std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& context)
 {
     if (sawQuote)

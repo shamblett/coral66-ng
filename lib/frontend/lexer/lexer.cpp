@@ -455,15 +455,8 @@ std::uint32_t octalToValue(std::string_view const value)
     return result;
 }
 
-enum class Literal
-{
-    CharLiteral,
-    StringLiteral,
-};
-
 std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view const characters,
-                                                            ConversionContext& context, bool wide,
-                                                            Literal const literalType)
+                                                            ConversionContext& context, bool wide)
 {
     constexpr std::uint32_t largestCharacter = []() -> std::uint32_t
     {
@@ -482,18 +475,9 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
         auto offset = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data());
         if (*iter == '\n')
         {
-            if (literalType == Literal::CharLiteral)
-            {
-                context.report(coral66::errors::lexer::NEWLINE_IN_CHARACTER_LITERAL_USE_BACKLASH_N, offset,
-                               std::forward_as_tuple(context.token, offset));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::NEWLINE_IN_CHARACTER_LITERAL_USE_BACKLASH_N);
-            }
-            else
-            {
-                context.report(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, offset,
-                               std::forward_as_tuple(context.token, offset));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N);
-            }
+            context.report(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, offset,
+                           std::forward_as_tuple(context.token, offset));
+            DiagnosticCollector::addDiagnostic(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N);
             iter++;
             errorOccurred = true;
             continue;
@@ -640,19 +624,6 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
         }
     }
 
-    if (literalType == Literal::CharLiteral)
-    {
-        for (const auto* iter = result.data(); iter != resultStart; iter++)
-        {
-            if (*iter > largestCharacter)
-            {
-                context.report(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, context.token,
-                               context.token);
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE);
-                errorOccurred = true;
-            }
-        }
-    }
     result.resize(std::distance(result.data(), resultStart));
     return {result, errorOccurred};
 }
@@ -783,20 +754,6 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 }
                 break;
             }
-            case TokenType::Literal:
-            {
-                ConversionContext context{reporter, sourceInterface, *iter, errorsOccurred};
-                constexpr bool wide = false; // No wide support
-                auto [chars, errorOccurred] = processCharacters(iter->getValue(), context, wide, Literal::CharLiteral);
-                if (chars.empty())
-                {
-                    break;
-                }
-                result.emplace_back(TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
-                                    iter->getMacroId(), llvm::APSInt(llvm::APInt(64, chars[0], true), false),
-                                    CToken::Integer);
-                break;
-            }
             default:
                 result.emplace_back(iter->getTokenType(), iter->getOffset(), iter->getLength(), iter->getFileId(),
                                     iter->getMacroId());
@@ -813,7 +770,7 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
     bool errorsOccurred = false;
     ConversionContext context{reporter, sourceInterface, PPToken, &errorsOccurred};
     const bool wide = PPToken.getRepresentation(sourceInterface)[0] == 'L';
-    auto [chars, errorOccurred] = processCharacters(PPToken.getValue(), context, wide, Literal::StringLiteral);
+    auto [chars, errorOccurred] = processCharacters(PPToken.getValue(), context, wide);
     if (errorOccurred)
     {
         return {};
