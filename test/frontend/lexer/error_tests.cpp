@@ -81,4 +81,15 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(errors);
         CHECK(result.findDiagnostic(INVALID_ESCAPE_SEQUENCE_N));
     }
+
+    SECTION("Newline in String Literal")
+    {
+        bool errors = false;
+        std::string source = "'zz\nzz'";
+        auto result = lexToCTokens(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N));
+    }
+
+    // INVALID_UC_EXPECTED_N_MORE_DIGITS - does coral process hex digits
 }
