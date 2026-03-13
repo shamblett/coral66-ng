@@ -91,5 +91,13 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(result.findDiagnostic(NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N));
     }
 
-    // INVALID_UC_EXPECTED_N_MORE_DIGITS - does coral process hex digits
+    SECTION("Unexpected Character")
+    {
+        bool errors = false;
+        std::string source = "#";
+        auto result = lexToCTokens(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(UNEXPECTED_CHARACTER));
+    }
+
 }

@@ -215,7 +215,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
                 buffer.resize(std::distance(buffer.data(), start));
                 return Text{std::move(buffer)};
             }
-            if (coral66::isWhitespace(c))
+            if (isWhitespace(c))
             {
                 context.leadingWhitespace = true;
                 return *this;
@@ -227,8 +227,8 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
                 llvm::raw_string_ostream ss(buffer);
                 ss << llvm::format_hex_no_prefix(c, 8);
                 ss.flush();
-                auto size = getNumUTF8ForUTF32(c);
-                context.report(coral66::errors::lexer::NON_PRINTABLE_CHARACTER_N, context.getOffset() - size, buffer,
+                const auto size = getNumUTF8ForUTF32(c);
+                context.report(errors::lexer::NON_PRINTABLE_CHARACTER_N, context.getOffset() - size, buffer,
                                std::pair{context.getOffset() - size, context.getOffset()});
             }
             else

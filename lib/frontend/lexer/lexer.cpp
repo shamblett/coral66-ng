@@ -618,7 +618,7 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 if (reporter)
                 {
                     *reporter << errors::lexer::UNEXPECTED_CHARACTER.args(*iter, sourceInterface, *iter);
-                    DiagnosticCollector::addDiagnostic(coral66::errors::lexer::UNEXPECTED_CHARACTER);
+                    DiagnosticCollector::addDiagnostic(errors::lexer::UNEXPECTED_CHARACTER);
                 }
                 break;
             case TokenType::Newline: break;
