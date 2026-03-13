@@ -523,57 +523,8 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 errorOccurred = true;
                 continue;
             }
-
-            const auto* hexStart = iter;
-            const auto* hexEnd = std::find_if(
-                hexStart, hexStart + std::min<std::size_t>(std::distance(hexStart, end), big ? 8 : 4),
-                [](char c) { return !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'); });
-            if (std::distance(hexStart, hexEnd) != (big ? 8 : 4))
-            {
-                auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data()) - 2;
-                context.report(
-                    coral66::errors::lexer::INVALID_UC_EXPECTED_N_MORE_DIGITS, start,
-                    (big ? 8 : 4) - std::distance(hexStart, hexEnd),
-                    std::forward_as_tuple(context.token, start, start + std::distance(hexStart, hexEnd) + 1));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_UC_EXPECTED_N_MORE_DIGITS);
-                errorOccurred = true;
-                iter = hexEnd;
-                continue;
-            }
-            auto uc = universalCharacterToValue(
-                {hexStart, static_cast<std::size_t>(hexEnd - hexStart)}, offset,
-                std::forward_as_tuple(context.token, offset, offset + 1 + (big ? 8 : 4)), context);
-            if (uc)
-            {
-                *resultStart = *uc;
-                resultStart++;
-            }
-            else
-            {
-                errorOccurred = true;
-            }
-            iter = hexEnd;
-            continue;
         }
-        if (iter[1] == 'x')
-        {
-            iter += 2;
-            const auto* lastHex =
-                std::find_if(iter, end, [](char c)
-                             { return !(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'); });
-            if (lastHex == iter)
-            {
-                auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 2);
-                context.report(coral66::errors::lexer::AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, start,
-                               std::forward_as_tuple(context.token, start, start + 1));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED);
-                errorOccurred = true;
-                continue;
-            }
-
-            iter = lastHex;
-        }
-        else if (iter[1] >= '0' && iter[1] <= '9')
+        if (iter[1] >= '0' && iter[1] <= '9')
         {
             // We take 8 and 9 here as well to tell the user it's an invalid octal instead of an invalid simple
             // escape sequence
