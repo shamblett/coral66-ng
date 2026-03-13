@@ -164,7 +164,7 @@ class Context : source_interface
 
     [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, const std::uint64_t offset) const noexcept override
     {
-        auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
+        const auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
         CORAL66_ASSERT(result != m_lineStarts.end());
         return std::distance(m_lineStarts.begin(), result) + (*result == offset ? 1 : 0);
     }

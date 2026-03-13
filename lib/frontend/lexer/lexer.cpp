@@ -447,7 +447,7 @@ std::optional<std::uint32_t> escapeCharToValue(char const escape, std::uint64_t 
     }
 }
 
-std::uint32_t octalToValue(std::string_view const value)
+[[maybe_unused]] std::uint32_t octalToValue(std::string_view const value)
 {
     std::uint32_t result;
     auto errors = std::from_chars(value.data(), value.data() + value.size(), result, 8);
@@ -458,11 +458,6 @@ std::uint32_t octalToValue(std::string_view const value)
 std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view const characters,
                                                             ConversionContext& context, bool wide)
 {
-    constexpr std::uint32_t largestCharacter = []() -> std::uint32_t
-    {
-        std::uint8_t size = 1;
-        return 0xFFFFFFFFu >> (32 - 8 * size);
-    }();
     std::vector<llvm::UTF32> result;
     result.resize(characters.size());
     auto* resultStart = result.data();
@@ -524,55 +519,18 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
                 continue;
             }
         }
-        if (iter[1] >= '0' && iter[1] <= '9')
+
+        // Escape sequence or illegal escape
+        if (auto character = escapeCharToValue(iter[1], offset, context))
         {
-            // We take 8 and 9 here as well to tell the user it's an invalid octal instead of an invalid simple
-            // escape sequence
-            iter++;
-            const auto* lastOctal = std::find_if(iter, iter + std::min<std::size_t>(3, std::distance(iter, end)),
-                                                 [](char c) { return c < '0' || c > '7'; });
-            if (lastOctal == iter)
-            {
-                // First character is 8 or 9. That's why we didn't encounter a single octal digit.
-                // Also since there must be at least one character after \, lastOctal is definitely not end
-                // here.
-                context.report(coral66::errors::lexer::INVALID_OCTAL_CHARACTER, offset, std::string_view(lastOctal, 1),
-                               std::forward_as_tuple(context.token, offset, offset + 1));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_OCTAL_CHARACTER);
-                errorOccurred = true;
-                continue;
-            }
-
-            const auto value = octalToValue({iter, static_cast<std::size_t>(lastOctal - iter)});
-            if (value > largestCharacter)
-            {
-                auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 1);
-                context.report(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, start,
-                               std::forward_as_tuple(context.token, start, start + lastOctal - iter));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE);
-                errorOccurred = true;
-                iter = lastOctal;
-                continue;
-            }
-            *resultStart = value;
+            *resultStart = *character;
             resultStart++;
-
-            iter = lastOctal;
         }
         else
         {
-            // Escape sequence or illegal escape
-            if (auto character = escapeCharToValue(iter[1], offset, context))
-            {
-                *resultStart = *character;
-                resultStart++;
-            }
-            else
-            {
-                errorOccurred = true;
-            }
-            iter += 2;
+            errorOccurred = true;
         }
+        iter += 2;
     }
 
     result.resize(std::distance(result.data(), resultStart));
@@ -582,7 +540,7 @@ std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view con
 std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const char* begin, const char* end,
                                                                         std::uint64_t, ConversionContext&)
 {
-    std::string text(begin, end);
+    const std::string text(begin, end);
     const bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos
                          || text.find('E') != std::string::npos;
 

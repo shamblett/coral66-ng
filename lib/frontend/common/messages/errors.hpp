@@ -111,8 +111,6 @@ CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for outpu
 namespace lexer
 {
 // Adding some Lexer errors that might be used by Lexer.cpp
-CREATE_ERROR(INVALID_OCTAL_CHARACTER, "Invalid octal character '%0'", PointAt<1>);
-CREATE_ERROR(CHARACTER_TOO_LARGE_FOR_LITERAL_TYPE, "Character too large for literal type", Underline<0>);
 CREATE_ERROR(INVALID_ESCAPE_SEQUENCE_N, "Invalid escape sequence '%0'", PointAt<1>);
 CREATE_ERROR(EXPECTED_CHARACTER_AFTER_BACKSLASH, "Expected character after backslash", PointAt<0>);
 CREATE_ERROR(NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, "Newline in string literal. Use \\n instead", PointAt<0>);
@@ -122,7 +120,6 @@ CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, "Invalid universal charact
 CREATE_ERROR(INVALID_UC_VALUE_MUST_FIT_IN_UTF32, "Invalid universal character. Value must fit in UTF32", Underline<0>);
 CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE,
              "Invalid universal character. Value mustn't be in range of 0xD800 to 0xDFFF", Underline<0>);
-CREATE_ERROR(AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, "At least one hexadecimal digit required", PointAt<0>);
 CREATE_ERROR(UNEXPECTED_CHARACTER, "Unexpected character", PointAt<0>);
 CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<1>);
 CREATE_ERROR(STRAY_N_IN_PROGRAM, "Stray %tokenType0 in program", PointAt<0>);
