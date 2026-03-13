@@ -122,8 +122,6 @@ CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, "Invalid universal charact
 CREATE_ERROR(INVALID_UC_VALUE_MUST_FIT_IN_UTF32, "Invalid universal character. Value must fit in UTF32", Underline<0>);
 CREATE_ERROR(INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE,
              "Invalid universal character. Value mustn't be in range of 0xD800 to 0xDFFF", Underline<0>);
-CREATE_ERROR(INVALID_UC_EXPECTED_N_MORE_DIGITS, "Invalid universal character. Expected %0 more hex digit%s0",
-             Underline<1>);
 CREATE_ERROR(AT_LEAST_ONE_HEXADECIMAL_DIGIT_REQUIRED, "At least one hexadecimal digit required", PointAt<0>);
 CREATE_ERROR(UNEXPECTED_CHARACTER, "Unexpected character", PointAt<0>);
 CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<1>);
