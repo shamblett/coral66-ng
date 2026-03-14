@@ -31,7 +31,6 @@ enum class TokenType : std::uint8_t
     // Symbols
     Assignment,
     Asterisk,
-    CloseBrace,
     CloseParentheses,
     CloseSquareBracket,
     Colon,
@@ -49,7 +48,6 @@ enum class TokenType : std::uint8_t
     Miscellaneous,
     Newline,
     NotEqual,
-    OpenBrace,
     OpenParentheses,
     OpenSquareBracket,
     PPNumber,

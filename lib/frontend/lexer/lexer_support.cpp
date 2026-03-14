@@ -169,8 +169,8 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
     switch (c)
     {
         case '.': return Dot{};
-        case '\'': return StringLiteral{};
-        case '\\': return MaybeUC{};
+        case '\'': return StroppedKeyword{};
+        case '"': return StringLiteral{};
         case '0':
         case '1':
         case '2':
@@ -192,10 +192,22 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
         case '=': context.push(context.getOffset() - 1, context.getOffset(), TokenType::Equal); return *this;
         case '*': return Punctuation{static_cast<int>(TokenType::Asterisk)};
         case '/': return Punctuation{static_cast<int>(TokenType::Division)};
-        case '(': context.push(context.getOffset() - 1, context.getOffset(), TokenType::OpenParentheses); return *this;
+        case '(':
+        {
+            auto& res = context.getResult();
+            auto it = res.rbegin();
+            while (it != res.rend() && it->getTokenType() == TokenType::Newline)
+            {
+                ++it;
+            }
+            if (it != res.rend() && it->getTokenType() == TokenType::SemiColon)
+            {
+                return BracketedComment{};
+            }
+            context.push(context.getOffset() - 1, context.getOffset(), TokenType::OpenParentheses);
+            return *this;
+        }
         case ')': context.push(context.getOffset() - 1, context.getOffset(), TokenType::CloseParentheses); return *this;
-        case '{': context.push(context.getOffset() - 1, context.getOffset(), TokenType::OpenBrace); return *this;
-        case '}': context.push(context.getOffset() - 1, context.getOffset(), TokenType::CloseBrace); return *this;
         case '[':
             context.push(context.getOffset() - 1, context.getOffset(), TokenType::OpenSquareBracket);
             return *this;
@@ -244,56 +256,39 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
 
 std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& context)
 {
-    if (sawQuote)
+    if (c == '"')
     {
-        if (c == '\'')
-        {
-            characters += '\'';
-            sawQuote = false;
-            return {std::move(*this), true};
-        }
+        characters += c;
         context.push(TokenType::StringLiteral, characters);
         return {Start{}, false};
-    }
-
-    if (c == '\'')
-    {
-        sawQuote = true;
-        return {std::move(*this), true};
     }
 
     characters += c;
     if ((c == '\n' || c == '\r'))
     {
+        context.report(errors::lexer::UNTERMINATED_STRING_LITERAL, context.getOffset() - 1,
+                       std::pair{context.tokenStartOffset, context.getOffset()});
+        DiagnosticCollector::addDiagnostic(errors::lexer::UNTERMINATED_STRING_LITERAL);
         context.push(TokenType::StringLiteral, characters);
         return {Start{}, false};
     }
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> L::advance(char const c, Context&) noexcept
-{
-    if (c == '\'')
-    {
-        return {StringLiteral{true, {}}, true};
-    }
-    if (c == '\\')
-    {
-        return {MaybeUC{std::make_unique<StateMachine>(L{})}, true};
-    }
-
-    return {Text{"L"}, false};
-}
-
 std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& context)
 {
-    if (c == '\\')
-    {
-        return {MaybeUC{std::make_unique<StateMachine>(std::move(*this))}, true};
-    }
-
     if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9'))
     {
+        if (characters == "COMMENT")
+        {
+            return {CommentSentence{}, false};
+        }
+        else if (characters == "END")
+        {
+            context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, characters);
+            return {EndComment{}, false};
+        }
+
         context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, characters);
         return {Start{}, false};
     }
@@ -306,14 +301,7 @@ std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& cont
 
 std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c, Context& context)
 {
-    constexpr std::uint8_t toLower = 32;
-    if (c == '\\')
-    {
-        return {MaybeUC{std::make_unique<StateMachine>(std::move(*this))}, true};
-    }
-
-    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '.'
-        && (((characters.back() | toLower) != 'e' && (characters.back() | toLower) != 'p') || (c != '+' && c != '-')))
+    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '.')
     {
         context.push(1, TokenType::PPNumber, characters);
         return {Start{}, false};
@@ -325,86 +313,83 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> MaybeUC::advance(std::uint32_t c,           // NOLINT(*-make-member-function-const)
-                                               Context& context) noexcept // NOLINT(*-make-member-function-const)
+std::pair<StateMachine, bool> CommentSentence::advance(char const c, Context& context)
 {
-    if (c == 'u' || c == 'U')
+    if (c == ';')
     {
-        // If Universal character, it's in or starting an identifier, not in a character or string literal
-        if (!prevState)
-        {
-            return {UniversalCharacter{c == 'U'}, true};
-        }
-        if (std::holds_alternative<Text>(*prevState))
-        {
-            return {UniversalCharacter{c == 'U', coral66::get<Text>(std::move(*prevState))}, true};
-        }
-        if (std::holds_alternative<L>(*prevState))
-        {
-            return {UniversalCharacter{c == 'U', Text{"L"}}, true};
-        }
-        if (std::holds_alternative<PreprocessingNumber>(*prevState))
-        {
-            return {UniversalCharacter{c == 'U', coral66::get<PreprocessingNumber>(std::move(*prevState))}, true};
-        }
-        CORAL66_UNREACHABLE;
+        context.push(TokenType::Identifier, "COMMENT"); // Emit comment keyword
+        return {Start{}, false};                        // Let Start handle the semicolon
     }
+    return {std::move(*this), true};
+}
 
-    if (prevState)
+std::pair<StateMachine, bool> BracketedComment::advance(char const c, Context& context)
+{
+    if (c == '(')
     {
-        context.withOffset(context.getOffset() - getNumUTF8ForUTF32(c),
-                           [&] { coral66::match(*prevState, [&](auto&& value) { value.advance(' ', context); }); });
+        nestCount++;
+    }
+    else if (c == ')')
+    {
+        nestCount--;
+        if (nestCount == 0)
+        {
+            return {Start{}, true}; // Bracketed comment finished, consume ')' and discard text
+        }
+    }
+    return {std::move(*this), true};
+}
+
+std::pair<StateMachine, bool> EndComment::advance(char const c, Context& context)
+{
+    if (isWhitespace(c))
+    {
+        if (characters.empty())
+        {
+            return {std::move(*this), true};
+        }
+        else
+        {
+            return {Start{}, false};
+        }
+    }
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+    {
+        characters += c;
+        return {std::move(*this), true};
     }
     return {Start{}, false};
 }
 
-std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context& context)
+std::pair<StateMachine, bool> StroppedKeyword::advance(char const c, Context& context)
 {
-    if (!(c >= '0' && c <= '9') && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
+    if (c == '\'')
     {
-        std::size_t result = context.view(context.tokenStartOffset, context.getOffset() - 1).rfind('\\');
-        CORAL66_ASSERT(result != std::string_view::npos);
-        result += context.tokenStartOffset;
-        if (suspHolder)
+        if (isKeyword(characters))
         {
-            context.withOffset(result + 1, [&]
-                               { coral66::match(*suspHolder, [&](auto&& value) { value.advance(' ', context); }); });
+            context.push(TokenType::Identifier, characters); // Emit as identifier, toCTokens converts
         }
-        return {Text{(big ? "U" : "u") + characters}, false};
+        else
+        {
+            context.report(errors::lexer::INVALID_STROPPED_KEYWORD_N, context.tokenStartOffset, characters,
+                           std::pair{context.tokenStartOffset, context.getOffset()});
+            DiagnosticCollector::addDiagnostic(errors::lexer::INVALID_STROPPED_KEYWORD_N);
+            context.push(TokenType::Identifier, characters);
+        }
+        return {Start{}, false};
     }
-
-    characters.push_back(c);
-    if (characters.size() != (big ? 8 : 4))
+    if (c == '\n' || c == '\r')
     {
-        return {std::move(*this), true};
+        context.report(errors::lexer::UNTERMINATED_STROPPED_KEYWORD, context.tokenStartOffset,
+                       std::pair{context.tokenStartOffset, context.getOffset()});
+        DiagnosticCollector::addDiagnostic(errors::lexer::UNTERMINATED_STROPPED_KEYWORD);
+        context.push(TokenType::Identifier, characters);
+        return {Start{}, false};
     }
-
-    std::size_t ucStart = context.currentView().rfind('\\');
-    CORAL66_ASSERT(ucStart != std::string_view::npos);
-    ucStart += context.tokenStartOffset;
-    auto result = universalCharacterToValue(characters, ucStart, std::pair{ucStart, context.getOffset()}, context);
-    if (!result)
-    {
-        return {Start{}, true};
-    }
-    // The Universal Character is a valid character from here on
-    if (suspHolder && std::holds_alternative<PreprocessingNumber>(*suspHolder))
-    {
-        auto pp = coral66::get<PreprocessingNumber>(std::move(*suspHolder));
-        pp.characters += context.currentView().substr(ucStart - context.tokenStartOffset);
-        return {std::move(pp), true};
-    }
-
-    auto newText = suspHolder ? coral66::get<Text>(std::move(*suspHolder)) : Text{};
-    newText.characters.resize(newText.characters.size() + 4);
-    auto* start = newText.characters.data() + newText.characters.size() - 4;
-    llvm::ConvertCodePointToUTF8(*result, start);
-    newText.characters.resize(newText.characters.size()
-                              - std::distance(start, newText.characters.data() + newText.characters.size()));
-    return {std::move(newText), true};
+    characters += c;
+    return {std::move(*this), true};
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
 std::pair<StateMachine, bool> Dot::advance(char const c, Context& context) // NOLINT(*-make-member-function-const)
 {
     if (c >= '0' && c <= '9')

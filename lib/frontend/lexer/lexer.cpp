@@ -65,86 +65,10 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     starts.shrink_to_fit();
     offset = 0;
 
-    std::string charactersSpace;
+    std::string charactersSpace = source;
     IntervalMap characterToSourceSpace;
-    charactersSpace.reserve(source.size());
-    {
-        auto stringView = std::string_view(source);
-        std::size_t curr = 0;
-        while (!stringView.empty())
-        {
-            for (; curr < stringView.size() && stringView[curr] != '?' && stringView[curr] != '\\'; curr++)
-                ;
-            if (curr == stringView.size())
-            {
-                break;
-            }
-            if (curr + 1 == stringView.size() || (stringView[curr] == '\\' && stringView[curr + 1] != '\n')
-                || (stringView[curr] == '?'
-                    && (curr + 1 == stringView.size() || stringView[curr + 1] != '?' || curr + 2 == stringView.size()
-                        || (stringView[curr + 2] != '=' && stringView[curr + 2] != '<' && stringView[curr + 2] != '('
-                            && stringView[curr + 2] != '!' && stringView[curr + 2] != '/' && stringView[curr + 2] != '>'
-                            && stringView[curr + 2] != ')' && stringView[curr + 2] != '-'
-                            && stringView[curr + 2] != '\'' && stringView[curr + 2] != '/'))))
-            {
-                curr++;
-                continue;
-            }
-            bool trigraph = false;
-            auto view = stringView.substr(curr);
-            if (view[0] == '\\')
-            {
-                view = view.substr(0, 2);
-            }
-            else if (view.substr(0, std::min<std::size_t>(view.size(), 4)) == "?\?/\n")
-            {
-                view = view.substr(0, 4);
-            }
-            else
-            {
-                trigraph = true;
-                view = view.substr(0, 3);
-            }
-            auto pos = stringView.data() + curr - source.data();
-            auto prefix = stringView.substr(0, curr);
-            if (!prefix.empty())
-            {
-                characterToSourceSpace.emplace_back(charactersSpace.size(), pos - prefix.size(), pos);
-            }
-            charactersSpace += prefix;
-            if (trigraph)
-            {
-                // If the first and only group didn't match it's a trigraph
-                // While backslashes are removed and therefore not replaced we need to now replace the
-                // trigraph
-                constexpr std::array<std::pair<std::string_view, char>, 9> mapping = {{{"?\?=", '#'},
-                                                                                       {"?\?(", '['},
-                                                                                       {"?\?/", '\\'},
-                                                                                       {"?\?)", ']'},
-                                                                                       {"?\?'", '^'},
-                                                                                       {"?\?<", '{'},
-                                                                                       {"?\?!", '|'},
-                                                                                       {"?\?>", '}'},
-                                                                                       {"?\?-", '~'}}};
-                const auto result =
-                    std::ranges::find_if(mapping, coral66::compose(coral66::bind_front(std::equal_to<>{}, view),
-                                                                   &decltype(mapping)::value_type::first));
-                CORAL66_ASSERT(result != mapping.end());
-                characterToSourceSpace.emplace_back(charactersSpace.size(), pos, pos + view.size());
-                charactersSpace += result->second;
-            }
-            stringView.remove_prefix(prefix.size() + view.size());
-            curr = 0;
-        }
-        if (!stringView.empty())
-        {
-            characterToSourceSpace.emplace_back(charactersSpace.size(), source.size() - stringView.size(),
-                                                source.size());
-            charactersSpace += stringView;
-        }
-        characterToSourceSpace.emplace_back(charactersSpace.size(), 0, 0);
-    }
-    charactersSpace.shrink_to_fit();
+    characterToSourceSpace.emplace_back(0, 0, source.size());
+    characterToSourceSpace.emplace_back(source.size(), 0, 0);
 
     Context context(source, characterToSourceSpace, charactersSpace, offset, starts, reporter, sourcePath);
     const auto* end = charactersSpace.data() + charactersSpace.size();
@@ -309,6 +233,13 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
         while (match(stateMachine, visitor))
             ;
     }
+
+    if (std::holds_alternative<BracketedComment>(stateMachine))
+    {
+        context.report(errors::lexer::UNTERMINATED_BRACKETED_COMMENT, context.tokenStartOffset,
+                       std::pair{context.tokenStartOffset, context.getOffset()});
+        DiagnosticCollector::addDiagnostic(errors::lexer::UNTERMINATED_BRACKETED_COMMENT);
+    }
     characterToSourceSpace.shrink_to_fit();
 
     if (errorsOccurred)
@@ -391,130 +322,6 @@ struct ConversionContext
         }
     }
 };
-
-std::optional<std::uint32_t> escapeCharToValue(char const escape, std::uint64_t backslash, ConversionContext& context)
-{
-    switch (escape)
-    {
-        case '\'': return '\'';
-        case '"': return '"';
-        case 'b': return '\b';
-        case 't': return '\t';
-        case '\\': return '\\';
-        case 'f': return '\f';
-        case 'v': return '\v';
-        case '?': return '\?';
-        case 'n': return '\n';
-        case 'a': return '\a';
-        case 'r': return '\r';
-        case ' ':
-        {
-            context.report(coral66::errors::lexer::EXPECTED_CHARACTER_AFTER_BACKSLASH, backslash + 1,
-                           std::forward_as_tuple(context.token, backslash, backslash + 2));
-            DiagnosticCollector::addDiagnostic(coral66::errors::lexer::EXPECTED_CHARACTER_AFTER_BACKSLASH);
-
-            return {};
-        }
-        default:
-        {
-            context.report(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N, backslash + 1, std::string("\\") + escape,
-                           std::forward_as_tuple(context.token, backslash, backslash + 1));
-            DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N);
-
-            return {};
-        }
-    }
-}
-
-[[maybe_unused]] std::uint32_t octalToValue(std::string_view const value)
-{
-    std::uint32_t result;
-    auto errors = std::from_chars(value.data(), value.data() + value.size(), result, 8);
-    CORAL66_ASSERT(errors.ec == std::errc{});
-    return result;
-}
-
-std::pair<std::vector<llvm::UTF32>, bool> processCharacters(std::string_view const characters,
-                                                            ConversionContext& context, bool wide)
-{
-    std::vector<llvm::UTF32> result;
-    result.resize(characters.size());
-    auto* resultStart = result.data();
-    auto* resultEnd = result.data() + result.size();
-
-    const auto* end = characters.data() + characters.size();
-    bool errorOccurred = false;
-    for (const auto* iter = characters.data(); iter != end;)
-    {
-        auto offset = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data());
-        if (*iter == '\n')
-        {
-            context.report(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N, offset,
-                           std::forward_as_tuple(context.token, offset));
-            DiagnosticCollector::addDiagnostic(coral66::errors::lexer::NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N);
-            iter++;
-            errorOccurred = true;
-            continue;
-        }
-        if (*iter != '\\')
-        {
-            const auto* start = iter;
-            iter = std::find_if(iter, end, [](const char c) { return c == '\\' || c == '\n'; });
-
-            const auto res = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
-                                                      reinterpret_cast<const llvm::UTF8*>(iter), &resultStart,
-                                                      resultEnd, llvm::strictConversion);
-            if (res != llvm::conversionOK)
-            {
-                auto invalidStart = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (start - characters.data());
-                auto invalidEnd = invalidStart + coral66::getNumBytesForUTF8(start, end) - 1;
-                context.report(coral66::errors::lexer::INVALID_UTF8_SEQUENCE, invalidStart,
-                               std::make_tuple(context.token, invalidStart, invalidEnd));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_UTF8_SEQUENCE);
-                errorOccurred = true;
-            }
-            continue;
-        }
-
-        if (iter + 1 == end)
-        {
-            break;
-        }
-
-        if (iter[1] == 'u' || iter[1] == 'U')
-        {
-            const bool big = iter[1] == 'U';
-            iter += 2;
-            if (iter == end
-                || (!(*iter >= '0' && *iter <= '9') && !(*iter >= 'a' && *iter <= 'f')
-                    && !(*iter >= 'A' && *iter <= 'F')))
-            {
-                auto start = context.token.getCharSpaceOffset() + (wide ? 2 : 1) + (iter - characters.data() - 2);
-                context.report(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N, start,
-                               std::string_view(big ? "\\U" : "\\u"),
-                               std::forward_as_tuple(context.token, start, start + 1));
-                DiagnosticCollector::addDiagnostic(coral66::errors::lexer::INVALID_ESCAPE_SEQUENCE_N);
-                errorOccurred = true;
-                continue;
-            }
-        }
-
-        // Escape sequence or illegal escape
-        if (auto character = escapeCharToValue(iter[1], offset, context))
-        {
-            *resultStart = *character;
-            resultStart++;
-        }
-        else
-        {
-            errorOccurred = true;
-        }
-        iter += 2;
-    }
-
-    result.resize(std::distance(result.data(), resultStart));
-    return {result, errorOccurred};
-}
 
 std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const char* begin, const char* end,
                                                                         std::uint64_t, ConversionContext&)
@@ -655,31 +462,13 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
                                                          llvm::raw_ostream* reporter)
 {
     CORAL66_ASSERT(PPToken.getTokenType() == coral66::lexer::TokenType::StringLiteral);
-    bool errorsOccurred = false;
-    ConversionContext context{reporter, sourceInterface, PPToken, &errorsOccurred};
-    const bool wide = PPToken.getRepresentation(sourceInterface)[0] == 'L';
-    auto [chars, errorOccurred] = processCharacters(PPToken.getValue(), context, wide);
-    if (errorOccurred)
+    std::string value = std::string(PPToken.getValue());
+    if (value.size() >= 2 && value.front() == '"' && value.back() == '"')
     {
-        return {};
+        value = value.substr(1, value.size() - 2);
     }
-    if (!wide)
-    {
-        const auto* start = chars.data();
-        std::vector<llvm::UTF8> utf8(chars.size() * 4);
-        auto* dest = utf8.data();
-        if (llvm::ConvertUTF32toUTF8(&start, start + chars.size(), &dest, dest + utf8.size(), llvm::strictConversion)
-            != llvm::conversionOK)
-        {
-            CORAL66_UNREACHABLE;
-        }
-
-        return CToken(TokenType::StringLiteral, PPToken.getOffset(), PPToken.getLength(), PPToken.getFileId(),
-                      PPToken.getMacroId(), std::string(utf8.data(), dest));
-    }
-
     return CToken(TokenType::StringLiteral, PPToken.getOffset(), PPToken.getLength(), PPToken.getFileId(),
-                  PPToken.getMacroId(), NonCharString{chars, NonCharString::Wide});
+                  PPToken.getMacroId(), std::move(value));
 }
 
 std::string_view coral66::lexer::tokenName(coral66::lexer::TokenType const tokenType, bool const quote)
@@ -710,8 +499,6 @@ std::string_view coral66::lexer::tokenName(coral66::lexer::TokenType const token
         case TokenType::CloseSquareBracket: return quote ? "']'" : "]";
         case TokenType::Dot: return quote ? "'.'" : ".";
         case TokenType::Newline: return quote ? "newline" : "\n";
-        case TokenType::CloseBrace: return quote ? "'}'" : "}";
-        case TokenType::OpenBrace: return quote ? "'{'" : "{";
         case TokenType::Miscellaneous: return "Miscellaneous";
         case TokenType::PPNumber: return "PPNumber";
         case TokenType::PPToken: return "PPToken";

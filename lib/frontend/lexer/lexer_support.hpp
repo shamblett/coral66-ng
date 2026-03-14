@@ -22,11 +22,12 @@ struct Start;
 struct StringLiteral;
 struct Text;
 struct PreprocessingNumber;
-struct MaybeUC;
-struct UniversalCharacter;
 struct Dot;
 struct Punctuation;
-struct L;
+struct CommentSentence;
+struct BracketedComment;
+struct EndComment;
+struct StroppedKeyword;
 
 bool isKeyword(std::string_view characters);
 
@@ -36,37 +37,8 @@ std::uint32_t hexToValue(std::string_view value);
 
 constexpr auto UTF32_MAX = 0x10FFFF;
 
-using StateMachine =
-    std::variant<Start, StringLiteral, Text, PreprocessingNumber, MaybeUC, UniversalCharacter, Dot, Punctuation, L>;
-
-template <class T, class PosArg>
-std::optional<std::uint32_t> universalCharacterToValue(std::string_view const value, std::uint64_t const location,
-                                                       PosArg&& arg, T& context)
-{
-    CORAL66_ASSERT(value.size() == 4 || value.size() == 8);
-    auto result = hexToValue(value);
-    if (result < 0xA0)
-    {
-        if (result != '$' && result != '@' && result != '`')
-        {
-            context.report(errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_LESS_THAN_A0, location,
-                           std::forward<PosArg>(arg));
-            return {};
-        }
-    }
-    else if (result > UTF32_MAX)
-    {
-        context.report(errors::lexer::INVALID_UC_VALUE_MUST_FIT_IN_UTF32, location, std::forward<PosArg>(arg));
-        return {};
-    }
-    else if ((result >= 0xD800 && result <= 0xDFFF))
-    {
-        context.report(errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location,
-                       std::forward<PosArg>(arg));
-        return {};
-    }
-    return result;
-}
+using StateMachine = std::variant<Start, StringLiteral, Text, PreprocessingNumber, Dot, Punctuation, CommentSentence,
+                                  BracketedComment, EndComment, StroppedKeyword>;
 
 inline std::pair<std::uint64_t, std::uint64_t> map(const IntervalMap& intervalMap, std::uint64_t const offset)
 {
@@ -364,23 +336,6 @@ struct PreprocessingNumber final
     std::pair<StateMachine, bool> advance(std::uint32_t c, Context& context);
 };
 
-struct MaybeUC final
-{
-    std::unique_ptr<StateMachine> prevState{};
-    [[maybe_unused]] bool error = false;
-
-    std::pair<StateMachine, bool> advance(std::uint32_t c, Context& context) noexcept;
-};
-
-struct UniversalCharacter final
-{
-    bool big;
-    std::optional<std::variant<Text, PreprocessingNumber>> suspHolder{};
-    std::string characters{};
-
-    std::pair<StateMachine, bool> advance(char c, Context& context);
-};
-
 struct Dot final
 {
     std::uint8_t dotCount = 1;
@@ -400,9 +355,27 @@ public:
     std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 
-struct L final
+struct CommentSentence final
 {
-    static std::pair<StateMachine, bool> advance(char c, Context& context) noexcept;
+    std::pair<StateMachine, bool> advance(char c, Context& context);
+};
+
+struct BracketedComment final
+{
+    std::uint32_t nestCount = 1;
+    std::pair<StateMachine, bool> advance(char c, Context& context);
+};
+
+struct EndComment final
+{
+    std::string characters{};
+    std::pair<StateMachine, bool> advance(char c, Context& context);
+};
+
+struct StroppedKeyword final
+{
+    std::string characters{};
+    std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 
 /*

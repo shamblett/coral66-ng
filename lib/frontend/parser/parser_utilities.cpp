@@ -88,7 +88,7 @@ bool coral66::parser::firstIsInPointer(const lexer::CToken& token, const coral66
 
 bool coral66::parser::firstIsInInitializer(const lexer::CToken& token, const coral66::parser::Context& context)
 {
-    return firstIsInAssignmentExpression(token, context) || token.getTokenType() == lexer::TokenType::OpenBrace;
+    return firstIsInAssignmentExpression(token, context);
 }
 
 [[maybe_unused]] bool coral66::parser::firstIsInInitializerList(const lexer::CToken& token,
@@ -101,7 +101,7 @@ bool coral66::parser::firstIsInInitializer(const lexer::CToken& token, const cor
 bool coral66::parser::firstIsInStatement(const lexer::CToken& token, const coral66::parser::Context& context)
 {
     return token.getTokenType() == lexer::TokenType::IfKeyword || token.getTokenType() == lexer::TokenType::ForKeyword
-           || token.getTokenType() == lexer::TokenType::OpenBrace
+
            || token.getTokenType() == lexer::TokenType::Identifier
            || token.getTokenType() == lexer::TokenType::DoKeyword
            || token.getTokenType() == lexer::TokenType::GotoKeyword
