@@ -51,3 +51,6 @@
 /.aswb/
 /.clwb/
 /MODULE.bazel.lock
+
+# Coverage
+/genhtml/
