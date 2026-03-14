@@ -390,15 +390,11 @@ std::pair<StateMachine, bool> UniversalCharacter::advance(char const c, Context&
     // The Universal Character is a valid character from here on
     if (suspHolder && std::holds_alternative<PreprocessingNumber>(*suspHolder))
     {
-        // In a PP Number we only go through the whole mechanism to check if the universal character is invalid.
-        // Otherwise, different tokens need to be generated
         auto pp = coral66::get<PreprocessingNumber>(std::move(*suspHolder));
         pp.characters += context.currentView().substr(ucStart - context.tokenStartOffset);
         return {std::move(pp), true};
     }
 
-    // This line is needed because a text can start with a universal character. Luckily a Preprocessing number can't
-    // So we only reach this line if suspHolder is either empty or contains a Text
     auto newText = suspHolder ? coral66::get<Text>(std::move(*suspHolder)) : Text{};
     newText.characters.resize(newText.characters.size() + 4);
     auto* start = newText.characters.data() + newText.characters.size() - 4;

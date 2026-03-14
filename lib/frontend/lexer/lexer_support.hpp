@@ -12,7 +12,7 @@
 #include "lib/support/scope_exit.hpp"
 
 /**
- * Lexer support functions
+ * Lexer support functions.
  */
 
 namespace coral66::lexer
@@ -62,7 +62,7 @@ std::optional<std::uint32_t> universalCharacterToValue(std::string_view const va
     else if ((result >= 0xD800 && result <= 0xDFFF))
     {
         context.report(coral66::errors::lexer::INVALID_UC_VALUE_MUSTNT_BE_IN_RANGE, location,
-                       std::forward<PosArg>(arg));
+                       std::forwA CSourceObject containing the CTokens.ard<PosArg>(arg));
         return {};
     }
     return result;
@@ -150,6 +150,9 @@ auto mapArguments(const Diag&, const IntervalMap& intervalMap, Tuple&& tuple, st
         }(std::integral_constant<std::size_t, ints>{})...);
 }
 
+/*
+ * Source file processing context.
+ */
 class Context : source_interface
 {
     llvm::raw_ostream* m_reporter;

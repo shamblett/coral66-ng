@@ -61,11 +61,18 @@ PPSourceObject tokenize(std::string source, llvm::raw_ostream* reporter = &llvm:
  * @param sourceObject The input PPTokens.
  * @param reporter Stream to report errors to.
  * @param errorsOccurred Pointer to a bool set to true if errors occur.
- * @return A SourceObject containing the CTokens.
+ * @return A sourceObject containing the CTokens.
  */
 CSourceObject toCTokens(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                         bool* errorsOccurred = nullptr);
 
+/**
+ *
+ * @param sourceObject The input PPTokens.
+ * @param reporter stream to report errors to.
+ * @param errorsOccurred Pointer to a bool set to true if errors occur.
+ * @return A CSourceObject containing the CTokens.
+ */
 CSourceObject toCTokens(const PPSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                         bool* errorsOccurred = nullptr);
 
