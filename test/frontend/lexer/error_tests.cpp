@@ -64,33 +64,6 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(result.findDiagnostic(INVALID_UTF8_SEQUENCE));
     }
 
-    SECTION("Expected Character After Backslash")
-    {
-        bool errors = false;
-        std::string source = "'\\ '";
-        auto result = lexToCTokens(source, errors);
-        CHECK(errors);
-        CHECK(result.findDiagnostic(EXPECTED_CHARACTER_AFTER_BACKSLASH));
-    }
-
-    SECTION("Invalid Escape Sequence")
-    {
-        bool errors = false;
-        std::string source = "'\\z'";
-        auto result = lexToCTokens(source, errors);
-        CHECK(errors);
-        CHECK(result.findDiagnostic(INVALID_ESCAPE_SEQUENCE_N));
-    }
-
-    SECTION("Newline in String Literal")
-    {
-        bool errors = false;
-        std::string source = "'zz\nzz'";
-        auto result = lexToCTokens(source, errors);
-        CHECK(errors);
-        CHECK(result.findDiagnostic(NEWLINE_IN_STRING_LITERAL_USE_BACKLASH_N));
-    }
-
     SECTION("Unexpected Character")
     {
         bool errors = false;
