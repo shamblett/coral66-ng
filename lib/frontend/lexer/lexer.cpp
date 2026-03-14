@@ -25,27 +25,6 @@
 using namespace coral66::lexer;
 using namespace coral66::detail;
 
-class DiagnosticCollector
-{
-    inline static std::vector<Diagnostic::DiagnosticBase> m_diagnostics;
-
-public:
-    template <typename DiagnosticType>
-    static void addDiagnostic(const DiagnosticType& diagnostic)
-    {
-        m_diagnostics.emplace_back(diagnostic);
-    }
-
-    static std::vector<Diagnostic::DiagnosticBase>& getDiagnostics()
-    {
-        return m_diagnostics;
-    }
-    static void clearDiagnostics()
-    {
-        m_diagnostics.clear();
-    }
-};
-
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath)
 {

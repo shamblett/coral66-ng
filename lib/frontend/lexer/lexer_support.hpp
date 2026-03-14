@@ -402,4 +402,28 @@ struct L final
     static std::pair<StateMachine, bool> advance(char c, Context& context) noexcept;
 };
 
+/*
+ * Diagnostics collection helper.
+ */
+class DiagnosticCollector
+{
+    inline static std::vector<detail::Diagnostic::DiagnosticBase> m_diagnostics;
+
+public:
+    template <typename DiagnosticType>
+    static void addDiagnostic(const DiagnosticType& diagnostic)
+    {
+        m_diagnostics.emplace_back(diagnostic);
+    }
+
+    static std::vector<detail::Diagnostic::DiagnosticBase>& getDiagnostics()
+    {
+        return m_diagnostics;
+    }
+    static void clearDiagnostics()
+    {
+        m_diagnostics.clear();
+    }
+};
+
 } // namespace coral66::lexer
