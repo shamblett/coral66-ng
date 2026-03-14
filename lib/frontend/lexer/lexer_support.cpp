@@ -230,6 +230,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
                 const auto size = getNumUTF8ForUTF32(c);
                 context.report(errors::lexer::NON_PRINTABLE_CHARACTER_N, context.getOffset() - size, buffer,
                                std::pair{context.getOffset() - size, context.getOffset()});
+                DiagnosticCollector::addDiagnostic(errors::lexer::NON_PRINTABLE_CHARACTER_N);
             }
             else
             {
