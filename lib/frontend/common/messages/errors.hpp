@@ -119,6 +119,8 @@ CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underli
 CREATE_ERROR(UNTERMINATED_BRACKETED_COMMENT, "Unterminated bracketed comment", Underline<0>);
 CREATE_ERROR(UNTERMINATED_STROPPED_KEYWORD, "Unterminated stropped keyword", Underline<0>);
 CREATE_ERROR(INVALID_STROPPED_KEYWORD_N, "Invalid stropped keyword '%0'", PointAt<1>);
+CREATE_ERROR(UNTERMINATED_COMMENT_KEYWORD_SEQUENCE, "Unterminated COMMENT keyword sequence", Underline<0>);
+CREATE_ERROR(MALFORMED_END_KEYWORD_SEQUENCE, "Malformed END keyword sequence", Underline<0>);
 } // namespace lexer
 
 namespace pp

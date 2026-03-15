@@ -73,11 +73,45 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(result.findDiagnostic(UNEXPECTED_CHARACTER));
     }
 
+    SECTION("Unterminated Comment Keyword Sequence")
+    {
+        bool errors = false;
+        std::string source = "COMMENT Hello";
+        auto result = lex(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(UNTERMINATED_COMMENT_KEYWORD_SEQUENCE));
+    }
+
+    SECTION("Malformed End Keyword Sequence")
+    {
+        bool errors = false;
+        std::string source = "END 123";
+        auto result = lex(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(MALFORMED_END_KEYWORD_SEQUENCE));
+    }
+
     SECTION("Non-Printable Character")
     {
         bool errors = false;
         std::string source = "\u200B";
         auto result = lexToCTokens(source, errors);
         CHECK(result.findDiagnostic(NON_PRINTABLE_CHARACTER_N));
+    }
+
+    SECTION("Unterminated Stropped Keyword")
+    {
+        bool errors = false;
+        std::string source = "'INTEGE hhhh";
+        auto result = lexToCTokens(source, errors);
+        CHECK(result.findDiagnostic(UNTERMINATED_STROPPED_KEYWORD));
+    }
+
+    SECTION("Invalid Stropped Keyword")
+    {
+        bool errors = false;
+        std::string source = "'BEGIZ'";
+        auto result = lexToCTokens(source, errors);
+        CHECK(result.findDiagnostic(INVALID_STROPPED_KEYWORD_N));
     }
 }

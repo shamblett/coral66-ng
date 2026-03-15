@@ -233,6 +233,12 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
             ;
     }
 
+    if (std::holds_alternative<CommentSentence>(stateMachine))
+    {
+        context.report(errors::lexer::UNTERMINATED_COMMENT_KEYWORD_SEQUENCE, context.tokenStartOffset,
+                       std::pair{context.tokenStartOffset, context.getOffset()});
+        DiagnosticCollector::addDiagnostic(errors::lexer::UNTERMINATED_COMMENT_KEYWORD_SEQUENCE);
+    }
     if (std::holds_alternative<BracketedComment>(stateMachine))
     {
         context.report(errors::lexer::UNTERMINATED_BRACKETED_COMMENT, context.tokenStartOffset,

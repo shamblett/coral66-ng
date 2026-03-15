@@ -353,8 +353,19 @@ std::pair<StateMachine, bool> EndComment::advance(char const c, Context& context
             return {Start{}, false};
         }
     }
-    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
     {
+        characters += c;
+        return {std::move(*this), true};
+    }
+    if (c >= '0' && c <= '9')
+    {
+        if (characters.empty())
+        {
+            context.report(errors::lexer::MALFORMED_END_KEYWORD_SEQUENCE, context.tokenStartOffset,
+                           std::pair{context.tokenStartOffset, context.getOffset()});
+            DiagnosticCollector::addDiagnostic(errors::lexer::MALFORMED_END_KEYWORD_SEQUENCE);
+        }
         characters += c;
         return {std::move(*this), true};
     }
