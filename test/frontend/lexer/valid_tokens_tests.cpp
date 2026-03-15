@@ -20,6 +20,7 @@
  *
  */
 
+using namespace coral66::lexer;
 using namespace coral66::errors::lexer;
 using namespace Catch::Matchers;
 
@@ -44,32 +45,52 @@ coral66::CSourceObject lex(const std::string& code)
 
 TEST_CASE("Coral Lexing Keywords", "[lexer]")
 {
-    using namespace coral66::lexer;
-    auto result = lex("'ABSOLUTE' 'AND' 'ANSWER' 'ARRAY' 'BEGIN' 'BIT' 'BITS' 'CODE' 'COMMENT' "
-                      "'COMMON' 'DEFINE' 'DELETE' 'DIFFER' 'DO' 'ELSE' 'END' 'EXTERNAL' 'FIXED' 'FLOATING' "
-                      "'FOR' 'GOTO' 'IF' 'INTEGER' 'LABEL' 'LIBRARY' 'LITERAL' 'LOCATION' 'MASK' 'OCTAL' 'OR' "
-                      "'OVERLAY' 'PRESET' 'PROCEDURE' 'PROGRAM' 'RECURSIVE' 'SEGMENT' 'STEP' 'SWITCH' 'TABLE' "
-                      "'THEN' 'UNION' 'UNSIGNED' 'UNTIL' 'VALUE' 'WHILE' 'WITH'");
+    const std::vector correct = {TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,
+                                 TokenType::ArrayKeyword,     TokenType::BeginKeyword,    TokenType::BitKeyword,
+                                 TokenType::BitsKeyword,      TokenType::CodeKeyword,     TokenType::CommentKeyword,
+                                 TokenType::SemiColon,        TokenType::CommonKeyword,   TokenType::DefineKeyword,
+                                 TokenType::DeleteKeyword,    TokenType::DifferKeyword,   TokenType::DoKeyword,
+                                 TokenType::ElseKeyword,      TokenType::EndKeyword,      TokenType::ExternalKeyword,
+                                 TokenType::FixedKeyword,     TokenType::FloatingKeyword, TokenType::ForKeyword,
+                                 TokenType::GotoKeyword,      TokenType::IfKeyword,       TokenType::IntegerKeyword,
+                                 TokenType::LabelKeyword,     TokenType::LibraryKeyword,  TokenType::LiteralKeyword,
+                                 TokenType::LocationKeyword,  TokenType::MaskKeyword,     TokenType::OctalKeyword,
+                                 TokenType::OrKeyword,        TokenType::OverlayKeyword,  TokenType::PresetKeyword,
+                                 TokenType::ProcedureKeyword, TokenType::ProgramKeyword,  TokenType::RecursiveKeyword,
+                                 TokenType::SegmentKeyword,   TokenType::StepKeyword,     TokenType::SwitchKeyword,
+                                 TokenType::TableKeyword,     TokenType::ThenKeyword,     TokenType::UnionKeyword,
+                                 TokenType::UnsignedKeyword,  TokenType::UntilKeyword,    TokenType::ValueKeyword,
+                                 TokenType::WhileKeyword,     TokenType::WithKeyword};
 
-    const std::vector correct = {
-        TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,    TokenType::ArrayKeyword,
-        TokenType::BeginKeyword,     TokenType::BitKeyword,      TokenType::BitsKeyword,      TokenType::CodeKeyword,
-        TokenType::CommentKeyword,   TokenType::CommonKeyword,   TokenType::DefineKeyword,    TokenType::DeleteKeyword,
-        TokenType::DifferKeyword,    TokenType::DoKeyword,       TokenType::ElseKeyword,      TokenType::EndKeyword,
-        TokenType::ExternalKeyword,  TokenType::FixedKeyword,    TokenType::FloatingKeyword,  TokenType::ForKeyword,
-        TokenType::GotoKeyword,      TokenType::IfKeyword,       TokenType::IntegerKeyword,   TokenType::LabelKeyword,
-        TokenType::LibraryKeyword,   TokenType::LiteralKeyword,  TokenType::LocationKeyword,  TokenType::MaskKeyword,
-        TokenType::OctalKeyword,     TokenType::OrKeyword,       TokenType::OverlayKeyword,   TokenType::PresetKeyword,
-        TokenType::ProcedureKeyword, TokenType::ProgramKeyword,  TokenType::RecursiveKeyword, TokenType::SegmentKeyword,
-        TokenType::StepKeyword,      TokenType::SwitchKeyword,   TokenType::TableKeyword,     TokenType::ThenKeyword,
-        TokenType::UnionKeyword,     TokenType::UnsignedKeyword, TokenType::UntilKeyword,     TokenType::ValueKeyword,
-        TokenType::WhileKeyword,     TokenType::WithKeyword};
+    SECTION("Stropped")
+    {
+        auto result = lex("'ABSOLUTE' 'AND' 'ANSWER' 'ARRAY' 'BEGIN' 'BIT' 'BITS' 'CODE' 'COMMENT' ; "
+                          "'COMMON' 'DEFINE' 'DELETE' 'DIFFER' 'DO' 'ELSE' 'END' DUMMY 'EXTERNAL' 'FIXED' 'FLOATING' "
+                          "'FOR' 'GOTO' 'IF' 'INTEGER' 'LABEL' 'LIBRARY' 'LITERAL' 'LOCATION' 'MASK' 'OCTAL' 'OR' "
+                          "'OVERLAY' 'PRESET' 'PROCEDURE' 'PROGRAM' 'RECURSIVE' 'SEGMENT' 'STEP' 'SWITCH' 'TABLE' "
+                          "'THEN' 'UNION' 'UNSIGNED' 'UNTIL' 'VALUE' 'WHILE' 'WITH'");
 
-    std::vector<TokenType> tokens;
-    tokens.reserve(result.data().size());
-    std::ranges::transform(result.data(), std::back_inserter(tokens),
-                           [](const CToken& token) { return token.getTokenType(); });
-    CHECK_THAT(tokens, Catch::Matchers::Equals(correct));
+        std::vector<TokenType> tokens;
+        tokens.reserve(result.data().size());
+        std::ranges::transform(result.data(), std::back_inserter(tokens),
+                               [](const CToken& token) { return token.getTokenType(); });
+        CHECK_THAT(tokens, Catch::Matchers::Equals(correct));
+    }
+
+    SECTION("Unstropped")
+    {
+        auto result = lex("ABSOLUTE AND ANSWER ARRAY BEGIN BIT BITS CODE COMMENT ; "
+                          "COMMON DEFINE DELETE DIFFER DO ELSE END DUMMY EXTERNAL FIXED FLOATING "
+                          "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
+                          "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
+                          "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
+
+        std::vector<TokenType> tokens;
+        tokens.reserve(result.data().size());
+        std::ranges::transform(result.data(), std::back_inserter(tokens),
+                               [](const CToken& token) { return token.getTokenType(); });
+        CHECK_THAT(tokens, Catch::Matchers::Equals(correct));
+    }
 }
 
 TEST_CASE("Coral Lexing Identifiers", "[lexer]")

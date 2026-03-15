@@ -367,6 +367,15 @@ std::pair<StateMachine, bool> StroppedKeyword::advance(char const c, Context& co
     {
         if (isKeyword(characters))
         {
+            if (characters == "COMMENT")
+            {
+                return {CommentSentence{}, true};
+            }
+            if (characters == "END")
+            {
+                context.push(TokenType::Identifier, characters);
+                return {EndComment{}, true};
+            }
             context.push(TokenType::Identifier, characters); // Emit as identifier, toCTokens converts
         }
         else
