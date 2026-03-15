@@ -45,11 +45,11 @@ coral66::CSourceObject lex(const std::string& code)
 TEST_CASE("Coral Lexing Keywords", "[lexer]")
 {
     using namespace coral66::lexer;
-    auto result = lex("ABSOLUTE AND ANSWER ARRAY BEGIN BIT BITS CODE COMMENT "
-                      "COMMON DEFINE DELETE DIFFER DO ELSE END EXTERNAL FIXED FLOATING "
-                      "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
-                      "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
-                      "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
+    auto result = lex("'ABSOLUTE' 'AND' 'ANSWER' 'ARRAY' 'BEGIN' 'BIT' 'BITS' 'CODE' 'COMMENT' "
+                      "'COMMON' 'DEFINE' 'DELETE' 'DIFFER' 'DO' 'ELSE' 'END' 'EXTERNAL' 'FIXED' 'FLOATING' "
+                      "'FOR' 'GOTO' 'IF' 'INTEGER' 'LABEL' 'LIBRARY' 'LITERAL' 'LOCATION' 'MASK' 'OCTAL' 'OR' "
+                      "'OVERLAY' 'PRESET' 'PROCEDURE' 'PROGRAM' 'RECURSIVE' 'SEGMENT' 'STEP' 'SWITCH' 'TABLE' "
+                      "'THEN' 'UNION' 'UNSIGNED' 'UNTIL' 'VALUE' 'WHILE' 'WITH'");
 
     const std::vector correct = {
         TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,    TokenType::ArrayKeyword,
@@ -126,7 +126,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
 
     SECTION("Strings")
     {
-        auto result = lex("'Hello World' 'It''s me' ''");
+        auto result = lex(R"("Hello World" "It's me" "")");
         REQUIRE(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");

@@ -49,7 +49,7 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
     SECTION("Unterminated String Literal")
     {
         bool errors = false;
-        std::string source = "'Hello World";
+        std::string source = "\"Hello World";
         auto result = lex(source, errors);
         CHECK(errors);
         CHECK(result.findDiagnostic(UNTERMINATED_STRING_LITERAL));

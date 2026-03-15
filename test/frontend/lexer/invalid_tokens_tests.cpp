@@ -103,9 +103,9 @@ TEST_CASE("Coral Lexing Keyword = Invalid Strings", "[lexer]")
     {
         using namespace coral66::lexer;
         bool errors = false;
-        auto result = lex("BEGI HHHH AND COMMM COMMENT", errors);
-        const std::vector correct = {TokenType::Identifier, TokenType::Identifier, TokenType::AndKeyword,
-                                     TokenType::Identifier, TokenType::CommentKeyword};
+        auto result = lex("BEGI HHHH AND COMMM COMMENT ;", errors);
+        const std::vector correct = {TokenType::Identifier, TokenType::Identifier,     TokenType::AndKeyword,
+                                     TokenType::Identifier, TokenType::CommentKeyword, TokenType::SemiColon};
         std::vector<TokenType> tokens;
         CHECK(result.data().size() == correct.size());
         tokens.reserve(result.data().size());
@@ -149,8 +149,8 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
     SECTION("Strings")
     {
         bool errors = false;
-        auto result = lex("'Hello World' 'It's me' ''", errors);
-        REQUIRE(result.data().size() == 4);
+        auto result = lex(R"("Hello World" "It"s me" "")", errors);
+        REQUIRE(result.data().size() == 5);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
         CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::StringLiteral);
@@ -159,5 +159,7 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
         CHECK(std::get<std::string>(result.data()[2].getValue()) == "s");
         CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(std::get<std::string>(result.data()[3].getValue()) == "me");
+        CHECK(result.data()[4].getTokenType() == coral66::lexer::TokenType::StringLiteral);
+        CHECK(std::get<std::string>(result.data()[4].getValue()) == " ");
     }
 }

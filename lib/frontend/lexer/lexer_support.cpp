@@ -170,7 +170,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
     {
         case '.': return Dot{};
         case '\'': return StroppedKeyword{};
-        case '"': return StringLiteral{};
+        case '"': return StringLiteral{false, "\""};
         case '0':
         case '1':
         case '2':
@@ -260,7 +260,7 @@ std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& cont
     {
         characters += c;
         context.push(TokenType::StringLiteral, characters);
-        return {Start{}, false};
+        return {Start{}, true};
     }
 
     characters += c;
@@ -376,7 +376,7 @@ std::pair<StateMachine, bool> StroppedKeyword::advance(char const c, Context& co
             DiagnosticCollector::addDiagnostic(errors::lexer::INVALID_STROPPED_KEYWORD_N);
             context.push(TokenType::Identifier, characters);
         }
-        return {Start{}, false};
+        return {Start{}, true};
     }
     if (c == '\n' || c == '\r')
     {
