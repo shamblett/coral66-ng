@@ -73,24 +73,6 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(result.findDiagnostic(UNEXPECTED_CHARACTER));
     }
 
-    SECTION("Unterminated Comment Keyword Sequence")
-    {
-        bool errors = false;
-        std::string source = "COMMENT Hello";
-        auto result = lex(source, errors);
-        CHECK(errors);
-        CHECK(result.findDiagnostic(UNTERMINATED_COMMENT_KEYWORD_SEQUENCE));
-    }
-
-    SECTION("Malformed End Keyword Sequence")
-    {
-        bool errors = false;
-        std::string source = "END 123";
-        auto result = lex(source, errors);
-        CHECK(errors);
-        CHECK(result.findDiagnostic(MALFORMED_END_KEYWORD_SEQUENCE));
-    }
-
     SECTION("Non-Printable Character")
     {
         bool errors = false;
@@ -113,5 +95,32 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         std::string source = "'BEGIZ'";
         auto result = lexToCTokens(source, errors);
         CHECK(result.findDiagnostic(INVALID_STROPPED_KEYWORD_N));
+    }
+
+    SECTION("Unterminated Comment Keyword Sequence")
+    {
+        bool errors = false;
+        std::string source = "COMMENT Hello";
+        auto result = lex(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(UNTERMINATED_COMMENT_KEYWORD_SEQUENCE));
+    }
+
+    SECTION("Malformed End Keyword Sequence")
+    {
+        bool errors = false;
+        std::string source = "END 123";
+        auto result = lex(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(MALFORMED_END_KEYWORD_SEQUENCE));
+    }
+
+    SECTION("Unterminated Bracketed Comment")
+    {
+        bool errors = false;
+        std::string source = "; ( this comment never ends";
+        auto result = lex(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(UNTERMINATED_BRACKETED_COMMENT));
     }
 }

@@ -114,7 +114,6 @@ namespace lexer
 CREATE_ERROR(INVALID_UTF8_SEQUENCE, "Invalid UTF-8 Sequence", PointAt<0>);
 CREATE_ERROR(UNEXPECTED_CHARACTER, "Unexpected character", PointAt<0>);
 CREATE_ERROR(NON_PRINTABLE_CHARACTER_N, "Non printable character '%0'", PointAt<1>);
-CREATE_ERROR(STRAY_N_IN_PROGRAM, "Stray %tokenType0 in program", PointAt<0>);
 CREATE_ERROR(UNTERMINATED_STRING_LITERAL, "Unterminated string literal", Underline<0>);
 CREATE_ERROR(UNTERMINATED_BRACKETED_COMMENT, "Unterminated bracketed comment", Underline<0>);
 CREATE_ERROR(UNTERMINATED_STROPPED_KEYWORD, "Unterminated stropped keyword", Underline<0>);
