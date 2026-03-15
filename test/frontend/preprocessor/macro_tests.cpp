@@ -115,30 +115,30 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
     SECTION("Simple Value Substitution")
     {
-        auto ret = preprocess("DEFINE ID 5; "
+        auto ret = preprocess("DEFINE ID \"5\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID 5; "
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
                                    "INTEGER A; "
                                    "A := 5;"));
     }
 
     SECTION("Simple Value Substitution Lowercase Identifiers")
     {
-        auto ret = preprocess("DEFINE id 5; "
+        auto ret = preprocess("DEFINE id \"5\"; "
                               "INTEGER a; "
                               "a := id;");
-        CHECK_THAT(ret, ProducesPP("DEFINE id 5; "
+        CHECK_THAT(ret, ProducesPP("DEFINE id \"5\"; "
                                    "INTEGER a; "
                                    "a := 5;"));
     }
 
     SECTION("Simple String Substitution")
     {
-        auto ret = preprocess("DEFINE ID 5 + 1; "
+        auto ret = preprocess("DEFINE ID \"5 + 1\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID 5 + 1; "
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5 + 1\"; "
                                    "INTEGER A; "
                                    "A := 5 + 1;"));
     }
@@ -161,20 +161,20 @@ TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
 {
     SECTION("Single Parameter")
     {
-        auto ret = preprocess("DEFINE ID(p1) 5 + p1; "
+        auto ret = preprocess("DEFINE ID(p1) \"5 + p1\"; "
                               "INTEGER A; "
                               "A := ID(1);");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1) 5 + p1; "
+        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1) \"5 + p1\"; "
                                    "INTEGER A; "
                                    "A := 5 + 1;"));
     }
 
     SECTION("Multiple Parameters")
     {
-        auto ret = preprocess("DEFINE ID(p1, p2) p2 + p1; "
+        auto ret = preprocess("DEFINE ID(p1, p2) \"p2 + p1\"; "
                               "INTEGER A; "
                               "A := ID(1, 5);");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1, p2) p2 + p1; "
+        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1, p2) \"p2 + p1\"; "
                                    "INTEGER A; "
                                    "A := 5 + 1;"));
     }
@@ -187,38 +187,38 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
 {
     SECTION("Single Level")
     {
-        auto ret = preprocess("DEFINE INNER 5 + 1; "
-                              "DEFINE OUTER 3 + INNER; "
+        auto ret = preprocess("DEFINE INNER \"5 + 1\"; "
+                              "DEFINE OUTER \"3 + INNER\"; "
                               "INTEGER A; "
                               "A := OUTER;");
-        CHECK_THAT(ret, ProducesPP("DEFINE INNER 5 + 1; "
-                                   "DEFINE OUTER 3 + INNER; "
+        CHECK_THAT(ret, ProducesPP("DEFINE INNER \"5 + 1\"; "
+                                   "DEFINE OUTER \"3 + INNER\"; "
                                    "INTEGER A; "
                                    "A := 3 + 5 + 1;"));
     }
 
     SECTION("Multi Level")
     {
-        auto ret = preprocess("DEFINE INNER1 1; "
-                              "DEFINE INNER 5 + INNER1; "
-                              "DEFINE OUTER 3 + INNER; "
+        auto ret = preprocess("DEFINE INNER1 \"1\"; "
+                              "DEFINE INNER \"5 + INNER1\"; "
+                              "DEFINE OUTER \"3 + INNER\"; "
                               "INTEGER A; "
                               "A := OUTER;");
-        CHECK_THAT(ret, ProducesPP("DEFINE INNER1 1; "
-                                   "DEFINE INNER 5 + INNER1; "
-                                   "DEFINE OUTER 3 + INNER; "
+        CHECK_THAT(ret, ProducesPP("DEFINE INNER1 \"1\"; "
+                                   "DEFINE INNER \"5 + INNER1\"; "
+                                   "DEFINE OUTER \"3 + INNER\"; "
                                    "INTEGER A; "
                                    "A := 3 + 5 + 1;"));
     }
 
     SECTION("Deferred Expansion")
     {
-        auto ret = preprocess("DEFINE OUTER 3 + INNER; "
-                              "DEFINE INNER 5 + 1; "
+        auto ret = preprocess("DEFINE OUTER \"3 + INNER\"; "
+                              "DEFINE INNER \"5 + 1\"; "
                               "INTEGER A; "
                               "A := OUTER;");
-        CHECK_THAT(ret, ProducesPP("DEFINE OUTER 3 + INNER; "
-                                   "DEFINE INNER 5 + 1; "
+        CHECK_THAT(ret, ProducesPP("DEFINE OUTER \"3 + INNER\"; "
+                                   "DEFINE INNER \"5 + 1\"; "
                                    "INTEGER A; "
                                    "A := 3 + 5 + 1;"));
     }
@@ -243,19 +243,19 @@ TEST_CASE("Coral DELETE Macro Substitution", "[PP]")
 
     SECTION("Redefinition And Stacking")
     {
-        auto ret = preprocess("DEFINE ID 5; "
+        auto ret = preprocess("DEFINE ID \"5\"; "
                               "INTEGER A; "
                               "A := ID; "
-                              "DEFINE ID 10; "
+                              "DEFINE ID \"10\"; "
                               "A := ID; "
                               "DELETE ID; "
                               "A := ID; "
                               "DELETE ID; "
                               "A := ID; ");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID 5; "
+        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
                                    "INTEGER A; "
                                    "A := 5; "
-                                   "DEFINE ID 10; "
+                                   "DEFINE ID \"10\"; "
                                    "A := 10; "
                                    "DELETE ID; "
                                    "A := 5; "

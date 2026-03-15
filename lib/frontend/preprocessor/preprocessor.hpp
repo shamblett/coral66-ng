@@ -367,7 +367,42 @@ public:
         auto iter = define.tokens.begin() + (iterPtr - define.tokens.data());
 
         std::vector<lexer::PPToken> replacementTokens;
-        if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::Miscellaneous)
+        if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::StringLiteral)
+        {
+            auto stringVal = iter->getValue();
+            std::string innerString(stringVal);
+            if (innerString.size() >= 2 && innerString.front() == '"' && innerString.back() == '"')
+            {
+                innerString = innerString.substr(1, innerString.size() - 2);
+            }
+
+            bool errors = false;
+            auto innerSource = coral66::lexer::tokenize(innerString, m_reporter, &errors, "Macro");
+            if (errors)
+            {
+                m_errorsOccurred = true;
+            }
+
+            auto fileOffset = m_files.size();
+            for (auto& file : innerSource.getFiles())
+            {
+                m_files.push_back(std::move(file));
+            }
+            for (auto& map : innerSource.getIntervalMap())
+            {
+                m_intervalMaps.push_back(std::move(map));
+            }
+
+            replacementTokens = std::move(innerSource.data());
+            for (auto& token : replacementTokens)
+            {
+                token.setFileId(token.getFileId() + fileOffset);
+            }
+
+            ++iter;
+            replacementTokens.insert(replacementTokens.end(), iter, define.tokens.end());
+        }
+        else if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::Miscellaneous)
         {
             ++iter;
             auto last = define.tokens.end();
