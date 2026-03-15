@@ -279,11 +279,11 @@ std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& cont
 {
     if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9'))
     {
-        if (characters == "COMMENT")
+        if (characters == tokenName(TokenType::CommentKeyword))
         {
             return {CommentSentence{}, false};
         }
-        else if (characters == "END")
+        else if (characters == tokenName(TokenType::EndKeyword))
         {
             context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, characters);
             return {EndComment{}, false};
@@ -317,10 +317,10 @@ std::pair<StateMachine, bool> CommentSentence::advance(char const c, Context& co
 {
     if (c == ';')
     {
-        context.push(TokenType::Identifier, "COMMENT"); // Emit comment keyword
+        context.push(TokenType::Identifier, tokenName(TokenType::CommentKeyword).data()); // Emit comment keyword
         return {Start{}, false};                        // Let Start handle the semicolon
     }
-    return {std::move(*this), true};
+    return {*this, true};
 }
 
 std::pair<StateMachine, bool> BracketedComment::advance(char const c, Context& context)
@@ -337,7 +337,7 @@ std::pair<StateMachine, bool> BracketedComment::advance(char const c, Context& c
             return {Start{}, true}; // Bracketed comment finished, consume ')' and discard text
         }
     }
-    return {std::move(*this), true};
+    return {*this, true};
 }
 
 std::pair<StateMachine, bool> EndComment::advance(char const c, Context& context)
@@ -378,11 +378,11 @@ std::pair<StateMachine, bool> StroppedKeyword::advance(char const c, Context& co
     {
         if (isKeyword(characters))
         {
-            if (characters == "COMMENT")
+            if (characters == tokenName(TokenType::CommentKeyword))
             {
                 return {CommentSentence{}, true};
             }
-            if (characters == "END")
+            if (characters == tokenName(TokenType::EndKeyword))
             {
                 context.push(TokenType::Identifier, characters);
                 return {EndComment{}, true};
@@ -410,6 +410,7 @@ std::pair<StateMachine, bool> StroppedKeyword::advance(char const c, Context& co
     return {std::move(*this), true};
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 std::pair<StateMachine, bool> Dot::advance(char const c, Context& context) // NOLINT(*-make-member-function-const)
 {
     if (c >= '0' && c <= '9')
