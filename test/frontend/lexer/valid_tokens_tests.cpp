@@ -215,7 +215,7 @@ TEST_CASE("Coral Lexing Code Strings ", "[lexer]")
             TokenType::IntegerKeyword, TokenType::Identifier,   TokenType::SemiColon,     TokenType::IntegerKeyword,
             TokenType::Identifier,     TokenType::SemiColon,    TokenType::EndKeyword,    TokenType::SemiColon};
 
-        // Check first batch
+        CHECK(result.data().size() == correct.size());
         for (size_t i = 0; i < correct.size(); ++i)
         {
             CHECK(result.data()[i].getTokenType() == correct[i]);
@@ -230,7 +230,7 @@ TEST_CASE("Coral Lexing Code Strings ", "[lexer]")
         const std::vector correct = {TokenType::Literal, TokenType::Plus,       TokenType::Literal, TokenType::Plus,
                                      TokenType::Literal, TokenType::Assignment, TokenType::Literal};
 
-        // Check first batch
+        CHECK(result.data().size() == correct.size());
         for (size_t i = 0; i < correct.size(); ++i)
         {
             CHECK(result.data()[i].getTokenType() == correct[i]);
@@ -254,7 +254,50 @@ TEST_CASE("Coral Lexing Code Strings ", "[lexer]")
             TokenType::Plus,           TokenType::Identifier, TokenType::Plus,           TokenType::Identifier,
             TokenType::SemiColon};
 
-        // Check first batch
+        CHECK(result.data().size() == correct.size());
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+}
+
+TEST_CASE("Comments", "[lexer]")
+{
+    SECTION("Comment Keyword")
+    {
+        auto result = lex("COMMENT This is a comment;");
+
+        const std::vector correct = {TokenType::CommentKeyword, TokenType::SemiColon};
+
+        CHECK(result.data().size() == correct.size());
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+
+    SECTION("End Comment")
+    {
+        auto result = lex("BEGIN INTEGER a; END a");
+
+        const std::vector correct = {TokenType::BeginKeyword, TokenType::IntegerKeyword, TokenType::Identifier,
+                                     TokenType::SemiColon, TokenType::EndKeyword};
+
+        CHECK(result.data().size() == correct.size());
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+
+    SECTION("Bracketed Comment")
+    {
+        auto result = lex("INTEGER a; (EOL Comment)");
+
+        const std::vector correct = {TokenType::IntegerKeyword, TokenType::Identifier, TokenType::SemiColon};
+
+        CHECK(result.data().size() == correct.size());
         for (size_t i = 0; i < correct.size(); ++i)
         {
             CHECK(result.data()[i].getTokenType() == correct[i]);
