@@ -333,36 +333,31 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
                                                                         std::uint64_t, ConversionContext&)
 {
     const std::string text(begin, end);
-    const bool isFloat = text.find('.') != std::string::npos;
 
-    if (isFloat)
+    if (text.find('.') != std::string::npos)
     {
         llvm::APFloat number(llvm::APFloat::IEEEdouble());
         if (auto result = number.convertFromString(text, llvm::APFloat::rmNearestTiesToEven); !result)
         {
-            // Fallback or error
             return {};
         }
         return {{std::move(number), CToken::Floating}};
     }
-    else
+    // Integer (Decimal)
+    // Coral 66 integers are decimal. OCTAL is handled via OCTAL().
+    const llvm::StringRef ref(text);
+    llvm::APInt value;
+    if (ref.getAsInteger(10, value))
     {
-        // Integer (Decimal)
-        // Coral 66 integers are decimal. OCTAL is handled via OCTAL().
-        const llvm::StringRef ref(text);
-        llvm::APInt value;
-        if (ref.getAsInteger(10, value))
-        {
-            return {};
-        }
-        // Use default size (e.g. 32 or 64-bit signed/unsigned)
-        // For now, let's make it 64-bit signed APSInt
-        if (value.getBitWidth() < 64)
-        {
-            value = value.sextOrTrunc(64);
-        }
-        return {{llvm::APSInt(value, false), CToken::Integer}};
+        return {};
     }
+    // Use default size (e.g. 32 or 64-bit signed/unsigned)
+    // For now, let's make it 64-bit signed APSInt
+    if (value.getBitWidth() < 64)
+    {
+        value = value.sextOrTrunc(64);
+    }
+    return {{llvm::APSInt(value, false), CToken::Integer}};
 }
 } // namespace
 
@@ -499,8 +494,7 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
             if (nextIdx < result.size() && result[nextIdx].getTokenType() == TokenType::Literal
                 && result[nextIdx].getType() == CToken::Integer)
             {
-                auto* apsExp = std::get_if<llvm::APSInt>(&result[nextIdx].getValue());
-                if (apsExp)
+                if (auto* apsExp = std::get_if<llvm::APSInt>(&result[nextIdx].getValue()))
                 {
                     long long exp = apsExp->getExtValue() * sign;
 

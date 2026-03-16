@@ -158,12 +158,12 @@ class Context : source_interface
         return m_sourceSpace.size();
     }
 
-    [[nodiscard]] std::span<const coral66::Source::File> getFiles() const noexcept override
+    [[nodiscard]] std::span<const Source::File> getFiles() const noexcept override
     {
         return {&m_fakeFile, &m_fakeFile + 1};
     }
 
-    [[nodiscard]] std::span<const coral66::Source::PPRecord> getSubstitutions() const noexcept override
+    [[nodiscard]] std::span<const Source::PPRecord> getSubstitutions() const noexcept override
     {
         return {};
     }
@@ -189,7 +189,7 @@ public:
     template <class Diag, class Location, class... Args>
     void report(const Diag& diag, Location&& location, Args&&... args)
     {
-        if (diag.getSeverity() == coral66::Severity::Error)
+        if (diag.getSeverity() == Severity::Error)
         {
             m_errorsOccurred = true;
         }

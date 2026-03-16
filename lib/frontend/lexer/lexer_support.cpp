@@ -8,8 +8,6 @@
 
 #include <llvm/Support/Format.h>
 
-#include <charconv>
-
 #include "lexer_support.hpp"
 
 namespace coral66::lexer
