@@ -14,8 +14,6 @@
 #include <cmath>
 #include <numeric>
 #include <optional>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "lexer_support.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
