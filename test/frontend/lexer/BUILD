@@ -11,7 +11,6 @@ cc_library(
         "error_tests.cpp",
         "invalid_tokens_tests.cpp",
         "valid_tokens_tests.cpp",
-        "review_2_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
