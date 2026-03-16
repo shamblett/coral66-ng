@@ -95,10 +95,9 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
 
 TEST_CASE("Coral Lexing Identifiers", "[lexer]")
 {
-    // Although Coral66 does not allow identifiers that contain uppercase characters,
-    // or start with a number or are not alphanumeric these are valid at this stage of
-    // lexing
-    auto result = lex("myidentifier var123 BILLY frEd 124rrr");
+    // Although Coral66 does not allow identifiers that contain uppercase characters
+    // these are valid at this stage of lexing
+    auto result = lex("myidentifier var123 BILLY frEd");
     REQUIRE(result.data().size() == 4);
     CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "myidentifier");
@@ -129,7 +128,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
 
     SECTION("Floating Point")
     {
-        auto result = lex("3.14 0.0 .5 1.2e3");
+        auto result = lex("3.14 0.0 .5 1.2 10 3");
         REQUIRE(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);

@@ -122,7 +122,7 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
     {
         bool errors = false;
         auto result = lex("12#3 !0 9999g", errors);
-        REQUIRE(result.data().size() == 3);
+        REQUIRE(result.data().size() == 5);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 12);
@@ -132,25 +132,35 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
         CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[2].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 0);
+        CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[3].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[3].getValue()) == 9999);
+        CHECK(result.data()[4].getTokenType() == coral66::lexer::TokenType::Identifier);
+        CHECK(std::get<std::string>(result.data()[4].getValue()) == "g");
+        CHECK(errors);
     }
 
     SECTION("Floating Point")
     {
         bool errors = false;
         auto result = lex("3.14h 0.gg0 rr.5 1.2eo", errors);
-        REQUIRE(result.data().size() == 2);
-        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Identifier);
-        CHECK(std::get<std::string>(result.data()[0].getValue()) == "rr");
-        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
-        CHECK(result.data()[1].getType() == coral66::lexer::CToken::Floating);
-        CHECK(std::get<llvm::APFloat>(result.data()[1].getValue()).isNonZero());
+        REQUIRE(result.data().size() == 8);
+        CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Identifier);
+        CHECK(result.data()[2].getType() == coral66::lexer::CToken::Floating);
+        CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Identifier);
+        CHECK(std::get<std::string>(result.data()[3].getValue()) == "gg0");
+        CHECK(result.data()[4].getTokenType() == coral66::lexer::TokenType::Identifier);
+        CHECK(result.data()[5].getType() == coral66::lexer::CToken::Floating);
+        CHECK(result.data()[6].getType() == coral66::lexer::CToken::Floating);
+        CHECK(result.data()[7].getTokenType() == coral66::lexer::TokenType::Identifier);
     }
 
     SECTION("Strings")
     {
         bool errors = false;
         auto result = lex(R"("Hello World" "It"s me" "")", errors);
-        REQUIRE(result.data().size() == 5);
+        REQUIRE(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
         CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::StringLiteral);
@@ -159,7 +169,5 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
         CHECK(std::get<std::string>(result.data()[2].getValue()) == "s");
         CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(std::get<std::string>(result.data()[3].getValue()) == "me");
-        CHECK(result.data()[4].getTokenType() == coral66::lexer::TokenType::StringLiteral);
-        CHECK(std::get<std::string>(result.data()[4].getValue()) == " ");
     }
 }

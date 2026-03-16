@@ -156,14 +156,6 @@ template <class Iter>
     return std::find_if(begin, end, [](std::uint8_t const c) { return c >= 0b1100'0000 || c < 0b1000'0000; });
 }
 
-std::uint32_t hexToValue(std::string_view const value)
-{
-    std::uint32_t result;
-    auto errors = std::from_chars(value.data(), value.data() + value.size(), result, 16);
-    CORAL66_ASSERT(errors.ec == std::errc{});
-    return result;
-}
-
 StateMachine Start::advance(std::uint32_t const c, Context& context)
 {
     switch (c)
@@ -256,17 +248,29 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
 
 std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& context)
 {
+    if (sawQuote)
+    {
+        if (c == '"')
+        {
+            characters += c;
+            sawQuote = false;
+            return {std::move(*this), true};
+        }
+        context.push(TokenType::StringLiteral, characters);
+        return {Start{}, false};
+    }
+
     if (c == '"')
     {
         characters += c;
-        context.push(TokenType::StringLiteral, characters);
-        return {Start{}, true};
+        sawQuote = true;
+        return {std::move(*this), true};
     }
 
     characters += c;
     if ((c == '\n' || c == '\r'))
     {
-        context.report(errors::lexer::UNTERMINATED_STRING_LITERAL, context.getOffset() - 1,
+        context.report(errors::lexer::UNTERMINATED_STRING_LITERAL, context.tokenStartOffset,
                        std::pair{context.tokenStartOffset, context.getOffset()});
         DiagnosticCollector::addDiagnostic(errors::lexer::UNTERMINATED_STRING_LITERAL);
         context.push(TokenType::StringLiteral, characters);
@@ -301,7 +305,7 @@ std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& cont
 
 std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c, Context& context)
 {
-    if (!(c >= 'a' && c <= 'z') && !(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9') && c != '.')
+    if (!(c >= '0' && c <= '9') && c != '.')
     {
         context.push(1, TokenType::PPNumber, characters);
         return {Start{}, false};
@@ -318,7 +322,7 @@ std::pair<StateMachine, bool> CommentSentence::advance(char const c, Context& co
     if (c == ';')
     {
         context.push(TokenType::Identifier, tokenName(TokenType::CommentKeyword).data()); // Emit comment keyword
-        return {Start{}, false};                        // Let Start handle the semicolon
+        return {Start{}, false}; // Let Start handle the semicolon
     }
     return {*this, true};
 }

@@ -33,8 +33,6 @@ bool isKeyword(std::string_view characters);
 
 TokenType charactersToKeyword(std::string_view characters);
 
-std::uint32_t hexToValue(std::string_view value);
-
 constexpr auto UTF32_MAX = 0x10FFFF;
 
 using StateMachine = std::variant<Start, StringLiteral, Text, PreprocessingNumber, Dot, Punctuation, CommentSentence,

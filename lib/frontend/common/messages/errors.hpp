@@ -120,6 +120,7 @@ CREATE_ERROR(UNTERMINATED_STROPPED_KEYWORD, "Unterminated stropped keyword", Und
 CREATE_ERROR(INVALID_STROPPED_KEYWORD_N, "Invalid stropped keyword '%0'", PointAt<1>);
 CREATE_ERROR(UNTERMINATED_COMMENT_KEYWORD_SEQUENCE, "Unterminated COMMENT keyword sequence", Underline<0>);
 CREATE_ERROR(MALFORMED_END_KEYWORD_SEQUENCE, "Malformed END keyword sequence", Underline<0>);
+CREATE_ERROR(MALFORMED_NUMBER_LITERAL, "Malformed number literal", Underline<0>);
 } // namespace lexer
 
 namespace pp

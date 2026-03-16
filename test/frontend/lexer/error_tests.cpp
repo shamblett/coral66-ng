@@ -123,4 +123,13 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(errors);
         CHECK(result.findDiagnostic(UNTERMINATED_BRACKETED_COMMENT));
     }
+
+    SECTION("Malformed Number Literal")
+    {
+        bool errors = false;
+        std::string source = "1.2.3";
+        auto result = lexToCTokens(source, errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(MALFORMED_NUMBER_LITERAL));
+    }
 }

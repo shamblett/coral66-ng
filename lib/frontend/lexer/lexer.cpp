@@ -11,6 +11,7 @@
 #include <llvm/Support/Error.h>
 
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 #include <optional>
 #include <unordered_map>
@@ -332,8 +333,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
                                                                         std::uint64_t, ConversionContext&)
 {
     const std::string text(begin, end);
-    const bool isFloat = text.find('.') != std::string::npos || text.find('e') != std::string::npos
-                         || text.find('E') != std::string::npos;
+    const bool isFloat = text.find('.') != std::string::npos;
 
     if (isFloat)
     {
@@ -436,6 +436,18 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                     result.emplace_back(TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
                                         iter->getMacroId(), std::move(number->first), number->second);
                 }
+                else
+                {
+                    if (errorsOccurred)
+                    {
+                        *errorsOccurred = true;
+                    }
+                    if (reporter)
+                    {
+                        *reporter << errors::lexer::MALFORMED_NUMBER_LITERAL.args(*iter, sourceInterface, *iter);
+                        DiagnosticCollector::addDiagnostic(errors::lexer::MALFORMED_NUMBER_LITERAL);
+                    }
+                }
                 break;
             }
             case TokenType::StringLiteral:
@@ -459,7 +471,75 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                                     iter->getMacroId());
         }
     }
-    return result;
+
+    std::vector<CToken> finalResult;
+    finalResult.reserve(result.size());
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        bool isTen = false;
+        if (result[i].getTokenType() == TokenType::Literal && result[i].getType() == CToken::Integer)
+        {
+            if (auto* aps = std::get_if<llvm::APSInt>(&result[i].getValue()); aps && *aps == 10)
+            {
+                isTen = true;
+            }
+        }
+
+        if (isTen && i + 1 < result.size())
+        {
+            size_t nextIdx = i + 1;
+            int sign = 1;
+            if (result[nextIdx].getTokenType() == TokenType::Plus || result[nextIdx].getTokenType() == TokenType::Minus)
+            {
+                if (result[nextIdx].getTokenType() == TokenType::Minus)
+                    sign = -1;
+                nextIdx++;
+            }
+
+            if (nextIdx < result.size() && result[nextIdx].getTokenType() == TokenType::Literal
+                && result[nextIdx].getType() == CToken::Integer)
+            {
+                auto* apsExp = std::get_if<llvm::APSInt>(&result[nextIdx].getValue());
+                if (apsExp)
+                {
+                    long long exp = apsExp->getExtValue() * sign;
+
+                    if (!finalResult.empty() && finalResult.back().getTokenType() == TokenType::Literal
+                        && (finalResult.back().getType() == CToken::Integer
+                            || finalResult.back().getType() == CToken::Floating))
+                    {
+                        double base = 0.0;
+                        if (finalResult.back().getType() == CToken::Integer)
+                        {
+                            base = std::get<llvm::APSInt>(finalResult.back().getValue()).getExtValue();
+                        }
+                        else
+                        {
+                            base = std::get<llvm::APFloat>(finalResult.back().getValue()).convertToDouble();
+                        }
+
+                        double finalVal = base * std::pow(10.0, exp);
+                        finalResult.back().setType(CToken::Floating);
+                        finalResult.back().setValue(llvm::APFloat(finalVal));
+                        i = nextIdx;
+                        continue;
+                    }
+                    else
+                    {
+                        double finalVal = std::pow(10.0, exp);
+                        CToken combinedToken = result[i];
+                        combinedToken.setType(CToken::Floating);
+                        combinedToken.setValue(llvm::APFloat(finalVal));
+                        finalResult.push_back(std::move(combinedToken));
+                        i = nextIdx;
+                        continue;
+                    }
+                }
+            }
+        }
+        finalResult.push_back(std::move(result[i]));
+    }
+    return finalResult;
 }
 
 std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
@@ -472,6 +552,20 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
     {
         value = value.substr(1, value.size() - 2);
     }
+    std::string finalValue;
+    for (size_t i = 0; i < value.size(); ++i)
+    {
+        if (value[i] == '"' && i + 1 < value.size() && value[i + 1] == '"')
+        {
+            finalValue += '"';
+            i++; // skip next quote
+        }
+        else
+        {
+            finalValue += value[i];
+        }
+    }
+    value = std::move(finalValue);
     return CToken(TokenType::StringLiteral, PPToken.getOffset(), PPToken.getLength(), PPToken.getFileId(),
                   PPToken.getMacroId(), std::move(value));
 }
