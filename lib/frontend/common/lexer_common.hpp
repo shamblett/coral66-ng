@@ -118,7 +118,7 @@ bool isText(TokenType tokenType);
 std::string_view tokenName(TokenType tokenType, bool quote = true);
 
 /**
- * Normalises the spelling of a token by removing backslash newline pairs and replacing trigraphs
+ * Normalises the spelling of a token by removing backslash newline pairs
  *
  * Does not change Digraphs as those are distinct and different spellings of a particular token type
  * @param tokenSpelling Spelling of a token
@@ -223,7 +223,7 @@ class PPToken final : public TokenBase
 {
     std::string m_value;
     std::uint64_t m_charSpaceOffset;
-    std::uint64_t m_charSpaceLength; /**< Length of the token after trigraphs and Backslash Newline pairs in its
+    std::uint64_t m_charSpaceLength; /**< Length of the token after Backslash Newline pairs in its
                                       representation have been removed*/
 
 public:

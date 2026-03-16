@@ -467,73 +467,7 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
         }
     }
 
-    std::vector<CToken> finalResult;
-    finalResult.reserve(result.size());
-    for (size_t i = 0; i < result.size(); ++i)
-    {
-        bool isTen = false;
-        if (result[i].getTokenType() == TokenType::Literal && result[i].getType() == CToken::Integer)
-        {
-            if (auto* aps = std::get_if<llvm::APSInt>(&result[i].getValue()); aps && *aps == 10)
-            {
-                isTen = true;
-            }
-        }
-
-        if (isTen && i + 1 < result.size())
-        {
-            size_t nextIdx = i + 1;
-            int sign = 1;
-            if (result[nextIdx].getTokenType() == TokenType::Plus || result[nextIdx].getTokenType() == TokenType::Minus)
-            {
-                if (result[nextIdx].getTokenType() == TokenType::Minus)
-                    sign = -1;
-                nextIdx++;
-            }
-
-            if (nextIdx < result.size() && result[nextIdx].getTokenType() == TokenType::Literal
-                && result[nextIdx].getType() == CToken::Integer)
-            {
-                if (auto* apsExp = std::get_if<llvm::APSInt>(&result[nextIdx].getValue()))
-                {
-                    long long exp = apsExp->getExtValue() * sign;
-
-                    if (!finalResult.empty() && finalResult.back().getTokenType() == TokenType::Literal
-                        && (finalResult.back().getType() == CToken::Integer
-                            || finalResult.back().getType() == CToken::Floating))
-                    {
-                        double base = 0.0;
-                        if (finalResult.back().getType() == CToken::Integer)
-                        {
-                            base = std::get<llvm::APSInt>(finalResult.back().getValue()).getExtValue();
-                        }
-                        else
-                        {
-                            base = std::get<llvm::APFloat>(finalResult.back().getValue()).convertToDouble();
-                        }
-
-                        double finalVal = base * std::pow(10.0, exp);
-                        finalResult.back().setType(CToken::Floating);
-                        finalResult.back().setValue(llvm::APFloat(finalVal));
-                        i = nextIdx;
-                        continue;
-                    }
-                    else
-                    {
-                        double finalVal = std::pow(10.0, exp);
-                        CToken combinedToken = result[i];
-                        combinedToken.setType(CToken::Floating);
-                        combinedToken.setValue(llvm::APFloat(finalVal));
-                        finalResult.push_back(std::move(combinedToken));
-                        i = nextIdx;
-                        continue;
-                    }
-                }
-            }
-        }
-        finalResult.push_back(std::move(result[i]));
-    }
-    return finalResult;
+    return result;
 }
 
 std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
@@ -654,7 +588,7 @@ std::string coral66::lexer::normalizeSpelling(std::string_view tokenSpelling)
     std::size_t i = 0;
     while (true)
     {
-        for (; i < tokenSpelling.size() && tokenSpelling[i] != '?' && tokenSpelling[i] != '\\'; i++)
+        for (; i < tokenSpelling.size() && tokenSpelling[i] != '\\'; i++)
             ;
         if (i >= tokenSpelling.size())
         {
@@ -665,29 +599,12 @@ std::string coral66::lexer::normalizeSpelling(std::string_view tokenSpelling)
         {
             result += tokenSpelling.substr(0, i);
             tokenSpelling = tokenSpelling.substr(i + 2);
-            i += 2;
+            i = 0;
             continue;
         }
-        if (tokenSpelling.substr(i, 4) == "?\?/\n")
-        {
-            result += tokenSpelling.substr(0, i);
-            tokenSpelling = tokenSpelling.substr(i + 4);
-            i += 4;
-            continue;
-        }
-        static const std::unordered_map<std::string_view, char> mapping = {{"?\?=", '#'}, {"?\?(", '['}, {"?\?/", '\\'},
-                                                                           {"?\?)", ']'}, {"?\?'", '^'}, {"?\?<", '{'},
-                                                                           {"?\?!", '|'}, {"?\?>", '}'}, {"?\?-", '~'}};
-        auto rep = mapping.find(tokenSpelling.substr(i, 3));
-        if (rep == mapping.end())
-        {
-            i += 3;
-            continue;
-        }
-        result += tokenSpelling.substr(0, i);
-        result += rep->second;
-        tokenSpelling = tokenSpelling.substr(i + 3);
-        i += 3;
+        result += tokenSpelling.substr(0, i + 1);
+        tokenSpelling = tokenSpelling.substr(i + 1);
+        i = 0;
     }
     return result;
 }
