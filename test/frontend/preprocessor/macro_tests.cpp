@@ -77,7 +77,7 @@ TEST_CASE("Coral DEFINE Macro Syntax", "[PP]")
 {
     SECTION("No Semicolon")
     {
-        std::string source = "DEFINE ID '5' "
+        std::string source = "DEFINE ID \"5\" "
                              "ID";
         std::string storage;
         llvm::raw_string_ostream ss(storage);
@@ -145,10 +145,10 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 
     SECTION("Simple String Substitution Nested Strings")
     {
-        auto ret = preprocess("DEFINE ID \"5 + \"1\"\"; "
+        auto ret = preprocess("DEFINE ID 5 + \"1\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5 + \"1\"\"; "
+        CHECK_THAT(ret, ProducesPP("DEFINE ID 5 + \"1\"; "
                                    "INTEGER A; "
                                    "A := 5 + \"1\";"));
     }
