@@ -1,12 +1,24 @@
+
+/*
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 17/03/2026
+ */
+
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
+/*
+ * Lexer support package specific tests
+ */
+
 using namespace coral66::lexer;
 using namespace coral66;
 
-TEST_CASE("needsWhitespaceInBetween", "[lexer]") {
+TEST_CASE("needsWhitespaceInBetween", "[lexer]")
+{
     // isText(left)
     // left is Identifier, Keyword, etc.
     // right is StringLiteral, Literal, PPNumber -> true
@@ -32,11 +44,12 @@ TEST_CASE("needsWhitespaceInBetween", "[lexer]") {
     REQUIRE(needsWhitespaceInBetween(TokenType::Plus, TokenType::PPNumber) == false);
 }
 
-TEST_CASE("parseStringLiteral", "[lexer]") {
+TEST_CASE("parseStringLiteral", "[lexer]")
+{
     PPSourceObject sourceObject;
     std::string buffer;
     llvm::raw_string_ostream reporter(buffer);
-    
+
     // Normal string
     PPToken normalToken(TokenType::StringLiteral, 0, 4, 0, 4, 0, 0, "\"AB\"");
     auto resultNormal = parseStringLiteral(normalToken, sourceObject, &reporter);
@@ -44,7 +57,7 @@ TEST_CASE("parseStringLiteral", "[lexer]") {
     REQUIRE(resultNormal->getText() == "AB");
 
     // String with escaped quote ""
-    PPToken escapedToken(TokenType::StringLiteral, 0, 6, 0, 6, 0, 0, "\"A\"\"B\"");
+    PPToken escapedToken(TokenType::StringLiteral, 0, 6, 0, 6, 0, 0, R"("A""B")");
     auto resultEscaped = parseStringLiteral(escapedToken, sourceObject, &reporter);
     REQUIRE(resultEscaped.has_value());
     REQUIRE(resultEscaped->getText() == "A\"B");
@@ -53,10 +66,11 @@ TEST_CASE("parseStringLiteral", "[lexer]") {
     PPToken emptyToken(TokenType::StringLiteral, 0, 2, 0, 2, 0, 0, "\"\"");
     auto resultEmpty = parseStringLiteral(emptyToken, sourceObject, &reporter);
     REQUIRE(resultEmpty.has_value());
-    REQUIRE(resultEmpty->getText() == "");
+    REQUIRE(resultEmpty->getText().empty());
 }
 
-TEST_CASE("toCTokens with PPSourceObject lvalue", "[lexer]") {
+TEST_CASE("toCTokens with PPSourceObject lvalue", "[lexer]")
+{
     std::string buffer;
     llvm::raw_string_ostream reporter(buffer);
     bool errorsOccurred = false;
@@ -68,12 +82,12 @@ TEST_CASE("toCTokens with PPSourceObject lvalue", "[lexer]") {
     // Call lvalue overload
     const PPSourceObject& lvalueRef = ppSource;
     auto cSource = toCTokens(lvalueRef, &reporter, &errorsOccurred);
-    
-    REQUIRE_FALSE(errorsOccurred);
-    REQUIRE(cSource.data().size() > 0);
+    e e C o a REQUIRE_FALSE(errorsOccurred);
+    REQUIRE(!cSource.data().empty());
 }
 
-TEST_CASE("toCTokens with PPTokenIterator", "[lexer]") {
+TEST_CASE("toCTokens with PPTokenIterator", "[lexer]")
+{
     std::string buffer;
     llvm::raw_string_ostream reporter(buffer);
     bool errorsOccurred = false;
@@ -83,25 +97,28 @@ TEST_CASE("toCTokens with PPTokenIterator", "[lexer]") {
     REQUIRE_FALSE(errorsOccurred);
 
     // Call iterator overload
-    auto cTokens = toCTokens(ppSource.data().data(), ppSource.data().data() + ppSource.data().size(),
-                             ppSource, &reporter, &errorsOccurred);
-                             
+    auto cTokens = toCTokens(ppSource.data().data(), ppSource.data().data() + ppSource.data().size(), ppSource,
+                             &reporter, &errorsOccurred);
+
     REQUIRE_FALSE(errorsOccurred);
-    REQUIRE(cTokens.size() > 0);
+    REQUIRE(!cTokens.empty());
 }
 
-TEST_CASE("CustomFormat for TokenType", "[lexer]") {
+TEST_CASE("CustomFormat for TokenType", "[lexer]")
+{
     coral66::diag::CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'> formatter;
     coral66::lexer::PPToken token(coral66::lexer::TokenType::Identifier, 0, 5, 0, 5, 0, 0, "dummy");
     std::string formatted = formatter(token);
-    REQUIRE(formatted.size() > 0); 
+    REQUIRE(!formatted.empty());
 }
 
-TEST_CASE("StringConverter for TokenType", "[lexer]") {
-    std::string inFormatStr = coral66::diag::StringConverter<coral66::lexer::TokenType>::inFormat(coral66::lexer::TokenType::Identifier, nullptr);
-    REQUIRE(inFormatStr.size() > 0);
+TEST_CASE("StringConverter for TokenType", "[lexer]")
+{
+    std::string inFormatStr = coral66::diag::StringConverter<coral66::lexer::TokenType>::inFormat(
+        coral66::lexer::TokenType::Identifier, nullptr);
+    REQUIRE(!inFormatStr.empty());
 
-    std::string inArgStr = coral66::diag::StringConverter<coral66::lexer::TokenType>::inArg(coral66::lexer::TokenType::Identifier, nullptr);
-    REQUIRE(inArgStr.size() > 0); 
+    std::string inArgStr = coral66::diag::StringConverter<coral66::lexer::TokenType>::inArg(
+        coral66::lexer::TokenType::Identifier, nullptr);
+    REQUIRE(!inArgStr.empty());
 }
-
