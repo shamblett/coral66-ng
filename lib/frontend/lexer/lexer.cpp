@@ -406,7 +406,8 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                     numberText += "e";
                     iter = next;
                     next = iter + 1;
-                    if (next != end && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
+                    if (next != end
+                        && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
                     {
                         numberText += (next->getTokenType() == TokenType::Plus) ? "+" : "-";
                         iter = next;
@@ -423,7 +424,8 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
             {
                 numberText += "1e";
                 auto next = iter + 1;
-                if (next != end && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
+                if (next != end
+                    && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
                 {
                     numberText += (next->getTokenType() == TokenType::Plus) ? "+" : "-";
                     iter = next;

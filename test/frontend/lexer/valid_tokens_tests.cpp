@@ -151,11 +151,11 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);
         CHECK(std::get<llvm::APFloat>(result.data()[0].getValue()) == llvm::APFloat(2500.0));
-        
+
         CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[1].getType() == coral66::lexer::CToken::Floating);
         CHECK(std::get<llvm::APFloat>(result.data()[1].getValue()) == llvm::APFloat(1000.0));
-        
+
         CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[2].getType() == coral66::lexer::CToken::Floating);
         CHECK(std::get<llvm::APFloat>(result.data()[2].getValue()) == llvm::APFloat(0.1));
@@ -347,4 +347,3 @@ TEST_CASE("Comments", "[lexer]")
         }
     }
 }
-
