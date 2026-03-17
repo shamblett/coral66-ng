@@ -12,6 +12,7 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/notes.hpp"
 #include "lib/support/scope_exit.hpp"
+#include "preprocessor_support.hpp"
 
 std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileID,
                                                        const std::uint64_t offset) const noexcept
@@ -43,13 +44,13 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     if (defineDirective.tokens.empty())
     {
         log(errors::pp::PP_EXPECTED_N_AFTER_N.args(*defineDirective.defineToken, *this, lexer::TokenType::Identifier,
-                                                    *defineDirective.defineToken));
+                                                   *defineDirective.defineToken));
         return {{}, nullptr};
     }
     if (defineDirective.tokens[0].getTokenType() != lexer::TokenType::Identifier)
     {
         log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
-                                                         defineDirective.tokens[0]));
+                                                        defineDirective.tokens[0]));
         return {{}, nullptr};
     }
     const auto* identifierPos = &defineDirective.tokens[0];
@@ -194,6 +195,7 @@ std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPToken
 coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
                                                 bool* errorsOccurred) noexcept
 {
+    preprocessor::DiagnosticCollector::clearDiagnostics();
     Preprocessor preprocessor(reporter);
     preprocessor.process(std::move(sourceObject));
     if (errorsOccurred)

@@ -13,6 +13,7 @@ cc_library(
     hdrs = [
         "preprocessor.hpp",
         "preprocessor_parser.hpp",
+        "preprocessor_support.hpp",
         "preprocessor_syntax.hpp",
     ],
     visibility = [
