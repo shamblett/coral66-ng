@@ -62,28 +62,9 @@ class Preprocessor final : PPSourceInterface
     bool m_errorsOccurred = false;
     bool m_visitingScratchPad = false;
 
-    void pushLine(std::vector<lexer::PPToken>&& tokens)
-    {
-        if (m_visitingScratchPad)
-        {
-            return;
-        }
-        append(m_result, std::move(tokens));
-    }
+    void pushLine(std::vector<lexer::PPToken>&& tokens);
 
-    // ReSharper disable once CppDFAUnreachableFunctionCall
-    bool log(const Message& message)
-    {
-        if (m_reporter)
-        {
-            *m_reporter << message;
-        }
-        if (message.getSeverity() == Severity::Error)
-        {
-            m_errorsOccurred = true;
-        }
-        return message.getSeverity() != Severity::None;
-    }
+    bool log(const Message& message);
 
     template <class F>
     void macroSubstitute(std::vector<lexer::PPToken>&& tokens, F lineOutput)
@@ -240,22 +221,7 @@ class Preprocessor final : PPSourceInterface
         lineOutput(std::move(output));
     }
 
-    static std::string escapeString(std::string_view input)
-    {
-        std::string result;
-        result.reserve(input.size());
-        for (auto& iter : input)
-        {
-            switch (iter)
-            {
-                case '"': result += "\\\""; break;
-                case '\\': result += "\\\\"; break;
-                case '?': result += "\\?"; break;
-                default: result += iter;
-            }
-        }
-        return {input.begin(), input.end()};
-    }
+    static std::string escapeString(std::string_view input);
 
     std::pair<std::optional<Macro>, const lexer::PPToken*> parseDefineDirective(const DefineDirective& defineDirective);
 
@@ -305,163 +271,21 @@ public:
         return m_substitutions;
     }
 
-    void process(PPSourceObject&& sourceObject)
-    {
-        CORAL66_ASSERT(sourceObject.getFiles().size() == 1);
-        m_files.push_back({std::move(sourceObject.getFiles()[0].path),
-                           std::move(sourceObject.getFiles()[0].source),
-                           std::move(sourceObject.getFiles()[0].starts),
-                           sourceObject.getFiles()[0].systemHeader,
-                           {},
-                           {}});
-        m_intervalMaps.push_back(std::move(sourceObject.getIntervalMap()[0]));
+    void process(PPSourceObject&& sourceObject);
 
-        Context context(*this, m_reporter);
-        const auto* begin = std::as_const(sourceObject).data().data();
-        const auto tree = parseMacro(
-            begin, std::as_const(sourceObject).data().data() + std::as_const(sourceObject).data().size(), context);
+    void visit(const TextBlock& text);
 
-        if (context.getErrorCount() != 0)
-        {
-            m_errorsOccurred = true;
-            return;
-        }
+    void visit(const File& file);
 
-        visit(tree);
-        m_fileTokens.push_back(std::move(sourceObject.data()));
-    }
-    void visit(const TextBlock& text)
-    {
-        macroSubstitute({text.tokens.begin(), text.tokens.end()}, coral66::bind_front(&Preprocessor::pushLine, this));
-    }
+    void visit(const Group& group);
 
-    void visit(const File& file)
-    {
-        for (auto& iter : file.groups)
-        {
-            visit(iter);
-        }
-    }
+    void visit(const ControlLine& controlLine);
 
-    void visit(const Group& group)
-    {
-        for (auto& iter : group.groupPart)
-        {
-            visit(iter);
-        }
-    }
+    void visit(const DefineDirective& define);
 
-    void visit(const ControlLine& controlLine)
-    {
-        match(controlLine.variant, [this](auto&& value) { this->visit(value); });
-    }
+    void visit(const GroupPart& groupPart);
 
-    void visit(const DefineDirective& define)
-    {
-        auto parse_res = parseDefineDirective(define);
-        if (!parse_res.first)
-            return;
-        auto optMacro = *parse_res.first;
-        auto iterPtr = parse_res.second;
-
-        auto iter = define.tokens.begin() + (iterPtr - define.tokens.data());
-
-        std::vector<lexer::PPToken> replacementTokens;
-        if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::StringLiteral)
-        {
-            auto stringVal = iter->getValue();
-            std::string innerString(stringVal);
-            if (innerString.size() >= 2 && innerString.front() == '"' && innerString.back() == '"')
-            {
-                innerString = innerString.substr(1, innerString.size() - 2);
-            }
-
-            bool errors = false;
-            auto innerSource = coral66::lexer::tokenize(innerString, m_reporter, &errors, "Macro");
-            if (errors)
-            {
-                m_errorsOccurred = true;
-            }
-
-            auto fileOffset = m_files.size();
-            for (auto& file : innerSource.getFiles())
-            {
-                m_files.push_back(std::move(file));
-            }
-            for (auto& map : innerSource.getIntervalMap())
-            {
-                m_intervalMaps.push_back(std::move(map));
-            }
-
-            replacementTokens = std::move(innerSource.data());
-            for (auto& token : replacementTokens)
-            {
-                token.setFileId(token.getFileId() + fileOffset);
-            }
-
-            ++iter;
-            replacementTokens.insert(replacementTokens.end(), iter, define.tokens.end());
-        }
-        else if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::Miscellaneous)
-        {
-            ++iter;
-            auto last = define.tokens.end();
-            if (last - iter >= 1 && (last - 1)->getTokenType() == lexer::TokenType::Miscellaneous)
-            {
-                replacementTokens.assign(iter, last - 1);
-            }
-            else
-            {
-                replacementTokens.assign(iter, last);
-            }
-        }
-        else
-        {
-            replacementTokens.assign(iter, define.tokens.end());
-        }
-
-        m_fileTokens.push_back(std::move(replacementTokens));
-        std::span<const lexer::PPToken> replacementSpan(m_fileTokens.back().data(), m_fileTokens.back().size());
-
-        optMacro.replacement = replacementSpan;
-        m_defines[optMacro.identifierPos->getValue()].push_back(optMacro);
-
-        if (define.defineToken != lexer::PPTokenIterator{})
-        {
-            std::vector<lexer::PPToken> outputTokens;
-            outputTokens.push_back(*define.defineToken);
-            outputTokens.insert(outputTokens.end(), define.tokens.begin(), define.tokens.end());
-            outputTokens.push_back(*define.tokens.end()); // The semicolon
-            pushLine(std::move(outputTokens));
-        }
-    }
-
-    void visit(const GroupPart& groupPart)
-    {
-        match(groupPart, [this](auto&& value) { this->visit(value); });
-    }
-
-    void visit(const lexer::PPTokenIterator& name)
-    {
-        if (name == lexer::PPTokenIterator{})
-            return;
-
-        std::vector<lexer::PPToken> outputTokens;
-        outputTokens.push_back(*(name - 1)); // DELETE keyword
-        outputTokens.push_back(*name);       // Macroname
-        outputTokens.push_back(*(name + 1)); // Semicolon
-        pushLine(std::move(outputTokens));
-
-        auto it = m_defines.find(name->getValue());
-        if (it != m_defines.end() && !it->second.empty())
-        {
-            it->second.pop_back();
-            if (it->second.empty())
-            {
-                m_defines.erase(it);
-            }
-        }
-    }
+    void visit(const lexer::PPTokenIterator& name);
 
     bool errorsOccurred() const
     {
@@ -470,13 +294,13 @@ public:
 };
 
 /**
-* Preprocessor entry point.
-*
-* @param sourceObject The source input
-* @param reporter Stream to report errors to.
-* @param errorsOccurred Pointer to a bool set to true if errors occur.
-* @return A PPSourceObject containing the processed PPTokens.
-*/
+ * Preprocessor entry point.
+ *
+ * @param sourceObject The source input
+ * @param reporter Stream to report errors to.
+ * @param errorsOccurred Pointer to a bool set to true if errors occur.
+ * @return A PPSourceObject containing the processed PPTokens.
+ */
 PPSourceObject preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                           bool* errorsOccurred = nullptr) noexcept;
 
