@@ -8,6 +8,7 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
+#include "preprocessor_support.hpp"
 
 namespace
 {
@@ -20,12 +21,14 @@ namespace
         if (begin == end || begin->getTokenType() == coral66::lexer::TokenType::Newline)
         {
             context.log(coral66::errors::pp::PP_EXPECTED_N.args(*(begin - 1), context.getSourceInterface(), tokenType,
-                                                                 *(begin - 1)));
+                                                                *(begin - 1)));
+            coral66::preprocessor::DiagnosticCollector::addDiagnostic(coral66::errors::pp::PP_EXPECTED_N);
         }
         else
         {
             context.log(coral66::errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
-                                                                              tokenType, *begin));
+                                                                             tokenType, *begin));
+            coral66::preprocessor::DiagnosticCollector::addDiagnostic(coral66::errors::pp::PP_EXPECTED_N_INSTEAD_OF_N);
         }
         if (additional)
         {
@@ -120,7 +123,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
         if (begin->getTokenType() == lexer::TokenType::Identifier)
         {
             if (auto value = begin->getValue(); value == lexer::tokenName(lexer::TokenType::DefineKeyword)
-                || value == tokenName(lexer::TokenType::DeleteKeyword))
+                                                || value == tokenName(lexer::TokenType::DeleteKeyword))
             {
                 flushText();
                 parts.emplace_back(parseControlLine(begin, end, context));
