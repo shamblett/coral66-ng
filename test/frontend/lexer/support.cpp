@@ -82,7 +82,7 @@ TEST_CASE("toCTokens with PPSourceObject lvalue", "[lexer]")
     // Call lvalue overload
     const PPSourceObject& lvalueRef = ppSource;
     auto cSource = toCTokens(lvalueRef, &reporter, &errorsOccurred);
-    e e C o a REQUIRE_FALSE(errorsOccurred);
+    REQUIRE_FALSE(errorsOccurred);
     REQUIRE(!cSource.data().empty());
 }
 
