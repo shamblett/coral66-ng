@@ -4,7 +4,6 @@
 
 module(
     name = "coral66",
-    version = "9.0.0-prerelease",
 )
 
 bazel_dep(
