@@ -8,6 +8,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "lexertest",
     srcs = [
+        "additional.cpp",
         "error_tests.cpp",
         "invalid_tokens_tests.cpp",
         "valid_tokens_tests.cpp",
