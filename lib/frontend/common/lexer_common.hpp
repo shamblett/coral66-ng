@@ -30,6 +30,7 @@ enum class TokenType : std::uint8_t
 {
     // Symbols
     Assignment,
+    Apostrophe,
     Asterisk,
     CloseParentheses,
     CloseSquareBracket,

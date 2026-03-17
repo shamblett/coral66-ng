@@ -28,6 +28,7 @@ struct CommentSentence;
 struct BracketedComment;
 struct EndComment;
 struct StroppedKeyword;
+struct Prime;
 
 bool isKeyword(std::string_view characters);
 
@@ -36,7 +37,7 @@ TokenType charactersToKeyword(std::string_view characters);
 constexpr auto UTF32_MAX = 0x10FFFF;
 
 using StateMachine = std::variant<Start, StringLiteral, Text, PreprocessingNumber, Dot, Punctuation, CommentSentence,
-                                  BracketedComment, EndComment, StroppedKeyword>;
+                                  BracketedComment, EndComment, StroppedKeyword, Prime>;
 
 inline std::pair<std::uint64_t, std::uint64_t> map(const IntervalMap& intervalMap, std::uint64_t const offset)
 {
@@ -373,6 +374,11 @@ struct EndComment final
 struct StroppedKeyword final
 {
     std::string characters{};
+    std::pair<StateMachine, bool> advance(char c, Context& context);
+};
+
+struct Prime final
+{
     std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 

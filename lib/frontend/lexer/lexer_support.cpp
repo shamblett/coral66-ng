@@ -159,7 +159,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
     switch (c)
     {
         case '.': return Dot{};
-        case '\'': return StroppedKeyword{};
+        case '\'': return Prime{};
         case '"': return StringLiteral{false, "\""};
         case '0':
         case '1':
@@ -410,6 +410,20 @@ std::pair<StateMachine, bool> StroppedKeyword::advance(char const c, Context& co
     }
     characters += c;
     return {std::move(*this), true};
+}
+
+std::pair<StateMachine, bool> Prime::advance(char const c, Context& context)
+{
+    if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+    {
+        return {StroppedKeyword{std::string(1, c)}, true};
+    }
+    if (c == '\'')
+    {
+        return {StroppedKeyword{""}, true};
+    }
+    context.push(context.tokenStartOffset, context.tokenStartOffset + 1, TokenType::Apostrophe);
+    return {Start{}, false};
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst

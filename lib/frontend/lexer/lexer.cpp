@@ -332,7 +332,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
 {
     const std::string text(begin, end);
 
-    if (text.find('.') != std::string::npos)
+    if (text.find('.') != std::string::npos || text.find('e') != std::string::npos)
     {
         llvm::APFloat number(llvm::APFloat::IEEEdouble());
         if (auto result = number.convertFromString(text, llvm::APFloat::rmNearestTiesToEven); !result)
@@ -392,6 +392,74 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
     result.reserve(end - begin);
     for (const auto* iter = begin; iter != end; iter++)
     {
+        if (iter->getTokenType() == TokenType::PPNumber || iter->getTokenType() == TokenType::Apostrophe)
+        {
+            std::string numberText;
+            auto startIter = iter;
+
+            if (iter->getTokenType() == TokenType::PPNumber)
+            {
+                numberText += std::string(iter->getValue());
+                auto next = iter + 1;
+                if (next != end && next->getTokenType() == TokenType::Apostrophe)
+                {
+                    numberText += "e";
+                    iter = next;
+                    next = iter + 1;
+                    if (next != end && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
+                    {
+                        numberText += (next->getTokenType() == TokenType::Plus) ? "+" : "-";
+                        iter = next;
+                        next = iter + 1;
+                    }
+                    if (next != end && next->getTokenType() == TokenType::PPNumber)
+                    {
+                        numberText += std::string(next->getValue());
+                        iter = next;
+                    }
+                }
+            }
+            else // TokenType::Apostrophe
+            {
+                numberText += "1e";
+                auto next = iter + 1;
+                if (next != end && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
+                {
+                    numberText += (next->getTokenType() == TokenType::Plus) ? "+" : "-";
+                    iter = next;
+                    next = iter + 1;
+                }
+                if (next != end && next->getTokenType() == TokenType::PPNumber)
+                {
+                    numberText += std::string(next->getValue());
+                    iter = next;
+                }
+            }
+
+            ConversionContext context{reporter, sourceInterface, *startIter, errorsOccurred};
+            auto number = processNumber(numberText.data(), numberText.data() + numberText.size(),
+                                        startIter->getCharSpaceOffset(), context);
+            if (number)
+            {
+                std::uint64_t length = (iter->getOffset() + iter->getLength()) - startIter->getOffset();
+                result.emplace_back(TokenType::Literal, startIter->getOffset(), length, startIter->getFileId(),
+                                    startIter->getMacroId(), std::move(number->first), number->second);
+            }
+            else
+            {
+                if (errorsOccurred)
+                {
+                    *errorsOccurred = true;
+                }
+                if (reporter)
+                {
+                    *reporter << errors::lexer::MALFORMED_NUMBER_LITERAL.args(*startIter, sourceInterface, *startIter);
+                    DiagnosticCollector::addDiagnostic(errors::lexer::MALFORMED_NUMBER_LITERAL);
+                }
+            }
+            continue;
+        }
+
         switch (iter->getTokenType())
         {
             case TokenType::Miscellaneous:
@@ -419,30 +487,6 @@ std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIter
                 result.emplace_back(TokenType::Identifier, iter->getOffset(), iter->getLength(), iter->getFileId(),
                                     iter->getMacroId(), coral66::to_string(iter->getValue()));
                 break;
-            case TokenType::PPNumber:
-            {
-                ConversionContext context{reporter, sourceInterface, *iter, errorsOccurred};
-                auto number = processNumber(iter->getValue().data(), iter->getValue().data() + iter->getValue().size(),
-                                            iter->getCharSpaceOffset(), context);
-                if (number)
-                {
-                    result.emplace_back(TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
-                                        iter->getMacroId(), std::move(number->first), number->second);
-                }
-                else
-                {
-                    if (errorsOccurred)
-                    {
-                        *errorsOccurred = true;
-                    }
-                    if (reporter)
-                    {
-                        *reporter << errors::lexer::MALFORMED_NUMBER_LITERAL.args(*iter, sourceInterface, *iter);
-                        DiagnosticCollector::addDiagnostic(errors::lexer::MALFORMED_NUMBER_LITERAL);
-                    }
-                }
-                break;
-            }
             case TokenType::StringLiteral:
             {
                 auto maybeToken = parseStringLiteral(*iter, sourceInterface, reporter);
@@ -518,6 +562,7 @@ std::string_view coral66::lexer::tokenName(coral66::lexer::TokenType const token
         case TokenType::LessThanOrEqual: return quote ? "'<='" : "<=";
         case TokenType::GreaterThan: return quote ? "'>'" : ">";
         case TokenType::GreaterThanOrEqual: return quote ? "'>='" : ">=";
+        case TokenType::Apostrophe: return quote ? "''" : "'";
         case TokenType::Assignment: return quote ? "':='" : ":=";
         case TokenType::Colon: return quote ? "':'" : ":";
         case TokenType::OpenSquareBracket: return quote ? "'['" : "[";
