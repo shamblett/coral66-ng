@@ -126,6 +126,8 @@ CREATE_ERROR(MALFORMED_NUMBER_LITERAL, "Malformed number literal", Underline<0>)
 namespace pp
 {
 
+CREATE_ERROR(KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER, "Macro name %0 cannot be a keyword", InsertAfter<1, 0>);
+
 CREATE_ERROR(REDEFINITION_OF_MACRO_PARAMETER_N, "Redefinition of macro parameter %0", Underline<0>);
 
 CREATE_ERROR(WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION, "Whitespace required after object macro definition",
