@@ -99,7 +99,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     }
     if (defineDirective.tokens[0].getTokenType() == lexer::TokenType::Identifier)
     {
-        if (lexer::isKeyword((tokenName(defineDirective.tokens[0].getTokenType()))))
+        if (lexer::isKeyword(defineDirective.tokens[0].getValue()))
         {
             log(errors::pp::KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
                                                             defineDirective.tokens[0]));
