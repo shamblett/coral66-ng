@@ -7,8 +7,8 @@
 #include <iostream>
 #include <utility>
 
-#include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
+#include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
@@ -22,7 +22,7 @@
 using namespace coral66::errors::pp;
 namespace
 {
-coral66::PPSourceObject preprocess(std::string source,  bool &errorsOccurred)
+coral66::PPSourceObject preprocess(std::string source, bool& errorsOccurred)
 {
     std::string storage;
     llvm::raw_string_ostream ss(storage);
@@ -66,5 +66,61 @@ TEST_CASE("Preprocess - Errors", "[PP]")
         auto result = preprocess("DEFINE id\"5\";", errors);
         CHECK(errors);
         CHECK(result.findDiagnostic(WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION));
+    }
+
+    SECTION("No Matching Close Parenthesis")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(p1;", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N));
+    }
+
+    SECTION("Macro Parameter Name is not an Identifier")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(6);", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N_INSTEAD_OF_N));
+    }
+
+    SECTION("Expected Additional Macro Parameter")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(p1,;", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N));
+    }
+
+    SECTION("Missing Macro Parameter")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(p1,);", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N_INSTEAD_OF_N));
+    }
+
+    SECTION("Macro Parameter Redefinition")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(p1,p1);", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(REDEFINITION_OF_MACRO_PARAMETER_N));
+    }
+
+    SECTION("Missing Close Parenthesis - Not Present")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(p1,p2;", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N));
+    }
+
+    SECTION("Missing Close Parenthesis - Not Parenthesis")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE id(p1,p2!;", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N_INSTEAD_OF_N));
     }
 }
