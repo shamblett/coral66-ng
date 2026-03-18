@@ -8,6 +8,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "pptest",
     srcs = [
+        "error_tests.cpp",
         "macro_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
