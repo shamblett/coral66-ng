@@ -114,7 +114,6 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     {
         return {Macro{identifierPos, {}}, curr};
     }
-
     if (curr->getTokenType() != lexer::TokenType::OpenParentheses
         || curr->getOffset() != identifierPos->getOffset() + identifierPos->getLength())
     {
