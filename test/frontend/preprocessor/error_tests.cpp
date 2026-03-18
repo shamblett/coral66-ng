@@ -123,4 +123,12 @@ TEST_CASE("Preprocess - Errors", "[PP]")
         CHECK(errors);
         CHECK(result.findDiagnostic(PP_EXPECTED_N_INSTEAD_OF_N));
     }
+
+    SECTION("Incomplete DEFINE")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE\n", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N));
+    }
 }

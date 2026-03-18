@@ -24,12 +24,6 @@ namespace
                                                                 *(begin - 1)));
             coral66::preprocessor::DiagnosticCollector::addDiagnostic(coral66::errors::pp::PP_EXPECTED_N);
         }
-        else
-        {
-            context.log(coral66::errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
-                                                                             tokenType, *begin));
-            coral66::preprocessor::DiagnosticCollector::addDiagnostic(coral66::errors::pp::PP_EXPECTED_N_INSTEAD_OF_N);
-        }
         if (additional)
         {
             context.log(*additional);
