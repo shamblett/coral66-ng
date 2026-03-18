@@ -43,4 +43,12 @@ TEST_CASE("Preprocess - Errors", "[PP]")
         CHECK(errors);
         CHECK(result.findDiagnostic(PP_EXPECTED_N_AFTER_N));
     }
+
+    SECTION("DEFINE Not Followed By Identifier")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE 'INTEGER';", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(PP_EXPECTED_N_INSTEAD_OF_N));
+    }
 }
