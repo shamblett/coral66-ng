@@ -10,6 +10,7 @@ cc_library(
     srcs = [
         "error_tests.cpp",
         "macro_tests.cpp",
+        "note_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [

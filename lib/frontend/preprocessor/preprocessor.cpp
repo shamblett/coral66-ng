@@ -101,8 +101,8 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     {
         if (lexer::isKeyword(defineDirective.tokens[0].getValue()))
         {
-            log(errors::pp::KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER.args(defineDirective.tokens[0], *this, lexer::TokenType::Identifier,
-                                                            defineDirective.tokens[0]));
+            log(errors::pp::KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER.args(
+                defineDirective.tokens[0], *this, lexer::TokenType::Identifier, defineDirective.tokens[0]));
             preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER);
             return {{}, nullptr};
         }
@@ -134,6 +134,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         log(errors::pp::PP_EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N);
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::TO_MATCH_N_HERE);
         return {{}, nullptr};
     }
 
@@ -181,6 +182,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         log(errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N.args(*curr, *this, *curr));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N);
         log(notes::PREVIOUSLY_DECLARED_HERE.args(*result, *this, *result));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::pp::PREVIOUSLY_DECLARED_HERE);
         curr++;
     }
     if (curr == end)
@@ -188,6 +190,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         log(errors::pp::PP_EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N);
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::TO_MATCH_N_HERE);
         return {{}, nullptr};
     }
     if (curr->getTokenType() != lexer::TokenType::CloseParentheses)
@@ -195,6 +198,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N);
         log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::TO_MATCH_N_HERE);
         return {{}, nullptr};
     }
 
