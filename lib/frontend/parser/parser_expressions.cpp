@@ -92,13 +92,16 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     if (begin == end || begin->getTokenType() != lexer::TokenType::ThenKeyword)
     {
         context.log(errors::parser::EXPECTED_THEN.args(*begin, context.getSourceInterface(), *begin));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_THEN);
         return nullptr; // Missing THEN
     }
     begin++; // THEN
     auto thenExpr = parseExpression(begin, end, context);
     if (!thenExpr)
     {
-        context.log(errors::parser::EXPECTED_THEN.args(*begin, context.getSourceInterface(), *begin));
+        context.log(errors::parser::EXPECTED_EXPRESSION.args(*begin, context.getSourceInterface(),
+        *begin));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
         return nullptr;
     }
 
