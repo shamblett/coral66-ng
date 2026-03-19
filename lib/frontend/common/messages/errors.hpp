@@ -133,6 +133,8 @@ CREATE_ERROR(REDEFINITION_OF_MACRO_PARAMETER_N, "Redefinition of macro parameter
 CREATE_ERROR(WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION, "Whitespace required after object macro definition",
              Underline<0>);
 
+CREATE_ERROR(INFINITE_MACRO_RECURSION_DETECTED_N, "Infinite macro recursion detected for macro %0", Underline<0>);
+
 CREATE_ERROR(NOT_ENOUGH_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N, "Not enough arguments for macro %0. Expected %1 got %2",
              Underline<0>);
 

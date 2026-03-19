@@ -13,8 +13,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
+#include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
 #include "preprocessor_support.hpp"
@@ -101,6 +101,61 @@ class Preprocessor final : PPSourceInterface
             auto result = m_defines.find(name);
             if (result == m_defines.end() || result->second.empty())
             {
+                output.push_back(std::move(tokens[idx]));
+                idx++;
+                continue;
+            }
+
+            // Cycle detection and Depth Limit
+            int depth = 0;
+            bool cycle_detected = false;
+            auto current_macro_id = tokens[idx].getMacroId();
+
+            while (current_macro_id > 0)
+            {
+                depth++;
+                if (depth > 200) // Max depth
+                {
+                    cycle_detected = true;
+                    break;
+                }
+
+                if (current_macro_id - 1 < m_substitutions.size())
+                {
+                    const auto& record = m_substitutions[current_macro_id - 1];
+                    if (std::holds_alternative<Source::Substitution>(record))
+                    {
+                        const auto& sub = std::get<Source::Substitution>(record);
+                        if (sub.macroIdentifier.getValue() == name)
+                        {
+                            cycle_detected = true;
+                            break;
+                        }
+                        current_macro_id = sub.replacedIdentifier.getMacroId();
+                    }
+                    else if (std::holds_alternative<Source::Stringification>(record))
+                    {
+                        current_macro_id = std::get<Source::Stringification>(record).replacedIdentifier.getMacroId();
+                    }
+                    else if (std::holds_alternative<Source::TokenConcatenation>(record))
+                    {
+                        current_macro_id = std::get<Source::TokenConcatenation>(record).leftToken.getMacroId();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if (cycle_detected)
+            {
+                log(errors::pp::INFINITE_MACRO_RECURSION_DETECTED_N.args(tokens[idx], *this, tokens[idx]));
+                preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::INFINITE_MACRO_RECURSION_DETECTED_N);
                 output.push_back(std::move(tokens[idx]));
                 idx++;
                 continue;

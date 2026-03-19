@@ -155,4 +155,20 @@ TEST_CASE("Preprocess - Errors", "[PP]")
         CHECK(errors);
         CHECK(result.findDiagnostic(TOO_MANY_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N));
     }
+
+    SECTION("Infinite Recursion Cycle Detected")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE A \"A\";\nA;", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(INFINITE_MACRO_RECURSION_DETECTED_N));
+    }
+
+    SECTION("Infinite Recursion Mutual Cycle Detected")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE A \"B\";\nDEFINE B \"A\";\nA;", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(INFINITE_MACRO_RECURSION_DETECTED_N));
+    }
 }
