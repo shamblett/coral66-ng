@@ -106,8 +106,8 @@ TEST_CASE("toCTokens with PPTokenIterator", "[lexer]")
 
 TEST_CASE("CustomFormat for TokenType", "[lexer]")
 {
-    coral66::diag::CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'> formatter;
-    coral66::lexer::PPToken token(coral66::lexer::TokenType::Identifier, 0, 5, 0, 5, 0, 0, "dummy");
+    diag::CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'> formatter;
+    const PPToken token(coral66::lexer::TokenType::Identifier, 0, 5, 0, 5, 0, 0, "dummy");
     std::string formatted = formatter(token);
     REQUIRE(!formatted.empty());
 }
@@ -115,10 +115,10 @@ TEST_CASE("CustomFormat for TokenType", "[lexer]")
 TEST_CASE("StringConverter for TokenType", "[lexer]")
 {
     std::string inFormatStr = coral66::diag::StringConverter<coral66::lexer::TokenType>::inFormat(
-        coral66::lexer::TokenType::Identifier, nullptr);
+        TokenType::Identifier, nullptr);
     REQUIRE(!inFormatStr.empty());
 
     std::string inArgStr = coral66::diag::StringConverter<coral66::lexer::TokenType>::inArg(
-        coral66::lexer::TokenType::Identifier, nullptr);
+        TokenType::Identifier, nullptr);
     REQUIRE(!inArgStr.empty());
 }
