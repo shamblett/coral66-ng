@@ -18,7 +18,7 @@ using namespace coral66::Syntax;
 /*
  * 6.1.1.1
  */
-TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Primaries", "[Parser][Expression]")
 {
     SECTION("Literals")
     {
@@ -40,7 +40,7 @@ TEST_CASE("Coral Parse Expression - Primaries", "[parser][expression]")
 /*
  * 6.1.1.2
  */
-TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Typed Primaries", "[Parser][Expression]")
 {
     SECTION("Type Change")
     {
@@ -77,7 +77,7 @@ TEST_CASE("Coral Parse Expression - Typed Primaries", "[parser][expression]")
 /*
  * 6.1.2
  */
-TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Bitwise", "[Parser][Expression]")
 {
     SECTION("MASK")
     {
@@ -112,7 +112,7 @@ TEST_CASE("Coral Parse Expression - Bitwise", "[parser][expression]")
 /*
  * 6.1.1.2.1
  */
-TEST_CASE("Coral Parse Expression - Word References", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Word References", "[Parser][Expression]")
 {
     SECTION("Array Access Single Index")
     {
@@ -143,7 +143,7 @@ TEST_CASE("Coral Parse Expression - Word References", "[parser][expression]")
 /*
  * 6.1.1.2.5
  */
-TEST_CASE("Coral Parse Expression - Function Calls", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Function Calls", "[Parser][Expression]")
 {
     SECTION("No Args Function Call Equivalent (Identifier)")
     {
@@ -163,7 +163,7 @@ TEST_CASE("Coral Parse Expression - Function Calls", "[parser][expression]")
 /*
  * 6.1.3
  */
-TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Arithmetic", "[Parser][Expression]")
 {
     SECTION("Addition")
     {
@@ -195,7 +195,7 @@ TEST_CASE("Coral Parse Expression - Arithmetic", "[parser][expression]")
 /*
  * 6.2.1
  */
-TEST_CASE("Coral Parse Expression - Conditionals", "[parser][expression]")
+TEST_CASE("Coral Parse Expression - Conditionals", "[Parser][Expression]")
 {
     SECTION("IF THEN")
     {

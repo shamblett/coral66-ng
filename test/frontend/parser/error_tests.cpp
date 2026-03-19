@@ -20,7 +20,7 @@
 
 using namespace coral66::errors::parser;
 
-TEST_CASE("Expressions - Errors", "[Parser]")
+TEST_CASE("Expressions - Errors", "[Parser][Expression]")
 {
     SECTION("IF Expected Condition")
     {
