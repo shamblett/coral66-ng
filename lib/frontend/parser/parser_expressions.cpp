@@ -99,9 +99,9 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     auto thenExpr = parseExpression(begin, end, context);
     if (!thenExpr)
     {
-        context.log(errors::parser::EXPECTED_EXPRESSION.args(*begin, context.getSourceInterface(),
+        context.log(errors::parser::EXPECTED_STATEMENT.args(*begin, context.getSourceInterface(),
         *begin));
-        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
         return nullptr;
     }
 

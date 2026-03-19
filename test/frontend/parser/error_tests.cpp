@@ -38,11 +38,11 @@ TEST_CASE("Expressions - Errors", "[Parser]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_THEN));
     }
 
-    SECTION("Expected Expression After THEN")
+    SECTION("Expected Statement After THEN")
     {
         const ParsedExpr p("IF a < b THEN ELSE");
         CHECK(p.expr.get() == nullptr);
         CHECK(parser::DiagnosticCollector::getDiagnostics().size() == 1);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
 }
