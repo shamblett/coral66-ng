@@ -260,8 +260,6 @@ class Preprocessor final : PPSourceInterface
 
     std::pair<std::optional<Macro>, const lexer::PPToken*> parseDefineDirective(const DefineDirective& defineDirective);
 
-    std::optional<bool> evaluateExpression(lexer::PPTokenIterator ifToken, std::span<const lexer::PPToken> tokens);
-
     std::uint64_t getLineNumber(std::uint32_t fileID, std::uint64_t offset) const noexcept override;
 
     std::uint64_t getLineStartOffset(std::uint32_t fileID, std::uint64_t line) const noexcept override;

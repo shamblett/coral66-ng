@@ -205,58 +205,6 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     return {Macro{identifierPos, std::move(argumentList)}, curr + 1};
 }
 
-std::optional<bool> coral66::pp::Preprocessor::evaluateExpression(lexer::PPTokenIterator ifToken,
-                                                                  std::span<const lexer::PPToken> tokens)
-{
-    std::vector<coral66::lexer::PPToken> result;
-    macroSubstitute({tokens.begin(), tokens.end()},
-                    coral66::bind_front(&append<coral66::lexer::PPToken>, std::ref(result)));
-    bool errorsOccurred = false;
-    auto cTokens =
-        coral66::lexer::toCTokens(result.data(), result.data() + result.size(), *this, m_reporter, &errorsOccurred);
-    if (errorsOccurred)
-    {
-        m_errorsOccurred = true;
-        return {};
-    }
-    for (auto iter = cTokens.begin(); iter != cTokens.end(); ++iter)
-    {
-        if (iter->getTokenType() == lexer::TokenType::Literal)
-        {
-            auto integer = coral66::get<llvm::APSInt>(iter->getValue());
-            integer = integer.extOrTrunc(64);
-            iter->setValue(integer);
-        }
-        else if (coral66::lexer::isText(iter->getTokenType()))
-        {
-            if (iter->getTokenType() == lexer::TokenType::Identifier
-                && iter->getText() == lexer::tokenName(lexer::TokenType::DefineKeyword))
-            {
-                if (iter + 1 == cTokens.end())
-                {
-                    continue;
-                }
-                if ((iter + 1)->getTokenType() == lexer::TokenType::Identifier)
-                {
-                    ++iter;
-                }
-                else if ((iter + 1)->getTokenType() == lexer::TokenType::OpenParentheses)
-                {
-                    if (iter + 2 != cTokens.end() && (iter + 2)->getTokenType() == lexer::TokenType::Identifier)
-                    {
-                        iter += 2;
-                    }
-                }
-                continue;
-            }
-            bool hasLeadingWhitespace = iter->hasLeadingWhitespace();
-            *iter = lexer::CToken(lexer::TokenType::Literal, iter->getOffset(), iter->getLength(), iter->getFileId(),
-                                  iter->getMacroId(), llvm::APSInt(64, false), lexer::CToken::Type::Integer);
-            iter->setLeadingWhitespace(hasLeadingWhitespace);
-        }
-    }
-    return {};
-}
 
 std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileID,
                                                        const std::uint64_t offset) const noexcept
