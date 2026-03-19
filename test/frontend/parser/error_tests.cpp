@@ -1,0 +1,31 @@
+/*
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 18/03/2026
+ */
+
+#include "common.hpp"
+#include "lib/frontend/common/messages/errors.hpp"
+#include "lib/frontend/common/source_object.hpp"
+#include "lib/frontend/parser/parser_support.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "test/common/test_config.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
+
+/*
+ *
+ * Error diagnostics tests
+ *
+ */
+
+using namespace coral66::errors::parser;
+
+TEST_CASE("Expressions - Errors", "[Parser]")
+{
+    SECTION("Empty DEFINE")
+    {
+        const ParsedExpr p("FOR ( I N )");
+        CHECK(p.expr.get() == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
+    }
+}

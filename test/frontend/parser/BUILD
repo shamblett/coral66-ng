@@ -8,6 +8,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "parsertest",
     srcs = [
+        "error_tests.cpp",
         "expression_tests.cpp",
     ],
     hdrs = [

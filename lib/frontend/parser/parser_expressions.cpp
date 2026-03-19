@@ -5,6 +5,7 @@
  */
 
 #include "parser.hpp"
+#include "parser_support.hpp"
 
 #include "lib/frontend/common/messages/errors.hpp"
 

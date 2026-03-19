@@ -12,7 +12,9 @@
 
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
+#include "lib/frontend/lexer/lexer_support.hpp"
 #include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/parser/parser_support.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
@@ -28,7 +30,7 @@ struct ParsedExpr
     std::unique_ptr<parser::Context> context;
     std::unique_ptr<Expression> expr;
 
-    explicit ParsedExpr(std::string  src) : source(std::move(src)), ss(outStr)
+    explicit ParsedExpr(std::string src) : source(std::move(src)), ss(outStr)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
@@ -43,6 +45,7 @@ struct ParsedExpr
             end--;
         }
 
+        parser::DiagnosticCollector::clearDiagnostics();
         expr = parser::parseExpression(begin, end, *context);
         REQUIRE(expr != nullptr);
         REQUIRE(begin == end);

@@ -16,6 +16,7 @@ cc_library(
     ],
     hdrs = [
         "parser.hpp",
+        "parser_support.hpp",
         "parser_utilities.hpp",
     ],
     visibility = [
