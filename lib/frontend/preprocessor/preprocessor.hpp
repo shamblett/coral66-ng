@@ -14,8 +14,10 @@
 #include <vector>
 
 #include "lib/frontend/common/source_object.hpp"
+#include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "preprocessor_parser.hpp"
+#include "preprocessor_support.hpp"
 
 /**
  * Defines the Preprocessor interface.
@@ -174,6 +176,39 @@ class Preprocessor final : PPSourceInterface
                 if (actual_args.size() != param_count
                     && !(param_count == 0 && actual_args.size() == 1 && actual_args[0].empty()))
                 {
+                    size_t num_actual_args = actual_args.size();
+                    if (num_actual_args == 1 && actual_args[0].empty())
+                    {
+                        if (param_count == 0)
+                        {
+                            num_actual_args = 0;
+                        }
+                    }
+
+                    if (num_actual_args < param_count)
+                    {
+                        log(errors::pp::NOT_ENOUGH_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N.args(
+                            tokens[idx], *this, tokens[idx], param_count, num_actual_args));
+                        preprocessor::DiagnosticCollector::addDiagnostic(
+                            errors::pp::NOT_ENOUGH_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N);
+                    }
+                    else if (num_actual_args > param_count)
+                    {
+                        lexer::PPToken excess_tok = tokens[idx];
+                        if (param_count < actual_args.size() && !actual_args[param_count].empty())
+                        {
+                            excess_tok = actual_args[param_count].front();
+                        }
+                        else if (arg_idx < tokens.size())
+                        {
+                            excess_tok = tokens[arg_idx];
+                        }
+                        log(errors::pp::TOO_MANY_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N.args(
+                            tokens[idx], *this, tokens[idx], param_count, num_actual_args, excess_tok));
+                        preprocessor::DiagnosticCollector::addDiagnostic(
+                            errors::pp::TOO_MANY_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N);
+                    }
+
                     output.push_back(std::move(tokens[idx]));
                     idx++;
                     continue;

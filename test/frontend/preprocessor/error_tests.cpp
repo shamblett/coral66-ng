@@ -131,4 +131,28 @@ TEST_CASE("Preprocess - Errors", "[PP]")
         CHECK(errors);
         CHECK(result.findDiagnostic(PP_EXPECTED_N));
     }
+
+    SECTION("Not Enough Arguments For Macro")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE mac(a, b) \"a + b\";\nmac(1);", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(NOT_ENOUGH_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N));
+    }
+
+    SECTION("Too Many Arguments For Macro")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE mac(a, b) \"a + b\";\nmac(1, 2, 3);", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(TOO_MANY_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N));
+    }
+
+    SECTION("Too Many Arguments For Zero-Arg Macro")
+    {
+        bool errors = false;
+        auto result = preprocess("DEFINE mac() \"a + b\";\nmac(1);", errors);
+        CHECK(errors);
+        CHECK(result.findDiagnostic(TOO_MANY_ARGUMENTS_FOR_MACRO_N_EXPECTED_N_GOT_N));
+    }
 }
