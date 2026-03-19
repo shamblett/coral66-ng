@@ -26,6 +26,7 @@ TEST_CASE("Expressions - Errors", "[Parser]")
     {
         const ParsedExpr p("IF THEN");
         CHECK(p.expr.get() == nullptr);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
     }
 }
