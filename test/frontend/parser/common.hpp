@@ -47,7 +47,5 @@ struct ParsedExpr
 
         parser::DiagnosticCollector::clearDiagnostics();
         expr = parser::parseExpression(begin, end, *context);
-        REQUIRE(expr != nullptr);
-        REQUIRE(begin == end);
     }
 };

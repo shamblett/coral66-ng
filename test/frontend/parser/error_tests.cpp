@@ -22,9 +22,9 @@ using namespace coral66::errors::parser;
 
 TEST_CASE("Expressions - Errors", "[Parser]")
 {
-    SECTION("Empty DEFINE")
+    SECTION("IF Expected Condition")
     {
-        const ParsedExpr p("FOR ( I N )");
+        const ParsedExpr p("IF THEN");
         CHECK(p.expr.get() == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
     }

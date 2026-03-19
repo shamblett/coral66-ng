@@ -5,9 +5,9 @@
  */
 
 #include "parser.hpp"
-#include "parser_support.hpp"
 
 #include "lib/frontend/common/messages/errors.hpp"
+#include "parser_support.hpp"
 
 using namespace coral66::Syntax;
 
@@ -86,6 +86,7 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     {
         context.log(errors::parser::EXPECTED_CONDITION.args(*begin, context.getSourceInterface(),
                                                             lexer::TokenType::IfKeyword, *begin));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CONDITION);
         return nullptr;
     }
     if (begin == end || begin->getTokenType() != lexer::TokenType::ThenKeyword)
