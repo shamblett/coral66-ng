@@ -20,7 +20,7 @@
 using namespace coral66;
 using namespace coral66::Syntax;
 
-struct ParsedExpr
+struct ParsedExpression
 {
     std::string source;
     std::string outStr;
@@ -30,7 +30,7 @@ struct ParsedExpr
     std::unique_ptr<parser::Context> context;
     std::unique_ptr<Expression> expr;
 
-    explicit ParsedExpr(std::string src) : source(std::move(src)), ss(outStr)
+    explicit ParsedExpression(std::string src) : source(std::move(src)), ss(outStr)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
@@ -47,5 +47,35 @@ struct ParsedExpr
 
         parser::DiagnosticCollector::clearDiagnostics();
         expr = parser::parseExpression(begin, end, *context);
+    }
+};
+
+struct ParsedStatement
+{
+    std::string source;
+    std::string outStr;
+    llvm::raw_string_ostream ss;
+    PPSourceObject ppTokens;
+    CSourceObject cTokens;
+    std::unique_ptr<parser::Context> context;
+    std::unique_ptr<Statement> statement;
+
+    explicit ParsedStatement(std::string src) : source(std::move(src)), ss(outStr)
+    {
+        ppTokens = lexer::tokenize(source, &ss);
+        cTokens = lexer::toCTokens(ppTokens, &ss);
+        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+
+        const auto& tokens = cTokens.data();
+        const lexer::CToken* begin = tokens.data();
+        const lexer::CToken* end = tokens.data() + tokens.size();
+
+        while (begin != end && (end - 1)->getTokenType() == lexer::TokenType::Newline)
+        {
+            end--;
+        }
+
+        parser::DiagnosticCollector::clearDiagnostics();
+        statement = parser::parseStatement(begin, end, *context);
     }
 };

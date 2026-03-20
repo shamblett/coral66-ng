@@ -10,6 +10,7 @@ cc_library(
     srcs = [
         "error_tests.cpp",
         "expression_tests.cpp",
+        "statement_tests.cpp",
     ],
     hdrs = [
         "common.hpp",
