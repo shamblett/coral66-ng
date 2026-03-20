@@ -6,8 +6,6 @@
 
 #include "parser.hpp"
 
-#include <llvm/Support/ConvertUTF.h>
-
 #include <algorithm>
 
 #include "lib/frontend/common/messages/errors.hpp"
@@ -52,8 +50,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     if (begin->getTokenType() == lexer::TokenType::Identifier)
     {
         auto start = begin;
-        auto iter = begin + 1;
-        if (iter != end && iter->getTokenType() == lexer::TokenType::Assignment)
+        if (auto iter = begin + 1; iter != end && iter->getTokenType() == lexer::TokenType::Assignment)
         {
             auto id = begin;
             begin++;
