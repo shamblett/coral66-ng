@@ -30,7 +30,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
     }
 
-    SECTION("Missing THEN")
+    SECTION("Expected THEN")
     {
         const ParsedExpr p("IF a < b ELSE");
         CHECK(p.expr.get() == nullptr);
@@ -43,6 +43,22 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         const ParsedExpr p("IF a < b THEN ELSE");
         CHECK(p.expr.get() == nullptr);
         CHECK(parser::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
+    }
+
+    SECTION("Expected ELSE")
+    {
+        const ParsedExpr p("IF a < b THEN d IF");
+        CHECK(p.expr.get() == nullptr);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ELSE));
+    }
+
+    SECTION("Expected Statement After ELSE")
+    {
+        const ParsedExpr p("IF a < b THEN d ELSE IF;");
+        CHECK(p.expr.get() == nullptr);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().size() == 2);
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
 }
