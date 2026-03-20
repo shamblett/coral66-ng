@@ -173,4 +173,27 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_PARENTHESIS));
     }
+
+    SECTION("Expected Open Parenthesis (Typed Primary)")
+    {
+        const ParsedExpr p("FIXED (1, 2) =");
+        CHECK(p.expr.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_PARENTHESIS));
+    }
+
+    SECTION("Graceful Failure Without Crashing on Premature EOF")
+    {
+        // Testing specific end-of-stream edge cases without trailing fallback tokens
+        // to ensure bounds checking correctly catches 'begin == end' instead of aborting.
+        const char* strings[] = {"a + ",    "a * ",          "a DIFFER ",    "a UNION ",    "a MASK ",
+                                 "IF a = ", "IF a = b AND ", "IF a = b OR ", "LOCATION ( ", "FIXED (1 "};
+
+        for (auto src : strings)
+        {
+            const ParsedExpr p(src);
+            CHECK(p.expr.get() == nullptr);
+            CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        }
+    }
 }
