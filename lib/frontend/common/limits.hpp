@@ -10,10 +10,7 @@
  *
  */
 
-namespace coral66::Limits
-{
-namespace Parser
+namespace coral66::Limits::parser
 {
 constexpr auto MAX_BRACKET_DEPTH = 256;
-} // namespace Parser
-} // namespace coral66::Limits
+} // namespace coral66::Limits::parser

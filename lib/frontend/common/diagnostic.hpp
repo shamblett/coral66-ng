@@ -6,7 +6,9 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
+#include <functional>
 #include <optional>
 #include <span>
 #include <unordered_map>
@@ -60,7 +62,7 @@ struct Arg
 constexpr std::optional<Arg> nextArg(std::string_view& text)
 {
     auto result = text.find('%');
-    if (result == text.npos)
+    if (result == std::string_view::npos)
     {
         return {};
     }
@@ -113,14 +115,7 @@ constexpr bool checkForNoHoles(std::string_view text)
                  }
              }(Args::indices)),
          ...);
-        for (auto iter : seen)
-        {
-            if (!iter)
-            {
-                return false;
-            }
-        }
-        return true;
+        return std::ranges::all_of(seen, std::identity{});
     }
 }
 
@@ -247,11 +242,11 @@ protected:
         std::unordered_map<std::string_view, std::string> customModifiers;
     };
 
-    Message print(std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
-                  std::span<Argument> arguments, std::span<const Modifiers> modifiers,
-                  const source_interface& sourceInterface) const;
+    [[nodiscard]] Message print(std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
+                                std::span<Argument> arguments, std::span<const Modifiers> modifiers,
+                                const source_interface& sourceInterface) const;
 
-    Message print(std::string_view message, std::span<Argument> arguments) const;
+    [[nodiscard]] Message print(std::string_view message, std::span<Argument> arguments) const;
 
     void evaluateFormatsInMessage(std::string_view message, std::span<Argument> arguments,
                                   llvm::raw_string_ostream& ss) const;
@@ -259,12 +254,12 @@ protected:
 public:
     constexpr DiagnosticBase(Severity severity, std::string_view name) : m_severity(severity), m_name(name) {}
 
-    constexpr Severity getSeverity() const noexcept
+    [[nodiscard]] constexpr Severity getSeverity() const noexcept
     {
         return m_severity;
     }
 
-    constexpr std::string_view getName() const
+    [[nodiscard]] constexpr std::string_view getName() const
     {
         return m_name;
     }

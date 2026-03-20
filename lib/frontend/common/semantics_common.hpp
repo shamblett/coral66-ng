@@ -127,7 +127,8 @@ private:
     }
 
 public:
-    PrimitiveType(Kind kind, TypeFlags flags = Nothing) : Type(std::in_place_type<PrimitiveType>, flags), m_kind(kind)
+    explicit PrimitiveType(Kind kind, TypeFlags flags = Nothing)
+        : Type(std::in_place_type<PrimitiveType>, flags), m_kind(kind)
     {
     }
 

@@ -15,7 +15,6 @@
 #include <variant>
 
 #include "lib/support/utilities.hpp"
-#include "source_interface.hpp"
 
 namespace coral66::lexer
 {
@@ -119,7 +118,7 @@ bool isText(TokenType tokenType);
 std::string_view tokenName(TokenType tokenType, bool quote = true);
 
 /**
- * Normalises the spelling of a token by removing backslash newline pairs
+ * Normalizes the spelling of a token by removing backslash newline pairs
  *
  * Does not change Digraphs as those are distinct and different spellings of a particular token type
  * @param tokenSpelling Spelling of a token
