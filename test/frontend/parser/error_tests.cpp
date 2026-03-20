@@ -165,4 +165,12 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
     }
+
+    SECTION("Expected Open Parenthesis (Typed Primary)")
+    {
+        const ParsedExpr p("FIXED (1, 2) =");
+        CHECK(p.expr.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_PARENTHESIS));
+    }
 }

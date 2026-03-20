@@ -477,7 +477,7 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                         }
                         context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*begin, context.getSourceInterface(),
                                                                                    *begin));
-                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSED_PARENTHESIS);
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
                         return nullptr;
                     }
                     context.log(
