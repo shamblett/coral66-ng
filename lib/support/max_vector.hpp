@@ -51,7 +51,7 @@ public:
     }
 
     template <std::size_t N2>
-    constexpr MaxVector(const MaxVector<T, N2>& rhs) noexcept : m_size(rhs.size())
+    explicit constexpr MaxVector(const MaxVector<T, N2>& rhs) noexcept : m_size(rhs.size())
     {
         CORAL66_ASSERT(m_size <= N);
         for (std::size_t i = 0; i < m_size; i++)

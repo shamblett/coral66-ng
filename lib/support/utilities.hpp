@@ -20,85 +20,21 @@
 
 #include "vendor/tsl/ordered_map.h"
 
-#ifdef NDEBUG
+#define CORAL66_ASSERT(...)                                                \
+    do                                                                     \
+    {                                                                      \
+        if (!(__VA_ARGS__))                                                \
+        {                                                                  \
+            fprintf(stderr, __FILE__ ":%d: " #__VA_ARGS__ "\n", __LINE__); \
+            std::abort();                                                  \
+        }                                                                  \
+    } while (0)
 
-    #ifndef CORAL66_USE_ASSERTS
-
-        #ifdef __clang__
-
-            #define CORAL66_UNREACHABLE      \
-                do                           \
-                    __builtin_unreachable(); \
-                while (0)
-
-            #define CORAL66_ASSERT(...) __builtin_assume(bool(__VA_ARGS__))
-
-        #elif defined(__GNUC__)
-
-            #define CORAL66_UNREACHABLE      \
-                do                           \
-                    __builtin_unreachable(); \
-                while (0)
-
-            #define CORAL66_ASSERT(...) \
-                if (__VA_ARGS__)        \
-                    ;                   \
-                else                    \
-                    __builtin_unreachable()
-
-            #define CORAL66_UNREACHABLE \
-                do                      \
-                    __assume(false);    \
-                while (0)
-
-            #define CORAL66_ASSERT(...) __assume((bool)(__VA_ARGS__))
-
-        #else
-
-            #define CORAL66_UNREACHABLE
-
-            #define CORAL66_ASSERT(...)
-
-        #endif
-
-    #else
-
-        #define CORAL66_UNREACHABLE \
-            do                      \
-                std::abort();       \
-            while (0)
-
-        #define CORAL66_ASSERT(...)                                                \
-            do                                                                     \
-            {                                                                      \
-                if (!(__VA_ARGS__))                                                \
-                {                                                                  \
-                    fprintf(stderr, __FILE__ ":%d: " #__VA_ARGS__ "\n", __LINE__); \
-                    std::abort();                                                  \
-                }                                                                  \
-            } while (0)
-
-    #endif
-
-#else
-
-    #define CORAL66_ASSERT(...)                                                \
-        do                                                                     \
-        {                                                                      \
-            if (!(__VA_ARGS__))                                                \
-            {                                                                  \
-                fprintf(stderr, __FILE__ ":%d: " #__VA_ARGS__ "\n", __LINE__); \
-                std::abort();                                                  \
-            }                                                                  \
-        } while (0)
-
-    #define CORAL66_UNREACHABLE                                                          \
-        do                                                                               \
-        {                                                                                \
-            std::abort(); /* So that the compiler sees code afterwards is unreachable */ \
-        } while (0)
-
-#endif
+#define CORAL66_UNREACHABLE                                                          \
+    do                                                                               \
+    {                                                                                \
+        std::abort(); /* So that the compiler sees code afterwards is unreachable */ \
+    } while (0)
 
 #ifdef __clang__
     #define CORAL66_NON_NULL _Nonnull

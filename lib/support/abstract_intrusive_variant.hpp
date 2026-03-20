@@ -199,11 +199,12 @@ public:
     IntrusiveVariantDeleter() = default;
 
     template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantDeleter(std::default_delete<T>&&) noexcept
+    explicit IntrusiveVariantDeleter(std::default_delete<T>&&) noexcept
     {
     }
 
     template <class U, std::enable_if_t<std::is_base_of_v<Base, U>>* = nullptr>
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     IntrusiveVariantDeleter(IntrusiveVariantDeleter<U>&&) noexcept
     {
     }
