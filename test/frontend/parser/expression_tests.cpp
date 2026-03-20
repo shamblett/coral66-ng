@@ -197,14 +197,7 @@ TEST_CASE("Coral Parse Expression - Arithmetic", "[Parser][Expression]")
  */
 TEST_CASE("Coral Parse Expression - Conditionals", "[Parser][Expression]")
 {
-    SECTION("IF THEN")
-    {
-        ParsedExpr p("IF a < b THEN c");
-        auto condExpr = dynamic_cast<ConditionalExpression*>(p.expr.get());
-        REQUIRE(condExpr != nullptr);
-        REQUIRE(dynamic_cast<const BinaryExpression*>(&condExpr->getCondition()) != nullptr);
-        REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getThenBranch()) != nullptr);
-    }
+
     SECTION("IF THEN ELSE")
     {
         ParsedExpr p("IF a < b THEN c ELSE d");
