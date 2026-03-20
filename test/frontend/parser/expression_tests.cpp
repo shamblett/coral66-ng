@@ -197,7 +197,6 @@ TEST_CASE("Coral Parse Expression - Arithmetic", "[Parser][Expression]")
  */
 TEST_CASE("Coral Parse Expression - Conditionals", "[Parser][Expression]")
 {
-
     SECTION("IF THEN ELSE")
     {
         ParsedExpr p("IF a < b THEN c ELSE d");
