@@ -22,8 +22,8 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
 {
     SECTION("Simple")
     {
-        ParsedStatement s("INTEGER A := 2;");
-        // auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
-        // REQUIRE(assignmentStatement != nullptr);
+        const ParsedStatement s("A := 2;");
+        auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
+        REQUIRE(assignmentStatement != nullptr);
     }
 }
