@@ -52,4 +52,18 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
         REQUIRE(assignmentStatement != nullptr);
     }
+
+    SECTION("Bits")
+    {
+        const ParsedStatement s("BITS[2,6]x := 3;");
+        auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
+        REQUIRE(assignmentStatement != nullptr);
+    }
+
+    SECTION("Location And Bits")
+    {
+        const ParsedStatement s("BITS[1,23] [LOCATION(i) + 1] := 1;");
+        auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
+        REQUIRE(assignmentStatement != nullptr);
+    }
 }
