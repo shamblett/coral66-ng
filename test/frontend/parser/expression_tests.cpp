@@ -205,6 +205,12 @@ TEST_CASE("Coral Parse Expression - Conditionals", "[Parser][Expression]")
         REQUIRE(dynamic_cast<const BinaryExpression*>(&condExpr->getCondition()) != nullptr);
         REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getThenBranch()) != nullptr);
         REQUIRE(dynamic_cast<const IdentifierExpression*>(&condExpr->getElseBranch()) != nullptr);
+        auto thenBranch = dynamic_cast<const IdentifierExpression*>(&condExpr->getThenBranch());
+        REQUIRE(thenBranch != nullptr);
+        CHECK(std::get<std::string>(thenBranch->getIdentifier()->getValue()) == "c");
+        auto elseBranch = dynamic_cast<const IdentifierExpression*>(&condExpr->getElseBranch());
+        REQUIRE(elseBranch != nullptr);
+        CHECK(std::get<std::string>(elseBranch->getIdentifier()->getValue()) == "d");
     }
     SECTION("Nested Conditionals")
     {
