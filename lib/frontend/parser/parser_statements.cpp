@@ -40,7 +40,7 @@ namespace coral66::parser
  * SWitches
  */
 
-std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                                   Context& context)
 {
     if (begin == end)
@@ -52,8 +52,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         || begin->getTokenType() == lexer::TokenType::BitsKeyword)
     {
         auto start = begin;
-        auto expr = parseExpression(begin, end, context);
-        if (expr)
+        if (auto expr = parseExpression(begin, end, context))
         {
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
