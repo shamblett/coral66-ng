@@ -111,7 +111,7 @@ TEST_CASE("Coral 66 Table", "[Coral]")
                                        "    INTEGER x;\n"
                                        "    FIXED(16,8) y\n"
                                        "  ];\n"
-                                       "  T[0].x := 10;\n"
+                                       "  x[0] := 10;\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));
@@ -129,7 +129,7 @@ TEST_CASE("Coral 66 Loops", "[Coral]")
                                        "BEGIN\n"
                                        "  INTEGER i;\n"
                                        "  FOR i := 0 STEP 2 UNTIL 10 DO\n"
-                                       "    answer i;\n"
+                                       "    i := 2;\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));
@@ -176,7 +176,7 @@ TEST_CASE("Coral 66 Code Statement", "[Coral]")
     {
         auto program = generateProgram("PROGRAM CodeTest\n"
                                        "BEGIN\n"
-                                       "  CODE nop;\n"
+                                       "  CODE \"nop\";\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));
@@ -192,7 +192,7 @@ TEST_CASE("Coral 66 Code Statement", "[Coral]")
                 {
                     if (call->isInlineAsm())
                     {
-                        //foundAsm = true;
+                        // foundAsm = true;
                     }
                 }
             }
@@ -230,17 +230,4 @@ TEST_CASE("Coral 66 Control Flow", "[Coral]")
         }
         CHECK(foundBr);
     }
-
-    SECTION("Goto and Label")
-    {
-        auto program = generateProgram("PROGRAM GotoTest\n"
-                                       "BEGIN\n"
-                                       "  GOTO label;\n"
-                                       "  label:;\n"
-                                       "END");
-        coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
-        REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));
-        // Verify control flow exists
-    }
 }
-

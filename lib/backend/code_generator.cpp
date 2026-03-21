@@ -352,6 +352,7 @@ void code_generator::visit(const Semantics::ForStatement& stmt)
     m_builder.SetInsertPoint(condBB);
     llvm::Value* currVal = m_builder.CreateLoad(convertType(stmt.getVariable().getType()), loopVarAddr);
     llvm::Value* untilVal = visit(stmt.getUntil());
+    if (untilVal->getType() != currVal->getType()) untilVal = m_builder.CreateIntCast(untilVal, currVal->getType(), true);
     llvm::Value* cond = m_builder.CreateICmpSLT(currVal, untilVal);
     m_builder.CreateCondBr(cond, bodyBB, endBB);
 
@@ -362,6 +363,7 @@ void code_generator::visit(const Semantics::ForStatement& stmt)
     m_builder.SetInsertPoint(stepBB);
     llvm::Value* stepVal = visit(stmt.getStep());
     llvm::Value* valForStep = m_builder.CreateLoad(convertType(stmt.getVariable().getType()), loopVarAddr);
+    if (stepVal->getType() != valForStep->getType()) stepVal = m_builder.CreateIntCast(stepVal, valForStep->getType(), true);
     llvm::Value* incVal = m_builder.CreateAdd(valForStep, stepVal);
     m_builder.CreateStore(incVal, loopVarAddr);
     m_builder.CreateBr(condBB);

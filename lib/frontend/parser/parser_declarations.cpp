@@ -172,7 +172,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
         {
             auto base = begin;
             begin++;
-            if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier && begin->getText() == "WITH")
+            if (begin != end && begin->getTokenType() == lexer::TokenType::WithKeyword)
             {
                 begin++;
             }

@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include "lib/frontend/common/messages/errors.hpp"
+#include "parser_support.hpp"
 
 namespace coral66::parser
 {
@@ -72,6 +73,13 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                 begin++;
                 return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
+            else
+            {
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+            }
         }
         return nullptr;
     }
@@ -89,6 +97,9 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             }
             return std::make_unique<Syntax::GotoStatement>(start, begin, label);
         }
+        context.log(errors::parser::EXPECTED_IDENTIFIER.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
         return nullptr;
     }
     if (begin->getTokenType() == lexer::TokenType::IfKeyword)
@@ -112,6 +123,13 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                                                              std::move(elseBranch));
             }
         }
+        else
+        {
+            context.log(errors::parser::EXPECTED_THEN.args(*(begin == end ? (end - 1) : begin),
+                                                           context.getSourceInterface(),
+                                                           *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_THEN);
+        }
         return nullptr;
     }
     if (begin->getTokenType() == lexer::TokenType::CodeKeyword)
@@ -127,6 +145,10 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             }
             return std::make_unique<Syntax::CodeStatement>(start, begin);
         }
+        context.log(errors::parser::EXPECTED_STRING_LITERAL.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STRING_LITERAL);
+        return nullptr;
     }
 
     if (begin->getTokenType() == lexer::TokenType::ForKeyword)
@@ -160,9 +182,44 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                                                                               std::move(body));
                             }
                         }
+                        else
+                        {
+                            context.log(errors::parser::EXPECTED_DO.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DO);
+                        }
+                    }
+                    else
+                    {
+                        context.log(errors::parser::EXPECTED_UNTIL.args(*(begin == end ? (end - 1) : begin),
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_UNTIL);
                     }
                 }
+                else
+                {
+                    context.log(errors::parser::EXPECTED_STEP.args(*(begin == end ? (end - 1) : begin),
+                                                                   context.getSourceInterface(),
+                                                                   *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STEP);
+                }
             }
+            else
+            {
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+            }
+        }
+        else
+        {
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
         }
         return nullptr;
     }
@@ -183,6 +240,14 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         return nullptr;
     }
 
+    if (begin->getTokenType() == lexer::TokenType::BeginKeyword || begin->getTokenType() == lexer::TokenType::SemiColon)
+    {
+        return nullptr;
+    }
+
+    context.log(errors::parser::EXPECTED_STATEMENT.args(
+        *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
     return nullptr;
 }
 } // namespace coral66::parser

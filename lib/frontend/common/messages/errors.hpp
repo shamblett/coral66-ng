@@ -69,6 +69,7 @@ CREATE_ERROR(EXPECTED_FRACTION_BITS, "Expected fraction bits", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_UNION, "Expected union", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_MASK, "Expected mask", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_STATEMENT, "Expected statement", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_STRING_LITERAL, "Expected string literal", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_DECLARATION, "Expected declaration", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_COMPARATOR, "Expected comparator", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_ASSIGNMENT, "Expected assignment ':='", InsertAfter<0>);
