@@ -6,6 +6,7 @@
 
 #include "common.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
+#include "llvm/ADT/APSInt.h"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
@@ -25,6 +26,7 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
         const ParsedStatement s("A := 2;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
         REQUIRE(assignmentStatement != nullptr);
+        CHECK(std::get<llvm::APSInt>(assignmentStatement->getExpression().begin()->getValue()) == 2);
     }
 
     SECTION("Expression")
@@ -32,5 +34,15 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
         const ParsedStatement s("A := IF 2 > 1 THEN 3 ELSE 4;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
         REQUIRE(assignmentStatement != nullptr);
+        auto condExpr = dynamic_cast<const ConditionalExpression*>(&assignmentStatement->getExpression());
+        REQUIRE(condExpr != nullptr);
+
+        auto thenBranch = dynamic_cast<const LiteralExpression*>(&condExpr->getThenBranch());
+        REQUIRE(thenBranch != nullptr);
+        CHECK(std::get<llvm::APSInt>(thenBranch->getLiteral()->getValue()) == 3);
+
+        auto elseBranch = dynamic_cast<const LiteralExpression*>(&condExpr->getElseBranch());
+        REQUIRE(elseBranch != nullptr);
+        CHECK(std::get<llvm::APSInt>(elseBranch->getLiteral()->getValue()) == 4);
     }
 }

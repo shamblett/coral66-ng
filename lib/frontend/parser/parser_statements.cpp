@@ -50,7 +50,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     if (begin->getTokenType() == lexer::TokenType::Identifier)
     {
         auto start = begin;
-        if (auto iter = begin + 1; iter != end && iter->getTokenType() == lexer::TokenType::Assignment)
+        if (const auto iter = begin + 1; iter != end && iter->getTokenType() == lexer::TokenType::Assignment)
         {
             auto id = begin;
             begin++;
