@@ -163,21 +163,20 @@ const Declaration& OverlayDeclaration::getOverlayedDeclaration() const
 
 // AssignmentStatement
 AssignmentStatement::AssignmentStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                                         const lexer::CTokenIterator identifier,
+                                         std::unique_ptr<Expression>&& variable,
                                          std::unique_ptr<Expression>&& expression)
-    : Statement(begin, end), m_identifier(identifier), m_expression(std::move(expression))
+    : Statement(begin, end), m_variable(std::move(variable)), m_expression(std::move(expression))
 {
 }
 
-lexer::CTokenIterator AssignmentStatement::getIdentifier() const
+const Expression& AssignmentStatement::getVariable() const
 {
-    return m_identifier;
+    return *m_variable;
 }
 const Expression& AssignmentStatement::getExpression() const
 {
     return *m_expression;
 }
-
 // IfStatement
 IfStatement::IfStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                          std::unique_ptr<Expression>&& condition, std::unique_ptr<Statement>&& thenBranch,
@@ -440,8 +439,13 @@ TypeChangeExpression::TypeChangeExpression(const lexer::CTokenIterator begin, co
 
 TypeChangeExpression::TypeChangeExpression(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                            const lexer::CTokenIterator type, std::unique_ptr<Expression>&& totalBits,
-                                           std::unique_ptr<Expression>&& fractionBits, std::unique_ptr<Expression>&& expression)
-    : Expression(begin, end), m_type(type), m_totalBits(std::move(totalBits)), m_fractionBits(std::move(fractionBits)), m_expression(std::move(expression))
+                                           std::unique_ptr<Expression>&& fractionBits,
+                                           std::unique_ptr<Expression>&& expression)
+    : Expression(begin, end),
+      m_type(type),
+      m_totalBits(std::move(totalBits)),
+      m_fractionBits(std::move(fractionBits)),
+      m_expression(std::move(expression))
 {
 }
 

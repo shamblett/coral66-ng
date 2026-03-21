@@ -356,19 +356,13 @@ void SemanticAnalysis::visit(const Syntax::OverlayDeclaration& node)
 
 void SemanticAnalysis::visit(const Syntax::AssignmentStatement& node)
 {
+    visit(node.getVariable());
+    auto lhs = std::move(m_lastExpression);
     visit(node.getExpression());
     auto rhs = std::move(m_lastExpression);
 
-    const auto& name = std::get<std::string>(node.getIdentifier()->getValue());
-    auto it = std::ranges::find_if(m_symbolTable, [&](const auto& p) { return p.first == name; });
-
-    if (it != m_symbolTable.end())
+    if (lhs && rhs)
     {
-        IntrusiveVariantValue<Type> type =
-            it->second->match([](const VariableDeclaration& v) { return cloneType(v.getType()); }, [](const auto&)
-                              { return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); });
-
-        auto lhs = makeIntr<DeclarationRead>(type, *it->second, node.getIdentifier());
         auto stmt = makeIntr<AssignmentStatement>(ScopePoint{0}, std::move(lhs), std::move(rhs));
         m_currentBlockStatements.push_back(std::move(stmt));
     }

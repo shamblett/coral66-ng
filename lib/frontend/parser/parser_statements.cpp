@@ -47,36 +47,30 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     {
         return nullptr;
     }
-    if (begin->getTokenType() == lexer::TokenType::Identifier)
+    if (begin->getTokenType() == lexer::TokenType::Identifier
+        || begin->getTokenType() == lexer::TokenType::OpenSquareBracket
+        || begin->getTokenType() == lexer::TokenType::BitsKeyword)
     {
         auto start = begin;
-        if (const auto iter = begin + 1; iter != end && iter->getTokenType() == lexer::TokenType::Assignment)
+        auto expr = parseExpression(begin, end, context);
+        if (expr)
         {
-            auto id = begin;
-            begin++;
-            begin++;
-            auto expr = parseExpression(begin, end, context);
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
                 begin++;
+                auto rhs = parseExpression(begin, end, context);
+                if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+                {
+                    begin++;
+                }
+                if (rhs)
+                {
+                    return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(expr), std::move(rhs));
+                }
             }
-            if (expr)
-            {
-                return std::make_unique<Syntax::AssignmentStatement>(id, begin, id, std::move(expr));
-            }
-        }
-        else if (iter != end
-                 && (iter->getTokenType() == lexer::TokenType::OpenParentheses
-                     || iter->getTokenType() == lexer::TokenType::SemiColon))
-        {
-            // Call: id(...) or id;
-            auto expr = parseExpression(begin, end, context);
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            else if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
             {
                 begin++;
-            }
-            if (expr)
-            {
                 return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
         }

@@ -45,4 +45,11 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
         REQUIRE(elseBranch != nullptr);
         CHECK(std::get<llvm::APSInt>(elseBranch->getLiteral()->getValue()) == 4);
     }
+
+    SECTION("Location")
+    {
+        const ParsedStatement s("[LOCATION(i) + 1] := 3.8;");
+        auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
+        REQUIRE(assignmentStatement != nullptr);
+    }
 }

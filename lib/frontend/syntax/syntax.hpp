@@ -145,13 +145,13 @@ class Statement : public Node
 
 class AssignmentStatement final : public Statement
 {
-    lexer::CTokenIterator m_identifier;
+    std::unique_ptr<Expression> m_variable;
     std::unique_ptr<Expression> m_expression;
 
 public:
-    AssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
+    AssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Expression>&& variable,
                         std::unique_ptr<Expression>&& expression);
-    [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
+    [[nodiscard]] const Expression& getVariable() const;
     [[nodiscard]] const Expression& getExpression() const;
 };
 
@@ -345,8 +345,7 @@ public:
     TypeChangeExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
                          std::unique_ptr<Expression>&& expression);
     TypeChangeExpression(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
-                         std::unique_ptr<Expression>&& totalBits,
-                         std::unique_ptr<Expression>&& fractionBits,
+                         std::unique_ptr<Expression>&& totalBits, std::unique_ptr<Expression>&& fractionBits,
                          std::unique_ptr<Expression>&& expression);
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const Expression* getTotalBits() const;
