@@ -26,4 +26,11 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
         REQUIRE(assignmentStatement != nullptr);
     }
+
+    SECTION("Expression")
+    {
+        const ParsedStatement s("A := IF 2 > 1 THEN 3 ELSE 4;");
+        auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
+        REQUIRE(assignmentStatement != nullptr);
+    }
 }
