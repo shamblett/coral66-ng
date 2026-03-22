@@ -38,7 +38,7 @@ namespace coral66::parser
  *
  * For
  *
- * SWitches
+ * Switches
  */
 
 std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,

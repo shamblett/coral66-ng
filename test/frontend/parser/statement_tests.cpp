@@ -67,3 +67,22 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
         REQUIRE(assignmentStatement != nullptr);
     }
 }
+
+TEST_CASE("Coral Parse Statements - Goto", "[Parser][Statement]")
+{
+    SECTION("Label")
+    {
+        const ParsedStatement s("GOTO FRED;");
+        auto gotoStatement = dynamic_cast<GotoStatement*>(s.statement.get());
+        REQUIRE(gotoStatement != nullptr);
+        CHECK(gotoStatement->getLabel()->getText() == "FRED");
+    }
+
+    // TODO FIX when switches implemented SECTION("Switch")
+    // {
+    //     const ParsedStatement s("SWITCH s := a,b,c; GOTO s[0];");
+    //     auto gotoStatement = dynamic_cast<GotoStatement*>(s.statement.get());
+    //     REQUIRE(gotoStatement != nullptr);
+    //     CHECK(gotoStatement->getLabel()->getText() == "a");
+    // }
+}

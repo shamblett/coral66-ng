@@ -215,4 +215,12 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
+
+    SECTION("GOTO No Label")
+    {
+        const ParsedStatement s("GOTO ;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
+    }
 }
