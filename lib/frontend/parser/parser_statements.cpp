@@ -73,14 +73,10 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                 begin++;
                 return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
-            else
-            {
-                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
-                                                                     context.getSourceInterface(),
-                                                                     *(begin == end ? (end - 1) : begin)));
-                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
-            }
         }
+        context.log(errors::parser::EXPECTED_ASSIGNMENT.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
         return nullptr;
     }
     if (begin->getTokenType() == lexer::TokenType::GotoKeyword)

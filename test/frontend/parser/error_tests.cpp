@@ -25,7 +25,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("IF Expected Condition")
     {
         const ParsedExpression p("IF THEN");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
     }
@@ -33,7 +33,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected THEN")
     {
         const ParsedExpression p("IF a < b ELSE");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_THEN));
     }
@@ -41,7 +41,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Statement After THEN")
     {
         const ParsedExpression p("IF a < b THEN ELSE");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
@@ -49,7 +49,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected ELSE")
     {
         const ParsedExpression p("IF a < b THEN d IF");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ELSE));
     }
@@ -57,7 +57,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Statement After ELSE")
     {
         const ParsedExpression p("IF a < b THEN d ELSE IF;");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
@@ -65,7 +65,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Expression (Condition OR)")
     {
         const ParsedExpression p("IF a = b OR = THEN c ELSE d");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
     }
@@ -73,7 +73,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Comparator (Comparison)")
     {
         const ParsedExpression p("IF a THEN b ELSE c");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_COMPARATOR));
     }
@@ -81,7 +81,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Simple Expression (Comparison Missing RHS)")
     {
         const ParsedExpression p("IF a = THEN c ELSE d");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_SIMPLE_EXPRESSION));
     }
@@ -89,7 +89,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Term (Simple Expression)")
     {
         const ParsedExpression p("a + =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TERM));
     }
@@ -97,7 +97,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Factor (Term)")
     {
         const ParsedExpression p("a * =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_FACTOR));
     }
@@ -105,7 +105,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Closed Parenthesis")
     {
         const ParsedExpression p("( a = ");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CLOSED_PARENTHESIS));
     }
@@ -113,7 +113,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Union (Bitwise Differ)")
     {
         const ParsedExpression p("a DIFFER =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_UNION));
     }
@@ -121,7 +121,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Mask (Bitwise Union)")
     {
         const ParsedExpression p("a UNION =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_MASK));
     }
@@ -129,7 +129,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Typed Primary (Bitwise Mask)")
     {
         const ParsedExpression p("a MASK =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
     }
@@ -137,7 +137,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Word Reference (Typed Primary)")
     {
         const ParsedExpression p("LOCATION ( = )");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_WORD_REFERENCE));
     }
@@ -145,7 +145,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Fraction Bits (Typed Primary)")
     {
         const ParsedExpression p("FIXED (1, ) (a)");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_FRACTION_BITS));
     }
@@ -153,7 +153,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Open Square Bracket (Typed Primary/Word Reference)")
     {
         const ParsedExpression p("BITS = ");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_SQUARE_BRACKET));
     }
@@ -161,7 +161,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Identifier (Word Reference)")
     {
         const ParsedExpression p("LOCATION ( = )");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
     }
@@ -169,7 +169,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Open Parenthesis (Typed Primary)")
     {
         const ParsedExpression p("FIXED (1, 2) =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_PARENTHESIS));
     }
@@ -177,7 +177,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     SECTION("Expected Open Parenthesis (Typed Primary)")
     {
         const ParsedExpression p("FIXED (1, 2) =");
-        CHECK(p.expr.get() == nullptr);
+        CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_PARENTHESIS));
     }
@@ -192,8 +192,27 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         for (auto src : strings)
         {
             const ParsedExpression p(src);
-            CHECK(p.expr.get() == nullptr);
+            CHECK(p.expression.get() == nullptr);
             CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         }
+    }
+}
+
+TEST_CASE("Statements - Errors", "[Parser][Statement]")
+{
+    SECTION("Assignment - No RHS")
+    {
+        const ParsedStatement s("A :=;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
+    }
+
+    SECTION("Assignment - No LHS")
+    {
+        const ParsedStatement s(":= 1;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
 }

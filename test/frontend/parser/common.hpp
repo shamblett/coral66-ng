@@ -28,7 +28,7 @@ struct ParsedExpression
     PPSourceObject ppTokens;
     CSourceObject cTokens;
     std::unique_ptr<parser::Context> context;
-    std::unique_ptr<Expression> expr;
+    std::unique_ptr<Expression> expression;
 
     explicit ParsedExpression(std::string src) : source(std::move(src)), ss(outStr)
     {
@@ -46,7 +46,7 @@ struct ParsedExpression
         }
 
         parser::DiagnosticCollector::clearDiagnostics();
-        expr = parser::parseExpression(begin, end, *context);
+        expression = parser::parseExpression(begin, end, *context);
     }
 };
 
