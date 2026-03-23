@@ -223,6 +223,22 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
     }
+
+    SECTION("GOTO Switch No Close Square Bracket")
+    {
+        const ParsedStatement s("GOTO s[0");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CLOSE_SQUARE_BRACKET));
+    }
+
+    SECTION("GOTO Switch No Open Square Bracket")
+    {
+        const ParsedStatement s("GOTO s0]");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
+    }
 }
 
 TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
