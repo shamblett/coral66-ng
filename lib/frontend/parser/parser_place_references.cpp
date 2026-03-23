@@ -79,7 +79,7 @@ std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterato
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_LABELS);
                 return nullptr;
             }
-            return std::make_unique<Syntax::Switch>(start, begin, name, labels);
+            return std::make_unique<Syntax::SwitchPlaceReference>(start, begin, name, labels);
         }
         context.log(errors::parser::EXPECTED_IDENTIFIER.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));

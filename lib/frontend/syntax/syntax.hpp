@@ -119,7 +119,7 @@ public:
                      std::vector<std::unique_ptr<Declaration>>&& elements);
     [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
     [[nodiscard]] const Expression* getWidth() const;
-    const Expression* getLength() const;
+    [[nodiscard]] const Expression* getLength() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getElements() const;
 };
 
@@ -143,14 +143,14 @@ class PlaceReference : public Node
     using Node::Node;
 };
 
-class Switch final : public PlaceReference
+class SwitchPlaceReference final : public PlaceReference
 {
     lexer::CTokenIterator m_name;
     std::vector<lexer::CTokenIterator> m_labels;
 
 public:
-    Switch(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
-           std::vector<lexer::CTokenIterator> labels);
+    SwitchPlaceReference(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
+                         std::vector<lexer::CTokenIterator> labels);
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] std::vector<lexer::CTokenIterator> getLabels() const;
 };

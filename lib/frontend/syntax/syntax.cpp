@@ -163,17 +163,17 @@ const Declaration& OverlayDeclaration::getOverlayedDeclaration() const
 }
 
 // Place reference
-Switch::Switch(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, const lexer::CTokenIterator name,
-               std::vector<lexer::CTokenIterator> labels)
+SwitchPlaceReference::SwitchPlaceReference(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const lexer::CTokenIterator name, std::vector<lexer::CTokenIterator> labels)
     : PlaceReference(begin, end), m_name(name), m_labels(std::move(labels))
 {
 }
 
-lexer::CTokenIterator Switch::getName() const
+lexer::CTokenIterator SwitchPlaceReference::getName() const
 {
     return m_name;
 }
-std::vector<lexer::CTokenIterator> Switch::getLabels() const
+std::vector<lexer::CTokenIterator> SwitchPlaceReference::getLabels() const
 {
     return m_labels;
 }
