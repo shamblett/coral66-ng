@@ -85,11 +85,29 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         {
             auto label = begin;
             begin++;
+            std::unique_ptr<Syntax::Expression> index = nullptr;
+            if (begin != end && begin->getTokenType() == lexer::TokenType::OpenSquareBracket)
+            {
+                begin++;
+                index = parseExpression(begin, end, context);
+                if (begin != end && begin->getTokenType() == lexer::TokenType::CloseSquareBracket)
+                {
+                    begin++;
+                }
+                else
+                {
+                    context.log(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET.args(
+                        *(begin == end ? (end - 1) : begin), context.getSourceInterface(),
+                        *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET);
+                    return nullptr;
+                }
+            }
             if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
             {
                 begin++;
             }
-            return std::make_unique<Syntax::GotoStatement>(start, begin, label);
+            return std::make_unique<Syntax::GotoStatement>(start, begin, label, std::move(index));
         }
         context.log(errors::parser::EXPECTED_IDENTIFIER.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));

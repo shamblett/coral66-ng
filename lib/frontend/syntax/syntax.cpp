@@ -220,14 +220,19 @@ const Statement* IfStatement::getElseBranch() const
 
 // GotoStatement
 GotoStatement::GotoStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                             const lexer::CTokenIterator label)
-    : Statement(begin, end), m_label(label)
+                             const lexer::CTokenIterator label, std::unique_ptr<Expression> index)
+    : Statement(begin, end), m_label(label), m_index(std::move(index))
 {
 }
 
 lexer::CTokenIterator GotoStatement::getLabel() const
 {
     return m_label;
+}
+
+const Expression* GotoStatement::getIndex() const
+{
+    return m_index.get();
 }
 
 // ForStatement

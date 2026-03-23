@@ -189,10 +189,13 @@ public:
 class GotoStatement final : public Statement
 {
     lexer::CTokenIterator m_label;
+    std::unique_ptr<Expression> m_index;
 
 public:
-    GotoStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator label);
+    GotoStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator label,
+                  std::unique_ptr<Expression> index = nullptr);
     [[nodiscard]] lexer::CTokenIterator getLabel() const;
+    [[nodiscard]] const Expression* getIndex() const;
 };
 
 class ForStatement final : public Statement
