@@ -6,10 +6,6 @@
 
 #include "parser.hpp"
 
-#include <llvm/Support/ConvertUTF.h>
-
-#include <algorithm>
-
 #include "lib/frontend/common/messages/errors.hpp"
 #include "parser_support.hpp"
 
@@ -27,7 +23,69 @@ namespace coral66::parser
 std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                             Context& context)
 {
-    std::unique_ptr<Syntax::PlaceReference> result;
-    return result;
+    if (begin == end)
+    {
+        return nullptr;
+    }
+
+    if (begin->getTokenType() == lexer::TokenType::SwitchKeyword)
+    {
+        auto start = begin;
+        begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+        {
+            std::vector<lexer::CTokenIterator> labels;
+            auto name = begin;
+            begin++;
+            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            {
+                begin++;
+            }
+            while (begin->getTokenType() != lexer::TokenType::Newline)
+            {
+                if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+                {
+                    auto label = begin;
+                    labels.emplace_back(label);
+                    begin++;
+
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                    {
+                        begin++;
+                    }
+                    else
+                    {
+                        context.log(errors::parser::EXPECTED_COMMA.args(*(begin == end ? (end - 1) : begin),
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COMMA);
+                        return nullptr;
+                    }
+                }
+                else
+                {
+                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+                    return nullptr;
+                }
+            }
+            if (labels.empty())
+            {
+                context.log(errors::parser::EXPECTED_LABELS.args(*(begin == end ? (end - 1) : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_LABELS);
+                return nullptr;
+            }
+            return std::make_unique<Syntax::Switch>(start, begin, name, labels);
+        }
+        context.log(errors::parser::EXPECTED_IDENTIFIER.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+        return nullptr;
+    }
+    return nullptr;
 }
 } // namespace coral66::parser

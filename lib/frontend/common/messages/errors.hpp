@@ -56,6 +56,8 @@ CREATE_ERROR(EXPECTED_CONDITION, "Expected Condition %0", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_BEGIN, "Expected 'BEGIN' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_END, "Expected 'END' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_IDENTIFIER, "Expected identifier", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_COMMA, "Expected comma seperator", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_LABELS, "Expected at least one label", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_EXPRESSION, "Expected expression", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_SIMPLE_EXPRESSION, "Expected simple expression", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_TERM, "Expected term", InsertAfter<0>);

@@ -146,13 +146,13 @@ class PlaceReference : public Node
 class Switch final : public PlaceReference
 {
     lexer::CTokenIterator m_name;
-    lexer::CTokenIterator m_labels;
+    std::vector<lexer::CTokenIterator> m_labels;
 
 public:
     Switch(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
-           lexer::CTokenIterator labels);
+           std::vector<lexer::CTokenIterator> labels);
     [[nodiscard]] lexer::CTokenIterator getName() const;
-    [[nodiscard]] lexer::CTokenIterator getLabels() const;
+    [[nodiscard]] std::vector<lexer::CTokenIterator> getLabels() const;
 };
 
 // Statements
