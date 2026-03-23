@@ -47,4 +47,6 @@ std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin
                                                     Context& context);
 std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                         Context& context);
+std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+                                                            Context& context);
 } // namespace coral66::parser

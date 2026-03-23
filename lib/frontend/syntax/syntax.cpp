@@ -8,7 +8,6 @@
 
 namespace coral66::Syntax
 {
-
 Node::Node(lexer::CTokenIterator begin, lexer::CTokenIterator end) : m_begin(begin), m_end(end) {}
 
 lexer::CTokenIterator Node::begin() const
@@ -159,6 +158,22 @@ lexer::CTokenIterator OverlayDeclaration::getOffset() const
 const Declaration& OverlayDeclaration::getOverlayedDeclaration() const
 {
     return *m_overlayedDeclaration;
+}
+
+// Place reference
+Switch::Switch(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, const lexer::CTokenIterator name,
+               lexer::CTokenIterator labels)
+    : PlaceReference(begin, end), m_name(name), m_labels(labels)
+{
+}
+
+lexer::CTokenIterator Switch::getName() const
+{
+    return m_name;
+}
+lexer::CTokenIterator Switch::getLabels() const
+{
+    return m_labels;
 }
 
 // AssignmentStatement

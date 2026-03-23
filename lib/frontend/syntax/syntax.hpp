@@ -137,6 +137,24 @@ public:
     [[nodiscard]] const Declaration& getOverlayedDeclaration() const;
 };
 
+// Place references
+class PlaceReference : public Node
+{
+    using Node::Node;
+};
+
+class Switch final : public PlaceReference
+{
+    lexer::CTokenIterator m_name;
+    lexer::CTokenIterator m_labels;
+
+public:
+    Switch(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
+           lexer::CTokenIterator labels);
+    [[nodiscard]] lexer::CTokenIterator getName() const;
+    [[nodiscard]] lexer::CTokenIterator getLabels() const;
+};
+
 // Statements
 class Statement : public Node
 {
