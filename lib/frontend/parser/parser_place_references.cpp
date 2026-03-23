@@ -41,7 +41,7 @@ std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterato
             {
                 begin++;
             }
-            while (begin->getTokenType() != lexer::TokenType::Newline)
+            while (begin != end)
             {
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
                 {
@@ -49,17 +49,17 @@ std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterato
                     labels.emplace_back(label);
                     begin++;
 
-                    if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
-                    {
-                        begin++;
-                    }
-                    else
+                    if (begin != end && begin->getTokenType() != lexer::TokenType::Comma)
                     {
                         context.log(errors::parser::EXPECTED_COMMA.args(*(begin == end ? (end - 1) : begin),
                                                                         context.getSourceInterface(),
                                                                         *(begin == end ? (end - 1) : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COMMA);
                         return nullptr;
+                    }
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                    {
+                        begin++;
                     }
                 }
                 else
