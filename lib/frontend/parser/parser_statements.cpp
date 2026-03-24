@@ -107,6 +107,14 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             {
                 begin++;
             }
+            if (begin != end && begin->getTokenType() != lexer::TokenType::OpenSquareBracket)
+            {
+                context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(*(begin == end ? (end - 1) : begin),
+                                                                              context.getSourceInterface(),
+                                                                              *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
+                return nullptr;
+            }
             return std::make_unique<Syntax::GotoStatement>(start, begin, label, std::move(index));
         }
         context.log(errors::parser::EXPECTED_IDENTIFIER.args(

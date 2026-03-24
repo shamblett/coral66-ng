@@ -72,7 +72,7 @@ TEST_CASE("Coral Parse Statements - Goto", "[Parser][Statement]")
 {
     SECTION("Label")
     {
-        const ParsedStatement s("GOTO FRED;");
+        const ParsedStatement s("GOTO FRED ;");
         auto gotoStatement = dynamic_cast<GotoStatement*>(s.statement.get());
         REQUIRE(gotoStatement != nullptr);
         CHECK(gotoStatement->getLabel()->getText() == "FRED");
@@ -81,7 +81,7 @@ TEST_CASE("Coral Parse Statements - Goto", "[Parser][Statement]")
 
     SECTION("Switch")
     {
-        const ParsedStatement s("GOTO s[0];");
+        const ParsedStatement s("GOTO s[0] ;");
         auto gotoStatement = dynamic_cast<GotoStatement*>(s.statement.get());
         REQUIRE(gotoStatement != nullptr);
         CHECK(gotoStatement->getLabel()->getText() == "s");

@@ -237,7 +237,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         const ParsedStatement s("GOTO s0]");
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_SQUARE_BRACKET));
     }
 }
 
