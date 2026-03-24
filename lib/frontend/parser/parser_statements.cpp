@@ -122,6 +122,45 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
         return nullptr;
     }
+
+    if (begin->getTokenType() == lexer::TokenType::AnswerKeyword)
+    {
+        auto start = begin;
+        begin++;
+        auto expr = parseExpression(begin, end, context);
+        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+        {
+            begin++;
+        }
+        if (expr)
+        {
+            return std::make_unique<Syntax::AnswerStatement>(start, begin, std::move(expr));
+        }
+        context.log(errors::parser::EXPECTED_EXPRESSION.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+        return nullptr;
+    }
+
+    if (begin->getTokenType() == lexer::TokenType::CodeKeyword)
+    {
+        auto start = begin;
+        begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::StringLiteral)
+        {
+            begin++;
+            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            {
+                begin++;
+            }
+            return std::make_unique<Syntax::CodeStatement>(start, begin);
+        }
+        context.log(errors::parser::EXPECTED_STRING_LITERAL.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STRING_LITERAL);
+        return nullptr;
+    }
+
     if (begin->getTokenType() == lexer::TokenType::IfKeyword)
     {
         auto start = begin;
@@ -150,24 +189,6 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                                                            *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_THEN);
         }
-        return nullptr;
-    }
-    if (begin->getTokenType() == lexer::TokenType::CodeKeyword)
-    {
-        auto start = begin;
-        begin++;
-        if (begin != end && begin->getTokenType() == lexer::TokenType::StringLiteral)
-        {
-            begin++;
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-            {
-                begin++;
-            }
-            return std::make_unique<Syntax::CodeStatement>(start, begin);
-        }
-        context.log(errors::parser::EXPECTED_STRING_LITERAL.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
-        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STRING_LITERAL);
         return nullptr;
     }
 
@@ -241,25 +262,6 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                                                                  *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
         }
-        return nullptr;
-    }
-
-    if (begin->getTokenType() == lexer::TokenType::AnswerKeyword)
-    {
-        auto start = begin;
-        begin++;
-        auto expr = parseExpression(begin, end, context);
-        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-        {
-            begin++;
-        }
-        if (expr)
-        {
-            return std::make_unique<Syntax::AnswerStatement>(start, begin, std::move(expr));
-        }
-        context.log(errors::parser::EXPECTED_EXPRESSION.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
-        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
         return nullptr;
     }
 
