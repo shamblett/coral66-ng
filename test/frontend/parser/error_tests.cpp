@@ -216,7 +216,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
 
-    SECTION("GOTO No Label")
+    SECTION("Goto No Label")
     {
         const ParsedStatement s("GOTO ;");
         CHECK(s.statement.get() == nullptr);
@@ -224,7 +224,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
     }
 
-    SECTION("GOTO Switch No Close Square Bracket")
+    SECTION("Goto Switch No Close Square Bracket")
     {
         const ParsedStatement s("GOTO s[0");
         CHECK(s.statement.get() == nullptr);
@@ -232,12 +232,20 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CLOSE_SQUARE_BRACKET));
     }
 
-    SECTION("GOTO Switch No Open Square Bracket")
+    SECTION("Goto Switch No Open Square Bracket")
     {
         const ParsedStatement s("GOTO s0]");
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_SQUARE_BRACKET));
+    }
+
+    SECTION("Answer No Expression")
+    {
+        const ParsedStatement s("ANSWER ;");
+        REQUIRE(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
     }
 }
 

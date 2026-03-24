@@ -210,3 +210,17 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
         CHECK(std::get<std::string>(expressionPtr->getValue()) == "A");
     }
 }
+
+/*
+ * 7.4 Answer
+ */
+TEST_CASE("Coral Parse Statements - Answer", "[Parser][Statement]")
+{
+    SECTION("Normal Answer")
+    {
+        const ParsedStatement s("ANSWER B;");
+        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
+        REQUIRE(answerStatement != nullptr);
+        CHECK(std::get<std::string>(answerStatement->getExpression().begin()->getValue()) == "B");
+    }
+}
