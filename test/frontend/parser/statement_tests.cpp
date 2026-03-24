@@ -68,6 +68,9 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
     }
 }
 
+/*
+ * 7.2 Goto
+ */
 TEST_CASE("Coral Parse Statements - Goto", "[Parser][Statement]")
 {
     SECTION("Label")
@@ -92,4 +95,46 @@ TEST_CASE("Coral Parse Statements - Goto", "[Parser][Statement]")
     }
 }
 
+/*
+ * 7.3 Procedure call
+ */
+TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
+{
+    SECTION("No Actual Parameters")
+    {
+        const ParsedStatement s("P;");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement!= nullptr);
+        CHECK(std::get<std::string>(procedureCallStatement->getExpression().begin()->getValue()) == "P");
+    }
 
+    SECTION("Actual Parameters - Simple")
+    {
+        const ParsedStatement s("P(1,2,3);");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement!= nullptr);
+        auto expressionPtr = procedureCallStatement->getExpression().begin();
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 1);
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 2);
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 3);
+    }
+
+    SECTION("Actual Parameters - Complex")
+    {
+        const ParsedStatement s("P(1 + 2,2 * 6,3);");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement!= nullptr);
+        auto expressionPtr = procedureCallStatement->getExpression().begin();
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 3);
+    }
+}
