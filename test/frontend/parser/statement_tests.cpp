@@ -135,6 +135,20 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
         CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
         expressionPtr++;
         expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 1);
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::Plus);
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 2);
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 2);
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::Asterisk);
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 6);
+        expressionPtr++;
+        expressionPtr++;
         CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 3);
     }
 }
