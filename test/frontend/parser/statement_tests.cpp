@@ -104,7 +104,7 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
     {
         const ParsedStatement s("P;");
         auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
-        REQUIRE(procedureCallStatement!= nullptr);
+        REQUIRE(procedureCallStatement != nullptr);
         CHECK(std::get<std::string>(procedureCallStatement->getExpression().begin()->getValue()) == "P");
     }
 
@@ -112,7 +112,7 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
     {
         const ParsedStatement s("P(1,2,3);");
         auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
-        REQUIRE(procedureCallStatement!= nullptr);
+        REQUIRE(procedureCallStatement != nullptr);
         auto expressionPtr = procedureCallStatement->getExpression().begin();
         CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
         expressionPtr++;
@@ -130,7 +130,7 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
     {
         const ParsedStatement s("P(1 + 2,2 * 6,3);");
         auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
-        REQUIRE(procedureCallStatement!= nullptr);
+        REQUIRE(procedureCallStatement != nullptr);
         auto expressionPtr = procedureCallStatement->getExpression().begin();
         CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
         expressionPtr++;
@@ -150,5 +150,63 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
         expressionPtr++;
         expressionPtr++;
         CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 3);
+    }
+
+    SECTION("Actual Parameters - Word Reference")
+    {
+        const ParsedStatement s("P([1], W[2]);");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement != nullptr);
+        auto expressionPtr = procedureCallStatement->getExpression().begin();
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::OpenSquareBracket);
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 1);
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::CloseSquareBracket);
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "W");
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::OpenSquareBracket);
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 2);
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::CloseSquareBracket);
+    }
+
+    SECTION("Actual Parameters - Destination")
+    {
+        const ParsedStatement s("P(Label1, S[2]);");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement != nullptr);
+        auto expressionPtr = procedureCallStatement->getExpression().begin();
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "Label1");
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "S");
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::OpenSquareBracket);
+        expressionPtr++;
+        CHECK(std::get<llvm::APSInt>(expressionPtr->getValue()) == 2);
+        expressionPtr++;
+        CHECK(expressionPtr->getTokenType() == lexer::TokenType::CloseSquareBracket);
+    }
+
+    SECTION("Actual Parameters - Name")
+    {
+        const ParsedStatement s("P(A);");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement != nullptr);
+        auto expressionPtr = procedureCallStatement->getExpression().begin();
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "P");
+        expressionPtr++;
+        expressionPtr++;
+        CHECK(std::get<std::string>(expressionPtr->getValue()) == "A");
     }
 }
