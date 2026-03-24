@@ -193,7 +193,7 @@ class GotoStatement final : public Statement
 
 public:
     GotoStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator label,
-                  std::unique_ptr<Expression> index = nullptr);
+                  std::unique_ptr<Expression> index);
     [[nodiscard]] lexer::CTokenIterator getLabel() const;
     [[nodiscard]] const Expression* getIndex() const;
 };
