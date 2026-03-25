@@ -247,6 +247,30 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
     }
+
+    SECTION("Code No Begin")
+    {
+        const ParsedStatement s("CODE \"mov eax\" END;");
+        REQUIRE(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_BEGIN));
+    }
+
+    SECTION("Code No Code")
+    {
+        const ParsedStatement s("CODE BEGIN END;");
+        REQUIRE(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STRING_LITERAL));
+    }
+
+    SECTION("Code No End")
+    {
+        const ParsedStatement s("CODE BEGIN \"mov eax\" ;");
+        REQUIRE(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_END));
+    }
 }
 
 TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")

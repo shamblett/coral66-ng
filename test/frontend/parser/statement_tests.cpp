@@ -226,7 +226,7 @@ TEST_CASE("Coral Parse Statements - Answer", "[Parser][Statement]")
 }
 
 /*
- * 7.5 Bode
+ * 7.5 Code
  */
 TEST_CASE("Coral Parse Statements - Code", "[Parser][Statement]")
 {
@@ -236,5 +236,13 @@ TEST_CASE("Coral Parse Statements - Code", "[Parser][Statement]")
         auto codeStatement = dynamic_cast<CodeStatement*>(s.statement.get());
         REQUIRE(codeStatement != nullptr);
         CHECK(std::get<std::string>(codeStatement->getCode()->getValue()) == "mov eax, add eax, mov eax");
+    }
+
+    SECTION("Substitutions")
+    {
+        const ParsedStatement s("CODE BEGIN \"mov eax, add @v1, mov eax !result\" END;");
+        auto codeStatement = dynamic_cast<CodeStatement*>(s.statement.get());
+        REQUIRE(codeStatement != nullptr);
+        CHECK(std::get<std::string>(codeStatement->getCode()->getValue()) == "mov eax, add @v1, mov eax !result");
     }
 }
