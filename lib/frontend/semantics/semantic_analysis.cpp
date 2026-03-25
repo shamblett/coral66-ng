@@ -79,6 +79,11 @@ void SemanticAnalysis::visit(const Syntax::Declaration& node)
 
 void SemanticAnalysis::visit(const Syntax::Statement& node)
 {
+
+    if (auto* dummy = dynamic_cast<const Syntax::DummyStatement*>(&node))
+    {
+        visit(*dummy);
+    }
     if (auto* blockStmt = dynamic_cast<const Syntax::BlockStatement*>(&node))
     {
         visit(*blockStmt);
@@ -360,6 +365,12 @@ void SemanticAnalysis::visit(const Syntax::TableDeclaration& node)
 void SemanticAnalysis::visit(const Syntax::OverlayDeclaration& node)
 {
     visit(node.getOverlayedDeclaration());
+}
+
+void SemanticAnalysis::visit(const Syntax::DummyStatement& node)
+{
+    auto stmt = makeIntr<DummyStatement>(ScopePoint{0});
+    m_currentBlockStatements.push_back(std::move(stmt));
 }
 
 void SemanticAnalysis::visit(const Syntax::BlockStatement& node)

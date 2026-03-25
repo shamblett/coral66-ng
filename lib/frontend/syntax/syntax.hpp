@@ -163,6 +163,12 @@ class Statement : public Node
     using Node::Node;
 };
 
+class DummyStatement final : public Statement
+{
+public:
+    DummyStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end);
+};
+
 class BlockStatement final : public Statement
 {
     std::unique_ptr<Block> m_block;

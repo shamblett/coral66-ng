@@ -472,12 +472,12 @@ class AnswerStatement;
 class CodeStatement;
 class ProcedureCallStatement;
 class LabelStatement;
+class DummyStatement;
 class BlockStatement;
 class CompoundStatement;
-
 class Statement : public AbstractIntrusiveVariant<Statement, AssignmentStatement, IfStatement, GotoStatement,
                                                   ForStatement, AnswerStatement, CodeStatement, ProcedureCallStatement,
-                                                  LabelStatement, BlockStatement, CompoundStatement>
+                                                  LabelStatement, DummyStatement, BlockStatement, CompoundStatement>
 {
     ScopePoint m_scopePoint;
 
@@ -494,7 +494,6 @@ public:
         return m_scopePoint;
     }
 };
-
 class AssignmentStatement final : public Statement
 {
     coral66::IntrVarPtr<ExpressionBase> m_target;
@@ -546,6 +545,17 @@ public:
         return m_elseBranch.get();
     }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(IfStatement)
+};
+
+class DummyStatement final : public Statement
+{
+public:
+    DummyStatement(ScopePoint sp) // NOLINT(*-pro-type-member-init)
+        : Statement(sp, std::in_place_type<DummyStatement>)
+    {
+    }
+
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(DummyStatement)
 };
 
 class LabelStatement final : public Statement

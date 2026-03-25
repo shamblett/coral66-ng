@@ -28,9 +28,7 @@ namespace coral66::parser
  *
  * Code
  *
- * Compound
- *
- * Blocks
+ * Compound + Blocks
  *
  * Dummy
  *
@@ -288,6 +286,18 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
         }
         return nullptr;
+    }
+
+    if (begin->getTokenType() == lexer::TokenType::SemiColon)
+    {
+        auto start = begin;
+        begin++;
+        return std::make_unique<Syntax::DummyStatement>(start, begin);
+    }
+
+    if (begin->getTokenType() == lexer::TokenType::EndKeyword || begin->getTokenType() == lexer::TokenType::ElseKeyword)
+    {
+        return std::make_unique<Syntax::DummyStatement>(begin, begin);
     }
 
     if (begin->getTokenType() == lexer::TokenType::BeginKeyword)
