@@ -290,7 +290,21 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         return nullptr;
     }
 
-    if (begin->getTokenType() == lexer::TokenType::BeginKeyword || begin->getTokenType() == lexer::TokenType::SemiColon)
+    if (begin->getTokenType() == lexer::TokenType::BeginKeyword)
+    {
+        auto blockStart = begin;
+        if (auto block = parseBlock(begin, end, context))
+        {
+            if (block->getDeclarations().empty())
+            {
+                return std::make_unique<Syntax::CompoundStatement>(blockStart, begin, block->takeStatements());
+            }
+            return std::make_unique<Syntax::BlockStatement>(blockStart, begin, std::move(block));
+        }
+        return nullptr;
+    }
+
+    if (begin->getTokenType() == lexer::TokenType::SemiColon)
     {
         return nullptr;
     }

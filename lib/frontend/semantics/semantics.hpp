@@ -472,10 +472,12 @@ class AnswerStatement;
 class CodeStatement;
 class ProcedureCallStatement;
 class LabelStatement;
+class BlockStatement;
+class CompoundStatement;
 
-class Statement
-    : public AbstractIntrusiveVariant<Statement, AssignmentStatement, IfStatement, GotoStatement, ForStatement,
-                                      AnswerStatement, CodeStatement, ProcedureCallStatement, LabelStatement>
+class Statement : public AbstractIntrusiveVariant<Statement, AssignmentStatement, IfStatement, GotoStatement,
+                                                  ForStatement, AnswerStatement, CodeStatement, ProcedureCallStatement,
+                                                  LabelStatement, BlockStatement, CompoundStatement>
 {
     ScopePoint m_scopePoint;
 
@@ -767,6 +769,47 @@ public:
 // ============================================================================
 // Helpers & Program
 // ============================================================================
+
+class BlockStatement final : public Statement
+{
+    std::vector<coral66::IntrVarPtr<Useable>> m_declarations;
+    std::vector<coral66::IntrVarPtr<Statement>> m_statements;
+
+public:
+    BlockStatement(ScopePoint scopePoint, std::vector<coral66::IntrVarPtr<Useable>> declarations,
+                   std::vector<coral66::IntrVarPtr<Statement>> statements)
+        : Statement(scopePoint, std::in_place_type<BlockStatement>),
+          m_declarations(std::move(declarations)),
+          m_statements(std::move(statements))
+    {
+    }
+
+    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Useable>>& getDeclarations() const
+    {
+        return m_declarations;
+    }
+
+    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Statement>>& getStatements() const
+    {
+        return m_statements;
+    }
+};
+
+class CompoundStatement final : public Statement
+{
+    std::vector<coral66::IntrVarPtr<Statement>> m_statements;
+
+public:
+    CompoundStatement(ScopePoint scopePoint, std::vector<coral66::IntrVarPtr<Statement>> statements)
+        : Statement(scopePoint, std::in_place_type<CompoundStatement>), m_statements(std::move(statements))
+    {
+    }
+
+    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Statement>>& getStatements() const
+    {
+        return m_statements;
+    }
+};
 
 class Program
 {

@@ -165,8 +165,35 @@ void code_generator::visit(const Semantics::Statement& stmt)
                [&](const Semantics::IfStatement& s) { visit(s); }, [&](const Semantics::GotoStatement& s) { visit(s); },
                [&](const Semantics::ForStatement& s) { visit(s); }, [&](const Semantics::AnswerStatement& s)
                { visit(s); }, [&](const Semantics::CodeStatement& s) { visit(s); },
-               [&](const Semantics::ProcedureCallStatement& s) { visit(s); },
-               [&](const Semantics::LabelStatement& s) { visit(s); }, [](const auto&) {});
+               [&](const Semantics::ProcedureCallStatement& s) { visit(s); }, [&](const Semantics::LabelStatement& s)
+               { visit(s); }, [&](const Semantics::BlockStatement& s) { visit(s); },
+               [&](const Semantics::CompoundStatement& s) { visit(s); }, [](const auto&) {});
+}
+
+void code_generator::visit(const Semantics::BlockStatement& stmt)
+{
+    // Generate declarations
+    // Warning: currently locals are treated as globals by code generator if they are simple VariableDeclarations
+    for (const auto& decl : stmt.getDeclarations())
+    {
+        if (auto* d = static_cast<const Semantics::Declaration*>(decl.get()))
+        {
+            visit(*d);
+        }
+    }
+
+    for (const auto& s : stmt.getStatements())
+    {
+        visit(*s);
+    }
+}
+
+void code_generator::visit(const Semantics::CompoundStatement& stmt)
+{
+    for (const auto& s : stmt.getStatements())
+    {
+        visit(*s);
+    }
 }
 
 void code_generator::visit(const Semantics::AssignmentStatement& stmt)
@@ -352,7 +379,8 @@ void code_generator::visit(const Semantics::ForStatement& stmt)
     m_builder.SetInsertPoint(condBB);
     llvm::Value* currVal = m_builder.CreateLoad(convertType(stmt.getVariable().getType()), loopVarAddr);
     llvm::Value* untilVal = visit(stmt.getUntil());
-    if (untilVal->getType() != currVal->getType()) untilVal = m_builder.CreateIntCast(untilVal, currVal->getType(), true);
+    if (untilVal->getType() != currVal->getType())
+        untilVal = m_builder.CreateIntCast(untilVal, currVal->getType(), true);
     llvm::Value* cond = m_builder.CreateICmpSLT(currVal, untilVal);
     m_builder.CreateCondBr(cond, bodyBB, endBB);
 
@@ -363,7 +391,8 @@ void code_generator::visit(const Semantics::ForStatement& stmt)
     m_builder.SetInsertPoint(stepBB);
     llvm::Value* stepVal = visit(stmt.getStep());
     llvm::Value* valForStep = m_builder.CreateLoad(convertType(stmt.getVariable().getType()), loopVarAddr);
-    if (stepVal->getType() != valForStep->getType()) stepVal = m_builder.CreateIntCast(stepVal, valForStep->getType(), true);
+    if (stepVal->getType() != valForStep->getType())
+        stepVal = m_builder.CreateIntCast(stepVal, valForStep->getType(), true);
     llvm::Value* incVal = m_builder.CreateAdd(valForStep, stepVal);
     m_builder.CreateStore(incVal, loopVarAddr);
     m_builder.CreateBr(condBB);

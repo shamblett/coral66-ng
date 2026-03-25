@@ -8,6 +8,7 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
+#include "parser_support.hpp"
 
 namespace coral66::parser
 {
@@ -109,9 +110,15 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
         begin++;
     }
 
-    if (begin != end)
+    if (begin != end && begin->getTokenType() == lexer::TokenType::EndKeyword)
     {
         begin++;
+    }
+    else
+    {
+        context.log(errors::parser::EXPECTED_END.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(),
+                                                      *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_END);
     }
 
     return std::make_unique<Syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements));

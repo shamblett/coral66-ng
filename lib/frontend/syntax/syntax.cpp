@@ -49,6 +49,16 @@ const std::vector<std::unique_ptr<Statement>>& Block::getStatements() const
     return m_statements;
 }
 
+std::vector<std::unique_ptr<Declaration>> Block::takeDeclarations()
+{
+    return std::move(m_declarations);
+}
+
+std::vector<std::unique_ptr<Statement>> Block::takeStatements()
+{
+    return std::move(m_statements);
+}
+
 // VariableDeclaration
 VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                          const lexer::CTokenIterator type,
@@ -176,6 +186,30 @@ lexer::CTokenIterator SwitchPlaceReference::getName() const
 std::vector<lexer::CTokenIterator> SwitchPlaceReference::getLabels() const
 {
     return m_labels;
+}
+
+// BlockStatement
+BlockStatement::BlockStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                               std::unique_ptr<Block>&& block)
+    : Statement(begin, end), m_block(std::move(block))
+{
+}
+
+const Block& BlockStatement::getBlock() const
+{
+    return *m_block;
+}
+
+// CompoundStatement
+CompoundStatement::CompoundStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                     std::vector<std::unique_ptr<Statement>>&& statements)
+    : Statement(begin, end), m_statements(std::move(statements))
+{
+}
+
+const std::vector<std::unique_ptr<Statement>>& CompoundStatement::getStatements() const
+{
+    return m_statements;
 }
 
 // AssignmentStatement

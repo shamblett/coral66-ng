@@ -79,7 +79,15 @@ void SemanticAnalysis::visit(const Syntax::Declaration& node)
 
 void SemanticAnalysis::visit(const Syntax::Statement& node)
 {
-    if (auto* assign = dynamic_cast<const Syntax::AssignmentStatement*>(&node))
+    if (auto* blockStmt = dynamic_cast<const Syntax::BlockStatement*>(&node))
+    {
+        visit(*blockStmt);
+    }
+    else if (auto* compStmt = dynamic_cast<const Syntax::CompoundStatement*>(&node))
+    {
+        visit(*compStmt);
+    }
+    else if (auto* assign = dynamic_cast<const Syntax::AssignmentStatement*>(&node))
     {
         visit(*assign);
     }
@@ -352,6 +360,40 @@ void SemanticAnalysis::visit(const Syntax::TableDeclaration& node)
 void SemanticAnalysis::visit(const Syntax::OverlayDeclaration& node)
 {
     visit(node.getOverlayedDeclaration());
+}
+
+void SemanticAnalysis::visit(const Syntax::BlockStatement& node)
+{
+    auto prevStmts = std::move(m_currentBlockStatements);
+    m_currentBlockStatements.clear();
+
+    // Process block
+    bool wasGlobal = m_isGlobalScope;
+    m_isGlobalScope = false; // Block creates a new scope (but our symbol table currently leaks)
+    visit(node.getBlock());
+    m_isGlobalScope = wasGlobal;
+
+    auto blockStmts = std::move(m_currentBlockStatements);
+    m_currentBlockStatements = std::move(prevStmts);
+
+    m_currentBlockStatements.push_back(
+        makeIntr<BlockStatement>(ScopePoint{0}, std::vector<coral66::IntrVarPtr<Useable>>{}, std::move(blockStmts)));
+}
+
+void SemanticAnalysis::visit(const Syntax::CompoundStatement& node)
+{
+    auto prevStmts = std::move(m_currentBlockStatements);
+    m_currentBlockStatements.clear();
+
+    for (const auto& stmt : node.getStatements())
+    {
+        visit(*stmt);
+    }
+
+    auto compStmts = std::move(m_currentBlockStatements);
+    m_currentBlockStatements = std::move(prevStmts);
+
+    m_currentBlockStatements.push_back(makeIntr<CompoundStatement>(ScopePoint{0}, std::move(compStmts)));
 }
 
 void SemanticAnalysis::visit(const Syntax::AssignmentStatement& node)

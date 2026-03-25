@@ -56,6 +56,8 @@ public:
           std::vector<std::unique_ptr<Statement>>&& statements);
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getDeclarations() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
+    std::vector<std::unique_ptr<Declaration>> takeDeclarations();
+    std::vector<std::unique_ptr<Statement>> takeStatements();
 };
 
 // Declarations
@@ -159,6 +161,25 @@ public:
 class Statement : public Node
 {
     using Node::Node;
+};
+
+class BlockStatement final : public Statement
+{
+    std::unique_ptr<Block> m_block;
+
+public:
+    BlockStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block);
+    [[nodiscard]] const Block& getBlock() const;
+};
+
+class CompoundStatement final : public Statement
+{
+    std::vector<std::unique_ptr<Statement>> m_statements;
+
+public:
+    CompoundStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                      std::vector<std::unique_ptr<Statement>>&& statements);
+    [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
 };
 
 class AssignmentStatement final : public Statement

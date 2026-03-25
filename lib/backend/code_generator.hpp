@@ -65,6 +65,8 @@ public:
     void visit(const Semantics::CodeStatement& stmt);
     void visit(const Semantics::ProcedureCallStatement& stmt);
     void visit(const Semantics::LabelStatement& stmt); // Add visitor for LabelStatement
+    void visit(const Semantics::BlockStatement& stmt);
+    void visit(const Semantics::CompoundStatement& stmt);
 
     // Visitors (Expressions)
     llvm::Value* visit(const Semantics::ExpressionBase& expr);

@@ -49,6 +49,8 @@ public:
     void visit(const Syntax::OverlayDeclaration& node);
 
     // Specific Visitors - Statements
+    void visit(const Syntax::BlockStatement& node);
+    void visit(const Syntax::CompoundStatement& node);
     void visit(const Syntax::AssignmentStatement& node);
     void visit(const Syntax::IfStatement& node);
     void visit(const Syntax::GotoStatement& node);
