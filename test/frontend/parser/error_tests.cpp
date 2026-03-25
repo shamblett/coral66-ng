@@ -200,6 +200,14 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
 
 TEST_CASE("Statements - Errors", "[Parser][Statement]")
 {
+    SECTION("Compound Statement - Missing END")
+    {
+        const ParsedStatement s("BEGIN A := 1;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_END));
+    }
+
     SECTION("Assignment - No RHS")
     {
         const ParsedStatement s("A :=;");

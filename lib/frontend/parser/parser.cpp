@@ -119,6 +119,7 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
         context.log(errors::parser::EXPECTED_END.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(),
                                                       *(begin == end ? (end - 1) : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_END);
+        return nullptr;
     }
 
     return std::make_unique<Syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements));

@@ -246,3 +246,45 @@ TEST_CASE("Coral Parse Statements - Code", "[Parser][Statement]")
         CHECK(std::get<std::string>(codeStatement->getCode()->getValue()) == "mov eax, add @v1, mov eax !result");
     }
 }
+
+/*
+ * 7.6 Compound
+ */
+TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
+{
+    SECTION("Empty compound")
+    {
+        const ParsedStatement s("BEGIN END;");
+        auto compoundStatement = dynamic_cast<CompoundStatement*>(s.statement.get());
+        REQUIRE(compoundStatement != nullptr);
+        CHECK(compoundStatement->getStatements().empty());
+    }
+
+    SECTION("Single statement compound")
+    {
+        const ParsedStatement s("BEGIN A := 1 END;");
+        auto compoundStatement = dynamic_cast<CompoundStatement*>(s.statement.get());
+        REQUIRE(compoundStatement != nullptr);
+        REQUIRE(compoundStatement->getStatements().size() == 1);
+        auto* assign = dynamic_cast<AssignmentStatement*>(compoundStatement->getStatements()[0].get());
+        REQUIRE(assign != nullptr);
+    }
+
+    SECTION("Multi statement compound")
+    {
+        const ParsedStatement s("BEGIN A := 1; B := 2 END;");
+        auto compoundStatement = dynamic_cast<CompoundStatement*>(s.statement.get());
+        REQUIRE(compoundStatement != nullptr);
+        REQUIRE(compoundStatement->getStatements().size() == 2);
+    }
+
+    SECTION("Block as statement")
+    {
+        const ParsedStatement s("BEGIN INTEGER A; A := 1 END;");
+        auto blockStatement = dynamic_cast<BlockStatement*>(s.statement.get());
+        REQUIRE(blockStatement != nullptr);
+        const auto& block = blockStatement->getBlock();
+        REQUIRE(block.getDeclarations().size() == 1);
+        REQUIRE(block.getStatements().size() == 1);
+    }
+}
