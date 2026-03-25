@@ -176,7 +176,7 @@ TEST_CASE("Coral 66 Code Statement", "[Coral]")
     {
         auto program = generateProgram("PROGRAM CodeTest\n"
                                        "BEGIN\n"
-                                       "  CODE \"nop\";\n"
+                                       "  CODE BEGIN \"nop\" END;\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));

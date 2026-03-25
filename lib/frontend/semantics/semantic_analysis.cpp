@@ -493,7 +493,7 @@ void SemanticAnalysis::visit(const Syntax::AnswerStatement& node)
 
 void SemanticAnalysis::visit(const Syntax::CodeStatement& node)
 {
-    auto lit = node.begin() + 1;
+    auto lit = node.getCode();
     std::string code = std::get<std::string>(lit->getValue());
     auto stmt = makeIntr<CodeStatement>(ScopePoint{0}, code);
     m_currentBlockStatements.push_back(std::move(stmt));
