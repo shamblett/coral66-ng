@@ -39,8 +39,10 @@ The lexer already correctly tokenizes the `CODE` keyword and string literals (`l
 
 ### 3.2. Parser (`lib/frontend/parser/`)
 **Impact: Minimal.**
-The parser (`parser_statements.cpp`) currently constructs a `Syntax::CodeStatement` containing the raw string literal. This behavior remains correct. The grammar remains:
-`CODE "assembly string";`
+The parser (`parser_statements.cpp`) currently constructs a `Syntax::CodeStatement` containing the raw string literal. This behavior remains correct. 
+
+The grammar remains:
+`CODE BEGIN "assembly string" END;` as per the specification section 7.5.
 
 ### 3.3. Semantic Analysis (`lib/frontend/semantics/`)
 **Impact: High.**

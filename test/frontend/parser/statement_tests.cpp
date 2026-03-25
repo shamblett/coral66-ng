@@ -224,3 +224,17 @@ TEST_CASE("Coral Parse Statements - Answer", "[Parser][Statement]")
         CHECK(std::get<std::string>(answerStatement->getExpression().begin()->getValue()) == "B");
     }
 }
+
+/*
+ * 7.5 Bode
+ */
+TEST_CASE("Coral Parse Statements - Code", "[Parser][Statement]")
+{
+    SECTION("No substitutions")
+    {
+        const ParsedStatement s("CODE BEGIN \"mov eax, add eax, mov eax\" END;");
+        auto codeStatement = dynamic_cast<CodeStatement*>(s.statement.get());
+        REQUIRE(codeStatement != nullptr);
+        CHECK(std::get<std::string>(codeStatement->getCode()->getValue()) == "mov eax, add eax, mov eax");
+    }
+}

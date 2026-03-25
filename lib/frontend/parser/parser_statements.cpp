@@ -144,23 +144,48 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
 
     if (begin->getTokenType() == lexer::TokenType::CodeKeyword)
     {
-        auto start = begin;
         begin++;
-        if (begin != end && begin->getTokenType() == lexer::TokenType::StringLiteral)
+        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
         {
             begin++;
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-            {
-                begin++;
-            }
-            return std::make_unique<Syntax::CodeStatement>(start, begin);
         }
-        context.log(errors::parser::EXPECTED_STRING_LITERAL.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
-        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STRING_LITERAL);
-        return nullptr;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword)
+        {
+            begin++;
+            if (begin != end && begin->getTokenType() == lexer::TokenType::StringLiteral)
+            {
+                auto start = begin;
+                begin++;
+                if (begin != end && begin->getTokenType() != lexer::TokenType::EndKeyword)
+                {
+                    context.log(errors::parser::EXPECTED_END.args(*(begin == end ? (end - 1) : begin),
+                                                                  context.getSourceInterface(),
+                                                                  *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_END);
+                    return nullptr;
+                }
+                return std::make_unique<Syntax::CodeStatement>(start, begin);
+            }
+            if (begin != end && begin->getTokenType() != lexer::TokenType::StringLiteral)
+            {
+                context.log(errors::parser::EXPECTED_STRING_LITERAL.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STRING_LITERAL);
+                return nullptr;
+            }
+        }
+        else
+        {
+            {
+                context.log(errors::parser::EXPECTED_BEGIN.args(*(begin == end ? (end - 1) : begin),
+                                                                context.getSourceInterface(),
+                                                                *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_BEGIN);
+                return nullptr;
+            }
+        }
     }
-
     if (begin->getTokenType() == lexer::TokenType::IfKeyword)
     {
         auto start = begin;

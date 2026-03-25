@@ -295,8 +295,15 @@ const Expression& ProcedureCallStatement::getExpression() const
 }
 
 // CodeStatement
-CodeStatement::CodeStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end) : Statement(begin, end)
+CodeStatement::CodeStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end)
+
+    : Statement(begin, end), m_code(begin)
 {
+}
+
+lexer::CTokenIterator CodeStatement::getCode() const
+{
+    return m_code;
 }
 
 // LiteralExpression

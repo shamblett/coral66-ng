@@ -238,8 +238,12 @@ public:
 
 class CodeStatement final : public Statement
 {
+    lexer::CTokenIterator m_code;
+
 public:
     CodeStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end);
+    [[nodiscard]] lexer::CTokenIterator getCode() const;
+    ;
 };
 
 // Expressions
