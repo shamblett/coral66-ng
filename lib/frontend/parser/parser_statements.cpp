@@ -198,8 +198,16 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             {
                 begin++;
                 elseBranch = parseStatement(begin, end, context);
+                if (!elseBranch)
+                {
+                    context.log(errors::parser::EXPECTED_STATEMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
+                    return nullptr;
+                }
             }
-            if (cond && thenBranch)
+            else if (cond && thenBranch)
             {
                 return std::make_unique<Syntax::IfStatement>(start, begin, std::move(cond), std::move(thenBranch),
                                                              std::move(elseBranch));
