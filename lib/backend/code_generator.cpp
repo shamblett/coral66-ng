@@ -161,13 +161,18 @@ void code_generator::generateProcedure(const Semantics::ProcedureDeclaration& pr
 
 void code_generator::visit(const Semantics::Statement& stmt)
 {
-    stmt.match([&](const Semantics::AssignmentStatement& s) { visit(s); },
-               [&](const Semantics::IfStatement& s) { visit(s); }, [&](const Semantics::GotoStatement& s) { visit(s); },
-               [&](const Semantics::ForStatement& s) { visit(s); }, [&](const Semantics::AnswerStatement& s)
-               { visit(s); }, [&](const Semantics::CodeStatement& s) { visit(s); },
-               [&](const Semantics::ProcedureCallStatement& s) { visit(s); }, [&](const Semantics::LabelStatement& s)
-               { visit(s); }, [&](const Semantics::BlockStatement& s) { visit(s); },
-               [&](const Semantics::CompoundStatement& s) { visit(s); }, [](const auto&) {});
+    stmt.match(
+        [&](const Semantics::AssignmentStatement& s) { visit(s); }, [&](const Semantics::IfStatement& s) { visit(s); },
+        [&](const Semantics::GotoStatement& s) { visit(s); }, [&](const Semantics::ForStatement& s) { visit(s); },
+        [&](const Semantics::AnswerStatement& s) { visit(s); }, [&](const Semantics::CodeStatement& s) { visit(s); },
+        [&](const Semantics::ProcedureCallStatement& s) { visit(s); }, [&](const Semantics::LabelStatement& s)
+        { visit(s); }, [&](const Semantics::BlockStatement& s) { visit(s); }, [&](const Semantics::CompoundStatement& s)
+        { visit(s); }, [](const auto&) {}, [&](const Semantics::DummyStatement& s) { visit(s); }, [](const auto&) {});
+}
+
+void code_generator::visit(const Semantics::DummyStatement& stmt)
+{
+    // A dummy statement has no effect
 }
 
 void code_generator::visit(const Semantics::BlockStatement& stmt)

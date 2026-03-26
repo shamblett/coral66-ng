@@ -188,6 +188,14 @@ std::vector<lexer::CTokenIterator> SwitchPlaceReference::getLabels() const
     return m_labels;
 }
 
+// DummyStatement
+// ReSharper disable once CppParameterMayBeConst
+DummyStatement::DummyStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end)
+
+    : Statement(begin, end)
+{
+}
+
 // BlockStatement
 BlockStatement::BlockStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                std::unique_ptr<Block>&& block)
