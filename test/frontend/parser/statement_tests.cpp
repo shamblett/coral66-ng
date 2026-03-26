@@ -315,3 +315,16 @@ TEST_CASE("Coral Parse Statements - Dummy", "[Parser][Statement]")
         REQUIRE(dummyStatement != nullptr);
     }
 }
+
+/*
+ * 7.9 Conditional
+ */
+TEST_CASE("Coral Parse Statements - Conditional", "[Parser][Statement]")
+{
+    SECTION("If Then - Statement")
+    {
+        const ParsedStatement s("IF A < 2 THEN C := 3");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
+}
