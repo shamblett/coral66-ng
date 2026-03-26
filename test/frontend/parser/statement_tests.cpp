@@ -288,3 +288,30 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
         REQUIRE(block.getStatements().size() == 1);
     }
 }
+
+/*
+ * 7.8 Dummy
+ */
+TEST_CASE("Coral Parse Statements - Dummy", "[Parser][Statement]")
+{
+    SECTION("After Label")
+    {
+        const ParsedStatement s("; label: END");
+        auto dummyStatement = dynamic_cast<DummyStatement*>(s.statement.get());
+        REQUIRE(dummyStatement != nullptr);
+    }
+
+    SECTION("End")
+    {
+        const ParsedStatement s("END");
+        auto dummyStatement = dynamic_cast<DummyStatement*>(s.statement.get());
+        REQUIRE(dummyStatement != nullptr);
+    }
+
+    SECTION("Else")
+    {
+        const ParsedStatement s("ELSE");
+        auto dummyStatement = dynamic_cast<DummyStatement*>(s.statement.get());
+        REQUIRE(dummyStatement != nullptr);
+    }
+}
