@@ -335,3 +335,23 @@ TEST_CASE("Coral Parse Statements - Conditional", "[Parser][Statement]")
         REQUIRE(ifStatement != nullptr);
     }
 }
+
+/*
+ * 7.10 For
+ */
+TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
+{
+    SECTION("FOR Single STEP DO")
+    {
+        const ParsedStatement s("FOR A := 1 STEP 1 UNTIL 4 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        CHECK(std::get<llvm::APSInt>(forStatement->getStart().begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(forStatement->getStep().begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(forStatement->getUntil().begin()->getValue()) == 4);
+        CHECK(std::get<std::string>(forStatement->getBody().begin()->getValue()) == "B");
+        CHECK(std::get<std::string>((forStatement->getBody().begin() + 2)->getValue()) == "B");
+        CHECK(std::get<llvm::APSInt>((forStatement->getBody().begin() + 4)->getValue()) == 2);
+    }
+}
