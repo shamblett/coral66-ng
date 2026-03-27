@@ -354,4 +354,14 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         CHECK(std::get<std::string>((forStatement->getBody().begin() + 2)->getValue()) == "B");
         CHECK(std::get<llvm::APSInt>((forStatement->getBody().begin() + 4)->getValue()) == 2);
     }
+
+    SECTION("FOR Double STEP DO")
+    {
+        const ParsedStatement s("FOR A := 1 STEP 1 UNTIL 4, "
+                                "6 STEP 2 UNTIL 10 "
+                                "DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+
+    }
 }
