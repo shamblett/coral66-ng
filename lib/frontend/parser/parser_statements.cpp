@@ -207,6 +207,14 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                     return nullptr;
                 }
             }
+            if (!cond)
+            {
+                context.log(errors::parser::EXPECTED_CONDITION.args(
+                    *(begin == end ? (end - 1) : begin), context.getSourceInterface(), lexer::TokenType::IfKeyword,
+                    *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CONDITION);
+                return nullptr;
+            }
             if (cond && thenBranch)
             {
                 return std::make_unique<Syntax::IfStatement>(start, begin, std::move(cond), std::move(thenBranch),

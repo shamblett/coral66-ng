@@ -279,6 +279,38 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_END));
     }
+
+    SECTION("Conditional Statement - IF No Condition")
+    {
+        const ParsedStatement s("IF THEN");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
+    }
+
+    SECTION("Conditional Statement - IF No THEN")
+    {
+        const ParsedStatement s("IF A < 2");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_THEN));
+    }
+
+    SECTION("Conditional Statement - IF THEN No Consequence")
+    {
+        const ParsedStatement s("IF A < 2 THEN ELSE");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
+    }
+
+    SECTION("Conditional Statement - IF THEN ELSE No Alternative")
+    {
+        const ParsedStatement s("IF A < 2 THEN B:= 2 ELSE");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
+    }
 }
 
 TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
