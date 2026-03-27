@@ -207,7 +207,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                     return nullptr;
                 }
             }
-            else if (cond && thenBranch)
+            if (cond && thenBranch)
             {
                 return std::make_unique<Syntax::IfStatement>(start, begin, std::move(cond), std::move(thenBranch),
                                                              std::move(elseBranch));

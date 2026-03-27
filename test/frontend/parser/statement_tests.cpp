@@ -327,4 +327,11 @@ TEST_CASE("Coral Parse Statements - Conditional", "[Parser][Statement]")
         auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
         REQUIRE(ifStatement != nullptr);
     }
+
+    SECTION("If Then Else - Statement")
+    {
+        const ParsedStatement s("IF A < 2 THEN C := 3 ELSE C := 4");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
 }

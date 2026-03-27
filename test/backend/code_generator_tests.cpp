@@ -212,7 +212,7 @@ TEST_CASE("Coral 66 Control Flow", "[Coral]")
                                        "BEGIN\n"
                                        "  INTEGER a;\n"
                                        "  a := 1;\n"
-                                       "  IF a > 2 THEN a := 2 ELSE a := 3;\n"
+                                       "  INTEGER b; b := 2; IF a > b THEN a := 2 ELSE a := 3;\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));
