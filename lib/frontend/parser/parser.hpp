@@ -43,6 +43,8 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                                                                    lexer::CTokenIterator end, Context& context);
 std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context);
+std::unique_ptr<Syntax::Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+                                                 Context& context);
 std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                     Context& context);
 std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,

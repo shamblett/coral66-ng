@@ -188,7 +188,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     {
         auto start = begin;
         begin++;
-        auto cond = parseExpression(begin, end, context);
+        auto cond = parseCondition(begin, end, context);
         if (begin != end && begin->getTokenType() == lexer::TokenType::ThenKeyword)
         {
             begin++;
