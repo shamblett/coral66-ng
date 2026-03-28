@@ -200,6 +200,30 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
 
 TEST_CASE("Statements - Errors", "[Parser][Statement]")
 {
+    SECTION("Assignment - Invalid LHS - Expression")
+    {
+        const ParsedStatement s("A + 1 := 2;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
+    }
+
+    SECTION("Assignment - Invalid LHS - Integer BITS Target")
+    {
+        const ParsedStatement s("BITS [ 2, 3 ] 4 := 5;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_WORD_REFERENCE));
+    }
+
+    SECTION("Assignment - Invalid LHS - Location BITS Target")
+    {
+        const ParsedStatement s("BITS [ 2, 3 ] LOCATION(A) := 5;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_WORD_REFERENCE));
+    }
+
     SECTION("Assignment - No RHS")
     {
         const ParsedStatement s("A :=;");

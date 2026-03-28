@@ -37,6 +37,36 @@ namespace coral66::parser
  * For
  */
 
+static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end)
+{
+    int parens = 0;
+    int brackets = 0;
+    for (auto it = begin; it != end; ++it)
+    {
+        if (it->getTokenType() == lexer::TokenType::OpenParentheses)
+            parens++;
+        else if (it->getTokenType() == lexer::TokenType::CloseParentheses)
+            parens--;
+        else if (it->getTokenType() == lexer::TokenType::OpenSquareBracket)
+            brackets++;
+        else if (it->getTokenType() == lexer::TokenType::CloseSquareBracket)
+            brackets--;
+        else if (parens == 0 && brackets == 0)
+        {
+            if (it->getTokenType() == lexer::TokenType::Assignment)
+                return true;
+            if (it->getTokenType() == lexer::TokenType::SemiColon || it->getTokenType() == lexer::TokenType::ThenKeyword
+                || it->getTokenType() == lexer::TokenType::ElseKeyword
+                || it->getTokenType() == lexer::TokenType::DoKeyword
+                || it->getTokenType() == lexer::TokenType::EndKeyword || it->getTokenType() == lexer::TokenType::Comma)
+            {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
 std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                                   Context& context)
 {
@@ -49,22 +79,34 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         || begin->getTokenType() == lexer::TokenType::BitsKeyword)
     {
         auto start = begin;
-        if (auto expr = parseExpression(begin, end, context))
+        if (isAssignmentStatement(begin, end))
         {
-            if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
+            if (auto var = parseVariable(begin, end, context))
             {
-                begin++;
-                auto rhs = parseExpression(begin, end, context);
-                if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+                if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
                 {
                     begin++;
-                }
-                if (rhs)
-                {
-                    return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(expr), std::move(rhs));
+                    auto rhs = parseExpression(begin, end, context);
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+                    {
+                        begin++;
+                    }
+                    if (rhs)
+                    {
+                        return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(var),
+                                                                             std::move(rhs));
+                    }
                 }
             }
-            else
+            context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+            return nullptr;
+        }
+        else
+        {
+            if (auto expr = parseExpression(begin, end, context))
             {
                 if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
                 {
@@ -72,11 +114,8 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                 }
                 return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
+            return nullptr;
         }
-        context.log(errors::parser::EXPECTED_ASSIGNMENT.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
-        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
-        return nullptr;
     }
     if (begin->getTokenType() == lexer::TokenType::GotoKeyword)
     {
@@ -230,7 +269,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     {
         auto start = begin;
         begin++;
-        auto var = parseExpression(begin, end, context);
+        auto var = parseWordReference(begin, end, context);
         if (var)
         {
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)

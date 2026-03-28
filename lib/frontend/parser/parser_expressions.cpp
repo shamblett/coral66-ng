@@ -669,6 +669,54 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
     return nullptr;
 }
 
+std::unique_ptr<Expression> parseVariable(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+{
+    if (begin == end)
+        return nullptr;
+
+    if (begin->getTokenType() == lexer::TokenType::BitsKeyword)
+    {
+        auto startToken = begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenSquareBracket)
+        {
+            begin++;
+            auto totalBits = parseExpression(begin, end, context);
+            if (!totalBits)
+                return nullptr;
+
+            if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+            {
+                begin++;
+                auto bitPos = parseExpression(begin, end, context);
+                if (!bitPos)
+                    return nullptr;
+
+                if (begin != end && begin->getTokenType() == lexer::TokenType::CloseSquareBracket)
+                {
+                    begin++;
+                    auto wordRef = parseWordReference(begin, end, context);
+                    if (!wordRef)
+                    {
+                        context.log(errors::parser::EXPECTED_WORD_REFERENCE.args(*(begin == end ? (end - 1) : begin),
+                                                                                 context.getSourceInterface(),
+                                                                                 *(begin == end ? (end - 1) : begin)));
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_WORD_REFERENCE);
+                        return nullptr;
+                    }
+                    return std::make_unique<PartWordExpression>(startToken, wordRef->end(), std::move(wordRef),
+                                                                std::move(bitPos), std::move(totalBits));
+                }
+            }
+        }
+        context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
+        return nullptr;
+    }
+
+    return parseWordReference(begin, end, context);
+}
+
 std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                Context& context)
 {
