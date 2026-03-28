@@ -378,4 +378,83 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
 
         CHECK(std::get<std::string>(forStatement->getBody().begin()->getValue()) == "B");
     }
+
+    SECTION("FOR Single Expression DO")
+    {
+        const ParsedStatement s("FOR A := 1 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        REQUIRE(forStatement->getElements().size() == 1);
+        auto& el = forStatement->getElements()[0];
+        CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
+        CHECK(el.step == nullptr);
+        CHECK(el.until == nullptr);
+        CHECK(el.whileCondition == nullptr);
+    }
+
+    SECTION("FOR Multiple Expressions DO")
+    {
+        const ParsedStatement s("FOR A := 1, 2, 4 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        REQUIRE(forStatement->getElements().size() == 3);
+        CHECK(std::get<llvm::APSInt>(forStatement->getElements()[0].expression->begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(forStatement->getElements()[1].expression->begin()->getValue()) == 2);
+        CHECK(std::get<llvm::APSInt>(forStatement->getElements()[2].expression->begin()->getValue()) == 4);
+    }
+
+    SECTION("FOR WHILE DO")
+    {
+        const ParsedStatement s("FOR A := 1 WHILE 1 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        REQUIRE(forStatement->getElements().size() == 1);
+        auto& el = forStatement->getElements()[0];
+        CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
+        REQUIRE(el.whileCondition != nullptr);
+        CHECK(std::get<llvm::APSInt>(el.whileCondition->begin()->getValue()) == 1);
+    }
+
+    SECTION("FOR Mixed List DO")
+    {
+        const ParsedStatement s("FOR A := 1, 2 STEP 1 UNTIL 4, 5 WHILE 0 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        REQUIRE(forStatement->getElements().size() == 3);
+        
+        auto& el1 = forStatement->getElements()[0];
+        CHECK(std::get<llvm::APSInt>(el1.expression->begin()->getValue()) == 1);
+        CHECK(el1.step == nullptr);
+        
+        auto& el2 = forStatement->getElements()[1];
+        CHECK(std::get<llvm::APSInt>(el2.expression->begin()->getValue()) == 2);
+        CHECK(std::get<llvm::APSInt>(el2.step->begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(el2.until->begin()->getValue()) == 4);
+        
+        auto& el3 = forStatement->getElements()[2];
+        CHECK(std::get<llvm::APSInt>(el3.expression->begin()->getValue()) == 5);
+        REQUIRE(el3.whileCondition != nullptr);
+        CHECK(std::get<llvm::APSInt>(el3.whileCondition->begin()->getValue()) == 0);
+    }
+
+    SECTION("FOR Error: Missing UNTIL")
+    {
+        parser::DiagnosticCollector::clearDiagnostics();
+        const ParsedStatement s("FOR A := 1 STEP 1 DO B := B + 2");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_UNTIL));
+    }
+
+    SECTION("FOR Error: Missing DO")
+    {
+        parser::DiagnosticCollector::clearDiagnostics();
+        const ParsedStatement s("FOR A := 1 B := B + 2");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DO));
+    }
 }
