@@ -69,6 +69,7 @@ CREATE_ERROR(EXPECTED_CLOSE_SQUARE_BRACKET, "Expected close square bracket", Ins
 CREATE_ERROR(EXPECTED_TYPED_PRIMARY, "Expected typed primary", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_WORD_REFERENCE, "Expected word reference", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_VARIABLE, "Expected variable", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_PROCEDURE_CALL, "Expected procedure call", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_FRACTION_BITS, "Expected fraction bits", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_UNION, "Expected union", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_MASK, "Expected mask", InsertAfter<0>);

@@ -106,8 +106,27 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         }
         else
         {
+            if (begin->getTokenType() != lexer::TokenType::Identifier)
+            {
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+                return nullptr;
+            }
+
             if (auto expr = parseExpression(begin, end, context))
             {
+                if (!dynamic_cast<Syntax::IdentifierExpression*>(expr.get())
+                    && !dynamic_cast<Syntax::FunctionCallExpression*>(expr.get()))
+                {
+                    context.log(errors::parser::EXPECTED_PROCEDURE_CALL.args(*(begin == end ? (end - 1) : begin),
+                                                                             context.getSourceInterface(),
+                                                                             *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_PROCEDURE_CALL);
+                    return nullptr;
+                }
+
                 if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
                 {
                     begin++;

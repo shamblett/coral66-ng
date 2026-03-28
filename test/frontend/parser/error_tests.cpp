@@ -240,6 +240,54 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
     }
 
+    SECTION("Invalid Procedure Call - Expression")
+    {
+        const ParsedStatement s("A + 1;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_PROCEDURE_CALL));
+    }
+
+    SECTION("Invalid Procedure Call - Bits Start Without Assignment")
+    {
+        const ParsedStatement s("BITS [1,2] P;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
+    }
+
+    SECTION("Invalid Procedure Call - Array Start Without Assignment")
+    {
+        const ParsedStatement s("[LOCATION(P)];");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
+    }
+
+    SECTION("Invalid Procedure Call - Literal")
+    {
+        const ParsedStatement s("123;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
+    }
+
+    SECTION("Invalid Procedure Call - Array Element")
+    {
+        const ParsedStatement s("P[1];");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_PROCEDURE_CALL));
+    }
+
+    SECTION("Invalid Procedure Call - Add to function")
+    {
+        const ParsedStatement s("P(1) + 1;");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_PROCEDURE_CALL));
+    }
+
     SECTION("Goto No Label")
     {
         const ParsedStatement s("GOTO ;");
