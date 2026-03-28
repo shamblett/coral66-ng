@@ -424,37 +424,19 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
         REQUIRE(forStatement->getElements().size() == 3);
-        
+
         auto& el1 = forStatement->getElements()[0];
         CHECK(std::get<llvm::APSInt>(el1.expression->begin()->getValue()) == 1);
         CHECK(el1.step == nullptr);
-        
+
         auto& el2 = forStatement->getElements()[1];
         CHECK(std::get<llvm::APSInt>(el2.expression->begin()->getValue()) == 2);
         CHECK(std::get<llvm::APSInt>(el2.step->begin()->getValue()) == 1);
         CHECK(std::get<llvm::APSInt>(el2.until->begin()->getValue()) == 4);
-        
+
         auto& el3 = forStatement->getElements()[2];
         CHECK(std::get<llvm::APSInt>(el3.expression->begin()->getValue()) == 5);
         REQUIRE(el3.whileCondition != nullptr);
         CHECK(std::get<llvm::APSInt>(el3.whileCondition->begin()->getValue()) == 0);
-    }
-
-    SECTION("FOR Error: Missing UNTIL")
-    {
-        parser::DiagnosticCollector::clearDiagnostics();
-        const ParsedStatement s("FOR A := 1 STEP 1 DO B := B + 2");
-        CHECK(s.statement.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_UNTIL));
-    }
-
-    SECTION("FOR Error: Missing DO")
-    {
-        parser::DiagnosticCollector::clearDiagnostics();
-        const ParsedStatement s("FOR A := 1 B := B + 2");
-        CHECK(s.statement.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DO));
     }
 }
