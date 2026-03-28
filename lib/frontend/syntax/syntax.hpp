@@ -235,14 +235,14 @@ struct ForElement
 
 class ForStatement final : public Statement
 {
-    lexer::CTokenIterator m_variable;
+    std::unique_ptr<Expression> m_variable;
     std::vector<ForElement> m_elements;
     std::unique_ptr<Statement> m_body;
 
 public:
-    ForStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator variable,
+    ForStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Expression>&& variable,
                  std::vector<ForElement>&& elements, std::unique_ptr<Statement>&& body);
-    [[nodiscard]] lexer::CTokenIterator getVariable() const;
+    [[nodiscard]] const Expression& getVariable() const;
     [[nodiscard]] const std::vector<ForElement>& getElements() const;
     [[nodiscard]] const Statement& getBody() const;
 };

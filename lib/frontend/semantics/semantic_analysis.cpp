@@ -452,21 +452,7 @@ void SemanticAnalysis::visit([[maybe_unused]] const Syntax::GotoStatement& node)
 
 void SemanticAnalysis::visit(const Syntax::ForStatement& node)
 {
-    auto name = std::string(node.getVariable()->getText());
-
-    if (auto it = std::ranges::find_if(m_symbolTable, [&](const auto& p) { return p.first == name; });
-        it != m_symbolTable.end())
-    {
-        IntrusiveVariantValue<Type> type =
-            it->second->match([](const VariableDeclaration& v) { return cloneType(v.getType()); }, [](const auto&)
-                              { return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); });
-        m_lastExpression = makeIntr<DeclarationRead>(type, *it->second, node.getVariable());
-    }
-    else
-    {
-        IntrusiveVariantValue<Type> type(ErrorType{});
-        m_lastExpression = makeIntr<ErrorExpression>(type, node.getVariable(), node.getVariable() + 1);
-    }
+    visit(node.getVariable());
     auto var = std::move(m_lastExpression);
 
     std::vector<Semantics::ForElement> elements;

@@ -64,9 +64,12 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                     return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(expr), std::move(rhs));
                 }
             }
-            else if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            else
             {
-                begin++;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+                {
+                    begin++;
+                }
                 return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
         }
@@ -104,14 +107,6 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
             {
                 begin++;
-            }
-            if (begin != end && begin->getTokenType() != lexer::TokenType::OpenSquareBracket)
-            {
-                context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(*(begin == end ? (end - 1) : begin),
-                                                                              context.getSourceInterface(),
-                                                                              *(begin == end ? (end - 1) : begin)));
-                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
-                return nullptr;
             }
             return std::make_unique<Syntax::GotoStatement>(start, begin, label, std::move(index));
         }
@@ -235,10 +230,9 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     {
         auto start = begin;
         begin++;
-        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+        auto var = parseExpression(begin, end, context);
+        if (var)
         {
-            auto var = begin;
-            begin++;
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
                 begin++;
@@ -289,7 +283,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                     else if (begin != end && begin->getTokenType() == lexer::TokenType::WhileKeyword)
                     {
                         begin++;
-                        element.whileCondition = parseExpression(begin, end, context);
+                        element.whileCondition = parseCondition(begin, end, context);
                         if (!element.whileCondition)
                         {
                             errorOccurred = true;
@@ -314,7 +308,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                     begin++;
                     if (auto body = parseStatement(begin, end, context); body && !elements.empty())
                     {
-                        return std::make_unique<Syntax::ForStatement>(start, begin, var, std::move(elements),
+                        return std::make_unique<Syntax::ForStatement>(start, begin, std::move(var), std::move(elements),
                                                                       std::move(body));
                     }
                 }
@@ -336,10 +330,10 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         }
         else
         {
-            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
                                                                  context.getSourceInterface(),
                                                                  *(begin == end ? (end - 1) : begin)));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
         }
         return nullptr;
     }

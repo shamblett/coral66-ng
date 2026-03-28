@@ -232,14 +232,6 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CLOSE_SQUARE_BRACKET));
     }
 
-    SECTION("Goto Switch No Open Square Bracket")
-    {
-        const ParsedStatement s("GOTO s0]");
-        CHECK(s.statement.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_SQUARE_BRACKET));
-    }
-
     SECTION("Answer No Expression")
     {
         const ParsedStatement s("ANSWER ;");
@@ -317,7 +309,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         const ParsedStatement s("FOR := 1 STEP 1 UNTIL 4 DO A :- A + 1");
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
     }
 
     SECTION("For Statement - Missing Assignment")

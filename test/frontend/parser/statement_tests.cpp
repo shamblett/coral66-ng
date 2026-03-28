@@ -346,7 +346,7 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         const ParsedStatement s("FOR A := 1 STEP 1 UNTIL 4 DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
-        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
         REQUIRE(forStatement->getElements().size() == 1);
         auto& el = forStatement->getElements()[0];
         CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
@@ -364,7 +364,7 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
                                 "DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
-        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
         REQUIRE(forStatement->getElements().size() == 2);
         auto& el1 = forStatement->getElements()[0];
         CHECK(std::get<llvm::APSInt>(el1.expression->begin()->getValue()) == 1);
@@ -384,7 +384,7 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         const ParsedStatement s("FOR A := 1 DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
-        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
         REQUIRE(forStatement->getElements().size() == 1);
         auto& el = forStatement->getElements()[0];
         CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
@@ -398,7 +398,7 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         const ParsedStatement s("FOR A := 1, 2, 4 DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
-        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
         REQUIRE(forStatement->getElements().size() == 3);
         CHECK(std::get<llvm::APSInt>(forStatement->getElements()[0].expression->begin()->getValue()) == 1);
         CHECK(std::get<llvm::APSInt>(forStatement->getElements()[1].expression->begin()->getValue()) == 2);
@@ -407,10 +407,10 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
 
     SECTION("FOR WHILE DO")
     {
-        const ParsedStatement s("FOR A := 1 WHILE 1 DO B := B + 2");
+        const ParsedStatement s("FOR A := 1 WHILE 1 = 1 DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
-        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
         REQUIRE(forStatement->getElements().size() == 1);
         auto& el = forStatement->getElements()[0];
         CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
@@ -420,7 +420,7 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
 
     SECTION("FOR Mixed List DO")
     {
-        const ParsedStatement s("FOR A := 1, 2 STEP 1 UNTIL 4, 5 WHILE 0 DO B := B + 2");
+        const ParsedStatement s("FOR A := 1, 2 STEP 1 UNTIL 4, 5 WHILE 0 = 0 DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
         REQUIRE(forStatement->getElements().size() == 3);
@@ -438,5 +438,47 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         CHECK(std::get<llvm::APSInt>(el3.expression->begin()->getValue()) == 5);
         REQUIRE(el3.whileCondition != nullptr);
         CHECK(std::get<llvm::APSInt>(el3.whileCondition->begin()->getValue()) == 0);
+    }
+}
+
+TEST_CASE("Coral Parse Statements - For Edge Cases", "[Parser][Statement]")
+{
+    SECTION("FOR Array Access DO")
+    {
+        const ParsedStatement s("FOR A[1] := 1 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
+    }
+
+    SECTION("FOR WHILE Condition DO")
+    {
+        const ParsedStatement s("FOR A := 1 WHILE B = 2 DO B := B + 2");
+        auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
+        REQUIRE(forStatement != nullptr);
+        REQUIRE(forStatement->getElements().size() == 1);
+        auto& el = forStatement->getElements()[0];
+        REQUIRE(el.whileCondition != nullptr);
+    }
+}
+
+TEST_CASE("Coral Parse Statements - Procedure Edge Cases", "[Parser][Statement]")
+{
+    SECTION("No Semicolon Required")
+    {
+        const ParsedStatement s("P");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement != nullptr);
+        CHECK(std::get<std::string>(procedureCallStatement->getExpression().begin()->getValue()) == "P");
+    }
+
+    SECTION("Procedure Call At End Of Block Without Semicolon")
+    {
+        const ParsedStatement s("BEGIN P END;");
+        auto compStmt = dynamic_cast<CompoundStatement*>(s.statement.get());
+        REQUIRE(compStmt != nullptr);
+        REQUIRE(compStmt->getStatements().size() == 1);
+        auto procCall = dynamic_cast<ProcedureCallStatement*>(compStmt->getStatements()[0].get());
+        REQUIRE(procCall != nullptr);
     }
 }
