@@ -312,8 +312,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
                 if (!errorOccurred && begin != end && begin->getTokenType() == lexer::TokenType::DoKeyword)
                 {
                     begin++;
-                    auto body = parseStatement(begin, end, context);
-                    if (body && !elements.empty())
+                    if (auto body = parseStatement(begin, end, context); body && !elements.empty())
                     {
                         return std::make_unique<Syntax::ForStatement>(start, begin, var, std::move(elements),
                                                                       std::move(body));
