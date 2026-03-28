@@ -225,22 +225,25 @@ public:
     [[nodiscard]] const Expression* getIndex() const;
 };
 
+struct ForElement
+{
+    std::unique_ptr<Expression> expression;
+    std::unique_ptr<Expression> step;
+    std::unique_ptr<Expression> until;
+    std::unique_ptr<Expression> whileCondition;
+};
+
 class ForStatement final : public Statement
 {
     lexer::CTokenIterator m_variable;
-    std::unique_ptr<Expression> m_start;
-    std::unique_ptr<Expression> m_step;
-    std::unique_ptr<Expression> m_until;
+    std::vector<ForElement> m_elements;
     std::unique_ptr<Statement> m_body;
 
 public:
     ForStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator variable,
-                 std::unique_ptr<Expression>&& start, std::unique_ptr<Expression>&& step,
-                 std::unique_ptr<Expression>&& until, std::unique_ptr<Statement>&& body);
+                 std::vector<ForElement>&& elements, std::unique_ptr<Statement>&& body);
     [[nodiscard]] lexer::CTokenIterator getVariable() const;
-    [[nodiscard]] const Expression& getStart() const;
-    [[nodiscard]] const Expression& getStep() const;
-    [[nodiscard]] const Expression& getUntil() const;
+    [[nodiscard]] const std::vector<ForElement>& getElements() const;
     [[nodiscard]] const Statement& getBody() const;
 };
 

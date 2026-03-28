@@ -279,15 +279,9 @@ const Expression* GotoStatement::getIndex() const
 
 // ForStatement
 ForStatement::ForStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                           lexer::CTokenIterator variable, std::unique_ptr<Expression>&& start,
-                           std::unique_ptr<Expression>&& step, std::unique_ptr<Expression>&& until,
+                           lexer::CTokenIterator variable, std::vector<ForElement>&& elements,
                            std::unique_ptr<Statement>&& body)
-    : Statement(begin, end),
-      m_variable(variable),
-      m_start(std::move(start)),
-      m_step(std::move(step)),
-      m_until(std::move(until)),
-      m_body(std::move(body))
+    : Statement(begin, end), m_variable(variable), m_elements(std::move(elements)), m_body(std::move(body))
 {
 }
 
@@ -295,17 +289,9 @@ lexer::CTokenIterator ForStatement::getVariable() const
 {
     return m_variable;
 }
-const Expression& ForStatement::getStart() const
+const std::vector<ForElement>& ForStatement::getElements() const
 {
-    return *m_start;
-}
-const Expression& ForStatement::getStep() const
-{
-    return *m_step;
-}
-const Expression& ForStatement::getUntil() const
-{
-    return *m_until;
+    return m_elements;
 }
 const Statement& ForStatement::getBody() const
 {

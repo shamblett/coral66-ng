@@ -347,9 +347,11 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
         CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
-        CHECK(std::get<llvm::APSInt>(forStatement->getStart().begin()->getValue()) == 1);
-        CHECK(std::get<llvm::APSInt>(forStatement->getStep().begin()->getValue()) == 1);
-        CHECK(std::get<llvm::APSInt>(forStatement->getUntil().begin()->getValue()) == 4);
+        REQUIRE(forStatement->getElements().size() == 1);
+        auto& el = forStatement->getElements()[0];
+        CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(el.step->begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(el.until->begin()->getValue()) == 4);
         CHECK(std::get<std::string>(forStatement->getBody().begin()->getValue()) == "B");
         CHECK(std::get<std::string>((forStatement->getBody().begin() + 2)->getValue()) == "B");
         CHECK(std::get<llvm::APSInt>((forStatement->getBody().begin() + 4)->getValue()) == 2);
@@ -362,6 +364,18 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
                                 "DO B := B + 2");
         auto forStatement = dynamic_cast<ForStatement*>(s.statement.get());
         REQUIRE(forStatement != nullptr);
+        CHECK(std::get<std::string>(forStatement->getVariable()->getValue()) == "A");
+        REQUIRE(forStatement->getElements().size() == 2);
+        auto& el1 = forStatement->getElements()[0];
+        CHECK(std::get<llvm::APSInt>(el1.expression->begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(el1.step->begin()->getValue()) == 1);
+        CHECK(std::get<llvm::APSInt>(el1.until->begin()->getValue()) == 4);
 
+        auto& el2 = forStatement->getElements()[1];
+        CHECK(std::get<llvm::APSInt>(el2.expression->begin()->getValue()) == 6);
+        CHECK(std::get<llvm::APSInt>(el2.step->begin()->getValue()) == 2);
+        CHECK(std::get<llvm::APSInt>(el2.until->begin()->getValue()) == 10);
+
+        CHECK(std::get<std::string>(forStatement->getBody().begin()->getValue()) == "B");
     }
 }

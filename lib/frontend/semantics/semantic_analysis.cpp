@@ -79,7 +79,6 @@ void SemanticAnalysis::visit(const Syntax::Declaration& node)
 
 void SemanticAnalysis::visit(const Syntax::Statement& node)
 {
-
     if (auto* dummy = dynamic_cast<const Syntax::DummyStatement*>(&node))
     {
         visit(*dummy);
@@ -470,14 +469,34 @@ void SemanticAnalysis::visit(const Syntax::ForStatement& node)
     }
     auto var = std::move(m_lastExpression);
 
-    visit(node.getStart());
-    auto start = std::move(m_lastExpression);
+    std::vector<Semantics::ForElement> elements;
+    for (const auto& synElement : node.getElements())
+    {
+        Semantics::ForElement semElement;
 
-    visit(node.getStep());
-    auto step = std::move(m_lastExpression);
+        visit(*synElement.expression);
+        semElement.expression = std::move(m_lastExpression);
 
-    visit(node.getUntil());
-    auto until = std::move(m_lastExpression);
+        if (synElement.step)
+        {
+            visit(*synElement.step);
+            semElement.step = std::move(m_lastExpression);
+        }
+
+        if (synElement.until)
+        {
+            visit(*synElement.until);
+            semElement.until = std::move(m_lastExpression);
+        }
+
+        if (synElement.whileCondition)
+        {
+            visit(*synElement.whileCondition);
+            semElement.whileCondition = std::move(m_lastExpression);
+        }
+
+        elements.push_back(std::move(semElement));
+    }
 
     auto prevStatements = std::move(m_currentBlockStatements);
     m_currentBlockStatements.clear();
@@ -490,8 +509,7 @@ void SemanticAnalysis::visit(const Syntax::ForStatement& node)
     }
     m_currentBlockStatements = std::move(prevStatements);
 
-    auto stmt = makeIntr<ForStatement>(ScopePoint{0}, std::move(var), std::move(start), std::move(step),
-                                       std::move(until), std::move(body));
+    auto stmt = makeIntr<ForStatement>(ScopePoint{0}, std::move(var), std::move(elements), std::move(body));
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 

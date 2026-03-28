@@ -591,24 +591,26 @@ public:
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(GotoStatement)
 };
 
+struct ForElement
+{
+    coral66::IntrVarPtr<ExpressionBase> expression;
+    coral66::IntrVarPtr<ExpressionBase> step;
+    coral66::IntrVarPtr<ExpressionBase> until;
+    coral66::IntrVarPtr<ExpressionBase> whileCondition;
+};
+
 class ForStatement final : public Statement
 {
     coral66::IntrVarPtr<ExpressionBase> m_variable;
-    coral66::IntrVarPtr<ExpressionBase> m_start;
-    coral66::IntrVarPtr<ExpressionBase> m_step;
-    coral66::IntrVarPtr<ExpressionBase> m_until;
+    std::vector<ForElement> m_elements;
     coral66::IntrVarPtr<Statement> m_body;
 
 public:
-    ForStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& variable,
-                 coral66::IntrVarPtr<ExpressionBase>&& start, // NOLINT(*-pro-type-member-init)
-                 coral66::IntrVarPtr<ExpressionBase>&& step, coral66::IntrVarPtr<ExpressionBase>&& until,
+    ForStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& variable, std::vector<ForElement>&& elements,
                  coral66::IntrVarPtr<Statement>&& body)
         : Statement(sp, std::in_place_type<ForStatement>),
           m_variable(std::move(variable)),
-          m_start(std::move(start)),
-          m_step(std::move(step)),
-          m_until(std::move(until)),
+          m_elements(std::move(elements)),
           m_body(std::move(body))
     {
     }
@@ -617,17 +619,9 @@ public:
     {
         return *m_variable;
     }
-    [[nodiscard]] const ExpressionBase& getStart() const
+    [[nodiscard]] const std::vector<ForElement>& getElements() const
     {
-        return *m_start;
-    }
-    [[nodiscard]] const ExpressionBase& getStep() const
-    {
-        return *m_step;
-    }
-    [[nodiscard]] const ExpressionBase& getUntil() const
-    {
-        return *m_until;
+        return m_elements;
     }
     [[nodiscard]] const Statement& getBody() const
     {

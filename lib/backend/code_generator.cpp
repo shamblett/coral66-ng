@@ -368,40 +368,112 @@ void code_generator::visit(const Semantics::LabelStatement& stmt)
 
 void code_generator::visit(const Semantics::ForStatement& stmt)
 {
-    llvm::Value* startVal = visit(stmt.getStart());
     llvm::Value* loopVarAddr = emitAddress(stmt.getVariable());
+    llvm::Type* loopVarType = convertType(stmt.getVariable().getType());
 
-    if (loopVarAddr && startVal)
-        m_builder.CreateStore(startVal, loopVarAddr);
-
-    llvm::BasicBlock* condBB = llvm::BasicBlock::Create(m_module.getContext(), "for.cond", m_currentFunction);
-    llvm::BasicBlock* bodyBB = llvm::BasicBlock::Create(m_module.getContext(), "for.body", m_currentFunction);
-    llvm::BasicBlock* stepBB = llvm::BasicBlock::Create(m_module.getContext(), "for.step", m_currentFunction);
     llvm::BasicBlock* endBB = llvm::BasicBlock::Create(m_module.getContext(), "for.end", m_currentFunction);
 
-    m_builder.CreateBr(condBB);
+    for (const auto& el : stmt.getElements())
+    {
+        llvm::BasicBlock* nextElBB = llvm::BasicBlock::Create(m_module.getContext(), "for.next_el", m_currentFunction);
 
-    m_builder.SetInsertPoint(condBB);
-    llvm::Value* currVal = m_builder.CreateLoad(convertType(stmt.getVariable().getType()), loopVarAddr);
-    llvm::Value* untilVal = visit(stmt.getUntil());
-    if (untilVal->getType() != currVal->getType())
-        untilVal = m_builder.CreateIntCast(untilVal, currVal->getType(), true);
-    llvm::Value* cond = m_builder.CreateICmpSLT(currVal, untilVal);
-    m_builder.CreateCondBr(cond, bodyBB, endBB);
+        if (el.step && el.until)
+        {
+            llvm::Value* v1 = visit(*el.expression);
+            llvm::Value* v2 = visit(*el.step);
+            llvm::Value* v3 = visit(*el.until);
 
-    m_builder.SetInsertPoint(bodyBB);
-    visit(stmt.getBody());
-    m_builder.CreateBr(stepBB);
+            if (v1->getType() != loopVarType)
+                v1 = m_builder.CreateIntCast(v1, loopVarType, true);
+            if (v2->getType() != loopVarType)
+                v2 = m_builder.CreateIntCast(v2, loopVarType, true);
+            if (v3->getType() != loopVarType)
+                v3 = m_builder.CreateIntCast(v3, loopVarType, true);
 
-    m_builder.SetInsertPoint(stepBB);
-    llvm::Value* stepVal = visit(stmt.getStep());
-    llvm::Value* valForStep = m_builder.CreateLoad(convertType(stmt.getVariable().getType()), loopVarAddr);
-    if (stepVal->getType() != valForStep->getType())
-        stepVal = m_builder.CreateIntCast(stepVal, valForStep->getType(), true);
-    llvm::Value* incVal = m_builder.CreateAdd(valForStep, stepVal);
-    m_builder.CreateStore(incVal, loopVarAddr);
-    m_builder.CreateBr(condBB);
+            llvm::AllocaInst* v1Addr = m_builder.CreateAlloca(loopVarType, nullptr, "v1");
+            llvm::AllocaInst* v2Addr = m_builder.CreateAlloca(loopVarType, nullptr, "v2");
+            llvm::AllocaInst* v3Addr = m_builder.CreateAlloca(loopVarType, nullptr, "v3");
 
+            m_builder.CreateStore(v1, v1Addr);
+            m_builder.CreateStore(v2, v2Addr);
+            m_builder.CreateStore(v3, v3Addr);
+
+            llvm::BasicBlock* condBB =
+                llvm::BasicBlock::Create(m_module.getContext(), "for.step.cond", m_currentFunction);
+            llvm::BasicBlock* bodyBB =
+                llvm::BasicBlock::Create(m_module.getContext(), "for.step.body", m_currentFunction);
+            llvm::BasicBlock* incBB =
+                llvm::BasicBlock::Create(m_module.getContext(), "for.step.inc", m_currentFunction);
+
+            m_builder.CreateBr(condBB);
+            m_builder.SetInsertPoint(condBB);
+
+            llvm::Value* currV1 = m_builder.CreateLoad(loopVarType, v1Addr);
+            if (loopVarAddr)
+                m_builder.CreateStore(currV1, loopVarAddr);
+
+            llvm::Value* currV2 = m_builder.CreateLoad(loopVarType, v2Addr);
+            llvm::Value* currV3 = m_builder.CreateLoad(loopVarType, v3Addr);
+
+            llvm::Value* diff = m_builder.CreateSub(currV1, currV3);
+            llvm::Value* prod = m_builder.CreateMul(diff, currV2);
+            llvm::Value* isExhausted = m_builder.CreateICmpSGT(prod, llvm::ConstantInt::get(loopVarType, 0));
+            m_builder.CreateCondBr(isExhausted, nextElBB, bodyBB);
+
+            m_builder.SetInsertPoint(bodyBB);
+            visit(stmt.getBody());
+            m_builder.CreateBr(incBB);
+
+            m_builder.SetInsertPoint(incBB);
+            llvm::Value* cv = m_builder.CreateLoad(loopVarType, loopVarAddr);
+            llvm::Value* nextV1 = m_builder.CreateAdd(cv, currV2);
+            m_builder.CreateStore(nextV1, v1Addr);
+            m_builder.CreateBr(condBB);
+        }
+        else if (el.whileCondition)
+        {
+            llvm::BasicBlock* condBB =
+                llvm::BasicBlock::Create(m_module.getContext(), "for.while.cond", m_currentFunction);
+            llvm::BasicBlock* bodyBB =
+                llvm::BasicBlock::Create(m_module.getContext(), "for.while.body", m_currentFunction);
+
+            m_builder.CreateBr(condBB);
+            m_builder.SetInsertPoint(condBB);
+
+            llvm::Value* exprVal = visit(*el.expression);
+            if (exprVal->getType() != loopVarType)
+                exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
+
+            if (loopVarAddr)
+                m_builder.CreateStore(exprVal, loopVarAddr);
+
+            llvm::Value* condVal = visit(*el.whileCondition);
+            if (condVal->getType() != m_builder.getInt1Ty())
+                condVal = m_builder.CreateICmpNE(condVal, llvm::ConstantInt::get(condVal->getType(), 0));
+
+            m_builder.CreateCondBr(condVal, bodyBB, nextElBB);
+
+            m_builder.SetInsertPoint(bodyBB);
+            visit(stmt.getBody());
+            m_builder.CreateBr(condBB);
+        }
+        else
+        {
+            llvm::Value* exprVal = visit(*el.expression);
+            if (exprVal->getType() != loopVarType)
+                exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
+
+            if (loopVarAddr)
+                m_builder.CreateStore(exprVal, loopVarAddr);
+
+            visit(stmt.getBody());
+            m_builder.CreateBr(nextElBB);
+        }
+
+        m_builder.SetInsertPoint(nextElBB);
+    }
+
+    m_builder.CreateBr(endBB);
     m_builder.SetInsertPoint(endBB);
 }
 

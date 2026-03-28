@@ -242,48 +242,89 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
                 begin++;
-                auto startExpr = parseExpression(begin, end, context);
-                if (begin != end && begin->getTokenType() == lexer::TokenType::StepKeyword)
+                std::vector<Syntax::ForElement> elements;
+                bool parsingElements = true;
+                bool errorOccurred = false;
+
+                while (parsingElements)
                 {
-                    begin++;
-                    auto stepExpr = parseExpression(begin, end, context);
-                    if (begin != end && begin->getTokenType() == lexer::TokenType::UntilKeyword)
+                    Syntax::ForElement element;
+                    element.expression = parseExpression(begin, end, context);
+                    if (!element.expression)
+                    {
+                        errorOccurred = true;
+                        break;
+                    }
+
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::StepKeyword)
                     {
                         begin++;
-                        auto untilExpr = parseExpression(begin, end, context);
-                        if (begin != end && begin->getTokenType() == lexer::TokenType::DoKeyword)
+                        element.step = parseExpression(begin, end, context);
+                        if (!element.step)
+                        {
+                            errorOccurred = true;
+                            break;
+                        }
+
+                        if (begin != end && begin->getTokenType() == lexer::TokenType::UntilKeyword)
                         {
                             begin++;
-                            auto body = parseStatement(begin, end, context);
-                            if (startExpr && stepExpr && untilExpr && body)
+                            element.until = parseExpression(begin, end, context);
+                            if (!element.until)
                             {
-                                return std::make_unique<Syntax::ForStatement>(start, begin, var, std::move(startExpr),
-                                                                              std::move(stepExpr), std::move(untilExpr),
-                                                                              std::move(body));
+                                errorOccurred = true;
+                                break;
                             }
                         }
                         else
                         {
-                            context.log(errors::parser::EXPECTED_DO.args(*(begin == end ? (end - 1) : begin),
-                                                                         context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
-                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DO);
+                            context.log(errors::parser::EXPECTED_UNTIL.args(*(begin == end ? (end - 1) : begin),
+                                                                            context.getSourceInterface(),
+                                                                            *(begin == end ? (end - 1) : begin)));
+                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_UNTIL);
+                            errorOccurred = true;
+                            break;
                         }
+                    }
+                    else if (begin != end && begin->getTokenType() == lexer::TokenType::WhileKeyword)
+                    {
+                        begin++;
+                        element.whileCondition = parseExpression(begin, end, context);
+                        if (!element.whileCondition)
+                        {
+                            errorOccurred = true;
+                            break;
+                        }
+                    }
+
+                    elements.push_back(std::move(element));
+
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                    {
+                        begin++;
                     }
                     else
                     {
-                        context.log(errors::parser::EXPECTED_UNTIL.args(*(begin == end ? (end - 1) : begin),
-                                                                        context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
-                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_UNTIL);
+                        parsingElements = false;
                     }
                 }
-                else
+
+                if (!errorOccurred && begin != end && begin->getTokenType() == lexer::TokenType::DoKeyword)
                 {
-                    context.log(errors::parser::EXPECTED_STEP.args(*(begin == end ? (end - 1) : begin),
-                                                                   context.getSourceInterface(),
-                                                                   *(begin == end ? (end - 1) : begin)));
-                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STEP);
+                    begin++;
+                    auto body = parseStatement(begin, end, context);
+                    if (body && !elements.empty())
+                    {
+                        return std::make_unique<Syntax::ForStatement>(start, begin, var, std::move(elements),
+                                                                      std::move(body));
+                    }
+                }
+                else if (!errorOccurred)
+                {
+                    context.log(errors::parser::EXPECTED_DO.args(*(begin == end ? (end - 1) : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DO);
                 }
             }
             else
