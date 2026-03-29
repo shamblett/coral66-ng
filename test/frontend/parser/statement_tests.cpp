@@ -216,14 +216,28 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
  */
 TEST_CASE("Coral Parse Statements - Answer", "[Parser][Statement]")
 {
-    SECTION("Normal Answer")
+    SECTION("Normal Answer in Typed Procedure")
     {
-        const ParsedStatement s("ANSWER B;");
+        const ParsedStatement s("ANSWER B;", true, false);
         auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
         REQUIRE(answerStatement != nullptr);
         CHECK(std::get<std::string>(answerStatement->getExpression().begin()->getValue()) == "B");
     }
+    SECTION("Answer in Untyped Procedure")
+    {
+        const ParsedStatement s("ANSWER B;", false, true);
+        REQUIRE(s.statement == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE));
+    }
+    SECTION("Answer outside Procedure")
+    {
+        const ParsedStatement s("ANSWER B;", false, false);
+        REQUIRE(s.statement == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE));
+    }
 }
+
+
 
 /*
  * 7.5 Code
@@ -480,5 +494,27 @@ TEST_CASE("Coral Parse Statements - Procedure Edge Cases", "[Parser][Statement]"
         REQUIRE(compStmt->getStatements().size() == 1);
         auto procCall = dynamic_cast<ProcedureCallStatement*>(compStmt->getStatements()[0].get());
         REQUIRE(procCall != nullptr);
+    }
+}
+
+TEST_CASE("Coral Parse Statements - Labels", "[Parser][Statement]")
+{
+    SECTION("Single Label")
+    {
+        const ParsedStatement s("L1: ANSWER B;", true, false);
+        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
+        REQUIRE(answerStatement != nullptr);
+        REQUIRE(answerStatement->getLabels().size() == 1);
+        CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
+    }
+    SECTION("Multiple Labels")
+    {
+        const ParsedStatement s("L1: L2: L3: ANSWER B;", true, false);
+        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
+        REQUIRE(answerStatement != nullptr);
+        REQUIRE(answerStatement->getLabels().size() == 3);
+        CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
+        CHECK(std::get<std::string>(answerStatement->getLabels()[1]->getValue()) == "L2");
+        CHECK(std::get<std::string>(answerStatement->getLabels()[2]->getValue()) == "L3");
     }
 }

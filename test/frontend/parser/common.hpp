@@ -60,11 +60,14 @@ struct ParsedStatement
     std::unique_ptr<parser::Context> context;
     std::unique_ptr<Statement> statement;
 
-    explicit ParsedStatement(std::string src) : source(std::move(src)), ss(outStr)
+    explicit ParsedStatement(std::string src, bool isTypedProc = false, bool isUntypedProc = false) : source(std::move(src)), ss(outStr)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
         context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+
+        if (isTypedProc) context->enterProcedure(true);
+        if (isUntypedProc) context->enterProcedure(false);
 
         const auto& tokens = cTokens.data();
         const lexer::CToken* begin = tokens.data();

@@ -80,8 +80,9 @@ const std::vector<lexer::CTokenIterator>& VariableDeclaration::getIdentifiers() 
 ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                            const lexer::CTokenIterator name,
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
-                                           std::unique_ptr<Block>&& body)
-    : Declaration(begin, end), m_name(name), m_parameters(std::move(parameters)), m_body(std::move(body))
+                                           std::unique_ptr<Block>&& body,
+                                           std::optional<lexer::CTokenIterator> typeToken)
+    : Declaration(begin, end), m_typeToken(typeToken), m_name(name), m_parameters(std::move(parameters)), m_body(std::move(body))
 {
 }
 

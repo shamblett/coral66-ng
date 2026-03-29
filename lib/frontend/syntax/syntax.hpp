@@ -80,16 +80,19 @@ public:
 
 class ProcedureDeclaration final : public Declaration
 {
+    std::optional<lexer::CTokenIterator> m_typeToken;
     lexer::CTokenIterator m_name;
     std::vector<std::unique_ptr<Declaration>> m_parameters;
     std::unique_ptr<Block> m_body;
 
 public:
     ProcedureDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
-                         std::vector<std::unique_ptr<Declaration>>&& parameters, std::unique_ptr<Block>&& body);
+                         std::vector<std::unique_ptr<Declaration>>&& parameters, std::unique_ptr<Block>&& body,
+                         std::optional<lexer::CTokenIterator> typeToken = std::nullopt);
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getParameters() const;
     [[nodiscard]] const Block& getBody() const;
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getTypeToken() const { return m_typeToken; }
 };
 
 class ArrayDeclaration final : public Declaration
@@ -160,7 +163,14 @@ public:
 // Statements
 class Statement : public Node
 {
+    std::vector<lexer::CTokenIterator> m_labels;
+
+public:
     using Node::Node;
+    Statement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::vector<lexer::CTokenIterator> labels) : Node(begin, end), m_labels(std::move(labels)) {}
+    
+    void setLabels(std::vector<lexer::CTokenIterator> labels) { m_labels = std::move(labels); }
+    const std::vector<lexer::CTokenIterator>& getLabels() const { return m_labels; }
 };
 
 class DummyStatement final : public Statement

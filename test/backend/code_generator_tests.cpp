@@ -145,12 +145,12 @@ TEST_CASE("Coral 66 Answer Statement", "[Coral]")
     {
         auto program = generateProgram("PROGRAM AnsTest\n"
                                        "BEGIN\n"
-                                       "  ANSWER 42;\n"
+                                       "  INTEGER PROCEDURE test; BEGIN ANSWER 42; END;\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));
 
-        auto* function = module.getFunction("main");
+        auto* function = module.getFunction("test");
         REQUIRE(function);
         bool foundRet = false;
         for (auto& bb : *function)

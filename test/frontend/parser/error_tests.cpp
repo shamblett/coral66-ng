@@ -306,7 +306,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
 
     SECTION("Answer No Expression")
     {
-        const ParsedStatement s("ANSWER ;");
+        const ParsedStatement s("ANSWER ;", true);
         REQUIRE(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));

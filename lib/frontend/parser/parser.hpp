@@ -19,12 +19,28 @@ class Context
     llvm::raw_ostream* m_reporter;
     std::size_t m_errorCount = 0;
 
+
+    struct ProcedureState {
+        bool isTyped;
+        bool hasAnswer;
+    };
+    std::vector<ProcedureState> m_procedureStack;
+
 public:
     explicit Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs());
 
     void log(const Message& message);
     [[nodiscard]] const source_interface& getSourceInterface() const;
     [[nodiscard]] std::size_t getErrorCount() const;
+
+    void enterProcedure(bool isTyped) { m_procedureStack.push_back({isTyped, false}); }
+    void exitProcedure() { m_procedureStack.pop_back(); }
+    bool isInsideProcedure() const { return !m_procedureStack.empty(); }
+    bool isInsideTypedProcedure() const { return !m_procedureStack.empty() && m_procedureStack.back().isTyped; }
+    bool isInsideUntypedProcedure() const { return !m_procedureStack.empty() && !m_procedureStack.back().isTyped; }
+    void markAnswerStatementFound() { if (!m_procedureStack.empty()) m_procedureStack.back().hasAnswer = true; }
+    bool isAnswerStatementFound() const { return !m_procedureStack.empty() && m_procedureStack.back().hasAnswer; }
+
 };
 
 /*

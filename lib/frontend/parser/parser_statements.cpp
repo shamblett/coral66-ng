@@ -67,7 +67,7 @@ static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIter
     return false;
 }
 
-std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                                   Context& context)
 {
     if (begin == end)
@@ -183,6 +183,23 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         {
             begin++;
         }
+        
+        if (!context.isInsideProcedure()) {
+            context.log(errors::parser::ANSWER_OUTSIDE_PROCEDURE.args(
+                *start, context.getSourceInterface(), *start));
+            DiagnosticCollector::addDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE);
+            return nullptr;
+        }
+        
+        if (context.isInsideUntypedProcedure()) {
+            context.log(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE.args(
+                *start, context.getSourceInterface(), *start));
+            DiagnosticCollector::addDiagnostic(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE);
+            return nullptr;
+        }
+
+        context.markAnswerStatementFound();
+
         if (expr)
         {
             return std::make_unique<Syntax::AnswerStatement>(start, begin, std::move(expr));
@@ -432,4 +449,36 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
     return nullptr;
 }
+
+std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+                                                  Context& context)
+{
+    if (begin == end)
+    {
+        return nullptr;
+    }
+
+    std::vector<lexer::CTokenIterator> labels;
+    while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+    {
+        auto next = begin + 1;
+        if (next != end && next->getTokenType() == lexer::TokenType::Colon)
+        {
+            labels.push_back(begin);
+            begin += 2;
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    auto stmt = parseStatementImpl(begin, end, context);
+    if (stmt)
+    {
+        stmt->setLabels(std::move(labels));
+    }
+    return stmt;
+}
 } // namespace coral66::parser
+

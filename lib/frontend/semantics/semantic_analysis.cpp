@@ -280,7 +280,17 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
 
     m_isGlobalScope = wasGlobal;
 
-    IntrusiveVariantValue<Type> type(ProcedureType{&voidType, std::move(paramTypes)});
+    const Type* returnType = &voidType;
+    if (auto typeToken = node.getTypeToken()) {
+        if (typeToken.value()->getTokenType() == lexer::TokenType::FloatingKeyword)
+            returnType = &floatingType;
+        else if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword)
+            returnType = &fixedType;
+        else
+            returnType = &integerType;
+    }
+    
+    IntrusiveVariantValue<Type> type(ProcedureType{returnType, std::move(paramTypes)});
     auto proc = makeIntr<ProcedureDeclaration>(node.getName(), std::move(type));
 
     const std::string& name = std::get<std::string>(node.getName()->getValue());
