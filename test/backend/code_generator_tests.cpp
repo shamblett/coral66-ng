@@ -210,9 +210,9 @@ TEST_CASE("Coral 66 Control Flow", "[Coral]")
     {
         auto program = generateProgram("PROGRAM IfTest\n"
                                        "BEGIN\n"
-                                       "  INTEGER a;\n"
+                                       "  INTEGER a; INTEGER b;\n"
                                        "  a := 1;\n"
-                                       "  INTEGER b; b := 2; IF a > b THEN a := 2 ELSE a := 3;\n"
+                                       "  b := 2; IF a > b THEN a := 2 ELSE a := 3;\n"
                                        "END");
         coral66::CGLLVM::generateLLVM(module, program, emitAllDecls);
         REQUIRE_FALSE(llvm::verifyModule(module, &llvm::errs()));

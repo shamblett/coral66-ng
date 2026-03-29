@@ -87,10 +87,6 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                 {
                     begin++;
                     auto rhs = parseExpression(begin, end, context);
-                    if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-                    {
-                        begin++;
-                    }
                     if (rhs)
                     {
                         return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(var),
@@ -126,11 +122,6 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_PROCEDURE_CALL);
                     return nullptr;
                 }
-
-                if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-                {
-                    begin++;
-                }
                 return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
             return nullptr;
@@ -162,10 +153,6 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     return nullptr;
                 }
             }
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-            {
-                begin++;
-            }
             return std::make_unique<Syntax::GotoStatement>(start, begin, label, std::move(index));
         }
         context.log(errors::parser::EXPECTED_IDENTIFIER.args(
@@ -179,10 +166,6 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         auto start = begin;
         begin++;
         auto expr = parseExpression(begin, end, context);
-        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-        {
-            begin++;
-        }
         
         if (!context.isInsideProcedure()) {
             context.log(errors::parser::ANSWER_OUTSIDE_PROCEDURE.args(
@@ -213,10 +196,6 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     if (begin->getTokenType() == lexer::TokenType::CodeKeyword)
     {
         begin++;
-        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-        {
-            begin++;
-        }
         if (begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword)
         {
             begin++;
@@ -413,14 +392,9 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         return nullptr;
     }
 
-    if (begin->getTokenType() == lexer::TokenType::SemiColon)
-    {
-        auto start = begin;
-        begin++;
-        return std::make_unique<Syntax::DummyStatement>(start, begin);
-    }
-
-    if (begin->getTokenType() == lexer::TokenType::EndKeyword || begin->getTokenType() == lexer::TokenType::ElseKeyword)
+    if (begin->getTokenType() == lexer::TokenType::SemiColon ||
+        begin->getTokenType() == lexer::TokenType::EndKeyword ||
+        begin->getTokenType() == lexer::TokenType::ElseKeyword)
     {
         return std::make_unique<Syntax::DummyStatement>(begin, begin);
     }
@@ -436,11 +410,6 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
             }
             return std::make_unique<Syntax::BlockStatement>(blockStart, begin, std::move(block));
         }
-        return nullptr;
-    }
-
-    if (begin->getTokenType() == lexer::TokenType::SemiColon)
-    {
         return nullptr;
     }
 

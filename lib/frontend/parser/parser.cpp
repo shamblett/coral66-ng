@@ -89,25 +89,65 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
     std::vector<std::unique_ptr<Syntax::Statement>> statements;
     std::vector<std::unique_ptr<Syntax::PlaceReference>> placeReferences;
 
+    bool parsingDeclarations = true;
+    bool firstStatement = true;
+
     while (begin != end && begin->getTokenType() != lexer::TokenType::EndKeyword)
     {
-        if (auto newDeclarations = parseDeclaration(begin, end, context); !newDeclarations.empty())
+        if (parsingDeclarations)
         {
-            for (auto& d : newDeclarations)
-                declarations.push_back(std::move(d));
-            continue;
+            auto newDeclarations = parseDeclaration(begin, end, context);
+            if (!newDeclarations.empty())
+            {
+                for (auto& d : newDeclarations)
+                    declarations.push_back(std::move(d));
+                continue;
+            }
+            if (auto placeReference = parsePlaceReference(begin, end, context))
+            {
+                placeReferences.push_back(std::move(placeReference));
+                continue;
+            }
+            parsingDeclarations = false;
         }
-        if (auto stmt = parseStatement(begin, end, context))
+
+        if (!firstStatement)
+        {
+            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            {
+                begin++;
+            }
+            else
+            {
+                context.log(errors::parser::EXPECTED_SEMICOLON.args(
+                    *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SEMICOLON);
+                // Recover to next statement boundary
+                while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon && begin->getTokenType() != lexer::TokenType::EndKeyword)
+                {
+                    begin++;
+                }
+                if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+                {
+                    begin++;
+                }
+                continue;
+            }
+        }
+
+        auto stmt = parseStatement(begin, end, context);
+        if (stmt)
         {
             statements.push_back(std::move(stmt));
-            continue;
         }
-        if (auto placeReference = parsePlaceReference(begin, end, context))
+        else
         {
-            placeReferences.push_back(std::move(placeReference));
-            continue;
+            while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon && begin->getTokenType() != lexer::TokenType::EndKeyword)
+            {
+                begin++;
+            }
         }
-        begin++;
+        firstStatement = false;
     }
 
     if (begin != end && begin->getTokenType() == lexer::TokenType::EndKeyword)

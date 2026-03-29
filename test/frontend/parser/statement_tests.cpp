@@ -271,7 +271,29 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
         const ParsedStatement s("BEGIN END;");
         auto compoundStatement = dynamic_cast<CompoundStatement*>(s.statement.get());
         REQUIRE(compoundStatement != nullptr);
-        CHECK(compoundStatement->getStatements().empty());
+        REQUIRE(compoundStatement->getStatements().empty());
+    }
+
+    SECTION("Semicolon separator compound")
+    {
+        const ParsedStatement s("BEGIN ; END;");
+        auto compoundStatement = dynamic_cast<CompoundStatement*>(s.statement.get());
+        REQUIRE(compoundStatement != nullptr);
+        REQUIRE(compoundStatement->getStatements().size() == 2);
+        auto dummy = dynamic_cast<DummyStatement*>(compoundStatement->getStatements()[0].get());
+        REQUIRE(dummy != nullptr);
+    }
+
+    SECTION("Missing semicolon error")
+    {
+        const ParsedStatement s("BEGIN A := 1 B := 2 END;");
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+    }
+
+    SECTION("Declarations after statements error")
+    {
+        const ParsedStatement s("BEGIN A := 1; INTEGER B; B := 2 END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
     SECTION("Single statement compound")
