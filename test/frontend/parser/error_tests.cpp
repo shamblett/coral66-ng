@@ -352,6 +352,27 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CONDITION));
     }
 
+    SECTION("Block missing semicolon between declarations")
+    {
+        const ParsedStatement s("BEGIN INTEGER A INTEGER B; A := 1 END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+    }
+
+    SECTION("Block missing semicolon between decl and stmt")
+    {
+        const ParsedStatement s("BEGIN INTEGER A A := 1 END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+    }
+
+    SECTION("Block with bad Switch Place Reference")
+    {
+        const ParsedStatement s("BEGIN SWITCH S ; L1, L2; GOTO L1; END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_ASSIGNMENT));
+    }
+
     SECTION("Conditional Statement - IF No THEN")
     {
         const ParsedStatement s("IF A < 2");

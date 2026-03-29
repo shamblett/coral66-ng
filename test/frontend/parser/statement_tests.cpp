@@ -209,6 +209,23 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
         expressionPtr++;
         CHECK(std::get<std::string>(expressionPtr->getValue()) == "A");
     }
+ SECTION("No Semicolon Required")
+    {
+        const ParsedStatement s("P");
+        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
+        REQUIRE(procedureCallStatement != nullptr);
+        CHECK(std::get<std::string>(procedureCallStatement->getExpression().begin()->getValue()) == "P");
+    }
+
+    SECTION("Procedure Call At End Of Block Without Semicolon")
+    {
+        const ParsedStatement s("BEGIN P END;");
+        auto compStmt = dynamic_cast<CompoundStatement*>(s.statement.get());
+        REQUIRE(compStmt != nullptr);
+        REQUIRE(compStmt->getStatements().size() == 1);
+        auto procCall = dynamic_cast<ProcedureCallStatement*>(compStmt->getStatements()[0].get());
+        REQUIRE(procCall != nullptr);
+    }
 }
 
 /*
@@ -236,8 +253,6 @@ TEST_CASE("Coral Parse Statements - Answer", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE));
     }
 }
-
-
 
 /*
  * 7.5 Code
@@ -322,6 +337,44 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
         const auto& block = blockStatement->getBlock();
         REQUIRE(block.getDeclarations().size() == 1);
         REQUIRE(block.getStatements().size() == 1);
+    }
+}
+
+/*
+ * 7.7 Blocks
+ */
+
+TEST_CASE("Coral Parse Statements - Blocks and Declarations", "[Parser][Statement][Block]")
+{
+    SECTION("Block with proper Switch Place Reference")
+    {
+        const ParsedStatement s("BEGIN SWITCH S <- L1, L2 ; END;");
+        REQUIRE(parser::DiagnosticCollector::getDiagnostics().empty());
+        auto blockStmt = dynamic_cast<BlockStatement*>(s.statement.get());
+        REQUIRE(blockStmt != nullptr);
+        REQUIRE(blockStmt->getBlock().getPlaceReferences().size() == 1);
+        auto* switchPref = dynamic_cast<SwitchPlaceReference*>(blockStmt->getBlock().getPlaceReferences()[0].get());
+        REQUIRE(switchPref != nullptr);
+        REQUIRE(switchPref->getLabels().size() == 2);
+    }
+
+    SECTION("Single Label")
+    {
+        const ParsedStatement s("L1: ANSWER B;", true, false);
+        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
+        REQUIRE(answerStatement != nullptr);
+        REQUIRE(answerStatement->getLabels().size() == 1);
+        CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
+    }
+    SECTION("Multiple Labels")
+    {
+        const ParsedStatement s("L1: L2: L3: ANSWER B;", true, false);
+        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
+        REQUIRE(answerStatement != nullptr);
+        REQUIRE(answerStatement->getLabels().size() == 3);
+        CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
+        CHECK(std::get<std::string>(answerStatement->getLabels()[1]->getValue()) == "L2");
+        CHECK(std::get<std::string>(answerStatement->getLabels()[2]->getValue()) == "L3");
     }
 }
 
@@ -475,10 +528,7 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         REQUIRE(el3.whileCondition != nullptr);
         CHECK(std::get<llvm::APSInt>(el3.whileCondition->begin()->getValue()) == 0);
     }
-}
 
-TEST_CASE("Coral Parse Statements - For Edge Cases", "[Parser][Statement]")
-{
     SECTION("FOR Array Access DO")
     {
         const ParsedStatement s("FOR A[1] := 1 DO B := B + 2");
@@ -495,84 +545,5 @@ TEST_CASE("Coral Parse Statements - For Edge Cases", "[Parser][Statement]")
         REQUIRE(forStatement->getElements().size() == 1);
         auto& el = forStatement->getElements()[0];
         REQUIRE(el.whileCondition != nullptr);
-    }
-}
-
-TEST_CASE("Coral Parse Statements - Procedure Edge Cases", "[Parser][Statement]")
-{
-    SECTION("No Semicolon Required")
-    {
-        const ParsedStatement s("P");
-        auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
-        REQUIRE(procedureCallStatement != nullptr);
-        CHECK(std::get<std::string>(procedureCallStatement->getExpression().begin()->getValue()) == "P");
-    }
-
-    SECTION("Procedure Call At End Of Block Without Semicolon")
-    {
-        const ParsedStatement s("BEGIN P END;");
-        auto compStmt = dynamic_cast<CompoundStatement*>(s.statement.get());
-        REQUIRE(compStmt != nullptr);
-        REQUIRE(compStmt->getStatements().size() == 1);
-        auto procCall = dynamic_cast<ProcedureCallStatement*>(compStmt->getStatements()[0].get());
-        REQUIRE(procCall != nullptr);
-    }
-}
-
-TEST_CASE("Coral Parse Statements - Labels", "[Parser][Statement]")
-{
-    SECTION("Single Label")
-    {
-        const ParsedStatement s("L1: ANSWER B;", true, false);
-        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
-        REQUIRE(answerStatement != nullptr);
-        REQUIRE(answerStatement->getLabels().size() == 1);
-        CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
-    }
-    SECTION("Multiple Labels")
-    {
-        const ParsedStatement s("L1: L2: L3: ANSWER B;", true, false);
-        auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
-        REQUIRE(answerStatement != nullptr);
-        REQUIRE(answerStatement->getLabels().size() == 3);
-        CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
-        CHECK(std::get<std::string>(answerStatement->getLabels()[1]->getValue()) == "L2");
-        CHECK(std::get<std::string>(answerStatement->getLabels()[2]->getValue()) == "L3");
-    }
-}
-
-TEST_CASE("Coral Parse Statements - Blocks and Declarations", "[Parser][Statement][Block]")
-{
-    SECTION("Block missing semicolon between declarations")
-    {
-        const ParsedStatement s("BEGIN INTEGER A INTEGER B; A := 1 END;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
-    }
-
-    SECTION("Block missing semicolon between decl and stmt")
-    {
-        const ParsedStatement s("BEGIN INTEGER A A := 1 END;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
-    }
-
-    SECTION("Block with proper Switch Place Reference")
-    {
-        const ParsedStatement s("BEGIN SWITCH S <- L1, L2 ; END;");
-        REQUIRE(parser::DiagnosticCollector::getDiagnostics().empty());
-        auto blockStmt = dynamic_cast<BlockStatement*>(s.statement.get());
-        REQUIRE(blockStmt != nullptr);
-        REQUIRE(blockStmt->getBlock().getPlaceReferences().size() == 1);
-        auto* switchPref = dynamic_cast<SwitchPlaceReference*>(blockStmt->getBlock().getPlaceReferences()[0].get());
-        REQUIRE(switchPref != nullptr);
-        REQUIRE(switchPref->getLabels().size() == 2);
-    }
-
-    SECTION("Block with bad Switch Place Reference")
-    {
-        const ParsedStatement s("BEGIN SWITCH S ; L1, L2; GOTO L1; END;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_ASSIGNMENT));
     }
 }
