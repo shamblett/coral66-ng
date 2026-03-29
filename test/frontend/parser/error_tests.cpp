@@ -421,25 +421,25 @@ TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
 
     SECTION("SWITCH No Label")
     {
-        const ParsedPlaceReference p("SWITCH SW ");
+        const ParsedPlaceReference p("SWITCH SW <- ");
         CHECK(p.placeReference.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_LABELS));
     }
 
-    SECTION("SWITCH Labels Not Comma Separated")
+    SECTION("SWITCH Missing Assignment")
     {
-        const ParsedPlaceReference p("SWITCH SW LABEL1 @ LABEL2");
+        const ParsedPlaceReference p("SWITCH SW ; LABEL1, LABEL2");
         CHECK(p.placeReference.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_COMMA));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
     }
 
-    SECTION("SWITCH Labels Space Separated")
+    SECTION("SWITCH Bad Identifier in List")
     {
-        const ParsedPlaceReference p("SWITCH SW LABEL1 LABEL2");
+        const ParsedPlaceReference p("SWITCH SW <- LABEL1, 123");
         CHECK(p.placeReference.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_COMMA));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
     }
 }

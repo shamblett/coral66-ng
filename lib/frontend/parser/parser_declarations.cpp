@@ -95,8 +95,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     context.enterProcedure(true);
                     if (auto body = parseBlock(begin, end, context))
                     {
-                        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-                            begin++;
                         if (!context.isAnswerStatementFound()) {
                             context.log(errors::parser::MISSING_ANSWER_STATEMENT.args(*start, context.getSourceInterface(), *start));
                             DiagnosticCollector::addDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT);
@@ -169,11 +167,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 result.push_back(
                     std::make_unique<Syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers)));
         }
-
-        if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-        {
-            begin++;
-        }
         return result;
     }
 
@@ -213,8 +206,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
 
             result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width),
                                                                         std::move(length), std::move(elements)));
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-                begin++;
         }
         return result;
     }
@@ -279,8 +270,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 context.enterProcedure(false);
                 if (auto body = parseBlock(begin, end, context))
                 {
-                    if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-                        begin++;
                     result.push_back(std::make_unique<Syntax::ProcedureDeclaration>(
                         start, begin, name, std::move(parameters), std::move(body)));
                 }
@@ -288,7 +277,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             }
         }
     }
-
     return result;
 }
 } // namespace coral66::parser

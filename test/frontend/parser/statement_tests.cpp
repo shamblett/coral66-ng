@@ -279,7 +279,7 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
         const ParsedStatement s("BEGIN ; END;");
         auto compoundStatement = dynamic_cast<CompoundStatement*>(s.statement.get());
         REQUIRE(compoundStatement != nullptr);
-        REQUIRE(compoundStatement->getStatements().size() == 2);
+        REQUIRE(compoundStatement->getStatements().size() == 1);
         auto dummy = dynamic_cast<DummyStatement*>(compoundStatement->getStatements()[0].get());
         REQUIRE(dummy != nullptr);
     }
@@ -538,5 +538,41 @@ TEST_CASE("Coral Parse Statements - Labels", "[Parser][Statement]")
         CHECK(std::get<std::string>(answerStatement->getLabels()[0]->getValue()) == "L1");
         CHECK(std::get<std::string>(answerStatement->getLabels()[1]->getValue()) == "L2");
         CHECK(std::get<std::string>(answerStatement->getLabels()[2]->getValue()) == "L3");
+    }
+}
+
+TEST_CASE("Coral Parse Statements - Blocks and Declarations", "[Parser][Statement][Block]")
+{
+    SECTION("Block missing semicolon between declarations")
+    {
+        const ParsedStatement s("BEGIN INTEGER A INTEGER B; A := 1 END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+    }
+
+    SECTION("Block missing semicolon between decl and stmt")
+    {
+        const ParsedStatement s("BEGIN INTEGER A A := 1 END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+    }
+
+    SECTION("Block with proper Switch Place Reference")
+    {
+        const ParsedStatement s("BEGIN SWITCH S <- L1, L2 ; END;");
+        REQUIRE(parser::DiagnosticCollector::getDiagnostics().empty());
+        auto blockStmt = dynamic_cast<BlockStatement*>(s.statement.get());
+        REQUIRE(blockStmt != nullptr);
+        REQUIRE(blockStmt->getBlock().getPlaceReferences().size() == 1);
+        auto* switchPref = dynamic_cast<SwitchPlaceReference*>(blockStmt->getBlock().getPlaceReferences()[0].get());
+        REQUIRE(switchPref != nullptr);
+        REQUIRE(switchPref->getLabels().size() == 2);
+    }
+
+    SECTION("Block with bad Switch Place Reference")
+    {
+        const ParsedStatement s("BEGIN SWITCH S ; L1, L2; GOTO L1; END;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_ASSIGNMENT));
     }
 }

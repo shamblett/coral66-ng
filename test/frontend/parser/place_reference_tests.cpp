@@ -22,7 +22,7 @@ TEST_CASE("Coral Parse Place References", "[Parser][PlaceReference]")
 {
     SECTION("Single label")
     {
-        const ParsedPlaceReference p("SWITCH SW LABEL1");
+        const ParsedPlaceReference p("SWITCH SW <- LABEL1");
         auto switchReference = dynamic_cast<SwitchPlaceReference*>(p.placeReference.get());
         REQUIRE(switchReference != nullptr);
         CHECK(std::get<std::string>(switchReference->getName()->getValue()) == "SW");
@@ -31,7 +31,7 @@ TEST_CASE("Coral Parse Place References", "[Parser][PlaceReference]")
 
     SECTION("Multiple labels")
     {
-        const ParsedPlaceReference p("SWITCH SW LABEL1, LABEL2, LABEL3");
+        const ParsedPlaceReference p("SWITCH SW <- LABEL1, LABEL2, LABEL3");
         auto switchReference = dynamic_cast<SwitchPlaceReference*>(p.placeReference.get());
         REQUIRE(switchReference != nullptr);
         CHECK(std::get<std::string>(switchReference->getName()->getValue()) == "SW");

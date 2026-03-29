@@ -37,10 +37,35 @@ std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterato
             std::vector<lexer::CTokenIterator> labels;
             auto name = begin;
             begin++;
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+            if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
                 begin++;
             }
+            else if (begin != end && begin->getTokenType() == lexer::TokenType::LessThan)
+            {
+                auto next = begin + 1;
+                if (next != end && next->getTokenType() == lexer::TokenType::Minus)
+                {
+                    begin += 2;
+                }
+                else
+                {
+                    context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+                    return nullptr;
+                }
+            }
+            else
+            {
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+                return nullptr;
+            }
+
             while (begin != end)
             {
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
@@ -49,17 +74,13 @@ std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterato
                     labels.emplace_back(label);
                     begin++;
 
-                    if (begin != end && begin->getTokenType() != lexer::TokenType::Comma)
-                    {
-                        context.log(errors::parser::EXPECTED_COMMA.args(*(begin == end ? (end - 1) : begin),
-                                                                        context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
-                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COMMA);
-                        return nullptr;
-                    }
                     if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                     {
                         begin++;
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
                 else

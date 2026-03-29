@@ -35,6 +35,7 @@ class Block;
 class Declaration;
 class Statement;
 class Expression;
+class PlaceReference;
 
 class Program final : public Node
 {
@@ -49,13 +50,16 @@ class Block final : public Node
 {
     std::vector<std::unique_ptr<Declaration>> m_declarations;
     std::vector<std::unique_ptr<Statement>> m_statements;
+    std::vector<std::unique_ptr<PlaceReference>> m_placeReferences;
 
 public:
     Block(lexer::CTokenIterator begin, lexer::CTokenIterator end,
           std::vector<std::unique_ptr<Declaration>>&& declarations,
-          std::vector<std::unique_ptr<Statement>>&& statements);
+          std::vector<std::unique_ptr<Statement>>&& statements,
+          std::vector<std::unique_ptr<PlaceReference>>&& placeReferences = {});
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getDeclarations() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<PlaceReference>>& getPlaceReferences() const;
     std::vector<std::unique_ptr<Declaration>> takeDeclarations();
     std::vector<std::unique_ptr<Statement>> takeStatements();
 };

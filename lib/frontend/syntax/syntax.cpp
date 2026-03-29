@@ -35,8 +35,9 @@ const Block& Program::getBlock() const
 // Block
 Block::Block(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
              std::vector<std::unique_ptr<Declaration>>&& declarations,
-             std::vector<std::unique_ptr<Statement>>&& statements)
-    : Node(begin, end), m_declarations(std::move(declarations)), m_statements(std::move(statements))
+             std::vector<std::unique_ptr<Statement>>&& statements,
+             std::vector<std::unique_ptr<PlaceReference>>&& placeReferences)
+    : Node(begin, end), m_declarations(std::move(declarations)), m_statements(std::move(statements)), m_placeReferences(std::move(placeReferences))
 {
 }
 
@@ -44,9 +45,15 @@ const std::vector<std::unique_ptr<Declaration>>& Block::getDeclarations() const
 {
     return m_declarations;
 }
+
 const std::vector<std::unique_ptr<Statement>>& Block::getStatements() const
 {
     return m_statements;
+}
+
+const std::vector<std::unique_ptr<PlaceReference>>& Block::getPlaceReferences() const
+{
+    return m_placeReferences;
 }
 
 std::vector<std::unique_ptr<Declaration>> Block::takeDeclarations()
