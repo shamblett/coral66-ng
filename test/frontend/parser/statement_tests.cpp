@@ -410,7 +410,63 @@ TEST_CASE("Coral Parse Statements - Dummy", "[Parser][Statement]")
  */
 TEST_CASE("Coral Parse Statements - Conditional", "[Parser][Statement]")
 {
-    SECTION("If Then - Statement")
+    
+    SECTION("If Then - Simple Statement")
+    {
+        const ParsedStatement s("IF A = 1 THEN B := 2;");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
+
+    
+    SECTION("If Then - Labeled Nested If Forbidden")
+    {
+        const ParsedStatement s("IF A = 1 THEN L1: IF B = 2 THEN C := 3;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+    }
+    
+    SECTION("If Then - Labeled Simple Statement Allowed")
+    {
+        const ParsedStatement s("IF A = 1 THEN L1: B := 2;");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
+SECTION("If Then - Nested If Forbidden")
+    {
+        const ParsedStatement s("IF A = 1 THEN IF B = 2 THEN C := 3;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+    }
+
+    SECTION("If Then - Nested For Forbidden")
+    {
+        const ParsedStatement s("IF A = 1 THEN FOR I := 1 STEP 1 UNTIL 10 DO C := 3;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+    }
+
+    SECTION("If Then Else - Else Can Have If")
+    {
+        const ParsedStatement s("IF A = 1 THEN B := 2 ELSE IF B = 3 THEN C := 4;");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
+
+    SECTION("If Then Else - Else Can Have For")
+    {
+        const ParsedStatement s("IF A = 1 THEN B := 2 ELSE FOR I := 1 STEP 1 UNTIL 10 DO C := 4;");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
+    
+    SECTION("If Then - Nested If Allowed in Block")
+    {
+        const ParsedStatement s("IF A = 1 THEN BEGIN IF B = 2 THEN C := 3 END;");
+        auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
+        REQUIRE(ifStatement != nullptr);
+    }
+SECTION("If Then - Statement")
     {
         const ParsedStatement s("IF A < 2 THEN C := 3");
         auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());

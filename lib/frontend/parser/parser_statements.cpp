@@ -67,8 +67,7 @@ static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIter
     return false;
 }
 
-static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                                  Context& context)
+static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
 {
     if (begin == end)
     {
@@ -235,13 +234,21 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     }
     if (begin->getTokenType() == lexer::TokenType::IfKeyword)
     {
+        if (isConsequence)
+        {
+            context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT);
+            return nullptr;
+        }
         auto start = begin;
         begin++;
         auto cond = parseCondition(begin, end, context);
         if (begin != end && begin->getTokenType() == lexer::TokenType::ThenKeyword)
         {
             begin++;
-            auto thenBranch = parseStatement(begin, end, context);
+            auto thenBranch = parseStatement(begin, end, context, true);
             std::unique_ptr<Syntax::Statement> elseBranch = nullptr;
             if (begin != end && begin->getTokenType() == lexer::TokenType::ElseKeyword)
             {
@@ -282,6 +289,14 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
 
     if (begin->getTokenType() == lexer::TokenType::ForKeyword)
     {
+        if (isConsequence)
+        {
+            context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT);
+            return nullptr;
+        }
         auto start = begin;
         begin++;
         auto var = parseWordReference(begin, end, context);
@@ -419,8 +434,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     return nullptr;
 }
 
-std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                                  Context& context)
+std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
 {
     if (begin == end)
     {
@@ -442,7 +456,7 @@ std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
         }
     }
 
-    auto stmt = parseStatementImpl(begin, end, context);
+    auto stmt = parseStatementImpl(begin, end, context, isConsequence);
     if (stmt)
     {
         stmt->setLabels(std::move(labels));

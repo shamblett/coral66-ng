@@ -58,7 +58,7 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
 std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
                                                                    lexer::CTokenIterator end, Context& context);
 std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
-                                                  Context& context);
+                                                  Context& context, bool isConsequence = false);
 std::unique_ptr<Syntax::Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                    Context& context);
 std::unique_ptr<Syntax::Expression> parseVariable(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
