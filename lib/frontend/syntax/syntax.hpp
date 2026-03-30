@@ -70,6 +70,22 @@ class Declaration : public Node
     using Node::Node;
 };
 
+class ParameterDeclaration : public Declaration
+{
+public:
+    enum class ParameterMode { Value, Location, Array, Label, Switch, Procedure, UntypedValue, UntypedLocation };
+private:
+    ParameterMode m_mode;
+    std::optional<lexer::CTokenIterator> m_type;
+    std::vector<lexer::CTokenIterator> m_identifiers;
+public:
+    ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode,
+                         std::optional<lexer::CTokenIterator> type, std::vector<lexer::CTokenIterator>&& identifiers);
+    [[nodiscard]] ParameterMode getMode() const;
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
+};
+
 class VariableDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_type; // INTEGER, FLOATING, FIXED
@@ -87,15 +103,15 @@ class ProcedureDeclaration final : public Declaration
     std::optional<lexer::CTokenIterator> m_typeToken;
     lexer::CTokenIterator m_name;
     std::vector<std::unique_ptr<Declaration>> m_parameters;
-    std::unique_ptr<Block> m_body;
+    std::unique_ptr<Statement> m_body;
 
 public:
     ProcedureDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
-                         std::vector<std::unique_ptr<Declaration>>&& parameters, std::unique_ptr<Block>&& body,
+                         std::vector<std::unique_ptr<Declaration>>&& parameters, std::unique_ptr<Statement>&& body,
                          std::optional<lexer::CTokenIterator> typeToken = std::nullopt);
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getParameters() const;
-    [[nodiscard]] const Block& getBody() const;
+    [[nodiscard]] const Statement& getBody() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getTypeToken() const { return m_typeToken; }
 };
 

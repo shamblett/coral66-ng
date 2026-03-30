@@ -23,10 +23,34 @@ namespace coral66::parser
 std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                              Context& context)
 {
+    auto rollback = begin;
+    std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
+    bool isTyped = false;
+
+    // Check Answerspec
+    if (begin != end && (begin->getTokenType() == lexer::TokenType::IntegerKeyword ||
+                         begin->getTokenType() == lexer::TokenType::FloatingKeyword ||
+                         begin->getTokenType() == lexer::TokenType::FixedKeyword))
+    {
+        typeToken = begin;
+        isTyped = true;
+        begin++;
+        if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword && 
+            begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+        {
+            begin++;
+            while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+                begin++;
+            if (begin != end)
+                begin++;
+        }
+    }
+
     if (begin != end && begin->getTokenType() == lexer::TokenType::ProcedureKeyword)
     {
-        auto start = begin;
-        begin++;
+        auto start = typeToken.has_value() ? typeToken.value() : begin;
+        begin++; // Consume PROCEDURE
+
         if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
         {
             auto name = begin;
@@ -37,43 +61,169 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                 begin++;
                 while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
                 {
-                    for (auto parameterDeclarations = parseDeclaration(begin, end, context);
-                         auto& p : parameterDeclarations)
-                        parameters.push_back(std::move(p));
+                    auto type = begin->getTokenType();
+
+                    if (type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
+                    {
+                        auto startMode = begin;
+                        begin++;
+                        auto mode = (type == lexer::TokenType::ValueKeyword) ? Syntax::ParameterDeclaration::ParameterMode::Value : Syntax::ParameterDeclaration::ParameterMode::Location;
+                        
+                        auto nextType = begin->getTokenType();
+                        if (nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword || nextType == lexer::TokenType::FixedKeyword)
+                        {
+                            auto paramTypeToken = begin;
+                            begin++;
+                            if (nextType == lexer::TokenType::FixedKeyword && begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses) {
+                                begin++;
+                                while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses) begin++;
+                                if (begin != end) begin++;
+                            }
+                            std::vector<lexer::CTokenIterator> ids;
+                            while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier) {
+                                ids.push_back(begin);
+                                begin++;
+                                if (begin != end && begin->getTokenType() == lexer::TokenType::Comma) {
+                                    begin++;
+                                } else {
+                                    break;
+                                }
+                            }
+                            parameters.push_back(std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, mode, paramTypeToken, std::move(ids)));
+                        }
+                        else if (nextType == lexer::TokenType::Identifier)
+                        {
+                            auto untypedMode = (type == lexer::TokenType::ValueKeyword) ? Syntax::ParameterDeclaration::ParameterMode::UntypedValue : Syntax::ParameterDeclaration::ParameterMode::UntypedLocation;
+                            std::vector<lexer::CTokenIterator> ids;
+                            while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier) {
+                                ids.push_back(begin);
+                                begin++;
+                                if (begin != end && begin->getTokenType() == lexer::TokenType::Colon) {
+                                    begin++;
+                                    if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier) {
+                                        ids.push_back(begin);
+                                        begin++;
+                                    }
+                                }
+                                if (begin != end && begin->getTokenType() == lexer::TokenType::Comma) {
+                                    begin++;
+                                } else {
+                                    break;
+                                }
+                            }
+                            parameters.push_back(std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, untypedMode, std::nullopt, std::move(ids)));
+                        }
+                        else {
+                            begin++;
+                        }
+                    }
+                    else if (type == lexer::TokenType::LabelKeyword || type == lexer::TokenType::SwitchKeyword)
+                    {
+                        auto startMode = begin;
+                        begin++;
+                        auto mode = (type == lexer::TokenType::LabelKeyword) ? Syntax::ParameterDeclaration::ParameterMode::Label : Syntax::ParameterDeclaration::ParameterMode::Switch;
+                        std::vector<lexer::CTokenIterator> ids;
+                        while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier) {
+                            ids.push_back(begin);
+                            begin++;
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::Comma) {
+                                begin++;
+                            } else {
+                                break;
+                            }
+                        }
+                        parameters.push_back(std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, mode, std::nullopt, std::move(ids)));
+                    }
+                    else if (type == lexer::TokenType::ProcedureKeyword)
+                    {
+                        auto startMode = begin;
+                        begin++;
+                        std::vector<lexer::CTokenIterator> ids;
+                        while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier) {
+                            ids.push_back(begin);
+                            begin++;
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses) {
+                                int depth = 1;
+                                begin++;
+                                while (begin != end && depth > 0) {
+                                    if (begin->getTokenType() == lexer::TokenType::OpenParentheses) depth++;
+                                    else if (begin->getTokenType() == lexer::TokenType::CloseParentheses) depth--;
+                                    begin++;
+                                }
+                            }
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::Comma) {
+                                begin++;
+                            } else {
+                                break;
+                            }
+                        }
+                        parameters.push_back(std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, Syntax::ParameterDeclaration::ParameterMode::Procedure, std::nullopt, std::move(ids)));
+                    }
+                    else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::FixedKeyword)
+                    {
+                        auto beforeFallback = begin;
+                        auto decls = parseDeclaration(begin, end, context);
+                        if (!decls.empty()) {
+                            for (auto& d : decls) parameters.push_back(std::move(d));
+                        } else {
+                            if (begin == beforeFallback) begin++; 
+                        }
+                    }
+                    else
+                    {
+                        auto beforeFallback = begin;
+                        auto decls = parseDeclaration(begin, end, context);
+                        if (!decls.empty()) {
+                            for (auto& d : decls) parameters.push_back(std::move(d));
+                        } else {
+                            if (begin == beforeFallback) begin++; 
+                        }
+                    }
 
                     if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-                        begin++; // NOLINT(*-branch-clone)
+                        begin++; 
                     else if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                         begin++;
                     else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
-                        begin++;
+                        begin++; 
                 }
                 if (begin != end)
-                    begin++;
+                    begin++; 
             }
-            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
-            {
+            
+            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon) {
                 begin++;
             }
-            if (begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword)
+            
+            context.enterProcedure(isTyped);
+            
+            if (auto body = parseStatement(begin, end, context))
             {
-                context.enterProcedure(true);
-                if (auto body = parseBlock(begin, end, context))
+                if (isTyped && !context.isAnswerStatementFound())
                 {
-                    if (!context.isAnswerStatementFound())
-                    {
-                        context.log(errors::parser::MISSING_ANSWER_STATEMENT.args(*start, context.getSourceInterface(),
-                                                                                  *start));
-                        DiagnosticCollector::addDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT);
-                    }
-                    return std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters),
-                                                                          std::move(body), start);
+                    context.log(errors::parser::MISSING_ANSWER_STATEMENT.args(*start, context.getSourceInterface(), *start));
+                    DiagnosticCollector::addDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT);
                 }
+                auto result = std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters),
+                                                                      std::move(body), typeToken);
                 context.exitProcedure();
+                return result;
+            }
+            else
+            {
+                // Error parsing body statement
+                context.exitProcedure();
+                return nullptr;
             }
         }
-        return nullptr;
+        else
+        {
+            // Expected identifier for procedure name
+            return nullptr;
+        }
     }
+
+    begin = rollback;
     return nullptr;
 }
 } // namespace coral66::parser

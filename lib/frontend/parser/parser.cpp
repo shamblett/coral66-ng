@@ -132,6 +132,12 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
 
         if (declarationsAllowed)
         {
+            if (auto procedure = parseProcedure(begin, end, context))
+            {
+                declarations.push_back(std::move(procedure));
+                firstItem = false;
+                continue;
+            }
             if (auto newDeclarations = parseDeclaration(begin, end, context); !newDeclarations.empty())
             {
                 for (auto& d : newDeclarations)
@@ -145,12 +151,8 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
                 firstItem = false;
                 continue;
             }
-            if (auto procedure = parseProcedure(begin, end, context))
-            {
-                declarations.push_back(std::move(procedure));
-                firstItem = false;
-                continue;
-            }
+            declarationsAllowed = false;
+
             declarationsAllowed = false;
         }
 

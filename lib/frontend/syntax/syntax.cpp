@@ -66,6 +66,43 @@ std::vector<std::unique_ptr<Statement>> Block::takeStatements()
     return std::move(m_statements);
 }
 
+// ParameterDeclaration
+
+ParameterDeclaration::ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode, std::optional<lexer::CTokenIterator> type, std::vector<lexer::CTokenIterator>&& identifiers)
+
+    : Declaration(begin, end), m_mode(mode), m_type(type), m_identifiers(std::move(identifiers))
+
+{
+
+}
+
+
+
+ParameterDeclaration::ParameterMode ParameterDeclaration::getMode() const
+
+{
+
+    return m_mode;
+
+}
+
+std::optional<lexer::CTokenIterator> ParameterDeclaration::getType() const
+
+{
+
+    return m_type;
+
+}
+
+const std::vector<lexer::CTokenIterator>& ParameterDeclaration::getIdentifiers() const
+
+{
+
+    return m_identifiers;
+
+}
+
+
 // VariableDeclaration
 VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                          const lexer::CTokenIterator type,
@@ -87,7 +124,7 @@ const std::vector<lexer::CTokenIterator>& VariableDeclaration::getIdentifiers() 
 ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                            const lexer::CTokenIterator name,
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
-                                           std::unique_ptr<Block>&& body,
+                                           std::unique_ptr<Statement>&& body,
                                            std::optional<lexer::CTokenIterator> typeToken)
     : Declaration(begin, end), m_typeToken(typeToken), m_name(name), m_parameters(std::move(parameters)), m_body(std::move(body))
 {
@@ -101,7 +138,7 @@ const std::vector<std::unique_ptr<Declaration>>& ProcedureDeclaration::getParame
 {
     return m_parameters;
 }
-const Block& ProcedureDeclaration::getBody() const
+const Statement& ProcedureDeclaration::getBody() const
 {
     return *m_body;
 }
