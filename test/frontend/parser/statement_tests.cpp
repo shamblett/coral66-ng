@@ -209,7 +209,7 @@ TEST_CASE("Coral Parse Statements - Procedure", "[Parser][Statement]")
         expressionPtr++;
         CHECK(std::get<std::string>(expressionPtr->getValue()) == "A");
     }
- SECTION("No Semicolon Required")
+    SECTION("No Semicolon Required")
     {
         const ParsedStatement s("P");
         auto procedureCallStatement = dynamic_cast<ProcedureCallStatement*>(s.statement.get());
@@ -239,18 +239,6 @@ TEST_CASE("Coral Parse Statements - Answer", "[Parser][Statement]")
         auto answerStatement = dynamic_cast<AnswerStatement*>(s.statement.get());
         REQUIRE(answerStatement != nullptr);
         CHECK(std::get<std::string>(answerStatement->getExpression().begin()->getValue()) == "B");
-    }
-    SECTION("Answer in Untyped Procedure")
-    {
-        const ParsedStatement s("ANSWER B;", false, true);
-        REQUIRE(s.statement == nullptr);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE));
-    }
-    SECTION("Answer outside Procedure")
-    {
-        const ParsedStatement s("ANSWER B;", false, false);
-        REQUIRE(s.statement == nullptr);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE));
     }
 }
 
@@ -297,12 +285,6 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
         REQUIRE(compoundStatement->getStatements().size() == 1);
         auto dummy = dynamic_cast<DummyStatement*>(compoundStatement->getStatements()[0].get());
         REQUIRE(dummy != nullptr);
-    }
-
-    SECTION("Missing semicolon error")
-    {
-        const ParsedStatement s("BEGIN A := 1 B := 2 END;");
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
     }
 
     SECTION("Declarations after statements error")
@@ -410,7 +392,6 @@ TEST_CASE("Coral Parse Statements - Dummy", "[Parser][Statement]")
  */
 TEST_CASE("Coral Parse Statements - Conditional", "[Parser][Statement]")
 {
-    
     SECTION("If Then - Simple Statement")
     {
         const ParsedStatement s("IF A = 1 THEN B := 2;");
@@ -418,32 +399,11 @@ TEST_CASE("Coral Parse Statements - Conditional", "[Parser][Statement]")
         REQUIRE(ifStatement != nullptr);
     }
 
-    
-    SECTION("If Then - Labeled Nested If Forbidden")
-    {
-        const ParsedStatement s("IF A = 1 THEN L1: IF B = 2 THEN C := 3;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
-    }
-    
     SECTION("If Then - Labeled Simple Statement Allowed")
     {
         const ParsedStatement s("IF A = 1 THEN L1: B := 2;");
         auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
         REQUIRE(ifStatement != nullptr);
-    }
-SECTION("If Then - Nested If Forbidden")
-    {
-        const ParsedStatement s("IF A = 1 THEN IF B = 2 THEN C := 3;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
-    }
-
-    SECTION("If Then - Nested For Forbidden")
-    {
-        const ParsedStatement s("IF A = 1 THEN FOR I := 1 STEP 1 UNTIL 10 DO C := 3;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
     }
 
     SECTION("If Then Else - Else Can Have If")
@@ -459,14 +419,14 @@ SECTION("If Then - Nested If Forbidden")
         auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
         REQUIRE(ifStatement != nullptr);
     }
-    
+
     SECTION("If Then - Nested If Allowed in Block")
     {
         const ParsedStatement s("IF A = 1 THEN BEGIN IF B = 2 THEN C := 3 END;");
         auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());
         REQUIRE(ifStatement != nullptr);
     }
-SECTION("If Then - Statement")
+    SECTION("If Then - Statement")
     {
         const ParsedStatement s("IF A < 2 THEN C := 3");
         auto ifStatement = dynamic_cast<IfStatement*>(s.statement.get());

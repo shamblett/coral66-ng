@@ -312,6 +312,20 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
     }
 
+    SECTION("Answer in Untyped Procedure")
+    {
+        const ParsedStatement s("ANSWER B;", false, true);
+        REQUIRE(s.statement == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE));
+    }
+
+    SECTION("Answer outside Procedure")
+    {
+        const ParsedStatement s("ANSWER B;", false, false);
+        REQUIRE(s.statement == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE));
+    }
+
     SECTION("Code No Begin")
     {
         const ParsedStatement s("CODE \"mov eax\" END;");
@@ -342,6 +356,12 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_END));
+    }
+
+    SECTION("Compound Statement - Missing Semicolon")
+    {
+        const ParsedStatement s("BEGIN A := 1 B := 2 END;");
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
     }
 
     SECTION("Conditional Statement - IF No Condition")
@@ -395,6 +415,27 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STATEMENT));
+    }
+
+    SECTION("If Then - Labeled Nested If Forbidden")
+    {
+        const ParsedStatement s("IF A = 1 THEN L1: IF B = 2 THEN C := 3;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+    }
+
+    SECTION("If Then - Nested If Forbidden")
+    {
+        const ParsedStatement s("IF A = 1 THEN IF B = 2 THEN C := 3;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+    }
+
+    SECTION("If Then - Nested For Forbidden")
+    {
+        const ParsedStatement s("IF A = 1 THEN FOR I := 1 STEP 1 UNTIL 10 DO C := 3;");
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
     }
 
     SECTION("For Statement - Missing Identifier")
