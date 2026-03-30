@@ -12,6 +12,7 @@ cc_library(
         "parser_declarations.cpp",
         "parser_expressions.cpp",
         "parser_place_references.cpp",
+        "parser_procedures.cpp",
         "parser_statements.cpp",
         "parser_utilities.cpp",
     ],

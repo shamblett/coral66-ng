@@ -106,10 +106,12 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
             }
             else
             {
-                context.log(errors::parser::EXPECTED_SEMICOLON.args(
-                    *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+                context.log(errors::parser::EXPECTED_SEMICOLON.args(*(begin == end ? (end - 1) : begin),
+                                                                    context.getSourceInterface(),
+                                                                    *(begin == end ? (end - 1) : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SEMICOLON);
-                while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon && begin->getTokenType() != lexer::TokenType::EndKeyword)
+                while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
+                       && begin->getTokenType() != lexer::TokenType::EndKeyword)
                 {
                     begin++;
                 }
@@ -130,8 +132,7 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
 
         if (declarationsAllowed)
         {
-            auto newDeclarations = parseDeclaration(begin, end, context);
-            if (!newDeclarations.empty())
+            if (auto newDeclarations = parseDeclaration(begin, end, context); !newDeclarations.empty())
             {
                 for (auto& d : newDeclarations)
                     declarations.push_back(std::move(d));
@@ -144,17 +145,23 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
                 firstItem = false;
                 continue;
             }
+            if (auto procedure = parseProcedure(begin, end, context))
+            {
+                declarations.push_back(std::move(procedure));
+                firstItem = false;
+                continue;
+            }
             declarationsAllowed = false;
         }
 
-        auto stmt = parseStatement(begin, end, context);
-        if (stmt)
+        if (auto stmt = parseStatement(begin, end, context))
         {
             statements.push_back(std::move(stmt));
         }
         else
         {
-            while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon && begin->getTokenType() != lexer::TokenType::EndKeyword)
+            while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
+                   && begin->getTokenType() != lexer::TokenType::EndKeyword)
             {
                 begin++;
             }
@@ -174,7 +181,8 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
         return nullptr;
     }
 
-    return std::make_unique<Syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements), std::move(placeReferences));
+    return std::make_unique<Syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements),
+                                           std::move(placeReferences));
 }
 
 } // namespace coral66::parser

@@ -19,8 +19,8 @@ class Context
     llvm::raw_ostream* m_reporter;
     std::size_t m_errorCount = 0;
 
-
-    struct ProcedureState {
+    struct ProcedureState
+    {
         bool isTyped;
         bool hasAnswer;
     };
@@ -33,14 +33,35 @@ public:
     [[nodiscard]] const source_interface& getSourceInterface() const;
     [[nodiscard]] std::size_t getErrorCount() const;
 
-    void enterProcedure(bool isTyped) { m_procedureStack.push_back({isTyped, false}); }
-    void exitProcedure() { m_procedureStack.pop_back(); }
-    bool isInsideProcedure() const { return !m_procedureStack.empty(); }
-    bool isInsideTypedProcedure() const { return !m_procedureStack.empty() && m_procedureStack.back().isTyped; }
-    bool isInsideUntypedProcedure() const { return !m_procedureStack.empty() && !m_procedureStack.back().isTyped; }
-    void markAnswerStatementFound() { if (!m_procedureStack.empty()) m_procedureStack.back().hasAnswer = true; }
-    bool isAnswerStatementFound() const { return !m_procedureStack.empty() && m_procedureStack.back().hasAnswer; }
-
+    void enterProcedure(bool isTyped)
+    {
+        m_procedureStack.push_back({isTyped, false});
+    }
+    void exitProcedure()
+    {
+        m_procedureStack.pop_back();
+    }
+    bool isInsideProcedure() const
+    {
+        return !m_procedureStack.empty();
+    }
+    bool isInsideTypedProcedure() const
+    {
+        return !m_procedureStack.empty() && m_procedureStack.back().isTyped;
+    }
+    bool isInsideUntypedProcedure() const
+    {
+        return !m_procedureStack.empty() && !m_procedureStack.back().isTyped;
+    }
+    void markAnswerStatementFound()
+    {
+        if (!m_procedureStack.empty())
+            m_procedureStack.back().hasAnswer = true;
+    }
+    bool isAnswerStatementFound() const
+    {
+        return !m_procedureStack.empty() && m_procedureStack.back().hasAnswer;
+    }
 };
 
 /*
@@ -71,4 +92,6 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                                                         Context& context);
 std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                             Context& context);
+std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+                                                             Context& context);
 } // namespace coral66::parser
