@@ -505,3 +505,15 @@ TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
     }
 }
+
+TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
+{
+    SECTION("Typed procedure missing ANSWER statement")
+    {
+        ParsedProcedure p("INTEGER PROCEDURE p; BEGIN END");
+        REQUIRE(p.procedure != nullptr);
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT));
+    }
+}
+
