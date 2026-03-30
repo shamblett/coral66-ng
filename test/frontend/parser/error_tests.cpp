@@ -508,7 +508,7 @@ TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
 
 TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
 {
-    SECTION("Typed procedure missing ANSWER statement")
+    SECTION("Typed Procedure Missing ANSWER statement")
     {
         ParsedProcedure p("INTEGER PROCEDURE p; BEGIN END");
         REQUIRE(p.procedure != nullptr);

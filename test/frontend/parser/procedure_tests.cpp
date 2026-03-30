@@ -6,7 +6,6 @@
 
 #include "common.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
-#include "llvm/ADT/APSInt.h"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
@@ -16,9 +15,9 @@ using namespace coral66::Syntax;
  * Tests cover section 8 of the specification
  */
 
-TEST_CASE("Procedures - Basic declarations", "[parser]")
+TEST_CASE("Procedures - Basic Declarations", "[Parser][Procedure]")
 {
-    SECTION("Untyped procedure with no parameters")
+    SECTION("Untyped Procedure With No Parameters")
     {
         ParsedProcedure p("PROCEDURE p; BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -27,7 +26,7 @@ TEST_CASE("Procedures - Basic declarations", "[parser]")
         REQUIRE(p.procedure->getParameters().empty());
     }
 
-    SECTION("Typed procedure with no parameters - Integer")
+    SECTION("Typed Procedure With No Parameters - Integer")
     {
         ParsedProcedure p("INTEGER PROCEDURE p; ANSWER 0");
         REQUIRE(p.procedure != nullptr);
@@ -37,7 +36,7 @@ TEST_CASE("Procedures - Basic declarations", "[parser]")
         REQUIRE(p.procedure->getParameters().empty());
     }
 
-    SECTION("Typed procedure with no parameters - Floating")
+    SECTION("Typed Procedure With No Parameters - Floating")
     {
         ParsedProcedure p("FLOATING PROCEDURE p; ANSWER 0.0");
         REQUIRE(p.procedure != nullptr);
@@ -47,7 +46,7 @@ TEST_CASE("Procedures - Basic declarations", "[parser]")
         REQUIRE(p.procedure->getParameters().empty());
     }
 
-    SECTION("Typed procedure with no parameters - Fixed")
+    SECTION("Typed Procedure With No Parameters - Fixed")
     {
         ParsedProcedure p("FIXED(10,5) PROCEDURE p; ANSWER 0");
         REQUIRE(p.procedure != nullptr);
@@ -58,9 +57,9 @@ TEST_CASE("Procedures - Basic declarations", "[parser]")
     }
 }
 
-TEST_CASE("Procedures - Value/Location Parameters", "[parser]")
+TEST_CASE("Procedures - Value/Location Parameters", "[Parser][Procedure]")
 {
-    SECTION("Single VALUE parameter")
+    SECTION("Single VALUE Parameter")
     {
         ParsedProcedure p("PROCEDURE p(VALUE INTEGER i); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -74,7 +73,7 @@ TEST_CASE("Procedures - Value/Location Parameters", "[parser]")
         REQUIRE(param->getIdentifiers()[0]->getText() == "i");
     }
 
-    SECTION("Multiple VALUE parameters")
+    SECTION("Multiple VALUE Parameters")
     {
         ParsedProcedure p("PROCEDURE p(VALUE FLOATING x, y); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -89,7 +88,7 @@ TEST_CASE("Procedures - Value/Location Parameters", "[parser]")
         REQUIRE(param->getIdentifiers()[1]->getText() == "y");
     }
 
-    SECTION("LOCATION parameter")
+    SECTION("LOCATION Parameter")
     {
         ParsedProcedure p("PROCEDURE p(LOCATION FIXED(10,5) x); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -103,7 +102,7 @@ TEST_CASE("Procedures - Value/Location Parameters", "[parser]")
         REQUIRE(param->getIdentifiers()[0]->getText() == "x");
     }
 
-    SECTION("Multiple parameters mixed")
+    SECTION("Multiple Parameters Mixed")
     {
         ParsedProcedure p("PROCEDURE p(VALUE INTEGER i, j; LOCATION FLOATING x); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -122,7 +121,7 @@ TEST_CASE("Procedures - Value/Location Parameters", "[parser]")
         REQUIRE(param2->getIdentifiers()[0]->getText() == "x");
     }
 
-    SECTION("Untyped VALUE parameter (Non-standard extension)")
+    SECTION("Untyped VALUE Parameter (Non-Standard Extension)")
     {
         ParsedProcedure p("PROCEDURE p(VALUE u:v); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -137,9 +136,9 @@ TEST_CASE("Procedures - Value/Location Parameters", "[parser]")
     }
 }
 
-TEST_CASE("Procedures - Other Parameters", "[parser]")
+TEST_CASE("Procedures - Other Parameters", "[Parser][Procedure]")
 {
-    SECTION("LABEL and SWITCH parameters")
+    SECTION("LABEL and SWITCH Parameters")
     {
         ParsedProcedure p("PROCEDURE p(LABEL l1, l2; SWITCH s1); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -159,7 +158,7 @@ TEST_CASE("Procedures - Other Parameters", "[parser]")
         REQUIRE(param2->getIdentifiers()[0]->getText() == "s1");
     }
 
-    SECTION("ARRAY parameters")
+    SECTION("ARRAY Parameters")
     {
         ParsedProcedure p("PROCEDURE p(INTEGER ARRAY a, b); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -178,7 +177,7 @@ TEST_CASE("Procedures - Other Parameters", "[parser]")
         REQUIRE(param2->getDimensions().empty());
     }
 
-    SECTION("TABLE parameters")
+    SECTION("TABLE Parameters")
     {
         ParsedProcedure p("PROCEDURE p(TABLE t[10,10] [ INTEGER f1 ] ); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -191,7 +190,7 @@ TEST_CASE("Procedures - Other Parameters", "[parser]")
         REQUIRE(param1->getLength() != nullptr);
     }
 
-    SECTION("Untyped PROCEDURE parameters")
+    SECTION("Untyped PROCEDURE Parameters")
     {
         ParsedProcedure p("PROCEDURE p(PROCEDURE q); BEGIN END");
         REQUIRE(p.procedure != nullptr);
@@ -204,7 +203,7 @@ TEST_CASE("Procedures - Other Parameters", "[parser]")
         REQUIRE(param1->getIdentifiers()[0]->getText() == "q");
     }
 
-    SECTION("Untyped PROCEDURE parameters with typelist")
+    SECTION("Untyped PROCEDURE Parameters With Type List")
     {
         ParsedProcedure p("PROCEDURE p(PROCEDURE q(VALUE INTEGER, LABEL)); BEGIN END");
         REQUIRE(p.procedure != nullptr);
