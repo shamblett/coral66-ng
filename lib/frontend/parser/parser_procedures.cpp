@@ -37,7 +37,8 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                 begin++;
                 while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
                 {
-                    for (auto paramDecls = parseDeclaration(begin, end, context); auto& p : paramDecls)
+                    for (auto parameterDeclarations = parseDeclaration(begin, end, context);
+                         auto& p : parameterDeclarations)
                         parameters.push_back(std::move(p));
 
                     if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
