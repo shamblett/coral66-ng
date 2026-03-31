@@ -158,6 +158,22 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_OPEN_SQUARE_BRACKET));
     }
 
+    SECTION("Invalid Bits Format")
+    {
+        const ParsedExpression p("BITS [ 1, 2 ]");
+        CHECK(p.expression.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_TYPED_PRIMARY));
+    }
+
+    SECTION("Invalid Bits Format missing comma")
+    {
+        const ParsedExpression p("BITS [ 1 ] a");
+        CHECK(p.expression.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::INVALID_BITS_FORMAT));
+    }
+
     SECTION("Expected Identifier (Word Reference)")
     {
         const ParsedExpression p("LOCATION ( = )");

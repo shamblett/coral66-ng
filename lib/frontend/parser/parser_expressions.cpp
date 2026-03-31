@@ -605,6 +605,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                                                                 std::move(bitPos), std::move(totalBits));
                 }
             }
+            context.log(errors::parser::INVALID_BITS_FORMAT.args(*startToken, context.getSourceInterface(), *startToken));
+            DiagnosticCollector::addDiagnostic(errors::parser::INVALID_BITS_FORMAT);
+            return nullptr;
         }
         context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
@@ -707,6 +710,9 @@ std::unique_ptr<Expression> parseVariable(lexer::CTokenIterator& begin, lexer::C
                                                                 std::move(bitPos), std::move(totalBits));
                 }
             }
+            context.log(errors::parser::INVALID_BITS_FORMAT.args(*startToken, context.getSourceInterface(), *startToken));
+            DiagnosticCollector::addDiagnostic(errors::parser::INVALID_BITS_FORMAT);
+            return nullptr;
         }
         context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
