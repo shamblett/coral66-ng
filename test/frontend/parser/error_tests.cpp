@@ -508,12 +508,28 @@ TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
 
 TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
 {
+    SECTION("Missing Identifier")
+    {
+        ParsedProcedure p("PROCEDURE ; BEGIN END");
+        REQUIRE(p.procedure != nullptr);
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
+    }
+
     SECTION("Typed Procedure Missing ANSWER statement")
     {
         ParsedProcedure p("INTEGER PROCEDURE p; BEGIN END");
         REQUIRE(p.procedure != nullptr);
         REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
         REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT));
+    }
+
+    SECTION("Missing Body Statement")
+    {
+        ParsedProcedure p("PROCEDURE p; BEGIN");
+        REQUIRE(p.procedure != nullptr);
+        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
+        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_STATEMENT));
     }
 }
 
