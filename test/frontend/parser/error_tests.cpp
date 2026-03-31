@@ -469,6 +469,14 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DO));
     }
+
+    SECTION("For Statement - Missing STEP")
+    {
+        const ParsedStatement s("FOR A := 1 UNTIL 4 DO B := B + 2");
+        CHECK(s.statement.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_STEP));
+    }
 }
 
 TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")

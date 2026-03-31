@@ -364,6 +364,15 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                             break;
                         }
                     }
+                    else if (begin != end && begin->getTokenType() == lexer::TokenType::UntilKeyword)
+                    {
+                        context.log(errors::parser::EXPECTED_STEP.args(*(begin == end ? (end - 1) : begin),
+                                                                       context.getSourceInterface(),
+                                                                       *(begin == end ? (end - 1) : begin)));
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STEP);
+                        errorOccurred = true;
+                        break;
+                    }
 
                     elements.push_back(std::move(element));
 
