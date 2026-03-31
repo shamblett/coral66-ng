@@ -90,7 +90,12 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     std::make_unique<Syntax::ArrayDeclaration>(typeToken, begin, typeToken, id, std::move(dims)));
 
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
-                    begin++;
+                {
+                    if (begin + 1 != end && (begin + 1)->getTokenType() == lexer::TokenType::Identifier)
+                        begin++;
+                    else
+                        break;
+                }
                 else
                     break;
             }
@@ -104,7 +109,14 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 begin++;
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 {
-                    begin++;
+                    if (begin + 1 != end && (begin + 1)->getTokenType() == lexer::TokenType::Identifier)
+                    {
+                        begin++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 else
                 {
@@ -177,6 +189,18 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 result.push_back(
                     std::make_unique<Syntax::OverlayDeclaration>(start, begin, base, base, std::move(decls[0])));
             }
+            else
+            {
+                context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? (end - 1) : begin),
+                                                                      context.getSourceInterface(),
+                                                                      *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
+                begin = start;
+            }
+        }
+        else
+        {
+            begin = start;
         }
         return result;
     }

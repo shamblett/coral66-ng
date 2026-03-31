@@ -219,8 +219,11 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                         }
                         else
                         {
-                            if (begin == beforeFallback)
-                                begin++;
+                            context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? (end - 1) : begin),
+                                                                                  context.getSourceInterface(),
+                                                                                  *(begin == end ? (end - 1) : begin)));
+                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
+                            return nullptr;
                         }
                     }
                     else
@@ -234,8 +237,11 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                         }
                         else
                         {
-                            if (begin == beforeFallback)
-                                begin++;
+                            context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? (end - 1) : begin),
+                                                                                  context.getSourceInterface(),
+                                                                                  *(begin == end ? (end - 1) : begin)));
+                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
+                            return nullptr;
                         }
                     }
 

@@ -533,3 +533,22 @@ TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
     }
 }
 
+
+TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
+{
+    SECTION("Overlay Missing Declaration")
+    {
+        const ParsedStatement s("BEGIN OVERLAY x WITH ; END");
+        REQUIRE(s.statement.get() != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
+    }
+
+    SECTION("Procedure Parameter Missing Declaration")
+    {
+        const ParsedProcedure s("PROCEDURE P(INTEGER); BEGIN END");
+        CHECK(s.procedure.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
+    }
+}
