@@ -559,4 +559,12 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
     }
+
+    SECTION("Fixed Type Invalid Format")
+    {
+        const ParsedProcedure p("PROCEDURE P(FIXED(13) x); BEGIN END");
+        CHECK(p.procedure.get() != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::INVALID_FIXED_FORMAT));
+    }
 }

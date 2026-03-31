@@ -10,6 +10,7 @@
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "parser_support.hpp"
+#include "parser_utilities.hpp"
 
 namespace coral66::parser
 {
@@ -35,14 +36,9 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
         typeToken = begin;
         isTyped = true;
         begin++;
-        if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword && begin != end
-            && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+        if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword)
         {
-            begin++;
-            while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
-                begin++;
-            if (begin != end)
-                begin++;
+            validateFixedFormat(begin, end, context);
         }
     }
 
@@ -86,14 +82,9 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                         {
                             auto paramTypeToken = begin;
                             begin++;
-                            if (nextType == lexer::TokenType::FixedKeyword && begin != end
-                                && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                            if (nextType == lexer::TokenType::FixedKeyword)
                             {
-                                begin++;
-                                while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
-                                    begin++;
-                                if (begin != end)
-                                    begin++;
+                                validateFixedFormat(begin, end, context);
                             }
                             std::vector<lexer::CTokenIterator> ids;
                             while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)

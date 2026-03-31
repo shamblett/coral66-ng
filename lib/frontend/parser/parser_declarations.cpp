@@ -9,6 +9,7 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "parser_support.hpp"
+#include "parser_utilities.hpp"
 
 /*
  * Section 4
@@ -48,14 +49,9 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
         auto typeToken = begin;
         begin++;
 
-        if (type == lexer::TokenType::FixedKeyword && begin != end
-            && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+        if (type == lexer::TokenType::FixedKeyword)
         {
-            begin++;
-            while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
-                begin++;
-            if (begin != end)
-                begin++;
+            validateFixedFormat(begin, end, context);
         }
 
         if (begin != end && begin->getTokenType() == lexer::TokenType::ArrayKeyword)

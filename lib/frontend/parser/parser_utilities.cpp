@@ -7,6 +7,47 @@
 #include "parser_utilities.hpp"
 
 #include "lib/frontend/common/messages/errors.hpp"
+#include "parser_support.hpp"
+
+void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
+{
+    if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+    {
+        auto openParenToken = begin;
+        begin++;
+        auto tBits = parseExpression(begin, end, context);
+        if (!tBits || begin == end || begin->getTokenType() != lexer::TokenType::Comma)
+        {
+            context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(), *openParenToken));
+            DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
+            while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+                begin++;
+            if (begin != end) begin++;
+        }
+        else
+        {
+            begin++;
+            auto fBits = parseExpression(begin, end, context);
+            if (!fBits || begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
+            {
+                context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(), *openParenToken));
+                DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
+                while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+                    begin++;
+                if (begin != end) begin++;
+            }
+            else
+            {
+                begin++;
+            }
+        }
+    }
+    else
+    {
+        context.log(errors::parser::INVALID_FIXED_FORMAT.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
+    }
+}
 
 bool coral66::parser::expectIdentifier(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context,
                                        std::string_view& value, const coral66::FunctionRef<Message()> additional)

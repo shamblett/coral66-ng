@@ -20,6 +20,8 @@ namespace coral66::parser
 {
 bool isAssignment(lexer::TokenType type);
 
+void validateFixedFormat(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+
 bool expectIdentifier(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context,
                       std::string_view& value, coral66::FunctionRef<Message()> additional = {});
 
