@@ -91,12 +91,17 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                         return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(var),
                                                                              std::move(rhs));
                     }
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+                    return nullptr;
                 }
             }
-            context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
-                                                                 context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+            context.log(errors::parser::EXPECTED_VARIABLE.args(*(begin == end ? (end - 1) : begin),
+                                                               context.getSourceInterface(),
+                                                               *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_VARIABLE);
             return nullptr;
         }
         else
@@ -399,10 +404,10 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         }
         else
         {
-            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_VARIABLE.args(*(begin == end ? (end - 1) : begin),
                                                                  context.getSourceInterface(),
                                                                  *(begin == end ? (end - 1) : begin)));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_VARIABLE);
         }
         return nullptr;
     }

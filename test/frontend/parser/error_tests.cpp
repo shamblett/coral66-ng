@@ -205,7 +205,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         const ParsedStatement s("A + 1 := 2;");
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_VARIABLE));
     }
 
     SECTION("Assignment - Invalid LHS - Integer BITS Target")
@@ -229,7 +229,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         const ParsedStatement s("A :=;");
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
     }
 
     SECTION("Assignment - No LHS")
@@ -443,7 +443,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         const ParsedStatement s("FOR := 1 STEP 1 UNTIL 4 DO A :- A + 1");
         CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_VARIABLE));
     }
 
     SECTION("For Statement - Missing Assignment")
