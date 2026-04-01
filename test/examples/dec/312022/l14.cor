@@ -1,0 +1,16 @@
+   'CORAL' L14
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' QUOTE);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' QUOTE;
+       'BEGIN'
+           'BYTE''ARRAY' STRING [0:3]:=1,0,0,0;
+           STRING[2]:=34;
+           'ANSWER''LOCATION' (STRING[0]);
+       'END';
+   'END';
+   'FINISH'

@@ -1,0 +1,131 @@
+   'CORAL' L7C
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' QIO('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER',
+   'VALUE''INTEGER','INTEGER''ARRAY','INTEGER''ARRAY');
+   'INTEGER''PROCEDURE' WAITEF ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' RT04FLG ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' RT04LUN ('VALUE''INTEGER');
+   'PROCEDURE'          RTOUT  ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE'          COPY('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LEN('VALUE''INTEGER');
+   'FLOATING''PROCEDURE'VAL    ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG   ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS   ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' RT04('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' MACRO SYMBOL DEFINITIONS;
+       'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+       'INTEGER''PROCEDURE' RT04('VALUE''INTEGER' MODE, DATA);
+       'BEGIN'
+           'BYTE''ARRAY' INIT [0:3]:=1,0,23,0;
+           'INTEGER''ARRAY' PRL [0:5];
+           'INTEGER''ARRAY' ISB [0:1];
+           'INTEGER' FUNCTION, DEVICEOUT, DEVICEIN, INITALISE, IN, OUT, LUN;
+           'INTEGER' X,Y,Z;  (WORKSPACE VARABLES)
+           'BYTE''ARRAY' DDO [0:15]:=10,0,0,0;
+           'BYTE''ARRAY' DDI [0:15]:=10,0,0,0;
+           'BYTE''ARRAY' STORE [0:257]:=0;
+           'OVERLAY' STORE [2] 'WITH' 'BYTE''ARRAY' STORE1 [0:255];
+           'OVERLAY' STORE [0] 'WITH' 'INTEGER' LENGTH;
+           DEVICEOUT:='LOCATION' (DDO[2]);
+           DEVICEIN:='LOCATION' (DDI[2]);
+           INITALISE:='LOCATION' (INIT [0]);
+           'IF' LPOS(MODE,"ASSIGN",1)<>0
+           'THEN'
+           'BEGIN'
+               IN := FREE;
+               OUT := FREE;
+               'IF' LPOS(MODE,"INPUT",1)<>0
+               'THEN' IN := ALLOCATED;
+               'IF' LPOS(MODE,"OUTPUT",1)<>0
+               'THEN' OUT := ALLOCATED;
+               'IF'  IN  = FREE
+               'AND' OUT = FREE
+               'THEN'
+               'BEGIN'
+ 
+                   'COMMENT' ASSUME BOTH INPUT AND OUTPUT REQUIRED;
+                   IN  := ALLOCATED;
+                   OUT := ALLOCATED;
+               'END';
+               'IF' OUT = ALLOCATED
+               'THEN'
+               'BEGIN'
+                   COPY(DATA,DEVICEOUT);
+                   'IF' LPOS(MODE,"OVER",1)=0
+                   'THEN' RTOUT(MODE,INITALISE,DEVICEOUT);
+               'END';
+               'IF' IN  = ALLOCATED
+               'THEN' COPY(DATA,DEVICEIN);
+           'END'
+           'ELSE'
+           'BEGIN'
+               'IF' LEN(DEVICEOUT)<>0
+               'THEN' RTOUT(MODE,DATA,DEVICEOUT);
+               'IF' LEN(DEVICEIN)<>0
+               'THEN'
+               'BEGIN'
+                   'IF' LPOS(MODE,"I",1)<>0
+                   'THEN'
+                   'BEGIN'
+                       LUN:=RT04LUN(GIVE VALUE);
+                       'IF' LUN <> VOIDLUN
+                       'THEN'
+                       'BEGIN'
+ 
+                           'COMMENT' READ USING WAITING QIO MODE;
+                           'IF' LPOS(MODE,"-",1)=0
+                           'AND' LEN(DEVICEOUT)<>0
+                           'THEN' RTOUT("O"," ? ",DEVICEOUT);
+                           'IF' RT04FLG(ON,DEVICEIN)=SUCCESS
+                           'THEN'
+                           'BEGIN'
+                               FUNCTION:=512;
+                               'IF' LPOS(MODE,"@",1)<>0
+                               'THEN'FUNCTION:=FUNCTION+16;  (READ NO ECHO)
+                               ISB [0]:=0; (CLEAR ERROR CODE WORD)
+                               ISB [1]:=0; (NUMBER OF CHARS TRANSFERED)
+                               PRL [0]:='LOCATION'( STORE1 [0]); (ADDRESS WHERE TO STORE DATA)
+                               PRL [1]:=250;   (MAXIMUM NUMBER OF CHARACTERS TO BE TRANSFERED)
+                               PRL [2]:=600;  (TIME OUT SET FOR 10 MINS)
+                               Z := SUCCESS;
+                               X:=LPOS(MODE,"(",1);
+                               'IF' X<>0
+                               'THEN'
+                               'BEGIN'
+                                   Y:=LPOS(MODE,")",1);
+                                   'IF' Y-X<2
+                                   'THEN' Z := ERROR
+                                   'ELSE' X:=VAL(LSEG(MODE,X+1,Y-1));
+                                   'IF' X<=0
+                                   'OR' X>=254
+                                   'THEN' Z := ERROR
+                                   'ELSE' PRL[1]:=X;
+                                   'IF' Z = ERROR
+                                   'THEN'
+                                   'ANSWER' ERROR;
+                               'END';
+                               QIO(FUNCTION,LUN,1,0,ISB,PRL);
+                               WAITEF(1); (WAIT TILL QIO FINISHED)
+                               LENGTH:=ISB[1];
+                               'IF' LPOS(MODE,"-",1)=0
+                               'AND' LEN(DEVICEOUT)<>0
+                               'THEN' RTOUT("NL",-1,DEVICEOUT);
+                               'ANSWER''LOCATION' (STORE [0]);
+                           'END';
+                       'END';
+                   'END';
+               'END';
+           'END';
+           'ANSWER' ERROR;
+       'END';
+   'END';
+   'FINISH'

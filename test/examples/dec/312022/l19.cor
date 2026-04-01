@@ -1,0 +1,33 @@
+   'CORAL' L19
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY'(
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' LEN     ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' ADD TO  ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG    ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' FILL('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' FILL ('VALUE''INTEGER' STRING, TAB POSITION, CHARACTER);
+       'BEGIN'
+           'INTEGER' COUNT;
+           'IF' LEN(STRING)<TAB POSITION
+           'THEN'
+           'BEGIN'
+               'FOR' COUNT:=0 'WHILE' LEN(STRING)<>TAB POSITION 'DO'
+               'BEGIN'
+                   'IF' ADD TO (STRING,LSEG(CHARACTER,1,1)) = ERROR
+                   'THEN'
+                   'ANSWER' ERROR;
+               'END';
+               'ANSWER' SUCCESS
+           'END';
+           'ANSWER' ERROR
+       'END';
+   'END';
+   'FINISH'

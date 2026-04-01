@@ -1,0 +1,330 @@
+   'CORAL' L31
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' ADD TO('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE'          CLEAR('VALUE''INTEGER');
+   'PROCEDURE'          COPY('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' ADD('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' CHARVER('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' COMPARE('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' CHR('VALUE''BYTE');
+   'INTEGER''PROCEDURE' LEN('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' MULS('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' SRP('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'FLOATING''PROCEDURE'VAL('VALUE''INTEGER');
+   'FLOATING''PROCEDURE'AINT('VALUE''FLOATING'));
+   'COMMON' ('INTEGER''PROCEDURE' CVT('VALUE''INTEGER','VALUE''FLOATING'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' CVT('VALUE''INTEGER' MODE;
+       'VALUE''FLOATING' INVAL);
+       'BEGIN'
+ 
+           'COMMENT' CONTROL CONSTANTS;
+           'DEFINE' STR SIZE  "49";
+           'DEFINE' STR MAX   "46";
+           'BYTE''ARRAY' DECODE [0:39]:="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";  (CONVERT CHARS)
+           'BYTE''ARRAY' ANSER  [0:99]:=96,0,0,0;   (ANSWER STRING)
+           'BYTE''ARRAY' NSPACE [0:9]:=6,0,0,0;    (AREA WHERE NUMBER DECODE PUT)
+           'BYTE''ARRAY' FRACT [0:STR SIZE] := STR MAX,0,0,0;
+           'BYTE''ARRAY' INTEG [0:STR SIZE] := STR MAX,0,0,0;
+           'BYTE''ARRAY' WMODE [0:STR SIZE] := STR MAX,0,0,0;
+           'INTEGER' FRACTION, INTEGER, ANSWER, WORKMODE;
+           'INTEGER' START, END, NOSPACE, SIGN, LEAD ZEROS;
+           'INTEGER' SIGN POS, LEAD CHAR, EMODE, ECOUNT, EBASE;
+           'FLOATING' WORKFR, WORKIN, WORKNO, BASE, ELIMIT;
+ 
+           'COMMENT' START OF PROCEDURE;
+           'IF' MODE = VOID
+           'OR' MODE = ERROR
+           'THEN'
+           'ANSWER' ERROR;  (INVALID ADDRESS)
+ 
+           'COMMENT' SET UP THE ACCESS ADDRESS OF THE WORK STRINGS;
+           FRACTION:='LOCATION' (FRACT[2]);  (LOCATION OF FRACTION STRING)
+           INTEGER :='LOCATION' (INTEG[2]);  (LOCATION OF INTEGER  STRING)
+           WORKMODE:='LOCATION' (WMODE[2]);  (ADDRESS WHERE MODE WILL BE STORED)
+           NOSPACE :='LOCATION' (NSPACE[2]); (ADDRESS WHERE BASE NUMBER STORED)
+           ANSWER  :='LOCATION' (ANSER [2]); (ADDRESS WHERE RESULT WILL BE STORED)
+           WORKMODE:='LOCATION' (WMODE[2]);  (LOCATION OF WORKMODE STRING)
+ 
+           'COMMENT' START LOOKING FOR A DIFFERING BASE;
+           COPY(MODE,WORKMODE);      (HOLD MODE STRING IN WORK SPACE STRING)
+           START:=LPOS(MODE,"(",1);  (LOCATE POSITION OF FIRST BRACKET IF ANY)
+           BASE:=10;  (DEFAULT BASE SETTING)
+           'IF' START<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' NEW BASE TO BE EVALUATED;
+               END:=LPOS(MODE,")",START);  (FIND POSITION OF BASE END BRACKET)
+               'IF' END = 0
+               'THEN'
+               'ANSWER' ERROR;  (ERROR EXIT INVALID SYNTAX)
+               START:=START+1;  (INDEX TO CHAR POSITION OF FIRST BASE NUMBER)
+               END:=END-1;      (INDEX TO CHAR POSITION OF LAST  BASE NUMBER)
+               COPY(LSEG(MODE,START,END),NOSPACE);  (COPY NUMERICS TO WORKSPACE)
+               'IF' CHARVER("0123456789",NOSPACE)<0
+               'THEN'
+               'ANSWER' ERROR;  (CHARS COPIED NOT NUMERICS)
+               BASE := VAL(NOSPACE);  (HOLD VALUE OF OPERATOR BASE)
+               'IF' BASE > 36
+               'OR' BASE < 2
+               'THEN'
+               'ANSWER' ERROR; (BASE NUMBER OUT OF RANGE)
+               START:=START-2;  (PREPARE TO EXTRACT FORMAT CHARACTERS)
+               END:=END+2;
+ 
+               'COMMENT' MOVE ANY FORMAT CHAR IN FRONT OF BASE TO WORKMODE STRING;
+               COPY(LSEG(MODE,1,START),WORKMODE);
+ 
+               'COMMENT' MOVE REMAINING CHAR TO WORKMODE STRING;
+               ADD TO(WORKMODE,LSEG(MODE,END,LEN(MODE)));
+           'END';
+ 
+           'COMMENT' START PROCESSING THE OUTPUT FORMAT;
+           LEAD ZEROS := NO;  (ASSUME LEADING SPACES REQUIRED)
+           START:=LPOS(WORKMODE,"0",1);  (CHECK IF 0 IN STRING)
+           'IF' START <> 0
+           'THEN'
+           'BEGIN'
+               LEAD ZEROS := YES;  (LEADING ZEROS REQUIRED)
+ 
+               'COMMENT' REMOVE ALL OCCURANCES OF ZEROS IN WORKMODE;
+               COPY(SRP(WORKMODE,"0",-1,0),WORKMODE);
+           'END';
+ 
+           'COMMENT' CHECK IF SLOT TO BE RESERVED FOR SIGN;
+           SIGN POS := LPOS(WORKMODE,"S",1);
+ 
+           'COMMENT' REMOVE ALL OCCURANCES OF S;
+           'IF' SIGN POS<>0
+           'THEN' COPY(SRP(WORKMODE,"S",-1,0),WORKMODE);
+           EMODE := LPOS(WORKMODE,"E",1);  (HOLD POSITION OF E IF PRESENT)
+           'IF' EMODE <> 0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' REMOVE ALL OCURANCES OF LETTER E;
+               COPY(SRP(WORKMODE,"E",-1,0),WORKMODE);
+               BASE:=10;  (SET UP DEFAULT BASE)
+           'END';
+ 
+           'COMMENT' VERIFY THAT ALL THAT REMAINS IS NUMBER AND POINT SYMBOLS;
+           'IF' CHARVER("#.",WORKMODE) <> SUCCESS
+           'OR' LEN(WORKMODE) = 0
+           'THEN'
+           'ANSWER' ERROR; (INVALID FORMAT STRING)
+ 
+           'COMMENT' SORT OUT IF + OR -;
+           'IF' INVAL<0
+           'THEN'
+           'BEGIN'
+               INVAL:=-INVAL; (HOLD COMPLEMENT VALUE TO DECODE)
+               SIGN:=-1; (INDICATE INPUT VALUE WAS -VE)
+           'END'
+           'ELSE' SIGN:=0; (INDICATE SIGN +VE)
+ 
+           'COMMENT' CLEAR WORKSPACE STRINGS AND TRANSLATE TO ASCII CODE SET;
+           CLEAR(INTEGER);
+           CLEAR(FRACTION);
+           CLEAR(ANSWER);
+ 
+           'COMMENT' START = LENGTH OF INTEGER  SECTION
+                     END   = LENGTH OF FRACTION SECTION;
+           START:=LPOS(WORKMODE,".",1);  (LOCATE POSITION OF DECIMAL POINT)
+           'IF' START<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ASSUME DECIMAL POINT FOUND;
+               END:=LEN(WORKMODE)-START;  (LENGTH OF FRACTION)
+               START:=START-1;            (LENGTH OF INTEGER SECTION)
+           'END'
+           'ELSE'
+           'BEGIN'
+               START:=LEN(WORKMODE);      (ASSUME INTEGER ONLY)
+               END:=0;                    (FRACTION LENGTH IS ZERO)
+           'END';
+ 
+           'COMMENT' CHOP NUMBER INTO FRACTION AND INTEGER SECTIONS;
+           WORKIN := AINT(INVAL);         (HOLD INTEGER PART)
+           WORKFR := INVAL-WORKIN;        (HOLD FRACTIONAL PART)
+ 
+           'COMMENT' IF E MODE OPERATION ENSURE INTEGER MAKES
+                     THE BEST FIT IN THE INTEGER AREA;
+           'IF' EMODE<>0
+           'THEN'
+           'BEGIN'
+               ELIMIT:=1;                 (SET UP RANGES)
+               EBASE:=0;
+               'IF' START<>0
+               'THEN'
+               'BEGIN'
+                   'FOR' ECOUNT:=1 'STEP' 1 'UNTIL' START 'DO'
+                   ELIMIT:=ELIMIT*10;
+               'END'
+               'ELSE' ELIMIT:=10;
+               ELIMIT := ELIMIT-1;        (KEEP TO BOUNDS LIMITS)
+               'IF' INVAL<>0
+               'THEN'
+               'BEGIN'
+ ELOOP:            WORKIN := AINT(INVAL); (HOLD INTEGER PART)
+                   WORKFR := INVAL-WORKIN;(HOLD FRACTIONAL PART)
+                   'IF' WORKIN < 1
+                   'OR' WORKIN > ELIMIT
+                   'THEN'
+                   'BEGIN'
+ 
+                       'COMMENT' SCALE INTO INTEGER RANGE;
+                       'IF' WORKIN < 1
+                       'THEN'
+                       'BEGIN'
+                           INVAL := INVAL * 10;
+                           EBASE := EBASE - 1;
+                       'END'
+                       'ELSE'
+                       'BEGIN'
+                           INVAL := INVAL / 10;
+                           EBASE := EBASE + 1;
+                       'END';
+                       'GOTO' ELOOP;
+                   'END';
+               'END';
+               'IF' START=0
+               'THEN'
+               'BEGIN'
+ 
+                   'COMMENT' SPECIAL CASE WHEN NO INTEGER SIZE SPECIFIED;
+                   EBASE := EBASE+1;
+                   INVAL := INVAL/10;
+                   WORKIN := AINT(INVAL);  (HOLD INTEGER PART)
+                   WORKFR := INVAL-WORKIN;  (HOLD FRACTIONAL PART)
+               'END';
+           'END';
+ 
+           'COMMENT' DECODE THE INTEGER SECTION;
+ INTLOOP:   WORKNO := WORKIN-AINT(WORKIN/BASE)*BASE;  (GET REMAINDER)
+ 
+           'COMMENT' LOAD DECODED CHAR IN FRONT OF PREVIOUS CHARACTER;
+           COPY(ADD(CHR(DECODE[WORKNO]),INTEGER),INTEGER);
+           WORKIN := AINT(WORKIN/BASE);  (DESCALE WORK INTEGER)
+           'IF' WORKIN <> 0
+           'AND' LEN(INTEGER) < STR MAX
+           'THEN' 'GOTO' INTLOOP;  (CYCLE TILL JOB DONE)
+ 
+           'COMMENT' DECODE THE FRACTION SECTION;
+           'IF' WORKFR<>0
+           'THEN'
+           'BEGIN'
+ FRLOOP:       WORKFR := WORKFR*BASE;   (SHIFT DECIMAL POINT ONE PLACE RIGHT)
+ 
+               'COMMENT' EXTRACT INTEGER PART FROM INTEGER/FRACTIONAL NUMBER;
+               WORKNO := AINT(WORKFR);
+ 
+               'COMMENT' RECONVERT VALUE BACK TO A FRACTION AGAIN;
+               WORKFR := WORKFR-WORKNO;
+ 
+               'COMMENT' ADD IN NEXT CHARACTER AND TEST FOR END;
+               'IF'  ADD TO(FRACTION,CHR(DECODE[WORKNO])) = SUCCESS
+               'AND' WORKFR <> 0
+               'AND' LEN(FRACTION) < STR MAX
+               'THEN' 'GOTO' FRLOOP;  (REPEAT CYCLE UNTILL FRACTION DECODED)
+           'END';
+           'IF'   LEN(INTEGER) = 1
+           'AND'  COMPARE(INTEGER,"0") = 0
+           'THEN' CLEAR(INTEGER);
+           'IF'   INVAL    = 0
+           'THEN' ADD TO(INTEGER,"0"); (SPECIAL CASE WHEN INPUT VALUE = 0)
+           'IF'   SIGN     < 0
+           'AND'  SIGN POS = 0
+           'THEN' COPY(ADD("-",INTEGER),INTEGER);  (LOAD IN PRECEDING - SIGN)
+           'IF'   SIGN     < 0
+           'AND'  LEN(INTEGER) = START + 1
+           'THEN' START := START + 1;  (SPECIAL CASE FIELD WIDTH + SIGN)
+           'IF'   LEN(INTEGER) > START
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' INTEGER SECTION EXCEDDES SPACE AVAILABLE
+                         FOR PRESENTATION;
+               COPY(MULS("*",START),ANSWER); (FILL AREA WITH * CHARACTERS)
+               'IF' END<>0
+               'THEN'
+               'BEGIN'
+                   ADD TO(ANSWER,".");  (LOAD DECIMAL POINT)
+ 
+                   'COMMENT' FILL FRACTION PART WITH * CHARACTERS;
+                   ADD TO(ANSWER,MULS("*",END));
+               'END';
+           'END'
+           'ELSE'
+           'BEGIN'
+               LEAD CHAR := 'IF' LEAD ZEROS = NO
+               'THEN' " "
+               'ELSE' "0";
+ 
+               'COMMENT' FILL ANY FRONT AREA WITH SPACE OR ZERO CHARS;
+               COPY(MULS(LEAD CHAR,START-(LEN(INTEGER))),ANSWER);
+               ADD TO(ANSWER,INTEGER);  (LOAD IN INTEGER PART)
+               'IF' END <> 0
+               'THEN'
+               'BEGIN'
+                   ADD TO(ANSWER,".");  (LOAD IN DECIMAL POINT)
+ 
+                   'COMMENT' FILL END OF FRACTION WITH ZEROS;
+                   'IF' LEN(FRACTION) < END
+                   'THEN' ADD TO(FRACTION,MULS("0",STR MAX));
+ 
+                   'COMMENT' LOAD INTO ANSWER FINAL FRACTION SECTION;
+                   ADD TO(ANSWER,LSEG(FRACTION,1,END));
+               'END';
+ 
+               'COMMENT' IF NUMBER SIGN REQUESTED
+                         LOAD IN SIGN;
+               'IF' SIGN POS <> 0
+               'THEN'
+               'BEGIN'
+                   COPY  ('IF' SIGN < 0
+                   'THEN' ADD("-",ANSWER)
+                   'ELSE' ADD("+",ANSWER),ANSWER);
+               'END';
+           'END';
+           'IF' EMODE <> 0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' E SCALING REQUIRED;
+               ADD TO(ANSWER,"E");
+               'IF' EBASE < 0
+               'THEN'
+               'BEGIN'
+                   EBASE := -EBASE;
+                   ADD TO(ANSWER,"-");  (INDICATE NEGATIVE POWER USED)
+               'END'
+               'ELSE' ADD TO(ANSWER,"+");  (DEFAULT POSITIVE POWER)
+ 
+               'COMMENT' GENERATE E BASE NUMERICS;
+               EMODE := EBASE / 10;          (HOLD UNITS)
+               EBASE := EBASE - EMODE * 10;  (HOLD TENS)
+ 
+               'COMMENT' LOAD INTO REPLY TENS VALUE OR SPACE;
+               'IF' EMODE <> 0
+               'THEN' ADD TO(ANSWER,CHR(EMODE+48))
+               'ELSE' ADD TO(ANSWER," ");
+               ADD TO(ANSWER,CHR(EBASE+48));  (LOAD INTO REPLY UNITS VALUE)
+           'END';
+ 
+           'COMMENT' PROCEDURE REPLY ADDRESS OF DECODED VALUE;
+           'ANSWER' 'LOCATION' (ANSER[2]);
+       'END' OF PROCEDURE CVT;
+   'END';
+   'FINISH'

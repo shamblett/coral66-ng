@@ -1,0 +1,16 @@
+   'CORAL' P6 BLK MODULE
+ 
+ 
+   'LIBRARY' ('PROCEDURE' CHPEN ('LOCATION''INTEGER'));
+   'COMMON' ('PROCEDURE' BLK);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' BLK;
+       'BEGIN'
+           'INTEGER' COLOUR:=1;
+           CHPEN(COLOUR);
+       'END'OF PROCEDURE BLK;
+   'END';
+   'FINISH'

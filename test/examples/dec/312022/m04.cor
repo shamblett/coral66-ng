@@ -1,0 +1,113 @@
+	.TITLE	BUGERR	DEBUG ERROR PROGRAMMES FOR CORAL
+;	.LIST MEB
+	.MCALL ALUN$S,QIOW$S
+;
+;=================================================================
+;......................DATA OUTPUT PROGRAMME......................
+;=================================================================
+;
+SPRINT::
+;	This routine outputs a string to the users terminal
+;
+;	USAGE	PRINT ('VI' LUN,'VI' TEXT);
+;
+	CMP #2,(R5)+		;IF two parameters
+	BNE	PEND		;THEN
+	MOV (R5)+,R0		;hold the LUN value
+	MOV @R5,R1		;hold the string address
+RSPNT:	ALUN$S R0,#"TI,#0	;assign the LUN
+	BCS	PEND		;LUN error so give up
+	MOV (R1)+,R2		;hold the length and point to 1st character
+	QIOW$S #IO.WAL,R0,R0,,,,<R1,R2>
+	ALUN$S R0		;deassign LUN
+PEND:	RETURN			;back to coral programme
+;
+;=================================================================
+;......................DATA INPUT PROGRAMME.......................
+;=================================================================
+;
+SINPUT::
+;	This routine reads a string from the users terminal
+;
+;	USAGE	A:=SINPUT('VI' LUN);
+;
+	CMP #1,(R5)+		;IF one paramters
+	BNE	100$		;THEN
+	ALUN$S @R5,#"TI,#0	;assign the LUN
+	BCS	100$		;give up if assign failed
+	QIOW$S #IO.RLB,@R5,@R5,,#GEN,,<#GEN+4,#80.>
+				;read 80. max chars
+	ALUN$S @R5		;deassign lun
+100$:	MOV #GEN+2,R0		;hold string address
+	RETURN			;back to calling programme
+;
+;=================================================================
+;...................INPUT DATA CONVERT PROGRAMME..................
+;=================================================================
+;
+IINPUT::
+;	This procedure reads an integer from the users terminal
+;
+;	USAGE	A:=VALUE('VI' LUN);
+;
+	CALL SINPUT		;read the string
+	BCS	100$		;escape if error
+	MOV (R0)+,R2		;hold length R0 -> 1st char
+	CLR R1			;reset acumulator
+	MOV #1,50$		;fiddle signer assume positive value
+10$:	MOVB (R0)+,R4		;hold char
+	CMP R4,#'-		;IF negative sign
+	BNE 20$			;THEN
+	NEG 50$			;mark value finished value as negative
+	BR	40$		;ELSE
+20$:	SUB #'0,R4		;convert ASCII to BCD
+	BLT 40$			;IF valid value THEN
+	MUL #10.,R1		;shift base one place left
+	ADD R4,R1		;and add in LS digit
+40$:	SOB R2,10$		;REPEAT till all characters processed
+	MUL (PC)+,R1		;Sign correct output value
+50$:	.WORD +1		;times one if positive ELSE time minus one
+	MOV R1,R0		;hold processed value in reply location
+	RETURN			;back to calling programme
+;
+100$:	CLR R0			;ucked no way answer
+	RETURN			;back to calling programme
+;
+;
+;=================================================================
+;...................OUTPUT DATA CONVERT PROGRAMME.................
+;=================================================================
+;
+IPRINT::
+;	This procedure writes an integer to the users terminal
+;
+;	USAGE	IPRINT ('VI' LUN,'VI' DECIMAL VALUE);
+	CMP #2,(R5)+		;IF two parameters
+	BNE	100$		;THEN
+	MOV 2(R5),R1		;hold value to convert
+	MOV #GEN+4,R0		;hold convert o/p store data address
+	MOV R0,R2		;use leading zero's
+	CALL $CBDSG		;convert to signed decimal
+	MOV #GEN+2,R1		;hold string addres
+	MOV #6.,@R1		;number of characters
+	CMPB 2(R1),#'-		;only 6 characters if negative value
+	BEQ	50$		;IF positive value
+	DEC @R1			;THEN reduce character count by one
+50$:	MOV @R5,R0		;hold lun value
+	CALL RSPNT		;display data
+100$:	RETURN			;back to calling programme
+;
+;
+;=================================================================
+;...................INPUT/OUTPUT DATA AREA........................
+;=================================================================
+;
+GEN:				;general data area
+110$:	.WORD			;IO status block +0
+111$:	.WORD			;string length and part of IO stat block +2
+113$:	.BLKB 84.		;room for 80 characters and a bit +4
+	.EVEN
+;
+;
+	.END
+;

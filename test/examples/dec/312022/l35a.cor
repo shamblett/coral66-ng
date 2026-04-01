@@ -1,0 +1,68 @@
+   'CORAL' L35A
+   'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+   'LIBRARY' ('INTEGER''PROCEDURE' LEN ('VALUE''INTEGER');
+   'PROCEDURE' CLEAR ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' COPY ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' SPLITS ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' SPLITS ('VALUE''INTEGER' MASTER, ANSWER, SEP);
+       'BEGIN'
+           'INTEGER' P, P1, CHAR, LOCATED;
+ 
+           'COMMENT' VALIDATE THE INPUT PARAMETERS;
+           'IF' MASTER=VOID
+           'OR' ANSWER=VOID
+           'OR' SEP=VOID
+           'OR' MASTER=ERROR
+           'OR' ANSWER=ERROR
+           'OR' SEP=ERROR
+           'OR' LEN(MASTER)=0
+           'OR' LEN(SEP)=0
+           'THEN'
+           'ANSWER' ERROR;
+           CHAR:=0;
+           LOCATED:=0;
+ 
+           'COMMENT' LOCATE THE POSITION OF THE NEAREST
+                     SPLIT CHARACTER;
+           'FOR' P:=1 'STEP' 1 'UNTIL' LEN(SEP) 'DO'
+           'BEGIN'
+               P1:=LPOS(MASTER,LSEG(SEP,P,P),1);  (LOCATE POSITION OF SPLIT CHARACTER)
+               'IF' P1<>0
+               'THEN'
+               'BEGIN'
+                   'IF' LOCATED=0
+                   'OR' P1<LOCATED
+                   'THEN' LOCATED:=P1;
+               'END';
+           'END';
+           P:=LOCATED;
+           'IF' P<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' CHOP INPUT STRING INTO TWO BITS AROUND
+                         THE SPLIT CHARACTER STORING THE LHS GROUP IN THE
+                         REPLY AREA AND THE RHS GROUP BACK IN THE INPUT STRING;
+               COPY(LSEG(MASTER,1,P-1),ANSWER);
+               COPY(LSEG(MASTER,P+1,LEN(MASTER)),MASTER);
+           'END'
+           'ELSE'
+           'BEGIN'
+ 
+               'COMMENT' SPLIT CHARACTER NOT FOUND THERFORE THE INPUT
+                         STRING IS THE REPLY STRING;
+               COPY(MASTER,ANSWER);
+               CLEAR(MASTER);
+           'END';
+           'ANSWER' SUCCESS;
+       'END' OF PROCEDURE SPLIT;
+   'END';
+   'FINISH'

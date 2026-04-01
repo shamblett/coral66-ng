@@ -1,0 +1,837 @@
+
+.TITLE MSI STANDARD INTERFACE STAND ALONE I/O CONTROLLER
+;
+	.IDENT /DSIO../
+;
+;
+;
+;
+;
+;.MACRO DEVIO $TCHN,$TCSR,$TVEC,$TPRM,$TIBF=10,$TISG=0,$TFIL=0,$TOBF=0
+;
+;
+.MACRO DEVIO $TCHN,$TCSR,$TVEC,$TPRM,$TIBF=10,$TISG=0,$TFIL=0,$TOBF=0
+;
+	.MCALL QUEBUF
+;
+;
+	$$STR	=	0	;string mode
+	$$CHAR	=	1	;character mode
+;
+	$TNE	=	1	;automatic echo required on input
+	$TSCP	=	0	;smart erase option required
+	$TESC	=	0	;escape terminates with strings
+	$TPAR	=	0	;remove parity bit on input
+	$THTAB	=	1	;terminal horizontal tab function required.
+	$TVTAB	=	1	;terminal vertical tab function required
+;
+	$TIN	=	0	;INPUT CODE REQUIRED
+	$TOUT	=	0	;OUTPUT CODE REQUIRED
+	$TERM	=	0	;This is a terminal handler
+	$TRXM	=	$$CHAR	;receiver    mode of operation
+	$TTXM	=	$$STR	;transmitter mode of operation
+;
+	$HTVAL	=	8.	;VALUE OF A TAB CHARACTER.
+	$VTVAL	=	66.	;TOTAL NUMBER OF LINES ON A PAGE
+	$PGAP	=	8.	;NUMBER OF BLANK BETWEEN PAGES.
+;
+	.IRP SYM,<$TPRM>
+	.IF NB SYM
+	.IIF IDN SYM,NOECHO	$TNE	=	0
+	.IIF IDN SYM,NOESCAPE	$TESC	=	1
+	.IIF IDN SYM,NOSCOPE	$TSCP	=	1
+	.IIF IDN SYM,NOIN	$TIN	=	1
+	.IIF IDN SYM,NOOUT	$TOUT	=	1
+	.IIF IDN SYM,NOPAR	$TPAR	=	1
+	.IIF IDN SYM,DEVICE	$TERM	=	1
+	.IIF IDN SYM,STRING	$TRXM	=	$$STR
+	.IIF IDN SYM,OCHAR	$TTXM	=	$$CHAR
+	.ENDC
+	.ENDM
+;
+;
+
+;
+	.SBTTL  CONTROL HANDLER PRESET
+;		**********************
+;
+;
+;		CONTROL FLAGS
+;		=============
+;
+	INITIAL =	000001		;PROGRAM NEEDS INITIALISING
+	CRLF	=	000010		;OUTPUT A CRLF TO DEVICE
+;	ECHOIB	=	000020		;ECHO INPUT BUFFER CNT/R OPTION
+	LOSE	=	000040		;DISABLE DATA OUTPUT CNT/0 FUNCTION
+;
+;		STATUS FLAGS
+;		============
+;
+	TXBUSY	=	000100		;TRANSMITTER SECTION BUSY
+	IPLOST	=	000200		;INPUT CHARACTER HAS BEEN LOST
+	ESCAPC	=	000400		;Escape character terminated string
+;
+;		INTERNAL CONTROL FLAGS
+;		======================
+;
+	NOINC	=	001000		;DONT INCREMENT TXMITTER O/P POINTER
+	FILL	=	002000		;FILLER OUTPUT CHARACTER REQD
+	ECHO	=	004000		;ECHO INPUT READ CHARACTER BUFFER BUSY
+;
+;		CHARACTERISTICS FLAGS
+;		=====================
+;
+	TERM	=	010000		;THIS IS A TERMINAL CHANNEL
+	SCOPE	=	020000		;ENABLE VDU SCOPE OPERATIONS
+	NOECHO	=	040000		;THIS IS A READ NO ECHO OPERATION
+	PARITY	=	100000		;LEAVE PARITY BIT ON INPUT CHANNEL
+;
+;
+;
+;		VECTOR AND I/O PAGE REGISTERS LOCATIONS
+;		=======================================
+;
+	RXVEC	=	$TVEC		;RECIVE VECTOR ADDRESS
+	RXPRI	=	RXVEC+2		;RECIEVER PSW PRIORITY ADDRESS
+	RXSTAT	=	$TCSR		;RECEIVER STATUS REGISTER LOCATION
+	RXBUFF	=	RXSTAT+2	;RECEIVER BUFFER LOCATION
+;
+	TXVEC	=	$TVEC+4		;TRANSMITTER VECTOR ADDRESS
+	TXPRI	=	TXVEC+2		;TRANSMITTER PSW PRIORITY ADDRESS
+	TXSTAT	=	$TCSR+4		;TRANSMITTER STATUS REGISTER LOCATION
+	TXBUFF	=	TXSTAT+2	;TRANSMITTER BUFFER LOCATION
+;
+	BR7	=	000340		;INTERRUPT PROCESSING PRIORITY
+	INTGO	=	000100		;INTERRUPT ENABLE FLAG BIT
+;
+
+;		CONSTANTS
+;		=========
+;
+	NULL	=	000000		;NULL VALUE
+	HT	=	000011		;VALUE OF HORIZONTAL TAB CHAR
+	LF	=	000012		;VALUE OF LINE FEED CHARACTER
+	VT	=	000013		;VALUE OF FORM FEED CHAR
+	CR	=	000015		;VALUE OF CARRIAGE RETURN
+	SPACE	=	000040		;VALUE OF A SPACE CHARACTER
+	ERASE	=	000177		;VALUE OF ERASE CHARACTER
+;
+	CTR.R	=	000002		;CONTROL'R CODE
+	CTR.O	=	000017		;CONTROL'O CODE
+;
+;
+	$TDEF	=	000000		;CLEAR OUT DEFAULT DEFINITIONS
+	.IIF EQ $TERM	$TDEF = $TDEF!TERM
+	.IIF EQ $TSCP	$TDEF = $TDEF!SCOPE
+	.IIF EQ $TPAR	$TDEF = $TDEF!PARITY
+	.IIF EQ $TNE	$TDEF = $TDEF!NOECHO
+;
+;
+	.SBTTL  MACRO CONFIGURATION DESCTIPTION
+;		*******************************
+;
+;	$HTVAL	=  8.	VALUE OF A TAB CHARACTER.
+;	$VTVAL	=  66.	TOTAL NUMBER OF LINES ON A PAGE
+;	$PGAP	=  8.	NUMBER OF BLANK BETWEEN PAGES.
+;	$TCHN	=	CHANNEL NUMBER
+;	$TCSR	=	BASE CONTOL/STATUS REGISTER
+;	$TVEC	=	BASE VECTOR ADDRESS OF CHANNEL
+;	$TFIL	=	NUMBER OF FILLER CHARACTERS AFTER LINE TERMINATOR
+;	$TIBF	=	NUMBER OF CHARACTERS ALLOWED IN READ AHEAD BUFFER
+;	$TISG	=	NUMBER OF CHARACTERS ALLOWED IN INPUT STRING
+;	$TOBF	=	NUMBER OF CHARACTERS ALLOWED IN OUTPUT RING BUFFER
+;	$TDEF	=	DEFAULT FLAG WORD SETUP FORMAT
+;	$TSCP	=  0	IF SMART SCOPE OPTION ENABLED
+;	$TESC	=  0	IF STRINGS MAY BE TERMINATED BY AN ESCAPE CHARACTER
+;	$TPAR	=  0	IF PARITY BIT TO BE REMOVED
+;	$TNE	=  1	IF AUTOMATIC INPUT ECHO REQUIRED
+;	$TIN	=  0	IF CHANNEL HAS AN INPUT FUNCTION
+;	$TOUT	=  0	IF CHANNEL HAS AN OUTPUT FUNCTION
+;	$TRXM	= $$STR	IF INPUT  CHANNEL CONFIGURED FOR STRING OPERATION
+;	$TTXM	= $$STR IF OUTPUT CHANNEL CONFIGURED FOR STRING OPERATION
+;
+;
+
+;
+	.SBTTL  ENTRY AND EXIT CONDITIONS
+;		*************************
+;
+;
+;	SFLGaa:: CHARACTERISTICS AND CONTROL DATA WORD
+;
+;
+;	SOUTaa:: serial output
+;	ENTRY CONDITIONS	(TRANSMIT DATA		ENTRY POINT	+0)
+;	R0 -> ADDRESS OF CHARACTER STRING
+;
+;	EXIT CONTITIONS		(TRANSMIT DATA		ENTRY POINT	+0)
+;	NONE
+;
+;	SINPaa:: serial input
+;	ENTRY CONDITIONS	(RECEIVE  DATA		ENTRY POINT	+2)
+;	NONE
+;
+;	EXIT CONDITIONS		(RECEIVE  DATA		ENTRY POINT	+2)
+;	R0= A CHARACTER/STRING IF STATUS = SUCCESS
+;
+;	SINTaa:: serial initialise
+;	ENTRY CONDITIONS	(INITIALISE SYSTEM	ENTRY POINT	+4)
+;	NONE
+;
+;	EXIT CONDITIONS		(INITIALSE SYSTEM	ENTRY POINT	+4)
+;	SYSTEM INITIALISED
+;
+;
+	.SBTTL  ROUTINE ENTRY POINTS AND CONTROL VECTOR WORD
+;		********************************************
+;		  (Retained for compatability with SERIO)
+;
+SIO'$TCHN::				;SERIAL I/O CHANNEL NUMBER '$TCHN
+;
+SOUT'$TCHN::
+	.IF EQ $$TTXM-$$STR
+		BR	OUTS'$TCHN
+	.IFF
+		BR	OUTC'$TCHN
+	.ENDC
+;
+SINP'$TCHN::
+	.IF EQ $$TRXM-$$STR
+		BR	INPS'$TCHN
+	.IFF
+		BR	INPC'$TCHN
+	.ENDC
+;
+SINT'$TCHN::
+		BR	INTS'$TCHN	;initialse system
+;
+;		SYSTEM STATUS FLAG
+;		==================
+;
+SFLG'$TCHN::
+FLAG'$TCHN:	.WORD	INITIAL		;initialisation required
+;
+;
+
+	.SBTTL  INITIALISATION SECTION
+;		**********************
+;
+;
+INIT'$TCHN:				;INITIALISATION ROUTINE
+					;======================
+;
+		BIT #INITIAL,FLAG'$TCHN ;TCHN ;IF initialisation required
+		BEQ	INTE'$TCHN	;THEN
+INTS'$TCHN:	
+		MOV #$TDEF,FLAG'$TCHN	;set up default condition of device
+;
+	.IF EQ	$TIN			;handler has an input section
+		CALL R$QCLR		;clear out queue buffer using address below
+		INBF'$TCHN		;address of input buffer
+;		CLR INBF'$TCHN		;remove any characters in input buffer
+		MOV #BR7,@#RXPRI	;load receive priority
+		MOV #RXNT'$TCHN,@#RXVEC	;load interrupt vector address
+		BIS #INTGO,@#RXSTAT	;enable input buffer to operate
+	.ENDC
+;
+	.IF EQ	$TOUT			;handler has an output section
+	.IF NE $TOBF			;If an output buffer
+		CALL R$QCLR		;Clear it.
+		OPBF'$TCHN		;Buffer address.
+	.ENDC
+		MOV #BR7,@#TXPRI	;load transmit priority
+		MOV #TXNT'$TCHN,@#TXVEC	;load transmit vector address
+	.ENDC
+;
+INTE'$TCHN:	
+;
+		RETURN			;back to calling program
+;
+;
+
+	.SBTTL  READ A CHARACTER FROM INTERNAL BUFFER
+;		*************************************
+;
+;
+	.IF EQ  $TIN			;handler has an input section
+;
+	.IF EQ	$TRXM-$$STR		;COMPILE THIS CODE IF STRING INPUT REQD
+;
+	.IF NE $TISG			;Input string has a length.
+;
+INPS'$TCHN::				;STRING READ MODE
+;***********
+;
+		CALL INIT'$TCHN		;ensure system initialised
+	 	MOV R4,-(SP)		;protect register R4
+		TST SSIZE'$TCHN		;IF string read size <=0
+		BLE	5$		;THEN assume maximum buffer size
+		CMP SSIZE'$TCHN,$TISG	;IF input buffer size too big
+		BLE	6$		;THEN
+5$:		MOV $TISG,SSIZE'$TSG	;assume maximum buffer size
+6$:		MOV #SBUF'$TCHN,R4	;hold string buffer address
+		CLR	@R4		;clear out string buffer
+;
+	.IF EQ $TESC
+		BIS #ESCAPC,FLAG'$TCHN	;assume string terminated with escape
+	.ENDC
+;
+		BR	20$		;bypass append routine
+;
+10$:		CALL R$ADDC		;append a character to string buffer
+		BCS	40$		;IF error condition THEN GOTO exit
+;
+20$:		CMP SBUF'$TCHN,SSIZE'$TCHN
+					;IF string buffer full
+		BLE	35$		;THEN exit
+		CALL GETC'$TCHN		;extract a character from read ahead buffer
+		BCC	30$		;IF  no more characters
+		BIT #IPLOST,FLAG'$TCHN	;AND no characters lost
+		BEQ	20$		;THEN wait for more characters to arrive
+		BR	40$		;ELSE exit with error flag
+;
+30$:		CMP #LF,R0		;IF character = line feed
+		BEQ	20$		;THEN lose character
+;
+	.IF EQ $TESC
+		CMP #ESC,R0		;IF character = escape
+		BEQ	36$		;THEN assume this is string terminator
+	.ENDC
+;
+		CMP #CR,R0		;IF character is not a line terminator
+		BNE	10$		;THEN append characters to string
+;
+35$:
+	.IF EQ $TESC
+		BIC #ESCAPC,FLAG'$TCHN	;remove escape termination flag
+	.ENDC
+;
+36$:		CLC			;ELSE indicate string loaded
+		MOV R4,R0		;hold address of string
+;
+40$:		MOV (SP)+,R4		;restore register R4
+;
+	.IFF
+;
+		.ERROR	;INPUT STRING LENGTH NOT DEFINED.
+;
+	.ENDC
+;
+		RETURN
+;
+;
+	.ENDC
+;
+;		CHARACTER READ MODE
+;		===================
+;
+INPC'$TCHN::
+;***********
+		CALL INIT'$TCHN		;ensure system is initialised.
+GETC'$TCHN:
+		MOV R1,-(SP)		;protect register R1
+		MOV #INBF'$TCHN,R1	;hold address of input buffer queue
+		CALL R$QREM		;get character from buffer
+		MOV (SP)+,R1		;restore register R1
+;
+	.IF NE $TNE			;ECHO REQUIRED.
+		BCS	30$		;IF character extracted
+		BIT #NOECHO,FLAG'$TCHN	;AND read with echo
+		BNE	30$		;THEN
+		CALL OUTC'$TCHN		;send character to output
+		CLC			;indicate character arrived OK
+	.ENDC
+;
+30$:
+;
+	.IFF				;COMPILE IF NO INPUT SECTION
+;
+		SEC			;indicate NO character has arrived (no input)
+	.ENDC
+;
+		RETURN			;back to calling program
+;
+;
+
+;
+	.SBTTL	OUTPUT ROUTINES.
+;		****************
+;
+	.IF EQ $TOUT				;OUTPUT ROUTINES REQUESTED.
+;
+;	.SBTTL	OUTPUT STRING ROUTINE.
+;		**********************
+;
+OUTS'$TCHN::			
+;***********
+;
+		CALL	INIT'$TCHN		;CHECK INITIALISATION.
+;
+	.IF NE $TOBF				;BUFFERED OUTPUT
+						;===============
+;
+		CALL	R$SAVE			;SAVE THE REGISTERS.
+		MOV	(R0)+,R1		;R1 HOLDS THE CHARACTER COUNT.
+		MOV	R0,R2			;R2 HOLDS THE CHAR. ADDRESS.
+		MOV	#OPBF'$TCHN,R4		;MOV OUTPUT BUFF ADD TO R4.
+;
+;		OUTPUT BUFFER INSERTION LOOP
+;		============================
+;
+100$:
+		MOVB	(R2)+,R0		;GET A CHARACTER.
+110$:
+		CALL	R$QADD			;PUT IT IN THE BUFFER.
+		BCS	120$			;RE-LOOP IF SUCCESS.
+;
+		CALL	TXST'$TCHN		;ELSE START THE TRANSMITTER.
+		BR	110$			;RETRY
+;
+120$:
+		CALL	TXST'$TCHN		;START TX IF NECESSARY.
+		SOB	R1,100$			;RE-LOOP
+;
+		CALL	R$UNSAVE		;RESTORE THE REGISTERS.
+		RETURN
+;
+	.IFF					;NON BUFFERED OUTPUT
+						;===================
+;
+100$:
+		BIT	#TXBUSY,FLAG'$TCHN	;IF TRANSMITTER BUSY
+		BNE	100$			;THEN WAIT
+		MOV	(R0)+,TXCN'$TCHN	;HOLD CHARS COUNT / SET PNTR.
+		MOV	R0,TXAD'$TCHN		;HOLD DATA ADDRESS
+		TST	-(R0)			;FUDGE POINTER BACK.
+		BR	TXGO'$TCHN		;START CHANNEL
+	.ENDC
+;
+
+;
+;	.SBTTL	OUTPUT CHARACTER ROUTINE.
+;		*************************
+;
+OUTC'$TCHN::
+;***********
+		CALL	INIT'$TCHN		;CHECK INITISLISATION.
+;
+	.IF NE $TOBF				;BUFFERED OUTPUT
+						;===============
+;
+		MOV	R4,-(SP)		;SAVE R4
+		MOV	#OPBF'$TCHN,R4		;GET BUFFER ADDRESS
+100$:
+		CALL	R$QADD			;PUT CHARACTER IN BUFFER.
+		BCC	100$			;WAIT IF FULL.
+		MOV	(SP)+,R4		;RESTORE R4.
+		BR	TXST'$TCHN		;MAKE SURE TRANSMITTER 'GO'
+;
+	.IFF					;NON BUFFERED OUTPUT
+						;===================
+;
+100$:
+		BIT	#TXBUSY,FLAG'$TCHN	;IF TERMINAL BUSY
+		BNE	100$			;THEN WAIT
+;
+		MOVB	R0,TXCB'TCHN		;PUT CHAR IN SINGLE CHAR BUFF.
+		MOV	#TXCB'$TCHN,TXAD'$TCHN	;R0 EQ BUFF ADDRESS.
+		MOV	#1,TXCN'$TCHN		;SINGLE CHARACTER COUNT
+		BR	TXGO'$TCHN		;GET TRANSMITTER RUNNING.
+;
+	.ENDC
+;
+;
+;
+;
+;
+;
+;
+;
+
+;
+	.SBTTL	TRANSMITTER INTERRUPT START.
+;		****************************
+;
+TXST'$TCHN:
+;
+		BIT	#TXBUSY,FLAG'$TCHN	;IS OUTPUT BUFFER ENGAGED.
+		BNE	$TXND'$TCHN		;THEN RETURN
+TXGO'$TCHN:
+		BIS	#TXBUSY,FLAG'$TCHN	;INDICATE TRANSMITTER BUSY.
+		BIS	#INTGO,@#TXSTATUS	;START TRANSMIT INTERUPT.
+TXND'$TCHN:
+		RETURN
+;
+;
+
+;
+;	.SBTTL	TRANSMITTER INTERRUPT ROUTINE.
+;		******************************
+;
+TXNT'$TCHN:
+;
+		MOV	R0,-(SP)		;SAVE R0
+;
+;		SPECIAL TERMINAL CHECK
+;		**********************
+;
+	.IF EQ $TERM				;IF ITS A TERMINAL
+;
+		BIT	#TERM,FLAG'$TCHN	;IS DEVICE FACILITY SELECTED
+		BEQ	120$			;MISS NEXT LOT IF YES.
+;
+		BIT	#LOSE,FLAG'$TCHN	;HAS CNTR'O BEEN PRESSED
+		BNE	150$			;CLEAR OUTPUT & EXIT IF YES.
+;
+		TST	$FLRC'$TCHN		;ANY REPEAT CHARS REQ.
+		BLE	110$			;SKIP THIS IF NOT
+		MOV	@RPTA'$TCHN,R0		;GET REPEAT CHAR
+		DEC	FLRC'$TCHN		;DECREMENT COUNT
+		BIT	#NOINC,FLAG'TCHN	;IS INCREMENTATION REQUIRED
+		BNE	110$			;BYPASS INC IF NOT
+		INC	RPTA'$TCHN		;INCREMENT ADDRESS
+		BR	130$			;OUTPUT THE CHARACTER
+;
+110$:
+		BIC	#NOINC,FLAG'$TCHN	;CLEAR NO INCREMENT
+;
+	.ENDC
+;
+;		GET CHARACTER ROUTINES AND STATUS CHECK.
+;		****************************************
+120$:
+;
+	.IF EQ $TOBF				;NO OUTPUT BUFFER.
+;
+		TST	TXCN'$TCHN		;ANY MORE CHARACTERS FOR O/PT
+		BLE	150$			;IF NOT EXIT.
+		MOV	@TXAD'$TCHN,R0		;GET DATA ADDRESS.
+		INC	TXAD'$TCHN		;INCREMENT IT.
+		DEC	TXCN'$TCHN		;REDUCE CHARACTER COUNT.
+;
+	.IFF
+;
+		BNE	150$			;IF IT IS RETURN.
+		MOV	R1,-(SP)		;SAVE R1
+		MOV	#OPBF'TCHN,R1		;GET A CHARACTER -
+		CALL	R$QREM			;FROM THE OUTPUT BUFFER.
+		MOV	(SP)+,R1		;UNSAVE R1
+		BCC	150$			;IF NO MORE CLOSE DOWN.
+;
+	.ENDC
+;
+	.ENDC
+;
+;		OUTPUT THE CHARACTER
+;		*********************
+;
+130$:
+	.IF EQ $TERM
+;
+		BIT	#TERM,FLAG'$TCHN	;IS IT IN TERMINAL MODE
+		BNE	140$
+		CALL	TXCK'$TCHN		;SPECIAL CHARACTER CHECK
+;
+140$:
+	.ENDC
+		MOV	R0,TXCR'$TCHN		;MOVE THE CHARACTER OUT.
+		BIS	#TXBUSY,FLAG'$TCHN	;SET BUSY FLAG.
+		BIS	#INTGO,@#TXSTATUS	;KICK THE INTERUPT.
+;
+		BR	160$			;BRANCH TO RETURN.
+;
+;		SWITCH OF INTERRUPT
+;		********************
+;
+150$:		BIC	#INTGO,@#TXSTATUS	;SWITCH OF INTERRUPT SOFTWARE.
+;
+;		CLEAR BUFFER/OR STRING COUNT
+;		----------------------------
+;
+	.IF NE $TOBF
+;
+		CALL	R$QCLR			;CLEAR OUTPUT BUFFER
+		OPBF'$TCHN			;BUFFER ADDRESS
+;
+	.IFF
+;
+	.IF EQ $TTXM-$$STR			;IF STRING MODE, NO BUFFER.
+;
+		CLR	TXCN'$TCHN		;INDICATE NO MORE CHARACTERS.
+;
+	.ENDC
+;
+	.ENDC
+;
+;		CLEAR FLAGS
+;		***********
+;
+	.IF EQ $TERM
+;
+		BIC	#ECHO!FILL!CRLF!TXBUSY!NOINC,FLAG'$TCHN
+						;REMOVE ALL CNTR ACTION FLAGS.
+;
+	.ENDC
+;
+;		EXIT
+;		****
+;
+150$:
+		MOV	(SP)+,R0		;RESTORE REGISTER.
+		RTI				;RETURN FROM INTERRUPT.
+;
+	.ENDC					;$TOUT
+
+;
+;		TERMINAL MODE SPECIAL CHECKS
+;		****************************
+;
+TXCK'$TCHN:
+;
+	.IF EQ $TERM				;IF A TERMINAL
+;
+	.IF EQ $THTAB				;IF HORIZONTAL TAB REQUIRED.
+;
+		CMPB	#HT,R0			;IS IT A TAB CHARACTER
+		BNE	100$			;FORGET IT IF NOT
+;
+		MOV	HTAB'$TCHN,FLRC'$TCHN	;GET NUMBER OF TAB SPACES
+		MOV	#TXSP'$TCHN,RPTA'$TCHN	;GET ADDRESS OF SPACE CHAR.
+		BIS	#NOINC,FLAG'$TCHN	;SET NO INCREMENT ADDRESS.
+		BIS	#FILL,FLAG'$TCHN	;SET INTO FILL MODE
+		BR	200$			;CAN'T BE ANYTHING ELSE
+;
+100$:
+		TST	HTAB'$TCHN		;CHECK TAB COUNT
+		BEQ	101$			;BR TO RESET IF ZERO
+		DEC	HTAB'$TCHN		;DECREMENT IF NOT
+		BR	102$			;EXIT
+101$:
+		MOV	#$HTVAL,HTAB'$TCHN	;RESET IF ZERO
+102$:
+	.ENDC
+;
+	.IF EQ $TVTAB				;IF VERTICAL TAB REQUIRED.
+;
+		TST	VTAB'$TCHN		;IS IT TIME FOR A 'FF'.
+		BEQ	110$			;THEN DO IT
+		CMPB	#VT,R0			;IS IT A TAB CHARACTER
+		BNE	111$			;FORGET IT IF NOT
+;
+110$:
+		MOV	VTAB'$TCHN,FLRC'$TCHN	;GET NUMBER OF TAB FEEDS
+		ADD	#$PGAP,FLRC'$TCHN	;ADD THE PAGE GAP
+		MOV	#TXLF'$TCHN,RPTA'$TCHN	;GET ADDRESS OF LF CHAR.
+		BIS	#NOINC,FLAG'$TCHN	;SET NO INCREMENT ADDRESS.
+		BIS	#FILL,FLAG'$TCHN	;SET INTO FILL MODE
+		MOV	#$VTVAL-#$PGAP,VTAB'$TCHN
+						;SET THE TAB LINE COUNT
+		BR	200$			;CAN'T BE ANYTHING ELSE
+;
+111$:
+	.ENDC
+;
+	.IF EQ $TSCP
+;
+		CMP	#ERASE,R0		;IS IT AN ERASE CHARACTER.
+		BNE	120$			;FORGET IT IF NOT.
+;
+	.IF EQ $TFIL				;MUST BE A VDU
+		MOV	#3,FLRC'#TCHN		;SET CHAR COUNT
+		MOV	#TXVD'$TCHN,RPTA'$TCHN	;SMART SCOPE OPTION
+	.IFF					;MUST BE A PRINTER
+		MOV	#1,FLRC'#TCHN		;SET CHAR COUNT
+		MOV	#TXPR'$TCHN,RPTA'$TCHN	;SMART SCOPE OPTION (PRINTER)
+	.ENDC
+;
+	.IF NE $TISG
+		DEC	SBUF'$TCHN		;REMOVE CHAR FROM INPUT BUFF.
+	.ENDC
+		BIS	#FILL,FLAG'$TCHN	;SET INTO FILL MODE
+		BR	200$			;AND EXIT
+;
+120$:
+;
+	.ENDC
+;
+	.ENDC
+;
+	.IF NE $TFIL				;CHECK FOR FILLER CHARACTER.
+;
+	.IF NE $TESC				;ESCAPE TERMINATOR
+		CMPB	#CR,R0			;IS CHARACTER A 'CR'.
+	.IFF
+		CMPB	#ESC,R0
+	.ENDC
+;
+		BNE	130$			;FORGET THIS BIT IF NOT.
+;
+		MOV	$TFILL,FLRC'$TCHN	;SET THE FILLER COUNT.
+		MOV	#TXNL'$TCHN,RPTA'$TCHN	;SEND NEW LINE CHARACTER
+		BIS	#FILL,FLAG'$TCHN	;ELSE SET FILLER FLAG.
+;
+	.IF EQ #TVTAB
+		DEC	VTAB'$TCHN		;DECREMENT THE VT COUNT
+	.ENDC
+;
+130$:
+		BIT	#CRLF,FLAG'$TCHN	;IS CRLF REQUIRED.
+		BEQ	140$
+;
+135$:
+		BIT	#FILL,FLAG'$TCHN	;IS FILL FLAG SET
+		BNE	135$			;THEN WAIT
+;
+		MOV	#2,FLRC'$TCHN		;SET OUTPUT COUNT TO 2.
+		MOV	#TXLT'$TCHN,RPTA'$TCHN	;GET CR/LF ADDRESS
+		BIS	#FILL,FLAG'$TCHN	;SET TO FILL MODE
+;
+	.IF NE $TISG
+		MOV	#SBUF'$TCHN,R0		;RE-OUTPUT STRING
+		CALL	OUTS'$TCHN		;CNTR-R
+	.ENDC
+140$:
+;
+	.ENDC
+;
+200$:
+;
+		RETURN
+;
+
+;
+	.SBTTL	RECEIVE INTERRUPT SECTION
+;		*************************
+;
+.IF EQ $TIN
+;
+;
+RXNT'$TCHN:				;RECEIVER INTERRUPT PROGRAM
+;
+;
+		MOV R4,-(SP)
+		MOV R0,-(SP)		;protect registers R0 and R4
+		MOVB @#RXBUFF,R0	;hold input character
+		BIT #PARITY,FLAG'$TCHN  ;IF parity bit remove flag set
+		BEQ	10$		;THEN
+		BIC #177600,R0		;remove parity bits
+;
+10$:		BIC #IPLOST,FLAG'$TCHN	;remove lost character flag
+	.IF EQ $TERM
+		BIT #TERM,FLAG'$TCHN	;IF this a terminal channel
+		BEQ 	50$		;THEN
+		CMP #CTR.O,R0		;	IF this a control/o signal
+		BNE	40$		;	THEN
+		MOV #LOSE,R0		;	hold output control flag
+		XOR R0,FLAG'$TCHN	;	toggle output control flag
+		BR	60$		;EXIT
+;
+40$:
+		CMP #CTR.R,R0		;Has contro R been selected
+		BNE 50$			;Forget this if not.
+;
+		BIS #CRLF,FLAG'$TCHN	;Set the flag
+;
+	.ENDC
+;
+		MOV #INBF'$TCHN,R4	;hold input buffer queue address
+		CALL R$QADD		;append character to i/p buffer
+		BCC 60$			;IF operation ok
+		BIS #IPLOST,FLAG'$TCHN	;THEN	indicate character has been lost
+					;	and this is the end of the buffer
+60$:		MOV (SP)+,R0		;restore register R0
+		MOV (SP)+,R4		;restore register R4
+;
+		RTI			;RESUME WORKING POSITION
+;
+.ENDC
+;
+;
+
+;
+;
+	.SBTTL	DATA SECTION.
+;		*************
+;
+TXCB'$TCHN:	.WORD	0		;SINGLE CHAR OUTPUT BUFFER.
+;
+;		STRING MODE - INPUT STRING
+;		==========================
+;
+	.IF EQ $TRXM-$$STR		;IF string mode
+SSIZ'$TCHN::
+SSIZE'$TCHN:	.WORD	$TISG		;buffer limit i/p size
+	.ENDC
+;
+	.IF EQ $TOUT
+;
+					;NON BUFFERED STRG OUTPUT MODE
+					;=============================
+TXCN'$TCHN:	.WORD	0		;OUTPUT CHARACTER COUNTER
+TXAD'$TCHN:	.WORD	0		;ADDRESS OF OUTPUT BUFFER
+TXCR'$TCHN:	.WORD	0		;STORE AREA FOR ECHO OPERATIONS
+;
+	.IF EQ $TERM
+;
+					;TERMINAL DATA AREA
+					;==================
+TXPR'$TCHN:	.BYTE	'/		;printer backspace character
+TXVD'$TCHN:	.BYTE	10,40,10,0	;backspace space backspace null
+TXLT'$TCHN:	.BYTE	CR		;line terminator characters
+TXLF'$TCHN:	.BYTE	LF		;line feed character.
+TXNL'$TCHN:	.BYTE	NULL		;null character.
+TXSP'$TCHN:	.BYTE	SPACE		;space chracter.
+;
+		.EVEN
+;
+	.ENDC
+;
+	.IF NE $TFIL
+;
+					;FILLER CHARACTER DATA
+					;=====================
+HTAB'$TCHN	.WORD	0		;HT COUNT
+VTAB'$TCHN	.WORD	0		;FF COUNT
+FLR'$TCHN:	.WORD	0		;ZERO FILLER CHARACTER
+FLRC'$TCHN:	.WORD	0		;USE $TFIL FILLER CHARACTERS
+RPTA'$TCHN:	.WORD	0		;REPEAT ADDRESS
+;
+	.ENDC
+;
+	.ENDC
+;
+;
+	.IF EQ  $TIN			;INPUT RING BUFFER
+					;=================
+;
+	    QUEBUF $TIBF,INBF'$TCHN	;reserve area for input que buffer
+;
+	.ENDC
+;
+	.IF EQ $TOUT			;OUTPUT RING BUFFER
+					;==================
+	.IF NE $TOBF
+	    QUEBUF $TOBF,OPBF'$TCHN	;reserve area for output que buffer
+	.ENDC
+;
+	.ENDC
+;
+;
+	.IF EQ	$TRXM-$$STR
+					;BUFFER FOR INPUT STRING MODE
+					;============================
+		.WORD	$TISG		;max number of characters in string
+SBUF'$TCHN:	.WORD	0		;number of characters in string
+		.BLKB	$TISG		;reserve area for string storage
+		.EVEN			;ensure array in word boundary
+;		
+	.ENDC
+;
+;
+;
+;
+	.ENDM	DEVIO
+;
+;
+;
+	.END

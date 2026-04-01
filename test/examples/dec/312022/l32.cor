@@ -1,0 +1,65 @@
+   'CORAL' L32
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' LPOS('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LEN('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' CLEAR('VALUE''INTEGER');
+   'PROCEDURE' ADD TO('VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' SRP('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' SRP('VALUE''INTEGER' MASTER,FROM,TO,TIMES);
+       'BEGIN'
+ 
+           'COMMENT' This routine creates a new string which will
+                     look like the master string but with TIMES/all
+                     occurances of string FROM replaced with string TO;
+ 
+           'COMMENT' Author R. J. Spriggs ATCEU Hurn Apt Christchurch;
+           'INTEGER' COUNT, START, END, STRING;
+           'BYTE''ARRAY' WORKSPACE[0:259];
+           'OVERLAY' WORKSPACE[0] 'WITH' 'INTEGER' SIZE;
+           'OVERLAY' WORKSPACE[2] 'WITH' 'INTEGER' LENGTH;
+           SIZE:=256;  (MAX LENGTH OF STRING)
+           LENGTH:=0;  (CLEAR STRING)
+           STRING:='LOCATION' (WORKSPACE[2]);  (HOLD ADDRESS OF START OF STRING)
+           COUNT:=0;  (RESET NUMBER OF REPEATS COUNTER)
+ 
+           'COMMENT' Please note all input strings may be read only type
+                     and change TO string may be a VOID string;
+           'IF' MASTER = VOID
+           'OR' MASTER = ERROR
+           'OR' FROM   = VOID
+           'OR' FROM   = ERROR
+           'OR' TIMES  < 0
+           'THEN'
+           'ANSWER' ERROR; (DUMMY STRINGS NO ACTION OR NO EXCHANGES)
+ 
+           'COMMENT' IF TIMES = 0 REPLACE ALL OCCURANCES;
+           START:=1;  (START AT BEGINING OF LINE)
+ LOOP:     END:=LPOS(MASTER,FROM,START); (LOCATE IF ANY OCCURANCES)
+           'IF' END<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' REPLACEMENT CHARACTERS FOUND;
+               ADD TO(STRING,LSEG(MASTER,START,END-1));  (COPY ACROSS PRECEDING CHARACTERS)
+               ADD TO(STRING,TO);  (ADD IN REPLACEMENT CHARACTERS)
+               START:=END+LEN(FROM);  (INDEX TO NEXT CHARACTER AFTER REPLACED CHARACTERS)
+               COUNT:=COUNT+1;  (INDEX COUNTER OF NUMBER OF EXCHANGES)
+               'IF' COUNT<TIMES
+               'OR' TIMES=0
+               'THEN' 'GOTO' LOOP;  (REPEAT TILL ALL REPLACEMENT TAKEN PLACE)
+           'END';
+           ADD TO(STRING,LSEG(MASTER,START,LEN(MASTER)));  (COPY OVER ANY REMAINING CHARACTERS)
+           'ANSWER' STRING;
+       'END';
+   'END';
+   'FINISH'

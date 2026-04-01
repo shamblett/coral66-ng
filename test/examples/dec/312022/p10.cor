@@ -1,0 +1,15 @@
+   'CORAL' P10 DEV MODULE
+ 
+ 
+   'COMMON' ('PROCEDURE' DEV ('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' DEV ('VALUE''INTEGER' TYPE);
+       'BEGIN'
+           'INTEGER' DUMMY;
+           DUMMY:=DUMMY;
+       'END'OF PROCEDURE DEV;
+   'END';
+   'FINISH'

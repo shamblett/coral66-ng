@@ -1,0 +1,31 @@
+   'CORAL' P11 ARR MODULE
+ 
+ 
+   'LIBRARY' ('PROCEDURE' MOV ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' PLT ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' WHERE ('LOCATION''FLOATING','LOCATION''FLOATING','LOCATION''FLOATING'));
+   'COMMON' ('PROCEDURE' ARR ('VALUE''INTEGER','VALUE''FLOATING'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' ARR ('VALUE''INTEGER' SIZE;
+       'VALUE''FLOATING' ANGLE);
+       'BEGIN'
+           'FLOATING' X, Y, F, XCENT, YCENT;
+ 
+           'COMMENT' LOCATE CENTER OF CHARACTER;
+           WHERE(XCENT,YCENT,F);
+           'IF' SIZE>0
+           'THEN'
+           'BEGIN'
+               Y:=SIZE;  (HOLD INPUT VALUE)
+               X:=-(Y*0.07);
+               PLT(X,ANGLE+150);
+               MOV(XCENT,YCENT);
+               PLT(X,ANGLE-150);
+               MOV(XCENT,YCENT);
+           'END';
+       'END'OF PROCEDURE ARR;
+   'END';
+   'FINISH'

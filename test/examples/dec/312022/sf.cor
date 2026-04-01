@@ -1,0 +1,18 @@
+   'CORAL' SF
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' FS);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' FS;
+       'BEGIN'
+           'BYTE''ARRAY' STRING [0:259]:=1,0,0,0;
+           'OVERLAY' STRING [0] 'WITH' 'INTEGER' BUFFER LENGTH;
+           'OVERLAY' STRING [2] 'WITH' 'INTEGER' LENGTH;
+           BUFFER LENGTH:=256;
+           'ANSWER''LOCATION' (STRING[2]);
+       'END';
+   'END';
+   'FINISH'

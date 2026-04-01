@@ -1,0 +1,38 @@
+   'COMMENT' =====================================
+             COMMON DEFINITIONS FOR CORAL PROGRAMS
+             =====================================;
+   'DEFINE' SAME           "0";
+   'DEFINE' SUCCESS        "+1";
+   'DEFINE' ERROR          "-1";
+   'DEFINE' ERR            "-1";
+   'DEFINE' EOF            "-2";
+   'DEFINE' YES            "+1";
+   'DEFINE' NO             "-1";
+   'DEFINE' GO             "+1";
+   'DEFINE' STOP           "-1";
+   'DEFINE' SWITCHED ON    "+1";
+   'DEFINE' SWITCH   ON    "+1";
+   'DEFINE' ON             "+1";
+   'DEFINE' SWITCHED OFF   "-1";
+   'DEFINE' SWITCH OFF     "-1";
+   'DEFINE' OFF            "-1";
+   'DEFINE' SHUT           "-1";
+   'DEFINE' OPENED         "+1";
+   'DEFINE' ALLOCATED      "+1";
+   'DEFINE' FREE           "-1";
+   'DEFINE' USED           "+1";
+   'DEFINE' DONE           "+1";
+   'DEFINE' BUSY           "0";
+   'DEFINE' VOID           "0";
+   'DEFINE' GIVE VALUE     "0";
+   'DEFINE' VOID LUN       "0";
+ 
+   'COMMENT' FLOATING REGISTERS;
+   'DEFINE' FLOATING REGISTERS "
+   'FLOATING' AF, BF, CF, DF, EF, FF, GF, HF, IF, JF, KF, LF, MF;
+   'FLOATING' NF, OF, PF, QF, RF, SF, TF, UF, VF, WF, XF, YF, ZF";
+ 
+   'COMMENT' INTEGER REGISTERS;
+   'DEFINE' INTEGER REGISTERS "
+   'INTEGER' A, B, C, D, E, F, G, H, I, J, K, L, M;
+   'INTEGER' N, O, P, Q, R, S, T, U, V, W, X, Y, Z";

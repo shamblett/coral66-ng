@@ -1,0 +1,57 @@
+   'CORAL' L34
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' SHIFT ('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' SHIFT('VALUE''INTEGER' STRING,PLACES);
+       'BEGIN'
+           'INTEGER' POSITION, COUNT, DIR;
+           'BYTE''ARRAY' WORK[0:7];
+           'OVERLAY' WORK[2] 'WITH' 'INTEGER' REF1;
+           'OVERLAY' WORK[4] 'WITH' 'INTEGER' REF2;
+           'OVERLAY' WORK[1] 'WITH' 'BYTE' CARRYIN;
+           'OVERLAY' WORK[6] 'WITH' 'BYTE' CARRYOUT;
+ 
+ 
+           'PROCEDURE' MOVE;
+           'BEGIN'
+ 
+               'COMMENT' DIR = -1 THEN SHIFT LEFT  ONE PLACE
+                         DIR = +1 THEN SHIFT RIGHT ONE PLACE;
+               'IF' [STRING] <> 0 
+               'AND' [STRING]+DIR <= [STRING-2]
+               'THEN' 
+               'BEGIN'
+ 
+                   'COMMENT' SUFFICENT SPACE TO WORK IN;
+                   CARRY IN := 32; (SET AS SPACE IF SHIFT RIGHT)
+ 
+                   'COMMENT' LOOP TO END OF STRING;
+                   'FOR' POS:=2 'STEP' 2 'UNTIL' [STRING] 'DO' 
+                   'BEGIN'
+                       REF1 := [STRING + POS];
+                       REF2 := [STRING + POS +2];
+ 
+                       'COMMENT' SET UP LIMITS FOR SHIFTING LOOP;
+                       COUNT:= 'IF' DIR>0 
+                       'THEN' 4 
+                       'ELSE' 1;
+                       LIMIT= 'IF' DIR >0 
+                       'THEN' 1 
+                       'ELSE' 4;
+ 
+                       'COMMENT' ONE CHARACTER SHIFTING OPERATION;
+                       'FOR' COUNT:=COUNT 'STEP' -DIR 'UNTIL' LIMIT 'DO'
+                       WORK[COUNT+DIR] := WORK[COUNT];  (TRANSFER CHARACTERS)
+                       CARRY IN := CARRY OUT;  (COPY CARRY CHARACTER IF REQD)
+                       [STRING+POS]:= REF1;  (COPY OUT MODIFIED BLOCK)
+                   'END';
+                   [STRING]:=[STRING]+DIR;  (CORRECT LENGTH)
+               'END';
+           'END';
+       'END';
+   'END';
+   'FINISH'

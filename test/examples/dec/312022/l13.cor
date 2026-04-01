@@ -1,0 +1,17 @@
+   'CORAL' L13
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' CHR('VALUE''BYTE'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' CHR('VALUE''BYTE' VALUE);
+       'BEGIN'
+           'BYTE''ARRAY' STRING [0:3]:=1,0,0,0;
+           STRING[2]:=VALUE;
+           'ANSWER''LOCATION' (STRING [0]);
+           ;
+       'END';
+   'END';
+   'FINISH'

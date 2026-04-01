@@ -1,0 +1,71 @@
+   'CORAL' L5A
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'           LEN    ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE'           COMPARE('VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' LPOS('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' LPOS ('VALUE''INTEGER' STRING1, STRING2, START);
+       'BEGIN'
+           'INTEGER' COUNT;
+ 
+ 
+           'INTEGER''PROCEDURE' SEG ('VALUE''INTEGER' STRING, START, END);
+           'BEGIN'
+               'BYTE''ARRAY' STRING1 [0:57] := 0;
+               'INTEGER' COUNT;
+               'OVERLAY' STRING1 'WITH' 'INTEGER' STRINGLENGTH;
+               'IF' END-START > 55
+               'THEN'
+               'BEGIN'
+                   STRINGLENGTH := 0;  (ERROR NO CHARACTERS)
+               'END'
+               'ELSE'
+               'BEGIN'
+                   STRINGLENGTH := END-START+1;
+ 
+                   'COMMENT' BUILD UP A VALID STRING;
+                   'FOR' COUNT := START 'STEP' 1 'UNTIL' END 'DO'
+                   STRING1[COUNT-START+2] := [STRING+COUNT+1];
+               'END';
+               'ANSWER''LOCATION'(STRING1[0]);
+           'END';
+ 
+           'COMMENT' START OF POSITION PROCEDURE;
+ 
+           'COMMENT' CHECK IF INPUT PARAMETERS VALID;
+           'IF' STRING1 =ERROR
+           'OR' STRING2 = ERROR
+           'OR' STRING1 = VOID
+           'OR' STRING2 = VOID
+           'THEN'
+           'ANSWER' 0;    (NO MATCH FOUND)
+           'IF' LEN(STRING1)<LEN(STRING2)
+           'OR' LEN(STRING1)=0
+           'OR' LEN(STRING2)=0
+           'THEN'
+           'ANSWER' 0;          (INDICATE NO MATCH FOUND)
+ 
+           'COMMENT' SEARCH FOR A MATCH;
+           'FOR' COUNT :=  START , COUNT 'WHILE' COUNT+LEN(STRING2)-1<=LEN(STRING1) 'DO'
+           'BEGIN'
+               'IF' COMPARE(STRING2,SEG(STRING1,COUNT,COUNT + LEN(STRING2) -1)) = SAME
+               'THEN'
+               'ANSWER' COUNT;    (POSITION OF MATCH AND EXIT METHOD)
+ 
+               'COMMENT' MATCH NOT FOUND SHIFT COMPARE STRING FURTHER ALONG MAIN;
+               COUNT := COUNT+1;    (INDEX REFERENCE POINTER)
+           'END';
+ 
+           'COMMENT' THE WHOLE STRING CHECKED AND NO MATCH FOUND;
+           'ANSWER' 0;
+       'END';
+   'END';
+   'FINISH'

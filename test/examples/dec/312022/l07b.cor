@@ -1,0 +1,38 @@
+   'CORAL' L7B
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'          QIO ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER',
+   'VALUE''INTEGER','INTEGER''ARRAY','INTEGER''ARRAY');
+   'INTEGER''PROCEDURE' VDULUN('VALUE''INTEGER');
+   'INTEGER''PROCEDURE'          WAITEF ('VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' VDUTX('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' CONTROL DEFINITIONS;
+       'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+       'INTEGER''PROCEDURE' VDUTX ('VALUE''INTEGER' STRING);
+       'BEGIN'
+           'INTEGER''ARRAY' ISB [0:1];
+           'INTEGER''ARRAY' PRL [0:5];
+           'INTEGER' LUN;
+           'BEGIN'
+               PRL [0]:=STRING+2;
+               PRL [1]:= [STRING];
+               PRL [2]:= 0;  (UN FORMATED NO LFCR AT END)
+               LUN := VDULUN (GIVE VALUE);
+               'IF' LUN <> VOID LUN
+               'THEN'
+               'BEGIN'
+                   QIO(392,LUN,4,0,ISB,PRL);  (OUTPUT DATA)
+                   WAITEF(4); (WAIT TILL ALL DATA TRANSFERED)
+               'END';
+           'END';
+       'END';
+   'END';
+   'FINISH'

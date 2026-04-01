@@ -1,0 +1,95 @@
+   'CORAL' L8
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'PROCEDURE'	         FCHAR('VALUE''FLOATING','BYTE''ARRAY','VALUE''INTEGER','LABEL');
+   'FLOATING''PROCEDURE' AINT('VALUE''FLOATING'));
+   'COMMON' ('INTEGER''PROCEDURE' STR('VALUE''INTEGER','VALUE''FLOATING'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' STR ('VALUE''INTEGER' MODE;
+       'VALUE''FLOATING' VALUE);
+       'BEGIN'
+           'INTEGER' COUNT,POSITION,END;
+           'FLOATING' VAL;
+           'BYTE''ARRAY' ZERO [0:3]:=1,0,48,0;
+           'BYTE''ARRAY' AREA [0:21]:=11;
+           'BYTE''ARRAY' STORE1[0:127]:=0;
+           'OVERLAY' STORE1[0] 'WITH' 'INTEGER' LENGTH;
+           'OVERLAY' STORE1[2] 'WITH' 'BYTE''ARRAY' STORE2[0:125];
+           'OVERLAY' AREA[2] 'WITH' 'BYTE''ARRAY' STORE[0:19];
+           'IF' MODE=0 
+           'OR' MODE=-1
+           'THEN' 
+           'BEGIN'
+ 
+               'COMMENT' UN FORMAT OUTPUT;
+               'IF' VALUE = 0.0
+               'THEN'
+               'ANSWER' 'LOCATION' (ZERO [0]);
+               VAL:='IF' VALUE<0.0
+               'THEN' -VALUE
+               'ELSE' VALUE;
+               'IF' VAL>=0.0001
+               'AND' VAL<100000.0
+               'THEN'
+               'BEGIN'
+                   FCHAR(VAL,STORE,"F11.5",ERROR);
+                   'FOR' COUNT:=10,COUNT 'WHILE' STORE[COUNT]='LITERAL'(0) 'DO'
+                   'BEGIN'
+                       'IF' STORE[COUNT]='LITERAL'(0)
+                       'THEN'
+                       'BEGIN'
+                           STORE[COUNT]:=32;
+                           COUNT:=COUNT-1;
+                       'END';
+                   'END';
+                   STORE1[2]:='IF' VALUE<0.0
+                   'THEN' 'LITERAL'(-)
+                   'ELSE' 32;
+                   POSITION:=3;
+                   END:='IF' AINT(VALUE)=VALUE
+                   'THEN' 5
+                   'ELSE' 11;
+                   LENGTH:=1;    (INITIAL SET UP VALUE)
+                   'FOR' COUNT:=0 'STEP' 1 'UNTIL' END 'DO'
+                   'BEGIN'
+                       'IF' POSITION<9
+                       'AND' STORE[COUNT]<>32
+                       'THEN' 
+                       'BEGIN'
+                           STORE1[POSITION]:=STORE[COUNT];
+                           LENGTH:=LENGTH+1;
+                           POSITION:=POSITION+1;
+                       'END';
+                   'END';
+               'END'
+               'ELSE'
+               'BEGIN'
+                   FCHAR(VALUE,STORE2,"E10.4",ERROR);
+                   LENGTH:=10;
+               'END';
+           'END'
+           'ELSE'
+           'BEGIN'
+               'FOR' COUNT:=0 'STEP' 1 'UNTIL' 127 'DO' STORE1[COUNT]:=0;  (CLEAR DATA AREA)
+               FCHAR(VALUE,STORE2,MODE,ERROR);  (CONVERT TO ASCII CHARS)
+               'FOR' COUNT:=127 'STEP' -1 'UNTIL' 2 'DO'
+               'IF' STORE1[COUNT]=0
+               'THEN' LENGTH:=COUNT-2;   (HOLD LENGTH OF CHARACTER STRING)
+           'END';
+ ERROR:    'IF' STORE1[LENGTH+1]='LITERAL'(.)
+           'THEN' 
+           'BEGIN'
+               'FOR' COUNT:=LENGTH+1 'STEP' -1 'UNTIL' 2 'DO'
+               STORE1[COUNT]:=STORE1[COUNT-1];  (SHIFT ALL ASCII CHARACTERS ONE PLACE RIGHT)
+               STORE1[2]:=32;  (LOAD A SPACE IN FIRST POSITION)
+           'END';
+           'ANSWER''LOCATION'(STORE1[0]);
+       'END';
+   'END';
+   'FINISH'

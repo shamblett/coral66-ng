@@ -1,0 +1,15 @@
+   'CORAL' L20
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' CRLF);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' CRLF;
+       'BEGIN'
+           'BYTE''ARRAY' STRING [0:3]:=2,0,13,10;
+           'ANSWER''LOCATION' (STRING[0]);
+       'END';
+   'END';
+   'FINISH'

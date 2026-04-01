@@ -1,0 +1,44 @@
+;
+;
+;
+;
+;
+        .TITLE MR24..  PROGRAM TO EXTRACT A CHARACTER FROM A QUEUE
+        .IDENT /MR24../
+;
+;        ENTRY CONDITIONS
+;        R1 -> QUEUE BUFFER
+;
+;        EXIT CONDITIONS
+;        R0 = CHARACTER IF STATUS = SUCCESS
+;
+;
+R$QREM::                             ;REMOVE A CHARACTER FROM INPUT BUFFER
+        MOV R1,-(SP)               ;save registers R1 and R2
+        MOV R2,-(SP)
+        TST -(R1)                  ;IF buffer empty
+       	BNE	20$                ;THEN
+ 
+        SEC                        ;indicate no more characters
+10$:	MOV (SP)+,R2               ;restore resisters R2 and R1
+        MOV (SP)+,R1
+        RETURN                     ;back to calling program
+;
+20$:    TST -(R1)                  ;access get pointer address
+        MOV @R1,R2                 ;hold extract address
+        CMP @R1,-4(R1)             ;IF pointer = buffer end
+        BNE     30$                ;THEN
+        MOV R1,@R1                 ;hold start address of input buffer-4
+        ADD #3,@R1                 ;hold start address -1 (next function add one)
+30$:    INC (R1)+                  ;step pointer to next character & fudge index
+        MOVB @R2,R0                ;extract character from input buffer
+        DEC @R1                    ;indicate a character removed from buffer
+        CLC                        ;indicate character remove with success
+        BR     10$                 ;exit back to calling program
+;
+;
+       .END
+;
+        
+
+

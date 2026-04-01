@@ -1,0 +1,61 @@
+   'CORAL' L28
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'           LEN('VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' COMSORT('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT'RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' COMSORT ('VALUE''INTEGER' STRING1, STRING2);
+       'BEGIN'
+           'INTEGER'COUNT, POSITION;
+           'BYTE' BYTE  2, BYTE 1;
+ 
+           'COMMENT' UPGRADE MOD 5 AUG 82
+                     TO CATER FOR VOID AND ERROR PARAMETERS ;
+           'IF' STRING1 = VOID
+           'OR' STRING1 = ERROR
+           'THEN'
+           'ANSWER' -1;  (ASSUME ITS THE SMALLEST)
+           'IF' STRING2 = VOID
+           'OR' STRING2 = ERROR
+           'THEN'
+           'ANSWER' +1;  (FIRST STRING MUST BE BIGGER)
+ 
+           'COMMENT' FIND THE SHORTEST STRING AS THE REFERENCE
+                     LENGTH FOR THE PROCESSING;
+           COUNT := 'IF' LEN(STRING1) < LEN(STRING2)
+           'THEN' LEN(STRING2) + 1
+           'ELSE' LEN(STRING1) + 1;
+           'FOR' POSITION := 2 'STEP' 1 'UNTIL' COUNT 'DO'
+           'BEGIN'
+ 
+               'COMMENT' HOLD THE NEXT CHARACTER FROM BOTH STRINGS;
+               BYTE1 := 'IF' (LEN(STRING1)+1) >= POSITION
+               'THEN' [STRING1+POSITION]
+               'ELSE' 0;
+               BYTE2 := 'IF' (LEN(STRING2)+1) >= POSITION
+               'THEN' [STRING2+POSITION]
+               'ELSE' 0;
+ 
+               'COMMENT' IF CHARACTERS NOT THE SAME INDICATE RELATIVE
+                         MAGNITUDE OF THE COMPARISON;
+               'IF' BYTE1 < BYTE2
+               'THEN'
+               'ANSWER' -1;
+               'IF' BYTE1 > BYTE2
+               'THEN'
+               'ANSWER' +1;
+           'END';
+ 
+           'COMMENT' THIS EXIT INDICATES BOTH STRINGS ARE
+                     IDENTICAL WITHIN THE CHECKED AREA;
+           'ANSWER' SAME;
+       'END';
+   'END';
+   'FINISH'

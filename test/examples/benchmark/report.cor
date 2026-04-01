@@ -1,0 +1,112 @@
+'comment'  ----------------------------------------------------------------
+ -
+ - Filename:
+ -
+ -    report.cor
+ -
+ - Description:
+ -
+ -    Header file for the report functions. Used to support validation
+ -    tests and generates output similar in appearance to the Ada ACVC
+ -    test output.
+ -
+ - Revision:
+ -
+ -    $Id:$
+ -
+ --------------------------------------------------------------------------;
+
+
+'common'(
+   'procedure' test    ('value''integer', 'value''integer');
+   'procedure' comment ('value''integer');
+   'procedure' failed  ('value''integer');
+   'procedure' result;  
+)
+
+'common' (
+   'procedure' outchar ('value''integer','value''integer');
+   'procedure' outstring ('value''integer','value''integer');
+   'procedure' outinteger ('value''integer','value''integer');
+   'procedure' outnewline ('value''integer');
+)
+
+'begin'
+
+   'byte''array' test_name [0 : 100];
+
+   'integer' test_failed;
+
+
+   'procedure' test ('value''integer' name; 'value''integer' message);
+   'begin'
+      'integer' i;
+
+      'for' i := 0 'while' 'byte'[name + i] <> 0 'do'
+         'begin'
+            test_name [i] := 'byte'[name + i];
+            i := i + 1
+         'end';
+
+      test_name [i] := 0;
+
+      outstring (1, ",.,. ");
+      outstring (1, name);
+      outstring (1, " Report Version 0.1");
+      outnewline (1);
+
+      outstring (1, "---- ");
+      outstring (1, 'location' (test_name [0]));
+      outstring (1, " ");
+      outstring (1, message);
+      outstring (1, ".");
+      outnewline (1);
+
+      test_failed := 0;
+   'end' test;
+
+
+   'procedure' failed ('value''integer' description);
+   'begin'
+      test_failed := 1;
+
+      outstring (1, "   * ");
+      outstring (1, 'location' (test_name [0]));
+      outstring (1, " ");
+      outstring (1, description);
+      outstring (1, ".");
+      outnewline (1);
+   'end' failed;
+
+
+   'procedure' comment ('value''integer' description);
+   'begin'
+      outstring (1, "   - ");
+      outstring (1, 'location' (test_name [0]));
+      outstring (1, " ");
+      outstring (1, description);
+      outstring (1, ".");
+      outnewline (1);
+   'end' comment;
+
+   'procedure' result;
+   'begin'
+      'if' test_failed <> 0 'then
+         'begin'
+            outstring (1, "**** ");
+            outstring (1, 'location' (test_name [0]));
+            outstring (1, "  FAILED ****************************.");
+            outnewline (1);
+         'end'
+      'else'
+         'begin'
+            outstring (1, "==== ");
+            outstring (1, 'location' (test_name [0]));
+            outstring (1, "  PASSED ============================.");
+            outnewline (1);
+         'end';
+   'end' result;
+
+
+'end'
+

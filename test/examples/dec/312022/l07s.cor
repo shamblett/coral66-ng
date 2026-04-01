@@ -1,0 +1,51 @@
+   'CORAL' L7S
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' QIO('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER',
+   'VALUE''INTEGER','INTEGER''ARRAY','INTEGER''ARRAY');
+   'INTEGER''PROCEDURE' VDUFLG ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' VDULUN ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' WAITEF ('VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' SYS('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' CONTROL DEFINITIONS;
+       'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+       'INTEGER''PROCEDURE' SYS ('VALUE''INTEGER' MODE);
+       'BEGIN'
+           'INTEGER''ARRAY' PRL [0:5];
+           'INTEGER''ARRAY' ISB [0:1];
+           'INTEGER' STORE,LUN;
+ 
+           'COMMENT' READ USING WAITING QIO MODE;
+           'IF' MODE =1
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ONLY BASIC FUNCTION SYS(1) ALLOWED;
+               VDUFLG(SWITCH ON);   (ASSIGN LUN)
+               LUN:=VDULUN(GIVE VALUE);  (HOLD ASIGNED LUN VALUE)
+               'IF' LUN <> VOID LUN
+               'THEN'
+               'BEGIN'
+                   STORE:=0;   (CLEAR REPLY AREA)
+                   ISB [0]:=0; (CLEAR ERROR CODE WORD)
+                   ISB [1]:=0; (NUMBER OF CHARS TRANSFERED)
+                   PRL [0]:='LOCATION'( STORE ); (ADDRESS WHERE TO STORE DATA)
+                   PRL [1]:=1;   (MAXIMUM NUMBER OF CHARACTERS TO BE TRANSFERED)
+                   PRL [2]:=600;  (TIME OUT SET FOR 10 MINS)
+                   QIO(536,LUN,1,0,ISB,PRL);  (READ NO ECHO PASS ALL CHARS)
+                   WAITEF(1); (WAIT TILL QIO FINISHED)
+                   'ANSWER' STORE;
+               'END';
+           'END';
+           'ANSWER' ERROR;
+       'END';
+   'END';
+   'FINISH'

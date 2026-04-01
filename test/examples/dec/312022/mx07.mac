@@ -1,0 +1,132 @@
+	.MACRO	INITIALISE A,C,STACK,?Z,?X
+;
+;		IAS INITIALISATION
+;
+.IF EQ OPSYS-IAS			;IF this an IAS system
+					;THEN
+	.IF NB A			;IF a terminal lun request been made
+		.IIF EQ LST$$	.LIST
+		MOV #A,V$LUN		;THEN hold new terminal lun number
+		.IIF EQ LST$$	.NLIST
+	.ENDC
+;
+	.IF NB C			;IF a terminal EFN alteration made
+		.IIF EQ LST$$	.LIST
+		MOV #C,V$EFN		;THEN hold new event flag number
+		.IIF EQ LST$$	.NLIST
+	.ENDC
+;
+	.IIF EQ LST$$	.LIST
+	CALL V$ON			;assign a lun to the terminal
+	.IIF EQ LST$$	.NLIST
+.ENDC
+;
+;		STAND ALONE SYSTEM INITIALISATION
+;
+.IF EQ OPSYS-ALONE
+	.IF GT MACHINE-03		;select between 03 and 23 machines
+		.IIF EQ LST$$	.LIST
+		MOV #340,@#177776	;stop interupts
+		CLR @#177572		;disable memory management
+		.IIF EQ LST$$	.NLIST
+	.IFF
+		.IIF EQ LST$$	.LIST
+		MTPS #340		;stop interupts on an PDP 02/03
+		.IIF EQ LST$$	.NLIST
+	.IFTF
+		.IIF EQ LST$$	.LIST
+		MOV #X,@#100		;load clock interupt vector
+		CLR @#102		;load new status value
+		BR	Z		;bypass interupt program
+		.IIF EQ LST$$	.NLIST
+;
+;	INTERUPT PROGRAM
+;
+		.IIF EQ LST$$	.LIST
+X:		RTI			;go back home
+Z:
+		.IIF EQ LST$$	.NLIST
+	.IFT
+		.IIF EQ LST$$	.LIST
+		CLR @#177776		;allow interupts
+		.IIF EQ LST$$	.NLIST
+	.IFF
+		.IIF EQ LST$$	.LIST
+		MTPS #0			;allow interupts
+		.IIF EQ LST$$	.NLIST
+;
+	.ENDC
+.ENDC
+;
+;		STACK SET UP OPTION
+;
+.IF NB STACK
+	.IIF EQ LST$$	.LIST
+	MOV #STACK,SP			;reset stack address
+	.IIF EQ LST$$	.NLIST
+.IFF
+	.IIF EQ LST$$	.LIST
+	MOV #1000,SP			;default stack address
+	.IIF EQ LST$$	.NLIST
+.ENDC
+;
+	.ENDM	INITIALISE
+;
+;
+;
+;
+	.MACRO	TERMINATE STATUS,?A
+	.NARG	NARG
+;
+;		IAS OPERATING SYSTEM
+;
+.IF EQ OPSYS-IAS			;IF this an IAS system
+;
+	.IF EQ NARG			;THEN IF no parameters
+	.MCALL	EXIT$S
+	.IIF EQ LST$$	.LIST
+	EXIT$S				;THEN exit from program
+	.IIF EQ LST$$	.NLIST
+	.ENDC
+;
+.IF EQ NARG-1				;IF one parameter
+	.MCALL	DIR$,EXST$
+	.IIF EQ LST$$	.LIST
+	DIR$	#A
+A:
+	EXST$	EX$'STATUS		;THEN exit with status reply
+	.IIF EQ LST$$	.NLIST
+	.ENDC
+.ENDC
+;
+;		RT-11 OPERATING SYSTEM
+;
+.IF EQ OPSYS-RT11			;IF this an RT11 system
+	.MCALL .EXIT
+	.IIF EQ LST$$	.LIST
+	.EXIT				;THEN exit back to monitor
+	.IIF EQ LST$$	.NLIST
+.ENDC
+;
+;		STAND ALONE SYSTEM
+;
+.IF EQ OPSYS-ALONE
+	.IF GT MACHINE-03		;IF not PDP 02/03 machine
+	.IIF EQ LST$$	.LIST
+	MOV #340,@#177776		;THEN disable all interupts
+	.IIF EQ LST$$	.NLIST
+.IFF
+	.IIF EQ LST$$	.LIST
+	MTPS #340			;02/03 variation of above
+	.IIF EQ LST$$	.NLIST
+.IFTF
+	.IIF EQ LST$$	.LIST
+	RESET				;reset all hardware
+	HALT				;back to ODT 'I SUPPOSE'
+					;or machine catches fire
+	.IIF EQ LST$$	.NLIST
+	.ENDC
+.ENDC
+;
+	.ENDM	TERMINATE
+;

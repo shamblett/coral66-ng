@@ -1,0 +1,22 @@
+	.TITLE	MC07I.	PROGRAMME TO READ A STRING FROM THE TERMINAL
+	.IDENT	/MC07I./
+;
+	.MCALL QIOW$S
+;
+;	This procedure reads a character from the users terminal
+;	and responds with the character in string format, if no
+;	characters have been entered this procedure does not wait
+;	but replys with the address of an empty string
+;
+INKEYS::
+	CALL V$ON			;SWITCH ON THE USERS TERMINAL
+	MOV #IO.RAL!TF.TMO!TF.RNE,V$FUN	;HOLD THE FUNCTION CODE
+	QIOW$S V$FUN,V$LUN,V$EFN,,#V$ISB,,<#V$STR+2,#1,#0>
+					;TIME OUT COUNT = ZERO
+	MOV V$ISB+2,V$STR		;HOLD NUMBER OF CHARACTERS READ
+	MOV #V$STR,R0			;HOLD STRING ADDRESS
+	RETURN				;GO BACK WITH STRING ADDRESS
+;
+	.END
+;
+;

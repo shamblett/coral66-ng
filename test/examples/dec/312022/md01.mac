@@ -1,0 +1,68 @@
+	.TITLE	MD01..	DECISION TABLE TRACE PROCEDURE.
+	.IDENT	/MD01../
+;
+	.PAGE
+;
+	.ENABL	LC
+;
+	.SBTTL	.	DECISION TABLE TRACE PROCEDURE.
+;
+D$TRACE::				;PRINT OUT DETAB RULES TRUE.
+;		ENTRY CONDITIONS
+;	R0 =	THE CONDITION WORD ADDRESS FOR THE DETAB ENTERED
+;
+	CALL	R$ADDRESS
+	IFERROR	RETURN		;If address not valid then exit.
+	CALL	R$SAVE
+	MOV	(R0),R1		;R1 Holds the RULES word.
+	MOV	6(R0),R2	;R2 Holds the ELSE rule.
+	MOV	#STR,R5		;R5 Holds the string address.
+	CLR	(R5)+		;Clear the string count.
+	TST	R1		;Are any rules true.
+	BEQ	50$		;Print 'else'rule only if not.
+	MOV	#1,R3		;R3 Holds the BIT TEST bit.
+	MOV	#'1,R4		;R4 Holds the BIT TEST ASCII CODE.
+;
+10$:	BIT	R2,R3		;IF the else rule is reached
+	BNE	40$		;THEN branch to ELSE RULE check.
+	BIT	R1,R3		;IF the rule not true
+	BEQ	30$		;THEN branch to 30$.
+	CMP	#256,R3		;IF code greater than 9th bit.
+	BGT	20$		;THEN output the tens unit.
+	MOVB	#'1,(R5)+	;Put the tens unit in string.
+	INC	STR		;Add one to the string.
+;
+20$:	MOVB	R4,(R5)+	;Put the units count in string.
+	INC	STR		;Add one to the string.
+	MOVB	#',,(R5)+	;Put a ',' in the string.
+	INC	STR		;And increment the string.
+;
+30$:	ASL	R3		;Set next bit in R3.
+	CMP	#256,R3		;Is the 9th bit reached.
+	BNE	35$		;Branch if not.
+	MOV	#'0,R4		;ELSE reset the units register.
+;
+35$:	INC	R4		;Increment the ascii count.
+	BR	10$		;Reloop
+;
+40$:	BIT	R1,R2		;IF the ELSE rule true.
+	BEQ	60$		;THEN branch to exit.
+;
+50$:	MOV	#"El,(R5)+	;Put 'ELSE' in buffer.
+	MOV	#"se,(R5)+
+	INC	R5		;Increment R5 for '.' frig.
+	ADD	#5,STR		;Increment the string count.
+;
+60$:	MOVB	#'.,-(R5)	;Put '.' in the string.
+	MOV	#STR,R0		;Put the string address in R0
+	PRINT			;and print the string.
+	CALL	R$UNSAVE
+;
+	RETURN
+;
+	.WORD	42
+STR:	.WORD	0
+	.BLKB	42
+;
+	.END
+;

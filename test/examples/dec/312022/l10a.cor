@@ -1,0 +1,183 @@
+   'CORAL' L10A
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY'(
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' LPOS ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LEN('VALUE''INTEGER'));
+   'COMMON' ('FLOATING''PROCEDURE' VAL('VALUE''INTEGER'));
+   'SEGMENT'RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' LOCAL DEFINITIONS;
+       'DEFINE' PLUS    "+1";
+       'DEFINE' MINUS   "-1";
+       'DEFINE' BCDDIF  "'LITERAL' (0)";
+ 
+       'COMMENT' THIS PROCEDURE CONVERTS A CHARACTER STRING
+                 INTO A BINARY FLOATING POINT NUMBER
+                 USING ANY BASE FROM 2 - 36;
+ 
+ 
+       'FLOATING''PROCEDURE' VAL ('VALUE''INTEGER' STRING);
+       'BEGIN'
+           'INTEGER' COUNT , ESIZE , BCCDIF;
+           'FLOATING' RESULT,MULT,BASE;
+           'BYTE' EMARKER , SIGN , ESIGN , IGFLAG , CHAR , CHARB;
+ 
+           'COMMENT' SET UP SPECIAL CONSTANTS
+                     BCDDIF = OFFSET CONSTANT BETWEEN ASCII 0 AND BINARY ZERO
+                     BCCDIF = OFFSET CONSTANT BETWEEN ASCII 9 AND ASCII A;
+           BCCDIF := 'LITERAL' (A) - 'LITERAL' (9) - 1;
+ 
+           'COMMENT' FIND OUT IF INPUT STRING IS VALID;
+           'IF' STRING = ERROR
+           'OR' STRING = VOID
+           'THEN'
+           'ANSWER' 0;
+ 
+           'COMMENT' LETS SEE IF SOME BASE OTHER THAN 10 BEING USED
+                     CHAR = START POSITION , CHARB = END POSITION;
+           CHAR := LPOS (STRING,"(",1);  (LOOK FOR OPENING BRACKET)
+           'IF' CHAR <> 0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' A LEAST A START BRACKET FOUND
+                         SEE IF WE CAN FIND THE END ONE;
+               CHARB := LPOS (STRING,")",1);
+ 
+               'COMMENT' SEE IF THEY ARE IN THE CORRECT ORDER;
+               'IF' CHARB = 0
+               'OR' CHARB - CHAR < 2
+               'THEN'
+               'ANSWER' 0
+               'ELSE'
+               'BEGIN'
+ 
+                   'COMMENT' SO FAR SO GOOD BRACKETS
+                             IN THE CORRECT ORDER;
+                   BASE := 0;  (INITIALISE THE BASE)
+                   'FOR' COUNT := CHAR+1 'STEP' 1 'UNTIL' CHARB 'DO'
+                   'BEGIN'
+ 
+                       'COMMENT' BUILD UP BASE VALUE;
+                       CHAR := [STRING + 1 + COUNT] - BCDDIF;  (HOLD VALUE)
+                       'IF'   CHAR >= 0
+                       'AND'  CHAR <= 9
+                       'THEN' BASE := BASE * 10.0 + CHAR;
+                   'END';
+               'END';
+           'END'
+           'ELSE' BASE := 10;   (TAKE THE DEFAULT)
+ 
+           'COMMENT' CHECK IF NEWLY CREATED BASE VALID;
+           'IF' BASE < 2
+           'OR' BASE > 36
+           'THEN'
+           'ANSWER' 0;  (ALL SCREWED UP)
+ 
+           'COMMENT' INITIALISE THE CONSTANTS;
+           ESIZE  := 0;       (NO NUMBER SHIFT REQUIRED)
+           MULT   := BASE;    (ASSUME THE INTEGER MULTIPLIER)
+           RESULT := 0.0;     (RESET NUMBER ACCUMULATOR)
+           SIGN   := PLUS;    (ASSUME POSITIVE)
+           EMARKER:= OFF;     (ASSUME NOT RAISED TO A POWER)
+           ESIGN  := PLUS;    (ASSUME POSITIVE RAISE TO POWER DEFAULT)
+           IGFLAG := OFF;     (ALLOW PROCESSING OF CHARACTER)
+ 
+           'COMMENT' LET PROCESS THAT STRING;
+           'FOR' COUNT:=1 'STEP' 1 'UNTIL' LEN(STRING) 'DO'
+           'BEGIN'
+ 
+               'COMMENT' EXTRACT A CHARACTER;
+               CHAR:=[STRING+1+COUNT];
+ 
+               'COMMENT' IF WE ARE IN AN ENCLOSED BRACKET SECTION
+                         WE WISH TO IGNORE THESE CHARACTERS AS THEY
+                         HAVE ALREADY BEEN PROCESSED;
+               'IF' CHAR = 'LITERAL' (()
+               'THEN' IGFLAG := ON;  (STOP PROCESSING TILL END BRACKET)
+               'IF' CHAR = 'LITERAL' ())
+               'THEN' IGFLAG := OFF; (RE-ENABLE PROCESSING BRACKET FOUND)
+               'IF' IGFLAG = OFF
+               'THEN'
+               'BEGIN'
+ 
+                   'COMMENT' RAISE TO A POWER ONLY ALLOWED
+                             WHEN USING BASE 10;
+                   'IF' CHAR='LITERAL'(E)
+                   'AND' BASE = 10
+                   'THEN' EMARKER:= ON;
+ 
+                   'COMMENT' CONVERT THE NUMBER TO A USABLE BINARY VALUE
+                             CHAR = ASCII CHARACTER
+                             CHARB = BINARY EQUIVALENT OF CHARACTER;
+                   CHARB := CHAR - BCDDIF;   (REDUCE TO BASE LEVEL)
+                   'IF' CHARB > 9
+                   'THEN' CHARB := CHARB - BCCDIF;    (CORRECT VALUE BASES 10 TO 36)
+                   'IF' EMARKER = OFF
+                   'THEN'
+                   'BEGIN'
+ 
+                       'COMMENT' NORMAL MODE ANY BASE;
+                       'IF'  CHARB <  BASE
+                       'AND' CHARB >= 0
+                       'THEN'
+                       'BEGIN'
+                           'IF' MULT = BASE
+                           'THEN' RESULT := (RESULT * MULT) + CHARB
+                           'ELSE'
+                           'BEGIN'
+                               RESULT := RESULT + (CHARB * MULT);
+                               MULT := MULT / BASE;   (DESCALE FRACTION MULTIPLIER)
+                           'END';
+                       'END';  (END OF NUMBER PROCESSING)
+ 
+                       'COMMENT' SPECIAL CHARACTER PROCESSING SECTION;
+                       'IF'   CHAR =  'LITERAL' (.)
+                       'AND'  MULT =  BASE
+                       'THEN' MULT := 1 / BASE;   (BASE FRACTION MULTIPLIER)
+                       'IF'   CHAR =  'LITERAL' (-)
+                       'AND'  SIGN =  PLUS
+                       'THEN' SIGN := MINUS;
+                       'IF'   CHAR =  'LITERAL' (+)
+                       'AND'  SIGN =  MINUS
+                       'THEN' SIGN := PLUS;       (RECORRECT SIGN)
+                   'END'
+                   'ELSE'
+                   'BEGIN'
+ 
+                       'COMMENT' RAISE TO POWER SECTION;
+                       'IF'   CHAR   =  'LITERAL' (-)
+                       'AND'  ESIGN  =  PLUS
+                       'THEN' ESIGN  := MINUS;
+                       'IF'   CHAR   = 'LITERAL'  (+)
+                       'AND'  ESIGN  =  MINUS
+                       'THEN' ESIGN  := PLUS;     (RECORRECT POWER SIGN)
+                       'IF'   CHAR   >= 'LITERAL' (0)
+                       'AND'  CHAR   <= 'LITERAL' (9)
+                       'THEN' ESIZE  := ESIZE * 10.0 + (CHAR - BCDDIF);
+                   'END';
+               'END';
+           'END';
+ 
+           'COMMENT' SHIFT NUMBER ARITHEMETICALLY LEFT OR RIGHT;
+           MULT := 'IF' ESIGN = MINUS
+           'THEN' 0.1
+           'ELSE' 10;
+           'FOR' ESIZE := ESIZE 'WHILE' ESIZE <> 0 'DO'
+           'BEGIN'
+               RESULT := RESULT * MULT;
+               ESIZE  := ESIZE  - 1;
+           'END';
+ 
+           'COMMENT' SIGN CORRECT NUMBER;
+           'IF'   SIGN   =  MINUS
+           'THEN' RESULT := -RESULT;
+           'ANSWER' RESULT;
+       'END';
+   'END';
+   'FINISH'

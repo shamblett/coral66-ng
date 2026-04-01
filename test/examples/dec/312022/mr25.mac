@@ -1,0 +1,25 @@
+;
+;
+	.TITLE MR25..	PROGRAM TO CLEAR OUT/RESET A QUEUE BUFFER
+	.IDENT	/MR25../
+;
+;
+R$QCLR::		;Reset a QUEUE buffer
+;
+	MOV R0,-(SP)	;save contents of register R0
+	MOV @2(SP),R0	;hold contents of location which follows
+			;the call to this routine
+			;R0 holds the address of the QUEUE buffer.
+	CLR -2(R0)	;set the stored length = zero
+	MOV R0,-4(R0)	;reset get  addresss pointer
+	MOV R0,-6(R0)	;reset load addresss pointer
+	MOV (SP)+,R0	;restore contents of register R0
+	INC @SP		;fudge return address +1 byte to pass Q address
+	INC @SP		;fudge return address +1 byte to pass Q address
+	RETURN		;go back and continue with inline code
+;
+;
+;
+	.END
+;
+;

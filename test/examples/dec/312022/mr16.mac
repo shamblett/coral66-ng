@@ -1,0 +1,45 @@
+	.TITLE	MR16.. STRING PROCEDURES IN MACRO
+;
+	.IDENT	/MR16../
+;
+	.SBTTL	.	PAD A CHARACTER STRING
+;
+;
+R$PAD::
+;
+;		ENTRY CONDITIONS
+;	R0 ->	ADDRESS OF CHARACTER STRING TO BE PADDED.
+;	R1 =	NUMBER OF CHARACTERS TO PAD WITH (OR 0 FOR ALL).
+;	R2 =	CHARACTER TO PAD WITH.
+;
+	CALL	R$SAVE		;SAVE THE REGISTERS
+;
+	TST	-2(R0)		;IF the string has length and isn't deleted
+	BLE	40$		; THEN error exit
+;
+	MOV	-2(R0),R4	;Get the remaining length in string.
+	SUB	(R0),R4		;R4 = renaining length of string.
+;
+	TST	R1		;IF R1 equals 0
+	BEQ	10$		;OR
+	CMP	R1,R4		;remainder of string less
+	BGT	10$		;THEN
+	BR	20$
+;
+10$:	MOV	R4,R1		;reset the requested length.
+;
+20$:	MOV	R0,R4		;Set R4 to the address of string.
+	MOV	R2,R0		;Set R0 to the requested fill char.
+;
+30$:	CALL	R$ADDC		;Append character loop.
+	SOB	R1,30$
+;
+	CLC			;SET SUCCESS
+	JMP	50$
+
+40$:	SEC			;SET ERROR
+;
+50$:	CALL	R$UNSAVE	;UNSAVE THE REGISTERS
+	RETURN
+;
+	.END

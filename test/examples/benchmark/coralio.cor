@@ -1,0 +1,132 @@
+comment' -----------------------------------------------------------------
+ -
+ -  File:
+ -
+ -     coralio.cor
+ -
+ -  Author:
+ -
+ -     Chris Nettleton
+ -
+ -  Description:
+ -
+ -     Basic output procedures for Coral programs. We call the appropriate
+ -     low-level UNIX function.
+ -
+ -     This example demonstrates:
+ -
+ -       o Typed anonymous references
+ -       o Common procedures
+ -       o System calls
+ -
+ -  Revision:
+ -
+ -     $Id: $
+ -
+ --------------------------------------------------------------------------;
+
+'common' (
+   'procedure' outchar ('value''integer','value''integer');
+   'procedure' outstring ('value''integer','value''integer');
+   'procedure' outinteger ('value''integer','value''integer');
+   'procedure' outnewline ('value''integer');
+)
+
+'external' (
+   'procedure' write ('value''integer', 'byte''array', 'value''integer');
+)
+
+'begin'
+
+   'comment'  -------------
+              -- outchar --
+              -------------;
+
+   'comment'  Output one character to the operating system;
+
+   'procedure' outchar ('value''integer' file, char);
+   'begin'
+      'byte''array' buf [0:0];
+
+      buf [0] := char;
+      write (1, buf, 1);
+   'end' outchar;
+
+
+   'comment' ---------------
+             -- outstring --
+             ---------------;
+
+   'procedure' outstring ('value''integer' file, item);
+   'begin'
+      'integer' i;
+
+      'for' i := 0 'while' 'byte'[item + i] <> 0 'do'
+      'begin'
+         'if' 'byte'[item + i] = 'literal'(\) 'and'
+              'byte'[item + i + 1] = 'literal'(n) 'then'
+            'begin'
+               outchar (file, 10);
+               i := i + 2;
+            'end'
+         'else'
+            'begin'
+               outchar (file, 'byte'[item + i]);
+               i := i + 1;
+            'end';
+      'end';
+   'end' outstring;
+
+
+   'comment' ----------------
+             -- outinteger --
+             ----------------;
+
+   'procedure' outinteger ('value''integer' file, item);
+   'begin'
+      'integer' Max := 31;
+      'byte''array' Buf [0 : 31];
+      'integer' d;
+      'integer' i;
+
+      d := item;
+
+      'if' d = 0 'then
+         outchar (file, 'literal'(0))
+      'else' 'if' d > 0 'then'
+         d := - d
+      'else'
+         outchar (file, 'literal'(-));
+
+      'for' i := Max 'while' d <> 0 'do'
+      'begin'
+         'integer' quotient;
+         'byte' remainder;
+
+         quotient := d / 10;
+         remainder := - (d - quotient * 10);
+
+         Buf [i] := 'literal' (0) + remainder;
+         d := quotient;
+         i := i - 1;
+      'end';
+
+      'for' i := i 'while' i < Max 'do'
+      'begin'
+         i := i + 1;
+         outchar (file, Buf [i]);
+      'end';
+   'end' outinteger;
+
+
+   'comment'  ----------------
+              -- outnewline --
+              ----------------;
+
+   'procedure' outnewline ('value''integer' file);
+   'begin'
+       outchar (file, 10);
+   'end' outnewline;
+
+'end'
+

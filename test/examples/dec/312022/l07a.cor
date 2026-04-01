@@ -1,0 +1,97 @@
+   'CORAL' L7A
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'PROCEDURE'          VDUTX ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' VDUFLG ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' VDUOUT('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' CONTROL DEFINITIONS;
+       'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+       'INTEGER''PROCEDURE' VDUOUT ('VALUE''INTEGER' MODE, STRING);
+       'BEGIN'
+ 
+           'COMMENT' PRESETS OF VARIOUS VDU SCREEN FUNCTIONS;
+           'BYTE''ARRAY' CRLFDATA [0:3]:=2,0,10,13;
+           'BYTE''ARRAY' CRDATA [0:3]:=1,0,13,0;
+           'BYTE''ARRAY' LFDATA [0:3]:=1,0,10,0;
+           'BYTE''ARRAY' REFDATA [0:3]:=2,0,27,72;
+           'BYTE''ARRAY' CLEARSDATA[0:7]:=6,0,27,72,27,74,27,72;
+           'BYTE''ARRAY' CLEAREDATA [0:5]:=4,0,27,74,27,72;
+           'BYTE''ARRAY' CLEARLDATA [0:5]:=4,0,27,75,0,0;
+           'BYTE''ARRAY' CURDATA [0:5]:=4,0,27,89,0,0;
+           'OVERLAY' CURDATA [4] 'WITH' 'BYTE' LINE;
+           'OVERLAY' CURDATA [5] 'WITH' 'BYTE' COLUMN;
+           'OVERLAY' CURDATA [4] 'WITH' 'INTEGER'  POSITION;
+           'INTEGER' CRLF,REF,CLEARE,CLEARL,CLEARS,CR,LF,CUR,LUN;
+           'BEGIN'
+ 
+               'COMMENT' HOLD ADDRESS OF THE VARIOUS SCREEN FUNCTIONS STRINGS;
+               CRLF:='LOCATION' (CRLFDATA[0]);
+               CR:='LOCATION' (CRDATA[0]);
+               LF:='LOCATION' (LFDATA[0]);
+               REF:='LOCATION' (REFDATA[0]);
+               CLEARS:='LOCATION' (CLEARSDATA[0]);
+               CLEARL:='LOCATION' (CLEARLDATA[0]);
+               CLEARE:='LOCATION' (CLEAREDATA[0]);
+               CUR:='LOCATION' (CURDATA[0]);
+ 
+               'COMMENT' OPEN UP THE VDU TERMINAL CHANNEL IF SHUT;
+               'IF' VDUFLG(SWITCH ON) <> SWITCHED OFF
+               'THEN'
+               'BEGIN'
+ 
+                   'COMMENT' FIND OUT WHAT FUNCTIONS ARE REQUIRED AND OUTPUT
+                             THE DATA VIA THE PROCEDURE VDUTX (THE SCREEN DRIVER PROCEDURE);
+                   'IF' LPOS(MODE,"SETCUR",1)<>0
+                   'THEN'
+                   'BEGIN'
+                       POSITION:=STRING;
+                       LINE:='IF' LINE >=0
+                       'AND' LINE <21
+                       'THEN' LINE+32
+                       'ELSE' 32;
+                       COLUMN:='IF' COLUMN >=0
+                       'AND' COLUMN <72
+                       'THEN' COLUMN+32
+                       'ELSE' 32;
+                       VDUTX(CUR);
+                   'END'
+                   'ELSE'
+                   'BEGIN'
+                       'IF' LPOS(MODE,"CR",1)<>0
+                       'THEN' VDUTX(CR);
+                       'IF' LPOS(MODE,"LF",1)<>0
+                       'THEN' VDUTX(LF);
+                       'IF' LPOS(MODE,"PRE",1)<>0
+                       'THEN' VDUTX(CRLF);
+                       'IF' LPOS(MODE,"REF",1)<>0
+                       'THEN' VDUTX(REF);
+                       'IF' LPOS(MODE,"CLEARS",1)<>0
+                       'THEN' VDUTX(CLEARS);
+                       'IF' LPOS(MODE,"O",1)<>0
+                       'AND' STRING<>0
+                       'AND' STRING <>-1
+                       'THEN' VDUTX(STRING);
+                       'IF' LPOS(MODE,"CLEARE",1)<>0
+                       'THEN' VDUTX(CLEARE);
+                       'IF' LPOS(MODE,"CLEARL",1)<>0
+                       'THEN' VDUTX(CLEARL);
+                       'IF' LPOS(MODE,"NL",1)<>0
+                       'OR' LPOS(MODE,"END",1)<>0
+                       'THEN' VDUTX(CRLF);
+                       'IF' LPOS(MODE,"RET",1)<>0
+                       'THEN' VDUTX(CR);
+                   'END';
+               'END';
+           'END';
+       'END';
+   'END';
+   'FINISH'

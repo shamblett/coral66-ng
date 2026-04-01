@@ -1,0 +1,95 @@
+   'CORAL' L7
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' QIO('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER',
+   'VALUE''INTEGER','INTEGER''ARRAY','INTEGER''ARRAY');
+   'INTEGER''PROCEDURE' WAITEF ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' VDULUN ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' VDUFLG ('VALUE''INTEGER');
+   'PROCEDURE'          VDUOUT ('VALUE''INTEGER','VALUE''INTEGER');
+   'FLOATING''PROCEDURE'VAL    ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG   ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS   ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' VDU('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' VDU ('VALUE''INTEGER' MODE, DATA);
+       'BEGIN'
+ 
+           'COMMENT' DATA DEFINITION SECTION;
+           'INTEGER''ARRAY' PRL [0:5];
+           'INTEGER''ARRAY' ISB [0:1];
+           'INTEGER' FUNCTION , LUN;
+           'INTEGER' X,Y,Z;  (WORKSPACE VARABLES)
+           'BYTE''ARRAY' STORE [0:257]:=0;
+           'OVERLAY' STORE [2] 'WITH' 'BYTE''ARRAY' STORE1 [0:255];
+           'OVERLAY' STORE [0] 'WITH' 'INTEGER' LENGTH;
+ 
+           'COMMENT' CONTROL DEFINITIONS SECTION;
+           'INCLUDE' "[200,25]GENDEF.COR"
+ 
+           'COMMENT' START OF PROCEDURE;
+           VDUOUT(MODE,DATA);
+           'IF' LPOS(MODE,"I",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' READ USING WAITING QIO MODE;
+               LUN:=VDULUN(GIVE VALUE);  (FIND OUT WHICH LUN THE VDU IS USING)
+ 
+               'COMMENT' IF THE VOID LUN IS THE REPLY CHANNEL NOT ALOCATED;
+               'IF' LUN <> VOID LUN
+               'THEN'
+               'BEGIN'
+                   'IF' LPOS(MODE,"-",1)=0
+                   'THEN' VDUOUT("O"," ? ");
+                   FUNCTION:=512;
+                   'IF' LPOS(MODE,"@",1)<>0
+                   'THEN'FUNCTION:=FUNCTION+16;  (READ NO ECHO)
+                   ISB [0]:=0; (CLEAR ERROR CODE WORD)
+                   ISB [1]:=0; (NUMBER OF CHARS TRANSFERED)
+                   PRL [0]:='LOCATION'( STORE1 [0]); (ADDRESS WHERE TO STORE DATA)
+                   PRL [1]:=250;   (MAXIMUM NUMBER OF CHARACTERS TO BE TRANSFERED)
+                   PRL [2]:=600;  (TIME OUT SET FOR 10 MINS)
+                   Z := SUCCESS;
+                   X:=LPOS(MODE,"(",1);
+                   'IF' X<>0
+                   'THEN'
+                   'BEGIN'
+                       Y:=LPOS(MODE,")",1);
+                       'IF' Y-X<2
+                       'THEN' Z := ERROR
+                       'ELSE' X:=VAL(LSEG(MODE,X+1,Y-1));
+                       'IF' X<=0
+                       'OR' X>=254
+                       'THEN' Z := ERROR
+                       'ELSE' PRL[1]:=X;
+                       'IF' Z = ERROR
+                       'THEN'
+                       'BEGIN'
+                           VDUOUT("PRE,O,END","SYNTAX ERROR USING INPUT MODE");
+                           'ANSWER' ERROR;
+                       'END';
+                   'END';
+                   QIO(FUNCTION,LUN,1,0,ISB,PRL);  (READ DATA FROM VDU)
+                   WAITEF(1); (WAIT TILL QIO FINISHED)
+                   LENGTH:=ISB[1];
+                   'IF' LPOS(MODE,"-",1)=0
+                   'THEN' VDUOUT("NL",-1);
+ 
+                   'COMMENT' IF A REQUEST IS MADE TO CLOSE THE VDU CHANNEL
+                             THEN CLOSE THE VDU CHANNEL;
+                   'IF' LPOS(MODE,"SHUT",1)<>0
+                   'THEN' VDUFLG(SHUT);
+                   'ANSWER''LOCATION' (STORE [0]);
+               'END';
+           'END';
+           'ANSWER' ERROR;
+       'END';
+   'END';
+   'FINISH'

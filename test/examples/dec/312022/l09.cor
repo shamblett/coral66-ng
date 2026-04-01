@@ -1,0 +1,16 @@
+   'CORAL' L9
+ 
+ 
+   'COMMON' ('BYTE''PROCEDURE' ASC('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'BYTE''PROCEDURE' ASC('VALUE''INTEGER' STRING);
+       'BEGIN'
+           'BYTE' CHAR;
+           CHAR:=[STRING+2];
+           'ANSWER'CHAR;
+       'END';
+   'END';
+   'FINISH'

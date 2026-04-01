@@ -1,0 +1,32 @@
+   'CORAL' L21
+   'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' CLEAR ('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' CLEAR ( 'VALUE''INTEGER' STRING);
+       'BEGIN'
+           'INTEGER' DUMMY;
+ 
+           'COMMENT' VALIDATE ENTRY PARAMETERS;
+           'IF' STRING = VOID
+           'OR' STRING = ERROR
+           'OR' [STRING-2] <= 0
+           'THEN'
+           'ANSWER' ERROR
+           'ELSE'
+           'BEGIN'
+ 
+               'COMMENT' SET STRING LENGTH TO ZERO AND FILL
+                         STRING AREA WITH NULL CHARACTERS;
+               [STRING +0]:=0;  (RESET STRING LENGTH TO ZERO)
+               'FOR' DUMMY:=0 'STEP' 2 'UNTIL' [STRING-2] 'DO'
+               [STRING+DUMMY]:=0;  (CLEAR OUT STRING ARRAY)
+           'END';
+           'ANSWER' SUCCESS;
+       'END';
+   'END';
+   'FINISH'

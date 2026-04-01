@@ -1,0 +1,84 @@
+   'CORAL' L10
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY'(
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' LEN('VALUE''INTEGER'));
+   'COMMON' ('FLOATING''PROCEDURE' VAL('VALUE''INTEGER'));
+   'SEGMENT'RJSSUB
+   'BEGIN'
+ 
+ 
+       'FLOATING''PROCEDURE' VAL ('VALUE''INTEGER' STRING);
+       'BEGIN'
+           'INTEGER'COUNT,ESIZE;
+           'FLOATING' RESULT,MULT,EMULT;
+           'BYTE' EMARKER,SIGN,CHAR,ESIGN;
+           'IF' STRING = ERROR
+           'OR' STRING = VOID
+           'THEN'
+           'ANSWER' 0;
+           ESIZE:=0;
+           MULT:=10.0;
+           RESULT:=0.0;
+           EMULT:=10;
+           SIGN:=1;
+           EMARKER:=0;
+           ESIGN:=1;
+           'FOR' COUNT:=1 'STEP' 1 'UNTIL' LEN(STRING) 'DO'
+           'BEGIN'
+ 
+               'COMMENT'CHAR:=ASC(SEG(STRING,COUNT,COUNT)) REPLACED BY;
+               CHAR:=[STRING+1+COUNT]; (EXTRACT CHARACTER)
+               'IF' CHAR='LITERAL'(E)
+               'THEN' EMARKER:=-1;
+               'IF' EMARKER=0
+               'THEN'
+               'BEGIN'
+                   'IF' CHAR>47
+                   'AND' CHAR<58
+                   'AND' MULT=10
+                   'THEN'
+                   RESULT:=RESULT*MULT+(CHAR-48);
+                   'IF' CHAR>47
+                   'AND' CHAR<58
+                   'AND' MULT<>10
+                   'THEN'
+                   'BEGIN'
+                       RESULT:=RESULT+(CHAR-48)*MULT;
+                       MULT:=MULT/10.0;
+                   'END';
+                   'IF' CHAR='LITERAL'(.)
+                   'THEN' MULT:=0.1;
+                   'IF' CHAR='LITERAL'(-)
+                   'THEN' SIGN:=-1;
+               'END'
+               'ELSE'
+               'BEGIN'
+                   'IF' CHAR='LITERAL'(-)
+                   'THEN' ESIGN:=-1;
+                   'IF' CHAR>47
+                   'AND' CHAR<58
+                   'THEN'ESIZE:=ESIZE*10.0+(CHAR-48);
+               'END';
+           'END';
+           EMULT:='IF' ESIGN<0
+           'THEN' 0.1
+           'ELSE' 10;
+           'IF' ESIZE<>0
+           'THEN'
+           'BEGIN'
+               'FOR' ESIZE:=ESIZE 'WHILE' ESIZE<>0 'DO'
+               'BEGIN'
+                   RESULT:=RESULT*EMULT;
+                   ESIZE:=ESIZE-1;
+               'END';
+           'END';
+           'IF' SIGN<0
+           'THEN' RESULT:=-RESULT;
+           'ANSWER' RESULT;
+       'END';
+   'END';
+   'FINISH'

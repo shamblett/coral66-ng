@@ -1,0 +1,36 @@
+   'CORAL' L22A
+   'LIBRARY' (
+ 
+ 
+   'INTEGER''PROCEDURE' GETTSK  ('INTEGER''ARRAY'));
+   'COMMON'('INTEGER''PROCEDURE' UIC);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' UIC;
+       'BEGIN'
+           'INTEGER''ARRAY' TSKDATA [0:17]:=0;
+           'OVERLAY' TSKDATA [0] 'WITH' 'BYTE''ARRAY' WORK [0:11];
+           'OVERLAY' WORK    [0] 'WITH' 'INTEGER' LENGTH;
+           'OVERLAY' TSKDATA [16]'WITH' 'INTEGER' GROUP;
+           'OVERLAY' TSKDATA [17]'WITH' 'INTEGER' MEMBER;
+           GETTSK (TSKDATA);  (READ TASK PARAMETERS)
+           GROUP:=  'BITS' [8,8]TSKDATA[7]; (HOLD GROUP NUMBER)
+           MEMBER:= 'BITS' [8,0]TSKDATA[7]; (HOLD MEMBER NUMBER)
+ 
+           'COMMENT' BUILD UP UIC STRING;
+           LENGTH:=9;  (UIC LENGTH = 9 CHARACTERS)
+           WORK [2]:=  'LITERAL' ([);
+           WORK [10]:= 'LITERAL' (]);
+           WORK [6]:=  'LITERAL' (,);
+           WORK [3]:= 'BITS' [2,6] GROUP +48;
+           WORK [4]:= 'BITS' [3,3] GROUP +48;
+           WORK [5]:= 'BITS' [3,0] GROUP +48;
+           WORK [7]:= 'BITS' [2,6] MEMBER +48;
+           WORK [8]:= 'BITS' [3,3] MEMBER +48;
+           WORK [9]:= 'BITS' [3,0] MEMBER +48;
+           'ANSWER' 'LOCATION' (WORK [0]);  (REPLY WITH ADDRESS OF UIC STRING)
+       'END'OF PROCEDURE UIC;
+   'END';
+   'FINISH'

@@ -1,0 +1,42 @@
+;
+	.TITLE	MMC2..	REPORT HUNTING MESSAGE PROCEDURE
+	.IDENT /MMC2../
+;
+M$HUNT::			;This procedure compares a binary value
+				;and trys to locate the value in a table.
+				;If a match is found then the procedure
+				;replys with the address of the report string
+;
+;	ENTRY CONDITIONS
+;	R0  =	THE BINARY REPORT VALUE
+;	R1 ->	THE ADDRESS OF THE REPORT TABLE
+;
+;	EXIT	CONDITIONS
+;	IF STATUS = SUCCESS	R0 -> REPORT STRING
+;	IF STATUS = ERROR	R0 =  0
+;
+	SAVE R1			;remember the address of the table start
+10$:	CMP R0,(R1)+		;[post shift data pointer]
+				;IF   report found
+	BEQ	40$		;THEN tell the world where the report is.
+	TST @R1			;IF   end of report table
+	BEQ	30$		;THEN exit in a sad state (status = error)
+	ADD @R1,R1		;hold end address of last character less
+				;a little bit.
+	BIT #1,R1		;IF an odd address has been found
+	BEQ	20$		;THEN
+	INC R1			;make the address even
+20$:	TST (R1)+		;fudge address to correct counting error
+	BR	10$		;try the next string
+;
+30$:	CLR R0			;oh dear we don't know this value
+	SETERROR 50$		;indicate duff data then exit
+;
+40$:	MOV R1,R0		;hold the address of the report string
+	SETSUCCESS		;we've found the report goody goody
+50$:	UNSAVE R1		;restore R1 to it's former value
+	RETURN			;go and confuse the calling programme
+;
+;
+	.END
+;

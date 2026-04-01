@@ -1,0 +1,74 @@
+   'CORAL' L24
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' LEN ('VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' TAB LOAD('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' TAB LOAD ('VALUE''INTEGER' LOAD POSITION, CHARS);
+       'BEGIN'
+           'BYTE''ARRAY' WORK SPACE [0:259]:=0;
+           'OVERLAY' WORK SPACE [0] 'WITH' 'INTEGER' BUFFER LENGTH;
+           'OVERLAY' WORK SPACE [2] 'WITH' 'INTEGER' LENGTH;
+           'OVERLAY' WORK SPACE [4] 'WITH' 'BYTE''ARRAY' CHAR SPACE [0:255];
+           'INTEGER' ADDRESS, COUNT, LOAD, END;
+           'INTEGER' MARKER:=0;
+           ADDRESS:= 'LOCATION' (WORK SPACE[2]);
+ 
+           'COMMENT' ON FIRST ENTRY INITIALISE WORK SPACE BUFFER
+                     BY SETTING STRING LENGTH TO 255 CHARACTERS
+                     AND SETTING MAXIMUM BUFFER SIZE TO 255 CHARACTERS
+                     AND PRESETTING ALL CHARACTERS IN BUFFER TO SPACES;
+           'IF' MARKER=0
+           'THEN'
+           'BEGIN'
+               'FOR' MARKER:=0 'STEP' 1 'UNTIL' 255 'DO'
+               CHAR SPACE [MARKER]:=32;
+               MARKER:=-1;
+               BUFFER LENGTH:=255;
+               LENGTH:=255;
+           'END';
+ 
+           'COMMENT' CHECK IF BUFFER NEEDS RESETING TO ALL SPACES;
+           'IF' LOAD POSITION=0
+           'THEN'
+           'BEGIN'
+               'FOR' COUNT:=0 'STEP' 1 'UNTIL' 255 'DO'
+               CHAR SPACE[COUNT]:=32;
+               'ANSWER' ADDRESS;
+           'END';
+ 
+           'COMMENT' CHECK IF RESET TO NEW STRING LENGTH MODE REQUIRED
+                     IF LENGTH IS ZERO AFTER MASK VDU WIDTH OF 72 ASSUMED;
+           'IF' LOAD POSITION=-2
+           'THEN'
+           'BEGIN'
+               LENGTH:=CHARS 'MASK' 255;
+               'IF' LENGTH=0
+               'THEN' LENGTH:=72;
+               'ANSWER' ADDRESS;
+           'END';
+ 
+           'COMMENT' CHECK IF LOAD POSIBLE;
+           'IF' LOAD POSITION > LENGTH
+           'OR' LOAD POSITION < 1
+           'OR' CHARS = VOID
+           'OR' CHARS = ERROR
+           'THEN'
+           'ANSWER' ADDRESS;
+ 
+           'COMMENT' NORMAL MODE LOAD CHARACTERS INTO FIXED POSITION WITHIN STRING;
+           END:=LOAD POSITION + LEN(CHARS) -2;
+           END:=END 'MASK' 255;
+           'FOR' LOAD:= LOAD POSITION -1 'STEP' 1 'UNTIL' END 'DO'
+           CHAR SPACE[LOAD]:=[CHARS + (LOAD-LOAD POSITION) +3 ];
+           'ANSWER' ADDRESS;
+       'END';
+   'END';
+   'FINISH'

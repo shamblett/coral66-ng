@@ -1,0 +1,502 @@
+'comment'-----------------------------------------------------------------
+ -
+ -   Filename:
+ -
+ -      whetstone.cor
+ -  
+ -   Description:
+ -  
+ -      Performs one million Whetstone instructions, a number of times, 
+ -      then prints the execution speed in K Whetstone Instructions per 
+ -      Second (KWIPS). For example, if ntimes = 1, and the execution time
+ -      is 1 second, then the result is 1000 KWIPS.
+ -    
+ -      The KWIPS rating is the number of Kilo Whetstone Instructions Per 
+ -      Second. The following code is worth 1 million whetstones for each 
+ -      iteration, so to compute the rating, run the code ntimes, then:
+ -
+ -          rating := 1000 / time taken in secs / ntimes
+ -
+ -      ntimes should be set so the benchmark takes about ten seconds to run 
+ -      so you can get an approximate verification of the printed rating.
+ -   
+ -      A Motorola 68020 with 68881 scores about 2000 KWIPS, so by setting
+ -      ntimes to 20, the execution time is 10 secs, which is a good time
+ -      from the point of view of timing the clock function, and from
+ -      checking using a stop watch. ntimes = 100 is good on a Pentium.
+ -
+ -   Credits:
+ -  
+ -      A Synthetic Benchmark, H.J. Curnow and B.A. Whichmann,
+ -      The Computing Journal, Volume 19  Number 1,  Feb 1976, P. 43-49
+ -
+ -      This source text was translated from Algol to Coral 66 by Chris
+ -      Nettleton, November 1999.
+ -
+ -      The elementary functions in the copyrighted section were copied
+ -      from the Ada compiler PIWG test program A000093.
+ - 
+ -   Revision:
+ -  
+ -      $Id: whetstone.c,v $
+ -
+ --------------------------------------------------------------------------;
+
+'common'(
+   'procedure' test    ('value''integer', 'value''integer');
+   'procedure' comment ('value''integer');
+   'procedure' failed  ('value''integer');
+   'procedure' result;
+)
+
+'common' (
+   'procedure' outchar ('value''integer','value''integer');
+   'procedure' outstring ('value''integer','value''integer');
+   'procedure' outinteger ('value''integer','value''integer');
+   'procedure' outnewline ('value''integer');
+)
+
+'include' "time.cor";
+
+'begin'
+
+   'integer' ntimes := 1; (number of times to run the benchmark)
+    
+   'comment' Benchmark timing stuff ;
+   'floating' rating;
+   'long''integer' start_time;
+   'long''integer' stop_time;
+  
+   
+   'floating''procedure' fabsf ('value''floating' x);
+   'answer' 'if' x < 0.0 'then' -x 'else' x;
+
+   
+   'comment'
+     ----------------------------------------------------------------------
+     These routines are provided for use by ACM SIGAda PIWG for making
+     measurements. These routines are copyrighted and may only be used for
+     performance measurements. These math routines must not be distributed
+     without this notice. No permission is granted to any party to modify,
+     to redistribute, to sell, to give away, or to otherwise use or
+     transmit these math routines without express written permission from
+     Westinghouse Electric Corporation, c/o Jon Squire, P.O. Box 746 MS1615,
+     Baltimore, MD 21203.
+     ----------------------------------------------------------------------;
+
+   'constant' pi := 3.14159265358978;
+   'constant' pi_2 := pi / 2.0; 
+  
+   'floating''recursive' sin ('value''floating' x);
+   'begin'
+      'constant' c1 := 1.57079631847;
+      'constant' c3 := -0.64596371106;
+      'constant' c5 := 0.07968967928;
+      'constant' c7 := -0.00467376557;
+      'constant' c9 := 0.00015148419;
+   
+      'floating' x_norm, x_int, x_2, y;
+    
+      x_norm := x / pi_2;
+
+      'if' fabsf (x_norm) > 4.0 'then'
+         'begin'
+            x_int := 'floating' ('integer' ('floating'(x_norm / 4.0)));
+            x_norm := x_norm - 4.0 * x_int;
+         'end';
+   
+      'if' x_norm > 2.0 'then'
+         x_norm := 2.0 - x_norm
+      'else' 'if' x_norm < -2.0 'then'
+         x_norm := -2.0 - x_norm;
+   
+      'if' x_norm > 1.0 'then'
+         x_norm := 2.0 - x_norm
+      'else' 'if' x_norm < -1.0 'then'
+         x_norm := -2.0 - x_norm;
+   
+      x_2 := x_norm * x_norm;
+      y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * x_2 ) * x_2) * x_2) * x_2) * x_norm;
+   
+      'answer' y;
+   'end' sin;
+   
+   'floating''recursive' cos ('value''floating' x);
+   'begin'
+     'answer' sin (x + pi_2);
+   'end' cos;
+   
+   'floating''recursive' arctan ('value''floating' x);
+   'begin'
+      'constant' c1 := 0.9999993329;
+      'constant' c3 := -0.3332985605;
+      'constant' c5 := 0.1994653599;
+      'constant' c7 := -0.1390853351;
+      'constant' c9 := 0.0964200441;
+      'constant' c11 := -0.0559098861;
+      'constant' c13 := 0.0218612288;
+      'constant' c15 := -0.0040540580;
+   
+      'floating' a_2, y, a;
+  
+      a := x;
+
+      'if' fabsf (a) > 1.0 'then'
+         a := 1.0 / a;
+   
+      a_2 := a * a;
+      y := ( c1 + ( c3 + ( c5 + ( c7 + ( c9 + ( c11 + ( c13 + c15 * a_2 ) * a_2) * a_2
+            ) * a_2) * a_2) * a_2) * a_2) * a;
+   
+      'if' fabsf (x) >= 1.0 'then'
+         'begin'
+            'if' x < 0.0 'then'
+               y := - ( pi_2 + y )
+            'else'
+               y := pi_2 - y
+         'end';
+   
+      'answer' y;
+   'end';
+   
+   'floating''recursive' sqrt ('value''floating' x);
+   'begin'
+      'constant' a := 2.1902;
+      'constant' b := -3.0339;
+      'constant' c := 1.5451;
+   
+      'floating' y, root_pwr, x_norm;
+
+      root_pwr := 1.0;
+   
+      'if' x <= 0.0 'then'
+         'answer' 0.0;
+   
+      'if' x > 1.0 'then' 
+         'begin'
+            'for' x_norm := x 'while' x_norm > 1.0 'do'
+               'begin'
+                  root_pwr := root_pwr * 2.0;
+                  x_norm := x_norm * 0.25
+               'end'
+         'end'
+      'else'
+         'begin'
+            'for' x_norm := x 'while' x_norm < 0.25 'do' 
+               'begin'
+                  root_pwr := root_pwr * 0.5;
+                  x_norm := x_norm * 4.0
+               'end'
+         'end';
+   
+     y := a + b / ( c + x_norm );
+     y := 0.5 * ( y + x_norm / y );
+     y := 0.5 * ( y + x_norm / y );
+     y := y * root_pwr;
+   
+     'answer' y
+   'end';
+   
+   'floating''recursive' exp ('value''floating' x);
+   'begin'
+      'constant' c1 := 9.99999900943303e-01;
+      'constant' c2 := 5.00006347344554e-01;
+      'constant' c3 := 1.66667985598315e-01;
+      'constant' c4 := 4.16350120350139e-02;
+      'constant' c5 := 8.32859610677671e-03;
+      'constant' c6 := 1.43927433449119e-03;
+      'constant' c7 := 2.04699933614437e-04;
+    
+      'floating' x1, y, e_pwr, e;
+
+      e_pwr := 1.0;
+      e := 2.71828182845905;
+   
+      'if' fabsf (x) > 88.0 'then'
+         'answer' 0.0;
+   
+      'for' x1 := fabsf (x) 'while' x1 >= 1.0 'do'
+         'begin'
+            e_pwr := e_pwr * e * e;
+            x1 := x1 - 2.0
+         'end';
+   
+      y := 1.0 + ( c1 + ( c2 + ( c3 + ( c4 + ( c5 + ( c6 + c7 * x1 ) * x1) * x1) * x1
+           ) * x1) * x1) * x1;
+      y := y * e_pwr;
+      'if' x < 0.0 'then'
+         y := 1.0 / y;
+   
+      'answer' y
+   'end';
+   
+   'floating''recursive' log10 ('value''floating' x);
+   'begin'
+     'constant' c1 := 0.868591718;
+     'constant' c3 := 0.289335524;
+     'constant' c5 := 0.177522071;
+     'constant' c7 := 0.094376476;
+     'constant' c9 := 0.191337714;
+     'constant' c_r10 := 3.1622777;
+   
+     'floating' y, x_norm, x_log, frac, frac_2;
+   
+     x_log := 0.5;
+     'if' x <= 0.0 'then'
+       'answer' 0.0;
+   
+     'if' x >= 10.0 'then'
+       'begin'
+          'comment' reduce to 1.0 .. 10.0 ;
+         'for' x_norm := x 'while' x_norm >= 10.0 'do' 
+           'begin'
+             x_log := x_log + 1.0;
+             x_norm := x_norm * 0.1
+           'end'
+       'end'
+     'else'
+       'begin'
+          'comment' reduce to 1.0 .. 10.0 ;
+         'for' x_norm := x 'while' x_norm < 1.0 'do'
+           'begin'
+             x_log := x_log - 1.0;
+             x_norm := x_norm * 10.0
+           'end'
+       'end';
+   
+       frac := ( x_norm - c_r10 ) / ( x_norm + c_r10 );
+       frac_2 := frac * frac;
+       y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * frac_2 ) * frac_2) * frac_2) * frac_2)
+           * frac;
+
+       'answer' y + x_log
+   'end';
+   
+   
+   'floating''recursive' ln ('value''floating' x);
+   'begin'
+     'answer' 2.302585093 * log10 ( x );
+   'end';
+   
+   'comment'
+     ----------------------------------------------------------------------
+     End of copyrighted section
+     ----------------------------------------------------------------------;
+
+
+   'comment' Major loop counter ; 
+   'integer' cycle_no; 
+
+   'floating' x1, x2, x3, x4, x, y, z, t, t1, t2;
+   'floating''array' e1[1:4];
+   'integer' i, j, k, l, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11;
+   
+  
+   'procedure' pa ('floating''array' e);
+   'begin'
+      'integer' j;
+
+      j := 0;
+   lab:
+      e[1] := (e[1] + e[2] + e[3] - e[4]) * t;
+      e[2] := (e[1] + e[2] - e[3] + e[4]) * t;
+      e[3] := (e[1] - e[2] + e[3] + e[4]) * t;
+      e[4] := (- e[1] + e[2] + e[3] + e[4]) / t2;
+      j := j + 1;
+      'if' j < 6 'then'
+         'goto' lab;
+   'end';
+
+   'procedure' p0;
+   'begin'
+      e1[j] := e1[k];
+      e1[k] := e1[l];
+      e1[l] := e1[j];
+   'end';
+
+   'procedure' p3 ('location''floating' x, y, z);
+   'begin'
+      x := t * (x + y);
+      y := t * (x + y);
+      z := (x + y) / t2;
+   'end';
+
+ 
+   test ("whetstone", "Whetstone scientific benchmark");
+  
+   start_time := clock;
+ 
+   'comment' initialize constants ;
+
+   t := 0.499975;
+   t1 := 0.50025;
+   t2 := 2.0;
+
+   'comment' read the value of i, controlling total weight: if i = 10 the
+      total weight is one million Whetstone instructions ;
+
+   'comment' inreal (2, i) ;
+
+   i := 10;
+
+   n1 := 0;        n2 := 12 * i;   n3 := 14 * i;
+   n4 := 345 * i;  n5 := 0;        n6 := 210 * i;
+   n7 := 32 * i;   n8 := 899 * i;  n9 := 616 * i;
+   n10 := 0;       n11 := 93 * i;
+
+   'for' cycle_no := 1 'step' 1 'until' ntimes 'do'
+      'begin'
+
+         'comment' module 1: simple identifiers ;
+   
+         x1 := 1.0;
+         x2 := -1.0;
+         x3 := -1.0;
+         x4 := -1.0;
+   
+         'for' i := 1 'step' 1 'until' n1 'do'
+         'begin'
+            x1 := (x1 + x2 + x3 - x4) * t;
+            x2 := (x1 + x2 - x3 + x4) * t;
+            x3 := (x1 - x2 + x3 + x4) * t;
+            x4 := (- x1 + x2 + x3 + x4) * t
+         'end';
+   
+         'comment' module 2: array elements ;
+      
+         e1[1] := 1.0;
+         e1[2] := -1.0;
+         e1[3] := -1.0;
+         e1[4] := -1.0;
+      
+         'for' i := 1 'step' 1 'until' n2 'do'
+         'begin'
+            e1[1] := (e1[1] + e1[2] + e1[3] - e1[4]) * t;
+            e1[2] := (e1[1] + e1[2] - e1[3] + e1[4]) * t;
+            e1[3] := (e1[1] - e1[2] + e1[3] + e1[4]) * t;
+            e1[4] := (- e1[1] + e1[2] + e1[3] + e1[4]) * t
+         'end';
+      
+
+         'comment' module 3: as array parameter ;
+      
+         'for' i:= 1 'step' 1 'until' n3 'do'
+            pa (e1);
+      
+      
+         'comment' module 4: conditional jumps ;
+      
+         j := 1;
+         'for' i := 1 'step' 1 'until' n4 'do'
+         'begin'
+            'if' j = 1 'then'
+               j := 2
+            'else'
+               j := 3;
+      
+            'if' j > 2 'then'
+               j := 0
+            'else'
+               j := 1;
+      
+            'if' j < 1 'then'
+               j := 1
+            'else'
+               j := 0;
+         'end';
+      
+      
+         'comment' module 5: omitted ;
+    
+         'comment' module 6: integer arithmetic ;
+      
+         j := 1;   k := 2;   l := 3;
+      
+         'for' i := 1 'step' 1 'until' n6 'do'
+         'begin'
+            j := j * (k - j) * (l - k);
+            k := l * k - (l - j) * k;
+            l := (l - k) * (k + j) ;    'comment' typo in TCJ ;
+            e1[l-1] := j + k + l;
+            e1[k-1] := j * k * l;
+         'end';
+      
+      
+         'comment' module 7: trig functions ;
+
+         x := 0.5;
+         y := 0.5;
+
+         'for' i := 1 'step' 1 'until' n7 'do'
+         'begin'
+            x := t * arctan (t2 * sin (x) * cos (x) /
+               (cos (x + y) + cos (x - y) - 1.0));
+            y := t * arctan (t2 * sin (y) * cos (y) /
+               (cos (x + y) + cos (x - y) - 1.0));
+         'end';
+
+
+         'comment' module 8: procedure calls ;
+      
+         x := 1.0;
+         y := 1.0;
+         z := 1.0;
+      
+         'for' i := 1 'step' 1 'until' n8 'do'
+            p3 (x, y, z);
+      
+      
+         'comment' module 9: array references ;
+      
+         j := 1;  
+         k := 2;  
+         l := 3;
+         e1[1] := 1.0;  
+         e1[2] := 2.0;  
+         e1[3] := 3.0;
+      
+         'for' i := 1 'step' 1 'until' n9 'do'
+            p0;
+      
+      
+         'comment' module 10: integer arithmetik ;
+      
+         j := 2;  
+         k := 3;
+      
+         'for' i := 1 'step' 1 'until' n10 'do'
+            'begin'
+               j := j + k;
+               k := j + k;
+               j := k - j;
+               k := k -j -j
+            'end';
+      
+   
+         'comment' module 11: standard functions ;
+      
+         x := 0.75;
+         'for' i := 1 'step' 1 'until' n11 'do'
+            x := sqrt (exp (ln (x) / t1));
+      
+         
+      'end';
+    
+   'comment' Get stop time after ntimes ;
+
+   stop_time := clock;
+
+   'comment'  Now compute number of K Whetstones per sec;
+
+   rating := 1000.0 * CLOCKS_PER_SEC * ntimes / 
+                'floating'(stop_time - start_time);
+
+   outstring (1, "Rating = ");
+   outinteger (1, rating);
+   outstring (1, " KWIPS");
+   outnewline (1);
+
+   result ;
+
+'end' main
+

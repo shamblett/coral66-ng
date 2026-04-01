@@ -1,0 +1,16 @@
+   'CORAL' L17
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' A SPACE);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' A SPACE;
+       'BEGIN'
+           'BYTE''ARRAY' STRING [0:3]:=1,0,0,0;
+           STRING[2]:=32;
+           'ANSWER''LOCATION' (STRING[0]);
+       'END';
+   'END';
+   'FINISH'

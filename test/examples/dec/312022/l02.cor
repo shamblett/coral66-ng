@@ -1,0 +1,60 @@
+   'CORAL' L2
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'           LEN('VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' COMPARE('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT'RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' COMPARE ('VALUE''INTEGER' STRING1, STRING2);
+       'BEGIN'
+           'INTEGER'COUNT, POSITION;
+           'BYTE' BYTE  2, BYTE 1;
+ 
+           'COMMENT' UPGRADE MOD 5 AUG 82
+                     TO CATER FOR VOID AND ERROR PARAMETERS;
+           'IF' STRING1 = VOID
+           'OR' STRING1 = ERROR
+           'THEN'
+           'ANSWER' -1;  (ASSUME ITS THE SMALLEST)
+           'IF' STRING2 = VOID
+           'OR' STRING2 = ERROR
+           'THEN'
+           'ANSWER' +1;  (FIRST STRING MUST BE BIGGER)
+ 
+           'COMMENT' IF STRING LENGTHS NOT SAME INDICATE WHICH IS LARGEST;
+           'IF' LEN(STRING1) < LEN(STRING2)
+           'THEN'
+           'ANSWER' -1;
+           'IF' LEN(STRING1) > LEN(STRING2)
+           'THEN'
+           'ANSWER' +1;
+ 
+           'COMMENT' HOLD COUNT OF NUMBER OF CHARACTERS TO COMPARE;
+           COUNT := LEN(STRING1) + 1;
+           'FOR' POSITION:=2 'STEP' 1 'UNTIL' COUNT 'DO'
+           'BEGIN'
+ 
+               'COMMENT' HOLD CHARACTERS TO COMPARE;
+               BYTE1 := [STRING1+POSITION];
+               BYTE2 := [STRING2+POSITION];
+ 
+               'COMMENT' IF CHARS NOT THE SAME BREAK THE COMPARE LOOP;
+               'IF' BYTE1 < BYTE2
+               'THEN'
+               'ANSWER' -1;
+               'IF' BYTE1 > BYTE2
+               'THEN'
+               'ANSWER' +1;
+           'END';
+ 
+           'COMMENT' ALL CHARS IN STRING ARE THE SAME;
+           'ANSWER' SAME;
+       'END';
+   'END';
+   'FINISH'

@@ -1,0 +1,33 @@
+   'CORAL' L23
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' GETTIM  ('INTEGER''ARRAY');
+   'INTEGER''PROCEDURE' CVT     ('VALUE''INTEGER','VALUE''FLOATING');
+   'INTEGER''PROCEDURE' A SPACE;
+   'PROCEDURE'          COPY    ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE'          ADD TO  ('VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' CLK);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' CLK;
+       'BEGIN'
+           'INTEGER''ARRAY' TIME [0:8];
+           'INTEGER' STRING1;
+           'BYTE''ARRAY' DATA [0:31]:=20,0;
+           'OVERLAY' DATA [2] 'WITH' 'BYTE''ARRAY' STRING [0:29];
+           GETTIM(TIME);
+           STRING1:='LOCATION' (STRING[0]);
+           COPY(CVT("##",TIME[3]),STRING1);
+           ADD TO (STRING1,":");
+           ADD TO (STRING1,CVT("##",TIME[4]));
+           ADD TO (STRING1,":");
+           ADD TO (STRING1,CVT("##",TIME[5]));
+           'ANSWER' STRING1;
+       'END';
+   'END';
+   'FINISH'

@@ -1,0 +1,92 @@
+   'CORAL' L7H
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE' LUNBOOK ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' COMPARE ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' COPY    ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LUNFREE ('VALUE''INTEGER');
+   'PROCEDURE'          DEFLUN ('VALUE''BYTE','VALUE''INTEGER','LABEL');
+   'PROCEDURE'          RELEASE('VALUE''BYTE','LABEL'));
+   'COMMON'('INTEGER''PROCEDURE' RT04FLG('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' RT04LUN('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' PROGRAM DEFINITIONS;
+       'INCLUDE' "[200,25]GENDEF.COR"
+ 
+       'COMMENT' PROGRAM DATA AREAS;
+       'INTEGER' CHANAME;
+       'INTEGER' STATUS:=-1;
+       'INTEGER' LUN:=2;   (DEFAULT LUN FOR RT04)
+       'BYTE''ARRAY' C [0:15]:=10,0,0,0;
+ 
+ 
+       'INTEGER''PROCEDURE' RT04LUN ('VALUE''INTEGER' MODE);
+       'BEGIN'
+           'IF' MODE=GIVE VALUE
+           'THEN'
+           'ANSWER' LUN;  (ANSWER WITH LUN)
+           'IF' STATUS = SWITCHED ON
+           'THEN'
+           'BEGIN'
+               LUNFREE(LUN);   (INDICATE LUN NO LONGER REQUIRED)
+               RELEASE(LUN,ERRL);  (RELEASE LUN FROM SYSTEM)
+           'END';
+           'IF' LUNBOOK (MODE) = SUCCESS
+           'THEN'
+           'BEGIN'
+               LUN:=MODE;  (HOLD NEW LUN VALUE)
+           'END'
+           'ELSE' LUN := VOID LUN;  (SEMI ERROR CONDITION)
+           STATUS:= SWITCHED OFF;  (VDU DEALOCATED)
+           'ANSWER' SUCCESS;   (JOB DONE OK)
+ ERRL:      'ANSWER' ERROR;  (JOB FAILED)
+       'END' OF PROCEDURE RT04LUN;
+ 
+ 
+       'INTEGER''PROCEDURE' RT04FLG ('VALUE''INTEGER' MODE,STRING);
+       'BEGIN'
+           CHANAME:= 'LOCATION' (C[2]); (HOLD ADDRESS OF CHANNEL NAME STRING)
+           'IF' MODE=GIVE VALUE
+           'THEN'
+           'ANSWER' STATUS;  (ANSWER WITH LUN STATUS)
+           'IF' LUN = VOID LUN
+           'THEN'
+           'ANSWER' VOID LUN;
+           'IF' MODE = SWITCH ON
+           'THEN'
+           'BEGIN'
+               'IF' STATUS = OFF
+               'THEN'
+               'BEGIN'
+                   'IF' COMPARE(CHANAME,STRING)<>SAME
+                   'THEN'
+                   'BEGIN'
+                       COPY(STRING,CHANAME);   (SAVE NEW NAME)
+                       RELEASE(LUN,ERRL);    (RELEASE DEVICE)
+                       STATUS:=OFF;   (INDICATE DEVICE UNUSED)
+                   'END';
+                   DEFLUN(LUN,CHANAME,ERRL);   (ASSIGN LUN TO TERMINAL)
+                   STATUS:=ON;   (INDICATE THAT THE VDU IS SWITCHED ON)
+               'END';
+               'ANSWER' SWITCHED ON;  (INDICATE STATUS OF LUN)
+           'END';
+           'IF' MODE = SWITCH OFF
+           'THEN'
+           'BEGIN'
+               'IF' STATUS = ON
+               'THEN'
+               'BEGIN'
+                   STATUS:=OFF;  (INDICATE THAT THE VDU IS SWITCHED OFF)
+                   RELEASE(LUN,ERRL);
+               'END';
+               'ANSWER' SWITCHED OFF;  (INDICATE STATUS OF LUN)
+           'END';
+ ERRL:      'ANSWER' ERROR;  (JOB FAILED)
+       'END' OF PROCEDURE RT04FLG;
+   'END';
+   'FINISH'

@@ -1,0 +1,30 @@
+   'CORAL' P13 PLS MODULE
+ 
+ 
+   'LIBRARY' ('PROCEDURE' MOV ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' PLT ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' WHERE ('LOCATION''FLOATING','LOCATION''FLOATING','LOCATION''FLOATING'));
+   'COMMON' ('PROCEDURE' PLS ('VALUE''FLOATING'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' PLS ('VALUE''FLOATING' SIZE);
+       'BEGIN'
+           'FLOATING' X, Y, F, XCENT, YCENT;
+ 
+           'COMMENT' LOCATE CENTER OF CHARACTER;
+           WHERE(XCENT,YCENT,F);
+           'IF' SIZE>0 
+           'THEN'
+           'BEGIN'
+               X:=-SIZE;   (SET UP BASE SIZE)
+               MOV(X/2,90);  (TOP OF PLUS SIGN)
+               PLT(X,270);
+               MOV(X*0.707,45);
+               PLT(X,180);
+           'END';
+           MOV(XCENT,YCENT);
+       'END'OF PROCEDURE PLS;
+   'END';
+   'FINISH'

@@ -1,0 +1,66 @@
+   'CORAL' L37
+   'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+   'LIBRARY' ('INTEGER''PROCEDURE' LEN    ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE'            ASC    ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE'            ADD TO ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE'            COPY   ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE'            CHR    ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE'            LSEG   ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' TABMOD ('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' TABMOD ('VALUE''INTEGER' INPUT STRING);
+       'BEGIN'
+ 
+           'COMMENT' THIS ROUTINE REMOVES ALL TAB CHARACTERS IN A STRING
+                     AND CONVERTS THEM TO SPACE CHARACTERS TO THE CORRECT
+                     TABULATION POINT;
+           'INTEGER' A, C, WORK STRING;
+           'BYTE''ARRAY' STRL [0:259]:=0,0,0,0;
+           'OVERLAY' STRL [0] 'WITH' 'INTEGER' BLEN;
+           'IF' [INPUT STRING - 2] > 0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' VALID STRING IF WRITE PERMISSION ALLOWED;
+               BLEN := 256;                         (FIX MAXIMUM LENGTH OF STRING)
+               WORK STRING := 'LOCATION'(STRL [2]); (HOLD ADDRESS OF WORK STRING)
+               [WORK STRING] := 0;       (SET WORK STRING LENGTH TO NO CHARACTERS)
+               COPY (INPUT STRING,WORK STRING);     (SAVE INPUT STRING)
+               [INPUT STRING] := 0;                 (CLEAR OUT INPUT STRING)
+               'FOR' A := 1 'STEP' 1 'UNTIL' LEN(WORK STRING) 'DO'
+               'BEGIN'
+                   C :=ASC(LSEG(WORK STRING,A,A));  (HOLD EXTRACTED CHARACTER)
+ 
+                   'COMMENT' IF CHARACTERS NOT A TABULATION CHARACTER COPY
+                             CHARACTER TO OUTPUT AREA OTHERWISE
+                             FILL WITH SPACES;
+                   'IF' C <> 9
+                   'THEN' ADD TO (INPUT STRING,CHR(C))
+                   'ELSE'
+                   'BEGIN'
+ 
+                       'COMMENT' VALUE 32 IS A SPACE CHARACTER;
+                       ADD TO (INPUT STRING,CHR(32));  (APPEND A SPACE)
+                       'FOR' A := A 'WHILE' LEN(INPUT STRING)/8*8 <> LEN(INPUT STRING) 'DO'
+                       'BEGIN'
+ 
+                           'COMMENT' IF AN ERROR OCCURS WHEN ADDING CHARACTERS
+                                     THIS ROUTINE WILL EXIT;
+                           'IF' ADD TO (INPUT STRING, CHR(32)) = ERROR
+                           'THEN'
+                           'ANSWER' ERROR;
+                       'END';
+                   'END';
+               'END';
+               'ANSWER' SUCCESS;
+           'END'
+           'ELSE'
+           'ANSWER' ERROR; (ATTEMPT TO WRITE TO PROTECTED STRING)
+       'END' OF PROCEDURE TABMOD;
+   'END';
+   'FINISH'

@@ -1,0 +1,42 @@
+   'CORAL' P4 CIR MODULE
+ 
+ 
+   'LIBRARY' ('FLOATING''PROCEDURE' SQRT ('VALUE''FLOATING');
+   'PROCEDURE' MOV ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' PLT ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' WHERE ('LOCATION''FLOATING','LOCATION''FLOATING','LOCATION''FLOATING'));
+   'COMMON' ('PROCEDURE' CIR ('VALUE''FLOATING'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' CIR ('VALUE''FLOATING' RAD);
+       'BEGIN'
+           'FLOATING' X, Y, F, XCENT, YCENT;
+ 
+           'COMMENT' LOCATE CENTER OF CIRCLE;
+           WHERE(XCENT,YCENT,F);
+           Y:=YCENT;
+           X:=XCENT+RAD;
+           MOV(X,Y);  (MOVE TO LEFT HAND SIDE OF CIRCLE)
+ 
+           'COMMENT' DRAW BOTTOM HALF OF CIRCLE;
+           'FOR' X:=RAD 'STEP' -0.01 'UNTIL' -RAD 'DO'
+           'BEGIN'
+               Y:=-SQRT(-(X*X-RAD*RAD));
+               PLT(X+XCENT,Y+YCENT);
+           'END';
+ 
+           'COMMENT' DRAW TOP HALF OF CIRCLE;
+           'FOR' X:=-RAD 'STEP' 0.01 'UNTIL' RAD 'DO'
+           'BEGIN'
+               Y:=SQRT(-(X*X-RAD*RAD));
+               PLT(X+XCENT,Y+YCENT);
+           'END';
+           PLT(XCENT+RAD,YCENT);  (FINISH OFF CIRCLE IF REQD)
+ 
+           'COMMENT' MOVE BACK TO MIDLE OF CIRCLE;
+           MOV(XCENT,YCENT);
+       'END'OF PROCEDURE CIR;
+   'END';
+   'FINISH'

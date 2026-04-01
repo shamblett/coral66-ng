@@ -1,0 +1,74 @@
+   'CORAL' L26
+ 
+ 
+   'COMMON' ('INTEGER''PROCEDURE' ASCRAD('VALUE''BYTE','VALUE''BYTE','VALUE''BYTE','LOCATION''INTEGER'));
+   'SEGMENT'RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' ASCRAD ('VALUE''BYTE' A,B,C;
+       'LOCATION''INTEGER' D);
+ 
+       'COMMENT' THE OBJECT OF THIS PROGRAM IS TO CONVERT
+                 THREE BYTES HELD IN A,B,C INTO A RAD50 INTEGER
+                 WHICH WILL BE PLACED INTO INTEGER D ON EXIT
+                 IF AN ERROR OCCURS A BIT WILL BE SET INDICATING
+                 WHICH BYTE ON INPUT FAILED AS THE ANSWER TO THIS
+                 PROCEDURE IF THE ANSWER IS ZERO PROCEDURE HAS WORKED
+                 OK ERRORS WILL OCCUR IF A,B,C BYTES CONTAIN
+                 NON-TRANSLATABLE RAD50 CHARACTERS TO ALLOW THE PROCEDURE
+                 TO EXIT CORRECTLY FAULTY CHARACTERS WILL BE ASUMMED TO
+                 BE A SPACE 
+                 AUTHOR R J SPRIGGS DATE 25/5/78;
+       'BEGIN'
+           'INTEGER' FINALSTATUS,IN BYTE SLOT,REPLYCODE,ANSWERCODE,REPLYSTATUS;
+           'BYTE' TESTBYTE;
+           'BYTE''ARRAY' REFCHARS[0:40] := " ","A","B","C","D","E","F","G","H",
+           "I","J","K","L",
+           "M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","$",".","?",
+           "0","1","2","3","4","5","6","7","8","9",-1;
+           FINALSTATUS:=0; (SET ANSWER AS NO BYTES HAVE FAILED)
+           REPLYCODE:=0; (SET REPLY VALUE TO ALL SPACES)
+           'FOR'TESTBYTE:=A,B,C 'DO'
+           'BEGIN'
+               'FOR'IN BYTE SLOT:=0, IN BYTE SLOT 'WHILE'IN BYTE SLOT>=0'DO'
+               'BEGIN'
+ 
+                   'COMMENT' -1 REFERS TO END OF ARRAY MARKER;
+                   'IF'REFCHARS[IN BYTE SLOT]<>-1
+                   'THEN'
+ 
+                   'COMMENT' NOT END OF ARRAY LOOP;
+                   'BEGIN'
+                       'IF'REFCHARS[IN BYTE SLOT]=TESTBYTE
+                       'THEN'
+                       'BEGIN'
+ 
+                           'COMMENT' CODE EQUAVALENCE FOUND;
+                           ANSWERCODE:=IN BYTE SLOT; (HOLD RAD50 SUBSET CODE)
+                           IN BYTE SLOT:=-2; (SET MARKER TO TERMINATE WHILE LOOP)
+                           REPLYSTATUS:=0; (SET MARKER TO INDICATE NO ERROR)
+                       'END';
+                   'END'
+                   'ELSE'
+                   'BEGIN'
+ 
+                       'COMMENT' SITUATION WHEN END OF ARRAY CHECK OCCURS;
+                       ANSWERCODE:=0; (ASSUME SPACE BECAUSE OF ERROR)
+                       IN BYTE SLOT:=-2; (SET MARKER TO TERMINATE WHILE LOOP)
+                       REPLYSTATUS:=1; (SET MARKER TO INDICATE FAULTY CHARACTER)
+                   'END';
+                   IN BYTE SLOT:=IN BYTE SLOT+1; (INDEX TO NEXT CHARACTER IN REF LIST)
+               'END';
+ 
+               'COMMENT' GENERATE RAD50 CODE;
+               FINALSTATUS:=FINALSTATUS*2; (MOVE ERROR MARKER ONE BIT LEFT)
+               FINALSTATUS:=FINALSTATUS+REPLYSTATUS; (ADD IN ANY ERROR MARKER SET)
+               REPLYCODE:=REPLYCODE*40; (SHIFT BASE OF REPLY VALUE ONE RAD 50 LEFT)
+               REPLYCODE:=REPLYCODE+ANSWERCODE; (BUILT UP REPLY VALUE)
+           'END';
+           D:=REPLYCODE; (LOAD OUT INTEGER ANSWER)
+           'ANSWER'FINALSTATUS;
+       'END'OF ASCRAD PROCEDURE;
+   'END';
+   'FINISH'

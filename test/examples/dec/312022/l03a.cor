@@ -1,0 +1,40 @@
+   'CORAL' L3A
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'          LEN('VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' LSEG ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' LSEG ('VALUE''INTEGER' STRING, START, END);
+       'BEGIN'
+           'BYTE''ARRAY' STRING1 [0:57]:=0;
+           'INTEGER' COUNT;
+           'OVERLAY' STRING1 'WITH' 'INTEGER' STRINGLENGTH;
+           'IF' END-START < 0
+           'OR' END < 1
+           'OR' START < 1
+           'OR' END> LEN(STRING)
+           'OR' END-START > 55
+           'OR' STRING = VOID
+           'OR' STRING = ERROR
+           'THEN'
+           'BEGIN'
+               STRINGLENGTH := 0;
+               STRING1[2] := 32;
+               'ANSWER''LOCATION'(STRING1[0]);
+           'END'
+           'ELSE' STRINGLENGTH := END-START+1;
+           'FOR' COUNT:=START 'STEP' 1 'UNTIL' END 'DO'
+           'BEGIN'
+               STRING1[COUNT-START+2] := [STRING+COUNT+1];
+           'END';
+           'ANSWER''LOCATION'(STRING1[0]);
+       'END';
+   'END';
+   'FINISH'

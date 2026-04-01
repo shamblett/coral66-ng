@@ -1,0 +1,42 @@
+   'CORAL' L36
+   'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+   'LIBRARY' ('INTEGER''PROCEDURE' LEN ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' VDU ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' COMPARE ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' ASK('INTEGER''ARRAY','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' ASK ('INTEGER''ARRAY' LIST;
+       'VALUE''INTEGER' PROMPT);
+       'BEGIN'
+ 
+           'COMMENT' THIS PROCEDURE OUTPUTS A PROMPT READ THE REPLY
+                     AND GIVE A NUMERICAL REPLY WHEN PROMPT REPLY MATCH FOUND;
+           'INTEGER' A,B,C,D;
+           'FOR' D:=-1,D 'WHILE' D=-1 'DO'
+           'BEGIN'
+               C:=VDU("IO",PROMPT);
+               'IF' LEN(C)<>0
+               'THEN'
+               'BEGIN'
+                   'FOR' A:=0,A+2 'WHILE' LIST[A]<>0 'DO'
+                   'BEGIN'
+                       'IF' COMPARE(C,LSEG(LIST[A],1,LEN(C)))=SAME
+                       'AND' D <> 0
+                       'THEN'
+                       'BEGIN'
+                           B := LIST [A+1];  (HOLD ANSWER)
+                           D := 0;           (JOB COMPLETE)
+                       'END';
+                   'END';
+               'END';
+           'END';
+           'ANSWER' B;
+       'END' OF PROCEDURE ASK;
+   'END';
+   'FINISH'

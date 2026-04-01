@@ -1,0 +1,99 @@
+   'CORAL' L27
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'   QIO ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER',
+   'VALUE''INTEGER','INTEGER''ARRAY','INTEGER''ARRAY');
+   'INTEGER''PROCEDURE'   WAITEF ('VALUE''INTEGER');
+   'PROCEDURE'            DEFLUN ('VALUE''BYTE','VALUE''INTEGER','LABEL');
+   'PROCEDURE'            RELEASE('VALUE''BYTE','LABEL');
+   'INTEGER''PROCEDURE'   LPOS   ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' TERMINAL('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' TERMINAL ('VALUE''INTEGER' STRING);
+       'BEGIN'
+           'INTEGER''ARRAY' ISB [0:1];
+           'INTEGER''ARRAY' PRL [0:5];
+ 
+ 
+           'INTEGER''PROCEDURE' DO;
+           'BEGIN'
+ 
+               'COMMENT' THIS PROCEDURE PROCESSES THE REQUEST TO
+                         CHANGE THE TERMINALS CHARACTERISTICS;
+               DEFLUN(1,"TI",DEFERR);
+               QIO(1296,1,4,0,ISB,PRL);
+               WAITEF(4);
+ DEFERR:       RELEASE(1,RELERR);
+               'ANSWER' VOID;
+ RELERR:       'ANSWER' ERROR;
+           'END' OF PROCEDURE DO;
+ 
+           'COMMENT' START OF MAIN SECTION;
+           'IF' STRING = VOID
+           'OR' STRING = ERROR
+           'THEN'
+           'ANSWER' ERROR; (INVALID ADDRESS)
+           'IF' LPOS(STRING,"LCO",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ENABLE TERMINAL TO BE LOWER CASE OUTPUT;
+               PRL[0]:=23;
+               PRL[1]:=1;
+               DO;
+           'END';
+           'IF' LPOS(STRING,"UCO",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ENABLE TERMINAL TO BE UPPER CASE OUTPUT;
+               PRL[0]:=23;
+               PRL[1]:=0;
+               DO;
+           'END';
+           'IF' LPOS(STRING,"LCI",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ENABLE TERMINAL TO BE LOWER CASE INPUT;
+               PRL[0]:=22;
+               PRL[1]:=1;
+               DO;
+           'END';
+           'IF' LPOS(STRING,"UCI",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ENABLE TERMINAL TO BE UPPER CASE INPUT;
+               PRL[0]:=22;
+               PRL[1]:=0;
+               DO;
+           'END';
+           'IF' LPOS(STRING,"FD",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ENABLE TERMINAL TO BE FULL DUPLEX OPERATION;
+               PRL[0]:=52;
+               PRL[1]:=1;
+               DO;
+           'END';
+           'IF' LPOS(STRING,"HD",1)<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' ENABLE TERMINAL TO BE HALF DUPLEX OPERATION;
+               PRL[0]:=52;
+               PRL[1]:=0;
+               DO;
+           'END';
+       'END' OF PROCEDURE TERMINAL;
+   'END';
+   'FINISH'

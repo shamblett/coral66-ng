@@ -1,0 +1,24 @@
+	.TITLE	MC07S.	PROGRAMME TO READ A CHARACTER FROM THE TERMINAL
+	.IDENT	/MC07S./
+;
+	.MCALL QIOW$S
+;
+;	This procedure reads a character from the users terminal
+;	and responds with the character. This procedure behaves
+;	as the SYS(1) function in BASIC.
+;
+SYS::
+	CMP 2(R5),#1			;IS THIS THE SYS(1) FUNCTION
+	BNE	10$			;ONLY SYS(1) ALLOWED IF NOT SOD OFF
+	CALL V$ON			;SWITCH ON THE USERS TERMINAL
+	CLR V$STR+2			;REMOVE ANY OLD CHARACTERS
+	MOV #IO.RAL!TF.RNE,V$FUN	;HOLD THE FUNCTION CODE
+					;PASS ALL WITH NO ECHO
+	QIOW$S V$FUN,V$LUN,V$EFN,,#V$ISB,,<#V$STR+2,#1>
+	MOVB V$STR+2,R0			;HOLD CHARACTER
+10$:	RETURN				;GO BACK WITH CHARACTER (I HOPE)
+;
+;
+	.END
+;
+;

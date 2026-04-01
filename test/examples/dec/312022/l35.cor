@@ -1,0 +1,49 @@
+   'CORAL' L35
+   'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+   'LIBRARY' ('INTEGER''PROCEDURE' LEN ('VALUE''INTEGER');
+   'PROCEDURE' CLEAR ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' COPY ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' SPLIT ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' SPLIT ('VALUE''INTEGER' MASTER, ANSWER, SEP);
+       'BEGIN'
+           'INTEGER' P;
+ 
+           'COMMENT' VALIDATE INPUT PARAMETERS;
+           'IF' MASTER=VOID
+           'OR' ANSWER=VOID
+           'OR' SEP=VOID
+           'OR' MASTER=ERROR
+           'OR' ANSWER=ERROR
+           'OR' SEP=ERROR
+           'OR' LEN(MASTER)=0
+           'THEN'
+           'ANSWER' ERROR;
+           P:=LPOS(MASTER,SEP,1);      (LOOK FOR THE SPLIT POSITION)
+           'IF' P<>0
+           'THEN'
+           'BEGIN'
+ 
+               'COMMENT' SPLIT GROUP FOUND CHOP UP INPUT STRING;
+               COPY(LSEG(MASTER,1,P-1),ANSWER);
+               COPY(LSEG(MASTER,P+LEN(SEP),LEN(MASTER)),MASTER);
+           'END'
+           'ELSE'
+           'BEGIN'
+ 
+               'COMMENT' SPLIT GROUP NOT FOUND THERFORE THE INPUT
+                         STRING IS THE REPLY;
+               COPY(MASTER,ANSWER);
+               CLEAR(MASTER);
+           'END';
+           'ANSWER' SUCCESS;
+       'END' OF PROCEDURE SPLIT;
+   'END';
+   'FINISH'

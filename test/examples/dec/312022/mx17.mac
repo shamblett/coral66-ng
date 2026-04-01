@@ -1,0 +1,525 @@
+
+.TITLE MSI STANDARD INTERFACE STAND ALONE I/O CONTROLLER
+	.IDENT /MSIO../
+;
+;
+;
+;
+;
+;.MACRO SERIO $TCHN,$TCSR,$TVEC,$TPRM,$TIBF=10,$TISG=0,$TFIL=0,$TOBL=0
+;
+;
+.MACRO SERIO $TCHN,$TCSR,$TVEC,$TPRM,$TIBF=10,$TISG=0,$TFIL=0,$TOBL=0
+;
+	.MCALL QUEBUF
+;
+;
+	$$STR	=	0	;string mode
+	$$CHAR	=	1	;character mode
+;
+	$TNE	=	1	;automatic echo required on input
+	$TSCP	=	0	;smart erase option required
+	$TESC	=	0	;escape terminates with strings
+	$TPAR	=	0	;remove parity bit on input
+	$TIN	=	0	;INPUT CODE REQUIRED
+	$TOUT	=	0	;OUTPUT CODE REQUIRED
+	$TERM	=	0	;This is a terminal handler
+	$TRXM	=	$$CHAR	;receiver    mode of operation
+	$TTXM	=	$$STR	;transmitter mode of operation
+;
+	.IRP SYM,<$TPRM>
+	.IF NB SYM
+	.IIF IDN SYM,NOECHO	$TNE	=	0
+	.IIF IDN SYM,NOESCAPE	$TESC	=	1
+	.IIF IDN SYM,NOSCOPE	$TSCP	=	1
+	.IIF IDN SYM,NOIN	$TIN	=	1
+	.IIF IDN SYM,NOOUT	$TOUT	=	1
+	.IIF IDN SYM,NOPAR	$TPAR	=	1
+	.IIF IDN SYM,DEVICE	$TERM	=	1
+	.IIF IDN SYM,STRING	$TRXM	=	$$STR
+	.IIF IDN SYM,OCHAR	$TTXM	=	$$CHAR
+	.ENDC
+	.ENDM
+;
+;
+;
+	.SBTTL  CONTROL HANDLER PRESET
+;
+;
+;
+;		CONTROL FLAGS
+;
+	INITIAL =	000001		;PROGRAM NEEDS INITIALISING
+	CRLF	=	000010		;OUTPUT A CRLF TO DEVICE
+;	ECHOIB	=	000020		;ECHO INPUT BUFFER CNT/R OPTION
+	LOSE	=	000040		;DISABLE DATA OUTPUT CNT/0 FUNCTION
+;
+;		STATUS FLAGS
+;
+	TXBUSY	=	000100		;TRANSMITTER SECTION BUSY
+	IPLOST	=	000200		;INPUT CHARACTER HAS BEEN LOST
+	ESCAPC	=	000400		;Escape character terminated string
+;
+;		INTERNAL CONTROL FLAGS
+;
+	NOINC	=	001000		;DONT INCREMENT TXMITTER O/P POINTER
+	FILL	=	002000		;FILLER OUTPUT CHARACTER REQD
+	ECHO	=	004000		;ECHO INPUT READ CHARACTER BUFFER BUSY
+;
+;		CHARACTERISTICS FLAGS
+;
+	TERM	=	010000		;THIS IS A TERMINAL CHANNEL
+	SCOPE	=	020000		;ENABLE VDU SCOPE OPERATIONS
+	NOECHO	=	040000		;THIS IS A READ NO ECHO OPERATION
+	PARITY	=	100000		;LEAVE PARITY BIT ON INPUT CHANNEL
+;
+;
+;
+;	VECTOR AND I/O PAGE REGISTERS LOCATIONS
+;
+	RXVEC	=	$TVEC		;RECIVE VECTOR ADDRESS
+	RXPRI	=	RXVEC+2		;RECIEVER PSW PRIORITY ADDRESS
+	RXSTAT	=	$TCSR		;RECEIVER STATUS REGISTER LOCATION
+	RXBUFF	=	RXSTAT+2	;RECEIVER BUFFER LOCATION
+;
+	TXVEC	=	$TVEC+4		;TRANSMITTER VECTOR ADDRESS
+	TXPRI	=	TXVEC+2		;TRANSMITTER PSW PRIORITY ADDRESS
+	TXSTAT	=	$TCSR+4		;TRANSMITTER STATUS REGISTER LOCATION
+	TXBUFF	=	TXSTAT+2	;TRANSMITTER BUFFER LOCATION
+;
+	BR7	=	000340		;INTERRUPT PROCESSING PRIORITY
+	INTGO	=	000100		;INTERRUPT ENABLE FLAG BIT
+;
+;		CONSTANTS
+;
+	LF	=	000012		;VALUE OF LINE FEED CHARACTER
+	CR	=	000015		;VALUE OF CARRIAGE RETURN
+	ERASE	=	000177		;VALUE OF ERASE CHARACTER
+;
+;
+	$TDEF	=	000000		;CLEAR OUT DEFAULT DEFINITIONS
+	.IIF EQ $TERM	$TDEF = $TDEF!TERM
+	.IIF EQ $TSCP	$TDEF = $TDEF!SCOPE
+	.IIF EQ $TPAR	$TDEF = $TDEF!PARITY
+	.IIF EQ $TNE	$TDEF = $TDEF!NOECHO
+;
+	.PAGE
+	.SBTTL  MACRO CONFIGURATION DESCTIPTION
+;
+;	$TCHN	=	CHANNEL NUMBER
+;	$TCSR	=	BASE CONTOL/STATUS REGISTER
+;	$TVEC	=	BASE VECTOR ADDRESS OF CHANNEL
+;	$TFIL	=	NUMBER OF FILLER CHARACTERS AFTER LINE TERMINATOR
+;	$TIBF	=	NUMBER OF CHARACTERS ALLOWED IN READ AHEAD BUFFER
+;	$TISG	=	NUMBER OF CHARACTERS ALLOWED IN INPUT STRING
+;	$TOBF	=	NUMBER OF CHARACTERS ALLOWED IN OUTPUT RING BUFFER
+;	$TDEF	=	DEFAULT FLAG WORD SETUP FORMAT
+;	$TSCP	=  0	IF SMART SCOPE OPTION ENABLED
+;	$TESC	=  0	IF STRINGS MAY BE TERMINATED BY AN ESCAPE CHARACTER
+;	$TPAR	=  0	IF PARITY BIT TO BE REMOVED
+;	$TNE	=  1	IF AUTOMATIC INPUT ECHO REQUIRED
+;	$TIN	=  0	IF CHANNEL HAS AN INPUT FUNCTION
+;	$TOUT	=  0	IF CHANNEL HAS AN OUTPUT FUNCTION
+;	$TRXM	= $$STR	IF INPUT  CHANNEL CONFIGURED FOR STRING OPERATION
+;	$TTXM	= $$STR IF OUTPUT CHANNEL CONFIGURED FOR STRING OPERATION
+;
+;
+;
+;
+;
+;
+;
+	.PAGE
+	.SBTTL  ENTRY AND EXIT CONDITIONS
+;
+;
+;		PROGRAM OFFSET +6
+;	CHARACTERISTICS AND CONTROL DATA WORD
+;
+;
+;	SOUTaa:: serial output
+;	ENTRY CONDITIONS	(TRANSMIT DATA		ENTRY POINT	+0)
+;	R0 -> ADDRESS OF CHARACTER STRING
+;
+;	EXIT CONTITIONS		(TRANSMIT DATA		ENTRY POINT	+0)
+;	NONE
+;
+;	SINPaa:: serial input
+;	ENTRY CONDITIONS	(RECEIVE  DATA		ENTRY POINT	+2)
+;	NONE
+;
+;	EXIT CONDITIONS		(RECEIVE  DATA		ENTRY POINT	+2)
+;	R0= A CHARACTER/STRING IF STATUS = SUCCESS
+;
+;	SINTaa:: serial initialise
+;	ENTRY CONDITIONS	(INITIALISE SYSTEM	ENTRY POINT	+4)
+;	NONE
+;
+;	EXIT CONDITIONS		(INITIALSE SYSTEM	ENTRY POINT	+4)
+;	SYSTEM INITIALISED
+;
+;
+	.PAGE
+	.SBTTL  ROUTINE ENTRY POINTS AND CONTROL VECTOR WORD
+;
+;
+SIO'$TCHN::			;SERIAL I/O CHANNEL NUMBER '$TCHN
+;
+SOUT'$TCHN::
+		BR	WRIT'$TCHN		;print a character/string
+SINP'$TCHN::
+		BR	READ'$TCHN		;get   a character/string
+SINT'$TCHN::
+		BR	INTS'$TCHN		;initialse system
+;
+SFLG'$TCHN::
+FLAG'$TCHN:	.WORD	INITIAL			;initialisation required
+.IF EQ $TRXM-$$STR				;IF string mode
+SSIZ'$TCHN::
+SSIZE'$TCHN:	.WORD	$TISG			;buffer limit i/p size
+.ENDC
+;
+;
+	.PAGE
+	.SBTTL  INITIALISATION SECTION
+;
+;
+INIT'$TCHN:			;INITIALISATION ROUTINE
+;
+	BIT #INITIAL,FLAG'$TCHN ;TCHN ;IF initialisation required
+	BEQ	INTE'$TCHN	;THEN
+INTS'$TCHN:	
+	MOV #$TDEF,FLAG'$TCHN	;set up default condition of device
+;
+.IF EQ	$TIN			;handler has an input section
+	CALL R$QCLR		;clear out queue buffer using address below
+	INBF'$TCHN		;address of input buffer
+;	CLR INBF'$TCHN		;remove any characters in input buffer
+	MOV #BR7,@#RXPRI	;load receive priority
+	MOV #RXNT'$TCHN,@#RXVEC	;load interrupt vector address
+	BIS #INTGO,@#RXSTAT	;enable input buffer to operate
+.ENDC
+;
+.IF EQ	$TOUT			;handler has an output section
+	MOV #BR7,@#TXPRI	;load transmit priority
+	MOV #TXNT'$TCHN,@#TXVEC	;load transmit vector address
+.ENDC
+;
+INTE'$TCHN:	
+	RETURN			;back to calling program
+;
+;
+	.PAGE
+	.SBTTL  READ A CHARACTER FROM INTERNAL BUFFER
+;
+;
+READ'$TCHN:			;EXTRACT A CHARACTER FROM INPUT BUFFER
+;
+.IF EQ  $TIN			;handler has an input section
+;
+				;COMPILE IF HANDLER HAS AN INPUT SECTION
+;
+.IF EQ	$TRXM-$$STR		;COMPILE THIS CODE IF STRING INPUT REQD
+.IFTF
+	CALL INIT'$TCHN		;ensure system initialised
+.IFT
+ 	MOV R4,-(SP)		;protect register R4
+	TST SSIZE'$TCHN		;IF string read size <=0
+	BLE	5$		;THEN assume maximum buffer size
+	CMP SSIZE'$TCHN,$TISG	;IF read size too big
+	BLE	6$		;THEN
+5$:	MOV $TISG,SSIZE'$TSG	;assume maximum buffer size
+6$:	MOV #SBUF'$TCHN,R4	;hold string buffer address
+	CLR	@R4		;clear out string buffer
+.IF EQ $TESC
+	BIS #ESCAPC,FLAG'$TCHN	;assume string terminated with escape
+.ENDC
+	BR	20$		;bypass append routine
+;
+10$:	CALL R$ADDC		;append a character to string buffer
+	BCS	40$		;IF error condition THEN GOTO exit
+20$:	CMP SBUF'$TCHN,SSIZE'$TCHN
+				;IF string buffer full
+	BLE	35$		;THEN exit
+	CALL R$QREM		;extract a character from read ahead buffer
+	BCC	30$		;IF  no more characters
+	BIT #IPLOST,FLAG'$TCHN	;AND no characters lost
+	BEQ	20$		;THEN wait for more characters to arrive
+	BR	40$		;ELSE exit with error flag
+;
+30$:	CMP #LF,R0		;IF character = line feed
+	BEQ	10$		;THEN lose character
+.IF EQ $TESC
+	CMP #ESC,R0		;IF character = escape
+	BEQ	36$		;THEN assume this is string terminator
+.ENDC
+	CMP #CR,R0		;IF character<> line terminator
+	BNE	10$		;THEN append characters to string
+35$:
+.IF EQ $TESC
+	BIS #ESCAPC,FLAG'$TCHN	;remove escape termination flag
+.ENDC
+36$:	CLC			;ELSE indicate string loaded
+	MOV R4,R0		;hold address of string
+40$:	MOV (SP)+,R4		;restore register R4
+;
+;
+.ENDC
+;
+;
+.IF EQ	$TRXM-$$CHAR		;COMPILE THIS CODE IF CHARACTER INPUT REQD
+	MOV R1,-(SP)		;protect register R1
+	MOV #INBF'$TCHN,R1	;hold address of input buffer queue
+	CALL R$QREM		;get character from buffer
+	MOV (SP)+,R1		;restore register R1
+	BCS	30$		;IF character extracted
+	BIT #NOECHO,FLAG'$TCHN	;AND read with echo
+	BNE	30$		;THEN
+	CALL CHGO'$TCHN		;send character to output
+	CLC			;indicate character arrived OK
+;
+30$:
+;
+.ENDC
+.IFF				;COMPILE IF NO INPUT SECTION
+	SEC			;indicate NO character has arrived (no input)
+.ENDC
+	RETURN			;back to calling program
+;
+;
+	.PAGE
+	.SBTTL	WRITE A DATA STRING TO DEVICE CHANNEL
+;
+;
+;
+WRIT'$TCHN:			;SENT CHARACTERS TO O/P DEVICE
+.IF EQ  $TOUT			;does handler have an output section
+	CALL INIT'$TCHN		;check if initialisation required
+;
+.IF EQ	$TTXM-$$STR		;IF STRING OUTPUT THEN COMPILE THIS CODE
+;
+10$:	BIT #TXBUSY,FLAG'$TCHN	;IF transmitter busy
+	BNE	10$		;THEN loop till free
+	MOV (R0)+,TXCN'$TCHN	;hold count of number of chars to send
+				;AND fudge pointer to data address
+	MOV R0,TXAD'$TCHN	;hold data address
+	TST -(R0)		;fudge pointer back to bytes
+	BR	OPST'$TCHN	;start output channel
+.ENDC
+;
+.IF EQ	$TTXM-$$CHAR		;IF CHARACTER OUTPUT THEN COMPILE THIS CODE
+;
+	CALL CHGO'$TCHN		;send character to output routine
+;
+.ENDC
+;
+;
+.ENDC
+	RETURN			;back to calling program
+;
+;
+	.PAGE
+	.SBTTL INITIATE DATA OUTPUT TRANSFER
+;
+;
+;
+CHGO'$TCHN:			;SEND A CHARACTER TO OUTPUT CHANNEL
+;
+.IF EQ $TOUT
+	BIT #ECHO,FLAG'$TCHN	;IF short o/p buffer engaged
+	BNE	CHGO'$TCHN	;THEN loop till buffer comes free
+	MOV R0,TXCR'$TCHN	;load echo character
+	BIS #ECHO,FLAG'$TCHN	;indicate character to be echoed
+.ENDC
+;
+OPST'$TCHN:			;THIS ROUTINE RESTARTS O/P INTERRUPT ROUTINE
+.IF EQ $TOUT
+	BIT #TXBUSY,FLAG'$TCHN	;IF output routine free
+	BNE	50$		;THEN
+	BIS #TXBUSY,FLAG'$TCHN	;indicate transmitter busy
+	BIS #INTGO,@#TXSTATUS	;start o/p routine
+50$:
+.ENDC
+	RETURN			;back to calling program
+;
+
+;
+	.PAGE
+	.SBTTL RECEIVE INTERRUPT SECTION
+;
+.IF EQ $TIN
+;
+;
+RXNT'$TCHN:			;RECEIVER INTERRUPT PROGRAM
+;
+;
+	MOV R4,-(SP)
+	MOV R0,-(SP)		;protect registers R0 and R4
+	MOVB @#RXBUFF,R0	;hold input character
+	BIT #PARITY,FLAG'$TCHN  ;IF parity bit remove flag set
+	BEQ	10$		;THEN
+	BIC #177600,R0		;remove parity bits
+10$:	BIC #IPLOST,FLAG'$TCHN	;remove lost character flag
+.IF EQ $TERM
+	BIT #TERM,FLAG'$TCHN	;IF this a terminal channel
+	BEQ 	40$		;THEN
+	CMP #17,R0		;	IF this a control/o signal
+	BNE	40$		;	THEN
+	MOV #LOSE,R0		;	hold output control flag
+	XOR R0,FLAG'$TCHN	;	toggle output control flag
+	BR	60$		;EXIT
+;
+40$:
+.ENDC
+	MOV #INBF'$TCHN,R4	;hold input buffer queue address
+	CALL R$QADD		;append character to i/p buffer
+	BCC 60$			;IF operation ok
+	BIS #IPLOST,FLAG'$TCHN	;THEN	indicate character has been lost
+				;	and this is the end of the buffer
+60$:	MOV (SP)+,R0		;restore register R0
+	MOV (SP)+,R4		;restore register R4
+	RTI			;RESUME WORKING POSITION
+;
+.ENDC
+;
+;
+	.PAGE
+;	.SBTTL  TRANSMITTER INTERRUPT SECTION
+;
+;
+;
+.IF EQ	$TOUT
+;
+TXNT'$TCHN:			;TRANSMITTER INTERRUPT ROUTINE
+;
+	MOV R0,-(SP)		;protect register R0
+	BIT #LOSE,FLAG'$TCHN	;IF output to be enabled
+	BNE	45$		;THEN
+	TST TXCN'$TCHN		;IF any more characterss for output
+	BLE	40$		;THEN
+;
+10$:	MOV TXAD'$TCHN,R0	;hold address of data to send
+	BIT #NOINC,FLAG'$TCHN	;IF address to be moved
+	BNE	20$		;THEN
+	INC TXAD'$TCHN		;shove o/p character address on one place
+20$:	DEC TXCN'$TCHN		;reduce character count
+	MOVB @R0,@#TXBUFF	;send character to o/p device
+.IF NE	$TFIL
+	CMP #CR,@R0		;IF character just sent is a line terminator
+	BNE	30$		;THEN
+	TST FLRC'$TCHN		;IF filler characters required
+	BEQ	30$		;THEN
+	BIS #FILL,FLAG'$TCHN	;request filler characters to be output
+.ENDC
+30$:	MOV (SP)+,R0		;restore register R0
+	RTI			;resume normal service
+;
+;
+40$:
+.IF EQ $TERM
+	BIT #CRLF,FLAG'$TCHN	;is crlf to be dumped??
+	BNE	53$		;yep then process at label
+.ENDC
+.IF NE	$TFIL
+	BIT #FILL,FLAG'$TCHN	;are any filler characters reqd at string end
+	BNE	50$		;yep process filler option
+.ENDC
+	BIT #ECHO,FLAG'$TCHN	;is a read character to be echoed??
+	BNE	55$		;process echo character
+45$:	BIC #INTGO,@#TXSTATUS	;switch  of interrupt software
+	CLR TXCN'$TCHN		;indicate no more characters for o/p
+	BIC #ECHO!FILL!CRLF!TXBUSY!NOINC,FLAG'$TCHN
+				;remove all control action flags
+	BR	30$		;go back home
+;
+;
+.IF NE $TFIL
+50$:	MOV #FLR'$TCHN,TXAD'$TCHN
+				;hold filler character address
+	MOV FLRC'$TCHN,TXCN'$TCHN
+				;hold filler repeat count
+	BIC #FILL,FLAG'$TCHN	;remove filler request flag
+	BIS #NOINC,FLAG'$TCHN	;remove data pointer increment faicility
+	BR	10$		;o/p filler characters
+.ENDC
+;
+.IF EQ $TERM
+53$:	MOV #TXNL'$TCHN,TXAD'$TCHN
+				;hold address of line terminator
+	MOV #2,TXCN'$TCHN	;indicate number of characters to be o/p
+	BIC #CRLF,FLAG'$TCHN	;remove control flag
+	BR	10$		;o/p line terminator
+.ENDC
+;
+55$:
+.IF EQ $TERM
+	BIT #TERM,FLAG'$TCHN	;IF terminal type channel
+	BEQ	57$		;THEN
+	MOV TXCR'$TCHN,R0	;hold character value
+	BIC #177600,R0		;strip off parity and junk bits
+	CMP #ERASE,R0		;IF character = erase
+	BNE	57$		;THEN
+	BIT #SCOPE,FLAG'$TCHN	;IF smart erase
+	BEQ	56$		;THEN
+	
+	MOV #TXSM'$TCHN,TXAD'$TCHN
+				;hold address of smart erase characters
+	MOV #3,TXCN'$TCHN	;number of characters to o/p
+	BR	58$		;ELSE
+;
+56$:	MOV #'\,TXCR'$TCHN	; replace erase character with printer char
+.ENDC
+;
+57$:	MOV #TXCR'$TCHN,TXAD'$TCHN
+				;hold address of read echo character
+	INC TXCN'$TCHN		;indicate one character for o/p
+58$:	BIC #ECHO!NOINC,FLAG'$TCHN
+				;remove character echo request
+	BR	10$		;o/p echo character
+;
+.ENDC
+;
+;
+	.PAGE
+	.SBTTL DATA AREAS
+;
+.IF EQ $TOUT
+;
+TXCN'$TCHN:	.WORD	0	;OUTPUT CHARACTER COUNTER
+TXAD'$TCHN:	.WORD	0	;ADDRESS OF OUTPUT BUFFER
+TXCR'$TCHN:	.WORD	0	;STORE AREA FOR ECHO OPERATIONS
+.IF EQ $TERM
+TXSM'$TCHN:	.BYTE	10,40,10,0	;backspace space backspace null
+TXNL'$TCHN:	.BYTE	CR,LF	;line terminator characters
+.ENDC
+.IF NE $TFIL
+FLR'$TCHN:	.WORD	0	;ZERO FILLER CHARACTER
+FLRC'$TCHN:	.WORD	$TFIL	;USE $TFIL FILLER CHARACTERS
+.ENDC
+.ENDC
+;
+;
+;
+.IF EQ  $TIN
+;
+	QUEBUF $TIBF,INBF'$TCHN	;reserve area for que buffer
+;
+.ENDC
+;
+;
+.IF EQ	$TRXM-$$STR
+		.WORD	$TISG	;max number of characters in string
+SBUF'$TCHN:	.WORD	0	;number of characters in string
+		.BLKB	$TISG	;reserve area for string storage
+		.EVEN		;ensure array in word boundary
+		
+.ENDC
+;
+;
+;
+;
+	.ENDM	SERIO
+;
+;
+;
+	.END

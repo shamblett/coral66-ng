@@ -1,0 +1,545 @@
+'comment' -----------------------------------------------------------------
+ -
+ -  File:
+ -
+ -     bench.cor
+ -
+ -  Credits:
+ -
+ -     C version of the systems programming language benchmark 
+ -     Author:  M. J. Jordan  Cambridge Computer Laboratory. 
+ -     
+ -     Modified by:  M. Richards, Nov 1996
+ -       to be ANSI C and runnable on 64 bit machines + other minor changes
+ -     Modified by:  M. Richards, 20 Oct 1998
+ -       made minor corrections to improve ANSI compliance (suggested
+ -       by David Levine)
+ -
+ -     Translated by:  Chris Nettleton <cnettleton@acm.org>, Nov 2000
+ -       translated bench.c into Coral 66
+ -
+ -  Description:
+ -
+ -     "This benchmark is designed to be a machine and language
+ -     independent test of Systems Implementation Languages. The test
+ -     itself simulates part of a light weight kernel of a
+ -     multi-tasking operating system.  It spends its time packing and
+ -     unpacking small messages and passing them between simulated
+ -     tasks and devices under the control of a scheduler."
+ -
+ -  Notes:
+ -
+ -     Lack of first class procedure variables forced the Coral 66 version
+ -     to use a small integer to refer to the several functions called by
+ -     the scheduler. The integer values are defined "idlefn_num" etc.
+ -
+ -     Coral 66 also lacks a structure type (i.e. a table type) for which
+ -     a pointer type can be built. We therefore resort to anonymous 
+ -     reference to access the structure fields, and define all these as
+ -     macros.
+ -
+ -     In procedure schedule, the Coral version uses an if statement rather
+ -     than a switch, and it is this that is responsible for the slighlty
+ -     slower running time for the Coral version. Example times are 1101
+ -     mSec for C and 1275 mSec for Coral.
+ -
+ -     The Coral version is also slightly larger than the C version. This 
+ -     mainly due to the use of Coral IO functions instead of printf.
+ -
+ -  Revision:
+ -
+ -     $Id: $
+ -
+ --------------------------------------------------------------------------;
+
+'common' (
+   'procedure' outchar ('value''integer','value''integer');
+   'procedure' outstring ('value''integer','value''integer');
+   'procedure' outinteger ('value''integer','value''integer');
+   'procedure' outnewline ('value''integer');
+)
+
+'external' (
+   'integer''procedure' malloc ('value''integer');
+)
+
+'common' (
+   'comment'  We declare these here to avoid forward references;
+
+   'procedure' append ('value''integer', 'value''integer');
+   'integer''procedure' idlefn ('value''integer');
+   'integer''procedure' workfn ('value''integer');
+   'integer''procedure' handlerfn ('value''integer');
+   'integer''procedure' devfn ('value''integer');
+)
+
+'include' "time.cor";
+
+'define' Count "10000";
+'define' Qpktcountval "23246";
+'define' Holdcountval "9297";
+
+'define' TRUE "1";
+'define' FALSE "0";
+'define' MAXINT "32767";
+
+'define' BUFSIZE "3";
+
+'define' I_IDLE "1";
+'define' I_WORK "2";
+'define' I_HANDLERA "3";
+'define' I_HANDLERB "4";
+'define' I_DEVA "5";
+'define' I_DEVB "6";
+
+'define' PKTBIT "1";
+'define' WAITBIT "2";
+'define' HOLDBIT "4";
+'define' NOTHOLDBIT "'hex' (FFFB)";
+
+'define' S_RUN "0";
+'define' S_RUNPKT "1";
+'define' S_WAIT "2";
+'define' S_WAITPKT "3";
+'define' S_HOLD "4";
+'define' S_HOLDPKT "5";
+'define' S_HOLDWAIT "6";
+'define' S_HOLDWAITPKT "7";
+
+'define' K_DEV "1000";
+'define' K_WORK "1001";
+
+'comment' Definitions for struct packet;
+
+'define' p_link (Base) "[Base]";
+'define' p_id (Base)   "[Base + 4]";
+'define' p_kind (Base) "[Base + 8]";
+'define' p_a1 (Base)   "[Base + 12]";
+'define' p_a2 (Base, Index)   "[Base + 16 + 4 * Index]";
+
+'define' sizeof_packet "32";
+
+
+'comment' Definitions for struct task;
+
+'define' t_link (Base)  "[Base + 0]";
+'define' t_id (Base)    "[Base + 4]";
+'define' t_pri (Base)   "[Base + 8]";
+'define' t_wkq (Base)   "[Base + 12]";
+'define' t_state (Base) "[Base + 16]";
+'define' t_fn (Base)    "[Base + 20]";
+'define' t_v1 (Base)    "[Base + 24]";
+'define' t_v2 (Base)    "[Base + 28]";
+
+'define' sizeof_task "32";
+
+'define' idlefn_num "1";
+'define' workfn_num "2";
+'define' handlerfn_num "3";
+'define' devfn_num "4";
+
+'begin'
+
+   'byte''array' alphabet [1:26] := "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+   'integer''array' tasktab[0:10] := 
+      10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+   'integer' tasklist;
+   'integer' tcb;
+
+   'integer' taskid;
+   'integer' v1;
+   'integer' v2;
+   'integer' qpktcount;
+   'integer' holdcount;
+   'integer' tracing;
+   'integer' layout;
+
+
+   'procedure' createtask (
+      'value''integer' id, pri, wkq, state;
+      'value''integer' fn;
+      'value''integer' v1, v2);
+   'begin'
+      'integer' t;
+
+       t := malloc (sizeof_task);
+
+       tasktab [id] := t;
+       t_link (t) := tasklist;
+       t_id (t) := id;
+       t_pri (t) := pri;
+       t_wkq (t) := wkq;
+       t_state (t) := state;
+       t_fn (t) := fn;
+       t_v1 (t) := v1;
+       t_v2 (t) := v2;
+       tasklist := t
+   'end' createtask;
+
+
+   'integer''procedure' pkt ('value''integer' link, id, kind);
+   'begin'
+      'integer' i;
+      'integer' p;
+
+      p := malloc (sizeof_packet);
+
+      'for' i := 0 'step' 1 'until' BUFSIZE 'do'
+         p_a2 (p, i) := 0;
+
+      p_link (p) := link;
+      p_id (p) := id;
+      p_kind (p) := kind;
+      p_a1 (p) := 0;
+
+      'answer' p
+   'end' pkt;
+
+
+   'procedure' trace ('value''integer' a);
+   'begin'
+      layout := layout - 1;
+
+      'if' layout <= 0 'then'
+      'begin'
+         outnewline (1);
+         layout := 50
+      'end';
+
+      outchar (1, a)
+   'end' trace;
+
+
+   'procedure' schedule;
+   'begin'
+      'integer' i;
+
+      'for' i := i 'while' tcb <> 0 'do'
+         'begin'
+            'integer' pkt, newtcb;
+
+            pkt := 0;
+
+            'if' t_state (tcb) = S_WAITPKT 'then'
+               'begin'
+                   pkt := t_wkq (tcb);
+                   t_wkq (tcb) := p_link (pkt);
+
+                   t_state (tcb) :=
+                      'if' t_wkq (tcb) = 0 'then' S_RUN 'else' S_RUNPKT
+               'end';
+
+            'if' t_state (tcb) = S_RUN 'or'
+                 t_state (tcb) = S_WAITPKT 'or'
+                 t_state (tcb) = S_RUNPKT 'then'
+               'begin'
+                   taskid := t_id (tcb);
+                   v1 := t_v1 (tcb);
+                   v2 := t_v2 (tcb);
+
+                   'if' tracing = TRUE 'then'
+                      trace (taskid + 'literal' (0));
+
+                   'if' t_fn (tcb) = idlefn_num 'then'
+                      newtcb := idlefn (pkt)
+                   'else''if' t_fn (tcb) = workfn_num 'then'
+                      newtcb := workfn (pkt)
+                   'else''if' t_fn (tcb) = handlerfn_num 'then'
+                      newtcb := handlerfn (pkt)
+                   'else''if' t_fn (tcb) = devfn_num 'then'
+                      newtcb := devfn (pkt);
+
+                   t_v1 (tcb) := v1;
+                   t_v2 (tcb) := v2;
+                   tcb := newtcb
+               'end'
+            'else''if' t_state (tcb) = S_WAIT 'or'
+                       t_state (tcb) = S_HOLD 'or'
+                       t_state (tcb) = S_HOLDPKT 'or'
+                       t_state (tcb) = S_HOLDWAIT 'or'
+                       t_state (tcb) = S_HOLDWAITPKT 'then'
+               'begin'
+                  tcb := t_link (tcb)
+               'end'
+            'else' 'goto' L99
+         'end';
+L99:
+   'end' schedule;
+
+
+   'integer''procedure' wait;
+   'begin'
+      t_state (tcb) := t_state (tcb) 'union' WAITBIT;
+      'answer' tcb
+   'end' wait;
+
+
+   'integer''procedure' holdself;
+   'begin'
+      holdcount := holdcount + 1;
+      t_state (tcb) := t_state (tcb) 'union' HOLDBIT;
+      'answer' t_link (tcb)
+   'end' holdself;
+
+
+   'integer''procedure' findtcb ('value''integer' id);
+   'begin'
+      'integer' t;
+
+      t := 0;
+
+      'if' 1 <= id 'and' id <= tasktab [0] 'then'
+         t := tasktab [id];
+
+      'if' t = 0 'then'
+         'begin'
+            outnewline (1);
+            outstring (1, "Bad task id ");
+            outinteger (1, id);
+            outnewline (1)
+         'end';
+
+      'answer' t
+   'end' findtcb;
+
+
+   'integer''procedure' release ('value''integer' id);
+   'begin'
+       'integer' t;
+
+       t := findtcb (id);
+       'if' t = 0 'then' 'answer' 0;
+
+       t_state (t) := t_state (t) 'mask' NOTHOLDBIT;
+
+       'if' t_pri (t) > t_pri (tcb) 'then' 'answer' t;
+
+      'answer' tcb
+   'end' release;
+
+
+   'integer''procedure' qpkt ('value''integer' pkt);
+   'begin'
+      'integer' t;
+
+       t := findtcb (p_id (pkt));
+       'if' t = 0 'then' 'answer' t;
+
+       qpktcount := qpktcount + 1;
+
+       p_link (pkt) := 0;
+       p_id (pkt) := taskid;
+
+      'if' t_wkq (t) = 0 'then'
+         'begin'
+            t_wkq (t) := pkt;
+            t_state (t) := t_state (t) 'union' PKTBIT;
+
+            'if' t_pri (t) > t_pri (tcb) 'then' 'answer' t
+         'end'
+      'else'
+         'begin'
+            append (pkt, 'location'(t_wkq (t)))
+         'end';
+
+      'answer' tcb
+   'end' qpkt;
+
+
+   'integer''procedure' idlefn ('value''integer' pkt);
+   'begin'
+      v2 := v2 - 1;
+
+      'if' v2 = 0 'then' 'answer' holdself;
+
+      'if' (v1 'mask' 1) = 0 'then'
+         'begin'
+            v1 := 'integer'(v1 'srl' 1) 'mask' MAXINT;
+
+            'answer' release (I_DEVA)
+         'end'
+      'else'
+         'begin'
+            v1 := 'integer'('integer'(v1 'srl' 1) 
+               'mask' MAXINT) 'differ' 'hex'(D008);
+
+            'answer' release (I_DEVB)
+        'end'
+    'end' idlefn;
+
+
+   'integer''procedure' workfn ('value''integer' pkt);
+   'begin'
+      'if' pkt = 0 'then' 'answer' wait
+      'else'
+         'begin'
+            'integer' i;
+
+            v1 := I_HANDLERA + I_HANDLERB - v1;
+            p_id (pkt) := v1;
+
+            p_a1 (pkt) := 0;
+
+            'for' i := 0 'step' 1 'until' BUFSIZE 'do'
+            'begin'
+               v2 := v2 + 1;
+               'if' v2 > 26 'then' v2 := 1;
+                p_a2 (pkt, i) := alphabet [v2]
+            'end';
+
+            'answer' qpkt (pkt)
+         'end'
+   'end' workfn;
+
+
+   'integer''procedure' handlerfn ('value''integer' pkt);
+   'begin'
+      'if' pkt <> 0 'then' 
+         append (pkt, 'if' p_kind (pkt) = K_WORK 
+                      'then' 'location'(v1) 
+                      'else' 'location'(v2));
+
+      'if' v1 <> 0 'then'
+      'begin'
+         'integer' count, workpkt;
+
+         workpkt := v1;
+         count := p_a1 (workpkt);
+
+         'if' count > BUFSIZE 'then'
+            'begin'
+               v1 := p_link (v1);
+
+               'answer' qpkt (workpkt)
+            'end';
+
+         'if' v2 <> 0 'then'
+         'begin'
+            'integer' devpkt;
+
+            devpkt := v2;
+            v2 := p_link (v2);
+            p_a1 (devpkt) := p_a2 (workpkt, count);
+            p_a1 (workpkt) := count + 1;
+
+            'answer' qpkt (devpkt)
+         'end'
+      'end';
+
+      'answer' wait
+   'end' handlerfn;
+
+
+   'integer''procedure' devfn ('value''integer' pkt);
+   'begin'
+      'if' pkt = 0 'then'
+         'begin'
+            'if' v1 = 0 'then' 'answer' wait;
+
+            pkt := v1;
+            v1 := 0;
+            'answer' qpkt (pkt)
+         'end'
+      'else'
+         'begin'
+            v1 := pkt;
+
+            'if' tracing = TRUE 'then' trace (p_a1 (pkt));
+            'answer' holdself
+         'end'
+   'end' devfn;
+
+
+   'procedure' append ('value''integer' pkt, ptr);
+   'begin'
+      'for' p_link (pkt) := 0 'while' p_link (ptr) <> 0 'do'
+         ptr := p_link (ptr);
+
+      p_link (ptr) := pkt
+   'end' append;
+
+
+   'integer' wkq;
+   'long''integer' starttime, stoptime;
+
+   'comment' main program starts here;
+
+   tasklist := 0;
+   tracing := TRUE;
+   layout := 0;
+   wkq := 0;
+
+   outstring (1, "Bench mark starting");
+   outnewline (1);
+
+   starttime := clock;
+
+   createtask (I_IDLE, 0, wkq, S_RUN, idlefn_num, 1, Count);
+
+   wkq := pkt (0, 0, K_WORK);
+   wkq := pkt (wkq, 0, K_WORK);
+
+   createtask (I_WORK, 1000, wkq, S_WAITPKT, workfn_num, I_HANDLERA, 0);
+
+   wkq := pkt (0, I_DEVA, K_DEV);
+   wkq := pkt (wkq, I_DEVA, K_DEV);
+   wkq := pkt (wkq, I_DEVA, K_DEV);
+
+   createtask (I_HANDLERA, 2000, wkq, S_WAITPKT, handlerfn_num, 0, 0);
+
+   wkq := pkt (0, I_DEVB, K_DEV);
+   wkq := pkt (wkq, I_DEVB, K_DEV);
+   wkq := pkt (wkq, I_DEVB, K_DEV);
+
+   createtask (I_HANDLERB, 3000, wkq, S_WAITPKT, handlerfn_num, 0, 0);
+
+   wkq := 0;
+   createtask (I_DEVA, 4000, wkq, S_WAIT, devfn_num, 0, 0);
+   createtask (I_DEVB, 5000, wkq, S_WAIT, devfn_num, 0, 0);
+
+   tcb := tasklist;
+
+   qpktcount := 0;
+   holdcount := 0;
+
+   outstring (1, "Starting");
+   outnewline (1);
+
+   tracing := FALSE;
+   layout := 0;
+
+   schedule;
+
+   stoptime := clock;
+
+
+   outnewline (1);
+   outstring (1, "finished");
+   outnewline (1);
+   outstring (1, "qpkt count = ");
+   outinteger (1, qpktcount);
+   outstring (1, "  holdcount = ");
+   outinteger (1, holdcount);
+   outnewline (1);
+
+   outstring (1, "These results are ");
+
+   'if' qpktcount = Qpktcountval 'and' holdcount = Holdcountval 'then'
+      outstring (1, "correct")
+   'else' 
+      outstring (1, "incorrect");
+   outnewline (1);
+
+   outnewline (1);
+   outstring (1, "end of run");
+   outnewline (1);
+
+
+   outstring (1, "Time taken = ");
+   outinteger (1, 1000 * (stoptime - starttime) / CLOCKS PER SEC);
+   outstring (1, " milliseconds");
+   outnewline (1)
+
+'end'
+

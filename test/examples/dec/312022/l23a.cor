@@ -1,0 +1,48 @@
+   'CORAL' L23A
+   'LIBRARY' (
+ 
+ 
+   'INTEGER''PROCEDURE' GETTIM  ('INTEGER''ARRAY'));
+   'COMMON'('FLOATING''PROCEDURE' CLOCK ('VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'FLOATING''PROCEDURE' CLOCK ('VALUE''INTEGER' ACTION);
+       'BEGIN'
+           'FLOATING' INITIAL:=0;
+           'FLOATING' TIMBUILD;
+           'FLOATING' WAISTED:=0;
+           'FLOATING' VACANT:=0;
+           'INTEGER''ARRAY' TIME [0:8];
+           GETTIM(TIME);
+           TIM BUILD:=TIME[3];
+           TIM BUILD:=TIM BUILD*60+TIME[4];
+           TIM BUILD:=TIM BUILD*60+TIME[5]; (EVALUATE TIME AS SECONDS)
+           'IF' ACTION=-1 
+           'OR' INITIAL=0
+           'THEN' 
+           'BEGIN'
+               INITIAL:=TIM BUILD; (DATA SET UP)
+               VACANT:=0;  (NO WAISTED TIME)
+           'END';
+           'IF' ACTION=0  
+           'THEN' 
+           'ANSWER' TIM BUILD;  (ANSWER PRESENT TIME IN SECONDS)
+           'IF' ACTION=-2 
+           'THEN' 
+           'ANSWER' TIM BUILD-INITIAL; (OVERALL TIME)
+           'IF' ACTION=-3 
+           'THEN' 
+           'ANSWER' TIM BUILD-VACANT-INITIAL;  (USED TIME)
+           'IF' ACTION=-4 
+           'THEN' 
+           'ANSWER' VACANT; (WAISTED TIME)
+           'IF' ACTION=-5 
+           'THEN' WAISTED:=TIM BUILD;
+           'IF' ACTION=-6 
+           'THEN' VACANT:=VACANT+TIM BUILD-WAISTED;
+           'ANSWER' INITIAL;  (DEFAULT CONIDITION INITIAL TIME)
+       'END'OF PROCEDURE CLOCK;
+   'END';
+   'FINISH'

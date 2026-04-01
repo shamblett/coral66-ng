@@ -1,0 +1,16 @@
+   'CORAL' P5 RED MODULE
+ 
+ 
+   'LIBRARY' ('PROCEDURE' CHPEN ('LOCATION''INTEGER'));
+   'COMMON' ('PROCEDURE' RED);
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' RED;
+       'BEGIN'
+           'INTEGER' COLOUR:=2;
+           CHPEN(COLOUR);
+       'END'OF PROCEDURE RED;
+   'END';
+   'FINISH'

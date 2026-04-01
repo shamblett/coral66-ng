@@ -1,0 +1,69 @@
+   'CORAL' L4
+   'INCLUDE' "[200,25]GENDEF.COR"
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'INTEGER''PROCEDURE'  LEN   ('VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' COPY('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' COPY ('VALUE''INTEGER' FROM, TO);
+       'BEGIN'
+           'INTEGER' RECIVE POINTER, COUNT;
+           'INTEGER' WORKSPACE, LENGTH, BYTE POSITION, MAX STR LENGTH, LOAD POINTER;
+           'OVERLAY' WORKSPACE 'WITH' 'BYTE''ARRAY' CHARS[0:1];
+           'IF'  TO = VOID
+           'OR'  TO = ERROR
+           'THEN'
+           'ANSWER' ERROR;
+           'IF' [TO - 2] > 0
+           'THEN'
+           'BEGIN'
+               [TO] := 0;   (CLEAR OUT OUTPUT STRING)
+               'IF' FROM = VOID
+               'OR' FROM = ERROR
+               'THEN'
+               'ANSWER' ERROR
+               'ELSE'
+               'BEGIN'
+                   RECIVE POINTER:=2;            (SET UP INITIAL POINTER POSITION)
+                   WORKSPACE     :=0;            (CLEAR WORK SPACE)
+                   MAX STR LENGTH:=[TO-2];       (HOLD MAXIMUM BUFFER SIZE)
+                   LENGTH        := 0;           (PRESET LENGTH OF NEW STRING)
+                   BYTE POSITION := 0;           (INDICATE BYTE TO LOAD)
+                   LOAD POINTER  := LENGTH +1;   (SET UP OUTPUT LOAD POINTER)
+                   'IF' BYTE POSITION <> 0
+                   'THEN' WORKSPACE:=[TO + LOAD POINTER]
+                   'ELSE' LOAD POINTER := LOAD POINTER +1;
+                   'FOR' COUNT:=1 'STEP' 1 'UNTIL' LEN(FROM) 'DO'
+                   'BEGIN'
+                       'IF' LENGTH< MAX STR LENGTH
+                       'THEN'
+                       'BEGIN'
+                           CHARS[BYTE POSITION]:=[FROM+RECIVE POINTER];
+                           RECIVE POINTER:=RECIVE POINTER +1;
+                           LENGTH:=LENGTH+1;
+                           BYTE POSITION:=BYTE POSITION+1; (MOVE POINTER TO NEXT BYTE TO LOAD)
+                           'IF' BYTE POSITION=2
+                           'THEN'
+                           'BEGIN'
+                               BYTE POSITION:=0;  (RESET NEXT BYTE LOAD POINTER)
+                               [TO + LOAD POINTER]:=WORK SPACE; (LOAD OUT DATA)
+                               WORKSPACE:=0; (CLEAR WORK SPACE)
+                               LOAD POINTER:= LOAD POINTER+2; (INDEX TO NEXT WORD TO OUTPUT)
+                           'END';
+                       'END';
+                   'END';
+                   [TO]:=LENGTH; (LOAD OUT TOTAL STRING LENGTH)
+                   'IF' BYTE POSITION <> 0
+                   'THEN' [TO + LOAD POINTER]:= WORKSPACE; (LOAD OUT LAST CHARACTER IF REQUIRED)
+               'END';
+           'END';
+           'ANSWER' SUCCESS;
+       'END' OF COPY PROCEDURE;
+   'END';
+   'FINISH'

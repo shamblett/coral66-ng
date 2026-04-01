@@ -1,0 +1,226 @@
+   'CORAL' L7E
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'PROCEDURE'          RT04TX ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' RT04FLG('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS ('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON'('INTEGER''PROCEDURE' RTOUT('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+       'COMMENT' MACRO SYMBOL DEFINITIONS;
+       'INCLUDE' "[200,25]GENDEF.COR"
+ 
+ 
+       'INTEGER''PROCEDURE' RTOUT ('VALUE''INTEGER' MODE, STRING,DEVICE);
+ 
+       'COMMENT' DATA DECLARATIONS;
+       'BEGIN'
+           'INTEGER' TYPE:=0;
+           'BYTE''ARRAY' CRLFDATA [0:3]:=2,0,10,13;
+           'BYTE''ARRAY' CRDATA [0:3]:=1,0,13,0;
+           'BYTE''ARRAY' LFDATA [0:3]:=1,0,10,0;
+           'BYTE''ARRAY' REFDATA [0:3]:=1,0,29;
+           'BYTE''ARRAY' CLEARSDATA[0:9]:=8,0,28,29,0,0,0,0,0,0;
+           'BYTE''ARRAY' CLEAREDATA[0:9]:=8,0,31,29,0,0,0,0,0,0;
+           'BYTE''ARRAY' CLEARLDATA[0:5]:=3,0,30,10,13;
+           'BYTE''ARRAY' CURDATA [0:7]:=5,0,20,0,0,0,0;
+           'BYTE''ARRAY'  FBD [0:3]:=1,0,24,0;
+           'BYTE''ARRAY'  FED [0:3]:=1,0,25,0;
+           'BYTE''ARRAY'  CBD [0:3]:=1,0,26,0;
+           'BYTE''ARRAY'  CED [0:3]:=1,0,27,0;
+           'BYTE''ARRAY' DSBD [0:3]:=1,0,5,0;
+           'BYTE''ARRAY' DSED [0:3]:=1,0,8,0;
+           'BYTE''ARRAY' FL [0:7]:=4,0,0,0,0,0,0,0;
+           'OVERLAY' CURDATA [3] 'WITH' 'BYTE' C10S;
+           'OVERLAY' CURDATA [3] 'WITH' 'BYTE' COLT1;
+           'OVERLAY' CURDATA [4] 'WITH' 'BYTE' C1S;
+           'OVERLAY' CURDATA [4] 'WITH' 'BYTE' ROWT1;
+           'OVERLAY' CURDATA [5] 'WITH' 'BYTE' R10S;
+           'OVERLAY' CURDATA [6] 'WITH' 'BYTE' R1S;
+           'OVERLAY' CURDATA [6] 'WITH' 'BYTE' COLUMN;
+           'OVERLAY' CURDATA [7] 'WITH' 'BYTE' ROW;
+           'OVERLAY' CURDATA [6] 'WITH' 'INTEGER'  POSITION;
+           'INTEGER' CRLF,REF,CLEARE,CLEARL,CLEARS,CR,LF,CUR;
+           'INTEGER' FB, FE, CB, CE, DSB, DSE, FILER;
+ 
+           'COMMENT' STRING POINTER ASSIGMENTS;
+           'BEGIN'
+               CRLF:=  'LOCATION' (CRLFDATA[0]);
+               CR:=    'LOCATION' (CRDATA[0]);
+               LF:=    'LOCATION' (LFDATA[0]);
+               REF:=   'LOCATION' (REFDATA[0]);
+               CLEARS:='LOCATION' (CLEARSDATA[0]);
+               CLEARL:='LOCATION' (CLEARLDATA[0]);
+               CLEARE:='LOCATION' (CLEAREDATA[0]);
+               CUR:=   'LOCATION' (CURDATA[0]);
+               FB:=    'LOCATION' (FBD[0]);
+               FE:=    'LOCATION' (FED[0]);
+               CB:=    'LOCATION' (CBD[0]);
+               CE:=    'LOCATION' (CED[0]);
+               DSB:=   'LOCATION' (DSBD[0]);
+               DSE:=   'LOCATION' (DSED[0]);
+               FILER:= 'LOCATION' (FL[0]);
+ 
+               'COMMENT' START OF PROGRAM;
+               'IF' RT04FLG(ON,DEVICE)=SUCCESS
+               'THEN'
+               'BEGIN'
+                   'IF' LPOS(MODE,"SETCUR",1)<>0
+                   'THEN'
+                   'BEGIN'
+                       'IF' TYPE=0
+                       'THEN'
+                       'BEGIN'
+                           POSITION:=STRING;
+                           C10S:=COLUMN/10;
+                           COLUMN:=COLUMN-C10S*10;
+                           C1S:=COLUMN;
+                           R10S:=ROW/10;
+                           ROW:=ROW-R10S*10;
+                           R1S:=ROW;
+                       'END'
+                       'ELSE'
+                       'BEGIN'
+                           CURDATA[0]:=3;  (LENGTH 3 CHARACTERS)
+                           CURDATA[2]:=14;  (CURSOR CONTROL CODE)
+                           POSITION:=STRING;  (HOLD INPUT DATA)
+                           COLT1:=COLUMN;  (LOAD COLUMN ADDRESS)
+                           ROWT1:=ROW;  (LOAD LINE AND PAGE ADDRESS)
+                       'END';
+                       RT04TX(CUR);
+                       'IF' TYPE=1
+                       'THEN' RT04TX(FILER);
+                   'END'
+                   'ELSE'
+                   'BEGIN'
+                       'IF' LPOS(MODE,"ASSIGN",1)<>0
+                       'THEN'
+                       'BEGIN'
+                           RT04TX(STRING);
+                           'IF' LPOS(MODE,"TYPE1",1)<>0
+                           'THEN'
+                           'BEGIN'
+ 
+                               'COMMENT' CODE CONVERSION SECTION NEW TYPE RT04S;
+                               TYPE:=1;  (INDICATE TYPE 1 RT04S)
+                               REFDATA   [2]:=12;
+                               CLEARSDATA[2]:=22;
+                               CLEARSDATA[3]:=12;
+                               CLEAREDATA[2]:=21;
+                               CLEAREDATA[3]:=12;
+                               CLEARLDATA[2]:=20;
+                               FBD       [0]:=2;
+                               FBD       [2]:=30;
+                               FBD       [3]:=32;
+                               FED       [0]:=2;
+                               FED       [2]:=31;
+                               FED       [3]:=32;
+                               CBD       [2]:=6;
+                               CED       [2]:=7;
+                               DSBD      [2]:=28;
+                               DSED      [2]:=29;
+                           'END'
+                           'ELSE'
+                           'BEGIN'
+ 
+                               'COMMENT' CODE CONVERSION SECTION OLD TYPE RT04S;
+                               TYPE:=0;   (INDICATE TYPE 0 RT04S)
+                               REFDATA   [2]:=29;
+                               CLEARSDATA[2]:=28;
+                               CLEARSDATA[3]:=29;
+                               CLEAREDATA[2]:=31;
+                               CLEAREDATA[3]:=29;
+                               CLEARLDATA[2]:=30;
+                               FBD       [0]:=1;
+                               FBD       [2]:=24;
+                               FBD       [3]:=0;
+                               FED       [0]:=1;
+                               FED       [2]:=25;
+                               FED       [3]:=0;
+                               CBD       [2]:=26;
+                               CED       [2]:=27;
+                               DSBD      [2]:=5;
+                               DSED      [2]:=8;
+                           'END';
+                       'END'
+                       'ELSE'
+                       'BEGIN'
+                           'IF' LPOS(MODE,"FB",1)<>0
+                           'OR' LPOS(MODE,"FLASH",1)<>0
+                           'THEN' RT04TX(FB);
+                           'IF' LPOS(MODE,"CB",1)<>0
+                           'THEN' RT04TX(CB);
+                           'IF' LPOS(MODE,"CE",1)<>0
+                           'THEN' RT04TX(CE);
+                           'IF' LPOS(MODE,"DSB",1)<>0
+                           'OR' LPOS(MODE,"RVB",1)<>0
+                           'THEN' RT04TX(DSB);
+                           'IF' LPOS(MODE,"DSE",1)<>0
+                           'OR' LPOS(MODE,"RVE",1)<>0
+                           'THEN' RT04TX(DSE);
+                           'IF' LPOS(MODE,"CR",1)<>0
+                           'THEN'
+                           'BEGIN'
+                               RT04TX(CR);
+                               'IF' TYPE=1
+                               'THEN' RT04TX(FILER);
+                           'END';
+                           'IF' LPOS(MODE,"LF",1)<>0
+                           'THEN'
+                           'BEGIN'
+                               RT04TX(LF);
+                               'IF' TYPE=1
+                               'THEN' RT04TX(FILER);
+                           'END';
+                           'IF' LPOS(MODE,"PRE",1)<>0
+                           'THEN'
+                           'BEGIN'
+                               RT04TX(CRLF);
+                               'IF' TYPE=1
+                               'THEN' RT04TX(FILER);
+                           'END';
+                           'IF' LPOS(MODE,"REF",1)<>0
+                           'THEN' RT04TX(REF);
+                           'IF' LPOS(MODE,"CLEARS",1)<>0
+                           'THEN' RT04TX(CLEARS);
+                           'IF' STRING  <> VOID
+                           'AND' STRING <> ERROR
+                           'THEN'
+                           'BEGIN'
+                               'IF' LPOS(MODE,"O",1)<>0
+                               'OR' LPOS(MODE,"FLASH",1)<>0
+                               'THEN' RT04TX(STRING);
+                           'END';
+                           'IF' LPOS(MODE,"FE",1)<>0
+                           'OR' LPOS(MODE,"FLASH",1)<>0
+                           'THEN' RT04TX(FE);
+                           'IF' LPOS(MODE,"CLEARE",1)<>0
+                           'THEN' RT04TX(CLEARE);
+                           'IF' LPOS(MODE,"CLEARL",1)<>0
+                           'THEN' RT04TX(CLEARL);
+                           'IF' LPOS(MODE,"NL",1)<>0
+                           'OR' LPOS(MODE,"END",1)<>0
+                           'THEN'
+                           'BEGIN'
+                               RT04TX(CRLF);
+                               'IF' TYPE=1
+                               'THEN' RT04TX(FILER);
+                           'END';
+                           'IF' LPOS(MODE,"RET",1)<>0
+                           'THEN'
+                           'BEGIN'
+                               RT04TX(CR);
+                               'IF' TYPE=1
+                               'THEN' RT04TX(FILER);
+                           'END';
+                       'END';
+                   'END';
+               'END';
+           'END';
+       'END';
+   'END';
+   'FINISH'

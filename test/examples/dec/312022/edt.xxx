@@ -1,0 +1,223 @@
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+			PAGE	1 OF	4
+			-----------------
+
+QUIT
+----    
+This method of exiting from EDT behaves as kill does in EDI.
+ie. no output created and no modifications to the input file.
+quit may be used at any time other than when you are using
+the conditional command mode in this case quit just stops
+the conditional command. once a conditional command is finished
+quit can exit you from EDT
+
+EXIT
+----
+As EDT has two levels of editing EXit is used to exit you from either 
+level of the editor.
+EXit when you are in character mode returns you to the line mode of working.
+
+CHARACTER MODE CURSOR MOVEMENT CONTROLS
+---------------------------------------
+BL              Beginning of line
+BW              Beginning of word
+EL              End of line
+EW              End of word
+-nC             Move cursor towards start of the buffer by n characters
++nC             Move cursor towards end   of the buffer by n characters
+-nW             Move cursor towards start of the buffer by n words
++nW             Move cursor towards end   of the buffer by n words
+-nL             Move cursor towards start of the buffer by n lines
++nL             Move cursor towards end   of the buffer by n lines
+"STRING"  or)	Move cursor towards end   of the buffer until character
+'STRING'    )	match found
+-"STRING" or)	Move cursor towards start of the buffer until character
+-'STRING'   )	match found
+
+CHARACTER EDITING COMMANDS
+--------------------------
+
+RETYPE MODE
+------------
+RnC		Retype n characters. (cntl/z terminates)
+RnL 		Retype n lines       (cntl/z terminates)
+RnW		retype n words       (cntl/z terminates)
+
+DELETE MODE
+-----------
+DnC		Delete n characters
+DnL		Delete n lines
+DnW		Delete n words
+
+INSERTION MODE
+--------------
+I		Enters input mode    (cntl/z terminates input)
+
+SUBSTITUTE MODE
+---------------
+
+		SUBSTITUTE MODE
+		--------------
+
+	S	If you wish to change a group of characters you can
+		use the SUBSTITUTE mode the format of SUBSTITUTE is
+		S/old text/new text/
+		the / character used as the delimiter may be replaced
+		with any printing non alpha/numeric character.
+		eg. If your line of code was
+		The quich greeeeen box jumps over the lazy little dog.
+		S/h greeeeen b/k brown d/
+		convert the line to
+		The quick brown fox jumps over the lazy little dog.
+
+
+			PAGE	2 OF	4
+			-----------------
+ 
+LINE EDITING MODE
+-----------------
+ 
+SINGLE LINE RANGES
+------------------
+Range specifier			Meaning
+
+nn			Line number nn
+.(period)		The current line
+"object string" or )	The first line located that contains an
+'object string'	   )	acceptable match of the object string
+-"object string" or)	The first preceding line that contains an
+-'object string'   )	acceptable match of the object string
+%BE			The first line of the current text buffer
+%E			The last line of the current text buffer
+
+COMPLEX RANGE CONTROLS
+----------------------
+Range specifier			Meaning
+
+%BEF			All lines in the current text buffer from
+			the first line in the buffer through the
+			current line
+%R			All lines in the current text buffer
+			from the current line through the last
+			line in the buffer
+%WH			All lines in the current text buffer
+
+COMPOUND RANGE CONTROLS
+-----------------------
+Range  specifier		Meaning
+
+sr1:sr2	    or )	The lines between and including the
+sr1%THRUsr2    )	first single line range (sr1) and the
+			second single line range (sr2) where sr1
+			must precede sr2. For example, "ABC":"DEF"
+			refers to all lines between the
+			first line that contains ABC and the first
+			line that contains DEF, inclusive.
+sr;i	or )		The total number of lines specified by
+sr%FORi	   )		the integer (i) that begins with the line
+			specified by the single line range (sr).
+			For example, 100;10 refers to the ten
+			lines that follow line number 100.
+sr,sr,sr...   or )	The lines identified by the single line
+sr%ANDsr%ANDsr...)	ranges. For example, 10,70,130,190
+			refers to only those lines numbered 10,
+			70,130 and 190
+sr+i			The single line that is i lines after the
+			specified single line range. For example
+			"ABC"+10 refers to the tenth line
+			following the first line that contains an
+			acceptable match of the string ABC.
+sr-i			The single line that is i lines before the
+			single line range. For example, "ABC"-10
+			identifies the tenth line before the first
+			line containing a match of ABC.
+
+			PAGE	3 OF	4
+			-----------------
+
+INCLUSIVE RANGE SPECIFIER
+-------------------------
+
+%ALL 'STRING'		All lines in the current text buffer that
+			contain acceptable matches of the specified
+			object string. For example, %ALL "ABC"
+			identifies all lines in the current buffer
+			that contain ABC.
+
+Option		Meaning				Command
+------		-------				-------
+/BRief		Displays first ten		Type and
+		characters of lines		Substitute
+/FIle		Specifies a disc		Write SAve
+		file that is either		INClude PRint
+		accessed or created		and RESTore
+/NL		Allows deletion of		Change
+		line terminators
+/Query		Prompts you to control		Substitute Move
+		execution of command		COpy and Delete
+/REname		Specifies an output file	EXit
+/SEQuence	Specifies sequence		EXit INClude Insert
+		numbers				COpy Move Replace
+						RESequence WRite
+/-Type		Inhibits display of		Substitute
+		lines affected by
+		the command
+/UNsequenced	Inhibits renumbering		EXit INClude Insert
+		of lines			COpy Move Replace
+						RESequence WRite
+
+			PAGE	4 OF	4
+			-----------------
+
+			EDT COMMANDS
+			------------
+
+COMMAND			FORMAT
+CHANGE		Change [range] [/NL]
+COPY		COpy range-1 %TOrange-2	[/Query]
+					[/SEQuence:initial number:increment]
+					[/UNsequenced]
+DELETE		Delete [range] [/Query]
+EXIT		EXit [/RENAME:filename]
+		     [/SEQuence:initial number:increment]
+		     [/UNsequenced]
+FIND		Find range
+INCLUDE		INClude	[range]	/FI:filename [/SEQ:initial number:increment]
+					     [/UNsequenced]
+INSERT		Insert [range] [/sequence:initial number:increment]
+			       [/UNsequenced]
+MOVE		Move range-1%TOrange-2	[/Query]
+					[/SEQuence:initial number:increment]
+					[/UNsequenced]
+PRINT		PRint [range] /FI:filename
+REPLACE		Replace [range]	[SEQuence:initial number:increment]
+				[/UNsequence]
+RESEQUENCE	RESequence [range] [/SEQuence:initial number:increment]
+				   [/UNsequenced]
+RESTORE		RESTore /FI:filename
+SAVE		SAve /FI:filename
+SUBSTITUTE	Substitute/object/replacement/[range]	[/BRief]
+							[/Query]
+							[/-Type]
+	or
+		Substitute Next
+TYPE		[Type] range
+	or
+		Type [range] [/BRief]
+WRITE		WRite [range] /FI:filename [/UNsequenced]
+					   [/SEQ:initial number:increment]

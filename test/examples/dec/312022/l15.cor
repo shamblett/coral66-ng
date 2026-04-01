@@ -1,0 +1,315 @@
+   'CORAL' L15
+   'LIBRARY' (
+ 
+   'COMMENT' BASIC COMPATABLE PROCEDURES;
+ 
+ 
+   'PROCEDURE'          DEFLUN('VALUE''BYTE','VALUE''INTEGER','LABEL');
+   'PROCEDURE'          CREATE('VALUE''BYTE','VALUE''INTEGER','VALUE''INTEGER','VALUE''BYTE','LABEL');
+   'PROCEDURE'          OPEN('VALUE''BYTE','VALUE''INTEGER','VALUE''INTEGER','VALUE''BYTE','LABEL');
+   'PROCEDURE'          CLOSE('VALUE''BYTE','LABEL');
+   'PROCEDURE'          RELEASE('VALUE''BYTE','LABEL');
+   'PROCEDURE'          DELETE ('VALUE''BYTE','LABEL');
+   'PROCEDURE'          COPY   ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE'          ADD TO ('VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LUNBOOK ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LUNFREE ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LUNTEST ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LPOS('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LEN  ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' LSEG('VALUE''INTEGER','VALUE''INTEGER','VALUE''INTEGER');
+   'FLOATING''PROCEDURE' VAL ('VALUE''INTEGER');
+   'INTEGER''PROCEDURE' STR('VALUE''INTEGER','VALUE''FLOATING');
+   'INTEGER''PROCEDURE' VDU('VALUE''INTEGER','VALUE''INTEGER'));
+   'COMMON' ('INTEGER''PROCEDURE' FILE ('VALUE''BYTE','VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'INTEGER''PROCEDURE' FILE ('VALUE''BYTE' LUN;
+       'VALUE''INTEGER' MODE ,NAME);
+       'BEGIN'
+ 
+           'COMMENT' GENERAL DEFINITIONS;
+           'INCLUDE' "[200,25]GENDEF.COR"
+ 
+           'COMMENT' DATA AREAS USED;
+           'INTEGER''ARRAY' ERROR REPORT [0:10]:=
+           "SHUTDOWN MODE ERROR IN CLOSING FILE",
+           "ERROR FILE NUMBER OUT OF RANGE LIMITS 1-16 VALUE SENT = ",
+           "FILE ALREADY OPEN OR ERROR IN OPEN INPUT FILE",
+           "FILE ALREADY OPEN OR ERROR IN OPEN OUTPUT FILE",
+           "ERROR INPUT OR OUTPUT NOT SPECIFIED IN OPEN MODE",
+           "FILE NOT OPEN OR ERROR IN CLOSING FILE",
+           "DUMMY ITEM 6",
+           "ERROR IN KILLING FILE",
+           "DUMMY ITEM 8",
+           "ACCESS TO FILE TO BE KILLED NOT POSSIBLE";
+           'BYTE''ARRAY' STATUS [0:17]:=VOID,FREE,FREE,FREE,FREE,FREE,
+           FREE,FREE,FREE,FREE,FREE,FREE,FREE,FREE,FREE,
+           FREE,FREE,FREE;
+           'BYTE''ARRAY' TA [0:50]:=48,0;  (DEFAULT AREA TITLE)
+           'INTEGER' TIT;
+           'INTEGER' COUNT, COUNTA, WORKSPACE, TITLE, HOLDINT;
+           'BYTE' HOLD, MARKER;
+ 
+ 
+           'PROCEDURE' TITVER ('VALUE''INTEGER' TYPE);
+           'BEGIN'
+ 
+               'COMMENT' TITLE VERIFY PROCEDURE
+                         IF THE FILENAME IS NOT GIVEN REQUEST A FILE TITLE
+                         FROM THE VDU INTERACTIVE;
+               'IF' TITLE=0
+               'OR' TITLE=-1
+               'THEN'
+               'BEGIN'
+                   VDU("PRE,O",TYPE);
+                   TITLE:=VDU("I,O"," FILENAME ");
+               'END';
+               'IF' LPOS(TITLE,":",1)=0
+               'THEN'
+               'BEGIN'
+ 
+                   'COMMENT' IF DEVICE NOT SPECIFIED DEFAULT TO SY0:;
+                   COPY("SY0:",TIT);
+                   ADD TO(TIT,TITLE);
+                   TITLE:=TIT;
+               'END';
+           'END' OF PROCEDURE TITVER;
+ 
+ 
+           'PROCEDURE' KILL;
+ 
+           'COMMENT' DELETE A FILE
+                     IF THE FILE IS NOT BEING USED OPEN THE FILE
+                     REQUESTING THE FILENAME IF REQUIRED;
+           'BEGIN'
+               MARKER:=7;
+               'IF' STATUS[HOLDINT] = ALLOCATED
+               'THEN'
+               'BEGIN'
+                   DELETE(LUN,UCKED);
+                   RELEASE(LUN,UCKED);
+                   STATUS[HOLDINT]:= FREE;  (UNIT NOW FREE)
+                   LUNFREE (HOLDINT);
+                   MARKER:=-1; (JOB SUCCESFUL)
+               'END'
+               'ELSE'
+               'BEGIN'
+                   TITVER("INPUT");
+                   'BEGIN'
+                       'IF' LUNTEST (LUN) = FREE
+                       'THEN'
+                       'BEGIN'
+                           MARKER:=9;
+                           DEFLUN(LUN,TITLE,UCKED);
+                           MARKER:=8;
+                           OPEN(LUN,"R","RP",0,UCKED);
+                           MARKER:=7;
+                           DELETE(LUN,UCKED);
+                           RELEASE(LUN,UCKED);
+                           STATUS[HOLDINT]:= FREE;
+                           LUNFREE (HOLDINT);
+                           MARKER:=-1; (JOB SUCSESFUL)
+                       'END';
+                   'END';
+               'END';
+           'END' OF PROCEDURE KILL;
+ 
+ 
+           'PROCEDURE' SHUTDOWN;
+ 
+           'COMMENT' CLOSE ALL OPEN FILES;
+           'BEGIN'
+               MARKER :=0;
+               'FOR' COUNT:=1 'STEP' 1 'UNTIL' 16 'DO'
+               'BEGIN'
+                   'IF' STATUS[COUNT] = ALLOCATED
+                   'THEN'
+                   'BEGIN'
+                       HOLD:=COUNT;
+                       HOLDINT:=COUNT;
+                       CLOSE(HOLD,UCKED);
+                       RELEASE(HOLD,UCKED);
+                       STATUS[COUNT]:= FREE; (RELEASE UNIT)
+                       LUNFREE (COUNT);
+                   'END';
+               'END';
+               MARKER:=-1;       (JOB SUCCESFUL)
+           'END';
+ 
+ 
+           'PROCEDURE' INPUT OPEN;
+           'BEGIN'
+               'IF' LUNTEST(LUN)=FREE
+               'THEN'
+               'BEGIN'
+                   LUNBOOK (LUN);
+ 
+                   'COMMENT' OPEN INPUT FILES SECTION IN VARIOUS MODES;
+                   MARKER:=2;
+                   TITVER("INPUT");
+                   'BEGIN'
+                       DEFLUN(LUN,TITLE,UCKED);
+                       MARKER:=6;
+                       'IF' LPOS(MODE,"BLOCK",1)<>0
+                       'THEN' OPEN(LUN,"B","RS",0,UCKED)
+                       'ELSE' OPEN(LUN,"R","RS",0,UCKED);
+                       STATUS[HOLDINT]:= ALLOCATED;
+                       MARKER:=-1;       (JOB SUCCESFUL)
+                   'END';
+               'END'
+               'ELSE' MARKER:=1;
+           'END' OF SUB PROCEDURE INPUT OPEN;
+ 
+ 
+           'PROCEDURE' OUTPUT OPEN;
+           'BEGIN'
+               'IF' LUNTEST(LUN)=FREE
+               'THEN'
+               'BEGIN'
+                   LUNBOOK (LUN);
+ 
+                   'COMMENT' OPEN OUTPUT FILES IN VARIOUS MODES;
+                   MARKER:=3;
+                   TITVER("OUTPUT");
+                   'BEGIN'
+                       HOLDINT:=LUN;
+                       DEFLUN(LUN,TITLE,UCKED);
+                       'IF' LPOS(MODE,"BLOCK",1)<>0
+                       'THEN' CREATE(LUN,"B",0,0,UCKED)
+                       'ELSE''IF' LPOS(MODE,"FIXED",1)=0
+                       'THEN' CREATE(LUN,"RVL",0,0,UCKED)
+                       'ELSE'
+                       'BEGIN'
+                           COUNT:=LPOS(MODE,"(",1);
+                           COUNTA:=LPOS(MODE,")",1);
+                           WORKSPACE:=LSEG(MODE,COUNT+1,COUNTA-1);  (HOLD ADDRESS OF NUMERICS)
+                           'IF' LEN(WORKSPACE)=0
+                           'THEN' 'GOTO' UCKED;  (FAILED NUMERICS NOT SPECIFIED)
+                           COUNT:=VAL(WORKSPACE);  (HOLD FIXED RECORD SIZE)
+                           CREATE(LUN,"RFL",COUNT,0,UCKED);
+                       'END';
+                       STATUS[HOLDINT]:= ALLOCATED;
+                       MARKER:=-1;       (JOB SUCCESFUL)
+                   'END';
+               'END'
+               'ELSE' MARKER :=1;
+           'END' OF SUB PROCEDURE OPEN OUTPUT;
+ 
+ 
+           'PROCEDURE' SHUT FILE;
+           'BEGIN'
+ 
+               'COMMENT' CLOSE  A SPECIFIED OPENED FILE;
+               MARKER:=5;
+               'IF' STATUS[HOLDINT]=ALLOCATED
+               'THEN'
+               'BEGIN'
+                   CLOSE(LUN,UCKED);
+                   RELEASE(LUN,UCKED);
+                   STATUS[HOLDINT]:= FREE;
+                   LUNFREE (HOLDINT);
+                   MARKER:=-1;       (JOB SUCCESFUL)
+               'END'
+           'END';
+ 
+           'COMMENT' ============================
+                     MAIN ENTRY POINT STARTS HERE
+                     ============================;
+ 
+           'COMMENT' INITIAL SET UP;
+           MARKER:=1;
+           TITLE:=NAME;
+           HOLDINT:=LUN;
+           TIT:='LOCATION'(TA[2]);
+ 
+           'COMMENT' MAIN PROGRAM;
+ 
+           'COMMENT' FIND OUT WHAT OPERATION REQUIRED;
+           'IF' LPOS(MODE,"SHUTDOWN",1)<>0
+           'THEN' SHUTDOWN
+           'ELSE'
+           'IF' LUN<=0
+           'OR' LUN>16
+           'THEN' MARKER:=1
+           'ELSE'
+           'IF' LPOS(MODE,"?",1)<>0
+           'THEN'
+           'BEGIN'
+               'IF' STATUS[HOLDINT]=FREE
+               'THEN'
+               'ANSWER' FREE
+               'ELSE'
+               'ANSWER' ALLOCATED;  (INDICATE OPEN)
+           'END'
+           'ELSE'
+           'IF' LPOS(MODE,"CLOSE",1)<>0
+           'THEN' SHUT FILE
+           'ELSE'
+           'IF' LPOS(MODE,"KILL",1)<>0
+           'THEN' KILL
+           'ELSE'
+           'BEGIN'
+               'IF' LPOS(MODE,"OPEN",1)<>0
+               'THEN'
+               'BEGIN'
+                   'IF' LPOS(MODE,"INPUT",1)<>0
+                   'THEN' INPUT OPEN
+                   'ELSE'  'IF' LPOS(MODE,"OUTPUT",1)<>0
+                   'THEN' OUTPUT OPEN
+                   'ELSE'MARKER:=4;
+               'END';
+           'END';
+ 
+           'COMMENT' ====================
+                     ERROR REPORT SECTION
+                     ====================;
+ UCKED:    'IF' MARKER<>-1
+           'THEN'
+           'BEGIN'
+               'IF' MARKER=6
+               'OR' MARKER=8
+               'THEN'
+               'BEGIN'
+                   'IF' LPOS(MODE,"NORPT",1)=0
+                   'THEN'
+                   'BEGIN'
+                       VDU("PRE,O","FILE ");
+                       VDU("O",TITLE);
+                       'IF' MARKER=6
+                       'THEN' VDU("O,END"," DOES NOT EXIST")
+                       'ELSE' VDU("O,END"," DOES NOT EXIST FOR KILLING");
+                       'IF' LPOS(MODE,"NOSTOP",1)=0
+                       'THEN' VDU("I-O,END","INPUT A RETURN TO ACKNOWLEGE ERROR REPORT");
+                   'END';
+                   RELEASE(LUN,UCKED1);
+                   LUNFREE (LUN);
+ UCKED1:           'ANSWER' ERROR;
+               'END'
+               'ELSE'
+               'BEGIN'
+                   'IF' LPOS(MODE,"NORPT",1)=0
+                   'THEN'
+                   'BEGIN'
+                       VDU("PRE,O",ERROR REPORT[MARKER]);
+                       VDU("O,END",STR(-1,HOLDINT));
+                       'IF' LPOS(MODE,"NOSTOP",1)=0
+                       'THEN' VDU("I-O,END","INPUT A RETURN TO ACKNOWLEGE ERROR REPORT");
+                   'END';
+                   'IF' MARKER=2
+                   'OR' MARKER=3
+                   'OR' MARKER=9
+                   'THEN'
+                   'BEGIN'
+                       RELEASE(LUN,UCKED2);
+                       LUNFREE(LUN);
+                   'END';
+               'END';
+ UCKED2:       'ANSWER' ERROR;
+           'END';
+           'ANSWER' SUCCESS;
+       'END';
+   'END';
+   'FINISH'

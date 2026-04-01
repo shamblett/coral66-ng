@@ -1,0 +1,35 @@
+   'CORAL' P15 CCT MODULE
+ 
+ 
+   'LIBRARY' ('PROCEDURE' MOV ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' PLT ('VALUE''FLOATING','VALUE''FLOATING');
+   'PROCEDURE' CRS ('VALUE''FLOATING');
+   'PROCEDURE' WHERE ('LOCATION''FLOATING','LOCATION''FLOATING','LOCATION''FLOATING'));
+   'COMMON' ('PROCEDURE' CCT ('VALUE''INTEGER','VALUE''INTEGER'));
+   'SEGMENT' RJSSUB
+   'BEGIN'
+ 
+ 
+       'PROCEDURE' CCT ('VALUE''INTEGER' WIDTH,HIGHT);
+       'BEGIN'
+           'FLOATING' X, X1, Y, Y1, F, XCENT, YCENT;
+           X1:=WIDTH;
+           Y1:=HIGHT;
+           MOV (0,0);
+           PLT (X1*0.254,0);
+           PLT (X1*0.254,Y1*0.254);
+           PLT (0,Y1*0.254);
+           PLT (0,0);
+           'FOR' XCENT:=1 'STEP' 1 'UNTIL' X1-1 'DO'
+           'BEGIN'
+               'FOR' YCENT:=1 'STEP' 1 'UNTIL' Y1-1 'DO'
+               'BEGIN'
+                   X:=XCENT*0.254;
+                   Y:=YCENT*0.254;
+                   MOV (XCENT,YCENT);
+                   CRS(0.1);
+               'END';
+           'END';
+       'END'OF PROCEDURE CCT;
+   'END';
+   'FINISH'

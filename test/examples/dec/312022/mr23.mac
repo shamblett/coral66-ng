@@ -1,0 +1,62 @@
+;
+;
+	.TITLE MR23..  PROGRAM TO ADD A CHARACTER TO A QUEUE
+	.IDENT  /MR23.A/
+;
+;			MOD LIST
+;	(A)	INSERTIONS OF R$QTST ROUTINE
+;
+;
+;	ENTRY CONDITIONS
+;	R0 = THE CHARACTER TO LOAD INTO THE QUEUE
+;	R4 -> QUEUE BUFFER
+;
+;	EXIT CONDITIONS
+;	STATUS = SUCCESS OR ERROR
+;
+;
+R$QADD::			;LOAD A CHARACTER INTO A QUEUE BUFFER
+	MOV R2,-(SP)		;save resisters R2 and R4
+	MOV R4,-(SP)
+	CALL R$QTST		;IF buffer full
+	IFSUCCESS 20$		;THEN
+				;Indicate buffer full
+10$:	MOV (SP)+,R4		;restore resisters R2 and R4
+	MOV (SP)+,R2 
+	RETURN			;back to calling program
+;
+20$:	CMP -(R4),-(R4)		;access get pointer address -4
+	MOV -(R4),R2		;hold load address -6
+	CMP R2,-2(R4)		;IF pointer = buffer end
+	BNE   30$		;THEN
+	MOV R4,@R4		;hold buffer character start address-6
+	ADD #5,@R4		;hold buffer address -1
+30$:	INC @R4			;step onto next character load point
+	INC 4(R4)		;indicate another character added to buffer
+	MOVB R0,@R2		;store character into buffer
+	CLC			;indicate job done ok
+	BR	10$		;exit from program
+;
+;
+	.PAGE
+	.SBTTL	TEST IF QUEUE BUFFER FULL
+;
+;
+;	ENTRY CONDITIONS
+;	R4 -> QUEUE BUFFER
+;
+;	EXIT CONDITIONS
+;	STATUS = ERROR = BUFFER FULL
+;
+R$QTST::				;CHECK IF QUEUE BUFFER FULL
+	CMP -2(R4),-10.(R4)	;IF buffer has free space
+				;THEN
+	CLC			;indicate buffer not full
+	BLT	10$		;ELSE
+	SEC			;indicate buffer full
+10$:	RETURN			;return back to calling program
+;
+;
+;
+	.END
+;

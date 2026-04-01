@@ -1,0 +1,36 @@
+	.TITLE	MRC12. CHARACTER PROCEDURES IN MACRO
+;
+	.IDENT	/MRC12./
+;
+	.PAGE
+	.SBTTL	.		APPEND A STRING TO A STRING
+;
+R$ADDS::			;ADD A STRING TO A STRING
+;
+;			ENTRY CONDITIONS
+;
+;		R0 -> CHARACTER STRING TO ADD TO STRING
+;		R4 -> CHARACTER STRING
+;
+;			EXIT CONDITIONS
+;
+;		ERROREXIT IF INVAILD CONDITIONS
+;
+	SAVE R0,R1,R2	;save registers on stack
+	MOV (R0)+,R1	;hold character count and R0 -> first character
+	BEQ	20$	;IF no characters job done
+	MOV R0,R2	;hold address of first character
+10$:	MOVB (R2)+,R0	;hold character then point to next
+	CALL R$ADDC	;append extracted character to string
+	IFERROR 30$	;IF character no accepted THEN exit
+	SOB R1,10$	;loop till string end
+20$:	SETSUCCESS 40$	;indicate OK and exit
+;
+30$:	SETERROR	;summat screwed up so give up and exit
+40$:	UNSAVE R0,R1,R2	;restore used registers
+	RETURN		;nice way of saying SOD OFF BACK
+;
+;
+	.END
+;
+;

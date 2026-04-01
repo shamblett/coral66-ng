@@ -1,0 +1,475 @@
+;
+;
+;	MACROS FOR SYSTEM CONFIGURATION AND SERIAL IO DEFINITIONS.
+;	**********************************************************
+;
+;	AUTHOR	:-	J.S.CLIFTON
+;	DATE	:-	21st SEPTEMBER 82.
+;
+;	CONFIG MACRO.
+;	*************
+;
+;		This macro sets the system configuration, namely the machine
+;	that the program will run on, the operating system it will use,  the
+;	Macro group that will be defined and standard constants if required.
+;
+;		It will be called at the beginning of the program, or in the
+;	'prime' module. The parameters may be specified in any order, and if
+;	not specified then the default parameters will be assumed.
+;
+;	The call is of the form:-
+;
+;	.MCALL	CONFIG
+;	CONFIG	"machine","operating sys","macros","list flg","standard defs","trace flg"
+;
+;		  PDP70		IAS	   BASMAC     LIST	   DEFS		   TRACE
+;		  LSI03		RT11	   IOMACS    NOLIST	  NODEFS	  NOTRACE
+;		  LSI23		ALONE	   STGMAC
+;					   TBLMAC
+;					   SUPMAC
+;					   DTBMAC
+;					   ALLMAC
+;					   NOMACS
+;					   SERIO
+;					   DEVIO
+;
+;					   RTMACS
+;
+;	DEFAULT	:-	CONFIG	PDP70,IAS,NOMACS,NOLIST,NODEFS,NOTRACE
+;	*******
+;
+;	Machine:-	This defines the machine that the program is
+;			to run on.
+;
+;	Operating Sys:-	This gives the operating system that the ma-
+;			chine will  be  using, note that ALONE means
+;			in the STAND  ALONE  mode  on an LSI machine 
+;			and the output routines will be built accord
+;			-ingly.
+;
+;	Macros:-	Different levels of Macros can be easily def
+;			-ined  for  different  jobs. Note that Macro
+;			calls  of  a higher level will automatically
+;			generate all lower level macro calls.
+;
+;		BASMAC	- A limited  number  of  macros  for  simple
+;			macro programming.
+;
+;		IOMACS	- This includes all the macros  designed for
+;			IO includeing those in BASMAC.
+;
+;		STGMAC	- The basic set of string handling  macros -
+;			including those in IOMACS and BASMAC.
+;
+;		TBLMAC	- This  includes  all the 'NODE' and 'TABLE'
+;			macros plus those in the previous three.
+;
+;		SUPMAC	- These are the SUPER-MAC macros and include
+;			the previous four.
+;
+;		DTBMAC	- This includes all the previous macros plus
+;			all the 'DECISION TABLE' macros.
+;
+;		ALLMAC	- This includes macros included in the above
+;			groups.
+;
+;		RTMACS	- This calls the RT11 macros for test build
+;			purposes only, it does not automatically
+;			include any other macros.
+;
+;		SERIO	- Serial input output macro.
+;
+;		DEVIO	- Similar to 'SERIO'
+;
+;			NOTE -	A  few  very  special purpose macros 
+;				are not  defined  by this macro, see
+;				the Docimentation.
+;
+;		This table shows which Macro group is defined in the
+;		group selected.
+;
+;		BASMAC	IOMACS	STGMAC	TBLMAC	SUPMAC	DTBMAC	RTMACS
+;		******	******	******	******	******	******	******
+;
+;	BASMAC	  X
+;	IOMACS	  X	  X
+;	STGMAC	  X		  X
+;	TBLMAC	  X		  X	  X
+;	SUPMAC	  X		  X		  X
+;	DTBMAC	  X		  X		  X	  X
+;	ALLMAC	  X	  X	  X	  X	  X	  X
+;	RTMACS							  X
+;
+;
+.MACRO CONFIG	PAR0,PAR1,PAR2,PAR3,PAR4,PAR5,PAR6,PAR7,PAR8,PAR9
+;
+.LIST
+;
+	.SBTTL	CONTROL CONSTANTS
+;		*****************
+;
+	RT11	=	1		;RT11 STATUS FLAG.
+	IAS	=	2		;IAS STATUS FLAG.
+	ALONE	=	4		;STAND ALONE SYSTEM.
+;
+	PDP70	=	70		;MACHINE FLAGS.
+	LSI03	=	3
+	LSI23	=	23
+;
+.NLIST
+;
+	OPSYS	=	IAS		;OPERATING SYSTEM IS IAS.
+	MACHINE	=	PDP70		;MACHINE TYPE IS AN 1170.
+;
+	BASFLG	=	1		;MACRO SELECTION FLAGS.
+	IOFLG	=	3	;IOMACS/BASMAC
+	STGFLG	=	5	;STGMAC/BASMAC
+	TBLFLG	=	15	;TBLMAC/STGMAC/BASMAC
+	SUPFLG	=	25	;SUPMAC/STGMAC/BASMAC
+	DTBFLG	=	65	;DTBMAC/SUPMAC/STGMAC/BASMAC
+	ALLFLG	=	77	;DTBMAC/SUPMAC/TBLMAC/STGMAC/IOMACS/BASMAC
+	SIOFLG	=	100	;SERIO
+	DIOFLG	=	200	;DEVIO
+;
+	MACFLG	=	0		;FLAGS FOR THIS MACRO.
+	DEFFLG	=	1
+	RT11FG	=	1
+;
+	LST$$	=	1		;LISTING SWITCHED OFF.
+	$TRACE	=	1		;TRACE SWITCHED OFF.
+;
+;
+	.IRP	SYM,<PAR0,PAR1,PAR2,PAR3,PAR4,PAR5,PAR6,PAR7,PAR8,PAR9>
+	  .IF	NB	SYM
+;
+	    .IIF	IDN	SYM,LSI03	MACHINE	=	LSI03
+	    .IIF	IDN	SYM,LSI23	MACHINE	=	LSI23
+;
+	    .IIF	IDN	SYM,RT11	OPSYS	=	RT11
+	    .IIF	IDN	SYM,ALONE	OPSYS	=	ALONE
+;
+	    .IIF	IDN	SYM,BASMAC	MACFLG	=	MACFLG!BASFLG
+	    .IIF	IDN	SYM,IOMACS	MACFLG	=	MACFLG!IOFLG
+	    .IIF	IDN	SYM,STGMAC	MACFLG	=	MACFLG!STGFLG
+	    .IIF	IDN	SYM,TBLMAC	MACFLG	=	MACFLG!TBLFLG
+	    .IIF	IDN	SYM,SUPMAC	MACFLG	=	MACFLG!SUPFLG
+	    .IIF	IDN	SYM,DTBMAC	MACFLG	=	MACFLG!DTBFLG
+	    .IIF	IDN	SYM,ALLMAC	MACFLG	=	MACFLG!ALLFLG 
+	    .IIF	IDN	SYM,SERIO	MACFLG	=	MACFLG!SIOFLG
+	    .IIF	IDN	SYM,DEVIO	MACFLG	=	MACFLG!DIOFLG
+;
+	    .IF	IDN	SYM,RTMACS
+	      .IF	EQ	OPSYS,RT11
+		RT11FG	=	0
+	      .IFF
+		.ERROR	;RT11 SYSTEM MACROS INVALID IF NOT RT11 SYSTEM.
+	      .ENDC
+	    .ENDC
+;
+	    .IIF	IDN	SYM,LIST	LST$$	=	0
+	    .IIF	IDN	SYM,DEFS	DEFFLG	=	0
+	    .IIF	IDN	SYM,TRACE	$TRACE	=	0
+;
+	  .ENDC
+	.ENDM
+;
+;
+	.IIF	EQ	LST$$	.LIST
+;
+	.SBTTL	DEFAULT MACRO COMPILER SETTINGS
+;		*******************************
+;
+	.ENABL	LC
+	.ENABLE	GBL
+;
+	VDUSIZE	=	80.	;VDU INPUT BUFFER SIZE.
+	$LDEF$	=	30000	;BASE VALUE OF LOCAL LABELS.
+;
+	.IIF	EQ	LST$$	.NLIST
+	.IF	EQ	DEFFLG
+;
+	.IIF	EQ	LST$$	.LIST
+;
+	.SBTTL	STANDARD DEFINITIONS
+;		********************
+;
+	NULL	=	0
+	STX	=	2	;START OF TEXT.
+	ETX	=	3	;END OF TEXT.
+	EOT	=	4	;END OF TRANSFER.
+	CNTC	=	'C-100
+	CNTD	=	'D-100
+	CNTZ	=	'Z-100
+	TAB	=	11	;TAB CHARACTER.
+	HT	=	TAB
+	LF	=	12	;VALUE FOR A LINE FEED.
+	FF	=	14	;VALUE FOR A FORM FEED.
+	CR	=	15	;VALUE FOR A CARRIAGE RETURN.
+	ESC	=	33	;VALUE FOR AN ESCAPE CHARACTER.
+	SPACE	=	40	;VALUE FOR A SPACE CHARACTER.
+	ERASE	=	177	;VALUE FOR AN ERASE CHARACTER.
+	PARITY	=	200	;PARITY BIT FOR BYTE OPERATIONS.
+;
+	SET	=	1
+	CLEAR	=	0
+	ON	=	SET
+	OFF	=	CLEAR
+;
+	.IIF	EQ	LST$$	.NLIST
+;
+	.ENDC
+	.IF	NE	MACFLG&20
+	.IIF	EQ	LST$$	.LIST
+;
+	.SBTTL	MACRO DEFINITIONS.
+;		******************
+;
+	$SUPMC	=	47	;SUPERMAC VERSION NUMBER.
+	$DIDDO	=	0
+	$EF$	=	0
+	$L$	=	0
+	$T	=	0
+	$L	=	0
+	$R	=	-1
+	IIII	=	-1
+	$.$.$.	=	0
+	.IIF	EQ	LST$$	.NLIST
+	.ENDC
+;
+	.IF	GT	MACFLG&40
+	.IIF	EQ	LST$$	.LIST
+	$TABMC	=	02	;TABMAC VERSION NUMBER.
+	$DETL$	=	-1	;AUTO DETAB LABEL INCREMENT.
+	$DETM$	=	-1	;AUTO MACRO LABEL JUMP.
+	.IIF	EQ	LST$$	.NLIST
+	.ENDC
+;
+	.IIF	EQ	LST$$	.LIST
+;
+	.SBTTL	MACRO CALLS
+;		***********
+;
+	.IIF	EQ	LST$$	.NLIST
+;
+	.IF	NE	MACFLG&1
+			.IIF EQ LST$$	.LIST
+		.MCALL	MACBAS
+		MACBAS
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&2
+			.IIF EQ LST$$	.LIST
+		.MCALL	MACIO
+		MACIO
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&4
+			.IIF EQ LST$$	.LIST
+		.MCALL	MACSTG
+		MACSTG
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&10
+			.IIF EQ LST$$	.LIST
+		.MCALL	MACTBL
+		MACTBL
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&20
+			.IIF EQ LST$$	.LIST
+		.MCALL	MACSUP
+		MACSUP
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&40
+			.IIF EQ LST$$	.LIST
+		.MCALL	MACDTB
+		MACDTB
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&100
+			.IIF EQ LST$$	.LIST
+		.MCALL	SERIO
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+	.IF	NE	MACFLG&200
+			.IIF EQ LST$$	.LIST
+		.MCALL	DEVIO
+			.IIF EQ LST$$	.NLIST
+	.ENDC
+;
+	.IF	EQ	RT11FG
+		.MCALL	MACRT
+		MACRT
+	.IFF
+		.IF	EQ	MACFLG
+			.IIF	EQ	LST$$	.LIST
+;	NOTE:-	NO MACROS CALLED.
+			.IIF	EQ	LST$$	.NLIST
+		.ENDC
+	.ENDC
+;
+.ENDM	CONFIG
+;
+;
+.MACRO	MACBAS
+;
+	.MCALL	BITDEF  	
+;
+;	************************
+	BITDEF
+;	************************
+;
+	.MCALL	EXITER,EXITSU  	
+	.MCALL	FLODEF  	
+;
+;	************************
+	FLODEF
+;	************************
+
+	.MCALL	IFERRO,IFSUCC,INITIA  	
+	.MCALL	LIST    	
+	.MCALL	NOLIST  	
+	.MCALL	SAVE,SETERR,SETREG,SETSUC  	
+	.MCALL	TERMIN  	
+	.MCALL	UNSAVE  	
+	.MCALL	.EMIT,.EMITL,.EMITR  	
+	.MCALL	..TPRM  	
+;
+	.MACRO	MACBAS
+	.ENDM
+;
+.ENDM	MACBAS
+;
+;
+.MACRO	MACIO
+;
+	.MCALL	INPUT,INPUTN  	
+	.MCALL	NEWLIN  	
+	.MCALL	PRINT   	
+	.MCALL	PRINTA,PRINTB,PRINTC,PRINTD,PRINTH,PRINTO,PRINTR,PTEXT,P.D	
+	.MCALL	REPCHA  	
+	.MCALL	SPACES  	
+;
+	.MACRO	MACIO
+	.ENDM
+;
+.ENDM	MACIO
+;
+;
+.MACRO	MACSTG
+;
+	.MCALL	ADDCHR,ADDSTR		
+	.MCALL	CLRSTR,CMPSTR
+	.MCALL	DELCHR
+	.MCALL	INSCHR
+	.MCALL	MESSAG,MFUNCT,MODCHR,MOVSTR,MOVTEX
+	.MCALL	PAD,POPCHR,PRESET,PUSHCH	
+	.MCALL	REPORT,RESERV,ROLSTR,RORSTR	
+	.MCALL	SHLSTR,SHRSTR,SPPAD,STRING,SUBSTR,SWABST
+	.MCALL	TSTSTR,T..ALL  	
+	.MCALL	ZPAD
+	.MCALL	..LB10,..LB21,..LB22,..LB23  	
+;
+	.MACRO	MACSTG
+	.ENDM
+;
+.ENDM	MACSTG
+;
+;
+.MACRO	MACTBL
+;
+	.MCALL	NODE,NODEBL
+	.MCALL	TABLE,TABLEB
+	.MCALL	TCLOSE,TCREAT,TINSER,TKILL,TLOOKU,TPROTE,TREAD,TREMOV,TUNPRO,TWRITE
+;
+	.MACRO	MACTBL
+	.ENDM
+;
+.ENDM	MACTBL
+;
+;
+.MACRO	MACSUP
+;
+	.MCALL	AND,ANDB
+	.MCALL	BEGIN,BRJ
+	.MCALL	CALLG,CASE,CASEB
+	.MCALL	DO,DOWNTO
+	.MCALL	ELSE,END,ENTRYP
+	.MCALL	FI,FOR,FOR.AB
+	.MCALL	GOTO
+	.MCALL	IF,IFB
+	.MCALL	JUMPTO
+	.MCALL	LEAVE,LET     	
+	.MCALL	NCC,NCS,NEQ,NGE,NGT,NHI,NHIS,NLE,NLO,NLOS,NLT,NMI,NNE,NOTRAC,NPL,NVC,NVS
+	.MCALL	ON.ERR,ON.NOE,OR,ORB	
+	.MCALL	POP,POPB,PROBE,PROBEB,PROCED,PUSH,PUSHB
+	.MCALL	RCC,RCS,REPEAT,REQ,RGE,RGT,RHI,RHIS,RLE,RLO,RLOS,RLT,RMI,RNE,RPL,RVC,RVS
+	.MCALL	SOJ
+	.MCALL	THEN,THRU,TO,TRACE
+	.MCALL	UNTIL,UNTILB
+	.MCALL	WHILE,WHILEB
+	.MCALL	$CALL,$RETUR,$SET$K,$$END
+	.MCALL	.ARITH,.GENBR,.GOTO,.IFOPR,.IS,.LEAVE,.OPADD,.OPSUB,.OR,.SIMPL
+	.MCALL	..BRAN,..GET,..POP,..PUSH,..TAG
+;
+	.MACRO	MACSUP
+	.ENDM
+;
+.ENDM	MACSUP
+;
+;
+.MACRO	MACDTB
+;
+	.MCALL	A.
+	.MCALL	C.
+	.MCALL	DETAB,DETEND
+	.MCALL	EXIT,EXITFA,EXITTR
+	.MCALL	IFFALS,IFTRUE  	
+	.MCALL	SETFAL,SETTRU
+	.MCALL	..ACT,..ARLE,..COND,..CRLE,..ERLE,..TEST
+;
+	.MACRO	MACDTB
+	.ENDM
+;
+.ENDM	MACDTB
+;
+;
+.MACRO	MACRT
+;
+	.IIF	EQ	LST$$	.LIST
+	.MCALL	.CDFN,.CHAIN,.CHCOP,.CLOSE,.CMKT,.CNTXS
+	.MCALL	.CRAW,.CRRG,.CSIGE,.CSISP,.CSTAT,.CTIMI
+	.MCALL	.DATE,.DELET,.DEVIC,.DRAST,.DRBEG,.DRBOT
+	.MCALL	.DREND,.DRFIN,.DRSET,.DRVTB,.DSTAT
+	.MCALL	.ELAW,.ELRG,.ENTER,.EXIT
+	.MCALL	.FETCH,.FORK
+	.MCALL	.GMCX,.GTIM,.GTJB,.GTLIN,.GVAL
+	.MCALL	.HERR,.HRESE
+	.MCALL	.INTEN
+	.MCALL	.LOCK,.LOOKU
+	.MCALL	.MACS,.MAP,.MFPS,.MRKT,.MTATC,.MTDTC
+	.MCALL	.MTGET,.MTIN,.MTOUT,.MTPRN,.MTPS,.MTRCT
+	.MCALL	.MTSET,.MTSTA,.MWAIT
+	.MCALL	.PRINT,.PROTE,.PURGE
+	.MCALL	.QELDF,.QSET
+	.MCALL	.RCTRL,.RCVD,.RCVDC,.RCVDW,.RDBBK,.RDBDF
+	.MCALL	.READ,.READC,.READW,.REGDE,.RELEA,.RENAM
+	.MCALL	.REOPE,.RSUM
+	.MCALL	.SAVES,.SCCA,.SDAT,.SDATC,.SDATW,.SDTTM
+	.MCALL	.SERR,.SETTO,.SFPA,.SPCPS,.SPFUN,.SPND
+	.MCALL	.SRESE,.SYNCH
+	.MCALL	.TIMIO,.TLOCK,.TRPSE,.TTINR,.TTOUT,.TTYIN,.TTYOU,.TWAIT
+	.MCALL	.UNLOC,.UNMAP,.UNPRO
+	.MCALL	.WAIT,.WDBBK,.WDBDF,.WRITC,.WRITE,.WRITW
+	.MCALL	..V1..,..V2..
+	.MCALL	...CM0,...CM1,...CM2,...CM3,...CM4,...CM5,...CM6
+	.IIF	EQ	LST$$	.NLIST
+;
+;
+	.MACRO	MACRT
+	.ENDM
+;
+.ENDM	MACRT
+;
+.END
