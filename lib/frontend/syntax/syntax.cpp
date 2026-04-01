@@ -37,7 +37,10 @@ Block::Block(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
              std::vector<std::unique_ptr<Declaration>>&& declarations,
              std::vector<std::unique_ptr<Statement>>&& statements,
              std::vector<std::unique_ptr<PlaceReference>>&& placeReferences)
-    : Node(begin, end), m_declarations(std::move(declarations)), m_statements(std::move(statements)), m_placeReferences(std::move(placeReferences))
+    : Node(begin, end),
+      m_declarations(std::move(declarations)),
+      m_statements(std::move(statements)),
+      m_placeReferences(std::move(placeReferences))
 {
 }
 
@@ -68,40 +71,32 @@ std::vector<std::unique_ptr<Statement>> Block::takeStatements()
 
 // ParameterDeclaration
 
-ParameterDeclaration::ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode, std::optional<lexer::CTokenIterator> type, std::vector<lexer::CTokenIterator>&& identifiers)
+ParameterDeclaration::ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode,
+                                           std::optional<lexer::CTokenIterator> type,
+                                           std::vector<lexer::CTokenIterator>&& identifiers)
 
     : Declaration(begin, end), m_mode(mode), m_type(type), m_identifiers(std::move(identifiers))
 
 {
-
 }
-
-
 
 ParameterDeclaration::ParameterMode ParameterDeclaration::getMode() const
 
 {
-
     return m_mode;
-
 }
 
 std::optional<lexer::CTokenIterator> ParameterDeclaration::getType() const
 
 {
-
     return m_type;
-
 }
 
 const std::vector<lexer::CTokenIterator>& ParameterDeclaration::getIdentifiers() const
 
 {
-
     return m_identifiers;
-
 }
-
 
 // VariableDeclaration
 VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
@@ -126,7 +121,11 @@ ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, co
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
                                            std::unique_ptr<Statement>&& body,
                                            std::optional<lexer::CTokenIterator> typeToken)
-    : Declaration(begin, end), m_typeToken(typeToken), m_name(name), m_parameters(std::move(parameters)), m_body(std::move(body))
+    : Declaration(begin, end),
+      m_typeToken(typeToken),
+      m_name(name),
+      m_parameters(std::move(parameters)),
+      m_body(std::move(body))
 {
 }
 
@@ -569,6 +568,45 @@ const Expression* TypeChangeExpression::getFractionBits() const
 const Expression& TypeChangeExpression::getExpression() const
 {
     return *m_expression;
+}
+
+// CommonCommunicator
+CommonCommunicator::CommonCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                       const std::vector<lexer::CTokenIterator>& items)
+
+    : Communicator(begin, end), m_items(items)
+{
+}
+
+std::vector<lexer::CTokenIterator> CommonCommunicator::getItems() const
+{
+    return m_items;
+}
+
+// LibraryCommunicator
+LibraryCommunicator::LibraryCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                         const std::vector<lexer::CTokenIterator>& items)
+
+    : Communicator(begin, end), m_items(items)
+{
+}
+
+std::vector<lexer::CTokenIterator> LibraryCommunicator::getItems() const
+{
+    return m_items;
+}
+
+// ExternalCommunicator
+ExternalCommunicator::ExternalCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const std::vector<lexer::CTokenIterator>& items)
+
+    : Communicator(begin, end), m_items(items)
+{
+}
+
+std::vector<lexer::CTokenIterator> ExternalCommunicator::getItems() const
+{
+    return m_items;
 }
 
 } // namespace coral66::Syntax

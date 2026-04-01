@@ -6,11 +6,8 @@
 
 #include "parser.hpp"
 
-#include <llvm/Support/ConvertUTF.h>
-
-#include <algorithm>
-
 #include "lib/frontend/common/messages/errors.hpp"
+#include "parser_support.hpp"
 
 namespace coral66::parser
 {
@@ -32,7 +29,41 @@ namespace coral66::parser
 std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                         Context& context)
 {
-    std::unique_ptr<Syntax::Communicator> result;
-    return result;
+    if (begin == end)
+    {
+        return nullptr;
+    }
+
+    auto start = begin;
+
+    std::vector<lexer::CTokenIterator> result;
+    if (begin->getTokenType() == lexer::TokenType::CommonKeyword)
+    {
+        begin++;
+        if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
+        {
+            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+                                                                       context.getSourceInterface(),
+                                                                       *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
+            return nullptr;
+        }
+
+        // TODO process common communicator
+
+        begin++;
+        if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+        {
+            context.log(errors::parser::EXPECTED_CLOSED_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSED_PARENTHESIS);
+            return nullptr;
+        }
+
+        return std::make_unique<Syntax::CommonCommunicator>(start, begin, result);
+    }
+
+    return nullptr;
 }
 } // namespace coral66::parser

@@ -201,7 +201,6 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                     else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
                              || type == lexer::TokenType::FixedKeyword)
                     {
-                        auto beforeFallback = begin;
                         auto declarations = parseDeclaration(begin, end, context);
                         if (!declarations.empty())
                         {
@@ -219,7 +218,6 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                     }
                     else
                     {
-                        const auto beforeFallback = begin;
                         auto declarations = parseDeclaration(begin, end, context);
                         if (!declarations.empty())
                         {
@@ -269,8 +267,9 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
             }
             context.log(errors::parser::EXPECTED_STATEMENT.args(*start, context.getSourceInterface(), *start));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
-            auto result = std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters),
-                                                                         std::make_unique<Syntax::DummyStatement>(begin, begin), typeToken);
+            auto result = std::make_unique<Syntax::ProcedureDeclaration>(
+                start, begin, name, std::move(parameters), std::make_unique<Syntax::DummyStatement>(begin, begin),
+                typeToken);
             context.exitProcedure();
             return result;
         }

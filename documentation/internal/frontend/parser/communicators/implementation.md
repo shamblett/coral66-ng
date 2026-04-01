@@ -1,0 +1,1 @@
+ABSOLUTE communicators are not supported, there is no concept of an absolute memory address on this platform as far as Coral 66 is concerned. 

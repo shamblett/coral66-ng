@@ -56,7 +56,7 @@ public:
     Block(lexer::CTokenIterator begin, lexer::CTokenIterator end,
           std::vector<std::unique_ptr<Declaration>>&& declarations,
           std::vector<std::unique_ptr<Statement>>&& statements,
-          std::vector<std::unique_ptr<PlaceReference>>&& placeReferences = {});
+          std::vector<std::unique_ptr<PlaceReference>>&& placeReferences);
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getDeclarations() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
     [[nodiscard]] const std::vector<std::unique_ptr<PlaceReference>>& getPlaceReferences() const;
@@ -73,11 +73,23 @@ class Declaration : public Node
 class ParameterDeclaration : public Declaration
 {
 public:
-    enum class ParameterMode { Value, Location, Array, Label, Switch, Procedure, UntypedValue, UntypedLocation };
+    enum class ParameterMode
+    {
+        Value,
+        Location,
+        Array,
+        Label,
+        Switch,
+        Procedure,
+        UntypedValue,
+        UntypedLocation
+    };
+
 private:
     ParameterMode m_mode;
     std::optional<lexer::CTokenIterator> m_type;
     std::vector<lexer::CTokenIterator> m_identifiers;
+
 public:
     ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode,
                          std::optional<lexer::CTokenIterator> type, std::vector<lexer::CTokenIterator>&& identifiers);
@@ -112,7 +124,10 @@ public:
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getParameters() const;
     [[nodiscard]] const Statement& getBody() const;
-    [[nodiscard]] std::optional<lexer::CTokenIterator> getTypeToken() const { return m_typeToken; }
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getTypeToken() const
+    {
+        return m_typeToken;
+    }
 };
 
 class ArrayDeclaration final : public Declaration
@@ -187,10 +202,19 @@ class Statement : public Node
 
 public:
     using Node::Node;
-    Statement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::vector<lexer::CTokenIterator> labels) : Node(begin, end), m_labels(std::move(labels)) {}
-    
-    void setLabels(std::vector<lexer::CTokenIterator> labels) { m_labels = std::move(labels); }
-    const std::vector<lexer::CTokenIterator>& getLabels() const { return m_labels; }
+    Statement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::vector<lexer::CTokenIterator> labels)
+        : Node(begin, end), m_labels(std::move(labels))
+    {
+    }
+
+    void setLabels(std::vector<lexer::CTokenIterator> labels)
+    {
+        m_labels = std::move(labels);
+    }
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getLabels() const
+    {
+        return m_labels;
+    }
 };
 
 class DummyStatement final : public Statement
@@ -443,4 +467,35 @@ class Communicator : public Node
 {
     using Node::Node;
 };
+
+class CommonCommunicator final : public Communicator
+{
+    std::vector<lexer::CTokenIterator> m_items;
+
+public:
+    CommonCommunicator(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                       const std::vector<lexer::CTokenIterator>& items);
+    [[nodiscard]] std::vector<lexer::CTokenIterator> getItems() const;
+};
+
+class LibraryCommunicator final : public Communicator
+{
+    std::vector<lexer::CTokenIterator> m_items;
+
+public:
+    LibraryCommunicator(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                        const std::vector<lexer::CTokenIterator>& items);
+    [[nodiscard]] std::vector<lexer::CTokenIterator> getItems() const;
+};
+
+class ExternalCommunicator final : public Communicator
+{
+    std::vector<lexer::CTokenIterator> m_items;
+
+public:
+    ExternalCommunicator(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                         const std::vector<lexer::CTokenIterator>& items);
+    [[nodiscard]] std::vector<lexer::CTokenIterator> getItems() const;
+};
+
 } // namespace coral66::Syntax
