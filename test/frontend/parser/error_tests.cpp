@@ -107,7 +107,7 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         const ParsedExpression p("( a = ");
         CHECK(p.expression.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CLOSED_PARENTHESIS));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_CLOSE_PARENTHESIS));
     }
 
     SECTION("Expected Union (Bitwise Differ)")

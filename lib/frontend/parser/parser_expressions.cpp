@@ -325,10 +325,10 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTo
         }
         else
         {
-            context.log(errors::parser::EXPECTED_CLOSED_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
                                                                          context.getSourceInterface(),
                                                                          *(begin == end ? (end - 1) : begin)));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSED_PARENTHESIS);
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr; // Missing )
         }
         return expr;
@@ -523,10 +523,10 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
                         return nullptr;
                     }
-                    context.log(errors::parser::EXPECTED_CLOSED_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
                                                                                  context.getSourceInterface(),
                                                                                  *(begin == end ? (end - 1) : begin)));
-                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSED_PARENTHESIS);
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
                     return nullptr;
                 }
                 else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
@@ -660,10 +660,10 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                 auto endToken = begin++;
                 return std::make_unique<FunctionCallExpression>(idToken, endToken, idToken, std::move(args));
             }
-            context.log(errors::parser::EXPECTED_CLOSED_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
                                                                          context.getSourceInterface(),
                                                                          *(begin == end ? (end - 1) : begin)));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSED_PARENTHESIS);
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }
         return parseWordReference(begin, end, context);
