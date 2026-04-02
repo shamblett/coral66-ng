@@ -8,6 +8,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "parsertest",
     srcs = [
+        "communicator_tests.cpp",
         "error_tests.cpp",
         "expression_tests.cpp",
         "place_reference_tests.cpp",

@@ -55,8 +55,8 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
         if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
             context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
-                                                                         context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }

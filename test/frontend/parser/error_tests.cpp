@@ -557,7 +557,6 @@ TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
     }
 }
 
-
 TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
 {
     SECTION("Overlay Missing Declaration")
@@ -582,5 +581,24 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
         CHECK(p.procedure.get() != nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::INVALID_FIXED_FORMAT));
+    }
+}
+
+TEST_CASE("Communicators - Errors", "[Parser][Communicator]")
+{
+    SECTION("Common - Missing Open Parenthesis")
+    {
+        const ParsedCommunicator c("COMMON );");
+        REQUIRE(c.communicator.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS));
+    }
+
+    SECTION("Common - Missing Close Parenthesis")
+    {
+        const ParsedCommunicator c("COMMON (;");
+        REQUIRE(c.communicator.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS));
     }
 }

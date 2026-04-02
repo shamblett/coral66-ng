@@ -20,7 +20,7 @@ using namespace coral66::Syntax;
  */
 TEST_CASE("Coral Parse Place References", "[Parser][PlaceReference]")
 {
-    SECTION("Single label")
+    SECTION("Single Label")
     {
         const ParsedPlaceReference p("SWITCH SW <- LABEL1");
         auto switchReference = dynamic_cast<SwitchPlaceReference*>(p.placeReference.get());
@@ -29,7 +29,7 @@ TEST_CASE("Coral Parse Place References", "[Parser][PlaceReference]")
         CHECK(std::get<std::string>(switchReference->getLabels()[0]->getValue()) == "LABEL1");
     }
 
-    SECTION("Multiple labels")
+    SECTION("Multiple Labels")
     {
         const ParsedPlaceReference p("SWITCH SW <- LABEL1, LABEL2, LABEL3");
         auto switchReference = dynamic_cast<SwitchPlaceReference*>(p.placeReference.get());
