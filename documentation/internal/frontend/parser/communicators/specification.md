@@ -9,7 +9,7 @@
    `LIBRARY math;` whereby the compiler will look for a file named `math.cor` in the library path as specified on the command line.
 
 
-3. The EXTERNAL communicator will allow linkage between Coral 66 procedures and external libraries such as stdlib so that access
+3. The EXTERNAL communicator will allow linkage between Coral 66 procedures and external libraries such as libc so that access
    to the platforms facilities such as I/O can be achieved by linking the program against the appropriate shared library.
 
 
