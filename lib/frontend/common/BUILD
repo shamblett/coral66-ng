@@ -15,7 +15,6 @@ cc_library(
         "targets/x86_target_features.cpp",
     ],
     hdrs = [
-        "attributes.hpp",
         "builtins.def",
         "constant_value.hpp",
         "custom_diagnostics.hpp",

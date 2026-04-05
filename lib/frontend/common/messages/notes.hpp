@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * Note definitions for Coral 66
+ * Note definitions.
  *
  */
 

@@ -12,7 +12,6 @@
 #include <string>
 #include <vector>
 
-#include "lib/frontend/common/attributes.hpp"
 #include "lib/frontend/common/semantics_common.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/lexer/lexer.hpp"

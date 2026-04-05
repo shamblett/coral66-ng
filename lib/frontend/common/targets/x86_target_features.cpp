@@ -6,12 +6,12 @@
 
 #include "x86_target_features.hpp"
 
-bool coral66::x86_target_features::hasFeature(coral66::TargetFeatures::Features const features) const
+bool coral66::x86_target_features::hasFeature(Features const features) const
 {
     switch (features)
     {
         default: return false;
-        case TargetFeatures::IsX86: return true;
+        case IsX86: return true;
 #define HANDLE_VALUE(x) \
     case x: return m_##x;
 //
@@ -19,7 +19,7 @@ bool coral66::x86_target_features::hasFeature(coral66::TargetFeatures::Features 
     }
 }
 
-bool coral66::x86_target_features::setFeature(coral66::TargetFeatures::Features const features, bool value)
+bool coral66::x86_target_features::setFeature(Features const features, bool value)
 {
     switch (features)
     {

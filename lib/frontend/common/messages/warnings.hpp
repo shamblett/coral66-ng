@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * Warning message definitions for Coral 66
+ * Warning message definitions.
  *
  */
 

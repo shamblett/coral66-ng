@@ -20,7 +20,7 @@ class x86_target_features final : public TargetFeatures
 #define HANDLE_VALUE(x) bool m_##x;
 #include "x86_features.def"
 public:
-    bool hasFeature(Features features) const override;
+    [[nodiscard]] bool hasFeature(Features features) const override;
 
     bool setFeature(Features features, bool value) override;
 };

@@ -6,7 +6,7 @@
 
 #include "message.hpp"
 
-llvm::raw_ostream& coral66::operator<<(llvm::raw_ostream& os, const coral66::Message& message)
+llvm::raw_ostream& coral66::operator<<(llvm::raw_ostream& os, const Message& message)
 
 {
     os << message.m_text;

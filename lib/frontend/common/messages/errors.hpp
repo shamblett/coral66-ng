@@ -7,7 +7,7 @@
 #pragma once
 
 /**
- * Error message definitions for Coral 66
+ * Error message definitions.
  *
  */
 
