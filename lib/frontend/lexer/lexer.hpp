@@ -120,12 +120,14 @@ struct CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'>
 template <>
 struct StringConverter<lexer::TokenType>
 {
-    static std::string inFormat(lexer::TokenType arg, const source_interface*)
+    template <class... Ctx>
+    static std::string inFormat(lexer::TokenType arg, Ctx&&... /*ctx*/)
     {
         return coral66::to_string(tokenName(arg));
     }
 
-    static std::string inArg(lexer::TokenType arg, const source_interface*)
+    template <class... Ctx>
+    static std::string inArg(lexer::TokenType arg, Ctx&&... /*ctx*/)
     {
         return coral66::to_string(tokenName(arg, false));
     }
@@ -134,10 +136,10 @@ struct StringConverter<lexer::TokenType>
 template <>
 struct StringConverter<lexer::TokenBase>
 {
-    static std::string inFormat(const lexer::TokenBase& arg, const source_interface* sourceInterface)
+    static std::string inFormat(const lexer::TokenBase& arg, const source_interface& sourceInterface)
     {
-        CORAL66_ASSERT(sourceInterface);
-        auto spelling = lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
+        
+        auto spelling = lexer::normalizeSpelling(arg.getRepresentation(sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {
             if (spelling[i] != '\n')
@@ -149,10 +151,10 @@ struct StringConverter<lexer::TokenBase>
         return "'" + spelling + "'";
     }
 
-    static std::string inArg(const lexer::TokenBase& arg, const source_interface* sourceInterface)
+    static std::string inArg(const lexer::TokenBase& arg, const source_interface& sourceInterface)
     {
-        CORAL66_ASSERT(sourceInterface);
-        auto spelling = lexer::normalizeSpelling(arg.getRepresentation(*sourceInterface));
+        
+        auto spelling = lexer::normalizeSpelling(arg.getRepresentation(sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {
             if (spelling[i] != '\n')

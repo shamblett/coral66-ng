@@ -27,12 +27,14 @@ namespace diag
 template <class T>
 struct StringConverter
 {
-    static std::string inFormat(const T& arg, const source_interface*)
+    template <class... Ctx>
+    static std::string inFormat(const T& arg, Ctx&&... /*ctx*/)
     {
         return coral66::to_string(arg);
     }
 
-    static std::string inArg(const T& arg, const source_interface*)
+    template <class... Ctx>
+    static std::string inArg(const T& arg, Ctx&&... /*ctx*/)
     {
         return coral66::to_string(arg);
     }
@@ -41,14 +43,16 @@ struct StringConverter
 template <class T>
 struct StringConverter<IntrusiveVariantValue<T>>
 {
-    static std::string inFormat(const IntrusiveVariantValue<T>& arg, const source_interface* sourceInterface)
+    template <class... Ctx>
+    static std::string inFormat(const IntrusiveVariantValue<T>& arg, Ctx&&... ctx)
     {
-        return StringConverter<T>::inFormat(arg, sourceInterface);
+        return StringConverter<T>::inFormat(arg, std::forward<Ctx>(ctx)...);
     }
 
-    static std::string inArg(const IntrusiveVariantValue<T>& arg, const source_interface* sourceInterface)
+    template <class... Ctx>
+    static std::string inArg(const IntrusiveVariantValue<T>& arg, Ctx&&... ctx)
     {
-        return StringConverter<T>::inArg(arg, sourceInterface);
+        return StringConverter<T>::inArg(arg, std::forward<Ctx>(ctx)...);
     }
 };
 

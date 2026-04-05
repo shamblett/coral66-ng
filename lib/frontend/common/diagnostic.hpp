@@ -388,6 +388,26 @@ struct AnnotateExpr
  * @tparam format The format string (as a fixed_string).
  * @tparam Mods A list of modifiers (Underline, Annotate, etc.) applying to the arguments.
  */
+
+
+namespace detail {
+
+template <class T>
+concept HasStringConverters = requires(T t, const source_interface& src) {
+    { diag::StringConverter<T>::inFormat(t, src) };
+    { diag::StringConverter<T>::inArg(t, src) };
+} || requires(T t) {
+    { diag::StringConverter<T>::inFormat(t) };
+    { diag::StringConverter<T>::inArg(t) };
+};
+
+template <class T>
+concept HasType = requires(T t) {
+    { t.getType() };
+};
+
+} // namespace detail
+
 template <std::size_t N, auto& format, class... Mods>
 class diagnostic : public detail::Diagnostic::DiagnosticBase
 {
@@ -498,38 +518,16 @@ private:
         }
     }
 
-    template <class T, class = void>
-    struct HasStringConverters : std::false_type
-    {
-    };
 
-    template <class T>
-    struct HasStringConverters<
-        T, std::void_t<
-               decltype(diag::StringConverter<T>::inFormat(std::declval<T>(), std::declval<const source_interface*>()),
-                        diag::StringConverter<T>::inArg(std::declval<T>(), std::declval<const source_interface*>()))>>
-        : std::true_type
-    {
-    };
-
-    template <class T, class = void>
-    struct HasType : std::false_type
-    {
-    };
-
-    template <class T>
-    struct HasType<T, std::void_t<decltype(std::declval<T>().getType())>> : std::true_type
-    {
-    };
 
     template <std::size_t argumentIndex, std::underlying_type_t<Constraint> constraint, class T>
     struct ConstraintCheck
     {
-        static_assert(!(constraint & StringConstraint) || HasStringConverters<std::decay_t<T>>{},
+        static_assert(!(constraint & StringConstraint) || detail::HasStringConverters<std::decay_t<T>>,
                       "Argument must be convertible to string");
         static_assert(!(constraint & LocationConstraint) || locationConstraintCheck<T>(),
                       "Argument must denote a location range");
-        static_assert(!(constraint & TypeConstraint) || HasType<T>{}, "Argument must have a type");
+        static_assert(!(constraint & TypeConstraint) || detail::HasType<T>, "Argument must have a type");
     };
 
     template <auto&, std::size_t>
@@ -544,9 +542,9 @@ private:
         checkConstraints<array, i + 1, Args...>();
     }
 
-    template <class Tuple, std::size_t... ints>
-    static std::array<Argument, N> createArgumentArray(const source_interface* sourceInterface, Tuple&& args,
-                                                       std::index_sequence<ints...>);
+    template <class Tuple, class... Ctx, std::size_t... ints>
+    static std::array<Argument, N> createArgumentArray(Tuple&& args,
+                                                       std::index_sequence<ints...>, Ctx&&... ctx);
 
     constexpr static MaxVector<std::string_view, N> customModifiersFor(std::size_t i)
     {
@@ -674,8 +672,8 @@ Message diagnostic<N, format, Mods...>::args(const T& location, const source_int
         this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
                                                                   // function to improve debug perf a lil
     static_assert(locationConstraintCheck<T>(), "First argument must denote a location");
-    auto array = createArgumentArray(&sourceInterface, std::forward_as_tuple(std::forward<Args>(args)...),
-                                     std::index_sequence_for<Args...>{});
+    auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
+                                     std::index_sequence_for<Args...>{}, sourceInterface);
     return print(diag::getPointRange(location), getFormat(), array, modifiers, sourceInterface);
 }
 
@@ -689,7 +687,7 @@ Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
     // function to improve debug perf a lil
     // TODO: Instead of passing nullptr make it so that StringConverter may use const SourceInterface& as a second
     //  argument but make it a compiler error if such a string converter is used when using argsCLI instead of args
-    auto array = createArgumentArray(nullptr, std::forward_as_tuple(std::forward<Args>(args)...),
+    auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
                                      std::index_sequence_for<Args...>{});
     return print(getFormat(), array);
 }
@@ -743,14 +741,14 @@ constexpr auto diagnostic<N, format, Mods...>::getConstraints() -> std::array<st
 }
 
 template <std::size_t N, auto& format, class... Mods>
-template <class Tuple, std::size_t... ints>
-auto diagnostic<N, format, Mods...>::createArgumentArray(const source_interface* sourceInterface, Tuple&& args,
-                                                         std::index_sequence<ints...>) -> std::array<Argument, N>
+template <class Tuple, class... Ctx, std::size_t... ints>
+auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args,
+                                                         std::index_sequence<ints...>, Ctx&&... ctx) -> std::array<Argument, N>
 {
-    (void)sourceInterface;
+    
     std::array<Argument, N> result;
     (
-        [&result, &args, sourceInterface]<typename T0>([[maybe_unused]] T0 integer)
+        [&result, &args, &ctx...]<typename T0>([[maybe_unused]] T0 integer)
         {
             using IntegerTy = T0;
             using ArgTy = std::decay_t<std::tuple_element_t<IntegerTy::value, Tuple>>;
@@ -766,15 +764,15 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(const source_interface*
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::StringConstraint))
             {
                 result[IntegerTy::value].inFormatText = ::coral66::diag::StringConverter<ArgTy>::inFormat(
-                    std::get<IntegerTy::value>(args), sourceInterface);
+                    std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
                 result[IntegerTy::value].inArgText =
-                    diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), sourceInterface);
+                    diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::TypeConstraint))
             {
                 using Type = std::decay_t<decltype(std::declval<ArgTy>().getType())>;
                 result[IntegerTy::value].inArgText = ::coral66::diag::StringConverter<Type>::inArg(
-                    std::get<IntegerTy::value>(args).getType(), sourceInterface);
+                    std::get<IntegerTy::value>(args).getType(), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::CustomConstraint))
             {
