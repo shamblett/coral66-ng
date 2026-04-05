@@ -12,6 +12,11 @@
 namespace coral66::detail
 {
 
+/**
+ *
+ * LLVM raw_string_stream override for diagnostic colour handling.
+ *
+ */
 class ColorStringOstream : public llvm::raw_string_ostream
 {
 public:

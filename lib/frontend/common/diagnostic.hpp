@@ -22,8 +22,7 @@
 #include "messages/message.hpp"
 
 /**
- * @file diagnostic.hpp
- * @brief Defines the compile-time safe diagnostic engine.
+ * Defines the compile-time safe diagnostic engine.
  *
  * This file contains the infrastructure for defining compiler diagnostics (warnings, errors and notes).
  * It uses extensive template metaprogramming to validate format strings and argument types
@@ -104,6 +103,7 @@ constexpr bool checkForNoHoles(std::string_view text)
         std::array<bool, N> seen = {{false}};
         while (auto result = nextArg(text))
         {
+            // ReSharper disable once CppDFANullDereference
             seen[result->index] = true;
         }
         ((
