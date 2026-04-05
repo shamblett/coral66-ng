@@ -1,10 +1,9 @@
+#include "lib/frontend/common/color_string_ostream.hpp"
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
-
-#include "diagnostic.hpp"
 
 #include <llvm/ADT/STLExtras.h>
 #include <llvm/Support/Format.h>
@@ -14,6 +13,7 @@
 #include <array>
 #include <map>
 
+#include "diagnostic.hpp"
 #include "source_object.hpp"
 
 namespace
@@ -290,7 +290,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     // TODO: Right now the colour is useless. Just putting it here to know what the colour when and were.
     // Will have to create a segment map or so in coral66::Message that stores the colour and boldness information
     // and then emits it correctly in it's operator<<
-    llvm::raw_string_ostream ss(result);
+    ColorStringOstream ss(result);
 
     {
         auto file = sourceInterface.getFiles()[location.first.fileId].includedBy;
@@ -314,24 +314,21 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             if (map == range.end())
             {
                 // The element was not found. That means that any #lines appeared after this line or that none exist
-                llvm::WithColor(ss, ss.WHITE, true)
+                llvm::WithColor(ss, llvm::raw_string_ostream::WHITE, true)
                     << "In file included from " << sourceInterface.getFiles()[iter.first].path << ':' << line << ':';
             }
             else
             {
                 const auto path = std::get<1>(*map).value_or(sourceInterface.getFiles()[iter.first].path);
                 const auto printedLine = std::get<2>(*map) + line - std::get<0>(*map);
-                llvm::WithColor(ss, ss.WHITE, true) << "In file included from " << path << ':' << printedLine << ':';
+                llvm::WithColor(ss, llvm::raw_string_ostream::WHITE, true)
+                    << "In file included from " << path << ':' << printedLine << ':';
             }
             ss << '\n';
         }
     }
 
     location = toMacroId0Range(location, sourceInterface);
-    if (m_severity == Severity::Warning && sourceInterface.getFiles()[location.first.fileId].systemHeader)
-    {
-        return {};
-    }
     {
         const auto [line, column] = getLineCol(location.first, sourceInterface);
         const auto& range = sourceInterface.getFiles()[location.first.fileId].lineAndFileMapping;
@@ -344,14 +341,15 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         if (iter == range.end())
         {
             // The element was not found. That means that any #lines appeared after this line or that none exist
-            llvm::WithColor(ss, ss.WHITE, true)
+            llvm::WithColor(ss, llvm::raw_string_ostream::WHITE, true)
                 << sourceInterface.getFiles()[location.first.fileId].path << ':' << line << ':' << column << ": ";
         }
         else
         {
             const auto path = std::get<1>(*iter).value_or(sourceInterface.getFiles()[location.first.fileId].path);
             const auto printedLine = std::get<2>(*iter) + line - std::get<0>(*iter);
-            llvm::WithColor(ss, ss.WHITE, true) << path << ':' << printedLine << ':' << column << ": ";
+            llvm::WithColor(ss, llvm::raw_string_ostream::WHITE, true)
+                << path << ':' << printedLine << ':' << column << ": ";
         }
     }
 
@@ -501,14 +499,14 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
 {
     switch (this->m_severity)
     {
-        case coral66::Severity::None: CORAL66_UNREACHABLE;
-        case coral66::Severity::Error: llvm::WithColor(ss, ss.RED, true) << "error: "; break;
-        case coral66::Severity::Warning: llvm::WithColor(ss, ss.MAGENTA, true) << "warning: "; break;
-        case coral66::Severity::Note: llvm::WithColor(ss, ss.CYAN, true) << "note: "; break;
+        case Severity::None: CORAL66_UNREACHABLE;
+        case Severity::Error: llvm::WithColor(ss, llvm::raw_string_ostream::RED, true) << "error: "; break;
+        case Severity::Warning: llvm::WithColor(ss, llvm::raw_string_ostream::MAGENTA, true) << "warning: "; break;
+        case Severity::Note: llvm::WithColor(ss, llvm::raw_string_ostream::CYAN, true) << "note: "; break;
     }
     auto copy = message;
     const char* last = copy.data();
-    while (auto iter = detail::Diagnostic::nextArg(copy))
+    while (const auto iter = nextArg(copy))
     {
         auto index = iter->index;
         auto mods = iter->modifier;
@@ -537,13 +535,10 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(std::string_
                                                                     std::span<Argument> arguments) const
 {
     std::string result;
-    // TODO: Right now the colour is useless. Just putting it here to know what the colour when and were.
-    // Will have to create a segment map or so in coral66::Message that stores the colour and boldness information
-    // and then emits it correctly in it's operator<<
-    llvm::raw_string_ostream ss(result);
-    llvm::WithColor(ss, ss.RED, true) << "coral66"
+    ColorStringOstream ss(result);
+    llvm::WithColor(ss, llvm::raw_string_ostream::RED, true) << "coral66"
 
-                                         ": ";
+                                                                ": ";
     evaluateFormatsInMessage(message, arguments, ss);
     ss.flush();
     return {m_severity, std::move(result)};

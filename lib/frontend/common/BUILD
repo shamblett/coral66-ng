@@ -15,6 +15,7 @@ cc_library(
         "targets/x86_target_features.cpp",
     ],
     hdrs = [
+        "color_string_ostream.hpp",
         "constant_value.hpp",
         "custom_diagnostics.hpp",
         "diagnostic.hpp",

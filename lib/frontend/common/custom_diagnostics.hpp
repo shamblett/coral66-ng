@@ -18,7 +18,7 @@ class source_interface;
 namespace diag
 {
 /**
- * @brief Trait to convert a type T into a string for diagnostics.
+ * Trait to convert a type T into a string for diagnostics.
  *
  * Specializations of this struct allow the diagnostic engine to format
  * custom types (like ConstantValue, or specific AST nodes) when they are passed

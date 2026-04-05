@@ -33,15 +33,18 @@ public:
 
     /*implicit*/ constant_value(ValueType value) : m_value(std::move(value)) {}
 
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     constant_value(llvm::APSInt integer);
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     constant_value(llvm::APFloat floating);
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     constant_value(std::string string);
 
     constant_value castTo(const Type& type, const ProgramInterface* program, const LanguageOptions& options,
                           Issue* issue = nullptr) const;
 
     // Add accessors if needed by other parts of the system
-    const ValueType& getValue() const
+    [[nodiscard]] const ValueType& getValue() const
     {
         return m_value;
     }
