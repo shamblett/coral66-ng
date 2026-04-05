@@ -33,7 +33,7 @@ public:
 #include "lib/frontend/common/targets/x86_features.def"
     };
 
-    virtual bool hasFeature(Features features) const = 0;
+    [[nodiscard]] virtual bool hasFeature(Features features) const = 0;
 
     virtual bool setFeature(Features features, bool value) = 0;
 };
@@ -41,7 +41,7 @@ public:
 class DefaultTargetFeatures final : public TargetFeatures
 {
 public:
-    bool hasFeature(Features features) const override;
+    [[nodiscard]] bool hasFeature(Features features) const override;
 
     bool setFeature(Features features, bool value) override;
 };

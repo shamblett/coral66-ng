@@ -6,14 +6,11 @@
 
 #pragma once
 
-#include <optional>
-#include <string>
 #include <string_view>
 #include <tuple>
 #include <vector>
 
 #include "lib/support/abstract_intrusive_variant.hpp"
-#include "lib/support/intrusive_variant_value.hpp"
 #include "lib/support/utilities.hpp"
 
 namespace coral66::Semantics
@@ -323,7 +320,7 @@ class ErrorType : public Type
     }
 
 public:
-    ErrorType(TypeFlags flags = Nothing) : Type(std::in_place_type<ErrorType>, flags) {}
+    explicit ErrorType(TypeFlags flags = Nothing) : Type(std::in_place_type<ErrorType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ErrorType)
 };
 

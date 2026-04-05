@@ -23,7 +23,7 @@ class CToken;
 class PPToken;
 
 /**
- * @brief Enumeration of all possible token types in the C language and Preprocessor.
+ * Enumeration of all possible token types in the C language and Preprocessor.
  */
 enum class TokenType : std::uint8_t
 {

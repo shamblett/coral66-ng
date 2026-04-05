@@ -684,9 +684,6 @@ Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
     [[maybe_unused]] auto* v =
         this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
-    // function to improve debug perf a lil
-    // TODO: Instead of passing nullptr make it so that StringConverter may use const SourceInterface& as a second
-    //  argument but make it a compiler error if such a string converter is used when using argsCLI instead of args
     auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
                                      std::index_sequence_for<Args...>{});
     return print(getFormat(), array);

@@ -13,12 +13,12 @@
 #include "lib/support/utilities.hpp"
 #include "targets/x86_target_features.hpp"
 
-bool coral66::DefaultTargetFeatures::hasFeature(coral66::TargetFeatures::Features) const
+bool coral66::DefaultTargetFeatures::hasFeature(Features) const
 {
     return false;
 }
 
-bool coral66::DefaultTargetFeatures::setFeature(coral66::TargetFeatures::Features, bool)
+bool coral66::DefaultTargetFeatures::setFeature(Features, bool)
 {
     return false;
 }

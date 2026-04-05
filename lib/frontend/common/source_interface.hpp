@@ -11,7 +11,7 @@
 #include <variant>
 
 /**
- * @brief Defines the abstract interface for accessing source code information.
+ * Defines the abstract interface for accessing source code information.
  *
  * The SourceInterface (and PPSourceInterface) provides an abstraction layer for
  * querying details about the source code, such as:

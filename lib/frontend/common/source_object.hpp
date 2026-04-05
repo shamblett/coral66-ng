@@ -18,7 +18,7 @@
 #include "lib/support/utilities.hpp"
 
 /**
- * @brief Defines the SourceObject class, a concrete implementation of SourceInterface.
+ * Defines the SourceObject class, a concrete implementation of SourceInterface.
  *
  * SourceObject acts as the central storage for all source-related data for a translation unit.
  * It holds:

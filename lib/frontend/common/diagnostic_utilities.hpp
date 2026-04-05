@@ -95,7 +95,8 @@ PointRange getPointRange(const T& arg)
                       && std::is_base_of_v<lexer::TokenBase, std::remove_pointer_t<T2>>)
         {
             auto& [arg1, arg2] = arg;
-            PointLocation first, second;
+            // ReSharper disable once CppDFAUnusedValue
+            PointLocation first{}, second{};
             if constexpr (std::is_pointer_v<T1>)
             {
                 CORAL66_ASSERT(arg1);
