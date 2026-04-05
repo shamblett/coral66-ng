@@ -548,7 +548,7 @@ private:
     static std::array<Argument, N> createArgumentArray(const source_interface* sourceInterface, Tuple&& args,
                                                        std::index_sequence<ints...>);
 
-    constexpr static coral66::MaxVector<std::string_view, N> customModifiersFor(std::size_t i)
+    constexpr static MaxVector<std::string_view, N> customModifiersFor(std::size_t i)
     {
         coral66::MaxVector<std::string_view, N> result{};
         auto text = getFormat();
@@ -594,10 +594,7 @@ private:
     }
 
 public:
-    constexpr diagnostic(const Severity severity, const std::string_view name)
-        : detail::Diagnostic::DiagnosticBase(severity, name)
-    {
-    }
+    constexpr diagnostic(const Severity severity, const std::string_view name) : DiagnosticBase(severity, name) {}
 
     constexpr static std::size_t getSize()
     {
@@ -624,7 +621,7 @@ private:
     {
         if constexpr (N != 0)
         {
-            std::array<coral66::MaxVector<std::string_view, N>, N> result;
+            std::array<MaxVector<std::string_view, N>, N> result;
             for (std::size_t i = 0; i < N; i++)
             {
                 result[i] = customModifiersFor(i);
@@ -771,7 +768,7 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(const source_interface*
                 result[IntegerTy::value].inFormatText = ::coral66::diag::StringConverter<ArgTy>::inFormat(
                     std::get<IntegerTy::value>(args), sourceInterface);
                 result[IntegerTy::value].inArgText =
-                    ::coral66::diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), sourceInterface);
+                    diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), sourceInterface);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::TypeConstraint))
             {
