@@ -304,7 +304,7 @@ struct ConversionContext
                             sourceInterface, std::forward<T0>(args1)...);
                         return;
                     }
-                    if constexpr (coral66::IsTupleLike<std::decay_t<Location>>{})
+                    if constexpr (coral66::TupleLike<std::decay_t<Location>>)
                     {
                         if constexpr (std::tuple_size_v<std::decay_t<Location>> == 2)
                         {

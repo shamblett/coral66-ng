@@ -6,26 +6,14 @@
 
 #pragma once
 
-/**
- * Constexpr.hpp acts as a general-purpose utility header for compile-time programming and type metaprogramming
- * within the project.
- *
- * It provides a collection of:
- * - Compile-time string manipulation via `basic_fixed_string`, allowing strings to be used as non-type template
- * parameters.
- * - Type traits for detecting and working with standard library types like tuples, variants, smart pointers, and
- * containers.
- * - Integer type selection (`suitableUInt`, `suitableInt`) based on value ranges.
- * - `std::variant` helper utilities for type containment and union operations.
- * - Preprocessor macros for variadic argument counting and iteration.
- */
-
 #include <limits>
 #include <memory>
 #include <optional>
 #include <string_view>
 #include <tuple>
 #include <variant>
+#include <concepts>
+#include <vector>
 
 #include "utilities.hpp"
 
@@ -42,7 +30,6 @@ constexpr static auto integerSequenceToTuple(std::index_sequence<ints...>)
 template <class T, std::size_t N>
 class basic_fixed_string
 {
-    // Needs to be public due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=97740
 public:
     T m_data[N] = {};
 
@@ -141,89 +128,63 @@ using suitableInt =
 
 #pragma GCC diagnostic pop
 
-template <class T, typename = void>
-struct IsTupleLike : std::false_type
-{
-};
+template <class T>
+concept TupleLike = requires { typename std::tuple_size<T>::type; };
 
 template <class T>
-struct IsTupleLike<T, std::void_t<typename std::tuple_size<T>::type>> : std::true_type
-{
-};
-
-template <class T>
-struct IsTuple : std::false_type
-{
-};
-
+struct is_tuple_impl : std::false_type {};
 template <class... T>
-struct IsTuple<std::tuple<T...>> : std::true_type
-{
-};
+struct is_tuple_impl<std::tuple<T...>> : std::true_type {};
 
 template <class T>
-struct IsVariant : std::false_type
-{
-};
+concept Tuple = is_tuple_impl<T>::value;
 
+template <class T>
+struct is_variant_impl : std::false_type {};
 template <class... T>
-struct IsVariant<std::variant<T...>> : std::true_type
-{
-};
+struct is_variant_impl<std::variant<T...>> : std::true_type {};
 
 template <class T>
-struct IsUniquePtr : std::false_type
-{
-};
+concept Variant = is_variant_impl<T>::value;
 
+template <class T>
+struct is_unique_ptr_impl : std::false_type {};
 template <class T, class Del>
-struct IsUniquePtr<std::unique_ptr<T, Del>> : std::true_type
-{
-};
+struct is_unique_ptr_impl<std::unique_ptr<T, Del>> : std::true_type {};
 
 template <class T>
-struct IsOptional : std::false_type
-{
-};
+concept UniquePtr = is_unique_ptr_impl<T>::value;
 
 template <class T>
-struct IsOptional<std::optional<T>> : std::true_type
-{
-};
+struct is_optional_impl : std::false_type {};
+template <class T>
+struct is_optional_impl<std::optional<T>> : std::true_type {};
 
 template <class T>
-struct IsVector : std::false_type
-{
-};
+concept Optional = is_optional_impl<T>::value;
 
 template <class T>
-struct IsVector<std::vector<T>> : std::true_type
-{
-};
+struct is_vector_impl : std::false_type {};
+template <class T>
+struct is_vector_impl<std::vector<T>> : std::true_type {};
 
 template <class T>
-struct IsSharedPtr : std::false_type
-{
-};
+concept Vector = is_vector_impl<T>::value;
 
 template <class T>
-struct IsSharedPtr<std::shared_ptr<T>> : std::true_type
-{
-};
+struct is_shared_ptr_impl : std::false_type {};
+template <class T>
+struct is_shared_ptr_impl<std::shared_ptr<T>> : std::true_type {};
 
 template <class T>
-struct IsSmartPtr : std::disjunction<IsUniquePtr<T>, IsSharedPtr<T>>
-{
-};
+concept SharedPtr = is_shared_ptr_impl<T>::value;
 
-template <class T, class U, typename = void>
-struct IsEqualComparable : std::false_type
-{
-};
+template <class T>
+concept SmartPtr = UniquePtr<T> || SharedPtr<T>;
 
 template <class T, class U>
-struct IsEqualComparable<T, U, std::void_t<decltype(std::declval<T>() == std::declval<U>())>> : std::true_type
-{
+concept EqualComparable = requires(std::remove_cvref_t<T> const& a, std::remove_cvref_t<U> const& b) {
+    { a.operator==(b) } -> std::convertible_to<bool>;
 };
 
 template <class T>
@@ -232,11 +193,8 @@ constexpr bool always_false = false;
 template <class T>
 constexpr bool always_true = true;
 
-template <typename, typename = void>
-constexpr bool IsTypeCompleteV = false;
-
 template <typename T>
-constexpr bool IsTypeCompleteV<T, std::void_t<decltype(sizeof(T))>> = true;
+concept CompleteType = requires { sizeof(T); };
 
 namespace detail
 {
@@ -244,7 +202,7 @@ template <class T, class... Args>
 // ReSharper disable once CppFunctionIsNotImplemented
 constexpr auto variantTypesContain(std::variant<Args...>) -> std::disjunction<std::is_same<T, Args>...>;
 
-template <class Variant, class OtherVariant>
+template <class VariantType, class OtherVariant>
 struct VariantUnion;
 
 template <class... ThisArgs, class First>
@@ -262,16 +220,16 @@ struct VariantUnion<std::variant<ThisArgs...>, std::variant<First, Args...>>
                                     VariantUnion<std::variant<ThisArgs..., First>, std::variant<Args...>>>::type;
 };
 
-template <class Variant>
+template <class VariantType>
 struct Fold
 {
     template <class OtherVariant>
-    auto operator+(Fold<OtherVariant>) -> Fold<typename VariantUnion<Variant, OtherVariant>::type>
+    auto operator+(Fold<OtherVariant>) -> Fold<typename VariantUnion<VariantType, OtherVariant>::type>
     {
         CORAL66_UNREACHABLE;
     }
 
-    using type = Variant;
+    using type = VariantType;
 };
 
 template <class... Variants>
@@ -279,11 +237,11 @@ template <class... Variants>
 constexpr auto variantTypeUnion(Variants...) -> decltype((std::declval<Fold<Variants>>() + ...))::type;
 } // namespace detail
 
-template <class T, class Variant>
-constexpr bool variantTypesContainV = decltype(detail::variantTypesContain<T>(std::declval<Variant>())){};
+template <class T, class VariantType>
+constexpr bool variantTypesContainV = decltype(detail::variantTypesContain<T>(std::declval<VariantType>())){};
 
-template <class... Variant>
-using VariantUnion = decltype(detail::variantTypeUnion(std::declval<Variant>()...));
+template <class... VariantType>
+using VariantUnion = decltype(detail::variantTypeUnion(std::declval<VariantType>()...));
 
 #define CORAL66_CAT2(_1, _2) _1##_2
 #define CORAL66_PASTE2(_1, _2) CORAL66_CAT2(_1, _2)
@@ -296,9 +254,50 @@ using VariantUnion = decltype(detail::variantTypeUnion(std::declval<Variant>()..
                                   _36, _37, _38, _39, _40, _41, _42, _43, _44, _45, _46, _47, _48, _49, _50, _51, _52, \
                                   _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, N, ...)                       \
     N
-#define CORAL66_MACRO_RSEQ_N()                                                                                        \
-    63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36,   \
-        35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, \
+
+#define CORAL66_MACRO_RSEQ_N()                                                                                         \
+    63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36,    \
+        35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8,  \
         7, 6, 5, 4, 3, 2, 1, 0
 
+#define P00_FOR1(NAME, OP, FUNC, _1) FUNC(NAME, _1)
+#define P00_FOR2(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR1(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR3(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR2(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR4(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR3(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR5(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR4(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR6(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR5(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR7(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR6(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR8(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR7(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR9(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR8(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR10(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR9(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR11(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR10(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR12(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR11(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR13(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR12(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR14(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR13(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR15(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR14(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR16(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR15(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR17(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR16(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR18(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR17(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR19(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR18(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR20(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR19(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR21(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR20(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR22(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR21(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR23(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR22(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR24(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR23(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR25(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR24(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR26(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR25(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR27(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR26(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR28(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR27(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR29(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR28(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR30(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR29(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR31(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR30(NAME, OP, FUNC, __VA_ARGS__)
+#define P00_FOR32(NAME, OP, FUNC, _1, ...) FUNC(NAME, _1) OP P00_FOR31(NAME, OP, FUNC, __VA_ARGS__)
+
+#define CORAL66_FOR_EACH(NAME, OP, FUNC, ...) \
+    CORAL66_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), OP, FUNC, __VA_ARGS__)
+
+#define CORAL66_FOR_EACH_COMMA(NAME, FUNC, ...) \
+    CORAL66_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), , FUNC, __VA_ARGS__)
+
 } // namespace coral66
+

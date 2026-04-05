@@ -156,7 +156,7 @@ public:
     }
 
     template <class T = bool>
-    [[nodiscard]] friend std::enable_if_t<(always_true<T> && ... && coral66::IsEqualComparable<Args, Args>{}), T>
+    [[nodiscard]] friend std::enable_if_t<(always_true<T> && ... && coral66::EqualComparable<Args, Args>), T>
         operator==(const AbstractIntrusiveVariant & lhs, const AbstractIntrusiveVariant & rhs) noexcept
     {
         if (lhs.index() != rhs.index())
@@ -171,7 +171,7 @@ public:
     }
 
     template <class T = bool>
-    [[nodiscard]] friend std::enable_if_t<(always_true<T> && ... && coral66::IsEqualComparable<Args, Args>{}), T>
+    [[nodiscard]] friend std::enable_if_t<(always_true<T> && ... && coral66::EqualComparable<Args, Args>), T>
         operator!=(const AbstractIntrusiveVariant & lhs, const AbstractIntrusiveVariant & rhs) noexcept
     {
         return !(lhs == rhs);

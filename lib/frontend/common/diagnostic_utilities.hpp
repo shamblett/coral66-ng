@@ -61,7 +61,7 @@ PointRange getPointRange(const T& arg)
         CORAL66_ASSERT(std::begin(arg) != std::end(arg));
         auto& first = *std::begin(arg);
         auto& last = *(std::end(arg) - 1);
-        if constexpr (std::is_pointer_v<std::decay_t<decltype(first)>> || IsSmartPtr<std::decay_t<decltype(first)>>{})
+        if constexpr (std::is_pointer_v<std::decay_t<decltype(first)>> || SmartPtr<std::decay_t<decltype(first)>>)
         {
             return {getPointRange(*first).first, getPointRange(*last).second};
         }
@@ -70,13 +70,13 @@ PointRange getPointRange(const T& arg)
             return {getPointRange(first).first, getPointRange(last).second};
         }
     }
-    else if constexpr (IsVariant<U>{})
+    else if constexpr (Variant<U>)
     {
         return coral66::match(arg,
                               []<typename T0>(T0&& value)
                               {
                                   using V = std::decay_t<T0>;
-                                  if constexpr (std::is_pointer_v<V> || IsSmartPtr<V>{})
+                                  if constexpr (std::is_pointer_v<V> || SmartPtr<V>)
                                   {
                                       CORAL66_ASSERT(value);
                                       return getPointRange(*value);

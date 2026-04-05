@@ -623,37 +623,37 @@ public:
     }
 };
 
-template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
+template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
 bool operator==(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return *lhs == *rhs;
 }
 
-template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
+template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
 bool operator!=(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return !(lhs == rhs);
 }
 
-template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
+template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
 bool operator==(const IntrusiveVariantValue<T>& lhs, const U & rhs)
 {
     return *lhs == rhs;
 }
 
-template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
+template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
 bool operator==(const T & lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return lhs == *rhs;
 }
 
-template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
+template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
 bool operator!=(const T & lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return !(lhs == rhs);
 }
 
-template <class T, class U, std::enable_if_t<IsEqualComparable<T, U>{}>* = nullptr>
+template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
 bool operator!=(const IntrusiveVariantValue<T>& lhs, const U & rhs)
 {
     return !(lhs == rhs);

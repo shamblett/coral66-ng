@@ -427,7 +427,7 @@ private:
         {
             return true;
         }
-        else if constexpr (IsVariant<U>{})
+        else if constexpr (Variant<U>)
         {
             constexpr auto size = std::variant_size_v<U>;
             return std::apply(
@@ -439,7 +439,7 @@ private:
                             constexpr auto index = T0::value;
                             // Don't usually allow pointers except in variants.
                             using V = std::remove_pointer_t<std::variant_alternative_t<index, U>>;
-                            if constexpr (IsSmartPtr<V>{})
+                            if constexpr (SmartPtr<V>)
                             {
                                 return locationConstraintCheck<typename V::element_type>();
                             }
@@ -452,7 +452,7 @@ private:
                 },
                 Constexpr::integerSequenceToTuple(std::make_index_sequence<size>{}));
         }
-        else if constexpr (IsTupleLike<U>{})
+        else if constexpr (TupleLike<U>)
         {
             if constexpr (std::tuple_size_v<U> == 2)
             {
@@ -483,7 +483,7 @@ private:
         else if constexpr (IsIterable<U>{} && !std::is_same_v<std::string, U> && !std::is_same_v<std::string_view, U>)
         {
             using ValueType = std::iterator_traits<decltype(std::begin(std::declval<U>()))>::value_type;
-            if constexpr (IsSmartPtr<ValueType>{})
+            if constexpr (SmartPtr<ValueType>)
             {
                 return locationConstraintCheck<typename ValueType::element_type>();
             }
@@ -582,7 +582,7 @@ private:
             [&args]<typename... T0>([[maybe_unused]] T0... chars) -> std::string
             {
                 static_assert(
-                    IsTypeCompleteV<diag::CustomFormat<T0::value...>>,
+                    CompleteType<diag::CustomFormat<T0::value...>>,
                     "No template specialization of coral66::diag::CustomModifier exists for a given format modifier");
                 static_assert(
                     std::is_invocable_r_v<std::string, diag::CustomFormat<T0::value...>,
