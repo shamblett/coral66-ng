@@ -11,7 +11,7 @@
 namespace coral66
 {
 /**
- * @brief A RAII wrapper that assigns a specific value to a variable when it goes out of scope.
+ * A RAII wrapper that assigns a specific value to a variable when it goes out of scope.
  *
  * ValueReset holds a reference to a variable and a value. Upon destruction,
  * it assigns the stored value to the referenced variable. This is useful for

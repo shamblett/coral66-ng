@@ -11,9 +11,9 @@
 namespace coral66
 {
 /**
- * @brief A RAII wrapper that executes a callable when it goes out of scope.
+ * An RAII wrapper that executes a callable when it goes out of scope.
  *
- * ScopeExit is used to guarantee that cleanup code or state restoration logic
+ * ScopeExit is used to guarantee that clean-up code or state restoration logic
  * runs when a block is exited, regardless of how it exits (e.g., return, exception).
  * This pattern is often referred to as a "scope guard".
  *

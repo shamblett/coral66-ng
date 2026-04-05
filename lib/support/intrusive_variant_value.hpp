@@ -39,7 +39,7 @@ class IntrusiveVariantStorageBase
 {
 protected:
     alignas(SubClasses...) std::byte m_storage[std::max({sizeof(SubClasses)...})] = {};
-    coral66::suitableUInt<sizeof...(SubClasses)> m_index;
+    suitableUInt<sizeof...(SubClasses)> m_index;
 
     [[nodiscard]] Base& get()
     {

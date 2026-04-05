@@ -8,8 +8,8 @@
 
 #include "utilities.hpp"
 
-coral66::Triple::Triple(coral66::Architecture const architecture, coral66::Platform const operatingSystem,
-                        coral66::Environment const environment)
+coral66::Triple::Triple(Architecture const architecture, coral66::Platform const operatingSystem,
+                        Environment const environment)
     : m_architecture(architecture), m_operatingSystem(operatingSystem), m_environment(environment)
 {
 }
@@ -26,18 +26,21 @@ coral66::Triple coral66::Triple::defaultTarget()
 coral66::Triple coral66::Triple::native()
 {
     // ReSharper disable once CppDFAUnusedValue
+    // ReSharper disable once CppUseAuto
     Architecture architecture = Architecture ::Unknown;
 #if defined(_M_AMD64) || defined(__x86_64__)
     architecture = Architecture::x86_64;
 #endif
 
     // ReSharper disable once CppDFAUnusedValue
+    // ReSharper disable once CppUseAuto
     Platform operatingSystem = Platform::Unknown;
 #if defined(__linux__)
     operatingSystem = Platform ::Linux;
 #endif
 
     // ReSharper disable once CppDFAUnusedValue
+    // ReSharper disable once CppUseAuto
     Environment environment = Environment ::Unknown;
 #if defined(__GNUC__)
     environment = Environment ::GNU;

@@ -13,7 +13,7 @@
 namespace coral66
 {
 /**
- * @brief A fixed-capacity, stack-allocated vector implementation compatible with constexpr.
+ * A fixed-capacity, stack-allocated vector implementation compatible with constexpr.
  *
  * MaxVector mimics the interface of std::vector but allocates its storage statically
  * within the object itself (using std::array). This allows it to be used in

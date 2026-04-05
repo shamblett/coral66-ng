@@ -8,7 +8,7 @@
 
 /**
  * Constexpr.hpp acts as a general-purpose utility header for compile-time programming and type metaprogramming
- * within the coral66 project.
+ * within the project.
  *
  * It provides a collection of:
  * - Compile-time string manipulation via `basic_fixed_string`, allowing strings to be used as non-type template
@@ -17,7 +17,7 @@
  * containers.
  * - Integer type selection (`suitableUInt`, `suitableInt`) based on value ranges.
  * - `std::variant` helper utilities for type containment and union operations.
- * - Preprocessor macros (some adapted from the P99 library) for variadic argument counting and iteration.
+ * - Preprocessor macros for variadic argument counting and iteration.
  */
 
 #include <limits>
@@ -285,90 +285,9 @@ constexpr bool variantTypesContainV = decltype(detail::variantTypesContain<T>(st
 template <class... Variant>
 using VariantUnion = decltype(detail::variantTypeUnion(std::declval<Variant>()...));
 
-// See https://gitlab.inria.fr/gustedt/p99/-/tree/master. Code was copied and pasted out of multiple header files
-// without modifications to any macros that start with the P99_ or P00_ prefix. Copyright notice follows:
-
-/* This may look like nonsense, but it really is -*- mode: C; coding: utf-8 -*- */
-/*                                                                              */
-/* Except for parts copied from previous work and as explicitly stated below,   */
-/* the authors and copyright holders for this work are as follows:              */
-/* (C) copyright  2010-2013 Jens Gustedt, INRIA, France                         */
-/* (C) copyright  2013 Pierre-Nicolas Clauss                                    */
-/* (C) copyright  2012 William Morris                                           */
-/*                                                                              */
-/* This file is free software; it is part of the P99 project.                   */
-/*                                                                              */
-/* Licensed under the Apache License, Version 2.0 (the "License");              */
-/* you may not use this file except in compliance with the License.             */
-/* You may obtain a copy of the License at                                      */
-/*                                                                              */
-/*     http://www.apache.org/licenses/LICENSE-2.0                               */
-/*                                                                              */
-/* Unless required by applicable law or agreed to in writing, software          */
-/* distributed under the License is distributed on an "AS IS" BASIS,            */
-/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.     */
-/* See the License for the specific language governing permissions and          */
-/* limitations under the License.                                               */
-/*                                                                              */
-
-#define P99_PRED(N) P00_PRED(N)
-#define P00_PRED(N) P00__PRED(P00_PRED_, N)
-#define P00__PRED(P, N) P##N
-
-#define P00_PRED_1 0
-#define P00_PRED_2 1
-#define P00_PRED_3 2
-#define P00_PRED_4 3
-#define P00_PRED_5 4
-#define P00_PRED_6 5
-
-#define P99_LAST(...) P99_CHS(P99_PRED(P00_NARG(__VA_ARGS__)), __VA_ARGS__, )
-#define P99_ALLBUTLAST(...) P99_PASTE2(P00_PRE, P99_PRED(P00_NARG(__VA_ARGS__)))(__VA_ARGS__, )
-
-#define P99_CHS(N, ...) P00_CHS(P99_SKP(N, __VA_ARGS__))
-#define P00_CHS(...) P00_CHS_(__VA_ARGS__, )
-#define P00_CHS_(X, ...) X
-
-#define P99_SKP(N, ...) P99_PASTE2(P00_SKP, N)(__VA_ARGS__)
-#define P00_SKP0(...) __VA_ARGS__
-#define P00_SKP1(_0, ...) __VA_ARGS__
-#define P00_SKP2(_0, ...) P00_SKP1(__VA_ARGS__)
-#define P00_SKP3(_0, ...) P00_SKP2(__VA_ARGS__)
-#define P00_SKP4(_0, ...) P00_SKP3(__VA_ARGS__)
-#define P00_SKP5(_0, ...) P00_SKP4(__VA_ARGS__)
-
-#define P00_NARG(...) P00_NARG_1(__VA_ARGS__)
-#define P00_ARG(_1, _2, _3, _4, _5, _6, ...) _6
-#define P00_NARG_1(...) P00_ARG(__VA_ARGS__, 5, 4, 3, 2, 1, 0, )
-#define P00_NARG_2(...) P00_ARG(__VA_ARGS__, P00_INV(2), 2, P00_INV(2), 1, P00_INV(2), 0, )
-#define P00_NARG_3(...) P00_ARG(__VA_ARGS__, P00_INV(3), P00_INV(3), 1, P00_INV(3), P00_INV(3), 0, )
-#define P00_NARG_4(...) P00_ARG(__VA_ARGS__, P00_INV(4), 1, P00_INV(4), P00_INV(4), P00_INV(4), 0, )
-
-#define P00_PRE0(...)
-#define P00_PRE1(_0, ...) _0
-#define P00_PRE2(_0, ...) _0, P00_PRE1(__VA_ARGS__)
-#define P00_PRE3(_0, ...) _0, P00_PRE2(__VA_ARGS__)
-#define P00_PRE4(_0, ...) _0, P00_PRE3(__VA_ARGS__)
-#define P00_PRE5(_0, ...) _0, P00_PRE4(__VA_ARGS__)
-
-#define P00_FOR0(NAME, OP, FUNC, ...)
-#define P00_FOR1(NAME, OP, FUNC, ...) FUNC(NAME, P00_PRE1(__VA_ARGS__, ), 0)
-#define P00_FOR2(NAME, OP, FUNC, ...) \
-    OP(NAME, 1, P00_FOR1(NAME, OP, FUNC, P99_ALLBUTLAST(__VA_ARGS__)), FUNC(NAME, P99_LAST(__VA_ARGS__), 1))
-#define P00_FOR3(NAME, OP, FUNC, ...) \
-    OP(NAME, 2, P00_FOR2(NAME, OP, FUNC, P99_ALLBUTLAST(__VA_ARGS__)), FUNC(NAME, P99_LAST(__VA_ARGS__), 2))
-#define P00_FOR4(NAME, OP, FUNC, ...) \
-    OP(NAME, 3, P00_FOR3(NAME, OP, FUNC, P99_ALLBUTLAST(__VA_ARGS__)), FUNC(NAME, P99_LAST(__VA_ARGS__), 3))
-#define P00_FOR5(NAME, OP, FUNC, ...) \
-    OP(NAME, 4, P00_FOR4(NAME, OP, FUNC, P99_ALLBUTLAST(__VA_ARGS__)), FUNC(NAME, P99_LAST(__VA_ARGS__), 4))
-#define P00_FOR6(NAME, OP, FUNC, ...) \
-    OP(NAME, 5, P00_FOR5(NAME, OP, FUNC, P99_ALLBUTLAST(__VA_ARGS__)), FUNC(NAME, P99_LAST(__VA_ARGS__), 5))
-#define P99_CAT2(_1, _2) _1##_2
-#define P99_PASTE2(_1, _2) P99_CAT2(_1, _2)
-#define P99_FOR(NAME, N, OP, FUNC, ...) P99_PASTE2(P00_FOR, N)(NAME, OP, FUNC, __VA_ARGS__)
-
-// End of code copied from P99
-// Code starting here is subject to the license as seen in the LICENSE file of the root directory of this project
+#define CORAL66_CAT2(_1, _2) _1##_2
+#define CORAL66_PASTE2(_1, _2) CORAL66_CAT2(_1, _2)
+#define CORAL66_FOR(NAME, N, OP, FUNC, ...) CORAL66_PASTE2(P00_FOR, N)(NAME, OP, FUNC, __VA_ARGS__)
 
 #define CORAL66_MACRO_COUNT_ARGUMENTS(...) CORAL66_MACRO_COUNT_ARGUMENTS_(__VA_ARGS__, CORAL66_MACRO_RSEQ_N())
 #define CORAL66_MACRO_COUNT_ARGUMENTS_(...) CORAL66_MACRO_ARGUMENTS_N(__VA_ARGS__)

@@ -531,23 +531,24 @@ class not_null
     T* CORAL66_NON_NULL m_ptr;
 
 public:
-    constexpr not_null(T* CORAL66_NON_NULL ptr) : m_ptr(ptr)
+    explicit constexpr not_null(T* CORAL66_NON_NULL ptr) : m_ptr(ptr)
     {
         CORAL66_ASSERT(m_ptr);
     }
 
     template <class U, std::enable_if_t<std::is_convertible_v<U, T*>>* = nullptr>
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     constexpr not_null(U&& u) : m_ptr(std::forward<U>(u))
     {
         CORAL66_ASSERT(m_ptr);
     }
 
     template <class U, std::enable_if_t<std::is_convertible_v<U*, T*>>* = nullptr>
-    constexpr not_null(const not_null<U>& rhs) : not_null(rhs.get())
+    explicit constexpr not_null(const not_null<U>& rhs) : not_null(rhs.get())
     {
     }
 
-    not_null(std::nullptr_t) = delete;
+    explicit not_null(std::nullptr_t) = delete;
     not_null& operator=(std::nullptr_t) = delete;
 
     constexpr T* CORAL66_NON_NULL get() const

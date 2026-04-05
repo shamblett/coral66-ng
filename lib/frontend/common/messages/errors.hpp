@@ -14,13 +14,13 @@
 #include "lib/frontend/common/diagnostic.hpp"
 #include "lib/support/constexpr.hpp"
 
-#define CREATE_ERROR_2(variableName, format)                                                          \
-    namespace detail                                                                                  \
-    {                                                                                                 \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                                 \
-    constexpr auto variableName =                                                                     \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Error, #variableName)
+#define CREATE_ERROR_2(variableName, format)                                                              \
+    namespace detail                                                                                      \
+    {                                                                                                     \
+    constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
+    }                                                                                                     \
+    constexpr auto variableName = ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text)>(  \
+        ::coral66::Severity::Error, #variableName)
 
 #define CREATE_ERROR_3(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 #define CREATE_ERROR_4(...) CREATE_ERROR_VAARG(__VA_ARGS__)
@@ -29,23 +29,23 @@
 #define CREATE_ERROR_7(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 #define CREATE_ERROR_8(...) CREATE_ERROR_VAARG(__VA_ARGS__)
 
-#define CREATE_ERROR(...) P99_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
+#define CREATE_ERROR(...) CORAL66_PASTE2(CREATE_ERROR_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_ERROR_VAARG(variableName, format, ...)                                                             \
-    namespace detail                                                                                              \
-    {                                                                                                             \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
-    }                                                                                                             \
-    constexpr auto variableName = ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text), __VA_ARGS__>( \
+#define CREATE_ERROR_VAARG(variableName, format, ...)                                                                 \
+    namespace detail                                                                                                  \
+    {                                                                                                                 \
+    constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
+    }                                                                                                                 \
+    constexpr auto variableName = ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text), __VA_ARGS__>( \
         ::coral66::Severity::Error, #variableName)
 
-#define CREATE_UNIQUE_ERROR_3(variableName, name, format)                                             \
-    namespace detail                                                                                  \
-    {                                                                                                 \
-    constexpr auto P99_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-    }                                                                                                 \
-    constexpr auto variableName =                                                                     \
-        ::coral66::makeDiagnostic<detail::P99_PASTE2(variableName, Text)>(::coral66::Severity::Error, name)
+#define CREATE_UNIQUE_ERROR_3(variableName, name, format)                                                 \
+    namespace detail                                                                                      \
+    {                                                                                                     \
+    constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
+    }                                                                                                     \
+    constexpr auto variableName =                                                                         \
+        ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text)>(::coral66::Severity::Error, name)
 
 namespace coral66::errors
 {
