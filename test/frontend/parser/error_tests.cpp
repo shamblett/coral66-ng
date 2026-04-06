@@ -586,19 +586,17 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
 
 TEST_CASE("Communicators - Errors", "[Parser][Communicator]")
 {
-    SECTION("Common - Missing Open Parenthesis")
+    SECTION("Common Missing Open Parenthesis")
     {
-        const ParsedCommunicator c("COMMON );");
-        REQUIRE(c.communicator.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        const ParsedCommunicator p("COMMON INTEGER A ; LABEL B )");
+        REQUIRE(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS));
     }
 
-    SECTION("Common - Missing Close Parenthesis")
+    SECTION("Common Missing Close Parenthesis")
     {
-        const ParsedCommunicator c("COMMON (;");
-        REQUIRE(c.communicator.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        const ParsedCommunicator p("COMMON ( INTEGER A ; LABEL B ");
+        REQUIRE(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS));
     }
 }

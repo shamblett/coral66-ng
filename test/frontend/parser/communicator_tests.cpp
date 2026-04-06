@@ -29,7 +29,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(communicatorReference->getItems().empty());
     }
 
-    SECTION("Common with items")
+    SECTION("Common With items")
     {
         const ParsedCommunicator p("COMMON ( INTEGER A ; LABEL B )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -49,7 +49,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(placeSpec->getIdentifiers()[0]->getText() == "B");
     }
 
-    SECTION("Common with SWITCH placespec")
+    SECTION("Common With SWITCH")
     {
         const ParsedCommunicator p("COMMON ( SWITCH S1, S2 )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -64,7 +64,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(placeSpec->getIdentifiers()[1]->getText() == "S2");
     }
 
-    SECTION("Common with Procedurespec")
+    SECTION("Common With Procedure")
     {
         const ParsedCommunicator p("COMMON ( INTEGER PROCEDURE P(INTEGER, LABEL, VALUE FLOATING), Q )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -102,7 +102,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(procSpec2->getParameters().empty());
     }
 
-    SECTION("Common with Nested Procedurespec in Typelist")
+    SECTION("Common With Nested Procedure In Type List")
     {
         const ParsedCommunicator p("COMMON ( PROCEDURE P(PROCEDURE(INTEGER)) )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -122,7 +122,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(param1->getMode() == ParameterDeclaration::ParameterMode::Procedure);
     }
 
-    SECTION("Common with Variables initialized via Assignment")
+    SECTION("Common With Variables Initialized Via Assignment")
     {
         const ParsedCommunicator p("COMMON ( INTEGER A, B := 1, 2 )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -137,7 +137,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(varDecl->getIdentifiers()[1]->getText() == "B");
     }
 
-    SECTION("Common with Table Data presets")
+    SECTION("Common With Table Data Presets")
     {
         const ParsedCommunicator p("COMMON ( INTEGER ARRAY A[1:10] := 1, 2 )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -150,7 +150,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         CHECK(arrDecl->getIdentifier()->getText() == "A");
     }
 
-    SECTION("Common with PRESET keywords on Array")
+    SECTION("Common With PRESET Keywords On Array")
     {
         const ParsedCommunicator p("COMMON ( INTEGER ARRAY A[1:10] PRESET 1, 2 )");
         auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
@@ -161,19 +161,5 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         auto arrDecl = dynamic_cast<const ArrayDeclaration*>(items[0].get());
         REQUIRE(arrDecl != nullptr);
         CHECK(arrDecl->getIdentifier()->getText() == "A");
-    }
-
-    SECTION("Common Missing Open Parenthesis")
-    {
-        const ParsedCommunicator p("COMMON INTEGER A ; LABEL B )");
-        REQUIRE(p.communicator == nullptr);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS));
-    }
-
-    SECTION("Common Missing Close Parenthesis")
-    {
-        const ParsedCommunicator p("COMMON ( INTEGER A ; LABEL B ");
-        REQUIRE(p.communicator == nullptr);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS));
     }
 }
