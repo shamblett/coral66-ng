@@ -113,8 +113,9 @@ public:
 
     Deleter(::coral66::IntrusiveVariantAllocator<typename T::base_type>* allocator) : m_allocator(allocator) {}
 
-    template <class U, std::enable_if_t<std::is_same_v<typename T::base_type, typename U::base_type>>* = nullptr>
-    Deleter(Deleter<U>&& rhs) noexcept : m_allocator(rhs.m_allocator)
+    template <class U>
+    requires std::is_same_v<typename T::base_type, typename U::base_type> Deleter(Deleter<U>&& rhs) noexcept
+        : m_allocator(rhs.m_allocator)
     {
     }
 
@@ -298,9 +299,9 @@ public:
         head = pointerToStart;
     }
 
-    template <class U = Base,
-              std::enable_if_t<std::is_same_v<U, Base> && (std::is_copy_constructible_v<Subclasses> && ...)>* = nullptr>
-    [[nodiscard]] coral66::not_null<Base> alloc(const Base& value)
+    template <class U = Base>
+    requires(std::is_same_v<U, Base> && (std::is_copy_constructible_v<Subclasses> && ...))
+        [[nodiscard]] coral66::not_null<Base> alloc(const Base& value)
     {
         constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, const Base&), sizeof...(Subclasses)>
             copyConstructors = {+[](IntrusiveVariantAllocator* self, const Base& value) -> Base*
@@ -308,9 +309,9 @@ public:
         return copyConstructors[value.index()](this, value);
     }
 
-    template <class U = Base,
-              std::enable_if_t<std::is_same_v<U, Base> && (std::is_move_constructible_v<Subclasses> && ...)>* = nullptr>
-    [[nodiscard]] coral66::not_null<Base> alloc(Base&& value)
+    template <class U = Base>
+    requires(std::is_same_v<U, Base> && (std::is_move_constructible_v<Subclasses> && ...))
+        [[nodiscard]] coral66::not_null<Base> alloc(Base&& value)
     {
         constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, Base&&), sizeof...(Subclasses)> moveConstructors = {
             +[](IntrusiveVariantAllocator* self, Base&& value) -> Base*
@@ -319,8 +320,7 @@ public:
     }
 
     template <class U, class... Args>
-    [[nodiscard]] auto alloc(Args&&... args)
-        -> std::enable_if_t<(std::is_same_v<U, Subclasses> || ...), coral66::not_null<U>>
+    requires(std::is_same_v<U, Subclasses> || ...) [[nodiscard]] coral66::not_null<U> alloc(Args&&... args)
     {
         auto head = getFreeHead();
         __asan_unpoison_memory_region(*head, std::max(sizeof(U), sizeof(std::byte*)));

@@ -38,7 +38,8 @@ class FunctionRef<Ret(Params...)>
 public:
     FunctionRef() = default;
 
-    template <class Callable, std::enable_if_t<!std::is_same_v<std::decay_t<Callable>, FunctionRef>>* = nullptr>
+    template <class Callable>
+        requires(!std::is_same_v<std::decay_t<Callable>, FunctionRef>)
     FunctionRef(Callable&& callable)
         : m_callback(+[](void* callable, Params... params) -> Ret
                      {

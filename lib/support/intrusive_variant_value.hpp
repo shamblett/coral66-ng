@@ -489,25 +489,26 @@ class IntrusiveVariantValue<Base, AbstractIntrusiveVariant<Base, SubClasses...>>
     using detail::IntrusiveVariantStorage::IntrusiveVariantStorageBase<Base, SubClasses...>::get;
 
 public:
-    template <class T, class... Args, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue(std::in_place_type_t<T>, Args&&... args)
+    template <class T, class... Args>
+    requires(std::is_same_v<T, SubClasses> || ...) IntrusiveVariantValue(std::in_place_type_t<T>, Args&&... args)
     {
         new (this->m_storage) T(std::forward<Args>(args)...);
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
 
-    template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>)
+    template <class T>
+    requires(std::is_same_v<T, SubClasses> || ...)
+        IntrusiveVariantValue(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>)
     {
         new (this->m_storage) T(std::forward<T>(value));
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
 
-    template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue& operator=(T&& value) noexcept(std::is_nothrow_move_assignable_v<T>
-                                                         && std::is_nothrow_move_constructible_v<T>)
+    template <class T>
+    requires(std::is_same_v<T, SubClasses> || ...) IntrusiveVariantValue&
+        operator=(T&& value) noexcept(std::is_nothrow_move_assignable_v<T> && std::is_nothrow_move_constructible_v<T>)
     {
         constexpr auto var = Base::template indexOf<T>();
         if (this->m_index == var)
@@ -523,17 +524,19 @@ public:
         return *this;
     }
 
-    template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>)
+    template <class T>
+    requires(std::is_same_v<T, SubClasses> || ...)
+        IntrusiveVariantValue(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>)
     {
         new (this->m_storage) T(value);
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
 
-    template <class T, std::enable_if_t<std::disjunction_v<std::is_same<T, SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue& operator=(const T& value) noexcept(std::is_nothrow_copy_assignable_v<T>
-                                                              && std::is_nothrow_copy_constructible_v<T>)
+    template <class T>
+    requires(std::is_same_v<T, SubClasses> || ...) IntrusiveVariantValue&
+        operator=(const T& value) noexcept(std::is_nothrow_copy_assignable_v<T>
+                                           && std::is_nothrow_copy_constructible_v<T>)
     {
         constexpr auto var = Base::template indexOf<T>();
         if (this->m_index == var)
@@ -549,10 +552,9 @@ public:
         return *this;
     }
 
-    template <class U = Base,
-              std::enable_if_t<std::is_same_v<U, Base>
-                               && std::conjunction_v<std::is_copy_constructible<SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue(const U& value) noexcept((std::is_nothrow_copy_constructible_v<SubClasses> && ...))
+    template <class U = Base>
+    requires(std::is_same_v<U, Base> && (std::is_copy_constructible_v<SubClasses> && ...))
+        IntrusiveVariantValue(const U& value) noexcept((std::is_nothrow_copy_constructible_v<SubClasses> && ...))
     {
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, const Base&), sizeof...(SubClasses)> copyConstructors = {
@@ -561,10 +563,9 @@ public:
         copyConstructors[this->m_index](this->m_storage, value);
     }
 
-    template <class U = Base,
-              std::enable_if_t<std::is_same_v<U, Base>
-                               && std::conjunction_v<std::is_move_constructible<SubClasses>...>>* = nullptr>
-    IntrusiveVariantValue(U&& value) noexcept((std::is_nothrow_move_constructible_v<SubClasses> && ...))
+    template <class U = Base>
+    requires(std::is_same_v<U, Base> && (std::is_move_constructible_v<SubClasses> && ...))
+        IntrusiveVariantValue(U&& value) noexcept((std::is_nothrow_move_constructible_v<SubClasses> && ...))
     {
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, Base&&), sizeof...(SubClasses)> moveConstructors = {
@@ -572,8 +573,8 @@ public:
         moveConstructors[this->m_index](this->m_storage, std::forward<U>(value));
     }
 
-    template <class T, class... Args, std::enable_if_t<(std::is_same_v<T, SubClasses> || ...)>* = nullptr>
-    T& emplace(Args&&... args)
+    template <class T, class... Args>
+    requires(std::is_same_v<T, SubClasses> || ...) T& emplace(Args&&... args)
     {
         this->destruct();
         auto* object = new (this->m_storage) T(std::forward<Args>(args)...);
@@ -623,38 +624,38 @@ public:
     }
 };
 
-template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
-bool operator==(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue<U>& rhs)
+template <class T, class U>
+requires EqualComparable<T, U> bool operator==(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return *lhs == *rhs;
 }
 
-template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
-bool operator!=(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue<U>& rhs)
+template <class T, class U>
+requires EqualComparable<T, U> bool operator!=(const IntrusiveVariantValue<T>& lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return !(lhs == rhs);
 }
 
-template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
-bool operator==(const IntrusiveVariantValue<T>& lhs, const U & rhs)
+template <class T, class U>
+requires EqualComparable<T, U> bool operator==(const IntrusiveVariantValue<T>& lhs, const U& rhs)
 {
     return *lhs == rhs;
 }
 
-template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
-bool operator==(const T & lhs, const IntrusiveVariantValue<U>& rhs)
+template <class T, class U>
+requires EqualComparable<T, U> bool operator==(const T& lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return lhs == *rhs;
 }
 
-template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
-bool operator!=(const T & lhs, const IntrusiveVariantValue<U>& rhs)
+template <class T, class U>
+requires EqualComparable<T, U> bool operator!=(const T& lhs, const IntrusiveVariantValue<U>& rhs)
 {
     return !(lhs == rhs);
 }
 
-template <class T, class U, std::enable_if_t<EqualComparable<T, U>>* = nullptr>
-bool operator!=(const IntrusiveVariantValue<T>& lhs, const U & rhs)
+template <class T, class U>
+requires EqualComparable<T, U> bool operator!=(const IntrusiveVariantValue<T>& lhs, const U& rhs)
 {
     return !(lhs == rhs);
 }

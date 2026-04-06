@@ -153,8 +153,7 @@ template <typename G, class T>
 YWithRet(G, type_identity<T>) -> YWithRet<G, T>;
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant,
-                                   std::enable_if_t<(i == 0 || i > 12)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 0 || i > 12)
 {
     if (variant.index() == i)
     {
@@ -171,7 +170,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant,
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 1)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 1)
 {
     switch (variant.index())
     {
@@ -182,7 +181,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 2)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 2)
 {
     switch (variant.index())
     {
@@ -194,7 +193,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 3)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 3)
 {
     switch (variant.index())
     {
@@ -207,7 +206,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 4)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 4)
 {
     switch (variant.index())
     {
@@ -221,7 +220,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 5)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 5)
 {
     switch (variant.index())
     {
@@ -236,7 +235,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 6)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 6)
 {
     switch (variant.index())
     {
@@ -252,7 +251,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 7)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 7)
 {
     switch (variant.index())
     {
@@ -269,7 +268,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 8)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 8)
 {
     switch (variant.index())
     {
@@ -287,7 +286,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 9)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 9)
 {
     switch (variant.index())
     {
@@ -306,7 +305,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 10)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 10)
 {
     switch (variant.index())
     {
@@ -326,7 +325,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 11)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 11)
 {
     switch (variant.index())
     {
@@ -347,7 +346,7 @@ constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::
 }
 
 template <std::size_t i, class Callable, class Variant>
-constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant, std::enable_if_t<(i == 12)>* = nullptr)
+constexpr decltype(auto) visitImpl(Callable&& callable, Variant&& variant) requires(i == 12)
 {
     switch (variant.index())
     {
@@ -536,15 +535,16 @@ public:
         CORAL66_ASSERT(m_ptr);
     }
 
-    template <class U, std::enable_if_t<std::is_convertible_v<U, T*>>* = nullptr>
-    // ReSharper disable once CppNonExplicitConvertingConstructor
-    constexpr not_null(U&& u) : m_ptr(std::forward<U>(u))
+    template <class U>
+    requires std::is_convertible_v<U, T*>
+        // ReSharper disable once CppNonExplicitConvertingConstructor
+        constexpr not_null(U&& u) : m_ptr(std::forward<U>(u))
     {
         CORAL66_ASSERT(m_ptr);
     }
 
-    template <class U, std::enable_if_t<std::is_convertible_v<U*, T*>>* = nullptr>
-    explicit constexpr not_null(const not_null<U>& rhs) : not_null(rhs.get())
+    template <class U>
+    requires std::is_convertible_v<U*, T*> explicit constexpr not_null(const not_null<U>& rhs) : not_null(rhs.get())
     {
     }
 
