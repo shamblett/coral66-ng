@@ -575,15 +575,50 @@ const Expression& TypeChangeExpression::getExpression() const
     return *m_expression;
 }
 
-// CommonCommunicator
-CommonCommunicator::CommonCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                                       const std::vector<lexer::CTokenIterator>& items)
-
-    : Communicator(begin, end), m_items(items)
+// PlaceSpecification
+PlaceSpecification::PlaceSpecification(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                       std::vector<lexer::CTokenIterator>&& identifiers)
+    : Declaration(begin, end), m_identifiers(std::move(identifiers))
 {
 }
 
-std::vector<lexer::CTokenIterator> CommonCommunicator::getItems() const
+const std::vector<lexer::CTokenIterator>& PlaceSpecification::getIdentifiers() const
+{
+    return m_identifiers;
+}
+
+// ProcedureSpecification
+ProcedureSpecification::ProcedureSpecification(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                               std::optional<lexer::CTokenIterator> type, lexer::CTokenIterator name,
+                                               std::vector<std::unique_ptr<Declaration>>&& parameters)
+    : Declaration(begin, end), m_type(type), m_name(name), m_parameters(std::move(parameters))
+{
+}
+
+std::optional<lexer::CTokenIterator> ProcedureSpecification::getType() const
+{
+    return m_type;
+}
+
+lexer::CTokenIterator ProcedureSpecification::getName() const
+{
+    return m_name;
+}
+
+const std::vector<std::unique_ptr<Declaration>>& ProcedureSpecification::getParameters() const
+{
+    return m_parameters;
+}
+
+// CommonCommunicator
+CommonCommunicator::CommonCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                       std::vector<std::unique_ptr<Declaration>>&& items)
+
+    : Communicator(begin, end), m_items(std::move(items))
+{
+}
+
+const std::vector<std::unique_ptr<Declaration>>& CommonCommunicator::getItems() const
 {
     return m_items;
 }

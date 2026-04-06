@@ -92,6 +92,8 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                                                         Context& context);
 std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                             Context& context);
+std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureParameters(lexer::CTokenIterator& begin,
+                                                                                           lexer::CTokenIterator end, Context& context);
 std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                              Context& context);
 } // namespace coral66::parser
