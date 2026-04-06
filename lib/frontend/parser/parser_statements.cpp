@@ -85,8 +85,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
                 {
                     begin++;
-                    auto rhs = parseExpression(begin, end, context);
-                    if (rhs)
+                    if (auto rhs = parseExpression(begin, end, context))
                     {
                         return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(var),
                                                                              std::move(rhs));
@@ -304,8 +303,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         }
         auto start = begin;
         begin++;
-        auto var = parseWordReference(begin, end, context);
-        if (var)
+        if (auto var = parseWordReference(begin, end, context))
         {
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {

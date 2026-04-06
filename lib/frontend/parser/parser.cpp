@@ -153,7 +153,6 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
                 firstItem = false;
                 continue;
             }
-            declarationsAllowed = false;
 
             declarationsAllowed = false;
         }

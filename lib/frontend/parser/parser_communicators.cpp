@@ -36,9 +36,9 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
 
     auto start = begin;
 
-    std::vector<lexer::CTokenIterator> result;
     if (begin->getTokenType() == lexer::TokenType::CommonKeyword)
     {
+        std::vector<lexer::CTokenIterator> result;
         begin++;
         if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
         {
