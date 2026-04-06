@@ -389,21 +389,32 @@ struct AnnotateExpr
  * @tparam Mods A list of modifiers (Underline, Annotate, etc.) applying to the arguments.
  */
 
-
-namespace detail {
+namespace detail
+{
 
 template <class T>
-concept HasStringConverters = requires(T t, const source_interface& src) {
-    { diag::StringConverter<T>::inFormat(t, src) };
-    { diag::StringConverter<T>::inArg(t, src) };
-} || requires(T t) {
-    { diag::StringConverter<T>::inFormat(t) };
-    { diag::StringConverter<T>::inArg(t) };
+concept IsIterable = requires(T t)
+{
+    std::begin(t);
+    std::end(t);
 };
 
 template <class T>
-concept HasType = requires(T t) {
-    { t.getType() };
+concept HasStringConverters = requires(T t, const source_interface& src)
+{
+    {diag::StringConverter<T>::inFormat(t, src)};
+    {diag::StringConverter<T>::inArg(t, src)};
+}
+|| requires(T t)
+{
+    {diag::StringConverter<T>::inFormat(t)};
+    {diag::StringConverter<T>::inArg(t)};
+};
+
+template <class T>
+concept HasType = requires(T t)
+{
+    {t.getType()};
 };
 
 } // namespace detail
@@ -426,18 +437,7 @@ private:
     template <std::size_t... ints>
     constexpr static std::array<Modifiers, sizeof...(Mods)> getModifiers(std::index_sequence<ints...>);
 
-    // TODO: Replace all those things with Concepts once the Codebase is C++20
 
-    template <class T, class = void>
-    struct IsIterable : std::false_type
-    {
-    };
-
-    template <class T>
-    struct IsIterable<T, std::void_t<decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()))>>
-        : std::true_type
-    {
-    };
 
     template <class T>
     constexpr static bool locationConstraintCheck()
@@ -500,7 +500,7 @@ private:
                 return false;
             }
         }
-        else if constexpr (IsIterable<U>{} && !std::is_same_v<std::string, U> && !std::is_same_v<std::string_view, U>)
+        else if constexpr (detail::IsIterable<U> && !std::is_same_v<std::string, U> && !std::is_same_v<std::string_view, U>)
         {
             using ValueType = std::iterator_traits<decltype(std::begin(std::declval<U>()))>::value_type;
             if constexpr (SmartPtr<ValueType>)
@@ -517,8 +517,6 @@ private:
             return std::is_base_of_v<lexer::TokenBase, U> || std::is_convertible_v<U, std::uint64_t>;
         }
     }
-
-
 
     template <std::size_t argumentIndex, std::underlying_type_t<Constraint> constraint, class T>
     struct ConstraintCheck
@@ -543,8 +541,7 @@ private:
     }
 
     template <class Tuple, class... Ctx, std::size_t... ints>
-    static std::array<Argument, N> createArgumentArray(Tuple&& args,
-                                                       std::index_sequence<ints...>, Ctx&&... ctx);
+    static std::array<Argument, N> createArgumentArray(Tuple&& args, std::index_sequence<ints...>, Ctx&&... ctx);
 
     constexpr static MaxVector<std::string_view, N> customModifiersFor(std::size_t i)
     {
@@ -684,8 +681,8 @@ Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
     [[maybe_unused]] auto* v =
         this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
-    auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
-                                     std::index_sequence_for<Args...>{});
+    auto array =
+        createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{});
     return print(getFormat(), array);
 }
 
@@ -739,10 +736,9 @@ constexpr auto diagnostic<N, format, Mods...>::getConstraints() -> std::array<st
 
 template <std::size_t N, auto& format, class... Mods>
 template <class Tuple, class... Ctx, std::size_t... ints>
-auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args,
-                                                         std::index_sequence<ints...>, Ctx&&... ctx) -> std::array<Argument, N>
+auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args, std::index_sequence<ints...>, Ctx&&... ctx)
+    -> std::array<Argument, N>
 {
-    
     std::array<Argument, N> result;
     (
         [&result, &args, &ctx...]<typename T0>([[maybe_unused]] T0 integer)

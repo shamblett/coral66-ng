@@ -110,15 +110,17 @@ class SourceObject final : public detail::SourceObjectStorage<T>
 public:
     SourceObject() = default;
 
-    template <class U = T, std::enable_if_t<!std::is_same_v<lexer::PPToken, U>>* = nullptr>
-    SourceObject(std::vector<T> tokens, std::vector<Source::File> files, std::vector<Source::PPRecord> substitutions)
+    template <class U = T>
+    requires(!std::is_same_v<lexer::PPToken, U>) SourceObject(std::vector<T> tokens, std::vector<Source::File> files,
+                                                              std::vector<Source::PPRecord> substitutions)
         : m_tokens(std::move(tokens)), m_files(std::move(files)), m_substitutions(std::move(substitutions))
     {
     }
 
-    template <class U = T, std::enable_if_t<std::is_same_v<lexer::PPToken, U>>* = nullptr>
-    SourceObject(std::vector<T> tokens, std::vector<Source::File> files, std::vector<Source::PPRecord> substitutions,
-                 std::vector<lexer::IntervalMap> intervalMaps)
+    template <class U = T>
+    requires std::is_same_v<lexer::PPToken, U> SourceObject(std::vector<T> tokens, std::vector<Source::File> files,
+                                                            std::vector<Source::PPRecord> substitutions,
+                                                            std::vector<lexer::IntervalMap> intervalMaps)
         : detail::SourceObjectStorage<T>(std::move(intervalMaps)),
           m_tokens(std::move(tokens)),
           m_files(std::move(files)),

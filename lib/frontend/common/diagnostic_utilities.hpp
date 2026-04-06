@@ -19,14 +19,11 @@ namespace coral66::diag
 {
 namespace detail
 {
-template <class T, class = void>
-struct IsIterable : std::false_type
-{
-};
-
 template <class T>
-struct IsIterable<T, std::void_t<decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()))>> : std::true_type
+concept IsIterable = requires(T t)
 {
+    std::begin(t);
+    std::end(t);
 };
 } // namespace detail
 
@@ -56,7 +53,7 @@ PointRange getPointRange(const T& arg)
     {
         return {{static_cast<std::uint64_t>(arg), 0, 0}, {static_cast<std::uint64_t>(arg) + 1, 0, 0}};
     }
-    else if constexpr (detail::IsIterable<T>{})
+    else if constexpr (detail::IsIterable<T>)
     {
         CORAL66_ASSERT(std::begin(arg) != std::end(arg));
         auto& first = *std::begin(arg);
