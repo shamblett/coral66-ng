@@ -123,6 +123,28 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 result.push_back(
                     std::make_unique<Syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers)));
         }
+
+        if (begin != end && (begin->getTokenType() == lexer::TokenType::Assignment || begin->getTokenType() == lexer::TokenType::PresetKeyword))
+        {
+            begin++;
+            int depth = 0;
+            while (begin != end)
+            {
+                auto tType = begin->getTokenType();
+                if (tType == lexer::TokenType::OpenParentheses) depth++;
+                else if (tType == lexer::TokenType::CloseParentheses)
+                {
+                    if (depth > 0) depth--;
+                    else break;
+                }
+                else if (tType == lexer::TokenType::SemiColon && depth == 0)
+                {
+                    break;
+                }
+                begin++;
+            }
+        }
+
         return result;
     }
 
