@@ -136,6 +136,7 @@ class Context : source_interface
     bool m_errorsOccurred = false;
     Source::File m_fakeFile;
 
+public:
     [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, const std::uint64_t offset) const noexcept override
     {
         const auto result = std::ranges::lower_bound(m_lineStarts.begin(), m_lineStarts.end(), offset);
@@ -169,7 +170,6 @@ class Context : source_interface
         return {};
     }
 
-public:
     std::uint64_t tokenStartOffset;
     bool leadingWhitespace = false;
 
@@ -239,7 +239,7 @@ public:
         std::forward<F>(f)();
     }
 
-    [[nodiscard]] std::vector<coral66::lexer::PPToken>& getResult() noexcept
+    [[nodiscard]] std::vector<PPToken>& getResult() noexcept
     {
         return m_result;
     }
@@ -379,7 +379,7 @@ struct StroppedKeyword final
 
 struct Prime final
 {
-    std::pair<StateMachine, bool> advance(char c, Context& context);
+    static std::pair<StateMachine, bool> advance(char c, Context& context);
 };
 
 /*
