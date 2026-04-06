@@ -47,6 +47,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     auto end = sourceObject.data().data() + sourceObject.data().size();
 
     // Consume optional PROGRAM/SEGMENT header
+    std::unique_ptr<Syntax::Communicator> communicator;
     if (begin != end
         && (begin->getTokenType() == lexer::TokenType::ProgramKeyword
             || begin->getTokenType() == lexer::TokenType::SegmentKeyword))
@@ -56,6 +57,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         {
             begin++;
         }
+        communicator = parseCommunicator(begin, end, context);
     }
 
     auto block = parseBlock(begin, end, context);
@@ -73,7 +75,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         *errors = context.getErrorCount() > 0;
     }
 
-    return {sourceObject.data().data(), end, std::move(block)};
+    return {sourceObject.data().data(), end, std::move(block), std::move(communicator)};
 }
 
 std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)

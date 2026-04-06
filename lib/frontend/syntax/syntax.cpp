@@ -22,14 +22,19 @@ lexer::CTokenIterator Node::end() const
 }
 
 // Program
-Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block)
-    : Node(begin, end), m_block(std::move(block))
+Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block, std::unique_ptr<Communicator>&& communicator)
+    : Node(begin, end), m_communicator(std::move(communicator)), m_block(std::move(block))
 {
 }
 
 const Block& Program::getBlock() const
 {
     return *m_block;
+}
+
+const Communicator* Program::getCommunicator() const
+{
+    return m_communicator.get();
 }
 
 // Block

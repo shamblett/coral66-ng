@@ -37,13 +37,17 @@ class Statement;
 class Expression;
 class PlaceReference;
 
+class Communicator;
+
 class Program final : public Node
 {
+    std::unique_ptr<Communicator> m_communicator;
     std::unique_ptr<Block> m_block;
 
 public:
-    Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block);
+    Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block, std::unique_ptr<Communicator>&& communicator = nullptr);
     [[nodiscard]] const Block& getBlock() const;
+    [[nodiscard]] const Communicator* getCommunicator() const;
 };
 
 class Block final : public Node

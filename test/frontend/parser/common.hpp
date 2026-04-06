@@ -174,3 +174,22 @@ struct ParsedCommunicator
         communicator = parser::parseCommunicator(begin, end, *context);
     }
 };
+
+struct ParsedProgram
+{
+    std::string source;
+    std::string outStr;
+    llvm::raw_string_ostream ss;
+    PPSourceObject ppTokens;
+    CSourceObject cTokens;
+    std::unique_ptr<parser::Context> context;
+    Syntax::Program program;
+
+    explicit ParsedProgram(std::string src) : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr)
+    {
+        ppTokens = lexer::tokenize(source, &ss);
+        cTokens = lexer::toCTokens(ppTokens, &ss);
+        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+        program = parser::parseProgram(cTokens, &ss);
+    }
+};

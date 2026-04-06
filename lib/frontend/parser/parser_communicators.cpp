@@ -49,10 +49,47 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
             return nullptr;
         }
 
-        // TODO process common communicator
-
         begin++;
+
         if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+        {
+            while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+            {
+                result.push_back(begin);
+
+                int parenDepth = 0;
+                while (begin != end)
+                {
+                    if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                    {
+                        parenDepth++;
+                    }
+                    else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                    {
+                        if (parenDepth == 0)
+                        {
+                            break;
+                        }
+                        parenDepth--;
+                    }
+                    else if (begin->getTokenType() == lexer::TokenType::SemiColon)
+                    {
+                        if (parenDepth == 0)
+                        {
+                            break;
+                        }
+                    }
+                    begin++;
+                }
+
+                if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
+                {
+                    begin++;
+                }
+            }
+        }
+
+        if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
             context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
                                                                         context.getSourceInterface(),

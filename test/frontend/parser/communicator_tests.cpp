@@ -27,4 +27,17 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         REQUIRE(communicatorReference != nullptr);
         CHECK(communicatorReference->getItems().empty());
     }
+
+    SECTION("Common with items")
+    {
+        const ParsedCommunicator p("COMMON ( A ; B )");
+        auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
+        REQUIRE(communicatorReference != nullptr);
+        auto items = communicatorReference->getItems();
+        REQUIRE(items.size() == 2);
+        CHECK(items[0]->getTokenType() == lexer::TokenType::Identifier);
+        CHECK(items[0]->getText() == "A");
+        CHECK(items[1]->getTokenType() == lexer::TokenType::Identifier);
+        CHECK(items[1]->getText() == "B");
+    }
 }
