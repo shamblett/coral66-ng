@@ -36,7 +36,7 @@ from representing the valid grammar.
    block properly delegates data to parseDeclaration(), that underlying function completely lacks implementation for the PRESET keyword. Thus, initializing data inside
    a COMMON block will fail to parse.
 
-Assessment Level: HIGH
+Assessment Level: LOW
 
 Reasoning: While the parser no longer treats COMMON as a blind stub and successfully generates AST nodes, its interpretation of Procedurespec strictly contradicts
 the language specification. Reusing the declaration parameter parser breaks standard, anonymous procedure signatures (which are foundational to Coral 66
