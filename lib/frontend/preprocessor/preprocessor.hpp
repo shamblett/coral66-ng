@@ -315,6 +315,11 @@ class Preprocessor final : PPSourceInterface
 
     std::pair<std::optional<Macro>, const lexer::PPToken*> parseDefineDirective(const DefineDirective& defineDirective);
 
+
+
+public:
+    explicit Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
+
     std::uint64_t getLineNumber(std::uint32_t fileID, std::uint64_t offset) const noexcept override;
 
     std::uint64_t getLineStartOffset(std::uint32_t fileID, std::uint64_t line) const noexcept override;
@@ -335,9 +340,6 @@ class Preprocessor final : PPSourceInterface
     {
         return m_intervalMaps;
     }
-
-public:
-    explicit Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
 
     std::vector<lexer::PPToken>& getResult() noexcept
     {
