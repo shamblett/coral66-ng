@@ -42,11 +42,12 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>>
                     || begin->getTokenType() == lexer::TokenType::FloatingKeyword
                     || begin->getTokenType() == lexer::TokenType::FixedKeyword))
             {
-                if (begin->getTokenType() == lexer::TokenType::FixedKeyword)
+                auto currentType = begin->getTokenType();
+                begin++;
+                if (currentType == lexer::TokenType::FixedKeyword)
                 {
                     validateFixedFormat(begin, end, context);
                 }
-                begin++;
             }
         }
         else if (type == lexer::TokenType::LabelKeyword || type == lexer::TokenType::SwitchKeyword)
@@ -59,11 +60,11 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>>
                  || type == lexer::TokenType::FixedKeyword)
         {
             paramTypeToken = begin;
-            if (begin->getTokenType() == lexer::TokenType::FixedKeyword)
+            begin++;
+            if (type == lexer::TokenType::FixedKeyword)
             {
                 validateFixedFormat(begin, end, context);
             }
-            begin++;
 
             if (begin != end && begin->getTokenType() == lexer::TokenType::ArrayKeyword)
             {

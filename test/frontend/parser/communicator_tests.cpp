@@ -5,8 +5,8 @@
  */
 
 #include "common.hpp"
-#include "lib/frontend/syntax/syntax.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
+#include "lib/frontend/syntax/syntax.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
@@ -36,13 +36,13 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         REQUIRE(communicatorReference != nullptr);
         const auto& items = communicatorReference->getItems();
         REQUIRE(items.size() == 2);
-        
+
         auto varDecl = dynamic_cast<const VariableDeclaration*>(items[0].get());
         REQUIRE(varDecl != nullptr);
         CHECK(varDecl->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
         CHECK(varDecl->getIdentifiers().size() == 1);
         CHECK(varDecl->getIdentifiers()[0]->getText() == "A");
-        
+
         auto placeSpec = dynamic_cast<const PlaceSpecification*>(items[1].get());
         REQUIRE(placeSpec != nullptr);
         CHECK(placeSpec->getIdentifiers().size() == 1);
@@ -56,7 +56,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         REQUIRE(communicatorReference != nullptr);
         const auto& items = communicatorReference->getItems();
         REQUIRE(items.size() == 1);
-        
+
         auto placeSpec = dynamic_cast<const PlaceSpecification*>(items[0].get());
         REQUIRE(placeSpec != nullptr);
         CHECK(placeSpec->getIdentifiers().size() == 2);
@@ -161,5 +161,32 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         auto arrDecl = dynamic_cast<const ArrayDeclaration*>(items[0].get());
         REQUIRE(arrDecl != nullptr);
         CHECK(arrDecl->getIdentifier()->getText() == "A");
+    }
+
+    SECTION("Common With Fixed Parameter Procedures")
+    {
+        const ParsedCommunicator p("COMMON ( PROCEDURE P(FIXED(13,5), VALUE FIXED(24,2)) )");
+        auto communicatorReference = dynamic_cast<CommonCommunicator*>(p.communicator.get());
+        REQUIRE(communicatorReference != nullptr);
+        const auto& items = communicatorReference->getItems();
+        REQUIRE(items.size() == 1);
+
+        auto procSpec = dynamic_cast<const ProcedureSpecification*>(items[0].get());
+        REQUIRE(procSpec != nullptr);
+        CHECK(procSpec->getName()->getText() == "P");
+        const auto& params = procSpec->getParameters();
+        REQUIRE(params.size() == 2);
+
+        auto param1 = dynamic_cast<const ParameterDeclaration*>(params[0].get());
+        REQUIRE(param1 != nullptr);
+        CHECK(param1->getMode() == ParameterDeclaration::ParameterMode::Value);
+        REQUIRE(param1->getType().has_value());
+        CHECK(param1->getType().value()->getTokenType() == lexer::TokenType::FixedKeyword);
+
+        auto param2 = dynamic_cast<const ParameterDeclaration*>(params[1].get());
+        REQUIRE(param2 != nullptr);
+        CHECK(param2->getMode() == ParameterDeclaration::ParameterMode::Value);
+        REQUIRE(param2->getType().has_value());
+        CHECK(param2->getType().value()->getTokenType() == lexer::TokenType::FixedKeyword);
     }
 }
