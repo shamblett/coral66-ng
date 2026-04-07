@@ -599,4 +599,18 @@ TEST_CASE("Communicators - Errors", "[Parser][Communicator]")
         REQUIRE(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS));
     }
+
+    SECTION("Common Missing Identifier In Procedure Specification")
+    {
+        const ParsedCommunicator p("COMMON ( PROCEDURE (INTEGER) )");
+        REQUIRE(p.communicator == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
+    }
+
+    SECTION("Common Missing Semicolon Between Items")
+    {
+        const ParsedCommunicator p("COMMON ( LABEL A LABEL B )");
+        REQUIRE(p.communicator == nullptr);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_N));
+    }
 }
