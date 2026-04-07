@@ -107,16 +107,18 @@ class VariableDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_type; // INTEGER, FLOATING, FIXED
     std::vector<lexer::CTokenIterator> m_identifiers;
+    bool m_hasPreset;
     std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     VariableDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
-                        std::vector<lexer::CTokenIterator>&& identifiers,
+                        std::vector<lexer::CTokenIterator>&& identifiers, bool hasPreset = false,
                         std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
+    [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
-    void setPresetTokens(const std::vector<lexer::CTokenIterator>& tokens);
+    void setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens);
 };
 
 class ProcedureDeclaration final : public Declaration
@@ -144,28 +146,41 @@ class ArrayDeclaration final : public Declaration
     lexer::CTokenIterator m_type;
     std::vector<lexer::CTokenIterator> m_identifiers;
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>> m_dimensions;
+    bool m_hasPreset;
     std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     ArrayDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
                      std::vector<lexer::CTokenIterator>&& identifiers,
                      std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
-                     std::vector<lexer::CTokenIterator>&& presetTokens = {});
+                     bool hasPreset = false, std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
     [[nodiscard]] const std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&
         getDimensions() const;
+    [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
-    void setPresetTokens(const std::vector<lexer::CTokenIterator>& tokens);
+    void setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens);
 };
 
 class TableElementDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_identifier;
+    std::optional<lexer::CTokenIterator> m_type; // integer, floating, fixed (can be nullopt if just a bitfield)
+    bool m_unsigned;
+    std::optional<lexer::CTokenIterator> m_wordPosition;
+    std::optional<lexer::CTokenIterator> m_bitPosition;
 
 public:
-    TableElementDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier);
+    TableElementDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
+                            std::optional<lexer::CTokenIterator> type, bool isUnsigned,
+                            std::optional<lexer::CTokenIterator> wordPosition,
+                            std::optional<lexer::CTokenIterator> bitPosition);
     [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
+    [[nodiscard]] bool isUnsigned() const;
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getWordPosition() const;
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getBitPosition() const;
 };
 
 class TableDeclaration final : public Declaration
@@ -174,17 +189,19 @@ class TableDeclaration final : public Declaration
     std::unique_ptr<Expression> m_width;
     std::unique_ptr<Expression> m_length;
     std::vector<std::unique_ptr<Declaration>> m_elements;
+    bool m_hasPreset;
     std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     TableDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
                      std::unique_ptr<Expression>&& width, std::unique_ptr<Expression>&& length,
-                     std::vector<std::unique_ptr<Declaration>>&& elements,
+                     std::vector<std::unique_ptr<Declaration>>&& elements, bool hasPreset = false,
                      std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
     [[nodiscard]] const Expression* getWidth() const;
     [[nodiscard]] const Expression* getLength() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getElements() const;
+    [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
 };
 

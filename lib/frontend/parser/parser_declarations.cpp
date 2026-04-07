@@ -60,6 +60,30 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             return true;
         }
 
+        if (tType == lexer::TokenType::OpenParentheses)
+        {
+            begin++;
+            while (begin != end)
+            {
+                if (!parseGroup())
+                    return false;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                {
+                    begin++;
+                }
+                else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                {
+                    begin++;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
         if (tType == lexer::TokenType::Plus || tType == lexer::TokenType::Minus)
         {
             begin++;
@@ -296,10 +320,12 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
         }
 
         std::vector<lexer::CTokenIterator> presetTokens;
+        bool hasPresetAssignment = false;
         if (begin != end
             && (begin->getTokenType() == lexer::TokenType::Assignment
                 || begin->getTokenType() == lexer::TokenType::PresetKeyword))
         {
+            hasPresetAssignment = true;
             begin++;
 
             bool parsedAny = false;
@@ -345,17 +371,17 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             }
         }
 
-        if (!result.empty() && !presetTokens.empty())
+        if (!result.empty() && (hasPresetAssignment || !presetTokens.empty()))
         {
             for (auto& decl : result)
             {
                 if (auto* var = dynamic_cast<Syntax::VariableDeclaration*>(decl.get()))
                 {
-                    var->setPresetTokens(presetTokens);
+                    var->setPreset(hasPresetAssignment, presetTokens);
                 }
                 else if (auto* arr = dynamic_cast<Syntax::ArrayDeclaration*>(decl.get()))
                 {
-                    arr->setPresetTokens(presetTokens);
+                    arr->setPreset(hasPresetAssignment, presetTokens);
                 }
             }
         }
@@ -441,11 +467,17 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                         begin++;
 
                         bool isPartWord = false;
+                        bool isUnsigned = false;
                         if (begin != end && begin->getTokenType() == lexer::TokenType::UnsignedKeyword)
                         {
                             isPartWord = true;
+                            isUnsigned = true;
                             begin++;
                         }
+
+                        std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
+                        std::optional<lexer::CTokenIterator> wordPosition = std::nullopt;
+                        std::optional<lexer::CTokenIterator> bitPosition = std::nullopt;
 
                         if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
                         {
@@ -466,9 +498,9 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                                      || begin->getTokenType() == lexer::TokenType::IntegerKeyword
                                      || begin->getTokenType() == lexer::TokenType::FixedKeyword))
                         {
-                            auto typeToken = begin->getTokenType();
+                            typeToken = begin;
                             begin++;
-                            if (typeToken == lexer::TokenType::FixedKeyword)
+                            if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword)
                             {
                                 validateFixedFormat(begin, end, context);
                             }
@@ -492,6 +524,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                         if (begin != end && begin->getTokenType() == lexer::TokenType::Literal
                             && begin->getType() == lexer::CToken::Type::Integer)
                         {
+                            wordPosition = begin;
                             begin++;
                         }
 
@@ -506,12 +539,14 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                                 if (begin != end && begin->getTokenType() == lexer::TokenType::Literal
                                     && begin->getType() == lexer::CToken::Type::Integer)
                                 {
+                                    bitPosition = begin;
                                     begin++;
                                 }
                             }
                         }
 
-                        elements.push_back(std::make_unique<Syntax::TableElementDeclaration>(elemStart, begin, elemId));
+                        elements.push_back(std::make_unique<Syntax::TableElementDeclaration>(
+                            elemStart, begin, elemId, typeToken, isUnsigned, wordPosition, bitPosition));
 
                         if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
                         {
@@ -541,11 +576,13 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
             }
 
+            bool hasPresetAssignment = false;
             std::vector<lexer::CTokenIterator> presetTokens;
             if (begin != end
                 && (begin->getTokenType() == lexer::TokenType::Assignment
                     || begin->getTokenType() == lexer::TokenType::PresetKeyword))
             {
+                hasPresetAssignment = true;
                 begin++;
 
                 bool parsedAny = false;
@@ -591,8 +628,9 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
             }
 
-            result.push_back(std::make_unique<Syntax::TableDeclaration>(
-                start, begin, id, std::move(width), std::move(length), std::move(elements), std::move(presetTokens)));
+            result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width),
+                                                                        std::move(length), std::move(elements),
+                                                                        hasPresetAssignment, std::move(presetTokens)));
         }
         return result;
     }

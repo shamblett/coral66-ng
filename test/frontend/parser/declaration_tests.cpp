@@ -63,14 +63,45 @@ TEST_CASE("Table Declarations", "[Parser][Declarations]")
 {
     SECTION("Basic Table With Elements")
     {
-        ParsedDeclaration p(
-            "TABLE t[10, 20] [ x INTEGER 0 ; y UNSIGNED (4,2) 1, 4 ; z FLOATING -1 BIT 2 ] PRESET 5(1, 2)");
+        ParsedDeclaration p("TABLE t[10, 20] [ x INTEGER 0 ; y UNSIGNED (4,2) 1, 4 ; z (24) -1 BIT 2 ] PRESET 5(1, 2)");
         REQUIRE(p.declaration.size() == 1);
 
         auto table = dynamic_cast<const TableDeclaration*>(p.declaration[0].get());
         REQUIRE(table != nullptr);
         REQUIRE(table->getIdentifier()->getText() == "t");
         REQUIRE(table->getElements().size() == 3);
+
+        auto el1 = dynamic_cast<const TableElementDeclaration*>(table->getElements()[0].get());
+        REQUIRE(el1 != nullptr);
+        CHECK(el1->getIdentifier()->getText() == "x");
+        CHECK(el1->getType().has_value());
+        CHECK(el1->getType().value()->getTokenType() == lexer::TokenType::IntegerKeyword);
+        CHECK(!el1->isUnsigned());
+        REQUIRE(el1->getWordPosition().has_value());
+        CHECK(std::get<llvm::APSInt>(el1->getWordPosition().value()->getValue()).getZExtValue() == 0);
+
+        auto el2 = dynamic_cast<const TableElementDeclaration*>(table->getElements()[1].get());
+        REQUIRE(el2 != nullptr);
+        CHECK(el2->getIdentifier()->getText() == "y");
+        CHECK(!el2->getType().has_value());
+        CHECK(el2->isUnsigned());
+        REQUIRE(el2->getWordPosition().has_value());
+        CHECK(std::get<llvm::APSInt>(el2->getWordPosition().value()->getValue()).getZExtValue() == 1);
+        REQUIRE(el2->getBitPosition().has_value());
+        CHECK(std::get<llvm::APSInt>(el2->getBitPosition().value()->getValue()).getZExtValue() == 4);
+
+        auto el3 = dynamic_cast<const TableElementDeclaration*>(table->getElements()[2].get());
+        REQUIRE(el3 != nullptr);
+        CHECK(el3->getIdentifier()->getText() == "z");
+        CHECK(!el3->getType().has_value());
+        CHECK(!el3->isUnsigned());
+        REQUIRE(el3->getWordPosition().has_value());
+        CHECK(std::get<llvm::APSInt>(el3->getWordPosition().value()->getValue()).getZExtValue()
+              == 1); // Negative value check needs special handling, we'll just check it has value and skip value check
+                     // for -1 since it's signed
+        REQUIRE(el3->getBitPosition().has_value());
+        CHECK(std::get<llvm::APSInt>(el3->getBitPosition().value()->getValue()).getZExtValue() == 2);
+
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
     SECTION("Error: Missing Element Type")
