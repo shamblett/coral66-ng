@@ -12,9 +12,10 @@
 
 namespace coral66::parser
 {
-namespace {
-std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousTypelist(
-    lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+namespace
+{
+std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>>
+    parseAnonymousTypelist(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     std::vector<std::unique_ptr<Syntax::Declaration>> result;
     if (begin == end || begin->getTokenType() != lexer::TokenType::OpenParentheses)
@@ -32,14 +33,14 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
 
         if (type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
         {
-            mode = (type == lexer::TokenType::ValueKeyword) ? 
-                Syntax::ParameterDeclaration::ParameterMode::Value :
-                Syntax::ParameterDeclaration::ParameterMode::Location;
+            mode = (type == lexer::TokenType::ValueKeyword) ? Syntax::ParameterDeclaration::ParameterMode::Value :
+                                                              Syntax::ParameterDeclaration::ParameterMode::Location;
             begin++;
             paramTypeToken = begin;
-            if (begin != end && (begin->getTokenType() == lexer::TokenType::IntegerKeyword ||
-                                 begin->getTokenType() == lexer::TokenType::FloatingKeyword ||
-                                 begin->getTokenType() == lexer::TokenType::FixedKeyword))
+            if (begin != end
+                && (begin->getTokenType() == lexer::TokenType::IntegerKeyword
+                    || begin->getTokenType() == lexer::TokenType::FloatingKeyword
+                    || begin->getTokenType() == lexer::TokenType::FixedKeyword))
             {
                 if (begin->getTokenType() == lexer::TokenType::FixedKeyword)
                 {
@@ -50,14 +51,12 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
         }
         else if (type == lexer::TokenType::LabelKeyword || type == lexer::TokenType::SwitchKeyword)
         {
-            mode = (type == lexer::TokenType::LabelKeyword) ? 
-                Syntax::ParameterDeclaration::ParameterMode::Label :
-                Syntax::ParameterDeclaration::ParameterMode::Switch;
+            mode = (type == lexer::TokenType::LabelKeyword) ? Syntax::ParameterDeclaration::ParameterMode::Label :
+                                                              Syntax::ParameterDeclaration::ParameterMode::Switch;
             begin++;
         }
-        else if (type == lexer::TokenType::IntegerKeyword ||
-                 type == lexer::TokenType::FloatingKeyword ||
-                 type == lexer::TokenType::FixedKeyword)
+        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+                 || type == lexer::TokenType::FixedKeyword)
         {
             paramTypeToken = begin;
             if (begin->getTokenType() == lexer::TokenType::FixedKeyword)
@@ -65,7 +64,7 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
                 validateFixedFormat(begin, end, context);
             }
             begin++;
-            
+
             if (begin != end && begin->getTokenType() == lexer::TokenType::ArrayKeyword)
             {
                 mode = Syntax::ParameterDeclaration::ParameterMode::Array;
@@ -79,17 +78,19 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
                 {
                     int depth = 1;
                     begin++;
-                    while(begin != end && depth > 0)
+                    while (begin != end && depth > 0)
                     {
-                        if (begin->getTokenType() == lexer::TokenType::OpenParentheses) depth++;
-                        else if (begin->getTokenType() == lexer::TokenType::CloseParentheses) depth--;
+                        if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                            depth++;
+                        else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                            depth--;
                         begin++;
                     }
                 }
             }
             else
             {
-                // Numbertype with no ARRAY or PROCEDURE is technically invalid per Typelist Specifier grammar,
+                // Number type with no ARRAY or PROCEDURE is technically invalid per Type list Specifier grammar,
                 // but we will parse it gracefully as a value mode type without identifiers
             }
         }
@@ -101,10 +102,12 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
             {
                 int depth = 1;
                 begin++;
-                while(begin != end && depth > 0)
+                while (begin != end && depth > 0)
                 {
-                    if (begin->getTokenType() == lexer::TokenType::OpenParentheses) depth++;
-                    else if (begin->getTokenType() == lexer::TokenType::CloseParentheses) depth--;
+                    if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                        depth++;
+                    else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                        depth--;
                     begin++;
                 }
             }
@@ -119,7 +122,8 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
             begin++;
         }
 
-        result.push_back(std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, mode, paramTypeToken, std::vector<lexer::CTokenIterator>()));
+        result.push_back(std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, mode, paramTypeToken,
+                                                                        std::vector<lexer::CTokenIterator>()));
 
         if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
         {
@@ -137,13 +141,12 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseAnonymousT
     }
     else
     {
-        context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
-                                                                    context.getSourceInterface(),
-                                                                    *(begin == end ? (end - 1) : begin)));
+        context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
         return std::nullopt;
     }
-    
+
     return result;
 }
 } // namespace
@@ -176,9 +179,9 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
         while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
             auto currentStart = begin;
-            
-            if (begin->getTokenType() == lexer::TokenType::LabelKeyword || 
-                begin->getTokenType() == lexer::TokenType::SwitchKeyword)
+
+            if (begin->getTokenType() == lexer::TokenType::LabelKeyword
+                || begin->getTokenType() == lexer::TokenType::SwitchKeyword)
             {
                 begin++;
                 std::vector<lexer::CTokenIterator> ids;
@@ -205,9 +208,9 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 {
                     isProcedure = true;
                 }
-                else if (procLookahead->getTokenType() == lexer::TokenType::IntegerKeyword || 
-                         procLookahead->getTokenType() == lexer::TokenType::FloatingKeyword || 
-                         procLookahead->getTokenType() == lexer::TokenType::FixedKeyword)
+                else if (procLookahead->getTokenType() == lexer::TokenType::IntegerKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::FloatingKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::FixedKeyword)
                 {
                     procLookahead++;
                     if (procLookahead != end && procLookahead->getTokenType() == lexer::TokenType::ProcedureKeyword)
@@ -222,8 +225,10 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                             procLookahead++;
                             while (procLookahead != end && depth > 0)
                             {
-                                if (procLookahead->getTokenType() == lexer::TokenType::OpenParentheses) depth++;
-                                else if (procLookahead->getTokenType() == lexer::TokenType::CloseParentheses) depth--;
+                                if (procLookahead->getTokenType() == lexer::TokenType::OpenParentheses)
+                                    depth++;
+                                else if (procLookahead->getTokenType() == lexer::TokenType::CloseParentheses)
+                                    depth--;
                                 procLookahead++;
                             }
                         }
@@ -237,9 +242,9 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 if (isProcedure)
                 {
                     std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
-                    if (begin->getTokenType() == lexer::TokenType::IntegerKeyword ||
-                        begin->getTokenType() == lexer::TokenType::FloatingKeyword ||
-                        begin->getTokenType() == lexer::TokenType::FixedKeyword)
+                    if (begin->getTokenType() == lexer::TokenType::IntegerKeyword
+                        || begin->getTokenType() == lexer::TokenType::FloatingKeyword
+                        || begin->getTokenType() == lexer::TokenType::FixedKeyword)
                     {
                         typeToken = begin;
                         begin++;
@@ -248,12 +253,12 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                             validateFixedFormat(begin, end, context);
                         }
                     }
-                    
+
                     if (begin != end && begin->getTokenType() == lexer::TokenType::ProcedureKeyword)
                     {
                         begin++;
                     }
-                    
+
                     while (begin != end)
                     {
                         auto name = begin;
@@ -269,14 +274,15 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                             return nullptr;
                         }
-                        
+
                         auto parametersOpt = parseAnonymousTypelist(begin, end, context);
                         if (!parametersOpt.has_value())
                         {
                             return nullptr;
                         }
-                        
-                        result.push_back(std::make_unique<Syntax::ProcedureSpecification>(currentStart, begin, typeToken, name, std::move(parametersOpt.value())));
+
+                        result.push_back(std::make_unique<Syntax::ProcedureSpecification>(
+                            currentStart, begin, typeToken, name, std::move(parametersOpt.value())));
 
                         if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                         {
@@ -309,8 +315,8 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
             else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
             {
                 context.log(errors::parser::EXPECTED_N.args(*(begin == end ? (end - 1) : begin),
-                                                            context.getSourceInterface(),
-                                                            lexer::TokenType::SemiColon, *(begin == end ? (end - 1) : begin)));
+                                                            context.getSourceInterface(), lexer::TokenType::SemiColon,
+                                                            *(begin == end ? (end - 1) : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_N);
                 return nullptr;
             }
@@ -324,7 +330,7 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }
-        
+
         auto endToken = begin;
         begin++;
 
