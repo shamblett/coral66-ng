@@ -36,27 +36,6 @@ TEST_CASE("Array Declarations", "[Parser][Declarations]")
         CHECK(arr2->getIdentifiers()[0]->getText() == "r");
         REQUIRE(arr2->getDimensions().size() == 1);
     }
-
-    SECTION("Error: Missing Identifier")
-    {
-        ParsedDeclaration p("INTEGER ARRAY [1:2]");
-        REQUIRE(p.declaration.size() == 0);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
-    }
-
-    SECTION("Error: Missing Colon")
-    {
-        ParsedDeclaration p("INTEGER ARRAY a[1]");
-        REQUIRE(p.declaration.size() == 1);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_COLON));
-    }
-
-    SECTION("Error: Missing Close Bracket")
-    {
-        ParsedDeclaration p("INTEGER ARRAY a[1:2");
-        REQUIRE(p.declaration.size() == 1);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET));
-    }
 }
 
 TEST_CASE("Table Declarations", "[Parser][Declarations]")
@@ -104,19 +83,6 @@ TEST_CASE("Table Declarations", "[Parser][Declarations]")
 
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
-    SECTION("Error: Missing Element Type")
-    {
-        ParsedDeclaration p("TABLE t[10] [ x 0 ]");
-        REQUIRE(p.declaration.size() == 1);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_TYPE));
-    }
-
-    SECTION("Error: Missing Element Identifier")
-    {
-        ParsedDeclaration p("TABLE t[10] [ INTEGER 0 ]");
-        REQUIRE(p.declaration.size() == 1);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
-    }
 }
 
 TEST_CASE("Presetting", "[Parser][Declarations]")
@@ -158,13 +124,6 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
         ParsedDeclaration p("INTEGER ARRAY a[1:10] := 1, , 3, , , 6");
         REQUIRE(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
-    }
-
-    SECTION("Error: Missing Expression")
-    {
-        ParsedDeclaration p("INTEGER a := *");
-        REQUIRE(p.declaration.size() == 1);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
     }
 }
 
@@ -211,11 +170,5 @@ TEST_CASE("Overlay Declarations", "[Parser][Declarations]")
         CHECK(std::get<llvm::APSInt>(overlay->getOffset()->getValue()).getZExtValue() == 15);
         REQUIRE(overlay->getOffset2().has_value());
         CHECK(std::get<llvm::APSInt>(overlay->getOffset2().value()->getValue()).getZExtValue() == 20);
-    }
-    SECTION("Error: Expected Declaration")
-    {
-        ParsedDeclaration p("OVERLAY x WITH");
-        REQUIRE(p.declaration.size() == 0);
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
     }
 }

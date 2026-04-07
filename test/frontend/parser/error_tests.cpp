@@ -557,33 +557,6 @@ TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
     }
 }
 
-TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
-{
-    SECTION("Overlay Missing Declaration")
-    {
-        const ParsedStatement s("BEGIN OVERLAY x WITH ; END");
-        REQUIRE(s.statement.get() != nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
-    }
-
-    SECTION("Procedure Parameter Missing Declaration")
-    {
-        const ParsedProcedure s("PROCEDURE P(INTEGER); BEGIN END");
-        CHECK(s.procedure.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
-    }
-
-    SECTION("Fixed Type Invalid Format")
-    {
-        const ParsedProcedure p("PROCEDURE P(FIXED(13) x); BEGIN END");
-        CHECK(p.procedure.get() != nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::INVALID_FIXED_FORMAT));
-    }
-}
-
 TEST_CASE("Communicators - Errors", "[Parser][Communicator]")
 {
     SECTION("Common Missing Open Parenthesis")
@@ -612,5 +585,81 @@ TEST_CASE("Communicators - Errors", "[Parser][Communicator]")
         const ParsedCommunicator p("COMMON ( LABEL A LABEL B )");
         REQUIRE(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_N));
+    }
+}
+
+TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
+{
+    SECTION("Missing Identifier")
+    {
+        ParsedDeclaration p("INTEGER ARRAY [1:2]");
+        REQUIRE(p.declaration.size() == 0);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
+    }
+
+    SECTION("Missing Colon")
+    {
+        ParsedDeclaration p("INTEGER ARRAY a[1]");
+        REQUIRE(p.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_COLON));
+    }
+
+    SECTION("Missing Close Bracket")
+    {
+        ParsedDeclaration p("INTEGER ARRAY a[1:2");
+        REQUIRE(p.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET));
+    }
+
+    SECTION("Missing Element Type")
+    {
+        ParsedDeclaration p("TABLE t[10] [ x 0 ]");
+        REQUIRE(p.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_TYPE));
+    }
+
+    SECTION("Missing Element Identifier")
+    {
+        ParsedDeclaration p("TABLE t[10] [ INTEGER 0 ]");
+        REQUIRE(p.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
+    }
+
+    SECTION("Missing Expression")
+    {
+        ParsedDeclaration p("INTEGER a := *");
+        REQUIRE(p.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
+    }
+
+    SECTION("Expected Declaration")
+    {
+        ParsedDeclaration p("OVERLAY x WITH");
+        REQUIRE(p.declaration.size() == 0);
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
+    }
+
+    SECTION("Overlay Missing Declaration")
+    {
+        const ParsedStatement s("BEGIN OVERLAY x WITH ; END");
+        REQUIRE(s.statement.get() != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
+    }
+
+    SECTION("Procedure Parameter Missing Declaration")
+    {
+        const ParsedProcedure s("PROCEDURE P(INTEGER); BEGIN END");
+        CHECK(s.procedure.get() == nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
+    }
+
+    SECTION("Fixed Type Invalid Format")
+    {
+        const ParsedProcedure p("PROCEDURE P(FIXED(13) x); BEGIN END");
+        CHECK(p.procedure.get() != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::INVALID_FIXED_FORMAT));
     }
 }
