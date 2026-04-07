@@ -137,12 +137,12 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
 
     SECTION("Octal and Grouping")
     {
-        ParsedDeclaration p("INTEGER ARRAY a[1:10] := 5(1, 2(OCTAL(77)))");
+        ParsedDeclaration p("INTEGER ARRAY a[1:10] := (1, (OCTAL(77)))");
         REQUIRE(p.declaration.size() == 1);
         auto arr = dynamic_cast<const ArrayDeclaration*>(p.declaration[0].get());
         REQUIRE(arr != nullptr);
         REQUIRE(!arr->getPresetTokens().empty());
-        CHECK(arr->getPresetTokens()[0]->getTokenType() == lexer::TokenType::Literal);
+        CHECK(arr->getPresetTokens()[0]->getTokenType() == lexer::TokenType::OpenParentheses);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 

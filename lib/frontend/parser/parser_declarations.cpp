@@ -91,9 +91,10 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 && ((begin->getTokenType() == lexer::TokenType::Literal
                      && (begin->getType() == lexer::CToken::Type::Integer
                          || begin->getType() == lexer::CToken::Type::Floating))
-                    || begin->getTokenType() == lexer::TokenType::OctalKeyword))
+                    || begin->getTokenType() == lexer::TokenType::OctalKeyword
+                    || begin->getTokenType() == lexer::TokenType::LiteralKeyword))
             {
-                if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
+                if (begin->getTokenType() == lexer::TokenType::OctalKeyword || begin->getTokenType() == lexer::TokenType::LiteralKeyword)
                 {
                     begin++;
                     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -121,9 +122,11 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
         else if ((tType == lexer::TokenType::Literal
                   && (begin->getType() == lexer::CToken::Type::Integer
                       || begin->getType() == lexer::CToken::Type::Floating))
-                 || tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::StringLiteral)
+                 || tType == lexer::TokenType::OctalKeyword 
+                 || tType == lexer::TokenType::LiteralKeyword
+                 || tType == lexer::TokenType::StringLiteral)
         {
-            if (tType == lexer::TokenType::OctalKeyword)
+            if (tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::LiteralKeyword)
             {
                 begin++;
                 if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -154,29 +157,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             else // Integer Literal
             {
                 begin++;
-                if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                {
-                    begin++;
-                    while (begin != end)
-                    {
-                        if (!parseGroup())
-                            return false;
-                        if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
-                        {
-                            begin++;
-                        }
-                        else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
-                        {
-                            begin++;
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    return false;
-                }
                 return true;
             }
         }
