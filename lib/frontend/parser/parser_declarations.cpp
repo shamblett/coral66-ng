@@ -94,7 +94,8 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     || begin->getTokenType() == lexer::TokenType::OctalKeyword
                     || begin->getTokenType() == lexer::TokenType::LiteralKeyword))
             {
-                if (begin->getTokenType() == lexer::TokenType::OctalKeyword || begin->getTokenType() == lexer::TokenType::LiteralKeyword)
+                if (begin->getTokenType() == lexer::TokenType::OctalKeyword
+                    || begin->getTokenType() == lexer::TokenType::LiteralKeyword)
                 {
                     begin++;
                     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -119,12 +120,10 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             }
             return false;
         }
-        else if ((tType == lexer::TokenType::Literal
-                  && (begin->getType() == lexer::CToken::Type::Integer
-                      || begin->getType() == lexer::CToken::Type::Floating))
-                 || tType == lexer::TokenType::OctalKeyword 
-                 || tType == lexer::TokenType::LiteralKeyword
-                 || tType == lexer::TokenType::StringLiteral)
+        if ((tType == lexer::TokenType::Literal
+             && (begin->getType() == lexer::CToken::Type::Integer || begin->getType() == lexer::CToken::Type::Floating))
+            || tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::LiteralKeyword
+            || tType == lexer::TokenType::StringLiteral)
         {
             if (tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::LiteralKeyword)
             {
@@ -144,21 +143,14 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
                 return true;
             }
-            else if (tType == lexer::TokenType::StringLiteral)
+            if (tType == lexer::TokenType::StringLiteral)
             {
                 begin++;
                 return true;
             }
-            else if (tType == lexer::TokenType::Literal && begin->getType() == lexer::CToken::Type::Floating)
-            {
-                begin++;
-                return true;
-            }
-            else // Integer Literal
-            {
-                begin++;
-                return true;
-            }
+            // Floating or Integer
+            begin++;
+            return true;
         }
         return false;
     };
@@ -494,7 +486,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                             break;
                         }
 
-                        // Wordposition
+                        // Word position
                         if (begin != end
                             && (begin->getTokenType() == lexer::TokenType::Plus
                                 || begin->getTokenType() == lexer::TokenType::Minus))
@@ -510,7 +502,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
 
                         if (isPartWord)
                         {
-                            // Bitposition
+                            // A bit position
                             if (begin != end
                                 && (begin->getTokenType() == lexer::TokenType::Comma
                                     || begin->getTokenType() == lexer::TokenType::BitKeyword))
