@@ -46,7 +46,7 @@ class Program final : public Node
 
 public:
     Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
-            std::unique_ptr<Communicator>&& communicator = nullptr);
+            std::unique_ptr<Communicator>&& communicator);
     [[nodiscard]] const Block& getBlock() const;
     [[nodiscard]] const Communicator* getCommunicator() const;
 };

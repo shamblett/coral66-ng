@@ -215,7 +215,8 @@ struct ParsedProgram
     std::unique_ptr<parser::Context> context;
     Syntax::Program program;
 
-    explicit ParsedProgram(std::string src) : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr)
+    explicit ParsedProgram(std::string src)
+        : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, nullptr)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
