@@ -9,6 +9,7 @@ cc_library(
     name = "parsertest",
     srcs = [
         "communicator_tests.cpp",
+        "declaration_tests.cpp",
         "error_tests.cpp",
         "expression_tests.cpp",
         "place_reference_tests.cpp",

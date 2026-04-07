@@ -175,6 +175,36 @@ struct ParsedCommunicator
     }
 };
 
+struct ParsedDeclaration
+{
+    std::string source;
+    std::string outStr;
+    llvm::raw_string_ostream ss;
+    PPSourceObject ppTokens;
+    CSourceObject cTokens;
+    std::unique_ptr<parser::Context> context;
+    std::vector<std::unique_ptr<Declaration>> declaration;
+
+    explicit ParsedDeclaration(std::string src) : source(std::move(src)), ss(outStr)
+    {
+        ppTokens = lexer::tokenize(source, &ss);
+        cTokens = lexer::toCTokens(ppTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
+
+        const auto& tokens = cTokens.data();
+        const lexer::CToken* begin = tokens.data();
+        const lexer::CToken* end = tokens.data() + tokens.size();
+
+        while (begin != end && (end - 1)->getTokenType() == lexer::TokenType::Newline)
+        {
+            end--;
+        }
+
+        parser::DiagnosticCollector::clearDiagnostics();
+        declaration = parser::parseDeclaration(begin, end, *context);
+    }
+};
+
 struct ParsedProgram
 {
     std::string source;
