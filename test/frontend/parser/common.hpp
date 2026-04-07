@@ -213,7 +213,7 @@ struct ParsedProgram
     PPSourceObject ppTokens;
     CSourceObject cTokens;
     std::unique_ptr<parser::Context> context;
-    Syntax::Program program;
+    Program program;
 
     explicit ParsedProgram(std::string src)
         : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, nullptr)

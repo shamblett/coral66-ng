@@ -593,7 +593,7 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
     SECTION("Missing Identifier")
     {
         ParsedDeclaration p("INTEGER ARRAY [1:2]");
-        REQUIRE(p.declaration.size() == 0);
+        REQUIRE(p.declaration.empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
     }
 
@@ -635,7 +635,7 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
     SECTION("Expected Declaration")
     {
         ParsedDeclaration p("OVERLAY x WITH");
-        REQUIRE(p.declaration.size() == 0);
+        REQUIRE(p.declaration.empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
     }
 

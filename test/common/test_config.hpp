@@ -30,7 +30,7 @@ std::string args(const Diagnostic&, Args&&... args)
     std::string result;
     std::string_view stringView = Diagnostic::getFormat();
     const char* last = stringView.data();
-    while (auto iter = ::coral66::detail::Diagnostic::nextArg(stringView))
+    while (const auto iter = ::coral66::detail::Diagnostic::nextArg(stringView))
     {
         auto view = iter->view;
         result += std::string_view(last, view.data() - last);
@@ -168,7 +168,7 @@ struct ProducesNoWarnings : Catch::Matchers::StringMatcherBase
 // Matcher that works almost like == of two strings except it doesn't care of any leading whitespaces per line
 struct ProducesLines : Catch::Matchers::MatcherBase<std::string_view>
 {
-    ProducesLines(std::string_view text)
+    explicit ProducesLines(std::string_view text)
     {
         std::size_t result = 0;
         while (true)
@@ -184,6 +184,7 @@ struct ProducesLines : Catch::Matchers::MatcherBase<std::string_view>
         }
     }
 
+protected:
     std::string describe() const override
     {
         return "lines match \""
@@ -201,6 +202,7 @@ struct ProducesLines : Catch::Matchers::MatcherBase<std::string_view>
                + '"';
     }
 
+public:
     bool match(const std::string_view& source) const override
     {
         std::size_t i = 0;
@@ -220,17 +222,17 @@ struct ProducesLines : Catch::Matchers::MatcherBase<std::string_view>
             i++;
         }
         auto leftOver = source.substr(result);
-        return std::all_of(leftOver.begin(), leftOver.end(), [](unsigned char c) { return std::isspace(c & 0x7F); });
+        return std::ranges::all_of(leftOver, [](unsigned char c) { return std::isspace(c & 0x7F); });
     }
 
 private:
     static std::string_view trimEnd(std::string_view text)
     {
-        // ASCII should hopefully suffice for our tests... Otherwise I will have to properly parse it to UTF32
+        // ASCII should hopefully suffice for our tests... Otherwise, I will have to properly parse it to UTF32
         // and use one of the whitespace sets of the Lexer to match whitespace characters
-        auto end = std::find_if(std::make_reverse_iterator(text.end()), std::make_reverse_iterator(text.begin()),
-                                [](char c) { return c != ' ' && c != '\t'; })
-                       .base();
+        const auto end = std::find_if(std::make_reverse_iterator(text.end()), std::make_reverse_iterator(text.begin()),
+                                      [](char c) { return c != ' ' && c != '\t'; })
+                             .base();
         return text.substr(0, end - text.begin());
     }
 
@@ -239,10 +241,9 @@ private:
 
 struct FileScope
 {
-    coral66::fs::path m_path;
+    fs::path m_path;
 
-public:
-    FileScope(coral66::fs::path path) : m_path(std::move(path)) {}
+    explicit FileScope(coral66::fs::path path) : m_path(std::move(path)) {}
 
     ~FileScope();
 
@@ -254,7 +255,7 @@ public:
 
 struct EndTest
 {
-    coral66::fs::path path;
+    fs::path path;
     ~EndTest();
 };
 

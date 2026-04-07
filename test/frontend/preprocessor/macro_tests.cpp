@@ -48,7 +48,7 @@ public:
     bool match(const PPSourceObject& arg) const override
     {
         bool errors = false;
-        auto ret = coral66::lexer::tokenize(m_source, nullptr, &errors);
+        auto ret = lexer::tokenize(m_source, nullptr, &errors);
         if (errors)
             return false;
 
@@ -63,7 +63,7 @@ public:
         }
         return true;
     }
-
+protected:
     std::string describe() const override
     {
         return "produces pp tokens of:\n" + m_source;

@@ -22,7 +22,7 @@ class Base : public coral66::AbstractIntrusiveVariant<Base, class Derived1, clas
 {
 protected:
     template <class T>
-    Base(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
+    explicit Base(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
     {
     }
 };
@@ -367,7 +367,7 @@ class Base2 : public coral66::AbstractIntrusiveVariant<Base2, class Derived2>
 {
 protected:
     template <class T>
-    Base2(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
+    explicit Base2(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
     {
     }
 };

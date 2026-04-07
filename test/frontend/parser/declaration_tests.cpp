@@ -114,7 +114,7 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
 
     SECTION("String Literals")
     {
-        ParsedDeclaration p("INTEGER ARRAY a[1:10] := \"HELLO\", \"WORLD\"");
+        ParsedDeclaration p(R"(INTEGER ARRAY a[1:10] := "HELLO", "WORLD")");
         REQUIRE(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }

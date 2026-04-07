@@ -12,15 +12,15 @@
 
 #include <wordexp.h>
 
-coral66::Tests::FileScope::~FileScope()
+FileScope::~FileScope()
 {
-    coral66::fs::remove(m_path);
+    fs::remove(m_path);
 }
 
 EndTest coral66::Tests::enableParallelization()
 {
-    auto id = llvm::sys::Process::getProcessId();
-    auto path = coral66::fs::current_path() / std::to_string(id);
+    const auto id = llvm::sys::Process::getProcessId();
+    const auto path = coral66::fs::current_path() / std::to_string(id);
     coral66::fs::create_directory(path);
     coral66::fs::current_path(path);
     return EndTest{path};

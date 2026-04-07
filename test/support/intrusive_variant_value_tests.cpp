@@ -15,7 +15,7 @@ class TrivBase : public coral66::AbstractIntrusiveVariant<TrivBase, class TrivDe
 {
 protected:
     template <class T>
-    TrivBase(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
+    explicit TrivBase(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
     {
     }
 };
@@ -46,7 +46,7 @@ class Base
 {
 protected:
     template <class T>
-    Base(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
+    explicit Base(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
     {
     }
 };
@@ -57,7 +57,8 @@ public:
     std::size_t size;
     float thing;
 
-    Derived1(std::size_t size, float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
+    // ReSharper disable once CppDFAConstantParameter
+    Derived1(std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
 };
 
 class DestrSideEffect : public Base
@@ -133,8 +134,10 @@ TEST_CASE("IntrusiveVariantValue non trivial", "[IVV]")
     }
     SECTION("Move assignable once")
     {
+        // ReSharper disable once CppEntityAssignedButNoRead
         coral66::IntrusiveVariantValue value = Derived1(5, 3.0);
         MoveConstrSideEffect::i = 0;
+        // ReSharper disable once CppDFAUnusedValue
         value = MoveConstrSideEffect();
         CHECK(MoveConstrSideEffect::i == 1);
     }
