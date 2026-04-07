@@ -118,9 +118,16 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
+    SECTION("Void Presetting")
+    {
+        ParsedDeclaration p("INTEGER ARRAY a[1:10] := 1, , 3, , , 6");
+        REQUIRE(p.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+    }
+
     SECTION("Error: Missing Expression")
     {
-        ParsedDeclaration p("INTEGER a :=");
+        ParsedDeclaration p("INTEGER a := *");
         REQUIRE(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
     }

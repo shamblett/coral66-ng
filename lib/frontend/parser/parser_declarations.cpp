@@ -53,6 +53,13 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             return false;
 
         auto tType = begin->getTokenType();
+        if (tType == lexer::TokenType::Comma || tType == lexer::TokenType::CloseParentheses
+            || tType == lexer::TokenType::CloseSquareBracket || tType == lexer::TokenType::SemiColon)
+        {
+            // Void group
+            return true;
+        }
+
         if (tType == lexer::TokenType::Plus || tType == lexer::TokenType::Minus)
         {
             begin++;
@@ -363,6 +370,49 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 begin++;
                 while (begin != end && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
                 {
+                    if (begin->getTokenType() == lexer::TokenType::PresetKeyword)
+                    {
+                        begin++;
+
+                        bool parsedAny = false;
+                        while (begin != end && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
+                        {
+                            if (!parseGroup())
+                            {
+                                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                                                                                     context.getSourceInterface(),
+                                                                                     *(begin == end ? (end - 1) : begin)));
+                                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+
+                                // Recover
+                                while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
+                                       && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
+                                {
+                                    begin++;
+                                }
+                                parsedAny = true; // Error reported
+                                break;
+                            }
+                            parsedAny = true;
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                            {
+                                begin++;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        if (!parsedAny)
+                        {
+                            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                                                                                 context.getSourceInterface(),
+                                                                                 *(begin == end ? (end - 1) : begin)));
+                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+                        }
+                        break; // PRESET is always the last part of the table body
+                    }
+
                     auto elemStart = begin;
                     if (begin->getTokenType() == lexer::TokenType::Identifier)
                     {
@@ -446,6 +496,10 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                         {
                             begin++;
                         }
+                        else if (begin != end && begin->getTokenType() == lexer::TokenType::PresetKeyword)
+                        {
+                            // Allow loop to catch it next iteration
+                        }
                         else
                         {
                             break; // Stop parsing elements
@@ -469,7 +523,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width),
                                                                         std::move(length), std::move(elements)));
 
-            if (begin != end && begin->getTokenType() == lexer::TokenType::PresetKeyword)
+            if (begin != end && (begin->getTokenType() == lexer::TokenType::Assignment || begin->getTokenType() == lexer::TokenType::PresetKeyword))
             {
                 begin++;
 
