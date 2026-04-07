@@ -139,13 +139,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET);
                     }
                 }
-                else
-                {
-                    context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(*(begin == end ? (end - 1) : begin),
-                                                                                  context.getSourceInterface(),
-                                                                                  *(begin == end ? (end - 1) : begin)));
-                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
-                }
 
                 result.push_back(std::make_unique<Syntax::ArrayDeclaration>(typeToken, begin, typeToken, std::move(ids),
                                                                             std::move(dims)));
@@ -386,11 +379,12 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                                      || begin->getTokenType() == lexer::TokenType::IntegerKeyword
                                      || begin->getTokenType() == lexer::TokenType::FixedKeyword))
                         {
-                            if (begin->getTokenType() == lexer::TokenType::FixedKeyword)
+                            auto typeToken = begin->getTokenType();
+                            begin++;
+                            if (typeToken == lexer::TokenType::FixedKeyword)
                             {
                                 validateFixedFormat(begin, end, context);
                             }
-                            begin++;
                         }
                         else if (!isPartWord)
                         {

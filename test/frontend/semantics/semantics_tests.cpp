@@ -106,32 +106,34 @@ TEST_CASE("Coral Array Declaration with Ranges", "[semantics][array]")
 
 TEST_CASE("Coral Table Declaration", "[semantics][table]")
 {
-    // Basic table
-    semanticsProduces(
-        R"(
-        PROGRAM
-        BEGIN
-            TABLE t[10, 20]
-            [
-                INTEGER x;
-                FIXED(16,8) y
-            ];
-        END
-    )",
-        Catch::Matchers::Equals(""));
+    SECTION("TABLE Parameters")
+    {
+        semanticsProduces(
+            R"(
+            PROGRAM
+            BEGIN
+                TABLE t[10, 20]
+                [
+                    x INTEGER 0;
+                    y FIXED(16,8) 1
+                ];
+            END
+        )",
+            Catch::Matchers::Equals(""));
 
-    // Table with just width
-    semanticsProduces(
-        R"(
-        PROGRAM
-        BEGIN
-            TABLE t[10]
-            [
-                INTEGER x
-            ];
-        END
-    )",
-        Catch::Matchers::Equals(""));
+        // Table with just width
+        semanticsProduces(
+            R"(
+            PROGRAM
+            BEGIN
+                TABLE t[10]
+                [
+                    x INTEGER 0
+                ];
+            END
+        )",
+            Catch::Matchers::Equals(""));
+    }
 }
 
 TEST_CASE("Coral Overlay Declaration", "[semantics][overlay]")
@@ -152,7 +154,7 @@ TEST_CASE("Coral Overlay Declaration", "[semantics][overlay]")
         R"(
         PROGRAM
         BEGIN
-            INTEGER ARRAY a[10];
+            INTEGER ARRAY a[1:10];
             OVERLAY a WITH INTEGER b;
         END
     )",

@@ -108,8 +108,8 @@ TEST_CASE("Coral 66 Table", "[Coral]")
                                        "BEGIN\n"
                                        "  TABLE T[10]\n"
                                        "  [\n"
-                                       "    INTEGER x;\n"
-                                       "    FIXED(16,8) y\n"
+                                       "    x INTEGER 0;\n"
+                                       "    y FIXED(16,8) 1\n"
                                        "  ];\n"
                                        "  x[0] := 10;\n"
                                        "END");
