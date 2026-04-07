@@ -76,6 +76,8 @@ CREATE_ERROR(EXPECTED_MASK, "Expected mask", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_STATEMENT, "Expected statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_SIMPLE_STATEMENT, "Expected simple statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_STRING_LITERAL, "Expected string literal", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_COLON, "Expected colon", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_TYPE, "Expected type", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_DECLARATION, "Expected declaration", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_COMPARATOR, "Expected comparator", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_ASSIGNMENT, "Expected assignment ':='", InsertAfter<0>);

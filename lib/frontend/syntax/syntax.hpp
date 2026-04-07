@@ -45,7 +45,8 @@ class Program final : public Node
     std::unique_ptr<Block> m_block;
 
 public:
-    Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block, std::unique_ptr<Communicator>&& communicator = nullptr);
+    Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
+            std::unique_ptr<Communicator>&& communicator = nullptr);
     [[nodiscard]] const Block& getBlock() const;
     [[nodiscard]] const Communicator* getCommunicator() const;
 };
@@ -137,17 +138,26 @@ public:
 class ArrayDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_type;
-    lexer::CTokenIterator m_identifier;
+    std::vector<lexer::CTokenIterator> m_identifiers;
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>> m_dimensions;
 
 public:
     ArrayDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
-                     lexer::CTokenIterator identifier,
+                     std::vector<lexer::CTokenIterator>&& identifiers,
                      std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions);
     [[nodiscard]] lexer::CTokenIterator getType() const;
-    [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
     [[nodiscard]] const std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&
         getDimensions() const;
+};
+
+class TableElementDeclaration final : public Declaration
+{
+    lexer::CTokenIterator m_identifier;
+
+public:
+    TableElementDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier);
+    [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
 };
 
 class TableDeclaration final : public Declaration

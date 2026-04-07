@@ -261,13 +261,16 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
         {
             // For array param, we need to find the type.
             // visit(ArrayDeclaration) adds to symbol table.
-            std::string name = std::get<std::string>(arr->getIdentifier()->getValue());
-            if (auto* decl = m_symbolTable[name]) // Assuming found
+            for (auto id : arr->getIdentifiers())
             {
-                // decl is Useable*.
-                if (auto* v = decl->tryAs<VariableDeclaration>())
+                std::string name = std::get<std::string>(id->getValue());
+                if (auto* decl = m_symbolTable[name]) // Assuming found
                 {
-                    paramTypes.push_back(ProcedureType::Parameter{&v->getType(), name, false});
+                    // decl is Useable*.
+                    if (auto* v = decl->tryAs<VariableDeclaration>())
+                    {
+                        paramTypes.push_back(ProcedureType::Parameter{&v->getType(), name, false});
+                    }
                 }
             }
         }
@@ -281,7 +284,8 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
     m_isGlobalScope = wasGlobal;
 
     const Type* returnType = &voidType;
-    if (auto typeToken = node.getTypeToken()) {
+    if (auto typeToken = node.getTypeToken())
+    {
         if (typeToken.value()->getTokenType() == lexer::TokenType::FloatingKeyword)
             returnType = &floatingType;
         else if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword)
@@ -289,7 +293,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
         else
             returnType = &integerType;
     }
-    
+
     IntrusiveVariantValue<Type> type(ProcedureType{returnType, std::move(paramTypes)});
     auto proc = makeIntr<ProcedureDeclaration>(node.getName(), std::move(type));
 
@@ -327,15 +331,20 @@ void SemanticAnalysis::visit(const Syntax::ArrayDeclaration& node)
             dims.push_back(10);
         }
     }
-
     IntrusiveVariantValue<Type> type(ArrayType{elemTypePtr, dims});
-    auto var = makeIntr<VariableDeclaration>(node.getIdentifier(), std::move(type));
 
-    const std::string& name = std::get<std::string>(node.getIdentifier()->getValue());
-    m_symbolTable[name] = var.get();
-    m_globalDeclarations.push_back(std::move(var));
+    for (auto id : node.getIdentifiers())
+    {
+        auto typeCopy = cloneType(*type);
+        auto var = makeIntr<VariableDeclaration>(id, std::move(typeCopy));
+
+        const std::string& name = std::get<std::string>(id->getValue());
+        m_symbolTable[name] = var.get();
+
+        if (m_isGlobalScope)
+            m_globalDeclarations.push_back(std::move(var));
+    }
 }
-
 void SemanticAnalysis::visit(const Syntax::TableDeclaration& node)
 {
     uint64_t width = 1;

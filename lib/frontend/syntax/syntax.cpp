@@ -22,7 +22,8 @@ lexer::CTokenIterator Node::end() const
 }
 
 // Program
-Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block, std::unique_ptr<Communicator>&& communicator)
+Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
+                 std::unique_ptr<Communicator>&& communicator)
     : Node(begin, end), m_communicator(std::move(communicator)), m_block(std::move(block))
 {
 }
@@ -150,9 +151,9 @@ const Statement& ProcedureDeclaration::getBody() const
 // ArrayDeclaration
 ArrayDeclaration::ArrayDeclaration(
     const lexer::CTokenIterator begin, const lexer::CTokenIterator end, const lexer::CTokenIterator type,
-    const lexer::CTokenIterator identifier,
+    std::vector<lexer::CTokenIterator>&& identifiers,
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions)
-    : Declaration(begin, end), m_type(type), m_identifier(identifier), m_dimensions(std::move(dimensions))
+    : Declaration(begin, end), m_type(type), m_identifiers(std::move(identifiers)), m_dimensions(std::move(dimensions))
 {
 }
 
@@ -160,14 +161,26 @@ lexer::CTokenIterator ArrayDeclaration::getType() const
 {
     return m_type;
 }
-lexer::CTokenIterator ArrayDeclaration::getIdentifier() const
+const std::vector<lexer::CTokenIterator>& ArrayDeclaration::getIdentifiers() const
 {
-    return m_identifier;
+    return m_identifiers;
 }
 const std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&
     ArrayDeclaration::getDimensions() const
 {
     return m_dimensions;
+}
+
+// TableElementDeclaration
+TableElementDeclaration::TableElementDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                                 const lexer::CTokenIterator identifier)
+    : Declaration(begin, end), m_identifier(identifier)
+{
+}
+
+lexer::CTokenIterator TableElementDeclaration::getIdentifier() const
+{
+    return m_identifier;
 }
 
 // TableDeclaration

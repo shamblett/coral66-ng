@@ -162,24 +162,20 @@ TEST_CASE("Procedures - Other Parameters", "[Parser][Procedure]")
     {
         ParsedProcedure p("PROCEDURE p(INTEGER ARRAY a, b); BEGIN END");
         REQUIRE(p.procedure != nullptr);
-        REQUIRE(p.procedure->getParameters().size() == 2);
+        REQUIRE(p.procedure->getParameters().size() == 1);
 
         auto* param1 = dynamic_cast<const ArrayDeclaration*>(p.procedure->getParameters()[0].get());
         REQUIRE(param1 != nullptr);
         REQUIRE(param1->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
-        REQUIRE(param1->getIdentifier()->getText() == "a");
+        REQUIRE(param1->getIdentifiers().size() == 2);
+        REQUIRE(param1->getIdentifiers()[0]->getText() == "a");
+        REQUIRE(param1->getIdentifiers()[1]->getText() == "b");
         REQUIRE(param1->getDimensions().empty());
-
-        auto* param2 = dynamic_cast<const ArrayDeclaration*>(p.procedure->getParameters()[1].get());
-        REQUIRE(param2 != nullptr);
-        REQUIRE(param2->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
-        REQUIRE(param2->getIdentifier()->getText() == "b");
-        REQUIRE(param2->getDimensions().empty());
     }
 
     SECTION("TABLE Parameters")
     {
-        ParsedProcedure p("PROCEDURE p(TABLE t[10,10] [ INTEGER f1 ] ); BEGIN END");
+        ParsedProcedure p("PROCEDURE p(TABLE t[10,10] [ f1 INTEGER 0 ] ); BEGIN END");
         REQUIRE(p.procedure != nullptr);
         REQUIRE(p.procedure->getParameters().size() == 1);
 

@@ -147,7 +147,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
 
         auto arrDecl = dynamic_cast<const ArrayDeclaration*>(items[0].get());
         REQUIRE(arrDecl != nullptr);
-        CHECK(arrDecl->getIdentifier()->getText() == "A");
+        CHECK(arrDecl->getIdentifiers()[0]->getText() == "A");
     }
 
     SECTION("Common With PRESET Keywords On Array")
@@ -160,7 +160,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
 
         auto arrDecl = dynamic_cast<const ArrayDeclaration*>(items[0].get());
         REQUIRE(arrDecl != nullptr);
-        CHECK(arrDecl->getIdentifier()->getText() == "A");
+        CHECK(arrDecl->getIdentifiers()[0]->getText() == "A");
     }
 
     SECTION("Common With Fixed Parameter Procedures")
