@@ -288,6 +288,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 return false;
             };
 
+            bool parsedAny = false;
             while (begin != end)
             {
                 if (!parseGroup())
@@ -303,8 +304,10 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     {
                         begin++;
                     }
+                    parsedAny = true; // Error reported
                     break;
                 }
+                parsedAny = true;
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 {
                     begin++;
@@ -313,6 +316,13 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 {
                     break;
                 }
+            }
+            if (!parsedAny)
+            {
+                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
             }
         }
 
