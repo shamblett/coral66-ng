@@ -108,6 +108,10 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
     {
         ParsedDeclaration p("INTEGER ARRAY a[1:10] := 5(1, 2(OCTAL(77)))");
         REQUIRE(p.declaration.size() == 1);
+        auto arr = dynamic_cast<const ArrayDeclaration*>(p.declaration[0].get());
+        REQUIRE(arr != nullptr);
+        REQUIRE(!arr->getPresetTokens().empty());
+        CHECK(arr->getPresetTokens()[0]->getTokenType() == lexer::TokenType::Literal);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
@@ -163,8 +167,20 @@ TEST_CASE("Overlay Declarations", "[Parser][Declarations]")
         REQUIRE(overlay != nullptr);
         CHECK(overlay->getBase()->getText() == "arr");
         CHECK(std::get<llvm::APSInt>(overlay->getOffset()->getValue()).getZExtValue() == 10);
+        CHECK(!overlay->getOffset2().has_value());
     }
 
+    SECTION("With two offsets")
+    {
+        ParsedDeclaration p("OVERLAY arr[15, -20] WITH INTEGER y");
+        REQUIRE(p.declaration.size() == 1);
+        auto overlay = dynamic_cast<const OverlayDeclaration*>(p.declaration[0].get());
+        REQUIRE(overlay != nullptr);
+        CHECK(overlay->getBase()->getText() == "arr");
+        CHECK(std::get<llvm::APSInt>(overlay->getOffset()->getValue()).getZExtValue() == 15);
+        REQUIRE(overlay->getOffset2().has_value());
+        CHECK(std::get<llvm::APSInt>(overlay->getOffset2().value()->getValue()).getZExtValue() == 20);
+    }
     SECTION("Error: Expected Declaration")
     {
         ParsedDeclaration p("OVERLAY x WITH");

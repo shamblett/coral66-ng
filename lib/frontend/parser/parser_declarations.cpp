@@ -295,6 +295,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     std::make_unique<Syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers)));
         }
 
+        std::vector<lexer::CTokenIterator> presetTokens;
         if (begin != end
             && (begin->getTokenType() == lexer::TokenType::Assignment
                 || begin->getTokenType() == lexer::TokenType::PresetKeyword))
@@ -304,6 +305,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             bool parsedAny = false;
             while (begin != end)
             {
+                auto groupStart = begin;
                 if (!parseGroup())
                 {
                     context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
@@ -320,9 +322,13 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     parsedAny = true; // Error reported
                     break;
                 }
+                for (auto it = groupStart; it != begin; ++it)
+                    presetTokens.push_back(it);
+
                 parsedAny = true;
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 {
+                    presetTokens.push_back(begin);
                     begin++;
                 }
                 else
@@ -336,6 +342,21 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                                                                      context.getSourceInterface(),
                                                                      *(begin == end ? (end - 1) : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+            }
+        }
+
+        if (!result.empty() && !presetTokens.empty())
+        {
+            for (auto& decl : result)
+            {
+                if (auto* var = dynamic_cast<Syntax::VariableDeclaration*>(decl.get()))
+                {
+                    var->setPresetTokens(presetTokens);
+                }
+                else if (auto* arr = dynamic_cast<Syntax::ArrayDeclaration*>(decl.get()))
+                {
+                    arr->setPresetTokens(presetTokens);
+                }
             }
         }
 
@@ -379,9 +400,9 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                         {
                             if (!parseGroup())
                             {
-                                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
-                                                                                     context.getSourceInterface(),
-                                                                                     *(begin == end ? (end - 1) : begin)));
+                                context.log(errors::parser::EXPECTED_EXPRESSION.args(
+                                    *(begin == end ? (end - 1) : begin), context.getSourceInterface(),
+                                    *(begin == end ? (end - 1) : begin)));
                                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
 
                                 // Recover
@@ -520,16 +541,17 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
             }
 
-            result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width),
-                                                                        std::move(length), std::move(elements)));
-
-            if (begin != end && (begin->getTokenType() == lexer::TokenType::Assignment || begin->getTokenType() == lexer::TokenType::PresetKeyword))
+            std::vector<lexer::CTokenIterator> presetTokens;
+            if (begin != end
+                && (begin->getTokenType() == lexer::TokenType::Assignment
+                    || begin->getTokenType() == lexer::TokenType::PresetKeyword))
             {
                 begin++;
 
                 bool parsedAny = false;
                 while (begin != end)
                 {
+                    auto groupStart = begin;
                     if (!parseGroup())
                     {
                         context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
@@ -546,9 +568,13 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                         parsedAny = true; // Error reported
                         break;
                     }
+                    for (auto it = groupStart; it != begin; ++it)
+                        presetTokens.push_back(it);
+
                     parsedAny = true;
                     if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                     {
+                        presetTokens.push_back(begin);
                         begin++;
                     }
                     else
@@ -564,6 +590,9 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                 }
             }
+
+            result.push_back(std::make_unique<Syntax::TableDeclaration>(
+                start, begin, id, std::move(width), std::move(length), std::move(elements), std::move(presetTokens)));
         }
         return result;
     }
@@ -578,6 +607,7 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             begin++;
 
             lexer::CTokenIterator offset = base;
+            std::optional<lexer::CTokenIterator> offset2 = std::nullopt;
             if (begin != end && begin->getTokenType() == lexer::TokenType::OpenSquareBracket)
             {
                 begin++;
@@ -593,6 +623,24 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                     offset = begin;
                     begin++;
                 }
+
+                if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                {
+                    begin++;
+                    if (begin != end
+                        && (begin->getTokenType() == lexer::TokenType::Plus
+                            || begin->getTokenType() == lexer::TokenType::Minus))
+                    {
+                        begin++;
+                    }
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::Literal
+                        && begin->getType() == lexer::CToken::Type::Integer)
+                    {
+                        offset2 = begin;
+                        begin++;
+                    }
+                }
+
                 if (begin != end && begin->getTokenType() == lexer::TokenType::CloseSquareBracket)
                 {
                     begin++;
@@ -607,8 +655,8 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
             auto decls = parseDeclaration(begin, end, context);
             if (!decls.empty())
             {
-                result.push_back(
-                    std::make_unique<Syntax::OverlayDeclaration>(start, begin, base, offset, std::move(decls[0])));
+                result.push_back(std::make_unique<Syntax::OverlayDeclaration>(start, begin, base, offset, offset2,
+                                                                              std::move(decls[0])));
             }
             else
             {

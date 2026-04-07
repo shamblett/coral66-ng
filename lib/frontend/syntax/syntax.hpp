@@ -107,12 +107,16 @@ class VariableDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_type; // INTEGER, FLOATING, FIXED
     std::vector<lexer::CTokenIterator> m_identifiers;
+    std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     VariableDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
-                        std::vector<lexer::CTokenIterator>&& identifiers);
+                        std::vector<lexer::CTokenIterator>&& identifiers,
+                        std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
+    void setPresetTokens(const std::vector<lexer::CTokenIterator>& tokens);
 };
 
 class ProcedureDeclaration final : public Declaration
@@ -140,15 +144,19 @@ class ArrayDeclaration final : public Declaration
     lexer::CTokenIterator m_type;
     std::vector<lexer::CTokenIterator> m_identifiers;
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>> m_dimensions;
+    std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     ArrayDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
                      std::vector<lexer::CTokenIterator>&& identifiers,
-                     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions);
+                     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
+                     std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
     [[nodiscard]] const std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&
         getDimensions() const;
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
+    void setPresetTokens(const std::vector<lexer::CTokenIterator>& tokens);
 };
 
 class TableElementDeclaration final : public Declaration
@@ -166,28 +174,34 @@ class TableDeclaration final : public Declaration
     std::unique_ptr<Expression> m_width;
     std::unique_ptr<Expression> m_length;
     std::vector<std::unique_ptr<Declaration>> m_elements;
+    std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     TableDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
                      std::unique_ptr<Expression>&& width, std::unique_ptr<Expression>&& length,
-                     std::vector<std::unique_ptr<Declaration>>&& elements);
+                     std::vector<std::unique_ptr<Declaration>>&& elements,
+                     std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
     [[nodiscard]] const Expression* getWidth() const;
     [[nodiscard]] const Expression* getLength() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getElements() const;
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
 };
 
 class OverlayDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_base;
     lexer::CTokenIterator m_offset;
+    std::optional<lexer::CTokenIterator> m_offset2;
     std::unique_ptr<Declaration> m_overlayedDeclaration;
 
 public:
     OverlayDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator base,
-                       lexer::CTokenIterator offset, std::unique_ptr<Declaration>&& overlayedDeclaration);
+                       lexer::CTokenIterator offset, std::optional<lexer::CTokenIterator> offset2,
+                       std::unique_ptr<Declaration>&& overlayedDeclaration);
     [[nodiscard]] lexer::CTokenIterator getBase() const;
     [[nodiscard]] lexer::CTokenIterator getOffset() const;
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getOffset2() const;
     [[nodiscard]] const Declaration& getOverlayedDeclaration() const;
 };
 
