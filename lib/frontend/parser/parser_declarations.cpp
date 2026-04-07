@@ -45,6 +45,113 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
         return result;
     }
     auto type = begin->getTokenType();
+
+    std::function<bool()> parseGroup;
+    parseGroup = [&]() -> bool
+    {
+        if (begin == end)
+            return false;
+
+        auto tType = begin->getTokenType();
+        if (tType == lexer::TokenType::Plus || tType == lexer::TokenType::Minus)
+        {
+            begin++;
+            if (begin != end
+                && ((begin->getTokenType() == lexer::TokenType::Literal
+                     && (begin->getType() == lexer::CToken::Type::Integer
+                         || begin->getType() == lexer::CToken::Type::Floating))
+                    || begin->getTokenType() == lexer::TokenType::OctalKeyword))
+            {
+                if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
+                {
+                    begin++;
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                    {
+                        int depth = 1;
+                        begin++;
+                        while (begin != end && depth > 0)
+                        {
+                            if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                                depth++;
+                            else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                                depth--;
+                            begin++;
+                        }
+                    }
+                }
+                else
+                {
+                    begin++;
+                }
+                return true;
+            }
+            return false;
+        }
+        else if ((tType == lexer::TokenType::Literal
+                  && (begin->getType() == lexer::CToken::Type::Integer
+                      || begin->getType() == lexer::CToken::Type::Floating))
+                 || tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::StringLiteral)
+        {
+            if (tType == lexer::TokenType::OctalKeyword)
+            {
+                begin++;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                {
+                    int depth = 1;
+                    begin++;
+                    while (begin != end && depth > 0)
+                    {
+                        if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                            depth++;
+                        else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                            depth--;
+                        begin++;
+                    }
+                }
+                return true;
+            }
+            else if (tType == lexer::TokenType::StringLiteral)
+            {
+                begin++;
+                return true;
+            }
+            else if (tType == lexer::TokenType::Literal && begin->getType() == lexer::CToken::Type::Floating)
+            {
+                begin++;
+                return true;
+            }
+            else // Integer Literal
+            {
+                begin++;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                {
+                    begin++;
+                    while (begin != end)
+                    {
+                        if (!parseGroup())
+                            return false;
+                        if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                        {
+                            begin++;
+                        }
+                        else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                        {
+                            begin++;
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    };
+
     if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
         || type == lexer::TokenType::FixedKeyword)
     {
@@ -186,107 +293,6 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
                 || begin->getTokenType() == lexer::TokenType::PresetKeyword))
         {
             begin++;
-
-            std::function<bool()> parseGroup;
-            parseGroup = [&]() -> bool
-            {
-                if (begin == end)
-                    return false;
-
-                auto tType = begin->getTokenType();
-                if (tType == lexer::TokenType::Plus || tType == lexer::TokenType::Minus)
-                {
-                    begin++;
-                    if (begin != end
-                        && ((begin->getTokenType() == lexer::TokenType::Literal
-                             && (begin->getType() == lexer::CToken::Type::Integer
-                                 || begin->getType() == lexer::CToken::Type::Floating))
-                            || begin->getTokenType() == lexer::TokenType::OctalKeyword))
-                    {
-                        if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
-                        {
-                            begin++;
-                            if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                            {
-                                int depth = 1;
-                                begin++;
-                                while (begin != end && depth > 0)
-                                {
-                                    if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                                        depth++;
-                                    else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
-                                        depth--;
-                                    begin++;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            begin++;
-                        }
-                        return true;
-                    }
-                    return false;
-                }
-                else if ((tType == lexer::TokenType::Literal
-                          && (begin->getType() == lexer::CToken::Type::Integer
-                              || begin->getType() == lexer::CToken::Type::Floating))
-                         || tType == lexer::TokenType::OctalKeyword)
-                {
-                    if (tType == lexer::TokenType::OctalKeyword)
-                    {
-                        begin++;
-                        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                        {
-                            int depth = 1;
-                            begin++;
-                            while (begin != end && depth > 0)
-                            {
-                                if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                                    depth++;
-                                else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
-                                    depth--;
-                                begin++;
-                            }
-                        }
-                        return true;
-                    }
-                    else if (tType == lexer::TokenType::Literal && begin->getType() == lexer::CToken::Type::Floating)
-                    {
-                        begin++;
-                        return true;
-                    }
-                    else // Integer Literal
-                    {
-                        begin++;
-                        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                        {
-                            begin++;
-                            while (begin != end)
-                            {
-                                if (!parseGroup())
-                                    return false;
-                                if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
-                                {
-                                    begin++;
-                                }
-                                else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
-                                {
-                                    begin++;
-                                    return true;
-                                }
-                                else
-                                {
-                                    return false;
-                                }
-                            }
-                            return false;
-                        }
-                        return true;
-                    }
-                }
-                return false;
-            };
 
             bool parsedAny = false;
             while (begin != end)
@@ -462,6 +468,48 @@ std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CToken
 
             result.push_back(std::make_unique<Syntax::TableDeclaration>(start, begin, id, std::move(width),
                                                                         std::move(length), std::move(elements)));
+
+            if (begin != end && begin->getTokenType() == lexer::TokenType::PresetKeyword)
+            {
+                begin++;
+
+                bool parsedAny = false;
+                while (begin != end)
+                {
+                    if (!parseGroup())
+                    {
+                        context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                                                                             context.getSourceInterface(),
+                                                                             *(begin == end ? (end - 1) : begin)));
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+
+                        // Recover
+                        while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
+                               && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+                        {
+                            begin++;
+                        }
+                        parsedAny = true; // Error reported
+                        break;
+                    }
+                    parsedAny = true;
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                    {
+                        begin++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (!parsedAny)
+                {
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+                }
+            }
         }
         return result;
     }
