@@ -36,7 +36,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     reporter->changeColor(llvm::raw_ostream::RED);
     reporter->enable_colors(true);
 
-    // Initialise ethe action executor
+    // Initialise the action executor
     auto executor = ActionExecutor(reporter);
 
     // Check for a source filename with an extension of .cor

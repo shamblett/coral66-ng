@@ -11,7 +11,7 @@
 #include "lib/support/filesystem.hpp"
 
 /**
- * @brief Main processing action executor functionality.
+ * Main processing action executor functionality.
  *
  * Executes the actions as selected by the user, e.g. compile.
  */

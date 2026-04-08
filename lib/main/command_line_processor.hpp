@@ -9,7 +9,7 @@
 #include <llvm/Support/raw_ostream.h>
 
 /**
- * @brief The command line processor
+ * The command line processor
  *
  * Implemented using the LLVM CommandLine library
  */
