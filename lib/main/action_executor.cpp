@@ -40,7 +40,7 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
     {
         return EXIT_FAILURE;
     }
-    if (action == Action::Compile && !coral66::cl::SyntaxOnly)
+    if (action == Action::Compile && !cl::SyntaxOnly)
     {
         m_linkableFiles.emplace_back(*objectFile);
     }
@@ -146,7 +146,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         parserTimeRegion.emplace(*parserTimer);
     }
 
-    Syntax::Program tree = coral66::parser::parseProgram(cTokens, m_reporter, &errors);
+    Syntax::Program tree = parser::parseProgram(cTokens, m_reporter, &errors);
     if (errors)
     {
         return {};
@@ -168,7 +168,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     }
     if (cl::SyntaxOnly)
     {
-        return std::optional<coral66::fs::path>{std::in_place};
+        return std::optional<fs::path>{std::in_place};
     }
     semanticsTimeRegion.reset();
 
