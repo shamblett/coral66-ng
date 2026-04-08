@@ -23,6 +23,17 @@ TEST_CASE("Procedures - Basic Declarations", "[Parser][Procedure]")
         REQUIRE(p.procedure != nullptr);
         REQUIRE(p.procedure->getName()->getText() == "p");
         REQUIRE(!p.procedure->getTypeToken().has_value());
+        REQUIRE(!p.procedure->isRecursive());
+        REQUIRE(p.procedure->getParameters().empty());
+    }
+
+    SECTION("Recursive Procedure")
+    {
+        ParsedProcedure p("RECURSIVE PROCEDURE p; BEGIN END");
+        REQUIRE(p.procedure != nullptr);
+        REQUIRE(p.procedure->getName()->getText() == "p");
+        REQUIRE(!p.procedure->getTypeToken().has_value());
+        REQUIRE(p.procedure->isRecursive());
         REQUIRE(p.procedure->getParameters().empty());
     }
 
@@ -33,6 +44,18 @@ TEST_CASE("Procedures - Basic Declarations", "[Parser][Procedure]")
         REQUIRE(p.procedure->getName()->getText() == "p");
         REQUIRE(p.procedure->getTypeToken().has_value());
         REQUIRE(p.procedure->getTypeToken().value()->getTokenType() == lexer::TokenType::IntegerKeyword);
+        REQUIRE(!p.procedure->isRecursive());
+        REQUIRE(p.procedure->getParameters().empty());
+    }
+
+    SECTION("Typed Recursive Procedure")
+    {
+        ParsedProcedure p("INTEGER RECURSIVE PROCEDURE p; ANSWER 0");
+        REQUIRE(p.procedure != nullptr);
+        REQUIRE(p.procedure->getName()->getText() == "p");
+        REQUIRE(p.procedure->getTypeToken().has_value());
+        REQUIRE(p.procedure->getTypeToken().value()->getTokenType() == lexer::TokenType::IntegerKeyword);
+        REQUIRE(p.procedure->isRecursive());
         REQUIRE(p.procedure->getParameters().empty());
     }
 

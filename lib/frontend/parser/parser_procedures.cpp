@@ -231,9 +231,16 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
         }
     }
 
+    bool isRecursive = false;
+    if (begin != end && begin->getTokenType() == lexer::TokenType::RecursiveKeyword)
+    {
+        isRecursive = true;
+        begin++;
+    }
+
     if (begin != end && begin->getTokenType() == lexer::TokenType::ProcedureKeyword)
     {
-        auto start = typeToken.has_value() ? typeToken.value() : begin;
+        auto start = typeToken.has_value() ? typeToken.value() : (isRecursive ? (begin - 1) : begin);
         begin++;
 
         auto name = begin == end ? (end - 1) : begin;
@@ -271,7 +278,7 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                     DiagnosticCollector::addDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT);
                 }
                 auto result = std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters),
-                                                                             std::move(body), typeToken);
+                                                                             std::move(body), typeToken, isRecursive);
                 context.exitProcedure();
                 return result;
             }
@@ -279,7 +286,7 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
             auto result = std::make_unique<Syntax::ProcedureDeclaration>(
                 start, begin, name, std::move(parameters), std::make_unique<Syntax::DummyStatement>(begin, begin),
-                typeToken);
+                typeToken, isRecursive);
             context.exitProcedure();
             return result;
         }

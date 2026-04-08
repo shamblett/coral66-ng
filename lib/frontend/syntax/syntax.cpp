@@ -144,12 +144,14 @@ ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, co
                                            const lexer::CTokenIterator name,
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
                                            std::unique_ptr<Statement>&& body,
-                                           std::optional<lexer::CTokenIterator> typeToken)
+                                           std::optional<lexer::CTokenIterator> typeToken,
+                                           bool isRecursive)
     : Declaration(begin, end),
       m_typeToken(typeToken),
       m_name(name),
       m_parameters(std::move(parameters)),
-      m_body(std::move(body))
+      m_body(std::move(body)),
+      m_isRecursive(isRecursive)
 {
 }
 

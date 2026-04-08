@@ -127,17 +127,22 @@ class ProcedureDeclaration final : public Declaration
     lexer::CTokenIterator m_name;
     std::vector<std::unique_ptr<Declaration>> m_parameters;
     std::unique_ptr<Statement> m_body;
+    bool m_isRecursive;
 
 public:
     ProcedureDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
                          std::vector<std::unique_ptr<Declaration>>&& parameters, std::unique_ptr<Statement>&& body,
-                         std::optional<lexer::CTokenIterator> typeToken = std::nullopt);
+                         std::optional<lexer::CTokenIterator> typeToken = std::nullopt, bool isRecursive = false);
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getParameters() const;
     [[nodiscard]] const Statement& getBody() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getTypeToken() const
     {
         return m_typeToken;
+    }
+    [[nodiscard]] bool isRecursive() const
+    {
+        return m_isRecursive;
     }
 };
 
