@@ -94,6 +94,13 @@ TEST_CASE("Boolean options", "[cli]")
         CHECK(SyntaxOnly == true);
     }
 
+    SECTION("Parse Only")
+    {
+        auto [argc, argv] = createArgs("-parse-only main.cor");
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(ParseOnly == true);
+    }
+
     SECTION("Time")
     {
         auto [argc, argv] = createArgs("-time main.cor");

@@ -36,6 +36,7 @@ void CommandLineProcessor::ParseCommandLine(int argc, char** argv)
     cl::Version = false;
     cl::DebugLevel = cl::DebugLevel::NoDebug;
     cl::SyntaxOnly = false;
+    cl::ParseOnly = false;
     cl::Time = false;
     cl::NoAction = false;
     cl::SourceFilename = "";

@@ -26,6 +26,7 @@
  * -g2                 Generated debugging info
  * -g3                 Generated extended debugging info
  * -syntax-only        Stop after semantic analysis and produce no output file
+ * -parse-only         Stop after parsing and produce no output file
  * -time               Output time taken for each stage
  * -noact              Check command line only, take no further action
  */
@@ -69,6 +70,7 @@ inline llvm::cl::opt<DebugLevel> DebugLevel(llvm::cl::desc("Debug level:"),
                                                              clEnumVal(g3, "Generated extended debugging info")));
 inline llvm::cl::opt<bool> SyntaxOnly("syntax-only",
                                       llvm::cl::desc("Stop after semantic analysis and produce no output file"));
+inline llvm::cl::opt<bool> ParseOnly("parse-only", llvm::cl::desc("Stop after parsing and produce no output file"));
 inline llvm::cl::opt<bool> Time("time", llvm::cl::desc("Output time taken for each stage"));
 inline llvm::cl::opt<bool> NoAction("noact",
                                     llvm::cl::desc("Check command line parameter validity, take no further action"));

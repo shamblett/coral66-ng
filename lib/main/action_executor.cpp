@@ -151,6 +151,10 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     {
         return {};
     }
+    if (cl::ParseOnly)
+    {
+        return std::optional<fs::path>{std::in_place};
+    }
     parserTimeRegion.reset();
 
     std::optional<llvm::TimeRegion> semanticsTimeRegion;
