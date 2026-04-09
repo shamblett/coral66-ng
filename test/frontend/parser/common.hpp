@@ -220,7 +220,8 @@ struct ParsedProgram
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
-        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
         program = parser::parseProgram(cTokens, &ss);
     }
 };

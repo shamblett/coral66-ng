@@ -1,3 +1,4 @@
+PROGRAM Main
 BEGIN
    INTEGER A;
 END;

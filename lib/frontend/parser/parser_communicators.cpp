@@ -152,7 +152,7 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>>
 }
 } // namespace
 
-std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                                         Context& context)
 {
     if (begin == end)

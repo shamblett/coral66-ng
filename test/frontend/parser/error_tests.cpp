@@ -663,3 +663,20 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::INVALID_FIXED_FORMAT));
     }
 }
+
+TEST_CASE("Program structure", "[Parser][Program]")
+{
+    SECTION("No Program Or Segment")
+    {
+        const ParsedProgram p("TEST COMMON () BEGIN END");
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_PROGRAM_SEGMENT));
+    }
+
+    SECTION("Malformed Communicator")
+    {
+        const ParsedProgram p("SEGMENT TEST COMMON (hhhh hhh) BEGIN END");
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(MALFORMED_COMMUNICATOR));
+    }
+}

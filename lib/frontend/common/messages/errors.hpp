@@ -54,6 +54,7 @@ namespace parser
 CREATE_ERROR(EXPECTED_N, "Expected %0", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_CONDITION, "Expected Condition %0", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_BEGIN, "Expected 'BEGIN' keyword", InsertAfter<0>);
+CREATE_ERROR(EXPECTED_PROGRAM_SEGMENT, "Expected 'PROGRAM' or 'SEGMENT' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_END, "Expected 'END' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_SEMICOLON, "Expected semicolon", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_IDENTIFIER, "Expected identifier", InsertAfter<0>);
@@ -92,7 +93,7 @@ CREATE_ERROR(EXPECTED_N_INSTEAD_OF_N, "Expected %0 instead of %1", PointAt<1>);
 CREATE_ERROR(ANSWER_OUTSIDE_PROCEDURE, "Answer statement used outside procedure body", InsertAfter<0>);
 CREATE_ERROR(ANSWER_IN_UNTYPED_PROCEDURE, "Answer statement used inside untyped procedure", InsertAfter<0>);
 CREATE_ERROR(MISSING_ANSWER_STATEMENT, "Typed procedure must contain an answer statement", InsertAfter<0>);
-
+CREATE_ERROR(MALFORMED_COMMUNICATOR, "Invalid format for communicator", Underline<0>);
 CREATE_ERROR(EXPECTED_N_AFTER_N, "Expected %0 after %1", InsertAfter<1, 0>);
 } // namespace parser
 

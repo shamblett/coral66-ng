@@ -46,8 +46,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     auto begin = sourceObject.data().data();
     auto end = sourceObject.data().data() + sourceObject.data().size();
 
-    // Consume optional PROGRAM/SEGMENT header
-    std::unique_ptr<Syntax::Communicator> communicator;
+    // Consume PROGRAM/SEGMENT header
     if (begin != end
         && (begin->getTokenType() == lexer::TokenType::ProgramKeyword
             || begin->getTokenType() == lexer::TokenType::SegmentKeyword))
@@ -57,7 +56,31 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         {
             begin++;
         }
-        communicator = parseCommunicator(begin, end, context);
+    }
+    else
+    {
+        context.log(errors::parser::EXPECTED_PROGRAM_SEGMENT.args(*begin, context.getSourceInterface(), *begin));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_PROGRAM_SEGMENT);
+        if (errors)
+        {
+            *errors = context.getErrorCount() > 0;
+        }
+        return {sourceObject.data().data(), end, nullptr, nullptr};
+    }
+
+    std::unique_ptr<Syntax::Communicator> communicator = parseCommunicator(begin, end, context);
+    if (!communicator && context.getErrorCount() > 0)
+    {
+        if (begin != end)
+        {
+            context.log(errors::parser::MALFORMED_COMMUNICATOR.args(*begin, context.getSourceInterface(), *begin));
+            DiagnosticCollector::addDiagnostic(errors::parser::MALFORMED_COMMUNICATOR);
+            if (errors)
+            {
+                *errors = context.getErrorCount() > 0;
+            }
+            return {sourceObject.data().data(), end, nullptr, nullptr};
+        }
     }
 
     auto block = parseBlock(begin, end, context);
@@ -67,6 +90,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         {
             context.log(errors::parser::EXPECTED_N.args(*begin, context.getSourceInterface(),
                                                         lexer::TokenType::BeginKeyword, *begin));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_N);
         }
     }
 
@@ -80,6 +104,16 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
 
 std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
+    // Consume optional SEGMENT header
+    if (begin != end && begin->getTokenType() == lexer::TokenType::SegmentKeyword)
+    {
+        begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+        {
+            begin++;
+        }
+    }
+
     if (begin == end || begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {
         return nullptr;
