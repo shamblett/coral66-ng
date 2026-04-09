@@ -319,8 +319,7 @@ std::pair<StateMachine, bool> CommentSentence::advance(char const c, Context& co
 {
     if (c == ';')
     {
-        context.push(TokenType::Identifier, tokenName(TokenType::CommentKeyword).data()); // Emit comment keyword
-        return {Start{}, false}; // Let Start handle the semicolon
+        return {Start{}, true}; // Consume the semicolon and emit nothing
     }
     return {*this, true};
 }

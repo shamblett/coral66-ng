@@ -238,10 +238,16 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
         begin++;
     }
 
+    bool hasProcedureKeyword = false;
     if (begin != end && begin->getTokenType() == lexer::TokenType::ProcedureKeyword)
     {
-        auto start = typeToken.has_value() ? typeToken.value() : (isRecursive ? (begin - 1) : begin);
+        hasProcedureKeyword = true;
         begin++;
+    }
+
+    if (isRecursive || hasProcedureKeyword)
+    {
+        auto start = typeToken.has_value() ? typeToken.value() : (isRecursive ? rollback : (begin - 1));
 
         auto name = begin == end ? (end - 1) : begin;
         if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
