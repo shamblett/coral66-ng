@@ -104,8 +104,8 @@ TEST_CASE("Coral Lexing Keyword = Invalid Strings", "[lexer]")
         using namespace coral66::lexer;
         bool errors = false;
         auto result = lex("BEGI HHHH AND COMMM COMMENT ;", errors);
-        const std::vector correct = {TokenType::Identifier, TokenType::Identifier,     TokenType::AndKeyword,
-                                     TokenType::Identifier, TokenType::CommentKeyword, TokenType::SemiColon};
+        const std::vector correct = {TokenType::Identifier, TokenType::Identifier, TokenType::AndKeyword,
+                                     TokenType::Identifier};
         std::vector<TokenType> tokens;
         CHECK(result.data().size() == correct.size());
         tokens.reserve(result.data().size());

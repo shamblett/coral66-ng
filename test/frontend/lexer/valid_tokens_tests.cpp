@@ -45,22 +45,19 @@ coral66::CSourceObject lex(const std::string& code)
 
 TEST_CASE("Coral Lexing Keywords", "[lexer]")
 {
-    const std::vector correct = {TokenType::AbsoluteKeyword,  TokenType::AndKeyword,      TokenType::AnswerKeyword,
-                                 TokenType::ArrayKeyword,     TokenType::BeginKeyword,    TokenType::BitKeyword,
-                                 TokenType::BitsKeyword,      TokenType::CodeKeyword,     TokenType::CommentKeyword,
-                                 TokenType::SemiColon,        TokenType::CommonKeyword,   TokenType::DefineKeyword,
-                                 TokenType::DeleteKeyword,    TokenType::DifferKeyword,   TokenType::DoKeyword,
-                                 TokenType::ElseKeyword,      TokenType::EndKeyword,      TokenType::ExternalKeyword,
-                                 TokenType::FixedKeyword,     TokenType::FloatingKeyword, TokenType::ForKeyword,
-                                 TokenType::GotoKeyword,      TokenType::IfKeyword,       TokenType::IntegerKeyword,
-                                 TokenType::LabelKeyword,     TokenType::LibraryKeyword,  TokenType::LiteralKeyword,
-                                 TokenType::LocationKeyword,  TokenType::MaskKeyword,     TokenType::OctalKeyword,
-                                 TokenType::OrKeyword,        TokenType::OverlayKeyword,  TokenType::PresetKeyword,
-                                 TokenType::ProcedureKeyword, TokenType::ProgramKeyword,  TokenType::RecursiveKeyword,
-                                 TokenType::SegmentKeyword,   TokenType::StepKeyword,     TokenType::SwitchKeyword,
-                                 TokenType::TableKeyword,     TokenType::ThenKeyword,     TokenType::UnionKeyword,
-                                 TokenType::UnsignedKeyword,  TokenType::UntilKeyword,    TokenType::ValueKeyword,
-                                 TokenType::WhileKeyword,     TokenType::WithKeyword};
+    const std::vector correct = {
+        TokenType::AbsoluteKeyword, TokenType::AndKeyword,       TokenType::AnswerKeyword,  TokenType::ArrayKeyword,
+        TokenType::BeginKeyword,    TokenType::BitKeyword,       TokenType::BitsKeyword,    TokenType::CodeKeyword,
+        TokenType::CommonKeyword,   TokenType::DefineKeyword,    TokenType::DeleteKeyword,  TokenType::DifferKeyword,
+        TokenType::DoKeyword,       TokenType::ElseKeyword,      TokenType::EndKeyword,     TokenType::ExternalKeyword,
+        TokenType::FixedKeyword,    TokenType::FloatingKeyword,  TokenType::ForKeyword,     TokenType::GotoKeyword,
+        TokenType::IfKeyword,       TokenType::IntegerKeyword,   TokenType::LabelKeyword,   TokenType::LibraryKeyword,
+        TokenType::LiteralKeyword,  TokenType::LocationKeyword,  TokenType::MaskKeyword,    TokenType::OctalKeyword,
+        TokenType::OrKeyword,       TokenType::OverlayKeyword,   TokenType::PresetKeyword,  TokenType::ProcedureKeyword,
+        TokenType::ProgramKeyword,  TokenType::RecursiveKeyword, TokenType::SegmentKeyword, TokenType::StepKeyword,
+        TokenType::SwitchKeyword,   TokenType::TableKeyword,     TokenType::ThenKeyword,    TokenType::UnionKeyword,
+        TokenType::UnsignedKeyword, TokenType::UntilKeyword,     TokenType::ValueKeyword,   TokenType::WhileKeyword,
+        TokenType::WithKeyword};
 
     SECTION("Stropped")
     {
@@ -311,13 +308,7 @@ TEST_CASE("Comments", "[lexer]")
     {
         auto result = lex("COMMENT This is a comment;");
 
-        const std::vector correct = {TokenType::CommentKeyword, TokenType::SemiColon};
-
-        CHECK(result.data().size() == correct.size());
-        for (size_t i = 0; i < correct.size(); ++i)
-        {
-            CHECK(result.data()[i].getTokenType() == correct[i]);
-        }
+        CHECK(result.data().size() == 0);
     }
 
     SECTION("End Comment")
