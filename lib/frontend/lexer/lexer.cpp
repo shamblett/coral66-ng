@@ -24,9 +24,12 @@ using namespace coral66::lexer;
 using namespace coral66::detail;
 
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
-                                                 std::string_view const sourcePath)
+                                                 std::string_view const sourcePath, bool clearDiagnostics)
 {
-    DiagnosticCollector::clearDiagnostics();
+    if (clearDiagnostics)
+    {
+        DiagnosticCollector::clearDiagnostics();
+    }
 
     if (errorsOccurred)
     {

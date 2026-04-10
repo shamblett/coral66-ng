@@ -49,10 +49,11 @@ using PPTokenIterator = const PPToken* CORAL66_NON_NULL;
  * @param reporter Stream to report lexing errors to.
  * @param errorsOccurred Pointer to a bool set to true if errors occur.
  * @param sourcePath Path to the source file (for diagnostics).
+ * @param clearDiagnostics Request to not clear diagnostics if false.
  * @return A SourceObject containing the PPTokens.
  */
 PPSourceObject tokenize(std::string source, llvm::raw_ostream* reporter = &llvm::errs(), bool* errorsOccurred = nullptr,
-                        std::string_view sourcePath = "<stdin>");
+                        std::string_view sourcePath = "<stdin>", bool clearDiagnostics = true);
 
 /**
  * Converts a stream of PPTokens into a stream of CTokens.

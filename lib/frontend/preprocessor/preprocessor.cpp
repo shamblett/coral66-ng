@@ -277,7 +277,7 @@ void coral66::pp::Preprocessor::visit(const DefineDirective& define)
         }
 
         bool errors = false;
-        auto innerSource = coral66::lexer::tokenize(innerString, m_reporter, &errors, "Macro");
+        auto innerSource = coral66::lexer::tokenize(innerString, m_reporter, &errors, "Macro", false);
         if (errors)
         {
             m_errorsOccurred = true;
