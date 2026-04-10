@@ -1,12 +1,15 @@
 Recommended Alternative: External Traversal
 
-Instead of making the AST nodes know how to serialize themselves, you should write an external utility that knows how to read the AST and generate JSON.
+Instead of making the AST nodes know how to serialize themselves, you should write an external utility that knows how to
+read the AST and generate JSON.
 
-Looking at the codebase, coral66-ng already uses dynamic_cast heavily for AST traversal (for example, in lib/frontend/semantics/semantic_analysis.cpp). You can
+Looking at the codebase, coral66-ng already uses dynamic_cast heavily for AST traversal (for example, in
+lib/frontend/semantics/semantic_analysis.cpp). You can
 leverage this existing architectural pattern to build your utility entirely separated from the production code.
 
 You could create a testing utility (e.g., test/frontend/parser/ast_json_dumper.cpp) that looks something like this:
 
+```
     1 #include "lib/frontend/syntax/syntax.hpp"
     2 // Include your JSON library of choice here, NOT in syntax.hpp
     3 #include <rapidjson/document.h> 
@@ -26,23 +29,28 @@ You could create a testing utility (e.g., test/frontend/parser/ast_json_dumper.c
 17
 18     return result;
 19 }
+```
 
 Benefits of this approach:
+
 * Zero impact on production code: syntax.hpp remains untouched.
 * Fast compiles: The heavy JSON includes are confined to a single test utility .cpp file.
-* Flexibility: You can format the JSON exactly how your tests need it without worrying about exactly how the reflection library maps C++ members to JSON fields.
+* Flexibility: You can format the JSON exactly how your tests need it without worrying about exactly how the reflection
+  library maps C++ members to JSON fields.
 
-
-
-To dump the entire AST starting from the Syntax::Program root, you can extend the traversal pattern into a dedicated class. Wrapping the logic in a class is highly
-recommended because rapidjson requires an allocator to construct JSON values, and a class allows you to store the allocator as a member rather than passing it around
+To dump the entire AST starting from the Syntax::Program root, you can extend the traversal pattern into a dedicated
+class. Wrapping the logic in a class is highly
+recommended because rapidjson requires an allocator to construct JSON values, and a class allows you to store the
+allocator as a member rather than passing it around
 to every recursive call.
 
 Here is a complete architectural blueprint for how you can build this utility in your test/ directory.
 
 1. The Dumper Class Structure
-   Create a class that contains overloaded dump() methods for the top-level structured nodes (Program, Block) and a dispatcher method for generic Node pointers (where
+   Create a class that contains overloaded dump() methods for the top-level structured nodes (Program, Block) and a
+   dispatcher method for generic Node pointers (where
    you'll use dynamic_cast for statements, expressions, and declarations).
+
 ```
    1 #include "lib/frontend/syntax/syntax.hpp"
    2 #include <rapidjson/document.h>
@@ -160,9 +168,12 @@ Here is a complete architectural blueprint for how you can build this utility in
    114     }
    115 };
 ```
+
 2. Using the Dumper to output JSON
-   To actually use the AstJsonDumper in a test or a CLI application, you initialize a rapidjson::Document, pass its allocator to your dumper, format it as a string, and
+   To actually use the AstJsonDumper in a test or a CLI application, you initialize a rapidjson::Document, pass its
+   allocator to your dumper, format it as a string, and
    output it.
+
 ```
     1 #include <iostream>
     2
@@ -191,23 +202,35 @@ Here is a complete architectural blueprint for how you can build this utility in
 ```
 
 Key Takeaways:
-1. JSON Arrays from Vectors: Program and Block contain std::vector<std::unique_ptr<T>>. To serialize these, you iterate over them, unwrap the unique pointer with
+
+1. JSON Arrays from Vectors: Program and Block contain std::vector<std::unique_ptr<T>>. To serialize these, you iterate
+   over them, unwrap the unique pointer with
    .get(), pass it back into the polymorphic dump(Node*) dispatcher, and push the result into a rapidjson::kArrayType.
-2. Dynamic Dispatching: Because Declaration, Statement, and Expression nodes are stored polymorphically as pointers in the tree, a single dump(const Node*) function
+2. Dynamic Dispatching: Because Declaration, Statement, and Expression nodes are stored polymorphically as pointers in
+   the tree, a single dump(const Node*) function
    equipped with an if / else if chain of dynamic_casts acts as the router to safely unpack every subtype.
-3. Tokens: When extracting names, types, and values, you will likely encounter lexer::CTokenIterator variables (like in VariableDeclaration::getType()). You will
-   need a small helper to extract the actual lexeme string from those iterators and convert them into RapidJSON strings so your JSON dump has the actual
+3. Tokens: When extracting names, types, and values, you will likely encounter lexer::CTokenIterator variables (like in
+   VariableDeclaration::getType()). You will
+   need a small helper to extract the actual lexeme string from those iterators and convert them into RapidJSON strings
+   so your JSON dump has the actual
    human-readable variable names and operator types.
 
-To correctly extract the text or value from a CTokenIterator (which in coral66-ng is an alias for const coral66::lexer::CToken*), we need to look at how CToken is
+To correctly extract the text or value from a CTokenIterator (which in coral66-ng is an alias for const coral66::lexer::
+CToken*), we need to look at how CToken is
 implemented in your codebase.
 
-Based on the headers in lib/frontend/common/lexer_common.hpp, a CToken derives from TokenBase and contains two important pieces of information:
-1. The TokenType (e.g., Identifier, Integer, Plus, Assignment), which can be converted to a string using the existing coral66::lexer::tokenName() utility.
-2. A parsed Value stored as a std::variant (which can hold std::string for identifiers, or LLVM types like llvm::APSInt and llvm::APFloat for numbers).
+Based on the headers in lib/frontend/common/lexer_common.hpp, a CToken derives from TokenBase and contains two important
+pieces of information:
 
-Here is how you can implement the helper method inside the AstJsonDumper class. It uses std::visit to crack open the token's internal variant and extracts the most
+1. The TokenType (e.g., Identifier, Integer, Plus, Assignment), which can be converted to a string using the existing
+   coral66::lexer::tokenName() utility.
+2. A parsed Value stored as a std::variant (which can hold std::string for identifiers, or LLVM types like llvm::APSInt
+   and llvm::APFloat for numbers).
+
+Here is how you can implement the helper method inside the AstJsonDumper class. It uses std::visit to crack open the
+token's internal variant and extracts the most
 accurate string representation:
+
 ```
     1 #include "lib/frontend/common/lexer_common.hpp"
     2 #include <rapidjson/document.h>
@@ -276,9 +299,11 @@ accurate string representation:
 65     return tokenObj;
 66 }
 ```
+
 How to use it in your AST Node dumping logic:
 
 If you are dumping a VariableDeclaration, for example, you can now easily dump its type and the identifiers it declares:
+
 ```
     1 // Inside AstJsonDumper::dump(const coral66::Syntax::Node* node)
     2
