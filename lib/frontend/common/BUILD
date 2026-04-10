@@ -19,6 +19,7 @@ cc_library(
         "constant_value.hpp",
         "custom_diagnostics.hpp",
         "diagnostic.hpp",
+        "diagnostic_collection.hpp",
         "diagnostic_utilities.hpp",
         "language_options.hpp",
         "lexer_common.hpp",

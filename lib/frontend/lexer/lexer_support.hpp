@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/message.hpp"
 #include "lib/frontend/common/source_object.hpp"
@@ -385,25 +386,6 @@ struct Prime final
 /*
  * Diagnostics collection helper.
  */
-class DiagnosticCollector
-{
-    inline static std::vector<detail::Diagnostic::DiagnosticBase> m_diagnostics;
-
-public:
-    template <typename DiagnosticType>
-    static void addDiagnostic(const DiagnosticType& diagnostic)
-    {
-        m_diagnostics.emplace_back(diagnostic);
-    }
-
-    static std::vector<detail::Diagnostic::DiagnosticBase>& getDiagnostics()
-    {
-        return m_diagnostics;
-    }
-    static void clearDiagnostics()
-    {
-        m_diagnostics.clear();
-    }
-};
+using DiagnosticCollector = DiagnosticCollection<detail::Diagnostic::DiagnosticBase>;
 
 } // namespace coral66::lexer
