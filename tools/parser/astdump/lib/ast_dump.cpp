@@ -74,15 +74,38 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     rapidjson::Value obj(rapidjson::kObjectType);
 
     // Declarations
-    if (auto* variableDeclarations = dynamic_cast<const coral66::Syntax::VariableDeclaration*>(node))
+    if (auto* declaration = dynamic_cast<const Syntax::Declaration*>(node))
+    {
+        obj.AddMember("Declaration", dump(declaration), m_alloc);
+    }
+    // Statements
+    else if (auto* statement = dynamic_cast<const Syntax::Statement*>(node))
+    {
+        obj.AddMember("Statement", dump(statement), m_alloc);
+    }
+    else
+    {
+        obj.AddMember("NodeType", "UnknownNode", m_alloc);
+    }
+
+    return obj;
+}
+
+// Declarations
+rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    if (auto* variableDeclarations = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
         obj.AddMember("TypeToken", getTokenString(variableDeclarations->getType()), m_alloc);
     }
-    else if (auto* procedureDeclarations = dynamic_cast<const coral66::Syntax::ProcedureDeclaration*>(node))
+    else if (auto* procedureDeclarations = dynamic_cast<const Syntax::ProcedureDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
         obj.AddMember("IsRecursive", procedureDeclarations->isRecursive(), m_alloc);
+        obj.AddMember("Name", getTokenString(procedureDeclarations->getName()), m_alloc);
 
         rapidjson::Value params(rapidjson::kArrayType);
         for (const auto& param : procedureDeclarations->getParameters())
@@ -94,24 +117,33 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
         // Recursively dump the procedure body statement/block
         obj.AddMember("Body", dump(&procedureDeclarations->getBody()), m_alloc);
     }
-    // Statements
-    else if (auto* assignMentStatement = dynamic_cast<const coral66::Syntax::AssignmentStatement*>(node))
+
+    return obj;
+}
+
+// Statements
+rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    if (auto* assignmentStatement = dynamic_cast<const Syntax::AssignmentStatement*>(statement))
     {
         obj.AddMember("NodeType", "AssignmentStatement", m_alloc);
-        // obj.AddMember("LHS", dump(assignStmt->getLHS()), m_alloc);
-        //  obj.AddMember("RHS", dump(assignStmt->getRHS()), m_alloc);
+        obj.AddMember("LHS", dump(&assignmentStatement->getVariable()), m_alloc);
+        obj.AddMember("RHS", dump(&assignmentStatement->getExpression()), m_alloc);
     }
-    // --- Expressions ---
-    else if (auto* binExpr = dynamic_cast<const coral66::Syntax::BinaryExpression*>(node))
-    { // Assuming this exists based on semantic_analysis.cpp
-        obj.AddMember("NodeType", "BinaryExpression", m_alloc);
-        // obj.AddMember("Left", dump(binExpr->getLeft()), m_alloc);
-        //  obj.AddMember("Right", dump(binExpr->getRight()), m_alloc);
-    }
-    // ... Add cases for all other AST nodes ...
-    else
+    return obj;
+}
+
+// Expressions
+rapidjson::Value AstDump::dump(const Syntax::Expression* expression)
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    if (auto* binaryExpression = dynamic_cast<const Syntax::BinaryExpression*>(expression))
     {
-        obj.AddMember("NodeType", "UnknownNode", m_alloc);
+        obj.AddMember("NodeType", "BinaryExpression", m_alloc);
+        obj.AddMember("Expression", dump(binaryExpression), m_alloc);
     }
 
     return obj;
