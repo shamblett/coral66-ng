@@ -10,12 +10,14 @@
 
 namespace coral66
 {
+
+// Main entry point
 rapidjson::Value AstDump::dump(const Syntax::Program& program)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
     obj.AddMember("NodeType", "Program", m_alloc);
 
-    // Dump Communicator (if it exists)
+    // Dump Communicator
     if (const auto* comm = program.getCommunicator())
     {
         obj.AddMember("Communicator", dump(comm), m_alloc);
@@ -31,37 +33,39 @@ rapidjson::Value AstDump::dump(const Syntax::Program& program)
     return obj;
 }
 
+// Block
 rapidjson::Value AstDump::dump(const Syntax::Block& block)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
     obj.AddMember("NodeType", "Block", m_alloc);
 
     // Dump Declarations array
-    rapidjson::Value decls(rapidjson::kArrayType);
-    for (const auto& decl : block.getDeclarations())
+    rapidjson::Value declarations(rapidjson::kArrayType);
+    for (const auto& declaration : block.getDeclarations())
     {
-        decls.PushBack(dump(decl.get()), m_alloc);
+        declarations.PushBack(dump(declaration.get()), m_alloc);
     }
-    obj.AddMember("Declarations", decls, m_alloc);
+    obj.AddMember("Declarations", declarations, m_alloc);
 
-    // Dump Statements array
-    rapidjson::Value stmts(rapidjson::kArrayType);
-    for (const auto& stmt : block.getStatements())
+    // Dump Statements
+    rapidjson::Value statements(rapidjson::kArrayType);
+    for (const auto& statement : block.getStatements())
     {
-        stmts.PushBack(dump(stmt.get()), m_alloc);
+        statements.PushBack(dump(statement.get()), m_alloc);
     }
-    obj.AddMember("Statements", stmts, m_alloc);
+    obj.AddMember("Statements", statements, m_alloc);
 
-    // Dump Place References array
-    rapidjson::Value places(rapidjson::kArrayType);
-    for (const auto& place : block.getPlaceReferences())
+    // Dump Place References
+    rapidjson::Value placeReferences(rapidjson::kArrayType);
+    for (const auto& placeReference : block.getPlaceReferences())
     {
-        places.PushBack(dump(place.get()), m_alloc);
+        placeReferences.PushBack(dump(placeReference.get()), m_alloc);
     }
-    obj.AddMember("PlaceReferences", places, m_alloc);
+    obj.AddMember("PlaceReferences", placeReferences, m_alloc);
     return obj;
 }
 
+// Dispatcher
 rapidjson::Value AstDump::dump(const Syntax::Node* node)
 {
     if (!node)
@@ -69,30 +73,30 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
 
     rapidjson::Value obj(rapidjson::kObjectType);
 
-    // --- Declarations ---
-    if (auto* varDecl = dynamic_cast<const coral66::Syntax::VariableDeclaration*>(node))
+    // Declarations
+    if (auto* variableDeclarations = dynamic_cast<const coral66::Syntax::VariableDeclaration*>(node))
     {
         obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
-        obj.AddMember("TypeToken", getTokenString(varDecl->getType()), m_alloc);
+        obj.AddMember("TypeToken", getTokenString(variableDeclarations->getType()), m_alloc);
     }
-    else if (auto* procDecl = dynamic_cast<const coral66::Syntax::ProcedureDeclaration*>(node))
+    else if (auto* procedureDeclarations = dynamic_cast<const coral66::Syntax::ProcedureDeclaration*>(node))
     {
         obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
-        obj.AddMember("IsRecursive", procDecl->isRecursive(), m_alloc);
+        obj.AddMember("IsRecursive", procedureDeclarations->isRecursive(), m_alloc);
 
         rapidjson::Value params(rapidjson::kArrayType);
-        for (const auto& param : procDecl->getParameters())
+        for (const auto& param : procedureDeclarations->getParameters())
         {
             params.PushBack(dump(param.get()), m_alloc);
         }
         obj.AddMember("Parameters", params, m_alloc);
 
         // Recursively dump the procedure body statement/block
-        obj.AddMember("Body", dump(&procDecl->getBody()), m_alloc);
+        obj.AddMember("Body", dump(&procedureDeclarations->getBody()), m_alloc);
     }
-    // --- Statements ---
-    else if (auto* assignStmt = dynamic_cast<const coral66::Syntax::AssignmentStatement*>(node))
-    { // Assuming this exists based on semantic_analysis.cpp
+    // Statements
+    else if (auto* assignMentStatement = dynamic_cast<const coral66::Syntax::AssignmentStatement*>(node))
+    {
         obj.AddMember("NodeType", "AssignmentStatement", m_alloc);
         // obj.AddMember("LHS", dump(assignStmt->getLHS()), m_alloc);
         //  obj.AddMember("RHS", dump(assignStmt->getRHS()), m_alloc);
@@ -120,11 +124,11 @@ rapidjson::Value AstDump::getTokenString(const lexer::CTokenIterator& token)
         return rapidjson::Value(rapidjson::kNullType);
     }
 
-    // 1. Get the base token name (e.g. "Identifier", "+", "Integer")
+    // Get the base token name (e.g. "Identifier", "+", "Integer")
     std::string_view tokenNameView = coral66::lexer::tokenName(token->getTokenType(), false);
     std::string tokenName(tokenNameView);
 
-    // 2. Extract the actual parsed value from the token's variant payload
+    // Extract the actual parsed value from the token's variant payload
     std::string tokenValueStr;
     const auto& valueVariant = token->getValue();
 
@@ -166,7 +170,7 @@ rapidjson::Value AstDump::getTokenString(const lexer::CTokenIterator& token)
         },
         valueVariant);
 
-    // 3. Format it beautifully as a JSON Object for the dump
+    // Format it as a JSON Object for the dump
     // Example output: { "Class": "Identifier", "Value": "myVariable" }
     //                 { "Class": "Assignment", "Value": ":=" }
 

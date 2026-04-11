@@ -28,13 +28,13 @@ public:
     // Main dump method
     rapidjson::Value dump(const Syntax::Program& program);
 
+private:
     // Block dump
     rapidjson::Value dump(const Syntax::Block& block);
 
     // Dispatcher
     rapidjson::Value dump(const Syntax::Node* node);
 
-private:
     // Helper function to extract text from a Lexer CTokenIterator
     rapidjson::Value getTokenString(const lexer::CTokenIterator& token);
 };
