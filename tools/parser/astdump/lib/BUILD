@@ -8,6 +8,12 @@ cc_library(
     name = "astdump",
     srcs = [
         "ast_dump.cpp",
+        "ast_dump_communicators.cpp",
+        "ast_dump_declarations.cpp",
+        "ast_dump_expressions.cpp",
+        "ast_dump_place_references.cpp",
+        "ast_dump_procedures.cpp",
+        "ast_dump_statements.cpp",
     ],
     hdrs = [
         "ast_dump.hpp",

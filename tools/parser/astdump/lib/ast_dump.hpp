@@ -29,11 +29,18 @@ public:
     rapidjson::Value dump(const Syntax::Program& program);
 
 private:
-    // Block dump
-    rapidjson::Value dump(const Syntax::Block& block);
 
     // Node Dispatcher
     rapidjson::Value dump(const Syntax::Node* node);
+
+    // Block dump
+    rapidjson::Value dump(const Syntax::Block& block);
+
+    // Communicator
+    rapidjson::Value dump(const Syntax::Communicator* communicator);
+
+    // Place references
+    rapidjson::Value dump(const Syntax::PlaceReference* placeReference);
 
     // Declarations
     rapidjson::Value dump(const Syntax::Declaration* declaration);
@@ -43,6 +50,15 @@ private:
 
     // Expressions
     rapidjson::Value dump(const Syntax::Expression* expression);
+
+    // Procedure call statement
+    rapidjson::Value dump(const Syntax::ProcedureCallStatement* callStatement);
+
+    // Procedure declarations
+    rapidjson::Value dump(const Syntax::ProcedureDeclaration* declaration);
+
+    // Procedure Specifications
+    rapidjson::Value dump(const Syntax::ProcedureSpecification* specification);
 
     // Helper function to extract text from a Lexer CTokenIterator
     rapidjson::Value getTokenString(const lexer::CTokenIterator& token);

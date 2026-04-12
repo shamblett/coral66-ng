@@ -91,64 +91,6 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     return obj;
 }
 
-// Declarations
-rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
-{
-    rapidjson::Value obj(rapidjson::kObjectType);
-
-    if (auto* variableDeclarations = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
-    {
-        obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
-        obj.AddMember("TypeToken", getTokenString(variableDeclarations->getType()), m_alloc);
-    }
-    else if (auto* procedureDeclarations = dynamic_cast<const Syntax::ProcedureDeclaration*>(declaration))
-    {
-        obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
-        obj.AddMember("IsRecursive", procedureDeclarations->isRecursive(), m_alloc);
-        obj.AddMember("Name", getTokenString(procedureDeclarations->getName()), m_alloc);
-
-        rapidjson::Value params(rapidjson::kArrayType);
-        for (const auto& param : procedureDeclarations->getParameters())
-        {
-            params.PushBack(dump(param.get()), m_alloc);
-        }
-        obj.AddMember("Parameters", params, m_alloc);
-
-        // Recursively dump the procedure body statement/block
-        obj.AddMember("Body", dump(&procedureDeclarations->getBody()), m_alloc);
-    }
-
-    return obj;
-}
-
-// Statements
-rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
-{
-    rapidjson::Value obj(rapidjson::kObjectType);
-
-    if (auto* assignmentStatement = dynamic_cast<const Syntax::AssignmentStatement*>(statement))
-    {
-        obj.AddMember("NodeType", "AssignmentStatement", m_alloc);
-        obj.AddMember("LHS", dump(&assignmentStatement->getVariable()), m_alloc);
-        obj.AddMember("RHS", dump(&assignmentStatement->getExpression()), m_alloc);
-    }
-    return obj;
-}
-
-// Expressions
-rapidjson::Value AstDump::dump(const Syntax::Expression* expression)
-{
-    rapidjson::Value obj(rapidjson::kObjectType);
-
-    if (auto* binaryExpression = dynamic_cast<const Syntax::BinaryExpression*>(expression))
-    {
-        obj.AddMember("NodeType", "BinaryExpression", m_alloc);
-        obj.AddMember("Expression", dump(binaryExpression), m_alloc);
-    }
-
-    return obj;
-}
-
 rapidjson::Value AstDump::getTokenString(const lexer::CTokenIterator& token)
 {
     if (!token)
