@@ -18,9 +18,9 @@ rapidjson::Value AstDump::dump(const Syntax::Program& program)
     obj.AddMember("NodeType", "Program", m_alloc);
 
     // Dump Communicator
-    if (const auto* comm = program.getCommunicator())
+    if (const auto* communicator = program.getCommunicator())
     {
-        obj.AddMember("Communicator", dump(comm), m_alloc);
+        obj.AddMember("Communicator", dump(communicator), m_alloc);
     }
     else
     {
@@ -82,6 +82,21 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     else if (auto* statement = dynamic_cast<const Syntax::Statement*>(node))
     {
         obj.AddMember("Statement", dump(statement), m_alloc);
+    }
+    // Expressions
+    else if (auto* expression = dynamic_cast<const Syntax::Expression*>(node))
+    {
+        obj.AddMember("Expression", dump(expression), m_alloc);
+    }
+    // Place references
+    else if (auto* placeReference = dynamic_cast<const Syntax::PlaceReference*>(node))
+    {
+        obj.AddMember("Place Reference", dump(placeReference), m_alloc);
+    }
+    // Procedure call statement
+    else if (auto* procedureCallStatement = dynamic_cast<const Syntax::ProcedureCallStatement*>(node))
+    {
+        obj.AddMember("Procedure Call Statement", dump(procedureCallStatement), m_alloc);
     }
     else
     {
