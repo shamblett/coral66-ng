@@ -85,4 +85,22 @@ bool firstIsInUnaryExpression(const lexer::CToken& token, const Context& context
 bool firstIsInPostFixExpression(const lexer::CToken& token, const Context& context);
 
 bool firstIsInPrimaryExpression(const lexer::CToken& token, const Context& context);
+
+inline const char* parameterModeToString(Syntax::ParameterDeclaration::ParameterMode mode)
+{
+    using Mode = Syntax::ParameterDeclaration::ParameterMode;
+    switch (mode)
+    {
+        case Mode::Value: return "Value";
+        case Mode::Location: return "Location";
+        case Mode::Array: return "Array";
+        case Mode::Label: return "Label";
+        case Mode::Switch: return "Switch";
+        case Mode::Procedure: return "Procedure";
+        case Mode::UntypedValue: return "UntypedValue";
+        case Mode::UntypedLocation: return "UntypedLocation";
+        default: return "Unknown";
+    }
+}
+
 } // namespace coral66::parser
