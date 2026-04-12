@@ -15,6 +15,15 @@ rapidjson::Value AstDump::dump(const Syntax::Communicator* communicator)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
+    if (auto* commonCommunicator = dynamic_cast<const Syntax::CommonCommunicator*>(communicator))
+    {
+        rapidjson::Value commons(rapidjson::kArrayType);
+        for (const auto& common : commonCommunicator->getItems())
+        {
+            commons.PushBack(dump(common.get()), m_alloc);
+        }
+        obj.AddMember("Common", commons, m_alloc);
+    }
     return obj;
 }
 

@@ -227,6 +227,33 @@ public:
     [[nodiscard]] const Declaration& getOverlayedDeclaration() const;
 };
 
+class PlaceSpecification final : public Declaration
+{
+    std::vector<lexer::CTokenIterator> m_identifiers;
+
+public:
+    PlaceSpecification(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                       std::vector<lexer::CTokenIterator>&& identifiers);
+
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
+};
+
+class ProcedureSpecification final : public Declaration
+{
+    std::optional<lexer::CTokenIterator> m_type;
+    lexer::CTokenIterator m_name;
+    std::vector<std::unique_ptr<Declaration>> m_parameters;
+
+public:
+    ProcedureSpecification(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                           std::optional<lexer::CTokenIterator> type, lexer::CTokenIterator name,
+                           std::vector<std::unique_ptr<Declaration>>&& parameters);
+
+    [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
+    [[nodiscard]] lexer::CTokenIterator getName() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getParameters() const;
+};
+
 // Place references
 class PlaceReference : public Node
 {
@@ -513,33 +540,6 @@ public:
 };
 
 // Communicators
-class PlaceSpecification final : public Declaration
-{
-    std::vector<lexer::CTokenIterator> m_identifiers;
-
-public:
-    PlaceSpecification(lexer::CTokenIterator begin, lexer::CTokenIterator end,
-                       std::vector<lexer::CTokenIterator>&& identifiers);
-
-    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
-};
-
-class ProcedureSpecification final : public Declaration
-{
-    std::optional<lexer::CTokenIterator> m_type;
-    lexer::CTokenIterator m_name;
-    std::vector<std::unique_ptr<Declaration>> m_parameters;
-
-public:
-    ProcedureSpecification(lexer::CTokenIterator begin, lexer::CTokenIterator end,
-                           std::optional<lexer::CTokenIterator> type, lexer::CTokenIterator name,
-                           std::vector<std::unique_ptr<Declaration>>&& parameters);
-
-    [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
-    [[nodiscard]] lexer::CTokenIterator getName() const;
-    [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getParameters() const;
-};
-
 class Communicator : public Node
 {
     using Node::Node;
