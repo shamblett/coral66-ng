@@ -95,6 +95,15 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Preset Tokens", presetTokens, m_alloc);
     }
+    else if (auto* tableElementDeclaration = dynamic_cast<const Syntax::TableElementDeclaration*>(declaration))
+    {
+        obj.AddMember("NodeType", "TableElementDeclaration", m_alloc);
+        obj.AddMember("Identifier", getTokenString(tableElementDeclaration->getIdentifier()), m_alloc);
+        obj.AddMember("Type", getTokenString(tableElementDeclaration->getType().value()), m_alloc);
+        obj.AddMember("Is Unsigned", tableElementDeclaration->isUnsigned(), m_alloc);
+        obj.AddMember("Word Position", getTokenString(tableElementDeclaration->getWordPosition().value()), m_alloc);
+        obj.AddMember("Bit Position", getTokenString(tableElementDeclaration->getBitPosition().value()), m_alloc);
+    }
 
     return obj;
 }

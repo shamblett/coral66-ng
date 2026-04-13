@@ -29,7 +29,6 @@ public:
     rapidjson::Value dump(const Syntax::Program& program);
 
 private:
-
     // Node Dispatcher
     rapidjson::Value dump(const Syntax::Node* node);
 
