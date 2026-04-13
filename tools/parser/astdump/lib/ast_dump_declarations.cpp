@@ -66,6 +66,35 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("Parameters", parameters, m_alloc);
         obj.AddMember("Body", dump(&procedureDeclaration->getBody()), m_alloc);
     }
+    else if (auto* arrayDeclaration = dynamic_cast<const Syntax::ArrayDeclaration*>(declaration))
+    {
+        obj.AddMember("NodeType", "ArrayDeclaration", m_alloc);
+        obj.AddMember("Type", getTokenString(arrayDeclaration->getType()), m_alloc);
+
+        rapidjson::Value identifiers(rapidjson::kArrayType);
+        for (const auto& identifier : arrayDeclaration->getIdentifiers())
+        {
+            identifiers.PushBack(getTokenString(identifier), m_alloc);
+        }
+        obj.AddMember("Identifiers", identifiers, m_alloc);
+        rapidjson::Value dimensions(rapidjson::kArrayType);
+        rapidjson::Value dimensionValues(rapidjson::kArrayType);
+        for (const auto& [fst, snd] : arrayDeclaration->getDimensions())
+        {
+            dimensionValues.PushBack(dump(fst.get()), m_alloc);
+            dimensionValues.PushBack(dump(snd.get()), m_alloc);
+        }
+        dimensions.PushBack(dimensionValues, m_alloc);
+        obj.AddMember("Dimensions", dimensions, m_alloc);
+        obj.AddMember("Has Preset", arrayDeclaration->hasPreset(), m_alloc);
+
+        rapidjson::Value presetTokens(rapidjson::kArrayType);
+        for (const auto& presetToken : arrayDeclaration->getPresetTokens())
+        {
+            presetTokens.PushBack(getTokenString(presetToken), m_alloc);
+        }
+        obj.AddMember("Preset Tokens", presetTokens, m_alloc);
+    }
 
     return obj;
 }
