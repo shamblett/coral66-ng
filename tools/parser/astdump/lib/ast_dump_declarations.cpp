@@ -22,28 +22,49 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("NodeType", "ParameterDeclaration", m_alloc);
         obj.AddMember("Mode", rapidjson::StringRef(parser::parameterModeToString(parameterDeclaration->getMode())),
                       m_alloc);
+        obj.AddMember("Type", getTokenString(parameterDeclaration->getType().value()), m_alloc);
+        rapidjson::Value identifiers(rapidjson::kArrayType);
+        for (const auto& identifier : parameterDeclaration->getIdentifiers())
+        {
+            identifiers.PushBack(getTokenString(identifier), m_alloc);
+        }
+        obj.AddMember("Identifiers", identifiers, m_alloc);
     }
 
-    if (auto* variableDeclarations = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
+    if (auto* variableDeclaration = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
-        obj.AddMember("TypeToken", getTokenString(variableDeclarations->getType()), m_alloc);
+        obj.AddMember("Type", getTokenString(variableDeclaration->getType()), m_alloc);
+
+        rapidjson::Value identifiers(rapidjson::kArrayType);
+        for (const auto& identifier : variableDeclaration->getIdentifiers())
+        {
+            identifiers.PushBack(getTokenString(identifier), m_alloc);
+        }
+        obj.AddMember("Identifiers", identifiers, m_alloc);
+        obj.AddMember("Preset", variableDeclaration->hasPreset(), m_alloc);
+
+        rapidjson::Value presetTokens(rapidjson::kArrayType);
+        for (const auto& presetToken : variableDeclaration->getPresetTokens())
+        {
+            presetTokens.PushBack(getTokenString(presetToken), m_alloc);
+        }
+        obj.AddMember("Preset Tokens", presetTokens, m_alloc);
     }
-    else if (auto* procedureDeclarations = dynamic_cast<const Syntax::ProcedureDeclaration*>(declaration))
+    else if (auto* procedureDeclaration = dynamic_cast<const Syntax::ProcedureDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
-        obj.AddMember("IsRecursive", procedureDeclarations->isRecursive(), m_alloc);
-        obj.AddMember("Name", getTokenString(procedureDeclarations->getName()), m_alloc);
+        obj.AddMember("IsRecursive", procedureDeclaration->isRecursive(), m_alloc);
+        obj.AddMember("Name", getTokenString(procedureDeclaration->getName()), m_alloc);
+        obj.AddMember("Type Token", getTokenString(procedureDeclaration->getTypeToken().value()), m_alloc);
 
-        rapidjson::Value params(rapidjson::kArrayType);
-        for (const auto& param : procedureDeclarations->getParameters())
+        rapidjson::Value parameters(rapidjson::kArrayType);
+        for (const auto& param : procedureDeclaration->getParameters())
         {
-            params.PushBack(dump(param.get()), m_alloc);
+            parameters.PushBack(dump(param.get()), m_alloc);
         }
-        obj.AddMember("Parameters", params, m_alloc);
-
-        // Recursively dump the procedure body statement/block
-        obj.AddMember("Body", dump(&procedureDeclarations->getBody()), m_alloc);
+        obj.AddMember("Parameters", parameters, m_alloc);
+        obj.AddMember("Body", dump(&procedureDeclaration->getBody()), m_alloc);
     }
 
     return obj;
