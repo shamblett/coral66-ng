@@ -77,6 +77,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
             identifiers.PushBack(getTokenString(identifier), m_alloc);
         }
         obj.AddMember("Identifiers", identifiers, m_alloc);
+
         rapidjson::Value dimensions(rapidjson::kArrayType);
         rapidjson::Value dimensionValues(rapidjson::kArrayType);
         for (const auto& [fst, snd] : arrayDeclaration->getDimensions())
@@ -135,7 +136,30 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("Offset", getTokenString(overlayDeclaration->getOffset()), m_alloc);
         obj.AddMember("Offset2", getTokenString(overlayDeclaration->getOffset2().value()), m_alloc);
     }
+    else if (auto* placeSpecification = dynamic_cast<const Syntax::PlaceSpecification*>(declaration))
+    {
+        obj.AddMember("NodeType", "PlaceSpecification", m_alloc);
+        rapidjson::Value identifiers(rapidjson::kArrayType);
+        for (const auto& identifier : placeSpecification->getIdentifiers())
+        {
+            identifiers.PushBack(getTokenString(identifier), m_alloc);
+        }
+        obj.AddMember("Identifiers", identifiers, m_alloc);
+    }
+    else if (auto* procedureSpecification = dynamic_cast<const Syntax::ProcedureSpecification*>(declaration))
+    {
+        obj.AddMember("NodeType", "ProcedureSpecification", m_alloc);
+        obj.AddMember("Type", getTokenString(procedureSpecification->getType().value()), m_alloc);
+        obj.AddMember("Name", getTokenString(procedureSpecification->getName()), m_alloc);
 
+        rapidjson::Value parameters(rapidjson::kArrayType);
+        for (const auto& parameter : procedureSpecification->getParameters())
+        {
+            parameters.PushBack(dump(parameter.get()), m_alloc);
+        }
+        obj.AddMember("Parameters", parameters, m_alloc);
+    }
+    
     return obj;
 }
 
