@@ -215,16 +215,16 @@ class OverlayDeclaration final : public Declaration
     lexer::CTokenIterator m_base;
     lexer::CTokenIterator m_offset;
     std::optional<lexer::CTokenIterator> m_offset2;
-    std::unique_ptr<Declaration> m_overlayedDeclaration;
+    std::unique_ptr<Declaration> m_overlayDeclaration;
 
 public:
     OverlayDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator base,
                        lexer::CTokenIterator offset, std::optional<lexer::CTokenIterator> offset2,
-                       std::unique_ptr<Declaration>&& overlayedDeclaration);
+                       std::unique_ptr<Declaration>&& overlayDeclaration);
     [[nodiscard]] lexer::CTokenIterator getBase() const;
     [[nodiscard]] lexer::CTokenIterator getOffset() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getOffset2() const;
-    [[nodiscard]] const Declaration& getOverlayedDeclaration() const;
+    [[nodiscard]] const Declaration& getOverlayDeclaration() const;
 };
 
 class PlaceSpecification final : public Declaration

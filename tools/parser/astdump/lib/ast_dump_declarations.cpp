@@ -105,6 +105,37 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("Bit Position", getTokenString(tableElementDeclaration->getBitPosition().value()), m_alloc);
     }
 
+    else if (auto* tableDeclaration = dynamic_cast<const Syntax::TableDeclaration*>(declaration))
+    {
+        obj.AddMember("NodeType", "TableDeclaration", m_alloc);
+        obj.AddMember("Identifier", getTokenString(tableDeclaration->getIdentifier()), m_alloc);
+        obj.AddMember("Width", dump(tableDeclaration->getWidth()), m_alloc);
+        obj.AddMember("Length", dump(tableDeclaration->getLength()), m_alloc);
+
+        rapidjson::Value elements(rapidjson::kArrayType);
+        for (const auto& element : tableDeclaration->getElements())
+        {
+            elements.PushBack(dump(element.get()), m_alloc);
+        }
+        obj.AddMember("Elements", elements, m_alloc);
+
+        obj.AddMember("Has Preset", tableDeclaration->hasPreset(), m_alloc);
+
+        rapidjson::Value presetTokens(rapidjson::kArrayType);
+        for (const auto& presetToken : tableDeclaration->getPresetTokens())
+        {
+            presetTokens.PushBack(getTokenString(presetToken), m_alloc);
+        }
+        obj.AddMember("Preset Tokens", presetTokens, m_alloc);
+    }
+    else if (auto* overlayDeclaration = dynamic_cast<const Syntax::OverlayDeclaration*>(declaration))
+    {
+        obj.AddMember("NodeType", "OverlayDeclaration", m_alloc);
+        obj.AddMember("Base", getTokenString(overlayDeclaration->getBase()), m_alloc);
+        obj.AddMember("Offset", getTokenString(overlayDeclaration->getOffset()), m_alloc);
+        obj.AddMember("Offset2", getTokenString(overlayDeclaration->getOffset2().value()), m_alloc);
+    }
+
     return obj;
 }
 

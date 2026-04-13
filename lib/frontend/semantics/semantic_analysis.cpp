@@ -382,7 +382,7 @@ void SemanticAnalysis::visit(const Syntax::TableDeclaration& node)
 
 void SemanticAnalysis::visit(const Syntax::OverlayDeclaration& node)
 {
-    visit(node.getOverlayedDeclaration());
+    visit(node.getOverlayDeclaration());
 }
 
 void SemanticAnalysis::visit(const Syntax::DummyStatement& node)

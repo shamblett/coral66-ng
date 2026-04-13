@@ -296,7 +296,7 @@ OverlayDeclaration::OverlayDeclaration(const lexer::CTokenIterator begin, const 
       m_base(base),
       m_offset(offset),
       m_offset2(offset2),
-      m_overlayedDeclaration(std::move(overlayedDeclaration))
+      m_overlayDeclaration(std::move(overlayedDeclaration))
 {
 }
 
@@ -312,9 +312,9 @@ std::optional<lexer::CTokenIterator> OverlayDeclaration::getOffset2() const
 {
     return m_offset2;
 }
-const Declaration& OverlayDeclaration::getOverlayedDeclaration() const
+const Declaration& OverlayDeclaration::getOverlayDeclaration() const
 {
-    return *m_overlayedDeclaration;
+    return *m_overlayDeclaration;
 }
 
 // Place reference
