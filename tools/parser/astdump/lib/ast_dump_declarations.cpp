@@ -23,6 +23,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("Mode", rapidjson::StringRef(parser::parameterModeToString(parameterDeclaration->getMode())),
                       m_alloc);
         obj.AddMember("Type", getTokenString(parameterDeclaration->getType().value()), m_alloc);
+
         rapidjson::Value identifiers(rapidjson::kArrayType);
         for (const auto& identifier : parameterDeclaration->getIdentifiers())
         {
