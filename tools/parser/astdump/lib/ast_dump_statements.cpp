@@ -53,6 +53,20 @@ rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
         obj.AddMember("Label", getTokenString(gotoStatement->getLabel()), m_alloc);
         obj.AddMember("Index", dump(gotoStatement->getIndex()), m_alloc);
     }
+    else if (auto* forStatement = dynamic_cast<const Syntax::ForStatement*>(statement))
+    {
+        obj.AddMember("NodeType", "ForStatement", m_alloc);
+        obj.AddMember("Variable", dump(&forStatement->getVariable()), m_alloc);
+
+        rapidjson::Value elements(rapidjson::kArrayType);
+        for (const auto& element : forStatement->getElements())
+        {
+            elements.PushBack(dump(element), m_alloc);
+        }
+        obj.AddMember("Elements", elements, m_alloc);
+
+        obj.AddMember("Body", dump(&forStatement->getBody()), m_alloc);
+    }
 
     return obj;
 }

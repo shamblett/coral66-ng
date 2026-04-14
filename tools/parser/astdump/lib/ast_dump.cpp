@@ -106,6 +106,20 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     return obj;
 }
 
+// For element
+rapidjson::Value AstDump::dump(const Syntax::ForElement& element)
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    obj.AddMember("NodeType", "ForElement", m_alloc);
+    obj.AddMember("Expression", dump(element.expression.get()), m_alloc);
+    obj.AddMember("Step", dump(element.step.get()), m_alloc);
+    obj.AddMember("Until", dump(element.until.get()), m_alloc);
+    obj.AddMember("WhileCondition", dump(element.whileCondition.get()), m_alloc);
+
+    return obj;
+}
+
 rapidjson::Value AstDump::getTokenString(const lexer::CTokenIterator& token)
 {
     if (!token)

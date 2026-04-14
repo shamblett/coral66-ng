@@ -47,6 +47,9 @@ private:
     // Statements
     rapidjson::Value dump(const Syntax::Statement* statement);
 
+    // For element
+    rapidjson::Value dump(const Syntax::ForElement& element);
+
     // Expressions
     rapidjson::Value dump(const Syntax::Expression* expression);
 
