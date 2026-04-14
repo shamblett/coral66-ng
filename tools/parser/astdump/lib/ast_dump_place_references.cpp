@@ -15,6 +15,19 @@ rapidjson::Value AstDump::dump(const Syntax::PlaceReference* placeReference)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
+    if (auto* switchPlaceReference = dynamic_cast<const Syntax::SwitchPlaceReference*>(placeReference))
+    {
+        obj.AddMember("NodeType", "SwitchPlaceReference", m_alloc);
+        obj.AddMember("name", getTokenString(switchPlaceReference->getName()), m_alloc);
+
+        rapidjson::Value labels(rapidjson::kArrayType);
+        for (const auto& label : switchPlaceReference->getLabels())
+        {
+            labels.PushBack(getTokenString(label), m_alloc);
+        }
+        obj.AddMember("Labels", labels, m_alloc);
+    }
+
     return obj;
 }
 
