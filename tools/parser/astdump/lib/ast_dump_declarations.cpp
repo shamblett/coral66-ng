@@ -30,8 +30,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Identifiers", identifiers, m_alloc);
     }
-
-    if (auto* variableDeclaration = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
+    else if (auto* variableDeclaration = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
         obj.AddMember("Type", getTokenString(variableDeclaration->getType()), m_alloc);
@@ -159,7 +158,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Parameters", parameters, m_alloc);
     }
-    
+
     return obj;
 }
 
