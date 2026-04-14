@@ -67,6 +67,21 @@ rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
 
         obj.AddMember("Body", dump(&forStatement->getBody()), m_alloc);
     }
+    else if (auto* answerStatement = dynamic_cast<const Syntax::AnswerStatement*>(statement))
+    {
+        obj.AddMember("NodeType", "AnswerStatement", m_alloc);
+        obj.AddMember("Expression", dump(&answerStatement->getExpression()), m_alloc);
+    }
+    else if (auto* procedureCallStatement = dynamic_cast<const Syntax::ProcedureCallStatement*>(statement))
+    {
+        obj.AddMember("NodeType", "ProcedureCallStatement", m_alloc);
+        obj.AddMember("Expression", dump(&procedureCallStatement->getExpression()), m_alloc);
+    }
+    else if (auto* codeStatement = dynamic_cast<const Syntax::CodeStatement*>(statement))
+    {
+        obj.AddMember("NodeType", "CodeStatement", m_alloc);
+        obj.AddMember("Code", getTokenString(codeStatement->getCode()), m_alloc);
+    }
 
     return obj;
 }
