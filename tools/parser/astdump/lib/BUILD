@@ -20,6 +20,7 @@ cc_library(
     ],
     visibility = [
         "//test:__subpackages__",
+        "//tools/parser/astdump/bin:__pkg__",
     ],
     deps = [
         "//lib/frontend/common",
