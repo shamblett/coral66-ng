@@ -33,7 +33,19 @@ std::string readInputFile(const std::string& inputFile)
     return input;
 }
 
-void generateOutputFile(const std::string& inputFile, const rapidjson::StringBuffer& buffer) {}
+void generateOutputFile(const std::string& inputFile, const rapidjson::StringBuffer& buffer)
+{
+    auto filePath = std::filesystem::path(inputFile);
+    auto directory = std::string(filePath.parent_path().c_str());
+    auto fileName = directory + "/" + std::string(filePath.filename().c_str()) + "_ast.json";
+    coral66::fs::ofstream outputFile(fileName, std::ios_base::out);
+    if (!outputFile.is_open())
+    {
+        std::cout << "ParserAstDump::Could not open output file " << fileName << std::endl;
+    }
+    outputFile << buffer.GetString();
+    outputFile.close();
+}
 
 int main(const int argc, char** argv)
 {
@@ -96,9 +108,6 @@ int main(const int argc, char** argv)
 
     // Generate the output file
     generateOutputFile(inputFile, buffer);
-
-    // Print to console (or write to a test artifact file)
-    // std::cout << buffer.GetString() << std::endl;
 
     return EX_OK;
 }
