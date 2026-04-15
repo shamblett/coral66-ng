@@ -35,13 +35,14 @@ std::string readInputFile(const std::string& inputFile)
 
 void generateOutputFile(const std::string& inputFile, const rapidjson::StringBuffer& buffer)
 {
-    auto filePath = std::filesystem::path(inputFile);
-    auto directory = std::string(filePath.parent_path().c_str());
-    auto fileName = directory + "/" + std::string(filePath.filename().c_str()) + "_ast.json";
-    coral66::fs::ofstream outputFile(fileName, std::ios_base::out);
+    coral66::fs::path input_path = inputFile;
+    coral66::fs::path output_path = input_path.parent_path() / (input_path.stem().string() + "_ast");
+    output_path.replace_extension(".json");
+
+    coral66::fs::ofstream outputFile(output_path, std::ios_base::out);
     if (!outputFile.is_open())
     {
-        std::cout << "ParserAstDump::Could not open output file " << fileName << std::endl;
+        std::cout << "ParserAstDump::Could not open output file " << output_path << std::endl;
     }
     outputFile << buffer.GetString();
     outputFile.close();
