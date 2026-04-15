@@ -4,15 +4,12 @@
  * Date   : 14/04/2026
  */
 
-#include <iostream>
+// #include <iostream>
 
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
 #include "tools/parser/astdump/lib/ast_dump.hpp"
-
-namespace coral66
-{
 
 int main(const int argc, char** argv)
 {
@@ -21,7 +18,7 @@ int main(const int argc, char** argv)
     doc.SetObject();
 
     // Instantiate our dumper, providing the document's allocator
-    AstDump dump(doc.GetAllocator());
+    coral66::tools::AstDump dump(doc.GetAllocator());
 
     // Dump the AST into the RapidJSON document root
     // rapidjson::Value root = dump(program);
@@ -35,9 +32,7 @@ int main(const int argc, char** argv)
     doc.Accept(writer);
 
     // Print to console (or write to a test artifact file)
-    std::cout << buffer.GetString() << std::endl;
+    // std::cout << buffer.GetString() << std::endl;
 
     return 0;
 }
-
-} // namespace coral66

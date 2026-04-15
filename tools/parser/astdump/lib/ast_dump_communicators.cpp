@@ -8,7 +8,7 @@
 
 #include <rapidjson/stringbuffer.h>
 
-namespace coral66
+namespace coral66::tools
 {
 
 rapidjson::Value AstDump::dump(const Syntax::Communicator* communicator)
@@ -27,4 +27,4 @@ rapidjson::Value AstDump::dump(const Syntax::Communicator* communicator)
     return obj;
 }
 
-} // namespace coral66
+} // namespace coral66::tools

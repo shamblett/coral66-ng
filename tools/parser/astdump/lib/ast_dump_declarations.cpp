@@ -10,7 +10,7 @@
 
 #include "lib/frontend/parser/parser_utilities.hpp"
 
-namespace coral66
+namespace coral66::tools
 {
 
 rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
@@ -163,4 +163,4 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
     return obj;
 }
 
-} // namespace coral66
+} // namespace coral66::tools

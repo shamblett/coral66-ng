@@ -8,7 +8,7 @@
 
 #include <rapidjson/stringbuffer.h>
 
-namespace coral66
+namespace coral66::tools
 {
 
 // Main entry point
@@ -192,4 +192,4 @@ rapidjson::Value AstDump::getTokenString(const lexer::CTokenIterator& token)
     return tokenObj;
 }
 
-} // namespace coral66
+} // namespace coral66::tools

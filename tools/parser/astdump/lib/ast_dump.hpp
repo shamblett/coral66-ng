@@ -10,7 +10,7 @@
 
 #include "lib/frontend/syntax/syntax.hpp"
 
-namespace coral66
+namespace coral66::tools
 {
 
 /*
@@ -66,4 +66,4 @@ private:
     rapidjson::Value getTokenString(const lexer::CTokenIterator& token);
 };
 
-} // namespace coral66
+} // namespace coral66::tools
