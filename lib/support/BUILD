@@ -34,6 +34,7 @@ cc_library(
         "//lib/frontend:__subpackages__",
         "//lib/main:__pkg__",
         "//test:__subpackages__",
+        "//tools:__subpackages__",
     ],
     deps = ["//lib/llvm:llvm-21"],
 )
