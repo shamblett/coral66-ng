@@ -93,11 +93,6 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     {
         obj.AddMember("Place Reference", dump(placeReference), m_alloc);
     }
-    // Procedure call statement
-    else if (auto* procedureCallStatement = dynamic_cast<const Syntax::ProcedureCallStatement*>(node))
-    {
-        obj.AddMember("Procedure Call Statement", dump(procedureCallStatement), m_alloc);
-    }
     else
     {
         obj.AddMember("NodeType", "UnknownNode", m_alloc);
