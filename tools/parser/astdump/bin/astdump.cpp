@@ -17,7 +17,7 @@
 
 std::string readInputFile(const std::string& inputFile)
 {
-    coral66::fs::ifstream file(inputFile, std::ios_base::in);
+    coral66::fs::ifstream file(inputFile, std::ios_base::in | std::ios_base::ate);
     if (!file.is_open())
     {
         std::cout << "ParserAstDump::Could not open input source file " << inputFile << std::endl;
@@ -61,7 +61,7 @@ int main(const int argc, char** argv)
     auto source = readInputFile(std::string(inputFile));
     if (source.empty())
     {
-        std::cout << "ParserAstDump::Could not read input source file " << argv[0] << std::endl;
+        std::cout << "ParserAstDump::Could not read input source file " << argv[1] << std::endl;
         return EX_NOINPUT;
     }
 
