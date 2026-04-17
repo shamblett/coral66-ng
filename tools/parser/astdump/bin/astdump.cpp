@@ -11,6 +11,7 @@
 
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/support/filesystem.hpp"
 #include "sysexits.h"
 #include "tools/parser/astdump/lib/ast_dump.hpp"
@@ -70,13 +71,19 @@ int main(const int argc, char** argv)
     llvm::raw_string_ostream ss(string);
     coral66::PPSourceObject tokens;
     bool errors = false;
+    
+    // Lex
     tokens = coral66::lexer::tokenize(source, &ss, &errors);
     if (errors)
     {
         std::cout << "ParserAstDump::Error tokenizing source file " << ss.str() << std::endl;
         return EX_DATAERR;
     }
-    auto cTokens = coral66::lexer::toCTokens(tokens, &ss, &errors);
+    // Preprocess
+    auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errors);
+
+    // Parse
+    auto cTokens = coral66::lexer::toCTokens(result, &ss, &errors);
     if (errors)
     {
         std::cout << "ParserAstDump::Error tokenizing(C tokens) source file " << ss.str() << std::endl;

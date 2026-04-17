@@ -9,6 +9,7 @@ cc_binary(
     srcs = ["astdump.cpp"],
     deps = [
         "//lib/frontend/parser",
+        "//lib/frontend/preprocessor",
         "//lib/support",
         "//tools/parser/astdump/lib:astdump",
     ],
