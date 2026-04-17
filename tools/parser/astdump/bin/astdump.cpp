@@ -71,7 +71,7 @@ int main(const int argc, char** argv)
     llvm::raw_string_ostream ss(string);
     coral66::PPSourceObject tokens;
     bool errors = false;
-    
+
     // Lex
     tokens = coral66::lexer::tokenize(source, &ss, &errors);
     if (errors)
@@ -83,7 +83,7 @@ int main(const int argc, char** argv)
     auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errors);
 
     // Parse
-    auto cTokens = coral66::lexer::toCTokens(result, &ss, &errors);
+    auto cTokens = coral66::lexer::toCTokens(std::move(result), &ss, &errors);
     if (errors)
     {
         std::cout << "ParserAstDump::Error tokenizing(C tokens) source file " << ss.str() << std::endl;

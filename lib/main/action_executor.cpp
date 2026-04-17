@@ -105,22 +105,10 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     {
         auto reconstruction =
             pp::reconstruct(PPTokens.data().data(), PPTokens.data().data() + PPTokens.data().size(), PPTokens);
-        if (!cl::OutputFilename.empty())
-        {
-            llvm::outs() << reconstruction;
-            llvm::outs().flush();
-            return fs::path{};
-        }
 
-        fs::ofstream outputFile(coral66::to_string(cl::OutputFilename), std::ios_base::out);
-        if (!outputFile.is_open())
-        {
-            *m_reporter << errors::CLI::FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(coral66::cl::OutputFilename);
-            return {};
-        }
-        outputFile << reconstruction;
-        outputFile.close();
-        return cl::OutputFilename;
+        llvm::outs() << reconstruction;
+        llvm::outs().flush();
+        return fs::path{};
     }
 
     std::optional<llvm::TimeRegion> cTokenTimeRegion;
