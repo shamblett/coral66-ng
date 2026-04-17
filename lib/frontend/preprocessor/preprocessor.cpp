@@ -325,15 +325,6 @@ void coral66::pp::Preprocessor::visit(const DefineDirective& define)
 
     optMacro.replacement = replacementSpan;
     m_defines[optMacro.identifierPos->getValue()].push_back(optMacro);
-
-    if (define.defineToken != lexer::PPTokenIterator{})
-    {
-        std::vector<lexer::PPToken> outputTokens;
-        outputTokens.push_back(*define.defineToken);
-        outputTokens.insert(outputTokens.end(), define.tokens.begin(), define.tokens.end());
-        outputTokens.push_back(*define.tokens.end()); // The semicolon
-        pushLine(std::move(outputTokens));
-    }
 }
 
 void coral66::pp::Preprocessor::visit(const GroupPart& groupPart)
@@ -345,12 +336,6 @@ void coral66::pp::Preprocessor::visit(const lexer::PPTokenIterator& name)
 {
     if (name == lexer::PPTokenIterator{})
         return;
-
-    std::vector<lexer::PPToken> outputTokens;
-    outputTokens.push_back(*(name - 1)); // DELETE keyword
-    outputTokens.push_back(*name);       // Macroname
-    outputTokens.push_back(*(name + 1)); // Semicolon
-    pushLine(std::move(outputTokens));
 
     auto it = m_defines.find(name->getValue());
     if (it != m_defines.end() && !it->second.empty())

@@ -118,8 +118,7 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
         auto ret = preprocess("DEFINE ID \"5\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 5;"));
     }
 
@@ -128,8 +127,7 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
         auto ret = preprocess("DEFINE id \"5\"; "
                               "INTEGER a; "
                               "a := id;");
-        CHECK_THAT(ret, ProducesPP("DEFINE id \"5\"; "
-                                   "INTEGER a; "
+        CHECK_THAT(ret, ProducesPP("INTEGER a; "
                                    "a := 5;"));
     }
 
@@ -138,8 +136,7 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
         auto ret = preprocess("DEFINE ID \"5 + 1\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5 + 1\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 5 + 1;"));
     }
 
@@ -148,8 +145,7 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
         auto ret = preprocess("DEFINE ID 5 + \"1\"; "
                               "INTEGER A; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID 5 + \"1\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 5 + \"1\";"));
     }
 }
@@ -164,8 +160,7 @@ TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
         auto ret = preprocess("DEFINE ID(p1) \"5 + p1\"; "
                               "INTEGER A; "
                               "A := ID(1);");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1) \"5 + p1\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 5 + 1;"));
     }
 
@@ -174,8 +169,7 @@ TEST_CASE("Coral DEFINE Macro Substitution With Parameters", "[PP]")
         auto ret = preprocess("DEFINE ID(p1, p2) \"p2 + p1\"; "
                               "INTEGER A; "
                               "A := ID(1, 5);");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID(p1, p2) \"p2 + p1\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 5 + 1;"));
     }
 }
@@ -191,9 +185,7 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
                               "DEFINE OUTER \"3 + INNER\"; "
                               "INTEGER A; "
                               "A := OUTER;");
-        CHECK_THAT(ret, ProducesPP("DEFINE INNER \"5 + 1\"; "
-                                   "DEFINE OUTER \"3 + INNER\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 3 + 5 + 1;"));
     }
 
@@ -204,10 +196,7 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
                               "DEFINE OUTER \"3 + INNER\"; "
                               "INTEGER A; "
                               "A := OUTER;");
-        CHECK_THAT(ret, ProducesPP("DEFINE INNER1 \"1\"; "
-                                   "DEFINE INNER \"5 + INNER1\"; "
-                                   "DEFINE OUTER \"3 + INNER\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 3 + 5 + 1;"));
     }
 
@@ -217,9 +206,7 @@ TEST_CASE("Coral DEFINE Macro Substitution Nested", "[PP]")
                               "DEFINE INNER \"5 + 1\"; "
                               "INTEGER A; "
                               "A := OUTER;");
-        CHECK_THAT(ret, ProducesPP("DEFINE OUTER \"3 + INNER\"; "
-                                   "DEFINE INNER \"5 + 1\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 3 + 5 + 1;"));
     }
 }
@@ -235,9 +222,7 @@ TEST_CASE("Coral DELETE Macro Substitution", "[PP]")
                               "INTEGER A; "
                               "DELETE ID; "
                               "A := ID;");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
-                                   "INTEGER A; "
-                                   "DELETE ID; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := ID;"));
     }
 
@@ -252,14 +237,10 @@ TEST_CASE("Coral DELETE Macro Substitution", "[PP]")
                               "A := ID; "
                               "DELETE ID; "
                               "A := ID; ");
-        CHECK_THAT(ret, ProducesPP("DEFINE ID \"5\"; "
-                                   "INTEGER A; "
+        CHECK_THAT(ret, ProducesPP("INTEGER A; "
                                    "A := 5; "
-                                   "DEFINE ID \"10\"; "
                                    "A := 10; "
-                                   "DELETE ID; "
                                    "A := 5; "
-                                   "DELETE ID; "
                                    "A := ID; "));
     }
 }
