@@ -383,7 +383,7 @@ coral66::CSourceObject coral66::lexer::toCTokens(const PPSourceObject& sourceObj
     return result;
 }
 
-std::vector<CToken> coral66::lexer::toCTokens(PPTokenIterator begin, PPTokenIterator end,
+std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const PPTokenIterator end,
                                               const PPSourceInterface& sourceInterface, llvm::raw_ostream* reporter,
                                               bool* errorsOccurred)
 {
@@ -545,7 +545,7 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
                   PPToken.getMacroId(), std::move(value));
 }
 
-std::string_view coral66::lexer::tokenName(coral66::lexer::TokenType const tokenType, bool const quote)
+std::string_view coral66::lexer::tokenName(TokenType const tokenType, bool const quote)
 {
     switch (tokenType)
     {
@@ -625,6 +625,9 @@ std::string_view coral66::lexer::tokenName(coral66::lexer::TokenType const token
         case TokenType::ValueKeyword: return "VALUE";
         case TokenType::WhileKeyword: return "WHILE";
         case TokenType::WithKeyword: return "WITH";
+
+        // No Token
+        case TokenType::NoToken: return "None";
     }
     CORAL66_UNREACHABLE;
 }

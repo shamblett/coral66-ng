@@ -104,7 +104,10 @@ enum class TokenType : std::uint8_t
     WhileKeyword,
     WithKeyword,
 
-    TOKEN_MAX_VALUE = WithKeyword,
+    // No token
+    NoToken,
+
+    TOKEN_MAX_VALUE = NoToken,
 };
 
 bool isText(TokenType tokenType);
@@ -339,6 +342,6 @@ public:
     }
 };
 
-inline const auto noneCToken = CToken(TokenType::Assignment, 0, 0, 0, 0);
+inline const auto noneCToken = CToken(TokenType::NoToken, 0, 0, 0, 0);
 
 } // namespace coral66::lexer

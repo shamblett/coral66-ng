@@ -32,10 +32,10 @@ coral66::CSourceObject lex(const std::string& code)
     std::string buffer;
     llvm::raw_string_ostream ss(buffer);
     bool errors;
-    auto result = coral66::lexer::tokenize(code, &ss, &errors);
+    auto result = tokenize(code, &ss, &errors);
     UNSCOPED_INFO(buffer);
     REQUIRE_FALSE(errors);
-    auto tokens = coral66::lexer::toCTokens(std::move(result), &ss, &errors);
+    auto tokens = toCTokens(std::move(result), &ss, &errors);
     UNSCOPED_INFO(buffer);
     REQUIRE_FALSE(errors);
     return tokens;
@@ -236,6 +236,19 @@ TEST_CASE("Coral Lexing Operators And Punctuation", "[lexer]")
     CHECK(result.data()[offset + 1].getTokenType() == TokenType::Minus);
 }
 
+TEST_CASE("Coral Lexing No Token", "[lexer]")
+{
+    using namespace coral66::lexer;
+    auto result = lex("None");
+
+    const std::vector correct = {TokenType::Identifier};
+
+    for (size_t i = 0; i < correct.size(); ++i)
+    {
+        CHECK(result.data()[i].getTokenType() == correct[i]);
+    }
+}
+
 TEST_CASE("Coral Lexing Code Strings ", "[lexer]")
 {
     SECTION("Code fragment")
@@ -308,7 +321,7 @@ TEST_CASE("Comments", "[lexer]")
     {
         auto result = lex("COMMENT This is a comment;");
 
-        CHECK(result.data().size() == 0);
+        CHECK(result.data().empty());
     }
 
     SECTION("End Comment")
