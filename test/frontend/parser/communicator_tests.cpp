@@ -113,7 +113,7 @@ TEST_CASE("Coral Parse Common Communicator", "[Parser][Communicator]")
         auto procSpec1 = dynamic_cast<const ProcedureSpecification*>(items[0].get());
         REQUIRE(procSpec1 != nullptr);
         CHECK(procSpec1->getName()->getText() == "P");
-        CHECK(!procSpec1->getType().has_value());
+        CHECK(procSpec1->getType().value() == &lexer::noneCToken);
         const auto& params1 = procSpec1->getParameters();
         REQUIRE(params1.size() == 1);
 

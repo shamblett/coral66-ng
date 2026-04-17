@@ -308,7 +308,7 @@ public:
     using ValueType = variant;
 
     CToken(TokenType tokenType, std::uint64_t offset, std::uint64_t length, std::uint32_t fileId, std::uint32_t macroId,
-           variant value = std::monostate{}, Type type = Type::None)
+           variant value = std::monostate{}, Type type = None)
         : TokenBase(tokenType, offset, length, fileId, macroId), m_value(std::move(value)), m_type(type)
     {
     }
@@ -338,4 +338,7 @@ public:
         m_value = value;
     }
 };
+
+inline const auto noneCToken = CToken(TokenType::Assignment, 0, 0, 0, 0);
+
 } // namespace coral66::lexer

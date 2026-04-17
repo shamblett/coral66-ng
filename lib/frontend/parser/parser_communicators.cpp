@@ -283,7 +283,8 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                         }
 
                         result.push_back(std::make_unique<Syntax::ProcedureSpecification>(
-                            currentStart, begin, typeToken, name, std::move(parametersOpt.value())));
+                            currentStart, begin, typeToken.value_or(&lexer::noneCToken), name,
+                            std::move(parametersOpt.value())));
 
                         if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                         {
@@ -298,8 +299,7 @@ std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 }
                 else
                 {
-                    auto declarations = parseDeclaration(begin, end, context);
-                    if (!declarations.empty())
+                    if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
                     {
                         for (auto& d : declarations)
                         {
