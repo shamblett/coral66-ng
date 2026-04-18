@@ -34,12 +34,12 @@ using namespace coral66::errors::Semantics;
 TEST_CASE("Coral Semantic Analysis - Declarations", "[semantics]")
 {
     // Valid declarations should produce no errors
-    semanticsProduces("PROGRAM BEGIN INTEGER a; END", Catch::Matchers::Equals(""));
-    semanticsProduces("PROGRAM BEGIN FLOATING f; END", Catch::Matchers::Equals(""));
-    semanticsProduces("PROGRAM BEGIN FIXED(16,8) x; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN INTEGER a; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN FLOATING f; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN FIXED(16,8) x; END", Catch::Matchers::Equals(""));
 
     // Multiple variables
-    semanticsProduces("PROGRAM BEGIN INTEGER a, b; FLOATING x; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN INTEGER a, b; FLOATING x; END", Catch::Matchers::Equals(""));
 }
 
 TEST_CASE("Coral Semantic Analysis - Scopes", "[semantics]")
@@ -47,7 +47,7 @@ TEST_CASE("Coral Semantic Analysis - Scopes", "[semantics]")
     // Inner block
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             INTEGER a;
             BEGIN
@@ -61,7 +61,7 @@ TEST_CASE("Coral Semantic Analysis - Scopes", "[semantics]")
     // For now assuming allowed
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             INTEGER a;
             BEGIN
@@ -95,13 +95,13 @@ TEST_CASE("Coral Semantic Analysis - Undeclared Identifier", "[semantics]")
 TEST_CASE("Coral Array Declaration with Ranges", "[semantics][array]")
 {
     // Single dimension with range
-    semanticsProduces("PROGRAM BEGIN INTEGER ARRAY a[1:10]; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN INTEGER ARRAY a[1:10]; END", Catch::Matchers::Equals(""));
 
     // Multiple dimensions with range
-    semanticsProduces("PROGRAM BEGIN FLOATING ARRAY matrix[0:5, 1:4]; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN FLOATING ARRAY matrix[0:5, 1:4]; END", Catch::Matchers::Equals(""));
 
     // Multiple arrays
-    semanticsProduces("PROGRAM BEGIN INTEGER ARRAY a[1:10], b[0:5]; END", Catch::Matchers::Equals(""));
+    semanticsProduces("PROGRAM test BEGIN INTEGER ARRAY a[1:10], b[0:5]; END", Catch::Matchers::Equals(""));
 }
 
 TEST_CASE("Coral Table Declaration", "[semantics][table]")
@@ -110,7 +110,7 @@ TEST_CASE("Coral Table Declaration", "[semantics][table]")
     {
         semanticsProduces(
             R"(
-            PROGRAM
+            PROGRAM test
             BEGIN
                 TABLE t[10, 20]
                 [
@@ -124,7 +124,7 @@ TEST_CASE("Coral Table Declaration", "[semantics][table]")
         // Table with just width
         semanticsProduces(
             R"(
-            PROGRAM
+            PROGRAM test
             BEGIN
                 TABLE t[10]
                 [
@@ -141,7 +141,7 @@ TEST_CASE("Coral Overlay Declaration", "[semantics][overlay]")
     // Overlay variable
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             INTEGER x;
             OVERLAY x WITH INTEGER y;
@@ -152,7 +152,7 @@ TEST_CASE("Coral Overlay Declaration", "[semantics][overlay]")
     // Overlay with offset (assuming identifier for base)
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             INTEGER ARRAY a[1:10];
             OVERLAY a WITH INTEGER b;
@@ -166,7 +166,7 @@ TEST_CASE("Coral For Loop", "[semantics][loop]")
     // Standard loop
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             INTEGER i;
             INTEGER sum;
@@ -180,7 +180,7 @@ TEST_CASE("Coral For Loop", "[semantics][loop]")
     // Loop with expressions
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             INTEGER i, n, k;
             n := 10;
@@ -197,7 +197,7 @@ TEST_CASE("Coral Procedure Parameters", "[semantics][procedure]")
     // Procedure with parameters
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             PROCEDURE p(INTEGER x, FLOATING y);
             BEGIN
@@ -212,7 +212,7 @@ TEST_CASE("Coral Procedure Parameters", "[semantics][procedure]")
     // Procedure with array parameter (assuming syntax)
     semanticsProduces(
         R"(
-        PROGRAM
+        PROGRAM test
         BEGIN
             PROCEDURE sort(INTEGER ARRAY arr);
             BEGIN

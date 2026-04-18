@@ -46,15 +46,42 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     auto begin = sourceObject.data().data();
     auto end = sourceObject.data().data() + sourceObject.data().size();
 
-    // Consume PROGRAM/SEGMENT header
-    if (begin != end
-        && (begin->getTokenType() == lexer::TokenType::ProgramKeyword
-            || begin->getTokenType() == lexer::TokenType::SegmentKeyword))
+    // PROGRAM/SEGMENT must come first
+    lexer::CTokenIterator name;
+    bool isSegment = false;
+    if (begin != end && begin->getTokenType() == lexer::TokenType::ProgramKeyword)
     {
         begin++;
         if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
         {
             begin++;
+            name = begin;
+        }
+        else
+        {
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+            return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
+        }
+    }
+    else if (begin != end && begin->getTokenType() == lexer::TokenType::SegmentKeyword)
+    {
+        begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+        {
+            begin++;
+            name = begin;
+            isSegment = true;
+        }
+        else
+        {
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? (end - 1) : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+            return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
     }
     else
@@ -65,9 +92,10 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         {
             *errors = context.getErrorCount() > 0;
         }
-        return {sourceObject.data().data(), end, nullptr, nullptr};
+        return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
     }
 
+    // Communicator
     std::unique_ptr<Syntax::Communicator> communicator = parseCommunicator(begin, end, context);
     if (!communicator && context.getErrorCount() > 0)
     {
@@ -79,10 +107,11 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             {
                 *errors = context.getErrorCount() > 0;
             }
-            return {sourceObject.data().data(), end, nullptr, nullptr};
+            return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
     }
 
+    // Block
     auto block = parseBlock(begin, end, context);
     if (!block && context.getErrorCount() == 0)
     {
@@ -99,21 +128,11 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         *errors = context.getErrorCount() > 0;
     }
 
-    return {sourceObject.data().data(), end, std::move(block), std::move(communicator)};
+    return {sourceObject.data().data(), end, std::move(block), std::move(communicator), name, isSegment};
 }
 
 std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
-    // Consume optional SEGMENT header
-    if (begin != end && begin->getTokenType() == lexer::TokenType::SegmentKeyword)
-    {
-        begin++;
-        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
-        {
-            begin++;
-        }
-    }
-
     if (begin == end || begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {
         return nullptr;

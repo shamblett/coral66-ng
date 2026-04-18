@@ -14,6 +14,13 @@
 namespace coral66::Syntax
 {
 
+class Block;
+class Declaration;
+class Statement;
+class Expression;
+class PlaceReference;
+class Communicator;
+
 class Node
 {
     lexer::CTokenIterator m_begin;
@@ -31,24 +38,20 @@ public:
     [[nodiscard]] lexer::CTokenIterator end() const;
 };
 
-class Block;
-class Declaration;
-class Statement;
-class Expression;
-class PlaceReference;
-
-class Communicator;
-
 class Program final : public Node
 {
     std::unique_ptr<Communicator> m_communicator;
     std::unique_ptr<Block> m_block;
+    lexer::CTokenIterator m_name;
+    bool m_segment;
 
 public:
     Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
-            std::unique_ptr<Communicator>&& communicator);
+            std::unique_ptr<Communicator>&& communicator, lexer::CTokenIterator name, bool isSegment);
     [[nodiscard]] const Block& getBlock() const;
     [[nodiscard]] const Communicator* getCommunicator() const;
+    [[nodiscard]] lexer::CTokenIterator getName() const;
+    [[nodiscard]] bool getIsSegment() const;
 };
 
 class Block final : public Node

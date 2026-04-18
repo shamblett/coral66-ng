@@ -10,7 +10,7 @@
 
 namespace coral66::Syntax
 {
-Node::Node(lexer::CTokenIterator begin, lexer::CTokenIterator end) : m_begin(begin), m_end(end) {}
+Node::Node(const lexer::CTokenIterator begin, const lexer::CTokenIterator end) : m_begin(begin), m_end(end) {}
 
 lexer::CTokenIterator Node::begin() const
 {
@@ -23,8 +23,12 @@ lexer::CTokenIterator Node::end() const
 
 // Program
 Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
-                 std::unique_ptr<Communicator>&& communicator)
-    : Node(begin, end), m_communicator(std::move(communicator)), m_block(std::move(block))
+                 std::unique_ptr<Communicator>&& communicator, const lexer::CTokenIterator name, const bool isSegment)
+    : Node(begin, end),
+      m_communicator(std::move(communicator)),
+      m_block(std::move(block)),
+      m_name(name),
+      m_segment(isSegment)
 {
 }
 
@@ -36,6 +40,16 @@ const Block& Program::getBlock() const
 const Communicator* Program::getCommunicator() const
 {
     return m_communicator.get();
+}
+
+lexer::CTokenIterator Program::getName() const
+{
+    return m_name;
+}
+
+bool Program::getIsSegment() const
+{
+    return m_segment;
 }
 
 // Block
@@ -144,8 +158,7 @@ ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, co
                                            const lexer::CTokenIterator name,
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
                                            std::unique_ptr<Statement>&& body,
-                                           std::optional<lexer::CTokenIterator> typeToken,
-                                           bool isRecursive)
+                                           std::optional<lexer::CTokenIterator> typeToken, bool isRecursive)
     : Declaration(begin, end),
       m_typeToken(typeToken),
       m_name(name),

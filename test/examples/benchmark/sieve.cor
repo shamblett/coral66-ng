@@ -35,7 +35,7 @@
              - sieve -
              ---------;
 
-   'ARRAY' Flags [0 : SIZE];
+   'INTEGER' 'ARRAY' Flags [0 : SIZE];
 
    'INTEGER''PROCEDURE' sieve;
    'BEGIN'
