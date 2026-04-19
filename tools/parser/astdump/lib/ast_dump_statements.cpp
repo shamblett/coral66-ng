@@ -22,7 +22,7 @@ rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
     else if (auto* blockStatement = dynamic_cast<const Syntax::BlockStatement*>(statement))
     {
         obj.AddMember("NodeType", "BlockStatement", m_alloc);
-        obj.AddMember("Block", dump(&blockStatement->getBlock()), m_alloc);
+        obj.AddMember("Block", dump(blockStatement->getBlock()), m_alloc);
     }
     else if (auto* compoundStatement = dynamic_cast<const Syntax::CompoundStatement*>(statement))
     {
@@ -44,8 +44,11 @@ rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
     else if (auto* ifStatement = dynamic_cast<const Syntax::IfStatement*>(statement))
     {
         obj.AddMember("NodeType", "IfStatement", m_alloc);
-        obj.AddMember("ThenBranch", dump(&ifStatement->getThenBranch()), m_alloc);
-        obj.AddMember("ElseBranch", dump(ifStatement->getElseBranch()), m_alloc);
+        obj.AddMember("Then", dump(&ifStatement->getThenBranch()), m_alloc);
+        if (const auto* elseBranch = ifStatement->getElseBranch())
+        {
+            obj.AddMember("Else", dump(elseBranch), m_alloc);
+        }
     }
     else if (auto* gotoStatement = dynamic_cast<const Syntax::GotoStatement*>(statement))
     {

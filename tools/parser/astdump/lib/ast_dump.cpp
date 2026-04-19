@@ -6,6 +6,8 @@
 
 #include "ast_dump.hpp"
 
+#include <iostream>
+
 #include <rapidjson/stringbuffer.h>
 
 namespace coral66::tools
@@ -45,7 +47,10 @@ rapidjson::Value AstDump::dump(const Syntax::Block& block)
     {
         declarations.PushBack(dump(declaration.get()), m_alloc);
     }
-    obj.AddMember("Declarations", declarations, m_alloc);
+    if (!declarations.Empty())
+    {
+        obj.AddMember("Declarations", declarations, m_alloc);
+    }
 
     // Dump Statements
     rapidjson::Value statements(rapidjson::kArrayType);
@@ -53,7 +58,10 @@ rapidjson::Value AstDump::dump(const Syntax::Block& block)
     {
         statements.PushBack(dump(statement.get()), m_alloc);
     }
-    obj.AddMember("Statements", statements, m_alloc);
+    if (!statements.Empty())
+    {
+        obj.AddMember("Statements", statements, m_alloc);
+    }
 
     // Dump Place References
     rapidjson::Value placeReferences(rapidjson::kArrayType);
@@ -61,7 +69,10 @@ rapidjson::Value AstDump::dump(const Syntax::Block& block)
     {
         placeReferences.PushBack(dump(placeReference.get()), m_alloc);
     }
-    obj.AddMember("PlaceReferences", placeReferences, m_alloc);
+    if (!placeReferences.Empty())
+    {
+        obj.AddMember("PlaceReferences", placeReferences, m_alloc);
+    }
     return obj;
 }
 
@@ -96,6 +107,9 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     else
     {
         obj.AddMember("NodeType", "UnknownNode", m_alloc);
+        const auto token = lexer::tokenName(node->begin()->getTokenType());
+        std::cout << "ParserAstDump::WARNING - Unknown Node encountered - dump cannot resolve this node type " << token
+                  << "- output is incorrect";
     }
 
     return obj;
