@@ -47,14 +47,13 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     auto end = sourceObject.data().data() + sourceObject.data().size();
 
     // PROGRAM/SEGMENT must come first
-    lexer::CTokenIterator name;
+    lexer::CTokenIterator name = nullptr;
     bool isSegment = false;
     if (begin != end && begin->getTokenType() == lexer::TokenType::ProgramKeyword)
     {
         begin++;
         if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
         {
-            begin++;
             name = begin;
         }
         else
@@ -71,7 +70,6 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         begin++;
         if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
         {
-            begin++;
             name = begin;
             isSegment = true;
         }
@@ -92,10 +90,11 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         {
             *errors = context.getErrorCount() > 0;
         }
-        return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
+        return {sourceObject.data().data(), end, nullptr, nullptr, name, false};
     }
 
     // Communicator
+    begin++;
     std::unique_ptr<Syntax::Communicator> communicator = parseCommunicator(begin, end, context);
     if (!communicator && context.getErrorCount() > 0)
     {

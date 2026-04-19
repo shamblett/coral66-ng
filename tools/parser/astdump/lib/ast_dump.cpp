@@ -17,7 +17,17 @@ namespace coral66::tools
 rapidjson::Value AstDump::dump(const Syntax::Program& program)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
-    obj.AddMember("NodeType", "Program", m_alloc);
+
+    // Program or segment
+    if (!program.getIsSegment())
+    {
+        obj.AddMember("NodeType", "Program", m_alloc);
+    }
+    else
+    {
+        obj.AddMember("NodeType", "Segment", m_alloc);
+    }
+    obj.AddMember("Name", getTokenString(program.getName()), m_alloc);
 
     // Dump Communicator
     if (const auto* communicator = program.getCommunicator())
