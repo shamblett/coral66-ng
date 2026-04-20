@@ -72,6 +72,14 @@ TEST_CASE("Coral Parse Expression - Typed Primaries", "[Parser][Expression]")
         REQUIRE(pw != nullptr);
         REQUIRE(dynamic_cast<const IdentifierExpression*>(&pw->getBase()) != nullptr);
     }
+    SECTION("Octal Literal")
+    {
+        ParsedExpression p("OCTAL ( 1234 )");
+        auto literal = dynamic_cast<LiteralExpression*>(p.expression.get());
+        REQUIRE(literal != nullptr);
+        REQUIRE(literal->getLiteral()->getTokenType() == lexer::TokenType::Literal);
+        REQUIRE(literal->getLiteral()->getType() == lexer::CToken::Type::Integer);
+    }
 }
 
 /*

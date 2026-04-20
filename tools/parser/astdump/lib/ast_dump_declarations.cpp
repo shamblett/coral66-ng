@@ -56,7 +56,10 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
         obj.AddMember("IsRecursive", procedureDeclaration->isRecursive(), m_alloc);
         obj.AddMember("Name", getTokenString(procedureDeclaration->getName()), m_alloc);
-        obj.AddMember("Type Token", getTokenString(procedureDeclaration->getTypeToken().value()), m_alloc);
+        if (procedureDeclaration->getTypeToken().has_value())
+        {
+            obj.AddMember("Type Token", getTokenString(procedureDeclaration->getTypeToken().value()), m_alloc);
+        }
 
         rapidjson::Value parameters(rapidjson::kArrayType);
         for (const auto& param : procedureDeclaration->getParameters())

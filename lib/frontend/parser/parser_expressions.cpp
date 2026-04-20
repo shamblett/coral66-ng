@@ -437,6 +437,21 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
         return std::make_unique<LiteralExpression>(t, begin, t);
     }
 
+    if (tType == lexer::TokenType::OctalKeyword)
+    {
+        auto startToken = begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+        {
+            begin++;
+            auto t = begin++; // Parse the octal digits list
+            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+            {
+                begin++;
+                return std::make_unique<LiteralExpression>(startToken, begin, t);
+            }
+        }
+    }
+
     if (tType == lexer::TokenType::LocationKeyword)
     {
         auto startToken = begin++;

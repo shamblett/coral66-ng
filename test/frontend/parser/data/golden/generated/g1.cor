@@ -9,7 +9,7 @@ BEGIN
   INTEGER myInt, otherInt;
   FLOATING myFloat;
   FIXED ( 16, 8 ) myFixed;
-  BITS ( 16 ) myBits;
+  INTEGER myBits;
 
   COMMENT This is a single line comment;
   
