@@ -4,6 +4,8 @@
  * Date   : 18/03/2026
  */
 
+#include <iostream>
+
 #include "common.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
@@ -678,5 +680,12 @@ TEST_CASE("Program structure", "[Parser][Program]")
         const ParsedProgram p("SEGMENT TEST COMMON (hhhh hhh) BEGIN END");
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(MALFORMED_COMMUNICATOR));
+    }
+
+    SECTION("Misplaced Segment")
+    {
+        const ParsedProgram p("PROGRAM test COMMON () SEGMENT billy BEGIN END");
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_BEGIN));
     }
 }

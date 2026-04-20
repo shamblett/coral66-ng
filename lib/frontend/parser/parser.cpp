@@ -116,9 +116,8 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     {
         if (begin != end)
         {
-            context.log(errors::parser::EXPECTED_N.args(*begin, context.getSourceInterface(),
-                                                        lexer::TokenType::BeginKeyword, *begin));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_N);
+            context.log(errors::parser::EXPECTED_BEGIN.args(*begin, context.getSourceInterface(), *begin));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_BEGIN);
         }
     }
 
