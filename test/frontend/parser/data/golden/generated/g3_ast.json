@@ -1,0 +1,200 @@
+{
+    "NodeType": "Segment",
+    "Name": {
+        "Class": "identifier",
+        "Value": "goldenThree"
+    },
+    "Communicator": {
+        "Common": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "statusVal"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "myState"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myState"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "1"
+                    }
+                }
+            },
+            {
+                "NodeType": "GotoStatement",
+                "Label": {
+                    "Class": "identifier",
+                    "Value": "mySwitch"
+                },
+                "Index": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myState"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "statusVal"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "0"
+                    }
+                }
+            },
+            {
+                "NodeType": "GotoStatement",
+                "Label": {
+                    "Class": "identifier",
+                    "Value": "endLabel"
+                },
+                "Index": {}
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "statusVal"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "1"
+                    }
+                }
+            },
+            {
+                "NodeType": "GotoStatement",
+                "Label": {
+                    "Class": "identifier",
+                    "Value": "endLabel"
+                },
+                "Index": {}
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "statusVal"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "2"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "statusVal"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "BinaryExpression",
+                    "Left": {
+                        "NodeType": "IdentifierExpression",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "statusVal"
+                        }
+                    },
+                    "Operator": {
+                        "Class": "+",
+                        "Value": "+"
+                    },
+                    "Right": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "1"
+                        }
+                    }
+                }
+            }
+        ],
+        "PlaceReferences": [
+            {
+                "NodeType": "SwitchPlaceReference",
+                "name": {
+                    "Class": "identifier",
+                    "Value": "mySwitch"
+                },
+                "Labels": [
+                    {
+                        "Class": "identifier",
+                        "Value": "stateZero"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "stateOne"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "stateTwo"
+                    }
+                ]
+            }
+        ]
+    }
+}

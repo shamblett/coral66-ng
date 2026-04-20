@@ -452,6 +452,21 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
         }
     }
 
+    if (tType == lexer::TokenType::LiteralKeyword)
+    {
+        auto startToken = begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+        {
+            begin++;
+            auto t = begin++; // Parse the character
+            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+            {
+                begin++;
+                return std::make_unique<LiteralExpression>(startToken, begin, t);
+            }
+        }
+    }
+
     if (tType == lexer::TokenType::LocationKeyword)
     {
         auto startToken = begin++;

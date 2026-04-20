@@ -1,0 +1,723 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "goldenFour"
+    },
+    "Communicator": {
+        "Common": [
+            {
+                "NodeType": "ArrayDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "statusFlags"
+                    }
+                ],
+                "Dimensions": [
+                    [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        },
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "5"
+                            }
+                        }
+                    ]
+                ],
+                "Has Preset": false,
+                "Preset Tokens": []
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "status"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "flagMask"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "varA"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "varB"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "FLOATING",
+                    "Value": "FLOATING"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "result"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "TableDeclaration",
+                "Identifier": {
+                    "Class": "identifier",
+                    "Value": "myTable"
+                },
+                "Width": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "2"
+                    }
+                },
+                "Length": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "10"
+                    }
+                },
+                "Elements": [
+                    {
+                        "NodeType": "TableElementDeclaration",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "entryType"
+                        },
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Is Unsigned": false,
+                        "Word Position": {
+                            "Class": "literal",
+                            "Value": "0"
+                        }
+                    },
+                    {
+                        "NodeType": "TableElementDeclaration",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "entryValue"
+                        },
+                        "Is Unsigned": false,
+                        "Word Position": {
+                            "Class": "literal",
+                            "Value": "1"
+                        },
+                        "Bit Position": {
+                            "Class": "literal",
+                            "Value": "0"
+                        }
+                    },
+                    {
+                        "NodeType": "TableElementDeclaration",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "entryFlags"
+                        },
+                        "Is Unsigned": true,
+                        "Word Position": {
+                            "Class": "literal",
+                            "Value": "1"
+                        },
+                        "Bit Position": {
+                            "Class": "literal",
+                            "Value": "16"
+                        }
+                    }
+                ],
+                "Has Preset": true,
+                "Preset Tokens": [
+                    {
+                        "Class": "literal",
+                        "Value": "0"
+                    },
+                    {
+                        "Class": ",",
+                        "Value": ","
+                    },
+                    {
+                        "Class": "literal",
+                        "Value": "0"
+                    },
+                    {
+                        "Class": ",",
+                        "Value": ","
+                    },
+                    {
+                        "Class": "literal",
+                        "Value": "0"
+                    }
+                ]
+            },
+            {
+                "NodeType": "OverlayDeclaration",
+                "Base": {
+                    "Class": "identifier",
+                    "Value": "status"
+                },
+                "Offset": {
+                    "Class": "identifier",
+                    "Value": "status"
+                }
+            },
+            {
+                "NodeType": "ProcedureDeclaration",
+                "IsRecursive": true,
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "factorial"
+                },
+                "Type Token": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": [
+                            {
+                                "Class": "identifier",
+                                "Value": "n"
+                            }
+                        ]
+                    }
+                ],
+                "Body": {
+                    "NodeType": "BlockStatement",
+                    "Block": {
+                        "NodeType": "Block",
+                        "Declarations": [
+                            {
+                                "NodeType": "VariableDeclaration",
+                                "Type": {
+                                    "Class": "INTEGER",
+                                    "Value": "INTEGER"
+                                },
+                                "Identifiers": [
+                                    {
+                                        "Class": "identifier",
+                                        "Value": "ans"
+                                    }
+                                ],
+                                "Preset": false,
+                                "Preset Tokens": []
+                            }
+                        ],
+                        "Statements": [
+                            {
+                                "NodeType": "IfStatement",
+                                "Then": {
+                                    "NodeType": "AssignmentStatement",
+                                    "LHS": {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "ans"
+                                        }
+                                    },
+                                    "RHS": {
+                                        "NodeType": "LiteralExpression",
+                                        "Literal": {
+                                            "Class": "literal",
+                                            "Value": "1"
+                                        }
+                                    }
+                                },
+                                "Else": {
+                                    "NodeType": "AssignmentStatement",
+                                    "LHS": {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "ans"
+                                        }
+                                    },
+                                    "RHS": {
+                                        "NodeType": "BinaryExpression",
+                                        "Left": {
+                                            "NodeType": "IdentifierExpression",
+                                            "Identifier": {
+                                                "Class": "identifier",
+                                                "Value": "n"
+                                            }
+                                        },
+                                        "Operator": {
+                                            "Class": "*",
+                                            "Value": "*"
+                                        },
+                                        "Right": {
+                                            "NodeType": "FunctionCallExpression",
+                                            "Function": {
+                                                "Class": "identifier",
+                                                "Value": "factorial"
+                                            },
+                                            "Arguments": [
+                                                {
+                                                    "NodeType": "BinaryExpression",
+                                                    "Left": {
+                                                        "NodeType": "IdentifierExpression",
+                                                        "Identifier": {
+                                                            "Class": "identifier",
+                                                            "Value": "n"
+                                                        }
+                                                    },
+                                                    "Operator": {
+                                                        "Class": "-",
+                                                        "Value": "-"
+                                                    },
+                                                    "Right": {
+                                                        "NodeType": "LiteralExpression",
+                                                        "Literal": {
+                                                            "Class": "literal",
+                                                            "Value": "1"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "NodeType": "AnswerStatement",
+                                "Expression": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "ans"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                "NodeType": "ProcedureDeclaration",
+                "IsRecursive": false,
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "trapError"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Label",
+                        "Identifiers": [
+                            {
+                                "Class": "identifier",
+                                "Value": "errorLabel"
+                            }
+                        ]
+                    }
+                ],
+                "Body": {
+                    "NodeType": "CompoundStatement",
+                    "Compound": [
+                        {
+                            "NodeType": "GotoStatement",
+                            "Label": {
+                                "Class": "identifier",
+                                "Value": "errorLabel"
+                            },
+                            "Index": {}
+                        }
+                    ]
+                }
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "status"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "0"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "flagMask"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "255"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "varA"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "10"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "varB"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "20"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "status"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "BinaryExpression",
+                    "Left": {
+                        "NodeType": "BinaryExpression",
+                        "Left": {
+                            "NodeType": "BinaryExpression",
+                            "Left": {
+                                "NodeType": "IdentifierExpression",
+                                "Identifier": {
+                                    "Class": "identifier",
+                                    "Value": "varA"
+                                }
+                            },
+                            "Operator": {
+                                "Class": "MASK",
+                                "Value": "MASK"
+                            },
+                            "Right": {
+                                "NodeType": "IdentifierExpression",
+                                "Identifier": {
+                                    "Class": "identifier",
+                                    "Value": "flagMask"
+                                }
+                            }
+                        },
+                        "Operator": {
+                            "Class": "UNION",
+                            "Value": "UNION"
+                        },
+                        "Right": {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "varB"
+                            }
+                        }
+                    },
+                    "Operator": {
+                        "Class": "DIFFER",
+                        "Value": "DIFFER"
+                    },
+                    "Right": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "15"
+                        }
+                    }
+                }
+            },
+            {
+                "NodeType": "IfStatement",
+                "Then": {
+                    "NodeType": "AssignmentStatement",
+                    "LHS": {
+                        "NodeType": "IdentifierExpression",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "result"
+                        }
+                    },
+                    "RHS": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "1"
+                        }
+                    }
+                },
+                "Else": {
+                    "NodeType": "AssignmentStatement",
+                    "LHS": {
+                        "NodeType": "IdentifierExpression",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "result"
+                        }
+                    },
+                    "RHS": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "0"
+                        }
+                    }
+                }
+            },
+            {
+                "NodeType": "ForStatement",
+                "Variable": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "status"
+                    }
+                },
+                "Elements": [
+                    {
+                        "NodeType": "ForElement",
+                        "Expression": {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        },
+                        "Step": {},
+                        "Until": {},
+                        "WhileCondition": {
+                            "NodeType": "BinaryExpression",
+                            "Left": {
+                                "NodeType": "IdentifierExpression",
+                                "Identifier": {
+                                    "Class": "identifier",
+                                    "Value": "status"
+                                }
+                            },
+                            "Operator": {
+                                "Class": "<",
+                                "Value": "<"
+                            },
+                            "Right": {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "5"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "Body": {
+                    "NodeType": "CompoundStatement",
+                    "Compound": [
+                        {
+                            "NodeType": "AssignmentStatement",
+                            "LHS": {
+                                "NodeType": "ArrayAccessExpression",
+                                "Array": {
+                                    "Class": "identifier",
+                                    "Value": "statusFlags"
+                                },
+                                "Indices": [
+                                    {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "status"
+                                        }
+                                    }
+                                ]
+                            },
+                            "RHS": {
+                                "NodeType": "BinaryExpression",
+                                "Left": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "status"
+                                    }
+                                },
+                                "Operator": {
+                                    "Class": "*",
+                                    "Value": "*"
+                                },
+                                "Right": {
+                                    "NodeType": "LiteralExpression",
+                                    "Literal": {
+                                        "Class": "literal",
+                                        "Value": "2"
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "NodeType": "AssignmentStatement",
+                            "LHS": {
+                                "NodeType": "IdentifierExpression",
+                                "Identifier": {
+                                    "Class": "identifier",
+                                    "Value": "status"
+                                }
+                            },
+                            "RHS": {
+                                "NodeType": "BinaryExpression",
+                                "Left": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "status"
+                                    }
+                                },
+                                "Operator": {
+                                    "Class": "+",
+                                    "Value": "+"
+                                },
+                                "Right": {
+                                    "NodeType": "LiteralExpression",
+                                    "Literal": {
+                                        "Class": "literal",
+                                        "Value": "1"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "PartWordExpression",
+                    "Base": {
+                        "NodeType": "IdentifierExpression",
+                        "Identifier": {
+                            "Class": "identifier",
+                            "Value": "status"
+                        }
+                    },
+                    "StartBit": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "0"
+                        }
+                    },
+                    "Width": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "4"
+                        }
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "5"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "varA"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "identifier",
+                        "Value": "A"
+                    }
+                }
+            },
+            {
+                "NodeType": "ProcedureCallStatement",
+                "Expression": {
+                    "NodeType": "FunctionCallExpression",
+                    "Function": {
+                        "Class": "identifier",
+                        "Value": "trapError"
+                    },
+                    "Arguments": [
+                        {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "errorDest"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

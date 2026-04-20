@@ -1,0 +1,471 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "goldenOne"
+    },
+    "Communicator": {
+        "Common": [
+            {
+                "NodeType": "ArrayDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "commonArray"
+                    }
+                ],
+                "Dimensions": [
+                    [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "1"
+                            }
+                        },
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "10"
+                            }
+                        }
+                    ]
+                ],
+                "Has Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "FLOATING",
+                    "Value": "FLOATING"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "commonFloat"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "myInt"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "otherInt"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "FLOATING",
+                    "Value": "FLOATING"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "myFloat"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "FIXED",
+                    "Value": "FIXED"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "myFixed"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "myBits"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "ProcedureDeclaration",
+                "IsRecursive": false,
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "myProc"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": [
+                            {
+                                "Class": "identifier",
+                                "Value": "a"
+                            }
+                        ]
+                    },
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Location",
+                        "Type": {
+                            "Class": "FLOATING",
+                            "Value": "FLOATING"
+                        },
+                        "Identifiers": [
+                            {
+                                "Class": "identifier",
+                                "Value": "b"
+                            }
+                        ]
+                    }
+                ],
+                "Body": {
+                    "NodeType": "BlockStatement",
+                    "Block": {
+                        "NodeType": "Block",
+                        "Declarations": [
+                            {
+                                "NodeType": "VariableDeclaration",
+                                "Type": {
+                                    "Class": "INTEGER",
+                                    "Value": "INTEGER"
+                                },
+                                "Identifiers": [
+                                    {
+                                        "Class": "identifier",
+                                        "Value": "procLocal"
+                                    }
+                                ],
+                                "Preset": false,
+                                "Preset Tokens": []
+                            }
+                        ],
+                        "Statements": [
+                            {
+                                "NodeType": "AssignmentStatement",
+                                "LHS": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "procLocal"
+                                    }
+                                },
+                                "RHS": {
+                                    "NodeType": "BinaryExpression",
+                                    "Left": {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "a"
+                                        }
+                                    },
+                                    "Operator": {
+                                        "Class": "+",
+                                        "Value": "+"
+                                    },
+                                    "Right": {
+                                        "NodeType": "LiteralExpression",
+                                        "Literal": {
+                                            "Class": "literal",
+                                            "Value": "10"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "NodeType": "AssignmentStatement",
+                                "LHS": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "b"
+                                    }
+                                },
+                                "RHS": {
+                                    "NodeType": "BinaryExpression",
+                                    "Left": {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "b"
+                                        }
+                                    },
+                                    "Operator": {
+                                        "Class": "+",
+                                        "Value": "+"
+                                    },
+                                    "Right": {
+                                        "NodeType": "LiteralExpression",
+                                        "Literal": {
+                                            "Class": "literal",
+                                            "Value": "1.5"
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myInt"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "5"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "otherInt"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "10"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myFloat"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "3.1415899999999999"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myFixed"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "2.71"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myBits"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "1234"
+                    }
+                }
+            },
+            {
+                "NodeType": "ProcedureCallStatement",
+                "Expression": {
+                    "NodeType": "FunctionCallExpression",
+                    "Function": {
+                        "Class": "identifier",
+                        "Value": "myProc"
+                    },
+                    "Arguments": [
+                        {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "myInt"
+                            }
+                        },
+                        {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "myFloat"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myInt"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "ConditionalExpression",
+                    "Condition": {
+                        "NodeType": "BinaryExpression",
+                        "Left": {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "myInt"
+                            }
+                        },
+                        "Operator": {
+                            "Class": "=",
+                            "Value": "="
+                        },
+                        "Right": {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "otherInt"
+                            }
+                        }
+                    },
+                    "Then": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "0"
+                        }
+                    },
+                    "Else": {
+                        "NodeType": "BinaryExpression",
+                        "Left": {
+                            "NodeType": "IdentifierExpression",
+                            "Identifier": {
+                                "Class": "identifier",
+                                "Value": "otherInt"
+                            }
+                        },
+                        "Operator": {
+                            "Class": "/",
+                            "Value": "/"
+                        },
+                        "Right": {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "2"
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "ArrayAccessExpression",
+                    "Array": {
+                        "Class": "identifier",
+                        "Value": "commonArray"
+                    },
+                    "Indices": [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "1"
+                            }
+                        }
+                    ]
+                },
+                "RHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myInt"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "commonFloat"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "myFloat"
+                    }
+                }
+            }
+        ]
+    }
+}

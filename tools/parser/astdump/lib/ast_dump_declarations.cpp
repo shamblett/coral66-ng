@@ -22,7 +22,8 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("NodeType", "ParameterDeclaration", m_alloc);
         obj.AddMember("Mode", rapidjson::StringRef(parser::parameterModeToString(parameterDeclaration->getMode())),
                       m_alloc);
-        obj.AddMember("Type", getTokenString(parameterDeclaration->getType().value()), m_alloc);
+        if (parameterDeclaration->getType().has_value())
+            obj.AddMember("Type", getTokenString(parameterDeclaration->getType().value()), m_alloc);
 
         rapidjson::Value identifiers(rapidjson::kArrayType);
         for (const auto& identifier : parameterDeclaration->getIdentifiers())
@@ -103,10 +104,13 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
     {
         obj.AddMember("NodeType", "TableElementDeclaration", m_alloc);
         obj.AddMember("Identifier", getTokenString(tableElementDeclaration->getIdentifier()), m_alloc);
-        obj.AddMember("Type", getTokenString(tableElementDeclaration->getType().value()), m_alloc);
+        if (tableElementDeclaration->getType().has_value())
+            obj.AddMember("Type", getTokenString(tableElementDeclaration->getType().value()), m_alloc);
         obj.AddMember("Is Unsigned", tableElementDeclaration->isUnsigned(), m_alloc);
-        obj.AddMember("Word Position", getTokenString(tableElementDeclaration->getWordPosition().value()), m_alloc);
-        obj.AddMember("Bit Position", getTokenString(tableElementDeclaration->getBitPosition().value()), m_alloc);
+        if (tableElementDeclaration->getWordPosition().has_value())
+            obj.AddMember("Word Position", getTokenString(tableElementDeclaration->getWordPosition().value()), m_alloc);
+        if (tableElementDeclaration->getBitPosition().has_value())
+            obj.AddMember("Bit Position", getTokenString(tableElementDeclaration->getBitPosition().value()), m_alloc);
     }
 
     else if (auto* tableDeclaration = dynamic_cast<const Syntax::TableDeclaration*>(declaration))
@@ -137,7 +141,8 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("NodeType", "OverlayDeclaration", m_alloc);
         obj.AddMember("Base", getTokenString(overlayDeclaration->getBase()), m_alloc);
         obj.AddMember("Offset", getTokenString(overlayDeclaration->getOffset()), m_alloc);
-        obj.AddMember("Offset2", getTokenString(overlayDeclaration->getOffset2().value()), m_alloc);
+        if (overlayDeclaration->getOffset2().has_value())
+            obj.AddMember("Offset2", getTokenString(overlayDeclaration->getOffset2().value()), m_alloc);
     }
     else if (auto* placeSpecification = dynamic_cast<const Syntax::PlaceSpecification*>(declaration))
     {
@@ -152,7 +157,8 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
     else if (auto* procedureSpecification = dynamic_cast<const Syntax::ProcedureSpecification*>(declaration))
     {
         obj.AddMember("NodeType", "ProcedureSpecification", m_alloc);
-        obj.AddMember("Type", getTokenString(procedureSpecification->getType().value()), m_alloc);
+        if (procedureSpecification->getType().has_value())
+            obj.AddMember("Type", getTokenString(procedureSpecification->getType().value()), m_alloc);
         obj.AddMember("Name", getTokenString(procedureSpecification->getName()), m_alloc);
 
         rapidjson::Value parameters(rapidjson::kArrayType);

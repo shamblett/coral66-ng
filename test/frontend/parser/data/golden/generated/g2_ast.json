@@ -1,0 +1,134 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "goldenTwo"
+    },
+    "Communicator": {
+        "Common": [
+            {
+                "NodeType": "ArrayDeclaration",
+                "Type": {
+                    "Class": "FLOATING",
+                    "Value": "FLOATING"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "floatArray"
+                    }
+                ],
+                "Dimensions": [
+                    [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        },
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "5"
+                            }
+                        }
+                    ]
+                ],
+                "Has Preset": false,
+                "Preset Tokens": []
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "counter"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "ForStatement",
+                "Variable": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "counter"
+                    }
+                },
+                "Elements": [
+                    {
+                        "NodeType": "ForElement",
+                        "Expression": {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        },
+                        "Step": {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "1"
+                            }
+                        },
+                        "Until": {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "5"
+                            }
+                        },
+                        "WhileCondition": {}
+                    }
+                ],
+                "Body": {
+                    "NodeType": "CompoundStatement",
+                    "Compound": [
+                        {
+                            "NodeType": "AssignmentStatement",
+                            "LHS": {
+                                "NodeType": "ArrayAccessExpression",
+                                "Array": {
+                                    "Class": "identifier",
+                                    "Value": "floatArray"
+                                },
+                                "Indices": [
+                                    {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "counter"
+                                        }
+                                    }
+                                ]
+                            },
+                            "RHS": {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "0"
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}
