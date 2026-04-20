@@ -1,0 +1,349 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "Ackermann"
+    },
+    "Communicator": {
+        "Common": [
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "test"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    },
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            },
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "commenter"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            },
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "failed"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            },
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "result"
+                },
+                "Parameters": []
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "ans"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "starttime"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "stoptime"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "ProcedureDeclaration",
+                "IsRecursive": true,
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "Ackermann"
+                },
+                "Type Token": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": [
+                            {
+                                "Class": "identifier",
+                                "Value": "m"
+                            },
+                            {
+                                "Class": "identifier",
+                                "Value": "n"
+                            }
+                        ]
+                    }
+                ],
+                "Body": {
+                    "NodeType": "CompoundStatement",
+                    "Compound": [
+                        {
+                            "NodeType": "IfStatement",
+                            "Then": {
+                                "NodeType": "AnswerStatement",
+                                "Expression": {
+                                    "NodeType": "BinaryExpression",
+                                    "Left": {
+                                        "NodeType": "IdentifierExpression",
+                                        "Identifier": {
+                                            "Class": "identifier",
+                                            "Value": "n"
+                                        }
+                                    },
+                                    "Operator": {
+                                        "Class": "+",
+                                        "Value": "+"
+                                    },
+                                    "Right": {
+                                        "NodeType": "LiteralExpression",
+                                        "Literal": {
+                                            "Class": "literal",
+                                            "Value": "1"
+                                        }
+                                    }
+                                }
+                            },
+                            "Else": {
+                                "NodeType": "IfStatement",
+                                "Then": {
+                                    "NodeType": "AnswerStatement",
+                                    "Expression": {
+                                        "NodeType": "FunctionCallExpression",
+                                        "Function": {
+                                            "Class": "identifier",
+                                            "Value": "Ackermann"
+                                        },
+                                        "Arguments": [
+                                            {
+                                                "NodeType": "BinaryExpression",
+                                                "Left": {
+                                                    "NodeType": "IdentifierExpression",
+                                                    "Identifier": {
+                                                        "Class": "identifier",
+                                                        "Value": "m"
+                                                    }
+                                                },
+                                                "Operator": {
+                                                    "Class": "-",
+                                                    "Value": "-"
+                                                },
+                                                "Right": {
+                                                    "NodeType": "LiteralExpression",
+                                                    "Literal": {
+                                                        "Class": "literal",
+                                                        "Value": "1"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "NodeType": "LiteralExpression",
+                                                "Literal": {
+                                                    "Class": "literal",
+                                                    "Value": "1"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "Else": {
+                                    "NodeType": "AnswerStatement",
+                                    "Expression": {
+                                        "NodeType": "FunctionCallExpression",
+                                        "Function": {
+                                            "Class": "identifier",
+                                            "Value": "Ackermann"
+                                        },
+                                        "Arguments": [
+                                            {
+                                                "NodeType": "BinaryExpression",
+                                                "Left": {
+                                                    "NodeType": "IdentifierExpression",
+                                                    "Identifier": {
+                                                        "Class": "identifier",
+                                                        "Value": "m"
+                                                    }
+                                                },
+                                                "Operator": {
+                                                    "Class": "-",
+                                                    "Value": "-"
+                                                },
+                                                "Right": {
+                                                    "NodeType": "LiteralExpression",
+                                                    "Literal": {
+                                                        "Class": "literal",
+                                                        "Value": "1"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "NodeType": "FunctionCallExpression",
+                                                "Function": {
+                                                    "Class": "identifier",
+                                                    "Value": "Ackermann"
+                                                },
+                                                "Arguments": [
+                                                    {
+                                                        "NodeType": "IdentifierExpression",
+                                                        "Identifier": {
+                                                            "Class": "identifier",
+                                                            "Value": "m"
+                                                        }
+                                                    },
+                                                    {
+                                                        "NodeType": "BinaryExpression",
+                                                        "Left": {
+                                                            "NodeType": "IdentifierExpression",
+                                                            "Identifier": {
+                                                                "Class": "identifier",
+                                                                "Value": "n"
+                                                            }
+                                                        },
+                                                        "Operator": {
+                                                            "Class": "-",
+                                                            "Value": "-"
+                                                        },
+                                                        "Right": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "1"
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "ans"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "FunctionCallExpression",
+                    "Function": {
+                        "Class": "identifier",
+                        "Value": "Ackermann"
+                    },
+                    "Arguments": [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "3"
+                            }
+                        },
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "6"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,722 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "Sieve"
+    },
+    "Communicator": {
+        "Common": [
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "test"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    },
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            },
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "comment"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            },
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "failed"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            },
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "None",
+                    "Value": "None"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "result"
+                },
+                "Parameters": []
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "ans"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "startTime"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "stopTime"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "ArrayDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "Flags"
+                    }
+                ],
+                "Dimensions": [
+                    [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        },
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "8190"
+                            }
+                        }
+                    ]
+                ],
+                "Has Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "ProcedureDeclaration",
+                "IsRecursive": false,
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "sieve"
+                },
+                "Type Token": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Parameters": [],
+                "Body": {
+                    "NodeType": "BlockStatement",
+                    "Block": {
+                        "NodeType": "Block",
+                        "Declarations": [
+                            {
+                                "NodeType": "VariableDeclaration",
+                                "Type": {
+                                    "Class": "INTEGER",
+                                    "Value": "INTEGER"
+                                },
+                                "Identifiers": [
+                                    {
+                                        "Class": "identifier",
+                                        "Value": "iter"
+                                    }
+                                ],
+                                "Preset": false,
+                                "Preset Tokens": []
+                            },
+                            {
+                                "NodeType": "VariableDeclaration",
+                                "Type": {
+                                    "Class": "INTEGER",
+                                    "Value": "INTEGER"
+                                },
+                                "Identifiers": [
+                                    {
+                                        "Class": "identifier",
+                                        "Value": "count"
+                                    }
+                                ],
+                                "Preset": false,
+                                "Preset Tokens": []
+                            }
+                        ],
+                        "Statements": [
+                            {
+                                "NodeType": "ForStatement",
+                                "Variable": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "iter"
+                                    }
+                                },
+                                "Elements": [
+                                    {
+                                        "NodeType": "ForElement",
+                                        "Expression": {
+                                            "NodeType": "LiteralExpression",
+                                            "Literal": {
+                                                "Class": "literal",
+                                                "Value": "1"
+                                            }
+                                        },
+                                        "Step": {
+                                            "NodeType": "LiteralExpression",
+                                            "Literal": {
+                                                "Class": "literal",
+                                                "Value": "1"
+                                            }
+                                        },
+                                        "Until": {
+                                            "NodeType": "LiteralExpression",
+                                            "Literal": {
+                                                "Class": "literal",
+                                                "Value": "10"
+                                            }
+                                        },
+                                        "WhileCondition": {}
+                                    }
+                                ],
+                                "Body": {
+                                    "NodeType": "BlockStatement",
+                                    "Block": {
+                                        "NodeType": "Block",
+                                        "Declarations": [
+                                            {
+                                                "NodeType": "VariableDeclaration",
+                                                "Type": {
+                                                    "Class": "INTEGER",
+                                                    "Value": "INTEGER"
+                                                },
+                                                "Identifiers": [
+                                                    {
+                                                        "Class": "identifier",
+                                                        "Value": "i"
+                                                    },
+                                                    {
+                                                        "Class": "identifier",
+                                                        "Value": "prime"
+                                                    },
+                                                    {
+                                                        "Class": "identifier",
+                                                        "Value": "k"
+                                                    }
+                                                ],
+                                                "Preset": false,
+                                                "Preset Tokens": []
+                                            }
+                                        ],
+                                        "Statements": [
+                                            {
+                                                "NodeType": "AssignmentStatement",
+                                                "LHS": {
+                                                    "NodeType": "IdentifierExpression",
+                                                    "Identifier": {
+                                                        "Class": "identifier",
+                                                        "Value": "count"
+                                                    }
+                                                },
+                                                "RHS": {
+                                                    "NodeType": "LiteralExpression",
+                                                    "Literal": {
+                                                        "Class": "literal",
+                                                        "Value": "0"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "NodeType": "ForStatement",
+                                                "Variable": {
+                                                    "NodeType": "IdentifierExpression",
+                                                    "Identifier": {
+                                                        "Class": "identifier",
+                                                        "Value": "i"
+                                                    }
+                                                },
+                                                "Elements": [
+                                                    {
+                                                        "NodeType": "ForElement",
+                                                        "Expression": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "0"
+                                                            }
+                                                        },
+                                                        "Step": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "1"
+                                                            }
+                                                        },
+                                                        "Until": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "8190"
+                                                            }
+                                                        },
+                                                        "WhileCondition": {}
+                                                    }
+                                                ],
+                                                "Body": {
+                                                    "NodeType": "AssignmentStatement",
+                                                    "LHS": {
+                                                        "NodeType": "ArrayAccessExpression",
+                                                        "Array": {
+                                                            "Class": "identifier",
+                                                            "Value": "Flags"
+                                                        },
+                                                        "Indices": [
+                                                            {
+                                                                "NodeType": "IdentifierExpression",
+                                                                "Identifier": {
+                                                                    "Class": "identifier",
+                                                                    "Value": "i"
+                                                                }
+                                                            }
+                                                        ]
+                                                    },
+                                                    "RHS": {
+                                                        "NodeType": "LiteralExpression",
+                                                        "Literal": {
+                                                            "Class": "literal",
+                                                            "Value": "1"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "NodeType": "ForStatement",
+                                                "Variable": {
+                                                    "NodeType": "IdentifierExpression",
+                                                    "Identifier": {
+                                                        "Class": "identifier",
+                                                        "Value": "i"
+                                                    }
+                                                },
+                                                "Elements": [
+                                                    {
+                                                        "NodeType": "ForElement",
+                                                        "Expression": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "0"
+                                                            }
+                                                        },
+                                                        "Step": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "1"
+                                                            }
+                                                        },
+                                                        "Until": {
+                                                            "NodeType": "LiteralExpression",
+                                                            "Literal": {
+                                                                "Class": "literal",
+                                                                "Value": "8190"
+                                                            }
+                                                        },
+                                                        "WhileCondition": {}
+                                                    }
+                                                ],
+                                                "Body": {
+                                                    "NodeType": "CompoundStatement",
+                                                    "Compound": [
+                                                        {
+                                                            "NodeType": "IfStatement",
+                                                            "Then": {
+                                                                "NodeType": "CompoundStatement",
+                                                                "Compound": [
+                                                                    {
+                                                                        "NodeType": "AssignmentStatement",
+                                                                        "LHS": {
+                                                                            "NodeType": "IdentifierExpression",
+                                                                            "Identifier": {
+                                                                                "Class": "identifier",
+                                                                                "Value": "prime"
+                                                                            }
+                                                                        },
+                                                                        "RHS": {
+                                                                            "NodeType": "BinaryExpression",
+                                                                            "Left": {
+                                                                                "NodeType": "BinaryExpression",
+                                                                                "Left": {
+                                                                                    "NodeType": "IdentifierExpression",
+                                                                                    "Identifier": {
+                                                                                        "Class": "identifier",
+                                                                                        "Value": "i"
+                                                                                    }
+                                                                                },
+                                                                                "Operator": {
+                                                                                    "Class": "+",
+                                                                                    "Value": "+"
+                                                                                },
+                                                                                "Right": {
+                                                                                    "NodeType": "IdentifierExpression",
+                                                                                    "Identifier": {
+                                                                                        "Class": "identifier",
+                                                                                        "Value": "i"
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            "Operator": {
+                                                                                "Class": "+",
+                                                                                "Value": "+"
+                                                                            },
+                                                                            "Right": {
+                                                                                "NodeType": "LiteralExpression",
+                                                                                "Literal": {
+                                                                                    "Class": "literal",
+                                                                                    "Value": "3"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "NodeType": "AssignmentStatement",
+                                                                        "LHS": {
+                                                                            "NodeType": "IdentifierExpression",
+                                                                            "Identifier": {
+                                                                                "Class": "identifier",
+                                                                                "Value": "k"
+                                                                            }
+                                                                        },
+                                                                        "RHS": {
+                                                                            "NodeType": "BinaryExpression",
+                                                                            "Left": {
+                                                                                "NodeType": "IdentifierExpression",
+                                                                                "Identifier": {
+                                                                                    "Class": "identifier",
+                                                                                    "Value": "i"
+                                                                                }
+                                                                            },
+                                                                            "Operator": {
+                                                                                "Class": "+",
+                                                                                "Value": "+"
+                                                                            },
+                                                                            "Right": {
+                                                                                "NodeType": "IdentifierExpression",
+                                                                                "Identifier": {
+                                                                                    "Class": "identifier",
+                                                                                    "Value": "prime"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "NodeType": "ForStatement",
+                                                                        "Variable": {
+                                                                            "NodeType": "IdentifierExpression",
+                                                                            "Identifier": {
+                                                                                "Class": "identifier",
+                                                                                "Value": "i"
+                                                                            }
+                                                                        },
+                                                                        "Elements": [
+                                                                            {
+                                                                                "NodeType": "ForElement",
+                                                                                "Expression": {
+                                                                                    "NodeType": "IdentifierExpression",
+                                                                                    "Identifier": {
+                                                                                        "Class": "identifier",
+                                                                                        "Value": "i"
+                                                                                    }
+                                                                                },
+                                                                                "Step": {},
+                                                                                "Until": {},
+                                                                                "WhileCondition": {
+                                                                                    "NodeType": "BinaryExpression",
+                                                                                    "Left": {
+                                                                                        "NodeType": "IdentifierExpression",
+                                                                                        "Identifier": {
+                                                                                            "Class": "identifier",
+                                                                                            "Value": "k"
+                                                                                        }
+                                                                                    },
+                                                                                    "Operator": {
+                                                                                        "Class": "<=",
+                                                                                        "Value": "<="
+                                                                                    },
+                                                                                    "Right": {
+                                                                                        "NodeType": "LiteralExpression",
+                                                                                        "Literal": {
+                                                                                            "Class": "literal",
+                                                                                            "Value": "8190"
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        ],
+                                                                        "Body": {
+                                                                            "NodeType": "CompoundStatement",
+                                                                            "Compound": [
+                                                                                {
+                                                                                    "NodeType": "AssignmentStatement",
+                                                                                    "LHS": {
+                                                                                        "NodeType": "ArrayAccessExpression",
+                                                                                        "Array": {
+                                                                                            "Class": "identifier",
+                                                                                            "Value": "Flags"
+                                                                                        },
+                                                                                        "Indices": [
+                                                                                            {
+                                                                                                "NodeType": "IdentifierExpression",
+                                                                                                "Identifier": {
+                                                                                                    "Class": "identifier",
+                                                                                                    "Value": "k"
+                                                                                                }
+                                                                                            }
+                                                                                        ]
+                                                                                    },
+                                                                                    "RHS": {
+                                                                                        "NodeType": "LiteralExpression",
+                                                                                        "Literal": {
+                                                                                            "Class": "literal",
+                                                                                            "Value": "0"
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                {
+                                                                                    "NodeType": "AssignmentStatement",
+                                                                                    "LHS": {
+                                                                                        "NodeType": "IdentifierExpression",
+                                                                                        "Identifier": {
+                                                                                            "Class": "identifier",
+                                                                                            "Value": "k"
+                                                                                        }
+                                                                                    },
+                                                                                    "RHS": {
+                                                                                        "NodeType": "BinaryExpression",
+                                                                                        "Left": {
+                                                                                            "NodeType": "IdentifierExpression",
+                                                                                            "Identifier": {
+                                                                                                "Class": "identifier",
+                                                                                                "Value": "k"
+                                                                                            }
+                                                                                        },
+                                                                                        "Operator": {
+                                                                                            "Class": "+",
+                                                                                            "Value": "+"
+                                                                                        },
+                                                                                        "Right": {
+                                                                                            "NodeType": "IdentifierExpression",
+                                                                                            "Identifier": {
+                                                                                                "Class": "identifier",
+                                                                                                "Value": "prime"
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "NodeType": "AssignmentStatement",
+                                                                        "LHS": {
+                                                                            "NodeType": "IdentifierExpression",
+                                                                            "Identifier": {
+                                                                                "Class": "identifier",
+                                                                                "Value": "count"
+                                                                            }
+                                                                        },
+                                                                        "RHS": {
+                                                                            "NodeType": "BinaryExpression",
+                                                                            "Left": {
+                                                                                "NodeType": "IdentifierExpression",
+                                                                                "Identifier": {
+                                                                                    "Class": "identifier",
+                                                                                    "Value": "count"
+                                                                                }
+                                                                            },
+                                                                            "Operator": {
+                                                                                "Class": "+",
+                                                                                "Value": "+"
+                                                                            },
+                                                                            "Right": {
+                                                                                "NodeType": "LiteralExpression",
+                                                                                "Literal": {
+                                                                                    "Class": "literal",
+                                                                                    "Value": "1"
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "NodeType": "AnswerStatement",
+                                "Expression": {
+                                    "NodeType": "IdentifierExpression",
+                                    "Identifier": {
+                                        "Class": "identifier",
+                                        "Value": "count"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "startTime"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "clock"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "ans"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "sieve"
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "stopTime"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "clock"
+                    }
+                }
+            },
+            {
+                "NodeType": "IfStatement",
+                "Then": {
+                    "NodeType": "ProcedureCallStatement",
+                    "Expression": {
+                        "NodeType": "FunctionCallExpression",
+                        "Function": {
+                            "Class": "identifier",
+                            "Value": "failed"
+                        },
+                        "Arguments": [
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "string literal",
+                                    "Value": "Result wrong"
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
