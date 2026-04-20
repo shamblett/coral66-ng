@@ -7,7 +7,7 @@ processing chain. Each generated file must conform to the following specificatio
   must be stropped or unstropped
 - The first statement in the source file must be a valid PROGRAM or SEGMENT declaration, e.g ```PROGRAM test1```
 - If a communicator is generated it must be a COMMON communicator in between the PROGRAM or SEGMENT declaration and the
-  first BEGIN,
+  first BEGIN. ABSOLUTE, EXTERNAL and LIBRARY communicators are not yet supported and should not be generated.
 - Identifiers should be lower camel case
 - Comments whether single line, multi line or end of line can be used anywhere in the source file after the initial
   PROGRAM or SEGMENT declaration. 
