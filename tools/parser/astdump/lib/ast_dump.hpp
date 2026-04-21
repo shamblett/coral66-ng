@@ -28,6 +28,9 @@ public:
     // Main dump method
     rapidjson::Value dump(const Syntax::Program& program);
 
+    // Dump to a string
+    static std::string dumpToString(const Syntax::Program& program);
+
 private:
     // Node Dispatcher
     rapidjson::Value dump(const Syntax::Node* node);

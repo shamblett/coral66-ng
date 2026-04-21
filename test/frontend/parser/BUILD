@@ -28,6 +28,7 @@ cc_library(
         "//lib/support",
         "//test/common",
         "//test/vendor/catch2v3",
+        "//tools/parser/astdump/lib:astdump",
     ],
 )
 

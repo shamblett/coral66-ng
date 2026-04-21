@@ -8,6 +8,7 @@
 
 #include <iostream>
 
+#include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
 namespace coral66::tools
@@ -43,6 +44,29 @@ rapidjson::Value AstDump::dump(const Syntax::Program& program)
     obj.AddMember("Block", dump(program.getBlock()), m_alloc);
 
     return obj;
+}
+
+// String dump
+std::string AstDump::dumpToString(const Syntax::Program& program)
+{
+    // Create the RapidJSON Document
+    rapidjson::Document doc;
+    doc.SetObject();
+
+    // Instantiate our dumper, providing the document's allocator
+    AstDump dump(doc.GetAllocator());
+
+    // Dump the AST into the RapidJSON document root
+    rapidjson::Value root = dump.dump(program);
+    doc.Swap(root);
+
+    rapidjson::StringBuffer buffer;
+
+    // Use PrettyWriter instead of Writer for human-readable output
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    doc.Accept(writer);
+
+    return buffer.GetString();
 }
 
 // Block

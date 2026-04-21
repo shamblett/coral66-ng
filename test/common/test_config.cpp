@@ -54,3 +54,20 @@ std::string coral66::Tests::getTestDataPath(const std::string& relativePath, con
     }
     return relativePath;
 }
+
+std::string coral66::Tests::readFile(std::string& path)
+{
+    coral66::fs::ifstream file(path, std::ios_base::in | std::ios_base::ate);
+    if (!file.is_open())
+    {
+        return "";
+    }
+
+    std::streamsize const size = file.tellg();
+    file.seekg(0);
+    std::string input(size, '\0');
+    file.read(input.data(), size);
+    file.close();
+
+    return input;
+}
