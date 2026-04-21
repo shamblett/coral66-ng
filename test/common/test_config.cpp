@@ -20,7 +20,7 @@ FileScope::~FileScope()
 EndTest coral66::Tests::enableParallelization()
 {
     const auto id = llvm::sys::Process::getProcessId();
-    const auto path = coral66::fs::current_path() / std::to_string(id);
+    const auto path = fs::current_path() / std::to_string(id);
     coral66::fs::create_directory(path);
     coral66::fs::current_path(path);
     return EndTest{path};
@@ -57,7 +57,7 @@ std::string coral66::Tests::getTestDataPath(const std::string& relativePath, con
 
 std::string coral66::Tests::readFile(std::string& path)
 {
-    coral66::fs::ifstream file(path, std::ios_base::in | std::ios_base::ate);
+    fs::ifstream file(path, std::ios_base::in | std::ios_base::ate);
     if (!file.is_open())
     {
         return "";

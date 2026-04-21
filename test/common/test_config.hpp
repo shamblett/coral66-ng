@@ -228,8 +228,6 @@ public:
 private:
     static std::string_view trimEnd(std::string_view text)
     {
-        // ASCII should hopefully suffice for our tests... Otherwise, I will have to properly parse it to UTF32
-        // and use one of the whitespace sets of the Lexer to match whitespace characters
         const auto end = std::find_if(std::make_reverse_iterator(text.end()), std::make_reverse_iterator(text.begin()),
                                       [](char c) { return c != ' ' && c != '\t'; })
                              .base();
@@ -243,7 +241,7 @@ struct FileScope
 {
     fs::path m_path;
 
-    explicit FileScope(coral66::fs::path path) : m_path(std::move(path)) {}
+    explicit FileScope(fs::path path) : m_path(std::move(path)) {}
 
     ~FileScope();
 
