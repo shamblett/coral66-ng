@@ -60,7 +60,7 @@ struct Arg
 
 constexpr std::optional<Arg> nextArg(std::string_view& text)
 {
-    auto result = text.find('%');
+    const auto result = text.find('%');
     if (result == std::string_view::npos)
     {
         return {};
@@ -73,7 +73,7 @@ constexpr std::optional<Arg> nextArg(std::string_view& text)
     auto modifier = view;
     modifier.remove_prefix(1);
     modifier.remove_suffix(1);
-    auto index = static_cast<std::size_t>(text[modifierEnd] - '0');
+    const auto index = static_cast<std::size_t>(text[modifierEnd] - '0');
     text.remove_prefix(modifierEnd + 1);
     return Arg{modifier, index, view};
 }
@@ -437,8 +437,6 @@ private:
     template <std::size_t... ints>
     constexpr static std::array<Modifiers, sizeof...(Mods)> getModifiers(std::index_sequence<ints...>);
 
-
-
     template <class T>
     constexpr static bool locationConstraintCheck()
     {
@@ -500,7 +498,8 @@ private:
                 return false;
             }
         }
-        else if constexpr (detail::IsIterable<U> && !std::is_same_v<std::string, U> && !std::is_same_v<std::string_view, U>)
+        else if constexpr (detail::IsIterable<U> && !std::is_same_v<std::string, U>
+                           && !std::is_same_v<std::string_view, U>)
         {
             using ValueType = std::iterator_traits<decltype(std::begin(std::declval<U>()))>::value_type;
             if constexpr (SmartPtr<ValueType>)
@@ -518,7 +517,7 @@ private:
         }
     }
 
-    template <std::size_t argumentIndex, std::underlying_type_t<Constraint> constraint, class T>
+    template <std::underlying_type_t<Constraint> constraint, class T>
     struct ConstraintCheck
     {
         static_assert(!(constraint & StringConstraint) || detail::HasStringConverters<std::decay_t<T>>,
@@ -536,7 +535,7 @@ private:
     template <auto& array, std::size_t i, class Curr, class... Args>
     constexpr static void checkConstraints()
     {
-        [[maybe_unused]] constexpr auto v = ConstraintCheck<i, array[i], Curr>{};
+        [[maybe_unused]] constexpr auto v = ConstraintCheck<array[i], Curr>{};
         checkConstraints<array, i + 1, Args...>();
     }
 
@@ -566,8 +565,7 @@ private:
     }
 
     template <std::size_t i1, std::size_t i2, class Tuple>
-    constexpr static void convertCustomModifier(std::array<detail::Diagnostic::DiagnosticBase::Argument, N>& result,
-                                                Tuple& args)
+    constexpr static void convertCustomModifier(std::array<Argument, N>& result, Tuple& args)
     {
         constexpr std::tuple tuple = std::apply(
             []<typename... T0>([[maybe_unused]] T0... stringIndices)
@@ -752,19 +750,19 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args, std::inde
                           "If you are mean and want to circumvent this error, convert to std::string_view");
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::LocationConstraint))
             {
-                result[IntegerTy::value].range = ::coral66::diag::getPointRange(std::get<IntegerTy::value>(args));
+                result[IntegerTy::value].range = diag::getPointRange(std::get<IntegerTy::value>(args));
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::StringConstraint))
             {
-                result[IntegerTy::value].inFormatText = ::coral66::diag::StringConverter<ArgTy>::inFormat(
-                    std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
+                result[IntegerTy::value].inFormatText =
+                    diag::StringConverter<ArgTy>::inFormat(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
                 result[IntegerTy::value].inArgText =
                     diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::TypeConstraint))
             {
                 using Type = std::decay_t<decltype(std::declval<ArgTy>().getType())>;
-                result[IntegerTy::value].inArgText = ::coral66::diag::StringConverter<Type>::inArg(
+                result[IntegerTy::value].inArgText = diag::StringConverter<Type>::inArg(
                     std::get<IntegerTy::value>(args).getType(), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::CustomConstraint))
@@ -794,19 +792,19 @@ constexpr auto diagnostic<N, format, Mods...>::getModifiers(std::index_sequence<
 #endif
             if constexpr (detail::Diagnostic::IsUnderline<T>{})
             {
-                result[i] = Modifiers{DiagnosticBase::Underline{T::getIndex(), T::getCharacter(), T::isContinuous()}};
+                result[i] = Modifiers{Underline{T::getIndex(), T::getCharacter(), T::isContinuous()}};
             }
             else if constexpr (detail::Diagnostic::IsAnnotate<T>{})
             {
-                result[i] = Modifiers{DiagnosticBase::Annotate{T::getIndex(), T::getText()}};
+                result[i] = Modifiers{Annotate{T::getIndex(), T::getText()}};
             }
             else if constexpr (detail::Diagnostic::IsAnnotateExpr<T>{})
             {
-                result[i] = Modifiers{DiagnosticBase::Annotate{T::getIndex(), T::getIndex()}};
+                result[i] = Modifiers{Annotate{T::getIndex(), T::getIndex()}};
             }
             else if constexpr (detail::Diagnostic::IsInsertAfter<T>{})
             {
-                result[i] = Modifiers{DiagnosticBase::InsertAfter{T::getIndex(), T::getText()}};
+                result[i] = Modifiers{InsertAfter{T::getIndex(), T::getText()}};
             }
             else
             {
