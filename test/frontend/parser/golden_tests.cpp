@@ -4,7 +4,6 @@
  * Date   : 21/04/2026
  */
 
-
 #include "common.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
@@ -42,18 +41,138 @@ TEST_CASE("Examples", "[Parser][Golden]")
         CHECK(sourceAst == ast);
     }
 
-    SECTION("Sieve") {}
+    SECTION("Sieve")
+    {
+        auto sourcePath = getTestDataPath("golden/sieve/sieve.cor", "frontend/parser");
+        auto source = readFile(sourcePath);
+        REQUIRE(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("golden/sieve/sieve_ast.json", "frontend/parser");
+        auto ast = readFile(astPath);
+        REQUIRE(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
 }
 
 TEST_CASE("Generated", "[Parser][Golden]")
 {
-    SECTION("G1") {}
+    SECTION("G1")
+    {
+        auto sourcePath = getTestDataPath("golden/generated/g1.cor", "frontend/parser");
+        auto source = readFile(sourcePath);
+        REQUIRE(!source.empty());
 
-    SECTION("G2") {}
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
 
-    SECTION("G3") {}
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("golden/generated/g1_ast.json", "frontend/parser");
+        auto ast = readFile(astPath);
+        REQUIRE(!ast.empty());
 
-    SECTION("G4") {}
+        CHECK(sourceAst == ast);
+    }
 
-    SECTION("G5") {}
+    SECTION("G2")
+    {
+        auto sourcePath = getTestDataPath("golden/generated/g2.cor", "frontend/parser");
+        auto source = readFile(sourcePath);
+        REQUIRE(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("golden/generated/g2_ast.json", "frontend/parser");
+        auto ast = readFile(astPath);
+        REQUIRE(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
+
+    SECTION("G3")
+    {
+        auto sourcePath = getTestDataPath("golden/generated/g3.cor", "frontend/parser");
+        auto source = readFile(sourcePath);
+        REQUIRE(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("golden/generated/g3_ast.json", "frontend/parser");
+        auto ast = readFile(astPath);
+        REQUIRE(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
+
+    SECTION("G4")
+    {
+        auto sourcePath = getTestDataPath("golden/generated/g4.cor", "frontend/parser");
+        auto source = readFile(sourcePath);
+        REQUIRE(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("golden/generated/g4_ast.json", "frontend/parser");
+        auto ast = readFile(astPath);
+        REQUIRE(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
+
+    SECTION("G5")
+    {
+        auto sourcePath = getTestDataPath("golden/generated/g5.cor", "frontend/parser");
+        auto source = readFile(sourcePath);
+        REQUIRE(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("golden/generated/g5_ast.json", "frontend/parser");
+        auto ast = readFile(astPath);
+        REQUIRE(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
 }
