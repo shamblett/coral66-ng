@@ -32,6 +32,11 @@ Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator 
 {
 }
 
+bool Program::hasBlock() const
+{
+    return m_block != nullptr;
+}
+
 const Block& Program::getBlock() const
 {
     return *m_block;
@@ -359,6 +364,11 @@ BlockStatement::BlockStatement(const lexer::CTokenIterator begin, const lexer::C
                                std::unique_ptr<Block>&& block)
     : Statement(begin, end), m_block(std::move(block))
 {
+}
+
+bool BlockStatement::hasBlock() const
+{
+    return m_block != nullptr;
 }
 
 const Block& BlockStatement::getBlock() const

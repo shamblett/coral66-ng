@@ -49,6 +49,7 @@ public:
     Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
             std::unique_ptr<Communicator>&& communicator, lexer::CTokenIterator name, bool isSegment);
     [[nodiscard]] const Block& getBlock() const;
+    [[nodiscard]] bool hasBlock() const;
     [[nodiscard]] const Communicator* getCommunicator() const;
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] bool getIsSegment() const;
@@ -310,6 +311,7 @@ class BlockStatement final : public Statement
 public:
     BlockStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block);
     [[nodiscard]] const Block& getBlock() const;
+    [[nodiscard]] bool hasBlock() const;
 };
 
 class CompoundStatement final : public Statement

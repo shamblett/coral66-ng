@@ -7,7 +7,9 @@
 #include "common.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
+#include <iostream>
 #include "tools/parser/astdump/lib/ast_dump.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
 
 using namespace coral66;
 using namespace coral66::Syntax;
@@ -28,6 +30,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
@@ -50,10 +53,12 @@ TEST_CASE("Examples", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
         auto parsed = parser::parseProgram(cTokens, &ss);
+        
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/sieve/sieve_ast.json", "frontend/parser");
@@ -75,6 +80,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
@@ -97,6 +103,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
@@ -119,6 +126,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
@@ -141,6 +149,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
@@ -163,6 +172,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
         auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();

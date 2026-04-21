@@ -22,7 +22,11 @@ rapidjson::Value AstDump::dump(const Syntax::Statement* statement)
     else if (auto* blockStatement = dynamic_cast<const Syntax::BlockStatement*>(statement))
     {
         obj.AddMember("NodeType", "BlockStatement", m_alloc);
-        obj.AddMember("Block", dump(blockStatement->getBlock()), m_alloc);
+        if (blockStatement->hasBlock()) {
+            obj.AddMember("Block", dump(blockStatement->getBlock()), m_alloc);
+        } else {
+            obj.AddMember("Block", rapidjson::Value(rapidjson::kNullType), m_alloc);
+        }
     }
     else if (auto* compoundStatement = dynamic_cast<const Syntax::CompoundStatement*>(statement))
     {

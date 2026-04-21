@@ -41,7 +41,11 @@ rapidjson::Value AstDump::dump(const Syntax::Program& program)
     }
 
     // Dump Block
-    obj.AddMember("Block", dump(program.getBlock()), m_alloc);
+    if (program.hasBlock()) {
+        obj.AddMember("Block", dump(program.getBlock()), m_alloc);
+    } else {
+        obj.AddMember("Block", rapidjson::Value(rapidjson::kNullType), m_alloc);
+    }
 
     return obj;
 }
