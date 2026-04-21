@@ -1,4 +1,4 @@
-1. test/frontend/parser/data/golden/generated/g1.cor:
+1. g1.cor:
     - Uses unstropped keywords.
     - Starts with a PROGRAM declaration.
     - Includes a COMMON communicator with variables and arrays.
@@ -8,7 +8,7 @@
       END ...; comments.
 
 
-2. test/frontend/parser/data/golden/generated/g2.cor:
+2. g2.cor:
     - Uses stropped keywords ('PROGRAM', 'COMMON', 'FOR', etc.).
     - Starts with a 'PROGRAM' declaration.
     - Evaluates iterating constructs, specifically using a 'FOR ... STEP ... UNTIL ... DO' statement to assign
@@ -16,7 +16,7 @@
       inside a common block.
 
 
-3. test/frontend/parser/data/golden/generated/g3.cor:
+3. g3.cor:
     - Uses unstropped keywords.
     - Starts with a SEGMENT declaration instead of a PROGRAM declaration.
     - Verifies the SWITCH declaration alongside jump-table-driven control-flow via GOTO, demonstrating jumping into
@@ -24,7 +24,7 @@
       labels and assignment statements.
 
 
-4. test/frontend/parser/data/golden/generated/g4.cor
+4. g4.cor
    This file exercises table and overlay data structures, procedures, logic operators, bitwise operators, loops, and literal references:
     - TABLE, PRESET, BIT, UNSIGNED (Used to define and pre-fill structured tables).
     - OVERLAY, WITH (Used to overlap memory).
@@ -36,8 +36,8 @@
     - LITERAL (Used for direct character-code resolution).
 
 
-5. test/frontend/parser/data/golden/generated/g5.cor
-   This file specifically targets edge features like inline system code and the Coral 66 macro preprocessor:
+5. g5.cor
+  This file specifically targets edge features like inline system code and the Coral 66 macro preprocessor:
 - DEFINE (Preprocessor keyword to define a macro string).
 - DELETE (Preprocessor keyword to erase a macro from memory).
 - CODE (To verify the CODE BEGIN "..." END inline code assembly/escape).

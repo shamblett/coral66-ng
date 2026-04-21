@@ -12,6 +12,7 @@ cc_library(
         "declaration_tests.cpp",
         "error_tests.cpp",
         "expression_tests.cpp",
+        "golden_tests.cpp",
         "place_reference_tests.cpp",
         "procedure_tests.cpp",
         "program_tests.cpp",
