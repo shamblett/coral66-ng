@@ -226,13 +226,3 @@ struct ParsedProgram
     }
 };
 
-inline Program parseSourceFile(std::string& source)
-{
-    std::string string;
-    llvm::raw_string_ostream ss(string);
-    auto ppTokens = lexer::tokenize(source, &ss);
-    auto cTokens = lexer::toCTokens(ppTokens, &ss);
-    auto context = std::make_unique<parser::Context>(cTokens, &ss);
-    parser::DiagnosticCollector::clearDiagnostics();
-    return parser::parseProgram(cTokens, &ss);
-}

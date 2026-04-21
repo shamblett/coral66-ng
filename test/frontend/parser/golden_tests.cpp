@@ -4,6 +4,7 @@
  * Date   : 21/04/2026
  */
 
+
 #include "common.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
@@ -21,12 +22,20 @@ TEST_CASE("Examples", "[Parser][Golden]")
 {
     SECTION("Ackermann")
     {
-        auto sourcePath = getTestDataPath("parser", "ackermann/ackermann.cor");
+        auto sourcePath = getTestDataPath("golden/ackermann/ackerman.cor", "frontend/parser");
         auto source = readFile(sourcePath);
         REQUIRE(!source.empty());
-        auto parsed = parseSourceFile(source);
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("parser", "ackermann/ackermann_ast.json");
+        auto astPath = getTestDataPath("golden/ackermann/ackerman_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
         REQUIRE(!ast.empty());
 

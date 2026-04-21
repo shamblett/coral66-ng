@@ -5,6 +5,15 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
+filegroup(
+    name = "testdata",
+    srcs = glob([
+        "data/golden/ackermann/*",
+        "data/golden/sieve/*",
+        "data/golden/generated/*",
+    ]),
+)
+
 cc_library(
     name = "parsertest",
     srcs = [
@@ -20,6 +29,9 @@ cc_library(
     ],
     hdrs = [
         "common.hpp",
+    ],
+    data = [
+        "//test/frontend/parser:testdata",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
