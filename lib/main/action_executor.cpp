@@ -102,6 +102,11 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     }
     if (cl::ParseOnly)
     {
+        if (cl::Time)
+        {
+            auto result = ctrack::result_as_string();
+            *m_reporter << "\n" << result << "\n";
+        }
         return std::optional<fs::path>{std::in_place};
     }
 
@@ -112,6 +117,11 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     }
     if (cl::SyntaxOnly)
     {
+        if (cl::Time)
+        {
+            auto result = ctrack::result_as_string();
+            *m_reporter << "\n" << result << "\n";
+        }
         return std::optional<fs::path>{std::in_place};
     }
 

@@ -27,7 +27,7 @@
  * -g3                 Generated extended debugging info
  * -syntax-only        Stop after semantic analysis and produce no output file
  * -parse-only         Stop after parsing and produce no output file
- * -time               Output time taken for each stage
+ * -time               Output time taken for each stage produced by CTrack
  * -noact              Check command line only, take no further action
  */
 
