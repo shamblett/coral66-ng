@@ -54,27 +54,6 @@ enum class ValueCategory : std::uint8_t
     Rvalue
 };
 
-enum class Linkage : std::uint8_t
-{
-    Internal,
-    External,
-    None
-};
-
-enum class Lifetime : std::uint8_t
-{
-    Automatic,
-    Static,
-    Register
-};
-
-enum class InlineKind : std::uint8_t
-{
-    InlineDefinition,
-    Inline,
-    None,
-};
-
 class ScopePoint
 {
     std::size_t m_scopeId;

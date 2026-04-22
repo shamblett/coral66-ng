@@ -10,11 +10,6 @@ cc_library(
         "program.cpp",
         "program_interface.cpp",
         "semantic_analysis.cpp",
-        "semantic_analysis_builtins.cpp",
-        "semantic_analysis_declarations.cpp",
-        "semantic_analysis_expressions.cpp",
-        "semantic_analysis_statements.cpp",
-        "semantic_analysis_types.cpp",
         "semantics.cpp",
     ],
     hdrs = [
