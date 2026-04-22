@@ -6,6 +6,7 @@
 
 #include "parser.hpp"
 
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "parser_support.hpp"
@@ -42,6 +43,7 @@ std::size_t Context::getErrorCount() const
 
 Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter, bool* errors)
 {
+    CTRACK_NAME("Parse");
     Context context(sourceObject, reporter);
     auto begin = sourceObject.data().data();
     auto end = sourceObject.data().data() + sourceObject.data().size();

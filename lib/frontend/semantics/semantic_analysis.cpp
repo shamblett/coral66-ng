@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <ranges>
 
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 
 namespace coral66::Semantics
@@ -625,6 +626,7 @@ void SemanticAnalysis::visit(const Syntax::PartWordExpression& node)
 
 Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
 {
+    CTRACK_NAME("Semantics");
     SemanticAnalysis analysis(cTokens, reporter, errors);
     analysis.visit(parseTree);
 

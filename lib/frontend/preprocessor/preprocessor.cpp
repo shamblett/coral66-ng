@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <vector>
 
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/notes.hpp"
 #include "lib/frontend/lexer/lexer_support.hpp"
@@ -351,6 +352,7 @@ void coral66::pp::Preprocessor::visit(const lexer::PPTokenIterator& name)
 coral66::PPSourceObject coral66::pp::preprocess(PPSourceObject&& sourceObject, llvm::raw_ostream* reporter,
                                                 bool* errorsOccurred) noexcept
 {
+    CTRACK_NAME("Preprocess");
     preprocessor::DiagnosticCollector::clearDiagnostics();
     Preprocessor preprocessor(reporter);
     preprocessor.process(std::move(sourceObject));

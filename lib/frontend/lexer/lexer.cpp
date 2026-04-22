@@ -15,6 +15,7 @@
 #include <numeric>
 #include <optional>
 
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lexer_support.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
@@ -26,6 +27,7 @@ using namespace coral66::detail;
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
                                                  std::string_view const sourcePath, bool clearDiagnostics)
 {
+    CTRACK_NAME("Lexer");
     if (clearDiagnostics)
     {
         DiagnosticCollector::clearDiagnostics();

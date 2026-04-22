@@ -26,6 +26,7 @@ cc_library(
         "triple.hpp",
         "utilities.hpp",
         "value_reset.hpp",
+        "vendor/ctrack/include/ctrack.hpp",
         "vendor/tsl/ordered_hash.h",
         "vendor/tsl/ordered_map.h",
     ],

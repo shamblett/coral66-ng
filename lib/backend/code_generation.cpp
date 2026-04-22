@@ -7,7 +7,7 @@
 #include "code_generation.hpp"
 
 #include <llvm/MC/TargetRegistry.h>
-
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "code_generator.hpp"
 
 namespace coral66::CGLLVM
@@ -16,6 +16,7 @@ namespace coral66::CGLLVM
 std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const Semantics::Program& program,
                                                   const Options& options)
 {
+    CTRACK_NAME("Generate LLVM");
     // Minimal SourceInterface stub or pass nullptr if not needed by basic codegen yet
     // The previous code_generator constructor took SourceInterface.
     // We can pass a dummy one or update Codegen.hpp to take SourceInterface?

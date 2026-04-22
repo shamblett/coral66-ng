@@ -13,7 +13,6 @@
 #include <llvm/IRPrinter/IRPrintingPasses.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
-#include <llvm/Support/Timer.h>
 
 #include "command_line_arguments.hpp"
 #include "lib/backend/code_generation.hpp"
@@ -23,6 +22,7 @@
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/support/filesystem.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 
 int coral66::ActionExecutor::execute(const Action action, const std::string& file)
 {
@@ -49,11 +49,7 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
 
 std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Action action, fs::path& sourceFile) const
 {
-    std::optional<llvm::TimerGroup> timer;
-    if (cl::Time)
-    {
-        timer.emplace("Compilation", "Time it took for the whole compilation of " + sourceFile.string());
-    }
+    CTRACK_NAME("Compile");
     fs::ifstream file(sourceFile, std::ios_base::binary | std::ios_base::ate | std::ios_base::in);
     if (!file.is_open())
     {
@@ -70,29 +66,11 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     sourceFile = fs::absolute(sourceFile);
     sourceFile = sourceFile.lexically_normal();
 
-    std::optional<llvm::TimeRegion> PPTokenTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> PPTokenTimer;
-        PPTokenTimer.emplace("Lexing preprocessor tokens",
-                             "Time it took to lex all preprocessor tokens in " + sourceFile.string(), *timer);
-        PPTokenTimeRegion.emplace(*PPTokenTimer);
-    }
-
     bool errors = false;
     auto PPTokens = lexer::tokenize(std::move(input), m_reporter, &errors, sourceFile.string());
     if (errors)
     {
         return {};
-    }
-    PPTokenTimeRegion.reset();
-
-    std::optional<llvm::TimeRegion> ppTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> ppTimer;
-        ppTimer.emplace("Preprocessor", "Time it took to preprocess " + sourceFile.string(), *timer);
-        ppTimeRegion.emplace(*ppTimer);
     }
 
     PPTokens = pp::preprocess(std::move(PPTokens), m_reporter, &errors);
@@ -100,7 +78,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     {
         return {};
     }
-    ppTimeRegion.reset();
+
     if (action == Action::Preprocess)
     {
         auto reconstruction =
@@ -111,27 +89,10 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         return fs::path{};
     }
 
-    std::optional<llvm::TimeRegion> cTokenTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> cTokenTimer;
-        cTokenTimer.emplace("C Token", "Time it took turn PP Tokens into C Tokens " + sourceFile.string(), *timer);
-        cTokenTimeRegion.emplace(*cTokenTimer);
-    }
-
     auto cTokens = coral66::lexer::toCTokens(std::move(PPTokens), m_reporter, &errors);
     if (errors)
     {
         return {};
-    }
-    cTokenTimeRegion.reset();
-
-    std::optional<llvm::TimeRegion> parserTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> parserTimer;
-        parserTimer.emplace("Parser", "Time it took to parse " + sourceFile.string(), *timer);
-        parserTimeRegion.emplace(*parserTimer);
     }
 
     Syntax::Program tree = parser::parseProgram(cTokens, m_reporter, &errors);
@@ -143,15 +104,6 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     {
         return std::optional<fs::path>{std::in_place};
     }
-    parserTimeRegion.reset();
-
-    std::optional<llvm::TimeRegion> semanticsTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> semanticsTimer;
-        semanticsTimer.emplace("Semantics", "Time it took to semantically analyze " + sourceFile.string(), *timer);
-        semanticsTimeRegion.emplace(*semanticsTimer);
-    }
 
     auto program = Semantics::analyse(tree, std::move(cTokens), m_reporter, &errors);
     if (errors)
@@ -161,15 +113,6 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     if (cl::SyntaxOnly)
     {
         return std::optional<fs::path>{std::in_place};
-    }
-    semanticsTimeRegion.reset();
-
-    std::optional<llvm::TimeRegion> codegenTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> codegenTimer;
-        codegenTimer.emplace("Codegen", "Time it took to generate LLVM IR for " + sourceFile.string(), *timer);
-        codegenTimeRegion.emplace(*codegenTimer);
     }
 
     CGLLVM::Options codegenOptions;
@@ -207,7 +150,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     }
 
     auto targetMachine = coral66::CGLLVM::generateLLVM(module, program, codegenOptions);
-    codegenTimeRegion.reset();
+
     if (llvm::verifyModule(module, &llvm::errs()))
     {
         llvm::errs().flush();
@@ -255,14 +198,6 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         return {};
     }
 
-    std::optional<llvm::TimeRegion> compileTimeRegion;
-    if (timer)
-    {
-        std::optional<llvm::Timer> compileTimer;
-        compileTimer.emplace("Compile", "Time it took for LLVM to generate native object code " + sourceFile.string(),
-                             *timer);
-        compileTimeRegion.emplace(*compileTimer);
-    }
     llvm::PassBuilder passBuilder(targetMachine.get());
     llvm::LoopAnalysisManager loopAnalysisManager;
     llvm::FunctionAnalysisManager functionAnalysisManager;
@@ -276,6 +211,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     passBuilder.crossRegisterProxies(loopAnalysisManager, functionAnalysisManager, cgsccAnalysisManager,
                                      moduleAnalysisManager);
 
+    CTRACK_NAME("Pass Management");
     llvm::ModulePassManager modulePassManager;
     if (codegenOptions.ol == llvm::CodeGenOptLevel::None)
     {
@@ -319,8 +255,12 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         codegenPass.run(module);
     }
 
-    compileTimeRegion.reset();
     os.flush();
 
+    if (cl::Time)
+    {
+        auto result = ctrack::result_as_string();
+        *m_reporter << "\n" << result << "\n";
+    }
     return fs::path(outputFile);
 }
