@@ -30,7 +30,7 @@ void SymbolTable::exitScope()
     }
 }
 
-bool SymbolTable::insert(std::string_view name, const Usable* symbol)
+bool SymbolTable::insert(const std::string_view name, const Usable* symbol)
 {
     if (m_scopes.empty())
         return false;
@@ -45,7 +45,7 @@ bool SymbolTable::insert(std::string_view name, const Usable* symbol)
     return true;
 }
 
-const Usable* SymbolTable::lookup(std::string_view name) const
+const Usable* SymbolTable::lookup(const std::string_view name) const
 {
     for (const auto& m_scope : std::views::reverse(m_scopes))
     {
@@ -57,7 +57,7 @@ const Usable* SymbolTable::lookup(std::string_view name) const
     return nullptr;
 }
 
-const Usable* SymbolTable::lookupInCurrentScope(std::string_view name) const
+const Usable* SymbolTable::lookupInCurrentScope(const std::string_view name) const
 {
     if (m_scopes.empty())
         return nullptr;
@@ -70,7 +70,7 @@ const Usable* SymbolTable::lookupInCurrentScope(std::string_view name) const
     return nullptr;
 }
 
-const int SymbolTable::scopeCount() const
+int SymbolTable::scopeCount() const
 {
     return m_scopes.size();
 }

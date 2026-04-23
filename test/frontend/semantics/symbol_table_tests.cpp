@@ -45,23 +45,80 @@ TEST_CASE("Insert", "[Semantics][SymbolTable]")
         CToken nameToken(TokenType::Identifier, 0, 0, 0, 0, std::string{"myVar"});
         CTokenIterator cti = &nameToken;
 
-        VariableDeclaration decl(cti, UntypedType{});
+        VariableDeclaration declaration(cti, UntypedType{});
 
         auto st = SymbolTable();
-        CHECK(st.insert("myVar", &decl));
-        CHECK(st.lookup("myVar") == &decl);
+        CHECK(st.insert("myVar", &declaration));
+        CHECK(st.lookup("myVar") == &declaration);
     }
- SECTION("Current Scope  - Already Present")
+    SECTION("Current Scope  - Already Present")
     {
         CToken nameToken(TokenType::Identifier, 0, 0, 0, 0, std::string{"myVar"});
         CTokenIterator cti = &nameToken;
 
-        VariableDeclaration decl(cti, UntypedType{});
+        VariableDeclaration declaration(cti, UntypedType{});
 
         auto st = SymbolTable();
-        CHECK(st.insert("myVar", &decl));
-        CHECK(st.lookup("myVar") == &decl);
+        CHECK(st.insert("myVar", &declaration));
+        CHECK(st.lookup("myVar") == &declaration);
 
-        CHECK_FALSE(st.insert("myVar", &decl));
+        CHECK_FALSE(st.insert("myVar", &declaration));
+    }
+}
+
+TEST_CASE("Look Up", "[Semantics][SymbolTable]")
+{
+    SECTION("Current Scope")
+    {
+        auto st = SymbolTable();
+
+        CToken nameToken(TokenType::Identifier, 0, 0, 0, 0, std::string{"myVar"});
+        CTokenIterator cti = &nameToken;
+        VariableDeclaration declaration(cti, UntypedType{});
+
+        CHECK(st.insert("myVar", &declaration));
+        CHECK(st.lookupInCurrentScope("myVar") == &declaration);
+
+        st.enterScope();
+        CHECK_FALSE(st.lookupInCurrentScope("myVar") == &declaration);
+    }
+
+    SECTION("Current Scope - Not Found")
+    {
+        auto st = SymbolTable();
+
+        CToken nameToken(TokenType::Identifier, 0, 0, 0, 0, std::string{"myVar"});
+        CTokenIterator cti = &nameToken;
+        VariableDeclaration declaration(cti, UntypedType{});
+
+        CHECK(st.insert("myVar", &declaration));
+        CHECK(st.lookupInCurrentScope("myVar1") == nullptr);
+    }
+
+    SECTION("All Scopes")
+    {
+        auto st = SymbolTable();
+
+        CToken nameToken(TokenType::Identifier, 0, 0, 0, 0, std::string{"myVar"});
+        CTokenIterator cti = &nameToken;
+        VariableDeclaration declaration(cti, UntypedType{});
+
+        CHECK(st.insert("myVar", &declaration));
+        CHECK(st.lookup("myVar") == &declaration);
+
+        st.enterScope();
+        CHECK(st.lookup("myVar") == &declaration);
+    }
+
+    SECTION("All Scopes - Not Found")
+    {
+        auto st = SymbolTable();
+
+        CToken nameToken(TokenType::Identifier, 0, 0, 0, 0, std::string{"myVar"});
+        CTokenIterator cti = &nameToken;
+        VariableDeclaration declaration(cti, UntypedType{});
+
+        CHECK(st.insert("myVar", &declaration));
+        CHECK(st.lookup("myVar1") == nullptr);
     }
 }
