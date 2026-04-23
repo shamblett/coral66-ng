@@ -47,7 +47,7 @@ bool SymbolTable::insert(std::string_view name, const Usable* symbol)
 
 const Usable* SymbolTable::lookup(std::string_view name) const
 {
-    for (const auto & m_scope : std::views::reverse(m_scopes))
+    for (const auto& m_scope : std::views::reverse(m_scopes))
     {
         if (auto found = m_scope.find(name); found != m_scope.end())
         {
@@ -68,6 +68,11 @@ const Usable* SymbolTable::lookupInCurrentScope(std::string_view name) const
         return found->second;
     }
     return nullptr;
+}
+
+const int SymbolTable::scopeCount() const
+{
+    return m_scopes.size();
 }
 
 } // namespace coral66::Semantics
