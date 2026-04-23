@@ -9,8 +9,8 @@
 #include <algorithm>
 #include <ranges>
 
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 
 namespace coral66::Semantics
 {
@@ -267,7 +267,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
                 std::string name = std::get<std::string>(id->getValue());
                 if (auto* decl = m_symbolTable[name]) // Assuming found
                 {
-                    // decl is Useable*.
+                    // decl is Usable*.
                     if (auto* v = decl->tryAs<VariableDeclaration>())
                     {
                         paramTypes.push_back(ProcedureType::Parameter{&v->getType(), name, false});
@@ -407,7 +407,7 @@ void SemanticAnalysis::visit(const Syntax::BlockStatement& node)
     m_currentBlockStatements = std::move(prevStmts);
 
     m_currentBlockStatements.push_back(
-        makeIntr<BlockStatement>(ScopePoint{0}, std::vector<coral66::IntrVarPtr<Useable>>{}, std::move(blockStmts)));
+        makeIntr<BlockStatement>(ScopePoint{0}, std::vector<coral66::IntrVarPtr<Usable>>{}, std::move(blockStmts)));
 }
 
 void SemanticAnalysis::visit(const Syntax::CompoundStatement& node)

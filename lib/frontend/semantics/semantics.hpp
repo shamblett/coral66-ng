@@ -214,22 +214,22 @@ public:
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(Constant)
 };
 
-class Useable;
+class Usable;
 
 class DeclarationRead final : public ExpressionBase
 {
-    const Useable* CORAL66_NON_NULL m_declRead;
+    const Usable* CORAL66_NON_NULL m_declRead;
     lexer::CTokenIterator m_identifierToken;
 
 public:
-    DeclarationRead(IntrusiveVariantValue<Type> type, const Useable& useable, lexer::CTokenIterator identifierToken)
+    DeclarationRead(IntrusiveVariantValue<Type> type, const Usable& useable, lexer::CTokenIterator identifierToken)
         : ExpressionBase(std::in_place_type<DeclarationRead>, std::move(type), ValueCategory::Lvalue),
           m_declRead(&useable),
           m_identifierToken(identifierToken)
     {
     }
 
-    [[nodiscard]] const Useable& getDeclRead() const
+    [[nodiscard]] const Usable& getDeclRead() const
     {
         return *m_declRead;
     }
@@ -246,7 +246,7 @@ public:
 
 class BinaryOperator final : public ExpressionBase
 {
-    coral66::IntrVarPtr<ExpressionBase> m_leftOperand;
+    IntrVarPtr<ExpressionBase> m_leftOperand;
 
 public:
     enum Kind
@@ -268,11 +268,11 @@ public:
 private:
     Kind m_kind;
     lexer::CTokenIterator m_operatorToken;
-    coral66::IntrVarPtr<ExpressionBase> m_rightOperand;
+    IntrVarPtr<ExpressionBase> m_rightOperand;
 
 public:
-    BinaryOperator(IntrusiveVariantValue<Type> type, coral66::IntrVarPtr<ExpressionBase>&& left, Kind kind,
-                   lexer::CTokenIterator opToken, coral66::IntrVarPtr<ExpressionBase>&& right)
+    BinaryOperator(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& left, Kind kind,
+                   lexer::CTokenIterator opToken, IntrVarPtr<ExpressionBase>&& right)
         : ExpressionBase(std::in_place_type<BinaryOperator>, std::move(type), ValueCategory::Rvalue),
           m_leftOperand(std::move(left)),
           m_kind(kind),
@@ -311,11 +311,11 @@ public:
 private:
     Kind m_kind;
     lexer::CTokenIterator m_operatorToken;
-    coral66::IntrVarPtr<ExpressionBase> m_operand;
+    IntrVarPtr<ExpressionBase> m_operand;
 
 public:
     UnaryOperator(IntrusiveVariantValue<Type> type, Kind kind, lexer::CTokenIterator opToken,
-                  coral66::IntrVarPtr<ExpressionBase>&& operand)
+                  IntrVarPtr<ExpressionBase>&& operand)
         : ExpressionBase(std::in_place_type<UnaryOperator>, std::move(type), ValueCategory::Rvalue),
           m_kind(kind),
           m_operatorToken(opToken),
@@ -338,14 +338,14 @@ public:
 
 class PartWordAccess final : public ExpressionBase
 {
-    coral66::IntrVarPtr<ExpressionBase> m_base;
+    IntrVarPtr<ExpressionBase> m_base;
     std::uint32_t m_startBit;
     std::uint32_t m_width;
     lexer::CTokenIterator m_begin;
     lexer::CTokenIterator m_end;
 
 public:
-    PartWordAccess(IntrusiveVariantValue<Type> type, coral66::IntrVarPtr<ExpressionBase>&& base, std::uint32_t start,
+    PartWordAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& base, std::uint32_t start,
                    std::uint32_t width, lexer::CTokenIterator beginLoc, lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<PartWordAccess>, std::move(type), ValueCategory::Lvalue),
           m_base(std::move(base)),
@@ -381,14 +381,14 @@ public:
 
 class CallExpression final : public ExpressionBase
 {
-    coral66::IntrVarPtr<ExpressionBase> m_functionExpression;
-    std::vector<coral66::IntrVarPtr<ExpressionBase>> m_arguments;
+    IntrVarPtr<ExpressionBase> m_functionExpression;
+    std::vector<IntrVarPtr<ExpressionBase>> m_arguments;
     lexer::CTokenIterator m_begin;
     lexer::CTokenIterator m_end;
 
 public:
-    CallExpression(IntrusiveVariantValue<Type> type, coral66::IntrVarPtr<ExpressionBase>&& func,
-                   std::vector<coral66::IntrVarPtr<ExpressionBase>>&& args, lexer::CTokenIterator beginLoc,
+    CallExpression(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& func,
+                   std::vector<IntrVarPtr<ExpressionBase>>&& args, lexer::CTokenIterator beginLoc,
                    lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<CallExpression>, std::move(type), ValueCategory::Rvalue),
           m_functionExpression(std::move(func)),
@@ -402,7 +402,7 @@ public:
     {
         return *m_functionExpression;
     }
-    [[nodiscard]] const std::vector<coral66::IntrVarPtr<ExpressionBase>>& getArguments() const
+    [[nodiscard]] const std::vector<IntrVarPtr<ExpressionBase>>& getArguments() const
     {
         return m_arguments;
     }
@@ -474,12 +474,12 @@ public:
 };
 class AssignmentStatement final : public Statement
 {
-    coral66::IntrVarPtr<ExpressionBase> m_target;
-    coral66::IntrVarPtr<ExpressionBase> m_value;
+    IntrVarPtr<ExpressionBase> m_target;
+    IntrVarPtr<ExpressionBase> m_value;
 
 public:
-    AssignmentStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& target,
-                        coral66::IntrVarPtr<ExpressionBase>&& value) // NOLINT(*-pro-type-member-init)
+    AssignmentStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& target,
+                        IntrVarPtr<ExpressionBase>&& value) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AssignmentStatement>), m_target(std::move(target)), m_value(std::move(value))
     {
     }
@@ -496,14 +496,13 @@ public:
 
 class IfStatement final : public Statement
 {
-    coral66::IntrVarPtr<ExpressionBase> m_condition;
-    coral66::IntrVarPtr<Statement> m_thenBranch;
-    coral66::IntrVarPtr<Statement> m_elseBranch;
+    IntrVarPtr<ExpressionBase> m_condition;
+    IntrVarPtr<Statement> m_thenBranch;
+    IntrVarPtr<Statement> m_elseBranch;
 
 public:
-    IfStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& condition,
-                coral66::IntrVarPtr<Statement>&& thenBranch,
-                coral66::IntrVarPtr<Statement>&& elseBranch) // NOLINT(*-pro-type-member-init)
+    IfStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& condition, IntrVarPtr<Statement>&& thenBranch,
+                IntrVarPtr<Statement>&& elseBranch) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<IfStatement>),
           m_condition(std::move(condition)),
           m_thenBranch(std::move(thenBranch)),
@@ -550,6 +549,11 @@ public:
     {
         return m_target;
     }
+
+    [[nodiscard]] lexer::CTokenIterator getName() const
+    {
+        return m_name;
+    }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelStatement)
 };
 
@@ -571,21 +575,21 @@ public:
 
 struct ForElement
 {
-    coral66::IntrVarPtr<ExpressionBase> expression;
-    coral66::IntrVarPtr<ExpressionBase> step;
-    coral66::IntrVarPtr<ExpressionBase> until;
-    coral66::IntrVarPtr<ExpressionBase> whileCondition;
+    IntrVarPtr<ExpressionBase> expression;
+    IntrVarPtr<ExpressionBase> step;
+    IntrVarPtr<ExpressionBase> until;
+    IntrVarPtr<ExpressionBase> whileCondition;
 };
 
 class ForStatement final : public Statement
 {
-    coral66::IntrVarPtr<ExpressionBase> m_variable;
+    IntrVarPtr<ExpressionBase> m_variable;
     std::vector<ForElement> m_elements;
-    coral66::IntrVarPtr<Statement> m_body;
+    IntrVarPtr<Statement> m_body;
 
 public:
-    ForStatement(ScopePoint sp, coral66::IntrVarPtr<ExpressionBase>&& variable, std::vector<ForElement>&& elements,
-                 coral66::IntrVarPtr<Statement>&& body)
+    ForStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& variable, std::vector<ForElement>&& elements,
+                 IntrVarPtr<Statement>&& body)
         : Statement(sp, std::in_place_type<ForStatement>),
           m_variable(std::move(variable)),
           m_elements(std::move(elements)),
@@ -611,11 +615,11 @@ public:
 
 class AnswerStatement final : public Statement
 {
-    coral66::IntrVarPtr<ExpressionBase> m_expression;
+    IntrVarPtr<ExpressionBase> m_expression;
 
 public:
     explicit AnswerStatement(ScopePoint sp,
-                             coral66::IntrVarPtr<ExpressionBase>&& expression) // NOLINT(*-pro-type-member-init)
+                             IntrVarPtr<ExpressionBase>&& expression) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AnswerStatement>), m_expression(std::move(expression))
     {
     }
@@ -644,11 +648,11 @@ public:
 
 class ProcedureCallStatement final : public Statement
 {
-    coral66::IntrVarPtr<ExpressionBase> m_callExpr;
+    IntrVarPtr<ExpressionBase> m_callExpr;
 
 public:
     explicit ProcedureCallStatement(ScopePoint sp,
-                                    coral66::IntrVarPtr<ExpressionBase>&& callExpr) // NOLINT(*-pro-type-member-init)
+                                    IntrVarPtr<ExpressionBase>&& callExpr) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<ProcedureCallStatement>), m_callExpr(std::move(callExpr))
     {
     }
@@ -666,35 +670,35 @@ public:
 class VariableDeclaration;
 class ProcedureDeclaration;
 
-class Useable : public AbstractIntrusiveVariant<Useable, VariableDeclaration, ProcedureDeclaration>
+class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration>
 {
-    std::vector<const Useable*> m_uses;
+    std::vector<const Usable*> m_uses;
 
 protected:
     template <class T>
-    Useable(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
+    Usable(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
     {
     }
 
 public:
-    [[nodiscard]] const std::vector<const Useable*>& getUses() const
+    [[nodiscard]] const std::vector<const Usable*>& getUses() const
     {
         return m_uses;
     }
-    void setUses(std::vector<const Useable*> uses)
+    void setUses(std::vector<const Usable*> uses)
     {
         m_uses = std::move(uses);
     }
 };
 
-class Declaration : public Useable
+class Declaration : public Usable
 {
     lexer::CTokenIterator m_nameToken;
 
 protected:
     template <class T>
     Declaration(std::in_place_type_t<T>, lexer::CTokenIterator nameToken)
-        : Useable(std::in_place_type<T>), m_nameToken(nameToken)
+        : Usable(std::in_place_type<T>), m_nameToken(nameToken)
     {
     }
 
@@ -726,7 +730,7 @@ public:
 class ProcedureDeclaration final : public Declaration
 {
     IntrusiveVariantValue<Type> m_type;
-    std::vector<coral66::IntrVarPtr<Statement>> m_body;
+    std::vector<IntrVarPtr<Statement>> m_body;
 
 public:
     ProcedureDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
@@ -737,11 +741,11 @@ public:
     {
         return *m_type;
     }
-    void setBody(std::vector<coral66::IntrVarPtr<Statement>> body)
+    void setBody(std::vector<IntrVarPtr<Statement>> body)
     {
         m_body = std::move(body);
     }
-    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Statement>>& getBody() const
+    [[nodiscard]] const std::vector<IntrVarPtr<Statement>>& getBody() const
     {
         return m_body;
     }
@@ -754,24 +758,24 @@ public:
 
 class BlockStatement final : public Statement
 {
-    std::vector<coral66::IntrVarPtr<Useable>> m_declarations;
-    std::vector<coral66::IntrVarPtr<Statement>> m_statements;
+    std::vector<IntrVarPtr<Usable>> m_declarations;
+    std::vector<IntrVarPtr<Statement>> m_statements;
 
 public:
-    BlockStatement(ScopePoint scopePoint, std::vector<coral66::IntrVarPtr<Useable>> declarations,
-                   std::vector<coral66::IntrVarPtr<Statement>> statements)
+    BlockStatement(ScopePoint scopePoint, std::vector<IntrVarPtr<Usable>> declarations,
+                   std::vector<IntrVarPtr<Statement>> statements)
         : Statement(scopePoint, std::in_place_type<BlockStatement>),
           m_declarations(std::move(declarations)),
           m_statements(std::move(statements))
     {
     }
 
-    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Useable>>& getDeclarations() const
+    [[nodiscard]] const std::vector<IntrVarPtr<Usable>>& getDeclarations() const
     {
         return m_declarations;
     }
 
-    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Statement>>& getStatements() const
+    [[nodiscard]] const std::vector<IntrVarPtr<Statement>>& getStatements() const
     {
         return m_statements;
     }
@@ -779,15 +783,15 @@ public:
 
 class CompoundStatement final : public Statement
 {
-    std::vector<coral66::IntrVarPtr<Statement>> m_statements;
+    std::vector<IntrVarPtr<Statement>> m_statements;
 
 public:
-    CompoundStatement(ScopePoint scopePoint, std::vector<coral66::IntrVarPtr<Statement>> statements)
+    CompoundStatement(ScopePoint scopePoint, std::vector<IntrVarPtr<Statement>> statements)
         : Statement(scopePoint, std::in_place_type<CompoundStatement>), m_statements(std::move(statements))
     {
     }
 
-    [[nodiscard]] const std::vector<coral66::IntrVarPtr<Statement>>& getStatements() const
+    [[nodiscard]] const std::vector<IntrVarPtr<Statement>>& getStatements() const
     {
         return m_statements;
     }
@@ -795,22 +799,21 @@ public:
 
 class Program
 {
-    coral66::CSourceObject m_source;
-    std::vector<coral66::lexer::CToken> m_syntheticTokens;
-    std::vector<coral66::IntrVarPtr<Useable>> m_globals;
+    CSourceObject m_source;
+    std::vector<lexer::CToken> m_syntheticTokens;
+    std::vector<IntrVarPtr<Usable>> m_globals;
 
 public:
-    Program(coral66::CSourceObject&& source, std::vector<coral66::lexer::CToken> synthetic,
-            std::vector<coral66::IntrVarPtr<Useable>> globals)
+    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, std::vector<IntrVarPtr<Usable>> globals)
         : m_source(std::move(source)), m_syntheticTokens(std::move(synthetic)), m_globals(std::move(globals))
     {
     }
 
-    const std::vector<coral66::IntrVarPtr<Useable>>& getGlobals() const
+    [[nodiscard]] const std::vector<IntrVarPtr<Usable>>& getGlobals() const
     {
         return m_globals;
     }
-    const coral66::CSourceObject& getSource() const
+    [[nodiscard]] const CSourceObject& getSource() const
     {
         return m_source;
     }

@@ -22,9 +22,9 @@ class SemanticAnalysis final : public ProgramInterface
     bool* m_errors;
     std::vector<coral66::IntrVarPtr<Statement>> m_currentBlockStatements;
     coral66::IntrVarPtr<ExpressionBase> m_lastExpression;
-    std::vector<coral66::IntrVarPtr<Useable>> m_globalDeclarations;
+    std::vector<coral66::IntrVarPtr<Usable>> m_globalDeclarations;
     bool m_isGlobalScope = true;
-    std::unordered_map<std::string_view, const Useable*> m_symbolTable;
+    std::unordered_map<std::string_view, const Usable*> m_symbolTable;
 
 public:
     SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(),
