@@ -12,6 +12,12 @@
 namespace coral66::Semantics
 {
 
+/*
+* Structure for the second pass. This pass expects the symbol table to be fully resolved.
+* It will infer expression types, validate function calls
+* (matching arguments), check type conversions, etc.
+*/
+
 class TypeCheckingPass
 {
     SemanticContext& m_context;

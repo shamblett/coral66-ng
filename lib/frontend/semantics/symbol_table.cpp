@@ -6,6 +6,8 @@
 
 #include "symbol_table.hpp"
 
+#include <ranges>
+
 namespace coral66::Semantics
 {
 
@@ -34,7 +36,7 @@ bool SymbolTable::insert(std::string_view name, const Usable* symbol)
         return false;
 
     auto& currentScope = m_scopes.back();
-    if (currentScope.find(name) != currentScope.end())
+    if (currentScope.contains(name))
     {
         return false; // Already exists in current scope
     }
@@ -45,9 +47,9 @@ bool SymbolTable::insert(std::string_view name, const Usable* symbol)
 
 const Usable* SymbolTable::lookup(std::string_view name) const
 {
-    for (auto it = m_scopes.rbegin(); it != m_scopes.rend(); ++it)
+    for (const auto & m_scope : std::views::reverse(m_scopes))
     {
-        if (auto found = it->find(name); found != it->end())
+        if (auto found = m_scope.find(name); found != m_scope.end())
         {
             return found->second;
         }

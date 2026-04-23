@@ -12,6 +12,11 @@
 namespace coral66::Semantics
 {
 
+/*
+ * Structure for the third pass. This checks for valid goto label boundaries, unreachable code,
+ * or broken loop semantics independent of types.
+ */
+
 class ControlFlowPass
 {
     SemanticContext& m_context;

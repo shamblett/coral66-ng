@@ -17,6 +17,12 @@ class raw_ostream;
 namespace coral66::Semantics
 {
 
+/*
+ * Acts as the central context payload passed to each semantic pass. It currently wraps the
+ * source_interface, diagnostics reporter, error flags, and an instance
+ * of the SymbolTable.
+ */
+
 class SemanticContext
 {
 public:

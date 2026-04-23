@@ -12,13 +12,16 @@
 
 #include "semantics.hpp"
 
+/*
+ * Provides a SymbolTable class that manages stacked/nested scopes to correctly resolve
+ * variables and procedures within their respective blocks.
+ */
+
 namespace coral66::Semantics
 {
 
 class SymbolTable
 {
-    // A skeletal scoped symbol table.
-    // In Coral 66, scopes can be nested (e.g., inside blocks and procedures).
     std::vector<std::unordered_map<std::string_view, const Usable*>> m_scopes;
 
 public:
