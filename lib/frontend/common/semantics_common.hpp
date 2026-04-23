@@ -29,13 +29,15 @@ class TableType;
 class OverlayType;
 class VoidType;
 class ErrorType;
+class LabelType;
+class SwitchType;
 
 // ============================================================================
 // Type Hierarchy
 // ============================================================================
 
 class Type : public AbstractIntrusiveVariant<Type, PrimitiveType, ArrayType, ProcedureType, FixedType, TableType,
-                                             OverlayType, VoidType, ErrorType>
+                                             OverlayType, VoidType, ErrorType, LabelType, SwitchType>
 {
 public:
     enum TypeFlags : std::uint8_t
@@ -322,6 +324,48 @@ class ErrorType : public Type
 public:
     explicit ErrorType(TypeFlags flags = Nothing) : Type(std::in_place_type<ErrorType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ErrorType)
+};
+
+class LabelType : public Type
+{
+    friend class Type;
+    static std::size_t getSizeOfImpl(const ProgramInterface&)
+    {
+        return 0; // Or whatever is appropriate for labels (maybe sizeof void*)
+    }
+    static std::size_t getAlignOfImpl(const ProgramInterface&)
+    {
+        return 0;
+    }
+    static bool equalsImpl(const LabelType&)
+    {
+        return true;
+    }
+
+public:
+    explicit LabelType(TypeFlags flags = Nothing) : Type(std::in_place_type<LabelType>, flags) {}
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelType)
+};
+
+class SwitchType : public Type
+{
+    friend class Type;
+    static std::size_t getSizeOfImpl(const ProgramInterface&)
+    {
+        return 0; // Size of switch table/pointer
+    }
+    static std::size_t getAlignOfImpl(const ProgramInterface&)
+    {
+        return 0;
+    }
+    static bool equalsImpl(const SwitchType&)
+    {
+        return true; // Simple structural equivalence, refine if needed
+    }
+
+public:
+    explicit SwitchType(TypeFlags flags = Nothing) : Type(std::in_place_type<SwitchType>, flags) {}
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(SwitchType)
 };
 
 } // namespace coral66::Semantics

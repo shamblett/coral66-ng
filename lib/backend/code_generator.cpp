@@ -506,7 +506,8 @@ llvm::Value* code_generator::visit(const Semantics::ExpressionBase& expr)
                       [&](const Semantics::UnaryOperator& e) { return visit(e); },
                       [&](const Semantics::CallExpression& e) { return visit(e); },
                       [&](const Semantics::PartWordAccess& e) { return visit(e); },
-                      [&](const Semantics::ErrorExpression& e) { return visit(e); });
+                      [&](const Semantics::ErrorExpression& e) { return visit(e); },
+                      [&](const auto& e) -> llvm::Value* { CORAL66_UNREACHABLE; return nullptr; });
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst

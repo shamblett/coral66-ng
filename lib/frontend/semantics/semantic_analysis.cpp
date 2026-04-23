@@ -570,8 +570,7 @@ void SemanticAnalysis::visit(const Syntax::IdentifierExpression& node)
         it != m_symbolTable.end())
     {
         IntrusiveVariantValue<Type> type =
-            it->second->match([](const VariableDeclaration& v) { return cloneType(v.getType()); },
-                              [](const ProcedureDeclaration& p) { return cloneType(p.getType()); });
+            it->second->match([](const auto& decl) { return cloneType(decl.getType()); });
         m_lastExpression = makeIntr<DeclarationRead>(type, *it->second, node.getIdentifier());
     }
 }

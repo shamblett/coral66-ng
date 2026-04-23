@@ -148,9 +148,14 @@ class UnaryOperator;
 class PartWordAccess;
 class CallExpression;
 class ErrorExpression;
+class ConditionalExpression;
+class ArrayAccess;
+class LocationAccess;
+class TypeChange;
 
 class ExpressionBase : public AbstractIntrusiveVariant<ExpressionBase, Constant, DeclarationRead, BinaryOperator,
-                                                       UnaryOperator, PartWordAccess, CallExpression, ErrorExpression>
+                                                       UnaryOperator, PartWordAccess, CallExpression, ErrorExpression,
+                                                       ConditionalExpression, ArrayAccess, LocationAccess, TypeChange>
 {
     IntrusiveVariantValue<Type> m_type;
     ValueCategory m_valueCategory;
@@ -417,6 +422,137 @@ public:
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(CallExpression)
 };
 
+class ConditionalExpression final : public ExpressionBase
+{
+    IntrVarPtr<ExpressionBase> m_condition;
+    IntrVarPtr<ExpressionBase> m_thenBranch;
+    IntrVarPtr<ExpressionBase> m_elseBranch;
+
+public:
+    ConditionalExpression(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& condition,
+                          IntrVarPtr<ExpressionBase>&& thenBranch, IntrVarPtr<ExpressionBase>&& elseBranch)
+        : ExpressionBase(std::in_place_type<ConditionalExpression>, std::move(type), ValueCategory::Rvalue),
+          m_condition(std::move(condition)),
+          m_thenBranch(std::move(thenBranch)),
+          m_elseBranch(std::move(elseBranch))
+    {
+    }
+
+    [[nodiscard]] const ExpressionBase& getCondition() const
+    {
+        return *m_condition;
+    }
+    [[nodiscard]] const ExpressionBase& getThenBranch() const
+    {
+        return *m_thenBranch;
+    }
+    [[nodiscard]] const ExpressionBase& getElseBranch() const
+    {
+        return *m_elseBranch;
+    }
+    [[nodiscard]] lexer::CTokenIterator begin() const override
+    {
+        return m_condition->begin();
+    }
+    [[nodiscard]] lexer::CTokenIterator end() const override
+    {
+        return m_elseBranch->end();
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ConditionalExpression)
+};
+
+class ArrayAccess final : public ExpressionBase
+{
+    IntrVarPtr<ExpressionBase> m_array;
+    std::vector<IntrVarPtr<ExpressionBase>> m_indices;
+    lexer::CTokenIterator m_endLoc;
+
+public:
+    ArrayAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& array,
+                std::vector<IntrVarPtr<ExpressionBase>>&& indices, lexer::CTokenIterator endLoc)
+        : ExpressionBase(std::in_place_type<ArrayAccess>, std::move(type), ValueCategory::Lvalue),
+          m_array(std::move(array)),
+          m_indices(std::move(indices)),
+          m_endLoc(endLoc)
+    {
+    }
+
+    [[nodiscard]] const ExpressionBase& getArray() const
+    {
+        return *m_array;
+    }
+    [[nodiscard]] const std::vector<IntrVarPtr<ExpressionBase>>& getIndices() const
+    {
+        return m_indices;
+    }
+    [[nodiscard]] lexer::CTokenIterator begin() const override
+    {
+        return m_array->begin();
+    }
+    [[nodiscard]] lexer::CTokenIterator end() const override
+    {
+        return m_endLoc;
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ArrayAccess)
+};
+
+class LocationAccess final : public ExpressionBase
+{
+    IntrVarPtr<ExpressionBase> m_wordReference;
+    lexer::CTokenIterator m_beginLoc;
+
+public:
+    LocationAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& wordReference,
+                   lexer::CTokenIterator beginLoc)
+        : ExpressionBase(std::in_place_type<LocationAccess>, std::move(type), ValueCategory::Rvalue),
+          m_wordReference(std::move(wordReference)),
+          m_beginLoc(beginLoc)
+    {
+    }
+
+    [[nodiscard]] const ExpressionBase& getWordReference() const
+    {
+        return *m_wordReference;
+    }
+    [[nodiscard]] lexer::CTokenIterator begin() const override
+    {
+        return m_beginLoc;
+    }
+    [[nodiscard]] lexer::CTokenIterator end() const override
+    {
+        return m_wordReference->end();
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LocationAccess)
+};
+
+class TypeChange final : public ExpressionBase
+{
+    IntrVarPtr<ExpressionBase> m_expression;
+    lexer::CTokenIterator m_beginLoc;
+
+public:
+    TypeChange(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& expression, lexer::CTokenIterator beginLoc)
+        : ExpressionBase(std::in_place_type<TypeChange>, std::move(type), ValueCategory::Rvalue),
+          m_expression(std::move(expression)),
+          m_beginLoc(beginLoc)
+    {
+    }
+
+    [[nodiscard]] const ExpressionBase& getExpression() const
+    {
+        return *m_expression;
+    }
+    [[nodiscard]] lexer::CTokenIterator begin() const override
+    {
+        return m_beginLoc;
+    }
+    [[nodiscard]] lexer::CTokenIterator end() const override
+    {
+        return m_expression->end();
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(TypeChange)
+};
+
 class ErrorExpression final : public ExpressionBase
 {
     lexer::CTokenIterator m_begin;
@@ -669,8 +805,12 @@ public:
 
 class VariableDeclaration;
 class ProcedureDeclaration;
+class ArrayDeclaration;
+class TableDeclaration;
+class OverlayDeclaration;
+class SwitchDeclaration;
 
-class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration>
+class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration, TableDeclaration, OverlayDeclaration, SwitchDeclaration>
 {
     std::vector<const Usable*> m_uses;
 
@@ -750,6 +890,75 @@ public:
         return m_body;
     }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ProcedureDeclaration)
+};
+
+class ArrayDeclaration final : public Declaration
+{
+    IntrusiveVariantValue<Type> m_type;
+
+public:
+    ArrayDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+        : Declaration(std::in_place_type<ArrayDeclaration>, nameToken), m_type(std::move(type))
+    {
+    }
+    [[nodiscard]] const Type& getType() const
+    {
+        return *m_type;
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ArrayDeclaration)
+};
+
+class TableDeclaration final : public Declaration
+{
+    IntrusiveVariantValue<Type> m_type;
+
+public:
+    TableDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+        : Declaration(std::in_place_type<TableDeclaration>, nameToken), m_type(std::move(type))
+    {
+    }
+    [[nodiscard]] const Type& getType() const
+    {
+        return *m_type;
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(TableDeclaration)
+};
+
+class OverlayDeclaration final : public Declaration
+{
+    IntrusiveVariantValue<Type> m_type;
+
+public:
+    OverlayDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+        : Declaration(std::in_place_type<OverlayDeclaration>, nameToken), m_type(std::move(type))
+    {
+    }
+    [[nodiscard]] const Type& getType() const
+    {
+        return *m_type;
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(OverlayDeclaration)
+};
+
+class SwitchDeclaration final : public Declaration
+{
+    std::vector<const LabelStatement*> m_labels;
+    IntrusiveVariantValue<Type> m_type;
+
+public:
+    SwitchDeclaration(lexer::CTokenIterator nameToken, std::vector<const LabelStatement*> labels)
+        : Declaration(std::in_place_type<SwitchDeclaration>, nameToken), m_labels(std::move(labels)), m_type(std::in_place_type<SwitchType>)
+    {
+    }
+    [[nodiscard]] const Type& getType() const
+    {
+        return *m_type;
+    }
+    [[nodiscard]] const std::vector<const LabelStatement*>& getLabels() const
+    {
+        return m_labels;
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(SwitchDeclaration)
 };
 
 // ============================================================================
