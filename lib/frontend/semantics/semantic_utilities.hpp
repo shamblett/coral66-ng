@@ -11,14 +11,14 @@
 namespace coral66::Semantics
 {
 
-inline bool isVoid(const Type& type)
+inline bool isUntyped(const Type& type)
 {
     if (type.is<PrimitiveType>())
     {
-        // No Void kind in PrimitiveType currently, assuming VoidType class
+        // No Untyped kind in PrimitiveType currently, assuming UntypedType class
         return false;
     }
-    return type.is<VoidType>();
+    return type.is<UntypedType>();
 }
 
 inline bool isArray(const Type& type)

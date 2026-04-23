@@ -27,7 +27,7 @@ class ProcedureType;
 class FixedType;
 class TableType;
 class OverlayType;
-class VoidType;
+class UntypedType;
 class ErrorType;
 class LabelType;
 class SwitchType;
@@ -37,7 +37,7 @@ class SwitchType;
 // ============================================================================
 
 class Type : public AbstractIntrusiveVariant<Type, PrimitiveType, ArrayType, ProcedureType, FixedType, TableType,
-                                             OverlayType, VoidType, ErrorType, LabelType, SwitchType>
+                                             OverlayType, UntypedType, ErrorType, LabelType, SwitchType>
 {
 public:
     enum TypeFlags : std::uint8_t
@@ -139,7 +139,7 @@ public:
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(PrimitiveType)
 };
 
-class VoidType final : public Type
+class UntypedType final : public Type
 {
     friend class Type;
     [[nodiscard]] static std::uint64_t getSizeOfImpl(const ProgramInterface&)
@@ -150,14 +150,14 @@ class VoidType final : public Type
     {
         return 0;
     }
-    [[nodiscard]] static bool equalsImpl(const VoidType&)
+    [[nodiscard]] static bool equalsImpl(const UntypedType&)
     {
         return true;
     }
 
 public:
-    explicit VoidType(TypeFlags flags = Nothing) : Type(std::in_place_type<VoidType>, flags) {}
-    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(VoidType)
+    explicit UntypedType(TypeFlags flags = Nothing) : Type(std::in_place_type<UntypedType>, flags) {}
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(UntypedType)
 };
 
 class FixedType final : public Type

@@ -30,7 +30,7 @@ SemanticAnalysis::SemanticAnalysis(const source_interface& sourceInterface, llvm
 static PrimitiveType integerType{PrimitiveType::Integer};
 static PrimitiveType floatingType{PrimitiveType::Floating};
 static FixedType fixedType{16, 8};
-static VoidType voidType{};
+static UntypedType untypedType{};
 static ErrorType errorType{};
 
 void SemanticAnalysis::visit(const Syntax::Program& node)
@@ -166,8 +166,8 @@ IntrusiveVariantValue<Type> cloneType(const Type& type)
         auto& t = type.as<TableType>();
         return IntrusiveVariantValue<Type>(TableType{t.getInfo()});
     }
-    if (type.is<VoidType>())
-        return IntrusiveVariantValue<Type>(VoidType{});
+    if (type.is<UntypedType>())
+        return IntrusiveVariantValue<Type>(UntypedType{});
     if (type.is<ErrorType>())
         return IntrusiveVariantValue<Type>(ErrorType{});
     return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
@@ -284,7 +284,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
 
     m_isGlobalScope = wasGlobal;
 
-    const Type* returnType = &voidType;
+    const Type* returnType = &untypedType;
     if (auto typeToken = node.getTypeToken())
     {
         if (typeToken.value()->getTokenType() == lexer::TokenType::FloatingKeyword)

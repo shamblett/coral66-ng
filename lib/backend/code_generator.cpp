@@ -41,7 +41,7 @@ llvm::Type* code_generator::convertType(const Semantics::Type& type)
             case Semantics::PrimitiveType::Bits: return llvm::Type::getInt32Ty(ctx);
         }
     }
-    else if (type.is<Semantics::VoidType>())
+    else if (type.is<Semantics::UntypedType>())
     {
         return llvm::Type::getVoidTy(ctx);
     }
