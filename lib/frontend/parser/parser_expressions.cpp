@@ -15,8 +15,8 @@ namespace coral66::parser
 {
 
 /*
- * Parser expression sub parsers
- * */
+ *  Section 6
+ */
 
 std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                        Context& context);

@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <span>
 #include <variant>
+#include <vector>
 
 /**
  * Defines the abstract interface for accessing source code information.
