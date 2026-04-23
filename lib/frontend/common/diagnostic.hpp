@@ -198,7 +198,7 @@ public:
 };
 
 /**
- * @brief Base class for all diagnostics, handling runtime message formatting.
+ *  Base class for all diagnostics, handling runtime message formatting.
  *
  * DiagnosticBase contains the type-erased logic for printing diagnostics.
  * It handles the severity, name, and the actual formatting of the message
@@ -270,7 +270,7 @@ public:
 // Move the non-type template parameters to become members in C++20
 
 /**
- * @brief Modifier to underline a specific range in the source code.
+ *  Modifier to underline a specific range in the source code.
  *
  * @tparam index The index of the argument (0-based) that determines the location to underline.
  * @tparam character The character to use for underlining (default '^' or '~').
@@ -302,7 +302,7 @@ template <std::size_t index>
 using PointAt = Underline<index, '^', false>;
 
 /**
- * @brief Modifier to suggest inserting text after a specific location.
+ *  Modifier to suggest inserting text after a specific location.
  *
  * @tparam index The index of the argument determining the location.
  * @tparam text The index of the argument containing the text to insert, or -1 for no text.
@@ -339,7 +339,7 @@ public:
 };
 
 /**
- * @brief Modifier to annotate a location with a message.
+ *  Modifier to annotate a location with a message.
  *
  * @tparam index The index of the argument determining the location.
  * @tparam text The index of the argument containing the annotation text.
@@ -362,7 +362,7 @@ struct Annotate
 };
 
 /**
- * @brief Modifier to annotate an expression, verifying its type.
+ *  Modifier to annotate an expression, verifying its type.
  *
  * @tparam index The index of the argument determining the expression.
  */
@@ -379,7 +379,7 @@ struct AnnotateExpr
 };
 
 /**
- * @brief A fully typed diagnostic definition.
+ *  A fully typed diagnostic definition.
  *
  * This class validates the format string and arguments at compile time.
  * It is typically instantiated via the makeDiagnostic helper function.
@@ -638,7 +638,7 @@ const std::unordered_set<std::string_view>& getAllWarnings();
 } // namespace diag
 
 /**
- * @brief Creates a Diagnostic object with compile-time validation.
+ *  Creates a Diagnostic object with compile-time validation.
  *
  * @tparam text The format string for the diagnostic.
  * @tparam Args The modifiers (Underline, InsertAfter, etc.) to apply.

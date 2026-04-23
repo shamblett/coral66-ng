@@ -18,8 +18,8 @@
 #include "type_identity.hpp"
 
 /**
- * @file CommonABIImplementation.hpp
- * @brief Defines a common base class for ABI implementations with caching.
+ *  CommonABIImplementation.hpp
+ *  Defines a common base class for ABI implementations with caching.
  *
  * This file provides the common_abi_implementation template class, which extends abi_implementation.
  * It implements a caching mechanism for platform-specific ABI adjustments to function

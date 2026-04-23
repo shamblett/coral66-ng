@@ -57,7 +57,7 @@ struct StringConverter<IntrusiveVariantValue<T>>
 };
 
 /**
- * @brief Handling for custom format specifiers in diagnostics.
+ *  Handling for custom format specifiers in diagnostics.
  *
  * This struct allows defining custom behavior for format specifiers (e.g., %s)
  * based on the arguments provided.

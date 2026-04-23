@@ -130,7 +130,7 @@ std::string_view tokenName(TokenType tokenType, bool quote = true);
 std::string normalizeSpelling(std::string_view tokenSpelling);
 
 /**
- * @brief Base class for all tokens.
+ *  Base class for all tokens.
  *
  * Stores common information such as the token type, its position (offset, length, fileID),
  * and whether it was inserted by a macro.
@@ -217,7 +217,7 @@ public:
 };
 
 /**
- * @brief A Preprocessor Token.
+ *  A Preprocessor Token.
  *
  * Represents a token produced by the initial lexing phase. It contains raw string values
  * and information relevant to the preprocessor (like character space offsets).
@@ -284,7 +284,7 @@ struct NonCharString
 };
 
 /**
- * @brief A C Token.
+ *  A C Token.
  *
  * Represents a token after preprocessing, used by the parser. It may contain
  * parsed semantic values (like integer or floating-point values) in addition to the

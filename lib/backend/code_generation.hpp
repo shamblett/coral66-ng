@@ -13,8 +13,8 @@
 #include "lib/support/filesystem.hpp"
 
 /**
- * @file CodeGeneration.hpp
- * @brief Defines the entry point and options for LLVM code generation.
+ *  CodeGeneration.hpp
+ *  Defines the entry point and options for LLVM code generation.
  *
  * This file declares the `generateLLVM` function, which orchestrates the translation
  * of the semantic AST (Program) into LLVM IR. It also defines the `Options` struct
