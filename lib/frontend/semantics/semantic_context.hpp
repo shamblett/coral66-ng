@@ -27,8 +27,9 @@ class SemanticContext
 {
 public:
     const source_interface& source;
-    llvm::raw_ostream* reporter;
-    bool* errors;
+    llvm::raw_ostream* m_reporter;
+    bool* m_errors;
+    std::size_t m_errorCount = 0;
 
     SymbolTable symbolTable;
 
@@ -36,9 +37,11 @@ public:
     // Future: diagnostic collectors, control flow tracking state, etc.
 
     SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag)
-        : source(sourceInterface), reporter(reporterStream), errors(errorFlag)
+        : source(sourceInterface), m_reporter(nullptr), m_errors(nullptr)
     {
     }
+
+    void log(const Message& message);
 };
 
 } // namespace coral66::semantics

@@ -8,5 +8,16 @@
 
 namespace coral66::semantics
 {
-// Implementation can be added here if needed
+
+void SemanticContext::log(const Message& message)
+{
+    if (message.getSeverity() == Severity::Error)
+    {
+        m_errorCount++;
+    }
+    if (m_reporter)
+    {
+        *m_reporter << message;
+    }
+}
 } // namespace coral66::semantics
