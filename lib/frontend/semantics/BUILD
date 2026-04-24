@@ -23,6 +23,7 @@ cc_library(
         "program_interface.hpp",
         "semantic_analysis.hpp",
         "semantic_context.hpp",
+        "semantic_support.hpp",
         "semantic_utilities.hpp",
         "semantics.hpp",
         "symbol_resolution_pass.hpp",
