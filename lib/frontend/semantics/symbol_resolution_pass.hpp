@@ -27,6 +27,45 @@ public:
 
     // Entry point for the symbol resolution pass
     void run(const syntax::Program& program);
+
+private:
+    void visit(const syntax::Node& node);
+    
+    // Statements & Blocks
+    void visit(const syntax::Program& node);
+    void visit(const syntax::Block& node);
+    void visit(const syntax::Statement& node);
+    void visit(const syntax::CompoundStatement& node);
+    void visit(const syntax::BlockStatement& node);
+    void visit(const syntax::IfStatement& node);
+    void visit(const syntax::ForStatement& node);
+    void visit(const syntax::AssignmentStatement& node);
+    void visit(const syntax::GotoStatement& node);
+    void visit(const syntax::AnswerStatement& node);
+    void visit(const syntax::ProcedureCallStatement& node);
+    
+    // Declarations
+    void visit(const syntax::Declaration& node);
+    void visit(const syntax::VariableDeclaration& node);
+    void visit(const syntax::ProcedureDeclaration& node);
+    void visit(const syntax::ArrayDeclaration& node);
+    void visit(const syntax::TableDeclaration& node);
+    void visit(const syntax::OverlayDeclaration& node);
+    void visit(const syntax::ParameterDeclaration& node);
+    
+    // Expressions
+    void visit(const syntax::Expression& node);
+    void visit(const syntax::IdentifierExpression& node);
+    void visit(const syntax::BinaryExpression& node);
+    void visit(const syntax::UnaryExpression& node);
+    void visit(const syntax::PartWordExpression& node);
+    void visit(const syntax::ConditionalExpression& node);
+    void visit(const syntax::FunctionCallExpression& node);
+    void visit(const syntax::ArrayAccessExpression& node);
+    void visit(const syntax::LocationExpression& node);
+    void visit(const syntax::TypeChangeExpression& node);
+    
+    IntrusiveVariantValue<Type> createTypeFromToken(std::optional<lexer::CTokenIterator> token);
 };
 
 } // namespace coral66::semantics

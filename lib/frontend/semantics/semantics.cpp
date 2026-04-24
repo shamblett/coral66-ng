@@ -186,3 +186,27 @@ lexer::CTokenIterator UnaryOperator::end() const
 }
 
 } // namespace coral66::semantics
+
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
+#include "semantic_context.hpp"
+#include "symbol_resolution_pass.hpp"
+
+namespace coral66::semantics
+{
+
+Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
+{
+    CTRACK_NAME("Semantics");
+    SemanticContext context(cTokens, reporter, errors);
+    SymbolResolutionPass pass(context);
+    pass.run(parseTree);
+
+    std::vector<lexer::CToken> syntheticTokens;
+    std::vector<IntrVarPtr<Usable>> globals;
+    
+    // We can move ownership of usables to the program if we want, but since backend generates code from globals,
+    // we return an empty globals list so the backend gracefully generates an empty module.
+    return Program(std::move(cTokens), std::move(syntheticTokens), std::move(globals));
+}
+
+} // namespace coral66::semantics

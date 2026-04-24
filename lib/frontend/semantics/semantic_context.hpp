@@ -6,7 +6,11 @@
 
 #pragma once
 
+#include <unordered_map>
+#include <vector>
+
 #include "lib/frontend/common/source_interface.hpp"
+#include "lib/frontend/syntax/syntax.hpp"
 #include "symbol_table.hpp"
 
 namespace llvm
@@ -33,11 +37,14 @@ public:
 
     SymbolTable symbolTable;
 
-    // Future: maps to store annotations (e.g. mapping syntax::Expression nodes to their resolved semantics::Type)
-    // Future: diagnostic collectors, control flow tracking state, etc.
+    // Stores resolved symbols for identifiers in expressions
+    std::unordered_map<const syntax::Node*, const Usable*> resolvedIdentifiers;
+
+    // Owns the semantic usable objects (declarations)
+    std::vector<IntrVarPtr<Usable>> ownedUsables;
 
     SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag)
-        : source(sourceInterface), m_reporter(nullptr), m_errors(nullptr)
+        : source(sourceInterface), m_reporter(reporterStream), m_errors(errorFlag)
     {
     }
 
