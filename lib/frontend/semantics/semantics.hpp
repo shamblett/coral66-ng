@@ -23,11 +23,11 @@
  * Defines the classes and structures for the Semantic Abstract Syntax Tree (AST) for Coral 66.
  */
 
-namespace coral66::Syntax
+namespace coral66::syntax
 {
 class Node;
 class Program;
-} // namespace coral66::Syntax
+} // namespace coral66::syntax
 
 namespace coral66::Semantics
 {
@@ -531,7 +531,8 @@ class TypeChange final : public ExpressionBase
     lexer::CTokenIterator m_beginLoc;
 
 public:
-    TypeChange(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& expression, lexer::CTokenIterator beginLoc)
+    TypeChange(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& expression,
+               lexer::CTokenIterator beginLoc)
         : ExpressionBase(std::in_place_type<TypeChange>, std::move(type), ValueCategory::Rvalue),
           m_expression(std::move(expression)),
           m_beginLoc(beginLoc)
@@ -810,7 +811,8 @@ class TableDeclaration;
 class OverlayDeclaration;
 class SwitchDeclaration;
 
-class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration, TableDeclaration, OverlayDeclaration, SwitchDeclaration>
+class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration,
+                                               TableDeclaration, OverlayDeclaration, SwitchDeclaration>
 {
     std::vector<const Usable*> m_uses;
 
@@ -947,7 +949,9 @@ class SwitchDeclaration final : public Declaration
 
 public:
     SwitchDeclaration(lexer::CTokenIterator nameToken, std::vector<const LabelStatement*> labels)
-        : Declaration(std::in_place_type<SwitchDeclaration>, nameToken), m_labels(std::move(labels)), m_type(std::in_place_type<SwitchType>)
+        : Declaration(std::in_place_type<SwitchDeclaration>, nameToken),
+          m_labels(std::move(labels)),
+          m_type(std::in_place_type<SwitchType>)
     {
     }
     [[nodiscard]] const Type& getType() const
@@ -1028,7 +1032,7 @@ public:
     }
 };
 
-Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter = &llvm::errs(),
+Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter = &llvm::errs(),
                 bool* errors = nullptr);
 
 } // namespace coral66::Semantics

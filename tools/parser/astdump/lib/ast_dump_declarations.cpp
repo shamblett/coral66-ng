@@ -13,11 +13,11 @@
 namespace coral66::tools
 {
 
-rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
+rapidjson::Value AstDump::dump(const syntax::Declaration* declaration)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
-    if (auto* parameterDeclaration = dynamic_cast<const Syntax::ParameterDeclaration*>(declaration))
+    if (auto* parameterDeclaration = dynamic_cast<const syntax::ParameterDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "ParameterDeclaration", m_alloc);
         obj.AddMember("Mode", rapidjson::StringRef(parser::parameterModeToString(parameterDeclaration->getMode())),
@@ -32,7 +32,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Identifiers", identifiers, m_alloc);
     }
-    else if (auto* variableDeclaration = dynamic_cast<const Syntax::VariableDeclaration*>(declaration))
+    else if (auto* variableDeclaration = dynamic_cast<const syntax::VariableDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
         obj.AddMember("Type", getTokenString(variableDeclaration->getType()), m_alloc);
@@ -52,7 +52,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Preset Tokens", presetTokens, m_alloc);
     }
-    else if (auto* procedureDeclaration = dynamic_cast<const Syntax::ProcedureDeclaration*>(declaration))
+    else if (auto* procedureDeclaration = dynamic_cast<const syntax::ProcedureDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
         obj.AddMember("IsRecursive", procedureDeclaration->isRecursive(), m_alloc);
@@ -70,7 +70,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         obj.AddMember("Parameters", parameters, m_alloc);
         obj.AddMember("Body", dump(&procedureDeclaration->getBody()), m_alloc);
     }
-    else if (auto* arrayDeclaration = dynamic_cast<const Syntax::ArrayDeclaration*>(declaration))
+    else if (auto* arrayDeclaration = dynamic_cast<const syntax::ArrayDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "ArrayDeclaration", m_alloc);
         obj.AddMember("Type", getTokenString(arrayDeclaration->getType()), m_alloc);
@@ -100,7 +100,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Preset Tokens", presetTokens, m_alloc);
     }
-    else if (auto* tableElementDeclaration = dynamic_cast<const Syntax::TableElementDeclaration*>(declaration))
+    else if (auto* tableElementDeclaration = dynamic_cast<const syntax::TableElementDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "TableElementDeclaration", m_alloc);
         obj.AddMember("Identifier", getTokenString(tableElementDeclaration->getIdentifier()), m_alloc);
@@ -113,7 +113,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
             obj.AddMember("Bit Position", getTokenString(tableElementDeclaration->getBitPosition().value()), m_alloc);
     }
 
-    else if (auto* tableDeclaration = dynamic_cast<const Syntax::TableDeclaration*>(declaration))
+    else if (auto* tableDeclaration = dynamic_cast<const syntax::TableDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "TableDeclaration", m_alloc);
         obj.AddMember("Identifier", getTokenString(tableDeclaration->getIdentifier()), m_alloc);
@@ -136,7 +136,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Preset Tokens", presetTokens, m_alloc);
     }
-    else if (auto* overlayDeclaration = dynamic_cast<const Syntax::OverlayDeclaration*>(declaration))
+    else if (auto* overlayDeclaration = dynamic_cast<const syntax::OverlayDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "OverlayDeclaration", m_alloc);
         obj.AddMember("Base", getTokenString(overlayDeclaration->getBase()), m_alloc);
@@ -144,7 +144,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         if (overlayDeclaration->getOffset2().has_value())
             obj.AddMember("Offset2", getTokenString(overlayDeclaration->getOffset2().value()), m_alloc);
     }
-    else if (auto* placeSpecification = dynamic_cast<const Syntax::PlaceSpecification*>(declaration))
+    else if (auto* placeSpecification = dynamic_cast<const syntax::PlaceSpecification*>(declaration))
     {
         obj.AddMember("NodeType", "PlaceSpecification", m_alloc);
         rapidjson::Value identifiers(rapidjson::kArrayType);
@@ -154,7 +154,7 @@ rapidjson::Value AstDump::dump(const Syntax::Declaration* declaration)
         }
         obj.AddMember("Identifiers", identifiers, m_alloc);
     }
-    else if (auto* procedureSpecification = dynamic_cast<const Syntax::ProcedureSpecification*>(declaration))
+    else if (auto* procedureSpecification = dynamic_cast<const syntax::ProcedureSpecification*>(declaration))
     {
         obj.AddMember("NodeType", "ProcedureSpecification", m_alloc);
         if (procedureSpecification->getType().has_value())

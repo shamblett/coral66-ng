@@ -33,7 +33,7 @@ static FixedType fixedType{16, 8};
 static UntypedType untypedType{};
 static ErrorType errorType{};
 
-void SemanticAnalysis::visit(const Syntax::Program& node)
+void SemanticAnalysis::visit(const syntax::Program& node)
 {
     m_globalDeclarations.clear();
     m_currentBlockStatements.clear();
@@ -42,7 +42,7 @@ void SemanticAnalysis::visit(const Syntax::Program& node)
     visit(node.getBlock());
 }
 
-void SemanticAnalysis::visit(const Syntax::Block& node)
+void SemanticAnalysis::visit(const syntax::Block& node)
 {
     for (const auto& decl : node.getDeclarations())
     {
@@ -54,89 +54,89 @@ void SemanticAnalysis::visit(const Syntax::Block& node)
     }
 }
 
-void SemanticAnalysis::visit(const Syntax::Declaration& node)
+void SemanticAnalysis::visit(const syntax::Declaration& node)
 {
-    if (auto* varDecl = dynamic_cast<const Syntax::VariableDeclaration*>(&node))
+    if (auto* varDecl = dynamic_cast<const syntax::VariableDeclaration*>(&node))
     {
         visit(*varDecl);
     }
-    else if (auto* procDecl = dynamic_cast<const Syntax::ProcedureDeclaration*>(&node))
+    else if (auto* procDecl = dynamic_cast<const syntax::ProcedureDeclaration*>(&node))
     {
         visit(*procDecl);
     }
-    else if (auto* arrayDecl = dynamic_cast<const Syntax::ArrayDeclaration*>(&node))
+    else if (auto* arrayDecl = dynamic_cast<const syntax::ArrayDeclaration*>(&node))
     {
         visit(*arrayDecl);
     }
-    else if (auto* tableDecl = dynamic_cast<const Syntax::TableDeclaration*>(&node))
+    else if (auto* tableDecl = dynamic_cast<const syntax::TableDeclaration*>(&node))
     {
         visit(*tableDecl);
     }
-    else if (auto* overlayDecl = dynamic_cast<const Syntax::OverlayDeclaration*>(&node))
+    else if (auto* overlayDecl = dynamic_cast<const syntax::OverlayDeclaration*>(&node))
     {
         visit(*overlayDecl);
     }
 }
 
-void SemanticAnalysis::visit(const Syntax::Statement& node)
+void SemanticAnalysis::visit(const syntax::Statement& node)
 {
-    if (auto* dummy = dynamic_cast<const Syntax::DummyStatement*>(&node))
+    if (auto* dummy = dynamic_cast<const syntax::DummyStatement*>(&node))
     {
         visit(*dummy);
     }
-    if (auto* blockStmt = dynamic_cast<const Syntax::BlockStatement*>(&node))
+    if (auto* blockStmt = dynamic_cast<const syntax::BlockStatement*>(&node))
     {
         visit(*blockStmt);
     }
-    else if (auto* compStmt = dynamic_cast<const Syntax::CompoundStatement*>(&node))
+    else if (auto* compStmt = dynamic_cast<const syntax::CompoundStatement*>(&node))
     {
         visit(*compStmt);
     }
-    else if (auto* assign = dynamic_cast<const Syntax::AssignmentStatement*>(&node))
+    else if (auto* assign = dynamic_cast<const syntax::AssignmentStatement*>(&node))
     {
         visit(*assign);
     }
-    else if (auto* ifStmt = dynamic_cast<const Syntax::IfStatement*>(&node))
+    else if (auto* ifStmt = dynamic_cast<const syntax::IfStatement*>(&node))
     {
         visit(*ifStmt);
     }
-    else if (auto* gotoStmt = dynamic_cast<const Syntax::GotoStatement*>(&node))
+    else if (auto* gotoStmt = dynamic_cast<const syntax::GotoStatement*>(&node))
     {
         visit(*gotoStmt);
     }
-    else if (auto* forStmt = dynamic_cast<const Syntax::ForStatement*>(&node))
+    else if (auto* forStmt = dynamic_cast<const syntax::ForStatement*>(&node))
     {
         visit(*forStmt);
     }
-    else if (auto* ansStmt = dynamic_cast<const Syntax::AnswerStatement*>(&node))
+    else if (auto* ansStmt = dynamic_cast<const syntax::AnswerStatement*>(&node))
     {
         visit(*ansStmt);
     }
-    else if (auto* codeStmt = dynamic_cast<const Syntax::CodeStatement*>(&node))
+    else if (auto* codeStmt = dynamic_cast<const syntax::CodeStatement*>(&node))
     {
         visit(*codeStmt);
     }
-    else if (auto* procCall = dynamic_cast<const Syntax::ProcedureCallStatement*>(&node))
+    else if (auto* procCall = dynamic_cast<const syntax::ProcedureCallStatement*>(&node))
     {
         visit(*procCall);
     }
 }
 
-void SemanticAnalysis::visit(const Syntax::Expression& node)
+void SemanticAnalysis::visit(const syntax::Expression& node)
 {
-    if (auto* lit = dynamic_cast<const Syntax::LiteralExpression*>(&node))
+    if (auto* lit = dynamic_cast<const syntax::LiteralExpression*>(&node))
     {
         visit(*lit);
     }
-    else if (auto* id = dynamic_cast<const Syntax::IdentifierExpression*>(&node))
+    else if (auto* id = dynamic_cast<const syntax::IdentifierExpression*>(&node))
     {
         visit(*id);
     }
-    else if (auto* bin = dynamic_cast<const Syntax::BinaryExpression*>(&node))
+    else if (auto* bin = dynamic_cast<const syntax::BinaryExpression*>(&node))
     {
         visit(*bin);
     }
-    else if (auto* part = dynamic_cast<const Syntax::PartWordExpression*>(&node))
+    else if (auto* part = dynamic_cast<const syntax::PartWordExpression*>(&node))
     {
         visit(*part);
     }
@@ -173,7 +173,7 @@ IntrusiveVariantValue<Type> cloneType(const Type& type)
     return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
 }
 
-void SemanticAnalysis::visit(const Syntax::VariableDeclaration& node)
+void SemanticAnalysis::visit(const syntax::VariableDeclaration& node)
 {
     auto typeToken = node.getType();
     IntrusiveVariantValue<Type> type(PrimitiveType{PrimitiveType::Integer});
@@ -209,7 +209,7 @@ void SemanticAnalysis::visit(const Syntax::VariableDeclaration& node)
             // The ownership is the issue.
             // Let's store them in m_globalDeclarations for ownership, but we need to prevent CodeGen from emitting
             // them. Or better: ProcedureDeclaration body contains Statements. What about local declarations?
-            // Syntax::Block has declarations.
+            // syntax::Block has declarations.
             // CodeGen generates locals from Block declarations.
             // So we don't need to store locals in m_globalDeclarations!
             // EXCEPT parameters. Parameters are not in Block.
@@ -224,7 +224,7 @@ void SemanticAnalysis::visit(const Syntax::VariableDeclaration& node)
     }
 }
 
-void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
+void SemanticAnalysis::visit(const syntax::ProcedureDeclaration& node)
 {
     // 1. Create Procedure symbol first (recursive support)
     // For now we don't know types fully until we visit params.
@@ -240,7 +240,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
         visit(*param); // This adds to symbol table
 
         // Extract type
-        if (auto* var = dynamic_cast<const Syntax::VariableDeclaration*>(param.get()))
+        if (auto* var = dynamic_cast<const syntax::VariableDeclaration*>(param.get()))
         {
             // Find in symbol table (it was just added)
             // Or access the last added declaration?
@@ -258,7 +258,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
                 paramTypes.push_back({pType, std::get<std::string>(id->getValue()), false});
             }
         }
-        else if (auto* arr = dynamic_cast<const Syntax::ArrayDeclaration*>(param.get()))
+        else if (auto* arr = dynamic_cast<const syntax::ArrayDeclaration*>(param.get()))
         {
             // For array param, we need to find the type.
             // visit(ArrayDeclaration) adds to symbol table.
@@ -307,7 +307,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureDeclaration& node)
     m_globalDeclarations.push_back(std::move(proc));
 }
 
-void SemanticAnalysis::visit(const Syntax::ArrayDeclaration& node)
+void SemanticAnalysis::visit(const syntax::ArrayDeclaration& node)
 {
     auto typeToken = node.getType();
     const Type* elemTypePtr = &integerType;
@@ -346,7 +346,7 @@ void SemanticAnalysis::visit(const Syntax::ArrayDeclaration& node)
             m_globalDeclarations.push_back(std::move(var));
     }
 }
-void SemanticAnalysis::visit(const Syntax::TableDeclaration& node)
+void SemanticAnalysis::visit(const syntax::TableDeclaration& node)
 {
     uint64_t width = 1;
     uint64_t length = 1;
@@ -381,18 +381,18 @@ void SemanticAnalysis::visit(const Syntax::TableDeclaration& node)
     m_globalDeclarations.push_back(std::move(var));
 }
 
-void SemanticAnalysis::visit(const Syntax::OverlayDeclaration& node)
+void SemanticAnalysis::visit(const syntax::OverlayDeclaration& node)
 {
     visit(node.getOverlayDeclaration());
 }
 
-void SemanticAnalysis::visit(const Syntax::DummyStatement& node)
+void SemanticAnalysis::visit(const syntax::DummyStatement& node)
 {
     auto stmt = makeIntr<DummyStatement>(ScopePoint{0});
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit(const Syntax::BlockStatement& node)
+void SemanticAnalysis::visit(const syntax::BlockStatement& node)
 {
     auto prevStmts = std::move(m_currentBlockStatements);
     m_currentBlockStatements.clear();
@@ -410,7 +410,7 @@ void SemanticAnalysis::visit(const Syntax::BlockStatement& node)
         makeIntr<BlockStatement>(ScopePoint{0}, std::vector<coral66::IntrVarPtr<Usable>>{}, std::move(blockStmts)));
 }
 
-void SemanticAnalysis::visit(const Syntax::CompoundStatement& node)
+void SemanticAnalysis::visit(const syntax::CompoundStatement& node)
 {
     auto prevStmts = std::move(m_currentBlockStatements);
     m_currentBlockStatements.clear();
@@ -426,7 +426,7 @@ void SemanticAnalysis::visit(const Syntax::CompoundStatement& node)
     m_currentBlockStatements.push_back(makeIntr<CompoundStatement>(ScopePoint{0}, std::move(compStmts)));
 }
 
-void SemanticAnalysis::visit(const Syntax::AssignmentStatement& node)
+void SemanticAnalysis::visit(const syntax::AssignmentStatement& node)
 {
     visit(node.getVariable());
     auto lhs = std::move(m_lastExpression);
@@ -440,7 +440,7 @@ void SemanticAnalysis::visit(const Syntax::AssignmentStatement& node)
     }
 }
 
-void SemanticAnalysis::visit(const Syntax::IfStatement& node)
+void SemanticAnalysis::visit(const syntax::IfStatement& node)
 {
     visit(node.getCondition());
     auto cond = std::move(m_lastExpression);
@@ -464,13 +464,13 @@ void SemanticAnalysis::visit(const Syntax::IfStatement& node)
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit([[maybe_unused]] const Syntax::GotoStatement& node)
+void SemanticAnalysis::visit([[maybe_unused]] const syntax::GotoStatement& node)
 {
     auto stmt = makeIntr<CodeStatement>(ScopePoint{0}, "nop");
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit(const Syntax::ForStatement& node)
+void SemanticAnalysis::visit(const syntax::ForStatement& node)
 {
     visit(node.getVariable());
     auto var = std::move(m_lastExpression);
@@ -519,14 +519,14 @@ void SemanticAnalysis::visit(const Syntax::ForStatement& node)
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit(const Syntax::AnswerStatement& node)
+void SemanticAnalysis::visit(const syntax::AnswerStatement& node)
 {
     visit(node.getExpression());
     auto stmt = makeIntr<AnswerStatement>(ScopePoint{0}, std::move(m_lastExpression));
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit(const Syntax::CodeStatement& node)
+void SemanticAnalysis::visit(const syntax::CodeStatement& node)
 {
     auto lit = node.getCode();
     std::string code = std::get<std::string>(lit->getValue());
@@ -534,7 +534,7 @@ void SemanticAnalysis::visit(const Syntax::CodeStatement& node)
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit(const Syntax::ProcedureCallStatement& node)
+void SemanticAnalysis::visit(const syntax::ProcedureCallStatement& node)
 {
     visit(node.getExpression());
     auto callExpr = std::move(m_lastExpression);
@@ -547,7 +547,7 @@ void SemanticAnalysis::visit(const Syntax::ProcedureCallStatement& node)
     m_currentBlockStatements.push_back(std::move(stmt));
 }
 
-void SemanticAnalysis::visit(const Syntax::LiteralExpression& node)
+void SemanticAnalysis::visit(const syntax::LiteralExpression& node)
 {
     IntrusiveVariantValue<Type> type(PrimitiveType{PrimitiveType::Integer});
     if (node.getLiteral()->getType() == lexer::CToken::Floating)
@@ -562,7 +562,7 @@ void SemanticAnalysis::visit(const Syntax::LiteralExpression& node)
     m_lastExpression = makeIntr<Constant>(type, std::move(val), node.begin(), node.end());
 }
 
-void SemanticAnalysis::visit(const Syntax::IdentifierExpression& node)
+void SemanticAnalysis::visit(const syntax::IdentifierExpression& node)
 {
     auto name = std::get<std::string>(node.getIdentifier()->getValue());
 
@@ -575,7 +575,7 @@ void SemanticAnalysis::visit(const Syntax::IdentifierExpression& node)
     }
 }
 
-void SemanticAnalysis::visit(const Syntax::BinaryExpression& node)
+void SemanticAnalysis::visit(const syntax::BinaryExpression& node)
 {
     visit(node.getLeft());
     auto left = std::move(m_lastExpression);
@@ -595,7 +595,7 @@ void SemanticAnalysis::visit(const Syntax::BinaryExpression& node)
     m_lastExpression = makeIntr<BinaryOperator>(type, std::move(left), kind, node.getOp(), std::move(right));
 }
 
-void SemanticAnalysis::visit(const Syntax::PartWordExpression& node)
+void SemanticAnalysis::visit(const syntax::PartWordExpression& node)
 {
     visit(node.getBase());
     auto base = std::move(m_lastExpression);
@@ -623,7 +623,7 @@ void SemanticAnalysis::visit(const Syntax::PartWordExpression& node)
     m_lastExpression = makeIntr<PartWordAccess>(type, std::move(base), s, w, node.begin(), node.end());
 }
 
-Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
+Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
 {
     CTRACK_NAME("Semantics");
     SemanticAnalysis analysis(cTokens, reporter, errors);

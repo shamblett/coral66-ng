@@ -11,7 +11,7 @@
 
 #include "lib/frontend/lexer/lexer.hpp"
 
-namespace coral66::Syntax
+namespace coral66::syntax
 {
 
 class Block;
@@ -580,4 +580,4 @@ public:
     [[nodiscard]] std::vector<lexer::CTokenIterator> getItems() const;
 };
 
-} // namespace coral66::Syntax
+} // namespace coral66::syntax

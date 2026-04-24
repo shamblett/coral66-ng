@@ -4,15 +4,16 @@
  * Date   : 21/04/2026
  */
 
+#include <iostream>
+
 #include "common.hpp"
+#include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
-#include <iostream>
 #include "tools/parser/astdump/lib/ast_dump.hpp"
-#include "lib/frontend/preprocessor/preprocessor.hpp"
 
 using namespace coral66;
-using namespace coral66::Syntax;
+using namespace coral66::syntax;
 using namespace coral66::Tests;
 
 /*
@@ -58,7 +59,6 @@ TEST_CASE("Examples", "[Parser][Golden]")
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         parser::DiagnosticCollector::clearDiagnostics();
         auto parsed = parser::parseProgram(cTokens, &ss);
-        
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/sieve/sieve_ast.json", "frontend/parser");

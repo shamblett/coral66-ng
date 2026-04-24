@@ -30,41 +30,41 @@ public:
     SemanticAnalysis(const source_interface& sourceInterface, llvm::raw_ostream* reporter = &llvm::errs(),
                      bool* errors = nullptr);
 
-    friend Program analyse(const Syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter,
+    friend Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter,
                            bool* errors);
 
-    void visit(const Syntax::Program& node);
-    void visit(const Syntax::Block& node);
+    void visit(const syntax::Program& node);
+    void visit(const syntax::Block& node);
 
     // Dispatchers
-    void visit(const Syntax::Declaration& node);
-    void visit(const Syntax::Statement& node);
-    void visit(const Syntax::Expression& node);
+    void visit(const syntax::Declaration& node);
+    void visit(const syntax::Statement& node);
+    void visit(const syntax::Expression& node);
 
     // Specific Visitors - Declarations
-    void visit(const Syntax::VariableDeclaration& node);
-    void visit(const Syntax::ProcedureDeclaration& node);
-    void visit(const Syntax::ArrayDeclaration& node);
-    void visit(const Syntax::TableDeclaration& node);
-    void visit(const Syntax::OverlayDeclaration& node);
+    void visit(const syntax::VariableDeclaration& node);
+    void visit(const syntax::ProcedureDeclaration& node);
+    void visit(const syntax::ArrayDeclaration& node);
+    void visit(const syntax::TableDeclaration& node);
+    void visit(const syntax::OverlayDeclaration& node);
 
     // Specific Visitors - Statements
-    void visit(const Syntax::DummyStatement& node);
-    void visit(const Syntax::BlockStatement& node);
-    void visit(const Syntax::CompoundStatement& node);
-    void visit(const Syntax::AssignmentStatement& node);
-    void visit(const Syntax::IfStatement& node);
-    void visit(const Syntax::GotoStatement& node);
-    void visit(const Syntax::ForStatement& node);
-    void visit(const Syntax::AnswerStatement& node);
-    void visit(const Syntax::CodeStatement& node);
-    void visit(const Syntax::ProcedureCallStatement& node);
+    void visit(const syntax::DummyStatement& node);
+    void visit(const syntax::BlockStatement& node);
+    void visit(const syntax::CompoundStatement& node);
+    void visit(const syntax::AssignmentStatement& node);
+    void visit(const syntax::IfStatement& node);
+    void visit(const syntax::GotoStatement& node);
+    void visit(const syntax::ForStatement& node);
+    void visit(const syntax::AnswerStatement& node);
+    void visit(const syntax::CodeStatement& node);
+    void visit(const syntax::ProcedureCallStatement& node);
 
     // Specific Visitors - Expressions
-    void visit(const Syntax::LiteralExpression& node);
-    void visit(const Syntax::IdentifierExpression& node);
-    void visit(const Syntax::BinaryExpression& node);
-    void visit(const Syntax::PartWordExpression& node);
+    void visit(const syntax::LiteralExpression& node);
+    void visit(const syntax::IdentifierExpression& node);
+    void visit(const syntax::BinaryExpression& node);
+    void visit(const syntax::PartWordExpression& node);
 };
 
 } // namespace coral66::Semantics

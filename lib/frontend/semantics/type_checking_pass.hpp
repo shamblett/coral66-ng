@@ -13,10 +13,10 @@ namespace coral66::Semantics
 {
 
 /*
-* Structure for the second pass. This pass expects the symbol table to be fully resolved.
-* It will infer expression types, validate function calls
-* (matching arguments), check type conversions, etc.
-*/
+ * Structure for the second pass. This pass expects the symbol table to be fully resolved.
+ * It will infer expression types, validate function calls
+ * (matching arguments), check type conversions, etc.
+ */
 
 class TypeCheckingPass
 {
@@ -26,7 +26,7 @@ public:
     explicit TypeCheckingPass(SemanticContext& context);
 
     // Entry point for the type checking pass
-    void run(const Syntax::Program& program);
+    void run(const syntax::Program& program);
 };
 
 } // namespace coral66::Semantics

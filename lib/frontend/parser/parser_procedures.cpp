@@ -21,10 +21,10 @@ namespace coral66::parser
  *
  */
 
-std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureParameters(lexer::CTokenIterator& begin,
-                                                                                           lexer::CTokenIterator end, Context& context)
+std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
+    parseProcedureParameters(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
-    std::vector<std::unique_ptr<Syntax::Declaration>> parameters;
+    std::vector<std::unique_ptr<syntax::Declaration>> parameters;
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
         begin++;
@@ -37,8 +37,8 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
                 auto startMode = begin;
                 begin++;
                 auto mode = (type == lexer::TokenType::ValueKeyword) ?
-                                Syntax::ParameterDeclaration::ParameterMode::Value :
-                                Syntax::ParameterDeclaration::ParameterMode::Location;
+                                syntax::ParameterDeclaration::ParameterMode::Value :
+                                syntax::ParameterDeclaration::ParameterMode::Location;
 
                 auto nextType = begin->getTokenType();
                 if (nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword
@@ -64,14 +64,14 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
                             break;
                         }
                     }
-                    parameters.push_back(
-                        std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, mode, paramTypeToken, std::move(ids)));
+                    parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(
+                        startMode, begin, mode, paramTypeToken, std::move(ids)));
                 }
                 else if (nextType == lexer::TokenType::Identifier)
                 {
                     auto untypedMode = (type == lexer::TokenType::ValueKeyword) ?
-                                           Syntax::ParameterDeclaration::ParameterMode::UntypedValue :
-                                           Syntax::ParameterDeclaration::ParameterMode::UntypedLocation;
+                                           syntax::ParameterDeclaration::ParameterMode::UntypedValue :
+                                           syntax::ParameterDeclaration::ParameterMode::UntypedLocation;
                     std::vector<lexer::CTokenIterator> ids;
                     while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
                     {
@@ -95,8 +95,8 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
                             break;
                         }
                     }
-                    parameters.push_back(std::make_unique<Syntax::ParameterDeclaration>(
-                        startMode, begin, untypedMode, std::nullopt, std::move(ids)));
+                    parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(startMode, begin, untypedMode,
+                                                                                        std::nullopt, std::move(ids)));
                 }
                 else
                 {
@@ -108,8 +108,8 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
                 auto startMode = begin;
                 begin++;
                 auto mode = (type == lexer::TokenType::LabelKeyword) ?
-                                Syntax::ParameterDeclaration::ParameterMode::Label :
-                                Syntax::ParameterDeclaration::ParameterMode::Switch;
+                                syntax::ParameterDeclaration::ParameterMode::Label :
+                                syntax::ParameterDeclaration::ParameterMode::Switch;
                 std::vector<lexer::CTokenIterator> ids;
                 while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
                 {
@@ -124,8 +124,8 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
                         break;
                     }
                 }
-                parameters.push_back(
-                    std::make_unique<Syntax::ParameterDeclaration>(startMode, begin, mode, std::nullopt, std::move(ids)));
+                parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(startMode, begin, mode,
+                                                                                    std::nullopt, std::move(ids)));
             }
             else if (type == lexer::TokenType::ProcedureKeyword)
             {
@@ -158,8 +158,9 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
                         break;
                     }
                 }
-                parameters.push_back(std::make_unique<Syntax::ParameterDeclaration>(
-                    startMode, begin, Syntax::ParameterDeclaration::ParameterMode::Procedure, std::nullopt, std::move(ids)));
+                parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(
+                    startMode, begin, syntax::ParameterDeclaration::ParameterMode::Procedure, std::nullopt,
+                    std::move(ids)));
             }
             else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
                      || type == lexer::TokenType::FixedKeyword)
@@ -210,7 +211,7 @@ std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureP
     return parameters;
 }
 
-std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                              Context& context)
 {
     auto rollback = begin;
@@ -266,7 +267,7 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
             {
                 return nullptr;
             }
-            std::vector<std::unique_ptr<Syntax::Declaration>> parameters = std::move(parametersOpt.value());
+            std::vector<std::unique_ptr<syntax::Declaration>> parameters = std::move(parametersOpt.value());
 
             if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
             {
@@ -283,15 +284,15 @@ std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
                         errors::parser::MISSING_ANSWER_STATEMENT.args(*start, context.getSourceInterface(), *start));
                     DiagnosticCollector::addDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT);
                 }
-                auto result = std::make_unique<Syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters),
+                auto result = std::make_unique<syntax::ProcedureDeclaration>(start, begin, name, std::move(parameters),
                                                                              std::move(body), typeToken, isRecursive);
                 context.exitProcedure();
                 return result;
             }
             context.log(errors::parser::EXPECTED_STATEMENT.args(*start, context.getSourceInterface(), *start));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
-            auto result = std::make_unique<Syntax::ProcedureDeclaration>(
-                start, begin, name, std::move(parameters), std::make_unique<Syntax::DummyStatement>(begin, begin),
+            auto result = std::make_unique<syntax::ProcedureDeclaration>(
+                start, begin, name, std::move(parameters), std::make_unique<syntax::DummyStatement>(begin, begin),
                 typeToken, isRecursive);
             context.exitProcedure();
             return result;

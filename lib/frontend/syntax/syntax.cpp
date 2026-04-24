@@ -8,7 +8,7 @@
 
 #include <utility>
 
-namespace coral66::Syntax
+namespace coral66::syntax
 {
 Node::Node(const lexer::CTokenIterator begin, const lexer::CTokenIterator end) : m_begin(begin), m_end(end) {}
 
@@ -768,4 +768,4 @@ std::vector<lexer::CTokenIterator> ExternalCommunicator::getItems() const
     return m_items;
 }
 
-} // namespace coral66::Syntax
+} // namespace coral66::syntax

@@ -13,10 +13,10 @@ namespace coral66::Semantics
 {
 
 /*
-* Structure for the first pass. This pass will walk the Syntax::Program,
-* establish scopes in the symbol table, and resolve/bind identifiers to their
-* declarations without worrying about expression type rules.
-*/
+ * Structure for the first pass. This pass will walk the syntax::Program,
+ * establish scopes in the symbol table, and resolve/bind identifiers to their
+ * declarations without worrying about expression type rules.
+ */
 
 class SymbolResolutionPass
 {
@@ -26,7 +26,7 @@ public:
     explicit SymbolResolutionPass(SemanticContext& context);
 
     // Entry point for the symbol resolution pass
-    void run(const Syntax::Program& program);
+    void run(const syntax::Program& program);
 };
 
 } // namespace coral66::Semantics

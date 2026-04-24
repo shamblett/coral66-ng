@@ -15,7 +15,7 @@ namespace coral66::tools
 {
 
 // Main entry point
-rapidjson::Value AstDump::dump(const Syntax::Program& program)
+rapidjson::Value AstDump::dump(const syntax::Program& program)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
@@ -41,9 +41,12 @@ rapidjson::Value AstDump::dump(const Syntax::Program& program)
     }
 
     // Dump Block
-    if (program.hasBlock()) {
+    if (program.hasBlock())
+    {
         obj.AddMember("Block", dump(program.getBlock()), m_alloc);
-    } else {
+    }
+    else
+    {
         obj.AddMember("Block", rapidjson::Value(rapidjson::kNullType), m_alloc);
     }
 
@@ -51,7 +54,7 @@ rapidjson::Value AstDump::dump(const Syntax::Program& program)
 }
 
 // String dump
-std::string AstDump::dumpToString(const Syntax::Program& program)
+std::string AstDump::dumpToString(const syntax::Program& program)
 {
     // Create the RapidJSON Document
     rapidjson::Document doc;
@@ -74,7 +77,7 @@ std::string AstDump::dumpToString(const Syntax::Program& program)
 }
 
 // Block
-rapidjson::Value AstDump::dump(const Syntax::Block& block)
+rapidjson::Value AstDump::dump(const syntax::Block& block)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
     obj.AddMember("NodeType", "Block", m_alloc);
@@ -115,7 +118,7 @@ rapidjson::Value AstDump::dump(const Syntax::Block& block)
 }
 
 // Dispatcher
-rapidjson::Value AstDump::dump(const Syntax::Node* node)
+rapidjson::Value AstDump::dump(const syntax::Node* node)
 {
     if (!node)
         return rapidjson::Value(rapidjson::kNullType);
@@ -123,22 +126,22 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
     rapidjson::Value obj(rapidjson::kObjectType);
 
     // Declarations
-    if (auto* declaration = dynamic_cast<const Syntax::Declaration*>(node))
+    if (auto* declaration = dynamic_cast<const syntax::Declaration*>(node))
     {
         obj.AddMember("Declaration", dump(declaration), m_alloc);
     }
     // Statements
-    else if (auto* statement = dynamic_cast<const Syntax::Statement*>(node))
+    else if (auto* statement = dynamic_cast<const syntax::Statement*>(node))
     {
         obj.AddMember("Statement", dump(statement), m_alloc);
     }
     // Expressions
-    else if (auto* expression = dynamic_cast<const Syntax::Expression*>(node))
+    else if (auto* expression = dynamic_cast<const syntax::Expression*>(node))
     {
         obj.AddMember("Expression", dump(expression), m_alloc);
     }
     // Place references
-    else if (auto* placeReference = dynamic_cast<const Syntax::PlaceReference*>(node))
+    else if (auto* placeReference = dynamic_cast<const syntax::PlaceReference*>(node))
     {
         obj.AddMember("Place Reference", dump(placeReference), m_alloc);
     }
@@ -154,7 +157,7 @@ rapidjson::Value AstDump::dump(const Syntax::Node* node)
 }
 
 // For element
-rapidjson::Value AstDump::dump(const Syntax::ForElement& element)
+rapidjson::Value AstDump::dump(const syntax::ForElement& element)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 

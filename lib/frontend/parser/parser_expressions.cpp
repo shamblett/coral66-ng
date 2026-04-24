@@ -9,7 +9,7 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "parser_support.hpp"
 
-using namespace coral66::Syntax;
+using namespace coral66::syntax;
 
 namespace coral66::parser
 {
@@ -326,8 +326,8 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTo
         else
         {
             context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
-                                                                         context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr; // Missing )
         }
@@ -554,8 +554,8 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                         return nullptr;
                     }
                     context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
-                                                                                 context.getSourceInterface(),
-                                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                                context.getSourceInterface(),
+                                                                                *(begin == end ? (end - 1) : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
                     return nullptr;
                 }
@@ -635,7 +635,8 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                                                                 std::move(bitPos), std::move(totalBits));
                 }
             }
-            context.log(errors::parser::INVALID_BITS_FORMAT.args(*startToken, context.getSourceInterface(), *startToken));
+            context.log(
+                errors::parser::INVALID_BITS_FORMAT.args(*startToken, context.getSourceInterface(), *startToken));
             DiagnosticCollector::addDiagnostic(errors::parser::INVALID_BITS_FORMAT);
             return nullptr;
         }
@@ -691,8 +692,8 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexe
                 return std::make_unique<FunctionCallExpression>(idToken, endToken, idToken, std::move(args));
             }
             context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
-                                                                         context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }
@@ -740,7 +741,8 @@ std::unique_ptr<Expression> parseVariable(lexer::CTokenIterator& begin, lexer::C
                                                                 std::move(bitPos), std::move(totalBits));
                 }
             }
-            context.log(errors::parser::INVALID_BITS_FORMAT.args(*startToken, context.getSourceInterface(), *startToken));
+            context.log(
+                errors::parser::INVALID_BITS_FORMAT.args(*startToken, context.getSourceInterface(), *startToken));
             DiagnosticCollector::addDiagnostic(errors::parser::INVALID_BITS_FORMAT);
             return nullptr;
         }

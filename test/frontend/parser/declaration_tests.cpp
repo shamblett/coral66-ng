@@ -10,7 +10,7 @@
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
-using namespace coral66::Syntax;
+using namespace coral66::syntax;
 
 /*
  * Tests cover section 4 of the specification

@@ -67,7 +67,7 @@ static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIter
     return false;
 }
 
-static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
+static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
 {
     if (begin == end)
     {
@@ -87,7 +87,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     begin++;
                     if (auto rhs = parseExpression(begin, end, context))
                     {
-                        return std::make_unique<Syntax::AssignmentStatement>(start, begin, std::move(var),
+                        return std::make_unique<syntax::AssignmentStatement>(start, begin, std::move(var),
                                                                              std::move(rhs));
                     }
                     context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
@@ -116,8 +116,8 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
 
             if (auto expr = parseExpression(begin, end, context))
             {
-                if (!dynamic_cast<Syntax::IdentifierExpression*>(expr.get())
-                    && !dynamic_cast<Syntax::FunctionCallExpression*>(expr.get()))
+                if (!dynamic_cast<syntax::IdentifierExpression*>(expr.get())
+                    && !dynamic_cast<syntax::FunctionCallExpression*>(expr.get()))
                 {
                     context.log(errors::parser::EXPECTED_PROCEDURE_CALL.args(*(begin == end ? (end - 1) : begin),
                                                                              context.getSourceInterface(),
@@ -125,7 +125,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_PROCEDURE_CALL);
                     return nullptr;
                 }
-                return std::make_unique<Syntax::ProcedureCallStatement>(start, begin, std::move(expr));
+                return std::make_unique<syntax::ProcedureCallStatement>(start, begin, std::move(expr));
             }
             return nullptr;
         }
@@ -138,7 +138,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         {
             auto label = begin;
             begin++;
-            std::unique_ptr<Syntax::Expression> index = nullptr;
+            std::unique_ptr<syntax::Expression> index = nullptr;
             if (begin != end && begin->getTokenType() == lexer::TokenType::OpenSquareBracket)
             {
                 begin++;
@@ -156,7 +156,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     return nullptr;
                 }
             }
-            return std::make_unique<Syntax::GotoStatement>(start, begin, label, std::move(index));
+            return std::make_unique<syntax::GotoStatement>(start, begin, label, std::move(index));
         }
         context.log(errors::parser::EXPECTED_IDENTIFIER.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
@@ -188,7 +188,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
 
         if (expr)
         {
-            return std::make_unique<Syntax::AnswerStatement>(start, begin, std::move(expr));
+            return std::make_unique<syntax::AnswerStatement>(start, begin, std::move(expr));
         }
         context.log(errors::parser::EXPECTED_EXPRESSION.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
@@ -214,7 +214,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_END);
                     return nullptr;
                 }
-                return std::make_unique<Syntax::CodeStatement>(start, begin);
+                return std::make_unique<syntax::CodeStatement>(start, begin);
             }
             if (begin != end && begin->getTokenType() != lexer::TokenType::StringLiteral)
             {
@@ -253,7 +253,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         {
             begin++;
             auto thenBranch = parseStatement(begin, end, context, true);
-            std::unique_ptr<Syntax::Statement> elseBranch = nullptr;
+            std::unique_ptr<syntax::Statement> elseBranch = nullptr;
             if (begin != end && begin->getTokenType() == lexer::TokenType::ElseKeyword)
             {
                 begin++;
@@ -277,7 +277,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
             }
             if (cond && thenBranch)
             {
-                return std::make_unique<Syntax::IfStatement>(start, begin, std::move(cond), std::move(thenBranch),
+                return std::make_unique<syntax::IfStatement>(start, begin, std::move(cond), std::move(thenBranch),
                                                              std::move(elseBranch));
             }
         }
@@ -308,13 +308,13 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
                 begin++;
-                std::vector<Syntax::ForElement> elements;
+                std::vector<syntax::ForElement> elements;
                 bool parsingElements = true;
                 bool errorOccurred = false;
 
                 while (parsingElements)
                 {
-                    Syntax::ForElement element;
+                    syntax::ForElement element;
                     element.expression = parseExpression(begin, end, context);
                     if (!element.expression)
                     {
@@ -389,7 +389,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     begin++;
                     if (auto body = parseStatement(begin, end, context); body && !elements.empty())
                     {
-                        return std::make_unique<Syntax::ForStatement>(start, begin, std::move(var), std::move(elements),
+                        return std::make_unique<syntax::ForStatement>(start, begin, std::move(var), std::move(elements),
                                                                       std::move(body));
                     }
                 }
@@ -423,7 +423,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         begin->getTokenType() == lexer::TokenType::EndKeyword ||
         begin->getTokenType() == lexer::TokenType::ElseKeyword)
     {
-        return std::make_unique<Syntax::DummyStatement>(begin, begin);
+        return std::make_unique<syntax::DummyStatement>(begin, begin);
     }
 
     if (begin->getTokenType() == lexer::TokenType::BeginKeyword)
@@ -433,9 +433,9 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         {
             if (block->getDeclarations().empty() && block->getPlaceReferences().empty())
             {
-                return std::make_unique<Syntax::CompoundStatement>(blockStart, begin, block->takeStatements());
+                return std::make_unique<syntax::CompoundStatement>(blockStart, begin, block->takeStatements());
             }
-            return std::make_unique<Syntax::BlockStatement>(blockStart, begin, std::move(block));
+            return std::make_unique<syntax::BlockStatement>(blockStart, begin, std::move(block));
         }
         return nullptr;
     }
@@ -446,7 +446,7 @@ static std::unique_ptr<Syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     return nullptr;
 }
 
-std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
+std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
 {
     if (begin == end)
     {

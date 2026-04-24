@@ -25,7 +25,7 @@ public:
     explicit ControlFlowPass(SemanticContext& context);
 
     // Entry point for the control flow validation pass
-    void run(const Syntax::Program& program);
+    void run(const syntax::Program& program);
 };
 
 } // namespace coral66::Semantics

@@ -9,13 +9,11 @@
 namespace coral66::Semantics
 {
 
-SymbolResolutionPass::SymbolResolutionPass(SemanticContext& context) : m_context(context)
-{
-}
+SymbolResolutionPass::SymbolResolutionPass(SemanticContext& context) : m_context(context) {}
 
-void SymbolResolutionPass::run([[maybe_unused]] const Syntax::Program& program)
+void SymbolResolutionPass::run([[maybe_unused]] const syntax::Program& program)
 {
-    // Walk the AST to discover all declarations, manage scopes, 
+    // Walk the AST to discover all declarations, manage scopes,
     // and populate m_context.symbolTable
 }
 

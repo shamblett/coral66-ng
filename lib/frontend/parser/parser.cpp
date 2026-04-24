@@ -6,9 +6,9 @@
 
 #include "parser.hpp"
 
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "parser_support.hpp"
 
 namespace coral66::parser
@@ -41,7 +41,7 @@ std::size_t Context::getErrorCount() const
     return m_errorCount;
 }
 
-Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter, bool* errors)
+syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter, bool* errors)
 {
     CTRACK_NAME("Parse");
     Context context(sourceObject, reporter);
@@ -97,7 +97,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
 
     // Communicator
     begin++;
-    std::unique_ptr<Syntax::Communicator> communicator = parseCommunicator(begin, end, context);
+    std::unique_ptr<syntax::Communicator> communicator = parseCommunicator(begin, end, context);
     if (!communicator && context.getErrorCount() > 0)
     {
         if (begin != end)
@@ -131,7 +131,7 @@ Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     return {sourceObject.data().data(), end, std::move(block), std::move(communicator), name, isSegment};
 }
 
-std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     if (begin == end || begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {
@@ -140,9 +140,9 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
     auto blockStart = begin;
     begin++;
 
-    std::vector<std::unique_ptr<Syntax::Declaration>> declarations;
-    std::vector<std::unique_ptr<Syntax::Statement>> statements;
-    std::vector<std::unique_ptr<Syntax::PlaceReference>> placeReferences;
+    std::vector<std::unique_ptr<syntax::Declaration>> declarations;
+    std::vector<std::unique_ptr<syntax::Statement>> statements;
+    std::vector<std::unique_ptr<syntax::PlaceReference>> placeReferences;
 
     bool declarationsAllowed = true;
     bool firstItem = true;
@@ -237,7 +237,7 @@ std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
         return nullptr;
     }
 
-    return std::make_unique<Syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements),
+    return std::make_unique<syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements),
                                            std::move(placeReferences));
 }
 

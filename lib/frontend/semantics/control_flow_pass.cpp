@@ -9,11 +9,9 @@
 namespace coral66::Semantics
 {
 
-ControlFlowPass::ControlFlowPass(SemanticContext& context) : m_context(context)
-{
-}
+ControlFlowPass::ControlFlowPass(SemanticContext& context) : m_context(context) {}
 
-void ControlFlowPass::run([[maybe_unused]] const Syntax::Program& program)
+void ControlFlowPass::run([[maybe_unused]] const syntax::Program& program)
 {
     // Walk the AST to validate GOTO statements, labels, loop bounds,
     // and overall procedure return paths.

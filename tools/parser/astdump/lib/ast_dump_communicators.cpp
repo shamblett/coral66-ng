@@ -11,11 +11,11 @@
 namespace coral66::tools
 {
 
-rapidjson::Value AstDump::dump(const Syntax::Communicator* communicator)
+rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
-    if (auto* commonCommunicator = dynamic_cast<const Syntax::CommonCommunicator*>(communicator))
+    if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(communicator))
     {
         rapidjson::Value commons(rapidjson::kArrayType);
         for (const auto& common : commonCommunicator->getItems())

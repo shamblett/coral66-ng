@@ -26,44 +26,44 @@ public:
     explicit AstDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
 
     // Main dump method
-    rapidjson::Value dump(const Syntax::Program& program);
+    rapidjson::Value dump(const syntax::Program& program);
 
     // Dump to a string
-    static std::string dumpToString(const Syntax::Program& program);
+    static std::string dumpToString(const syntax::Program& program);
 
 private:
     // Node Dispatcher
-    rapidjson::Value dump(const Syntax::Node* node);
+    rapidjson::Value dump(const syntax::Node* node);
 
     // Block dump
-    rapidjson::Value dump(const Syntax::Block& block);
+    rapidjson::Value dump(const syntax::Block& block);
 
     // Communicator
-    rapidjson::Value dump(const Syntax::Communicator* communicator);
+    rapidjson::Value dump(const syntax::Communicator* communicator);
 
     // Place references
-    rapidjson::Value dump(const Syntax::PlaceReference* placeReference);
+    rapidjson::Value dump(const syntax::PlaceReference* placeReference);
 
     // Declarations
-    rapidjson::Value dump(const Syntax::Declaration* declaration);
+    rapidjson::Value dump(const syntax::Declaration* declaration);
 
     // Statements
-    rapidjson::Value dump(const Syntax::Statement* statement);
+    rapidjson::Value dump(const syntax::Statement* statement);
 
     // For element
-    rapidjson::Value dump(const Syntax::ForElement& element);
+    rapidjson::Value dump(const syntax::ForElement& element);
 
     // Expressions
-    rapidjson::Value dump(const Syntax::Expression* expression);
+    rapidjson::Value dump(const syntax::Expression* expression);
 
     // Procedure call statement
-    rapidjson::Value dump(const Syntax::ProcedureCallStatement* callStatement);
+    rapidjson::Value dump(const syntax::ProcedureCallStatement* callStatement);
 
     // Procedure declarations
-    rapidjson::Value dump(const Syntax::ProcedureDeclaration* declaration);
+    rapidjson::Value dump(const syntax::ProcedureDeclaration* declaration);
 
     // Procedure Specifications
-    rapidjson::Value dump(const Syntax::ProcedureSpecification* specification);
+    rapidjson::Value dump(const syntax::ProcedureSpecification* specification);
 
     // Helper function to extract text from a Lexer CTokenIterator
     rapidjson::Value getTokenString(const lexer::CTokenIterator& token);

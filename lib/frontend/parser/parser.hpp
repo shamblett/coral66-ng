@@ -67,33 +67,33 @@ public:
 /*
  * Main parser entry point
  */
-Syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
+syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostream* reporter = &llvm::errs(),
                              bool* errors = nullptr);
 
 /*
  * Program structure parsers
  */
 
-std::unique_ptr<Syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
 
-std::vector<std::unique_ptr<Syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
+std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
                                                                    lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context, bool isConsequence = false);
-std::unique_ptr<Syntax::Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                    Context& context);
-std::unique_ptr<Syntax::Expression> parseVariable(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::Expression> parseVariable(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context);
-std::unique_ptr<Syntax::Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                        Context& context);
-std::unique_ptr<Syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::Expression> parseExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                     Context& context);
-std::unique_ptr<Syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                         Context& context);
-std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                             Context& context);
-std::optional<std::vector<std::unique_ptr<Syntax::Declaration>>> parseProcedureParameters(lexer::CTokenIterator& begin,
-                                                                                           lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
+    parseProcedureParameters(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                              Context& context);
 } // namespace coral66::parser

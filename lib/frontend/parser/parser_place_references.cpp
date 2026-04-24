@@ -20,7 +20,7 @@ namespace coral66::parser
  *
  */
 
-std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                             Context& context)
 {
     if (begin == end)
@@ -100,7 +100,7 @@ std::unique_ptr<Syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterato
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_LABELS);
                 return nullptr;
             }
-            return std::make_unique<Syntax::SwitchPlaceReference>(start, begin, name, labels);
+            return std::make_unique<syntax::SwitchPlaceReference>(start, begin, name, labels);
         }
         context.log(errors::parser::EXPECTED_IDENTIFIER.args(
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));

@@ -14,14 +14,14 @@ You could create a testing utility (e.g., test/frontend/parser/ast_json_dumper.c
     2 // Include your JSON library of choice here, NOT in syntax.hpp
     3 #include <rapidjson/document.h> 
     4
-    5 rapidjson::Value dumpNode(const coral66::Syntax::Node* node, rapidjson::Document::AllocatorType& allocator) {
+    5 rapidjson::Value dumpNode(const coral66::syntax::Node* node, rapidjson::Document::AllocatorType& allocator) {
     6     rapidjson::Value result(rapidjson::kObjectType);
     7
-    8     if (auto* varDecl = dynamic_cast<const coral66::Syntax::VariableDeclaration*>(node)) {
+    8     if (auto* varDecl = dynamic_cast<const coral66::syntax::VariableDeclaration*>(node)) {
     9         result.AddMember("type", "VariableDeclaration", allocator);
 10         // ... extract fields from varDecl and add them to result
 11     }
-12     else if (auto* procDecl = dynamic_cast<const coral66::Syntax::ProcedureDeclaration*>(node)) {
+12     else if (auto* procDecl = dynamic_cast<const coral66::syntax::ProcedureDeclaration*>(node)) {
 13         result.AddMember("type", "ProcedureDeclaration", allocator);
 14         // ... recursively call dumpNode on parameters and body
 15     }
@@ -38,7 +38,7 @@ Benefits of this approach:
 * Flexibility: You can format the JSON exactly how your tests need it without worrying about exactly how the reflection
   library maps C++ members to JSON fields.
 
-To dump the entire AST starting from the Syntax::Program root, you can extend the traversal pattern into a dedicated
+To dump the entire AST starting from the syntax::Program root, you can extend the traversal pattern into a dedicated
 class. Wrapping the logic in a class is highly
 recommended because rapidjson requires an allocator to construct JSON values, and a class allows you to store the
 allocator as a member rather than passing it around
@@ -66,7 +66,7 @@ Here is a complete architectural blueprint for how you can build this utility in
    12         : m_alloc(allocator) {}
    13
    14     // 1. Entry point for the whole program
-   15     rapidjson::Value dump(const coral66::Syntax::Program& program) {
+   15     rapidjson::Value dump(const coral66::syntax::Program& program) {
    16         rapidjson::Value obj(rapidjson::kObjectType);
    17         obj.AddMember("NodeType", "Program", m_alloc);
    18         
@@ -84,7 +84,7 @@ Here is a complete architectural blueprint for how you can build this utility in
    30     }
    31
    32     // 2. Dump a Block (handles vectors of unique_ptrs)
-   33     rapidjson::Value dump(const coral66::Syntax::Block& block) {
+   33     rapidjson::Value dump(const coral66::syntax::Block& block) {
    34         rapidjson::Value obj(rapidjson::kObjectType);
    35         obj.AddMember("NodeType", "Block", m_alloc);
    36
@@ -113,18 +113,18 @@ Here is a complete architectural blueprint for how you can build this utility in
    59     }
    60
    61     // 3. The Dispatcher (handles polymorphic Nodes)
-   62     rapidjson::Value dump(const coral66::Syntax::Node* node) {
+   62     rapidjson::Value dump(const coral66::syntax::Node* node) {
    63         if (!node) return rapidjson::Value(rapidjson::kNullType);
    64         
    65         rapidjson::Value obj(rapidjson::kObjectType);
    66
    67         // --- Declarations ---
-   68         if (auto* varDecl = dynamic_cast<const coral66::Syntax::VariableDeclaration*>(node)) {
+   68         if (auto* varDecl = dynamic_cast<const coral66::syntax::VariableDeclaration*>(node)) {
    69             obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
    70             // Example of dumping an identifier token
    71             // obj.AddMember("TypeToken", getTokenString(varDecl->getType()), m_alloc);
    72         }
-   73         else if (auto* procDecl = dynamic_cast<const coral66::Syntax::ProcedureDeclaration*>(node)) {
+   73         else if (auto* procDecl = dynamic_cast<const coral66::syntax::ProcedureDeclaration*>(node)) {
    74             obj.AddMember("NodeType", "ProcedureDeclaration", m_alloc);
    75             obj.AddMember("IsRecursive", procDecl->isRecursive(), m_alloc);
    76             
@@ -138,13 +138,13 @@ Here is a complete architectural blueprint for how you can build this utility in
    84             obj.AddMember("Body", dump(&procDecl->getBody()), m_alloc);
    85         }
    86         // --- Statements ---
-   87         else if (auto* assignStmt = dynamic_cast<const coral66::Syntax::AssignmentStatement*>(node)) { // Assuming this exists based on semantic_analysis.cpp
+   87         else if (auto* assignStmt = dynamic_cast<const coral66::syntax::AssignmentStatement*>(node)) { // Assuming this exists based on semantic_analysis.cpp
    88             obj.AddMember("NodeType", "AssignmentStatement", m_alloc);
    89             // obj.AddMember("LHS", dump(assignStmt->getLHS()), m_alloc);
    90             // obj.AddMember("RHS", dump(assignStmt->getRHS()), m_alloc);
    91         }
    92         // --- Expressions ---
-   93         else if (auto* binExpr = dynamic_cast<const coral66::Syntax::BinaryExpression*>(node)) { // Assuming this exists based on semantic_analysis.cpp
+   93         else if (auto* binExpr = dynamic_cast<const coral66::syntax::BinaryExpression*>(node)) { // Assuming this exists based on semantic_analysis.cpp
    94             obj.AddMember("NodeType", "BinaryExpression", m_alloc);
    95             // obj.AddMember("Left", dump(binExpr->getLeft()), m_alloc);
    96             // obj.AddMember("Right", dump(binExpr->getRight()), m_alloc);
@@ -177,7 +177,7 @@ Here is a complete architectural blueprint for how you can build this utility in
 ```
     1 #include <iostream>
     2
-    3 void printAstAsJson(const coral66::Syntax::Program& program) {
+    3 void printAstAsJson(const coral66::syntax::Program& program) {
     4     // 1. Create the RapidJSON Document
     5     rapidjson::Document doc;
     6     doc.SetObject();
@@ -305,9 +305,9 @@ How to use it in your AST Node dumping logic:
 If you are dumping a VariableDeclaration, for example, you can now easily dump its type and the identifiers it declares:
 
 ```
-    1 // Inside AstJsonDumper::dump(const coral66::Syntax::Node* node)
+    1 // Inside AstJsonDumper::dump(const coral66::syntax::Node* node)
     2
-    3 if (auto* varDecl = dynamic_cast<const coral66::Syntax::VariableDeclaration*>(node)) {
+    3 if (auto* varDecl = dynamic_cast<const coral66::syntax::VariableDeclaration*>(node)) {
     4     obj.AddMember("NodeType", "VariableDeclaration", m_alloc);
     5     
     6     // Dump the 'Type' keyword token (e.g., INTEGER, FLOATING, FIXED)

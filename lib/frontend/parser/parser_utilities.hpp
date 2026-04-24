@@ -86,9 +86,9 @@ bool firstIsInPostFixExpression(const lexer::CToken& token, const Context& conte
 
 bool firstIsInPrimaryExpression(const lexer::CToken& token, const Context& context);
 
-inline const char* parameterModeToString(Syntax::ParameterDeclaration::ParameterMode mode)
+inline const char* parameterModeToString(syntax::ParameterDeclaration::ParameterMode mode)
 {
-    using Mode = Syntax::ParameterDeclaration::ParameterMode;
+    using Mode = syntax::ParameterDeclaration::ParameterMode;
     switch (mode)
     {
         case Mode::Value: return "Value";

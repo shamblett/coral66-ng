@@ -11,11 +11,11 @@
 namespace coral66::tools
 {
 
-rapidjson::Value AstDump::dump(const Syntax::PlaceReference* placeReference)
+rapidjson::Value AstDump::dump(const syntax::PlaceReference* placeReference)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
-    if (auto* switchPlaceReference = dynamic_cast<const Syntax::SwitchPlaceReference*>(placeReference))
+    if (auto* switchPlaceReference = dynamic_cast<const syntax::SwitchPlaceReference*>(placeReference))
     {
         obj.AddMember("NodeType", "SwitchPlaceReference", m_alloc);
         obj.AddMember("name", getTokenString(switchPlaceReference->getName()), m_alloc);

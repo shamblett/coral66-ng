@@ -9,13 +9,11 @@
 namespace coral66::Semantics
 {
 
-TypeCheckingPass::TypeCheckingPass(SemanticContext& context) : m_context(context)
-{
-}
+TypeCheckingPass::TypeCheckingPass(SemanticContext& context) : m_context(context) {}
 
-void TypeCheckingPass::run([[maybe_unused]] const Syntax::Program& program)
+void TypeCheckingPass::run([[maybe_unused]] const syntax::Program& program)
 {
-    // Walk the AST to validate type rules, expression evaluations, 
+    // Walk the AST to validate type rules, expression evaluations,
     // assignments, parameter passing, and annotate AST nodes with type information
 }
 

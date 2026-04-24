@@ -95,7 +95,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         return {};
     }
 
-    Syntax::Program tree = parser::parseProgram(cTokens, m_reporter, &errors);
+    syntax::Program tree = parser::parseProgram(cTokens, m_reporter, &errors);
     if (errors)
     {
         return {};
