@@ -97,7 +97,7 @@ CREATE_ERROR(MALFORMED_COMMUNICATOR, "Invalid format for communicator", Underlin
 CREATE_ERROR(EXPECTED_N_AFTER_N, "Expected %0 after %1", InsertAfter<1, 0>);
 } // namespace parser
 
-namespace Semantics
+namespace semantics
 {
 CREATE_ERROR(UNDECLARED_IDENTIFIER_N, "Undeclared identifier %0", Underline<0>);
 CREATE_ERROR(REDEFINITION_OF_SYMBOL_N, "Redefinition of symbol %0", Underline<0>);
@@ -112,7 +112,7 @@ CREATE_ERROR(PROCEDURE_ARGUMENT_COUNT_MISMATCH, "Incorrect number of arguments f
 CREATE_ERROR(PROCEDURE_ARGUMENT_TYPE_MISMATCH, "Argument type mismatch", AnnotateExpr<0>);
 CREATE_ERROR(LOCATION_PARAMETER_REQUIRES_LVALUE, "LOCATION parameter requires a variable (L-value)", AnnotateExpr<0>);
 CREATE_ERROR(INVALID_SCALE_FOR_FIXED, "Invalid scale for FIXED point operation", Underline<0>);
-} // namespace Semantics
+} // namespace semantics
 
 namespace CLI
 {

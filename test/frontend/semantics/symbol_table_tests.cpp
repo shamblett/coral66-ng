@@ -11,7 +11,7 @@
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66::semantics;
-using namespace coral66::errors::Semantics;
+using namespace coral66::errors::semantics;
 using namespace coral66::lexer;
 
 TEST_CASE("Construction", "[Semantics][SymbolTable]")

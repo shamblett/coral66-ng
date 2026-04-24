@@ -43,12 +43,12 @@
 
 namespace coral66::warnings
 {
-namespace Semantics
+namespace semantics
 {
 CREATE_WARNING(UNUSED_VARIABLE_N, "unused-variable", "Unused variable %0", PointAt<0>);
 CREATE_WARNING(POSSIBLE_PRECISION_LOSS, "precision-loss", "Possible loss of precision in fixed point operation",
                Underline<0>);
-} // namespace Semantics
+} // namespace semantics
 namespace CLI
 {
 CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME, "command-line-argument-combination",

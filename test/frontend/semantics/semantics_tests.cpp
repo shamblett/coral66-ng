@@ -29,6 +29,6 @@
         CHECK_THAT(string, matches);                                         \
     } while (0)
 
-using namespace coral66::errors::Semantics;
+using namespace coral66::errors::semantics;
 
 TEST_CASE("Dummy", "[Backend]") {}
