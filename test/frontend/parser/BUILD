@@ -33,7 +33,7 @@ cc_library(
     data = [
         "//test/frontend/parser:testdata",
     ],
-    visibility = ["//test:__pkg__"],
+    visibility = ["//test:__subpackages__"],
     deps = [
         "//lib/frontend/common",
         "//lib/frontend/parser",
@@ -49,7 +49,7 @@ cc_test(
     srcs = [
         "main.cpp",
     ],
-    visibility = ["//test:__pkg__"],
+    visibility = ["//test:__subpackages__"],
     deps = [
         "parsertest",
     ],

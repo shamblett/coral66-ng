@@ -180,7 +180,7 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
             typeCopy = IntrusiveVariantValue<Type>(FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
             
         auto decl = makeIntr<VariableDeclaration>(id, std::move(typeCopy));
-        std::string name = std::get<std::string>(id->getValue());
+        const auto& name = std::get<std::string>(id->getValue());
         
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
@@ -203,7 +203,7 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
         auto typeCopy = IntrusiveVariantValue<Type>(ArrayType{&untypedType, dims});
         
         auto decl = makeIntr<ArrayDeclaration>(id, std::move(typeCopy));
-        std::string name = std::get<std::string>(id->getValue());
+        const auto& name = std::get<std::string>(id->getValue());
         
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
@@ -233,7 +233,7 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     auto id = node.getIdentifier();
     auto typeCopy = IntrusiveVariantValue<Type>(TableType{*new TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 1, 1}}});
     auto decl = makeIntr<TableDeclaration>(id, std::move(typeCopy));
-    std::string name = std::get<std::string>(id->getValue());
+    const auto& name = std::get<std::string>(id->getValue());
     
     if (m_context.symbolTable.lookupInCurrentScope(name))
     {
@@ -260,7 +260,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     auto typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}}); // Dummy procedure type
     
     auto decl = makeIntr<ProcedureDeclaration>(id, std::move(typeCopy));
-    std::string name = std::get<std::string>(id->getValue());
+    const auto& name = std::get<std::string>(id->getValue());
     
     if (m_context.symbolTable.lookupInCurrentScope(name))
     {
@@ -289,7 +289,7 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
     {
         auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
         auto decl = makeIntr<VariableDeclaration>(id, std::move(typeCopy));
-        std::string name = std::get<std::string>(id->getValue());
+        const auto& name = std::get<std::string>(id->getValue());
         
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
@@ -328,7 +328,7 @@ void SymbolResolutionPass::visit(const syntax::Expression& node)
 
 void SymbolResolutionPass::visit(const syntax::IdentifierExpression& node)
 {
-    std::string name = std::get<std::string>(node.getIdentifier()->getValue());
+    const auto& name = std::get<std::string>(node.getIdentifier()->getValue());
     const Usable* usable = m_context.symbolTable.lookup(name);
     if (!usable)
     {
@@ -368,7 +368,7 @@ void SymbolResolutionPass::visit(const syntax::ConditionalExpression& node)
 
 void SymbolResolutionPass::visit(const syntax::FunctionCallExpression& node)
 {
-    std::string name = std::get<std::string>(node.getFunction()->getValue());
+    const auto& name = std::get<std::string>(node.getFunction()->getValue());
     const Usable* usable = m_context.symbolTable.lookup(name);
     if (!usable)
     {
@@ -390,7 +390,7 @@ void SymbolResolutionPass::visit(const syntax::ArrayAccessExpression& node)
 {
     if (node.getArray())
     {
-        std::string name = std::get<std::string>(node.getArray()->getValue());
+        const auto& name = std::get<std::string>(node.getArray()->getValue());
         const Usable* usable = m_context.symbolTable.lookup(name);
         if (!usable)
         {

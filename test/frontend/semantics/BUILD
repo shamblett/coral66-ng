@@ -8,15 +8,17 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "semanticstest",
     srcs = [
-        "semantics_tests.cpp",
+        "semantics_symbol_resolution_tests.cpp",
         "symbol_table_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
         "//lib/frontend/common",
+        "//lib/frontend/parser",
         "//lib/frontend/semantics",
         "//lib/support",
         "//test/common",
+        "//test/frontend/parser:parsertest",
         "//test/vendor/catch2v3",
     ],
 )
