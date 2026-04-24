@@ -29,8 +29,6 @@ public:
     void run(const syntax::Program& program);
 
 private:
-    void visit(const syntax::Node& node);
-    
     // Statements & Blocks
     void visit(const syntax::Program& node);
     void visit(const syntax::Block& node);
