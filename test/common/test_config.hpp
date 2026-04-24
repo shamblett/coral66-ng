@@ -290,9 +290,9 @@ struct StringMaker<llvm::APInt>
 };
 
 template <>
-struct StringMaker<coral66::Semantics::Type>
+struct StringMaker<coral66::semantics::Type>
 {
-    static std::string convert([[maybe_unused]] const coral66::Semantics::Type& type)
+    static std::string convert([[maybe_unused]] const coral66::semantics::Type& type)
     {
         return "Type";
     }

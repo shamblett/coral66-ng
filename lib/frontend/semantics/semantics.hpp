@@ -29,7 +29,7 @@ class Node;
 class Program;
 } // namespace coral66::syntax
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 class ProgramInterface;
@@ -1035,4 +1035,4 @@ public:
 Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter = &llvm::errs(),
                 bool* errors = nullptr);
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

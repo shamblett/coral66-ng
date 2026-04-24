@@ -42,8 +42,8 @@ class common_abi_implementation : public abi_implementation
         std::vector<llvm::Type*> arguments;
     };
 
-    std::unordered_map<Semantics::FunctionType, std::pair<T, Cache>, TypeHasher<Semantics::FunctionType>,
-                       TypeEqual<Semantics::FunctionType>>
+    std::unordered_map<semantics::FunctionType, std::pair<T, Cache>, TypeHasher<semantics::FunctionType>,
+                       TypeEqual<semantics::FunctionType>>
         m_adjustments;
 
 protected:
@@ -54,7 +54,7 @@ protected:
 
     virtual T applyPlatformABIImpl(llvm::Type*& returnType, std::vector<llvm::Type*>& arguments) = 0;
 
-    const T& getAdjustment(const Semantics::FunctionType& functionType) const
+    const T& getAdjustment(const semantics::FunctionType& functionType) const
     {
         auto result = m_adjustments.find(functionType);
         CORAL66_ASSERT(result != m_adjustments.end());
@@ -62,7 +62,7 @@ protected:
     }
 
 public:
-    void applyPlatformABI(const Semantics::FunctionType& functionType, llvm::Type*& returnType,
+    void applyPlatformABI(const semantics::FunctionType& functionType, llvm::Type*& returnType,
                           std::vector<llvm::Type*>& arguments) final
     {
         auto result = m_adjustments.find(functionType);

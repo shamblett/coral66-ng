@@ -13,7 +13,7 @@
 namespace coral66::CGLLVM
 {
 
-code_generator::code_generator(llvm::Module& module, const Semantics::Program& program,
+code_generator::code_generator(llvm::Module& module, const semantics::Program& program,
                                const source_interface& sourceInterface, const CGLLVM::Options& options)
     : m_module(module), m_program(program), m_sourceInterface(sourceInterface), m_options(options)
 {
@@ -24,28 +24,28 @@ void code_generator::generate()
     // Process globals
     for (const auto& global : m_program.getGlobals())
     {
-        global->match([&](const Semantics::VariableDeclaration& var) { visit(var); },
-                      [&](const Semantics::ProcedureDeclaration& proc) { visit(proc); }, [](const auto&) {});
+        global->match([&](const semantics::VariableDeclaration& var) { visit(var); },
+                      [&](const semantics::ProcedureDeclaration& proc) { visit(proc); }, [](const auto&) {});
     }
 }
 
-llvm::Type* code_generator::convertType(const Semantics::Type& type)
+llvm::Type* code_generator::convertType(const semantics::Type& type)
 {
     auto& ctx = m_module.getContext();
-    if (auto* prim = type.tryAs<Semantics::PrimitiveType>())
+    if (auto* prim = type.tryAs<semantics::PrimitiveType>())
     {
         switch (prim->getKind())
         {
-            case Semantics::PrimitiveType::Integer: return llvm::Type::getInt32Ty(ctx);
-            case Semantics::PrimitiveType::Floating: return llvm::Type::getFloatTy(ctx);
-            case Semantics::PrimitiveType::Bits: return llvm::Type::getInt32Ty(ctx);
+            case semantics::PrimitiveType::Integer: return llvm::Type::getInt32Ty(ctx);
+            case semantics::PrimitiveType::Floating: return llvm::Type::getFloatTy(ctx);
+            case semantics::PrimitiveType::Bits: return llvm::Type::getInt32Ty(ctx);
         }
     }
-    else if (type.is<Semantics::UntypedType>())
+    else if (type.is<semantics::UntypedType>())
     {
         return llvm::Type::getVoidTy(ctx);
     }
-    else if (auto* fixed = type.tryAs<Semantics::FixedType>())
+    else if (auto* fixed = type.tryAs<semantics::FixedType>())
     {
         if (fixed->getTotalBits() <= 16)
             return llvm::Type::getInt16Ty(ctx);
@@ -53,7 +53,7 @@ llvm::Type* code_generator::convertType(const Semantics::Type& type)
             return llvm::Type::getInt32Ty(ctx);
         return llvm::Type::getInt64Ty(ctx);
     }
-    else if (auto* arr = type.tryAs<Semantics::ArrayType>())
+    else if (auto* arr = type.tryAs<semantics::ArrayType>())
     {
         llvm::Type* ret = convertType(arr->getElementType());
         for (auto it = arr->getDimensions().rbegin(); it != arr->getDimensions().rend(); ++it)
@@ -62,9 +62,9 @@ llvm::Type* code_generator::convertType(const Semantics::Type& type)
         }
         return ret;
     }
-    else if (auto* table = type.tryAs<Semantics::TableType>())
+    else if (auto* table = type.tryAs<semantics::TableType>())
     {
-        if (auto* def = std::get_if<Semantics::TableDefinition>(&table->getInfo().type))
+        if (auto* def = std::get_if<semantics::TableDefinition>(&table->getInfo().type))
         {
             uint64_t totalWords = def->getWidth() * def->getLength();
             return llvm::ArrayType::get(llvm::Type::getInt32Ty(ctx), totalWords);
@@ -74,7 +74,7 @@ llvm::Type* code_generator::convertType(const Semantics::Type& type)
     return llvm::Type::getVoidTy(ctx);
 }
 
-llvm::BasicBlock* code_generator::getOrCreateLabel(const Semantics::LabelStatement* label)
+llvm::BasicBlock* code_generator::getOrCreateLabel(const semantics::LabelStatement* label)
 {
     if (!m_labels.contains(label))
     {
@@ -83,9 +83,9 @@ llvm::BasicBlock* code_generator::getOrCreateLabel(const Semantics::LabelStateme
     return m_labels[label];
 }
 
-llvm::Value* code_generator::emitAddress(const Semantics::ExpressionBase& expr)
+llvm::Value* code_generator::emitAddress(const semantics::ExpressionBase& expr)
 {
-    if (auto* declRead = dynamic_cast<const Semantics::DeclarationRead*>(&expr))
+    if (auto* declRead = dynamic_cast<const semantics::DeclarationRead*>(&expr))
     {
         const auto* decl = &declRead->getDeclRead();
         if (m_locals.contains(decl))
@@ -93,35 +93,35 @@ llvm::Value* code_generator::emitAddress(const Semantics::ExpressionBase& expr)
         if (m_globals.contains(decl))
             return m_globals[decl];
     }
-    else if (auto* part = dynamic_cast<const Semantics::PartWordAccess*>(&expr))
+    else if (auto* part = dynamic_cast<const semantics::PartWordAccess*>(&expr))
     {
         return emitAddress(part->getBase());
     }
     return nullptr;
 }
 
-void code_generator::visit(const Semantics::Declaration& decl)
+void code_generator::visit(const semantics::Declaration& decl)
 {
-    if (auto* var = dynamic_cast<const Semantics::VariableDeclaration*>(&decl))
+    if (auto* var = dynamic_cast<const semantics::VariableDeclaration*>(&decl))
     {
         auto* llvmType = convertType(var->getType());
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    llvm::Constant::getNullValue(llvmType), var->getName());
         m_globals[var] = globalVar;
     }
-    else if (auto* proc = dynamic_cast<const Semantics::ProcedureDeclaration*>(&decl))
+    else if (auto* proc = dynamic_cast<const semantics::ProcedureDeclaration*>(&decl))
     {
         generateProcedure(*proc);
     }
 }
 
-void code_generator::generateProcedure(const Semantics::ProcedureDeclaration& procDecl)
+void code_generator::generateProcedure(const semantics::ProcedureDeclaration& procDecl)
 {
     m_currentProcedure = &procDecl;
     m_labels.clear();
     m_locals.clear();
 
-    const auto* procType = procDecl.getType().tryAs<Semantics::ProcedureType>();
+    const auto* procType = procDecl.getType().tryAs<semantics::ProcedureType>();
     llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
     std::vector<llvm::Type*> paramTypes;
     if (procType && procType->getReturnType())
@@ -159,29 +159,29 @@ void code_generator::generateProcedure(const Semantics::ProcedureDeclaration& pr
     }
 }
 
-void code_generator::visit(const Semantics::Statement& stmt)
+void code_generator::visit(const semantics::Statement& stmt)
 {
     stmt.match(
-        [&](const Semantics::AssignmentStatement& s) { visit(s); }, [&](const Semantics::IfStatement& s) { visit(s); },
-        [&](const Semantics::GotoStatement& s) { visit(s); }, [&](const Semantics::ForStatement& s) { visit(s); },
-        [&](const Semantics::AnswerStatement& s) { visit(s); }, [&](const Semantics::CodeStatement& s) { visit(s); },
-        [&](const Semantics::ProcedureCallStatement& s) { visit(s); }, [&](const Semantics::LabelStatement& s)
-        { visit(s); }, [&](const Semantics::BlockStatement& s) { visit(s); }, [&](const Semantics::CompoundStatement& s)
-        { visit(s); }, [](const auto&) {}, [&](const Semantics::DummyStatement& s) { visit(s); }, [](const auto&) {});
+        [&](const semantics::AssignmentStatement& s) { visit(s); }, [&](const semantics::IfStatement& s) { visit(s); },
+        [&](const semantics::GotoStatement& s) { visit(s); }, [&](const semantics::ForStatement& s) { visit(s); },
+        [&](const semantics::AnswerStatement& s) { visit(s); }, [&](const semantics::CodeStatement& s) { visit(s); },
+        [&](const semantics::ProcedureCallStatement& s) { visit(s); }, [&](const semantics::LabelStatement& s)
+        { visit(s); }, [&](const semantics::BlockStatement& s) { visit(s); }, [&](const semantics::CompoundStatement& s)
+        { visit(s); }, [](const auto&) {}, [&](const semantics::DummyStatement& s) { visit(s); }, [](const auto&) {});
 }
 
-void code_generator::visit(const Semantics::DummyStatement& stmt)
+void code_generator::visit(const semantics::DummyStatement& stmt)
 {
     // A dummy statement has no effect
 }
 
-void code_generator::visit(const Semantics::BlockStatement& stmt)
+void code_generator::visit(const semantics::BlockStatement& stmt)
 {
     // Generate declarations
     // Warning: currently locals are treated as globals by code generator if they are simple VariableDeclarations
     for (const auto& decl : stmt.getDeclarations())
     {
-        if (auto* d = static_cast<const Semantics::Declaration*>(decl.get()))
+        if (auto* d = static_cast<const semantics::Declaration*>(decl.get()))
         {
             visit(*d);
         }
@@ -193,7 +193,7 @@ void code_generator::visit(const Semantics::BlockStatement& stmt)
     }
 }
 
-void code_generator::visit(const Semantics::CompoundStatement& stmt)
+void code_generator::visit(const semantics::CompoundStatement& stmt)
 {
     for (const auto& s : stmt.getStatements())
     {
@@ -201,7 +201,7 @@ void code_generator::visit(const Semantics::CompoundStatement& stmt)
     }
 }
 
-void code_generator::visit(const Semantics::AssignmentStatement& stmt)
+void code_generator::visit(const semantics::AssignmentStatement& stmt)
 {
     const auto& target = stmt.getTarget();
     llvm::Value* rhs = visit(stmt.getExpression());
@@ -222,7 +222,7 @@ void code_generator::visit(const Semantics::AssignmentStatement& stmt)
     llvm::Type* targetType = nullptr;
     llvm::Value* targetAddr = nullptr;
 
-    if (auto* part = dynamic_cast<const Semantics::PartWordAccess*>(&target))
+    if (auto* part = dynamic_cast<const semantics::PartWordAccess*>(&target))
     {
         targetAddr = emitAddress(*part);
         targetType = convertType(part->getBase().getType());
@@ -242,7 +242,7 @@ void code_generator::visit(const Semantics::AssignmentStatement& stmt)
             // Fixed 1.5 -> 1.5 * 2^frac
             // Need fractional bits.
             // If target is FixedType...
-            if (auto* fixed = target.getType().tryAs<Semantics::FixedType>())
+            if (auto* fixed = target.getType().tryAs<semantics::FixedType>())
             {
                 double scale = std::pow(2.0, fixed->getFractionalBits());
                 llvm::Value* scaleVal = llvm::ConstantFP::get(rhs->getType(), scale);
@@ -260,7 +260,7 @@ void code_generator::visit(const Semantics::AssignmentStatement& stmt)
         }
     }
 
-    if (auto* part = dynamic_cast<const Semantics::PartWordAccess*>(&target))
+    if (auto* part = dynamic_cast<const semantics::PartWordAccess*>(&target))
     {
         // Read-Modify-Write
         if (!targetAddr)
@@ -296,7 +296,7 @@ void code_generator::visit(const Semantics::AssignmentStatement& stmt)
     }
 }
 
-void code_generator::visit(const Semantics::IfStatement& stmt)
+void code_generator::visit(const semantics::IfStatement& stmt)
 {
     llvm::Value* cond = visit(stmt.getCondition());
     if (!cond)
@@ -334,7 +334,7 @@ void code_generator::visit(const Semantics::IfStatement& stmt)
     m_builder.SetInsertPoint(mergeBB);
 }
 
-void code_generator::visit(const Semantics::GotoStatement& stmt)
+void code_generator::visit(const semantics::GotoStatement& stmt)
 {
     if (stmt.getLabel())
     {
@@ -343,7 +343,7 @@ void code_generator::visit(const Semantics::GotoStatement& stmt)
     }
 }
 
-void code_generator::visit(const Semantics::LabelStatement& stmt)
+void code_generator::visit(const semantics::LabelStatement& stmt)
 {
     llvm::BasicBlock* bb = getOrCreateLabel(&stmt);
     if (!bb->getParent())
@@ -366,7 +366,7 @@ void code_generator::visit(const Semantics::LabelStatement& stmt)
     }
 }
 
-void code_generator::visit(const Semantics::ForStatement& stmt)
+void code_generator::visit(const semantics::ForStatement& stmt)
 {
     llvm::Value* loopVarAddr = emitAddress(stmt.getVariable());
     llvm::Type* loopVarType = convertType(stmt.getVariable().getType());
@@ -477,7 +477,7 @@ void code_generator::visit(const Semantics::ForStatement& stmt)
     m_builder.SetInsertPoint(endBB);
 }
 
-void code_generator::visit(const Semantics::AnswerStatement& stmt)
+void code_generator::visit(const semantics::AnswerStatement& stmt)
 {
     llvm::Value* val = visit(stmt.getExpression());
     if (val && m_currentFunction->getReturnType()->isIntegerTy())
@@ -487,31 +487,35 @@ void code_generator::visit(const Semantics::AnswerStatement& stmt)
     m_builder.CreateRet(val);
 }
 
-void code_generator::visit(const Semantics::CodeStatement& stmt)
+void code_generator::visit(const semantics::CodeStatement& stmt)
 {
     llvm::FunctionType* ft = llvm::FunctionType::get(llvm::Type::getVoidTy(m_module.getContext()), {}, false);
     llvm::InlineAsm* ia = llvm::InlineAsm::get(ft, stmt.getCode(), "", true);
     m_builder.CreateCall(ft, ia, {});
 }
 
-void code_generator::visit(const Semantics::ProcedureCallStatement& stmt)
+void code_generator::visit(const semantics::ProcedureCallStatement& stmt)
 {
     visit(stmt.getCallExpr());
 }
 
-llvm::Value* code_generator::visit(const Semantics::ExpressionBase& expr)
+llvm::Value* code_generator::visit(const semantics::ExpressionBase& expr)
 {
-    return expr.match([&](const Semantics::Constant& e) { return visit(e); }, [&](const Semantics::DeclarationRead& e)
-                      { return visit(e); }, [&](const Semantics::BinaryOperator& e) { return visit(e); },
-                      [&](const Semantics::UnaryOperator& e) { return visit(e); },
-                      [&](const Semantics::CallExpression& e) { return visit(e); },
-                      [&](const Semantics::PartWordAccess& e) { return visit(e); },
-                      [&](const Semantics::ErrorExpression& e) { return visit(e); },
-                      [&](const auto& e) -> llvm::Value* { CORAL66_UNREACHABLE; return nullptr; });
+    return expr.match([&](const semantics::Constant& e) { return visit(e); }, [&](const semantics::DeclarationRead& e)
+                      { return visit(e); }, [&](const semantics::BinaryOperator& e) { return visit(e); },
+                      [&](const semantics::UnaryOperator& e) { return visit(e); },
+                      [&](const semantics::CallExpression& e) { return visit(e); },
+                      [&](const semantics::PartWordAccess& e) { return visit(e); },
+                      [&](const semantics::ErrorExpression& e) { return visit(e); },
+                      [&](const auto& e) -> llvm::Value*
+                      {
+                          CORAL66_UNREACHABLE;
+                          return nullptr;
+                      });
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-llvm::Value* code_generator::visit(const Semantics::Constant& expr)
+llvm::Value* code_generator::visit(const semantics::Constant& expr)
 {
     auto& val = expr.getValue();
     if (std::holds_alternative<llvm::APSInt>(val))
@@ -525,7 +529,7 @@ llvm::Value* code_generator::visit(const Semantics::Constant& expr)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const Semantics::DeclarationRead& expr)
+llvm::Value* code_generator::visit(const semantics::DeclarationRead& expr)
 {
     llvm::Value* addr = emitAddress(expr);
     if (!addr)
@@ -535,7 +539,7 @@ llvm::Value* code_generator::visit(const Semantics::DeclarationRead& expr)
     return m_builder.CreateLoad(convertType(expr.getType()), addr);
 }
 
-llvm::Value* code_generator::visit(const Semantics::BinaryOperator& expr)
+llvm::Value* code_generator::visit(const semantics::BinaryOperator& expr)
 {
     llvm::Value* L = visit(expr.getLeftExpression());
     llvm::Value* R = visit(expr.getRightExpression());
@@ -554,15 +558,15 @@ llvm::Value* code_generator::visit(const Semantics::BinaryOperator& expr)
 
     switch (expr.getKind())
     {
-        case Semantics::BinaryOperator::Addition:
+        case semantics::BinaryOperator::Addition:
             if (L->getType()->isFloatingPointTy())
                 return m_builder.CreateFAdd(L, R);
             return m_builder.CreateAdd(L, R);
-        case Semantics::BinaryOperator::Subtraction:
+        case semantics::BinaryOperator::Subtraction:
             if (L->getType()->isFloatingPointTy())
                 return m_builder.CreateFSub(L, R);
             return m_builder.CreateSub(L, R);
-        case Semantics::BinaryOperator::Multiply:
+        case semantics::BinaryOperator::Multiply:
         {
             llvm::Value* mul = nullptr;
             if (L->getType()->isFloatingPointTy())
@@ -570,7 +574,7 @@ llvm::Value* code_generator::visit(const Semantics::BinaryOperator& expr)
             else
                 mul = m_builder.CreateMul(L, R);
 
-            if (auto* fixed = expr.getType().tryAs<Semantics::FixedType>())
+            if (auto* fixed = expr.getType().tryAs<semantics::FixedType>())
             {
                 // Fixed Point Scaling: val = (a * b) >> frac
                 if (fixed->getFractionalBits() > 0)
@@ -578,18 +582,18 @@ llvm::Value* code_generator::visit(const Semantics::BinaryOperator& expr)
             }
             return mul;
         }
-        case Semantics::BinaryOperator::Divide:
+        case semantics::BinaryOperator::Divide:
             if (L->getType()->isFloatingPointTy())
                 return m_builder.CreateFDiv(L, R);
             return m_builder.CreateSDiv(L, R);
-        case Semantics::BinaryOperator::Equal: return m_builder.CreateICmpEQ(L, R);
-        case Semantics::BinaryOperator::NotEqual: return m_builder.CreateICmpNE(L, R);
-        case Semantics::BinaryOperator::LessThan: return m_builder.CreateICmpSLT(L, R);
+        case semantics::BinaryOperator::Equal: return m_builder.CreateICmpEQ(L, R);
+        case semantics::BinaryOperator::NotEqual: return m_builder.CreateICmpNE(L, R);
+        case semantics::BinaryOperator::LessThan: return m_builder.CreateICmpSLT(L, R);
         default: return nullptr;
     }
 }
 
-llvm::Value* code_generator::visit(const Semantics::UnaryOperator& expr)
+llvm::Value* code_generator::visit(const semantics::UnaryOperator& expr)
 {
     llvm::Value* operand = visit(expr.getOperand());
     if (!operand)
@@ -597,14 +601,14 @@ llvm::Value* code_generator::visit(const Semantics::UnaryOperator& expr)
 
     switch (expr.getKind())
     {
-        case Semantics::UnaryOperator::Minus: return m_builder.CreateNeg(operand);
-        case Semantics::UnaryOperator::Not: return m_builder.CreateNot(operand);
-        case Semantics::UnaryOperator::Plus: return operand;
+        case semantics::UnaryOperator::Minus: return m_builder.CreateNeg(operand);
+        case semantics::UnaryOperator::Not: return m_builder.CreateNot(operand);
+        case semantics::UnaryOperator::Plus: return operand;
     }
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const Semantics::CallExpression& expr)
+llvm::Value* code_generator::visit(const semantics::CallExpression& expr)
 {
     llvm::Value* funcVal = visit(expr.getFunctionExpression());
 
@@ -617,7 +621,7 @@ llvm::Value* code_generator::visit(const Semantics::CallExpression& expr)
         args.push_back(visit(*arg));
     }
 
-    const auto* procType = expr.getFunctionExpression().getType().tryAs<Semantics::ProcedureType>();
+    const auto* procType = expr.getFunctionExpression().getType().tryAs<semantics::ProcedureType>();
     llvm::FunctionType* ft = nullptr;
     if (procType)
     {
@@ -647,7 +651,7 @@ llvm::Value* code_generator::visit(const Semantics::CallExpression& expr)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const Semantics::PartWordAccess& expr)
+llvm::Value* code_generator::visit(const semantics::PartWordAccess& expr)
 {
     // Read: (val >> start) & ((1 << width) - 1)
     llvm::Value* baseVal = visit(expr.getBase());
@@ -665,7 +669,7 @@ llvm::Value* code_generator::visit(const Semantics::PartWordAccess& expr)
     return m_builder.CreateAnd(shifted, mask, "partWord");
 }
 
-llvm::Value* code_generator::visit(const Semantics::ErrorExpression&)
+llvm::Value* code_generator::visit(const semantics::ErrorExpression&)
 {
     return nullptr;
 }

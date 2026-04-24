@@ -12,7 +12,7 @@
 #include "program_interface.hpp"
 #include "semantics.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 class SemanticAnalysis final : public ProgramInterface
@@ -67,4 +67,4 @@ public:
     void visit(const syntax::PartWordExpression& node);
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

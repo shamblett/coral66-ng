@@ -25,7 +25,7 @@
         REQUIRE_FALSE(errors);                                               \
         auto tree = coral66::parser::parseProgram(ctokens, &ss, &errors);    \
         REQUIRE_FALSE(errors);                                               \
-        coral66::Semantics::analyse(tree, std::move(ctokens), &ss, &errors); \
+        coral66::semantics::analyse(tree, std::move(ctokens), &ss, &errors); \
         CHECK_THAT(string, matches);                                         \
     } while (0)
 

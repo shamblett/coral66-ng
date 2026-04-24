@@ -6,7 +6,7 @@
 
 #include "symbol_resolution_pass.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 SymbolResolutionPass::SymbolResolutionPass(SemanticContext& context) : m_context(context) {}
@@ -17,4 +17,4 @@ void SymbolResolutionPass::run([[maybe_unused]] const syntax::Program& program)
     // and populate m_context.symbolTable
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

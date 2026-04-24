@@ -17,7 +17,7 @@
  * variables and procedures within their respective blocks.
  */
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 class SymbolTable
@@ -35,4 +35,4 @@ public:
     [[nodiscard]] int scopeCount() const;
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

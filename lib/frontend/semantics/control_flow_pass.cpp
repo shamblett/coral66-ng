@@ -6,7 +6,7 @@
 
 #include "control_flow_pass.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 ControlFlowPass::ControlFlowPass(SemanticContext& context) : m_context(context) {}
@@ -17,4 +17,4 @@ void ControlFlowPass::run([[maybe_unused]] const syntax::Program& program)
     // and overall procedure return paths.
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

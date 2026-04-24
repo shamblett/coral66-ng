@@ -6,7 +6,7 @@
 
 #include "type_checking_pass.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 TypeCheckingPass::TypeCheckingPass(SemanticContext& context) : m_context(context) {}
@@ -17,4 +17,4 @@ void TypeCheckingPass::run([[maybe_unused]] const syntax::Program& program)
     // assignments, parameter passing, and annotate AST nodes with type information
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

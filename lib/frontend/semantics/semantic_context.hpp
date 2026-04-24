@@ -14,7 +14,7 @@ namespace llvm
 class raw_ostream;
 }
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 /*
@@ -32,7 +32,7 @@ public:
 
     SymbolTable symbolTable;
 
-    // Future: maps to store annotations (e.g. mapping syntax::Expression nodes to their resolved Semantics::Type)
+    // Future: maps to store annotations (e.g. mapping syntax::Expression nodes to their resolved semantics::Type)
     // Future: diagnostic collectors, control flow tracking state, etc.
 
     SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag)
@@ -41,4 +41,4 @@ public:
     }
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

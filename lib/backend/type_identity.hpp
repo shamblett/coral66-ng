@@ -17,7 +17,7 @@
  *  TypeIdentity.hpp
  *  Defines backend-specific type hashing and equality comparison.
  *
- * This file contains TypeHasher and TypeEqual structures for Semantics::Type.
+ * This file contains TypeHasher and TypeEqual structures for semantics::Type.
  * Unlike the frontend's strict C type equality, the backend often needs to treat
  * qualified types (e.g., const int) as identical to their unqualified counterparts
  * (e.g., int) for the purpose of LLVM type generation and caching.
@@ -25,7 +25,7 @@
 
 namespace coral66::CGLLVM
 {
-// Default std::hash and operator== of Semantics::Type and subclasses make use of equality the way C defines it. This
+// Default std::hash and operator== of semantics::Type and subclasses make use of equality the way C defines it. This
 // does not equal the type system a backend may care about, however. The LLVM backend eg, does not care about any
 // qualifiers, making nonqualified, const qualpragma once
 
@@ -39,108 +39,108 @@ struct TypeHasher
 };
 
 template <>
-struct TypeHasher<Semantics::Type>
+struct TypeHasher<semantics::Type>
 {
-    std::size_t operator()(const Semantics::Type& arg) const noexcept;
+    std::size_t operator()(const semantics::Type& arg) const noexcept;
 };
 
 template <>
-struct TypeHasher<Semantics::PrimitiveType>
+struct TypeHasher<semantics::PrimitiveType>
 {
-    std::size_t operator()(const Semantics::PrimitiveType& arg) const noexcept
+    std::size_t operator()(const semantics::PrimitiveType& arg) const noexcept
     {
         return coral66::hashCombine(arg.getBitCount(), arg.isFloatingPoint());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::ArrayType>
+struct TypeHasher<semantics::ArrayType>
 {
-    std::size_t operator()(const Semantics::ArrayType& arg) const noexcept
+    std::size_t operator()(const semantics::ArrayType& arg) const noexcept
     {
         return coral66::hashCombine<TypeHasher>(arg.getSize(), arg.getType());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::AbstractArrayType>
+struct TypeHasher<semantics::AbstractArrayType>
 {
-    std::size_t operator()(const Semantics::AbstractArrayType& arg) const noexcept
+    std::size_t operator()(const semantics::AbstractArrayType& arg) const noexcept
     {
-        return TypeHasher<Semantics::Type>{}(arg.getType());
+        return TypeHasher<semantics::Type>{}(arg.getType());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::ValArrayType>
+struct TypeHasher<semantics::ValArrayType>
 {
-    std::size_t operator()(const Semantics::ValArrayType& arg) const noexcept
+    std::size_t operator()(const semantics::ValArrayType& arg) const noexcept
     {
-        return TypeHasher<Semantics::Type>{}(arg.getType());
+        return TypeHasher<semantics::Type>{}(arg.getType());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::FunctionType>
+struct TypeHasher<semantics::FunctionType>
 {
-    std::size_t operator()(const Semantics::FunctionType& arg) const noexcept
+    std::size_t operator()(const semantics::FunctionType& arg) const noexcept
     {
         const std::size_t hash =
             std::accumulate(arg.getParameters().begin(), arg.getParameters().end(), 0,
-                            [](std::size_t hash, const Semantics::FunctionType::Parameter& param)
-                            { return coral66::rawHashCombine(hash, TypeHasher<Semantics::Type>{}(*param.type)); });
+                            [](std::size_t hash, const semantics::FunctionType::Parameter& param)
+                            { return coral66::rawHashCombine(hash, TypeHasher<semantics::Type>{}(*param.type)); });
         return coral66::rawHashCombine(hash, coral66::hashCombine<TypeHasher>(arg.isLastVararg(), arg.getReturnType()));
     }
 };
 
 template <>
-struct TypeHasher<Semantics::PointerType>
+struct TypeHasher<semantics::PointerType>
 {
-    std::size_t operator()(const Semantics::PointerType& arg) const noexcept
+    std::size_t operator()(const semantics::PointerType& arg) const noexcept
     {
-        return TypeHasher<Semantics::Type>{}(arg.getElementType());
+        return TypeHasher<semantics::Type>{}(arg.getElementType());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::VectorType>
+struct TypeHasher<semantics::VectorType>
 {
-    std::size_t operator()(const Semantics::VectorType& arg) const noexcept
+    std::size_t operator()(const semantics::VectorType& arg) const noexcept
     {
         return coral66::hashCombine<TypeHasher>(arg.getSize(), arg.getType());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::FixedType>
+struct TypeHasher<semantics::FixedType>
 {
-    std::size_t operator()(const Semantics::FixedType& arg) const noexcept
+    std::size_t operator()(const semantics::FixedType& arg) const noexcept
     {
         return coral66::hashCombine(arg.getTotalBits(), arg.getFractionalBits());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::TableType>
+struct TypeHasher<semantics::TableType>
 {
-    std::size_t operator()(const Semantics::TableType& arg) const noexcept
+    std::size_t operator()(const semantics::TableType& arg) const noexcept
     {
         // Using pointer identity for now
-        return std::hash<const coral66::Semantics::TableInfo*>{}(&arg.getInfo());
+        return std::hash<const coral66::semantics::TableInfo*>{}(&arg.getInfo());
     }
 };
 
 template <>
-struct TypeHasher<Semantics::OverlayType>
+struct TypeHasher<semantics::OverlayType>
 {
-    std::size_t operator()(const Semantics::OverlayType& arg) const noexcept
+    std::size_t operator()(const semantics::OverlayType& arg) const noexcept
     {
         // Using pointer identity for now
-        return std::hash<const coral66::Semantics::OverlayInfo*>{}(&arg.getInfo());
+        return std::hash<const coral66::semantics::OverlayInfo*>{}(&arg.getInfo());
     }
 };
 
-inline std::size_t TypeHasher<Semantics::Type>::operator()(const Semantics::Type& arg) const noexcept
+inline std::size_t TypeHasher<semantics::Type>::operator()(const semantics::Type& arg) const noexcept
 {
     return coral66::rawHashCombine(std::hash<std::size_t>{}(arg.index()),
                                    arg.match(
@@ -173,15 +173,15 @@ struct TypeEqual<std::variant<Args...>>
 };
 
 template <>
-struct TypeEqual<Semantics::Type>
+struct TypeEqual<semantics::Type>
 {
-    bool operator()(const Semantics::Type& lhs, const Semantics::Type& rhs) const noexcept;
+    bool operator()(const semantics::Type& lhs, const semantics::Type& rhs) const noexcept;
 };
 
 template <>
-struct TypeEqual<Semantics::PrimitiveType>
+struct TypeEqual<semantics::PrimitiveType>
 {
-    bool operator()(const Semantics::PrimitiveType& lhs, const Semantics::PrimitiveType& rhs) const noexcept
+    bool operator()(const semantics::PrimitiveType& lhs, const semantics::PrimitiveType& rhs) const noexcept
     {
         return std::tuple(lhs.getBitCount(), lhs.isFloatingPoint())
                == std::tuple(rhs.getBitCount(), rhs.isFloatingPoint());
@@ -189,109 +189,109 @@ struct TypeEqual<Semantics::PrimitiveType>
 };
 
 template <>
-struct TypeEqual<Semantics::ArrayType>
+struct TypeEqual<semantics::ArrayType>
 {
-    bool operator()(const Semantics::ArrayType& lhs, const Semantics::ArrayType& rhs) const noexcept
+    bool operator()(const semantics::ArrayType& lhs, const semantics::ArrayType& rhs) const noexcept
     {
         if (lhs.getSize() != rhs.getSize())
         {
             return false;
         }
-        return TypeEqual<Semantics::Type>{}(lhs.getType(), rhs.getType());
+        return TypeEqual<semantics::Type>{}(lhs.getType(), rhs.getType());
     }
 };
 
 template <>
-struct TypeEqual<Semantics::AbstractArrayType>
+struct TypeEqual<semantics::AbstractArrayType>
 {
-    bool operator()(const Semantics::AbstractArrayType& lhs, const Semantics::AbstractArrayType& rhs) const noexcept
+    bool operator()(const semantics::AbstractArrayType& lhs, const semantics::AbstractArrayType& rhs) const noexcept
     {
-        return TypeEqual<Semantics::Type>{}(lhs.getType(), rhs.getType());
+        return TypeEqual<semantics::Type>{}(lhs.getType(), rhs.getType());
     }
 };
 
 template <>
-struct TypeEqual<Semantics::ValArrayType>
+struct TypeEqual<semantics::ValArrayType>
 {
-    bool operator()(const Semantics::ValArrayType& lhs, const Semantics::ValArrayType& rhs) const noexcept
+    bool operator()(const semantics::ValArrayType& lhs, const semantics::ValArrayType& rhs) const noexcept
     {
-        return TypeEqual<Semantics::Type>{}(lhs.getType(), rhs.getType());
+        return TypeEqual<semantics::Type>{}(lhs.getType(), rhs.getType());
     }
 };
 
 template <>
-struct TypeEqual<Semantics::PointerType>
+struct TypeEqual<semantics::PointerType>
 {
-    bool operator()(const Semantics::PointerType& lhs, const Semantics::PointerType& rhs) const noexcept
+    bool operator()(const semantics::PointerType& lhs, const semantics::PointerType& rhs) const noexcept
     {
-        return TypeEqual<Semantics::Type>{}(lhs.getElementType(), rhs.getElementType());
+        return TypeEqual<semantics::Type>{}(lhs.getElementType(), rhs.getElementType());
     }
 };
 
 template <>
-struct TypeEqual<Semantics::FunctionType>
+struct TypeEqual<semantics::FunctionType>
 {
-    bool operator()(const Semantics::FunctionType& lhs, const Semantics::FunctionType& rhs) const noexcept
+    bool operator()(const semantics::FunctionType& lhs, const semantics::FunctionType& rhs) const noexcept
     {
         if (lhs.isLastVararg() != rhs.isLastVararg())
         {
             return false;
         }
-        if (!TypeEqual<Semantics::Type>{}(lhs.getReturnType(), rhs.getReturnType()))
+        if (!TypeEqual<semantics::Type>{}(lhs.getReturnType(), rhs.getReturnType()))
         {
             return false;
         }
         return std::ranges::equal(
             lhs.getParameters(), rhs.getParameters(),
-            [](const Semantics::FunctionType::Parameter& lhs, const Semantics::FunctionType::Parameter& rhs)
-            { return TypeEqual<Semantics::Type>{}(*lhs.type, *rhs.type); });
+            [](const semantics::FunctionType::Parameter& lhs, const semantics::FunctionType::Parameter& rhs)
+            { return TypeEqual<semantics::Type>{}(*lhs.type, *rhs.type); });
     }
 };
 
 template <>
-struct TypeEqual<Semantics::StructType>
+struct TypeEqual<semantics::StructType>
 {
-    bool operator()(const Semantics::StructType& lhs, const Semantics::StructType& rhs) const noexcept
+    bool operator()(const semantics::StructType& lhs, const semantics::StructType& rhs) const noexcept
     {
         return &lhs.getInfo() == &rhs.getInfo();
     }
 };
 
 template <>
-struct TypeEqual<Semantics::UnionType>
+struct TypeEqual<semantics::UnionType>
 {
-    bool operator()(const Semantics::UnionType& lhs, const Semantics::UnionType& rhs) const noexcept
+    bool operator()(const semantics::UnionType& lhs, const semantics::UnionType& rhs) const noexcept
     {
         return &lhs.getInfo() == &rhs.getInfo();
     }
 };
 
 template <>
-struct TypeEqual<Semantics::EnumType>
+struct TypeEqual<semantics::EnumType>
 {
-    bool operator()(const Semantics::EnumType& lhs, const Semantics::EnumType& rhs) const noexcept
+    bool operator()(const semantics::EnumType& lhs, const semantics::EnumType& rhs) const noexcept
     {
         return &lhs.getInfo() == &rhs.getInfo();
     }
 };
 
 template <>
-struct TypeEqual<Semantics::VectorType>
+struct TypeEqual<semantics::VectorType>
 {
-    bool operator()(const Semantics::VectorType& lhs, const Semantics::VectorType& rhs) const noexcept
+    bool operator()(const semantics::VectorType& lhs, const semantics::VectorType& rhs) const noexcept
     {
         if (lhs.getSize() != rhs.getSize())
         {
             return false;
         }
-        return TypeEqual<Semantics::Type>{}(lhs.getType(), rhs.getType());
+        return TypeEqual<semantics::Type>{}(lhs.getType(), rhs.getType());
     }
 };
 
 template <>
-struct TypeEqual<Semantics::FixedType>
+struct TypeEqual<semantics::FixedType>
 {
-    bool operator()(const Semantics::FixedType& lhs, const Semantics::FixedType& rhs) const noexcept
+    bool operator()(const semantics::FixedType& lhs, const semantics::FixedType& rhs) const noexcept
     {
         return std::tuple(lhs.getTotalBits(), lhs.getFractionalBits())
                == std::tuple(rhs.getTotalBits(), rhs.getFractionalBits());
@@ -299,27 +299,27 @@ struct TypeEqual<Semantics::FixedType>
 };
 
 template <>
-struct TypeEqual<Semantics::TableType>
+struct TypeEqual<semantics::TableType>
 {
-    bool operator()(const Semantics::TableType& lhs, const Semantics::TableType& rhs) const noexcept
+    bool operator()(const semantics::TableType& lhs, const semantics::TableType& rhs) const noexcept
     {
         return &lhs.getInfo() == &rhs.getInfo();
     }
 };
 
 template <>
-struct TypeEqual<Semantics::OverlayType>
+struct TypeEqual<semantics::OverlayType>
 {
-    bool operator()(const Semantics::OverlayType& lhs, const Semantics::OverlayType& rhs) const noexcept
+    bool operator()(const semantics::OverlayType& lhs, const semantics::OverlayType& rhs) const noexcept
     {
         return &lhs.getInfo() == &rhs.getInfo();
     }
 };
 
 template <>
-struct TypeEqual<Semantics::ErrorType>
+struct TypeEqual<semantics::ErrorType>
 {
-    bool operator()(const Semantics::ErrorType&, const Semantics::ErrorType&) const noexcept
+    bool operator()(const semantics::ErrorType&, const semantics::ErrorType&) const noexcept
     {
         return true;
     }

@@ -8,7 +8,7 @@
 
 #include "semantics_common.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 constant_value::constant_value(llvm::APSInt integer) : m_value(std::move(integer)) {}
@@ -43,4 +43,4 @@ constant_value constant_value::castTo(const Type& type, const ProgramInterface*,
     return *this;
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

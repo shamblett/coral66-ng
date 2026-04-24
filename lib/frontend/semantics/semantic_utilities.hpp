@@ -8,7 +8,7 @@
 
 #include "semantics.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 inline bool isUntyped(const Type& type)
@@ -50,7 +50,7 @@ inline bool isScalar(const Type& type)
 }
 
 // Stub for template specializations used in diagnostics
-} // namespace coral66::Semantics
+} // namespace coral66::semantics
 
 namespace coral66::diag
 {

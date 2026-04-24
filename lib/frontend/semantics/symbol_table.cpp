@@ -8,7 +8,7 @@
 
 #include <ranges>
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 SymbolTable::SymbolTable()
@@ -75,4 +75,4 @@ int SymbolTable::scopeCount() const
     return m_scopes.size();
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

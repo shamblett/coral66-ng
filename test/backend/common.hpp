@@ -17,7 +17,7 @@
 #include "lib/support/function_ref.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-inline coral66::Semantics::Program generateProgram(std::string source)
+inline coral66::semantics::Program generateProgram(std::string source)
 {
     bool errors = false;
     auto pptokens = coral66::lexer::tokenize(std::move(source), &llvm::errs(), &errors);
@@ -28,7 +28,7 @@ inline coral66::Semantics::Program generateProgram(std::string source)
     REQUIRE_FALSE(errors);
     auto tree = coral66::parser::parseProgram(ctokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    auto program = coral66::Semantics::analyse(tree, std::move(ctokens), &llvm::errs(), &errors);
+    auto program = coral66::semantics::analyse(tree, std::move(ctokens), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
     return program;
 }

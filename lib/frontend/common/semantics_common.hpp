@@ -13,7 +13,7 @@
 #include "lib/support/abstract_intrusive_variant.hpp"
 #include "lib/support/utilities.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 class ProgramInterface;
@@ -368,4 +368,4 @@ public:
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(SwitchType)
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

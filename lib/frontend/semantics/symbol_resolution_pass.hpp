@@ -9,7 +9,7 @@
 #include "lib/frontend/syntax/syntax.hpp"
 #include "semantic_context.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 /*
@@ -29,4 +29,4 @@ public:
     void run(const syntax::Program& program);
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

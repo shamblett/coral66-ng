@@ -110,7 +110,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         return std::optional<fs::path>{std::in_place};
     }
 
-    auto program = Semantics::analyse(tree, std::move(cTokens), m_reporter, &errors);
+    auto program = semantics::analyse(tree, std::move(cTokens), m_reporter, &errors);
     if (errors)
     {
         return {};

@@ -14,7 +14,7 @@
 
 #include "language_options.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 class Type;
 class ProgramInterface;
@@ -50,4 +50,4 @@ public:
     }
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

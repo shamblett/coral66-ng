@@ -6,7 +6,7 @@
 
 #include "program_interface.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 // Minimal implementation for now
 }

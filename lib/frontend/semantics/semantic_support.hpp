@@ -12,7 +12,7 @@
  * Semantic support functions.
  */
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 /*
@@ -20,4 +20,4 @@ namespace coral66::Semantics
  */
 using DiagnosticCollector = DiagnosticCollection<detail::Diagnostic::DiagnosticBase>;
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

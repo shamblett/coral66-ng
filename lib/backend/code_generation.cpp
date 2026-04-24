@@ -7,13 +7,14 @@
 #include "code_generation.hpp"
 
 #include <llvm/MC/TargetRegistry.h>
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
+
 #include "code_generator.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 
 namespace coral66::CGLLVM
 {
 
-std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const Semantics::Program& program,
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const semantics::Program& program,
                                                   const Options& options)
 {
     CTRACK_NAME("Generate LLVM");

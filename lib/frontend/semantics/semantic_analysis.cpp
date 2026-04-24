@@ -12,7 +12,7 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 template <class T, class... Args>
@@ -475,10 +475,10 @@ void SemanticAnalysis::visit(const syntax::ForStatement& node)
     visit(node.getVariable());
     auto var = std::move(m_lastExpression);
 
-    std::vector<Semantics::ForElement> elements;
+    std::vector<semantics::ForElement> elements;
     for (const auto& synElement : node.getElements())
     {
-        Semantics::ForElement semElement;
+        semantics::ForElement semElement;
 
         visit(*synElement.expression);
         semElement.expression = std::move(m_lastExpression);
@@ -553,7 +553,7 @@ void SemanticAnalysis::visit(const syntax::LiteralExpression& node)
     if (node.getLiteral()->getType() == lexer::CToken::Floating)
         type = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating});
 
-    Semantics::Constant::Variant val;
+    semantics::Constant::Variant val;
     if (std::holds_alternative<llvm::APSInt>(node.getLiteral()->getValue()))
         val = std::get<llvm::APSInt>(node.getLiteral()->getValue());
     else if (std::holds_alternative<llvm::APFloat>(node.getLiteral()->getValue()))
@@ -582,7 +582,7 @@ void SemanticAnalysis::visit(const syntax::BinaryExpression& node)
     visit(node.getRight());
     auto right = std::move(m_lastExpression);
 
-    using BinOp = Semantics::BinaryOperator;
+    using BinOp = semantics::BinaryOperator;
     BinOp::Kind kind = BinOp::Addition;
     if (node.getOp()->getTokenType() == lexer::TokenType::Minus)
         kind = BinOp::Subtraction;
@@ -608,12 +608,12 @@ void SemanticAnalysis::visit(const syntax::PartWordExpression& node)
     uint32_t s = 0;
     uint32_t w = 1;
 
-    if (auto* c = dynamic_cast<const Semantics::Constant*>(startExpr.get()))
+    if (auto* c = dynamic_cast<const semantics::Constant*>(startExpr.get()))
     {
         if (std::holds_alternative<llvm::APSInt>(c->getValue()))
             s = std::get<llvm::APSInt>(c->getValue()).getZExtValue();
     }
-    if (auto* c = dynamic_cast<const Semantics::Constant*>(widthExpr.get()))
+    if (auto* c = dynamic_cast<const semantics::Constant*>(widthExpr.get()))
     {
         if (std::holds_alternative<llvm::APSInt>(c->getValue()))
             w = std::get<llvm::APSInt>(c->getValue()).getZExtValue();
@@ -657,4 +657,4 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
     return Program(std::move(cTokens), std::move(syntheticTokens), std::move(analysis.m_globalDeclarations));
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

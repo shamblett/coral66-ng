@@ -23,10 +23,10 @@
 
 namespace coral66
 {
-namespace Semantics
+namespace semantics
 {
 class Program;
-} // namespace Semantics
+} // namespace semantics
 namespace CGLLVM
 {
 enum class DebugEmission
@@ -45,7 +45,7 @@ struct Options
     llvm::CodeGenOptLevel ol = llvm::CodeGenOpt::parseLevel('0').value();
 };
 
-std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const Semantics::Program& program,
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const semantics::Program& program,
                                                   const Options& options = {});
 } // namespace CGLLVM
 } // namespace coral66

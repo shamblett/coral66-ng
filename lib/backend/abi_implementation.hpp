@@ -21,7 +21,7 @@ public:
     // Placeholder for platform-specific ABI handling
     // For Coral 66, we might need simple calling conventions initially.
 
-    virtual void applyPlatformABI(const Semantics::ProcedureType& procedureType, llvm::Type*& returnType,
+    virtual void applyPlatformABI(const semantics::ProcedureType& procedureType, llvm::Type*& returnType,
                                   std::vector<llvm::Type*>& parameterTypes) = 0;
 };
 

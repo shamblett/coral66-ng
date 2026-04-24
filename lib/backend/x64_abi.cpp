@@ -16,7 +16,7 @@
 namespace coral66::CGLLVM
 {
 
-void x64_abi::applyPlatformABI(const Semantics::ProcedureType&, llvm::Type*&, std::vector<llvm::Type*>&)
+void x64_abi::applyPlatformABI(const semantics::ProcedureType&, llvm::Type*&, std::vector<llvm::Type*>&)
 {
     // Stub implementation
 }

@@ -8,7 +8,7 @@
 
 #include "semantics.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 class ProgramInterface
@@ -20,4 +20,4 @@ public:
     // For now, minimal interface to satisfy getSizeOf signature
 };
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics

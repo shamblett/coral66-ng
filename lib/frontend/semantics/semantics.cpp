@@ -6,7 +6,7 @@
 
 #include "semantics.hpp"
 
-namespace coral66::Semantics
+namespace coral66::semantics
 {
 
 // Type Implementations
@@ -185,4 +185,4 @@ lexer::CTokenIterator UnaryOperator::end() const
     return m_operand->end();
 }
 
-} // namespace coral66::Semantics
+} // namespace coral66::semantics
