@@ -223,20 +223,20 @@ class Usable;
 
 class DeclarationRead final : public ExpressionBase
 {
-    const Usable* CORAL66_NON_NULL m_declRead;
+    const Usable* CORAL66_NON_NULL m_declarationRead;
     lexer::CTokenIterator m_identifierToken;
 
 public:
-    DeclarationRead(IntrusiveVariantValue<Type> type, const Usable& useable, lexer::CTokenIterator identifierToken)
+    DeclarationRead(IntrusiveVariantValue<Type> type, const Usable& usable, lexer::CTokenIterator identifierToken)
         : ExpressionBase(std::in_place_type<DeclarationRead>, std::move(type), ValueCategory::Lvalue),
-          m_declRead(&useable),
+          m_declarationRead(&usable),
           m_identifierToken(identifierToken)
     {
     }
 
-    [[nodiscard]] const Usable& getDeclRead() const
+    [[nodiscard]] const Usable& getDeclarationRead() const
     {
-        return *m_declRead;
+        return *m_declarationRead;
     }
     [[nodiscard]] lexer::CTokenIterator begin() const override
     {

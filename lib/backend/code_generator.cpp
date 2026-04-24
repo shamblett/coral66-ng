@@ -87,7 +87,7 @@ llvm::Value* code_generator::emitAddress(const semantics::ExpressionBase& expr)
 {
     if (auto* declRead = dynamic_cast<const semantics::DeclarationRead*>(&expr))
     {
-        const auto* decl = &declRead->getDeclRead();
+        const auto* decl = &declRead->getDeclarationRead();
         if (m_locals.contains(decl))
             return m_locals[decl];
         if (m_globals.contains(decl))

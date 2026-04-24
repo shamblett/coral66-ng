@@ -5,22 +5,20 @@
  * Date   : 31/01/2026
  */
 
-#include "symbol_resolution_pass.hpp"
-#include "lib/frontend/common/diagnostic_collection.hpp"
-#include "lib/frontend/common/messages/errors.hpp"
 #include <string>
+
+#include "lib/frontend/common/messages/errors.hpp"
+
+#include "semantic_support.hpp"
+#include "symbol_resolution_pass.hpp"
 
 namespace coral66::semantics
 {
-using DiagnosticCollector = DiagnosticCollection<detail::Diagnostic::DiagnosticBase>;
 
-static PrimitiveType integerType{PrimitiveType::Integer};
-static PrimitiveType floatingType{PrimitiveType::Floating};
-static FixedType fixedType{16, 8};
 static UntypedType untypedType{};
 
 template <class T, class... Args>
-IntrVarPtr<T> makeIntr(Args&&... args)
+IntrVarPtr<T> makeIntrusiveVariant(Args&&... args)
 {
     return IntrVarPtr<T>(new T(std::forward<Args>(args)...));
 }
@@ -48,12 +46,12 @@ void SymbolResolutionPass::visit(const syntax::Block& node)
 
     // In a full implementation, we might want to do a pre-pass to gather labels here.
     // For now, we process declarations and statements in order.
-    
-    for (const auto& decl : node.getDeclarations())
+
+    for (const auto& declaration : node.getDeclarations())
     {
-        visit(*decl);
+        visit(*declaration);
     }
-    
+
     for (const auto& stmt : node.getStatements())
     {
         visit(*stmt);
@@ -108,9 +106,12 @@ void SymbolResolutionPass::visit(const syntax::ForStatement& node)
     for (const auto& element : node.getElements())
     {
         visit(*element.expression);
-        if (element.step) visit(*element.step);
-        if (element.until) visit(*element.until);
-        if (element.whileCondition) visit(*element.whileCondition);
+        if (element.step)
+            visit(*element.step);
+        if (element.until)
+            visit(*element.until);
+        if (element.whileCondition)
+            visit(*element.whileCondition);
     }
     visit(node.getBody());
 }
@@ -138,34 +139,36 @@ void SymbolResolutionPass::visit(const syntax::ProcedureCallStatement& node)
     visit(node.getExpression());
 }
 
-IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken(std::optional<lexer::CTokenIterator> typeToken)
+// ReSharper disable once CppMemberFunctionMayBeStatic
+IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT(*-convert-member-functions-to-static)
+    std::optional<lexer::CTokenIterator> typeToken)                    // NOLINT(*-convert-member-functions-to-static)
 {
     if (!typeToken)
-        return IntrusiveVariantValue<Type>(UntypedType{});
-        
+        return {(UntypedType{})};
+
     auto type = typeToken.value()->getTokenType();
     if (type == lexer::TokenType::FloatingKeyword)
-        return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating});
+        return {(PrimitiveType{PrimitiveType::Floating})};
     if (type == lexer::TokenType::FixedKeyword)
-        return IntrusiveVariantValue<Type>(FixedType{16, 8});
-        
-    return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
+        return {(FixedType{16, 8})};
+
+    return {(PrimitiveType{PrimitiveType::Integer})};
 }
 
 void SymbolResolutionPass::visit(const syntax::Declaration& node)
 {
-    if (auto* varDecl = dynamic_cast<const syntax::VariableDeclaration*>(&node))
-        visit(*varDecl);
-    else if (auto* procDecl = dynamic_cast<const syntax::ProcedureDeclaration*>(&node))
-        visit(*procDecl);
-    else if (auto* arrDecl = dynamic_cast<const syntax::ArrayDeclaration*>(&node))
-        visit(*arrDecl);
-    else if (auto* tabDecl = dynamic_cast<const syntax::TableDeclaration*>(&node))
-        visit(*tabDecl);
-    else if (auto* ovrDecl = dynamic_cast<const syntax::OverlayDeclaration*>(&node))
-        visit(*ovrDecl);
-    else if (auto* paramDecl = dynamic_cast<const syntax::ParameterDeclaration*>(&node))
-        visit(*paramDecl);
+    if (auto* variableDeclaration = dynamic_cast<const syntax::VariableDeclaration*>(&node))
+        visit(*variableDeclaration);
+    else if (auto* procedureDeclaration = dynamic_cast<const syntax::ProcedureDeclaration*>(&node))
+        visit(*procedureDeclaration);
+    else if (auto* arrayDeclaration = dynamic_cast<const syntax::ArrayDeclaration*>(&node))
+        visit(*arrayDeclaration);
+    else if (auto* tableDeclaration = dynamic_cast<const syntax::TableDeclaration*>(&node))
+        visit(*tableDeclaration);
+    else if (auto* overlayDeclaration = dynamic_cast<const syntax::OverlayDeclaration*>(&node))
+        visit(*overlayDeclaration);
+    else if (auto* parameterDeclaration = dynamic_cast<const syntax::ParameterDeclaration*>(&node))
+        visit(*parameterDeclaration);
 }
 
 void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
@@ -173,15 +176,16 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
     auto type = createTypeFromToken(node.getType());
     for (auto id : node.getIdentifiers())
     {
-        auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
+        auto typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer});
         if (type->is<PrimitiveType>())
-            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind()});
+            typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
         else if (type->is<FixedType>())
-            typeCopy = IntrusiveVariantValue<Type>(FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
-            
-        auto decl = makeIntr<VariableDeclaration>(id, std::move(typeCopy));
+            typeCopy = IntrusiveVariantValue(
+                FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
+
+        auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
         const auto& name = std::get<std::string>(id->getValue());
-        
+
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
             m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
@@ -189,9 +193,9 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
         }
         else
         {
-            m_context.symbolTable.insert(name, decl.get());
+            m_context.symbolTable.insert(name, declaration.get());
         }
-        m_context.ownedUsables.push_back(std::move(decl));
+        m_context.ownedUsables.push_back(std::move(declaration));
     }
 }
 
@@ -200,11 +204,11 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
     for (auto id : node.getIdentifiers())
     {
         std::vector<std::uint64_t> dims(node.getDimensions().size(), 10); // Dummy dimensions
-        auto typeCopy = IntrusiveVariantValue<Type>(ArrayType{&untypedType, dims});
-        
-        auto decl = makeIntr<ArrayDeclaration>(id, std::move(typeCopy));
+        auto typeCopy = IntrusiveVariantValue(ArrayType{&untypedType, dims});
+
+        auto declaration = makeIntrusiveVariant<ArrayDeclaration>(id, std::move(typeCopy));
         const auto& name = std::get<std::string>(id->getValue());
-        
+
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
             m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
@@ -212,39 +216,44 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
         }
         else
         {
-            m_context.symbolTable.insert(name, decl.get());
+            m_context.symbolTable.insert(name, declaration.get());
         }
-        m_context.ownedUsables.push_back(std::move(decl));
+        m_context.ownedUsables.push_back(std::move(declaration));
     }
-    
+
     // Visit dimension expressions
     for (const auto& dim : node.getDimensions())
     {
-        if (dim.first) visit(*dim.first);
-        if (dim.second) visit(*dim.second);
+        if (dim.first)
+            visit(*dim.first);
+        if (dim.second)
+            visit(*dim.second);
     }
 }
 
 void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
 {
-    if (node.getWidth()) visit(*node.getWidth());
-    if (node.getLength()) visit(*node.getLength());
+    if (node.getWidth())
+        visit(*node.getWidth());
+    if (node.getLength())
+        visit(*node.getLength());
 
     auto id = node.getIdentifier();
-    auto typeCopy = IntrusiveVariantValue<Type>(TableType{*new TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 1, 1}}});
-    auto decl = makeIntr<TableDeclaration>(id, std::move(typeCopy));
+    auto typeCopy = IntrusiveVariantValue(
+        TableType{*new TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 1, 1}}});
+    auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
     const auto& name = std::get<std::string>(id->getValue());
-    
+
     if (m_context.symbolTable.lookupInCurrentScope(name))
     {
         m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
-            DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
     }
     else
     {
-        m_context.symbolTable.insert(name, decl.get());
+        m_context.symbolTable.insert(name, declaration.get());
     }
-    m_context.ownedUsables.push_back(std::move(decl));
+    m_context.ownedUsables.push_back(std::move(declaration));
 }
 
 void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
@@ -258,20 +267,20 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     auto id = node.getName();
     auto type = createTypeFromToken(node.getTypeToken());
     auto typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}}); // Dummy procedure type
-    
-    auto decl = makeIntr<ProcedureDeclaration>(id, std::move(typeCopy));
+
+    auto declaration = makeIntrusiveVariant<ProcedureDeclaration>(id, std::move(typeCopy));
     const auto& name = std::get<std::string>(id->getValue());
-    
+
     if (m_context.symbolTable.lookupInCurrentScope(name))
     {
         m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
-            DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
     }
     else
     {
-        m_context.symbolTable.insert(name, decl.get());
+        m_context.symbolTable.insert(name, declaration.get());
     }
-    m_context.ownedUsables.push_back(std::move(decl));
+    m_context.ownedUsables.push_back(std::move(declaration));
 
     m_context.symbolTable.enterScope();
     for (const auto& param : node.getParameters())
@@ -288,9 +297,9 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
     for (auto id : node.getIdentifiers())
     {
         auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
-        auto decl = makeIntr<VariableDeclaration>(id, std::move(typeCopy));
+        auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
         const auto& name = std::get<std::string>(id->getValue());
-        
+
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
             m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
@@ -298,9 +307,9 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
         }
         else
         {
-            m_context.symbolTable.insert(name, decl.get());
+            m_context.symbolTable.insert(name, declaration.get());
         }
-        m_context.ownedUsables.push_back(std::move(decl));
+        m_context.ownedUsables.push_back(std::move(declaration));
     }
 }
 
@@ -326,14 +335,16 @@ void SymbolResolutionPass::visit(const syntax::Expression& node)
         visit(*tyExpr);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void SymbolResolutionPass::visit(const syntax::IdentifierExpression& node)
 {
     const auto& name = std::get<std::string>(node.getIdentifier()->getValue());
     const Usable* usable = m_context.symbolTable.lookup(name);
     if (!usable)
     {
-        m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getIdentifier(), m_context.source, *node.getIdentifier()));
-            DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
+        m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getIdentifier(), m_context.source,
+                                                                      *node.getIdentifier()));
+        DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
     }
     else
     {
@@ -372,14 +383,15 @@ void SymbolResolutionPass::visit(const syntax::FunctionCallExpression& node)
     const Usable* usable = m_context.symbolTable.lookup(name);
     if (!usable)
     {
-        m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getFunction(), m_context.source, *node.getFunction()));
-            DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
+        m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getFunction(), m_context.source,
+                                                                      *node.getFunction()));
+        DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
     }
     else
     {
         m_context.resolvedIdentifiers[&node] = usable;
     }
-    
+
     for (const auto& arg : node.getArguments())
     {
         visit(*arg);
@@ -394,7 +406,8 @@ void SymbolResolutionPass::visit(const syntax::ArrayAccessExpression& node)
         const Usable* usable = m_context.symbolTable.lookup(name);
         if (!usable)
         {
-            m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getArray(), m_context.source, *node.getArray()));
+            m_context.log(
+                errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getArray(), m_context.source, *node.getArray()));
             DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
         }
         else
@@ -415,8 +428,10 @@ void SymbolResolutionPass::visit(const syntax::LocationExpression& node)
 
 void SymbolResolutionPass::visit(const syntax::TypeChangeExpression& node)
 {
-    if (node.getTotalBits()) visit(*node.getTotalBits());
-    if (node.getFractionBits()) visit(*node.getFractionBits());
+    if (node.getTotalBits())
+        visit(*node.getTotalBits());
+    if (node.getFractionBits())
+        visit(*node.getFractionBits());
     visit(node.getExpression());
 }
 
