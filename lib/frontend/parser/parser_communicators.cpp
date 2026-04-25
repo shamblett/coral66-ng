@@ -15,7 +15,7 @@ namespace coral66::parser
 namespace
 {
 std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
-    parseAnonymousTypelist(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+    parseAnonymousTypeList(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
 {
     std::vector<std::unique_ptr<syntax::Declaration>> result;
     if (begin == end || begin->getTokenType() != lexer::TokenType::OpenParentheses)
@@ -276,7 +276,7 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                             return nullptr;
                         }
 
-                        auto parametersOpt = parseAnonymousTypelist(begin, end, context);
+                        auto parametersOpt = parseAnonymousTypeList(begin, end, context);
                         if (!parametersOpt.has_value())
                         {
                             return nullptr;
@@ -289,7 +289,6 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                         if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                         {
                             begin++;
-                            continue;
                         }
                         else
                         {

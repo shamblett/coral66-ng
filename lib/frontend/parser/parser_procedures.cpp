@@ -214,7 +214,13 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
 std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                              Context& context)
 {
-    auto rollback = begin;
+
+    if (begin == end)
+    {
+        return nullptr;
+    }
+
+    const auto rollback = begin;
     std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
     bool isTyped = false;
 
