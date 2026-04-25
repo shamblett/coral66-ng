@@ -186,6 +186,30 @@ TEST_CASE("Symbol Resolution - Identifier Resolution", "[Semantics][SymbolResolu
         }
         CHECK(found);
     }
+
+    SECTION("Valid Variable Usage With Common Declarations")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON(INTEGER I;) BEGIN INTEGER I ; I := 1 END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+        CHECK(coral66::DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics().empty());
+
+        bool found = false;
+        for (const auto& [node, usable] : res.context.resolvedIdentifiers)
+        {
+            if (auto* idExpr = dynamic_cast<const IdentifierExpression*>(node))
+            {
+                if (std::get<std::string>(idExpr->getIdentifier()->getValue()) == "I")
+                {
+                    found = true;
+                    REQUIRE(usable != nullptr);
+                    CHECK(usable->is<semantics::VariableDeclaration>());
+                }
+            }
+        }
+        CHECK(found);
+    }
 }
 
 TEST_CASE("Symbol Resolution - Diagnostics", "[Semantics][SymbolResolution]")
