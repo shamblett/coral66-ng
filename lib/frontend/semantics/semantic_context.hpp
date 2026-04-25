@@ -40,6 +40,9 @@ public:
     // Stores resolved symbols for identifiers in expressions
     std::unordered_map<const syntax::Node*, const Usable*> resolvedIdentifiers;
 
+    // Stores inferred types for expressions
+    std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<Type>> expressionTypes;
+
     // Owns the semantic usable objects (declarations)
     std::vector<IntrVarPtr<Usable>> ownedUsables;
 

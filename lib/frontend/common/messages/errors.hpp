@@ -102,15 +102,15 @@ namespace semantics
 CREATE_ERROR(UNDECLARED_IDENTIFIER_N, "Undeclared identifier %0", Underline<0>);
 CREATE_ERROR(REDEFINITION_OF_SYMBOL_N, "Redefinition of symbol %0", Underline<0>);
 CREATE_ERROR(TYPE_MISMATCH, "Type mismatch in expression", Underline<0>);
-CREATE_ERROR(EXPECTED_INTEGER_TYPE, "Expected INTEGER type", AnnotateExpr<0>);
-CREATE_ERROR(EXPECTED_FLOATING_TYPE, "Expected FLOATING type", AnnotateExpr<0>);
+CREATE_ERROR(EXPECTED_INTEGER_TYPE, "Expected INTEGER type", Underline<0>);
+CREATE_ERROR(EXPECTED_FLOATING_TYPE, "Expected FLOATING type", Underline<0>);
 CREATE_ERROR(CANNOT_ASSIGN_TO_CONST, "Cannot assign to constant or value parameter", Underline<0>);
 CREATE_ERROR(TABLE_ELEMENT_NOT_FOUND_N, "Element %0 not found in table", Underline<0>);
 CREATE_ERROR(INVALID_BIT_RANGE, "Invalid bit range specified", Underline<0>);
 CREATE_ERROR(LABEL_NOT_FOUND_N, "Label %0 not found", Underline<0>);
 CREATE_ERROR(PROCEDURE_ARGUMENT_COUNT_MISMATCH, "Incorrect number of arguments for procedure call", Underline<0>);
-CREATE_ERROR(PROCEDURE_ARGUMENT_TYPE_MISMATCH, "Argument type mismatch", AnnotateExpr<0>);
-CREATE_ERROR(LOCATION_PARAMETER_REQUIRES_LVALUE, "LOCATION parameter requires a variable (L-value)", AnnotateExpr<0>);
+CREATE_ERROR(PROCEDURE_ARGUMENT_TYPE_MISMATCH, "Argument type mismatch", Underline<0>);
+CREATE_ERROR(LOCATION_PARAMETER_REQUIRES_LVALUE, "LOCATION parameter requires a variable (L-value)", Underline<0>);
 CREATE_ERROR(INVALID_SCALE_FOR_FIXED, "Invalid scale for FIXED point operation", Underline<0>);
 } // namespace semantics
 

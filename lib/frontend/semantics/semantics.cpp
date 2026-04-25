@@ -190,6 +190,7 @@ lexer::CTokenIterator UnaryOperator::end() const
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "semantic_context.hpp"
 #include "symbol_resolution_pass.hpp"
+#include "type_checking_pass.hpp"
 
 namespace coral66::semantics
 {
@@ -198,8 +199,11 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
 {
     CTRACK_NAME("Semantics");
     SemanticContext context(cTokens, reporter, errors);
-    SymbolResolutionPass pass(context);
-    pass.run(parseTree);
+    SymbolResolutionPass symPass(context);
+    symPass.run(parseTree);
+    
+    TypeCheckingPass typePass(context);
+    typePass.run(parseTree);
 
     std::vector<lexer::CToken> syntheticTokens;
     std::vector<IntrVarPtr<Usable>> globals;
