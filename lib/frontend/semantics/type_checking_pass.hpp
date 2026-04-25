@@ -53,6 +53,7 @@ private:
     
     // Expressions
     void visit(const syntax::Expression& node);
+    void visit(const syntax::LiteralExpression& node);
     void visit(const syntax::IdentifierExpression& node);
     void visit(const syntax::BinaryExpression& node);
     void visit(const syntax::UnaryExpression& node);

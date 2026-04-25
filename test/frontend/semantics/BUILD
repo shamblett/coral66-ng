@@ -9,6 +9,7 @@ cc_library(
     name = "semanticstest",
     srcs = [
         "semantics_symbol_resolution_tests.cpp",
+        "semantics_type_check_tests.cpp",
         "symbol_table_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],

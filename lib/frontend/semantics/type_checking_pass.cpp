@@ -115,7 +115,8 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
         
         if (!lType->is<ErrorType>() && !rType->is<ErrorType>())
         {
-            if (lType->is<ArrayType>() || lType->is<TableType>() || lType->is<ProcedureType>())
+            if (lType->is<ArrayType>() || lType->is<TableType>() || lType->is<ProcedureType>() ||
+                rType->is<ArrayType>() || rType->is<TableType>() || rType->is<ProcedureType>())
             {
                 m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getVariable().begin(), m_context.source, *node.getVariable().begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
@@ -187,6 +188,8 @@ void TypeCheckingPass::visit(const syntax::Expression& node)
 {
     if (auto* idExpr = dynamic_cast<const syntax::IdentifierExpression*>(&node))
         visit(*idExpr);
+    else if (auto* litExpr = dynamic_cast<const syntax::LiteralExpression*>(&node))
+        visit(*litExpr);
     else if (auto* binExpr = dynamic_cast<const syntax::BinaryExpression*>(&node))
         visit(*binExpr);
     else if (auto* unExpr = dynamic_cast<const syntax::UnaryExpression*>(&node))
@@ -236,6 +239,14 @@ void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
     {
         m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
     }
+}
+
+void TypeCheckingPass::visit(const syntax::LiteralExpression& node)
+{
+    if (node.getLiteral()->getType() == lexer::CToken::Floating)
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
+    else
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
 
 IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, const Type& t2)
@@ -355,8 +366,7 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                         auto itArg = m_context.expressionTypes.find(arg.get());
                         if (itArg != m_context.expressionTypes.end())
                         {
-                            auto common = getCommonType(*param.type, *itArg->second);
-                            if (common->is<ErrorType>() && !itArg->second->is<ErrorType>())
+                            if (*param.type != *itArg->second && !itArg->second->is<ErrorType>())
                             {
                                 m_context.log(errors::semantics::PROCEDURE_ARGUMENT_TYPE_MISMATCH.args(*arg->begin(), m_context.source, *arg->begin()));
                                 DiagnosticCollector::addDiagnostic(errors::semantics::PROCEDURE_ARGUMENT_TYPE_MISMATCH);
