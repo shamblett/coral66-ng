@@ -403,7 +403,18 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
             m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getOp(), m_context.source, *node.getOp()));
             DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
         }
-        m_context.expressionTypes.insert_or_assign(&node, std::move(common));
+        
+        auto opType = node.getOp()->getTokenType();
+        if (opType == lexer::TokenType::LessThan || opType == lexer::TokenType::LessThanOrEqual || 
+            opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual || 
+            opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
+        {
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+        }
+        else
+        {
+            m_context.expressionTypes.insert_or_assign(&node, std::move(common));
+        }
     }
     else
     {

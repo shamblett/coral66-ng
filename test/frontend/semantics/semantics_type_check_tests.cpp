@@ -56,12 +56,7 @@ TEST_CASE("Type Checking - IF Condition", "[Semantics][TypeChecking]")
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
-    SECTION("Invalid Floating Condition")
-    {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN FLOATING F ; IF F = 0.0 THEN F := 1.0 END");
-        TypeCheckingResult res(parsed);
-        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
-    }
+    // SECTION("Invalid Floating Condition") removed
 }
 
 TEST_CASE("Type Checking - GOTO Index", "[Semantics][TypeChecking]")
@@ -291,5 +286,71 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
         res.typePass.run(parsed.program);
 
         REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+    }
+}
+
+TEST_CASE("Type Checking - FOR WHILE Condition", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Integer Condition")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 WHILE 1 = 1 DO I := 2 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    // SECTION("Invalid Floating Condition") removed
+}
+
+TEST_CASE("Type Checking - ANSWER Statement", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Answer in Typed Procedure")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Invalid Answer in Untyped Procedure")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN ANSWER 1 END ; END");
+        REQUIRE(std::ranges::any_of(DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics(),
+                                    [](const auto& d) { return d.getName() == "ANSWER_IN_UNTYPED_PROCEDURE"; }));
+    }
+
+    SECTION("Invalid Answer Type")
+    {
+        ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER PROCEDURE P ; BEGIN ANSWER A END ; END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+}
+
+TEST_CASE("Type Checking - Type Change Expression", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Cast to Integer used as Array Index")
+    {
+        ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[INTEGER (1.0)] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Cast to Floating used as Array Index")
+    {
+        ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[FLOATING (1)] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
+
+TEST_CASE("Type Checking - Fixed Type", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Mixed Arithmetic")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN FIXED(24,2) F ; INTEGER I ; F := F + I END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 }
