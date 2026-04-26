@@ -1,4 +1,5 @@
 #include "type_checking_pass.hpp"
+
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
 
@@ -73,11 +74,12 @@ void TypeCheckingPass::visit(const syntax::IfStatement& node)
         auto prim = it->second->tryAs<PrimitiveType>();
         if (prim && prim->getKind() == PrimitiveType::Floating)
         {
-            m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source, *node.getCondition().begin()));
+            m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
+                                                                        *node.getCondition().begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
         }
     }
-    
+
     visit(node.getThenBranch());
     if (node.getElseBranch())
         visit(*node.getElseBranch());
@@ -103,22 +105,23 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
 {
     visit(node.getVariable());
     visit(node.getExpression());
-    
+
     // Check type compatibility
     auto itL = m_context.expressionTypes.find(&node.getVariable());
     auto itR = m_context.expressionTypes.find(&node.getExpression());
-    
+
     if (itL != m_context.expressionTypes.end() && itR != m_context.expressionTypes.end())
     {
         auto lType = itL->second;
         auto rType = itR->second;
-        
+
         if (!lType->is<ErrorType>() && !rType->is<ErrorType>())
         {
-            if (lType->is<ArrayType>() || lType->is<TableType>() || lType->is<ProcedureType>() ||
-                rType->is<ArrayType>() || rType->is<TableType>() || rType->is<ProcedureType>())
+            if (lType->is<ArrayType>() || lType->is<TableType>() || lType->is<ProcedureType>() || rType->is<ArrayType>()
+                || rType->is<TableType>() || rType->is<ProcedureType>())
             {
-                m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getVariable().begin(), m_context.source, *node.getVariable().begin()));
+                m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getVariable().begin(), m_context.source,
+                                                                    *node.getVariable().begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
             }
         }
@@ -136,7 +139,8 @@ void TypeCheckingPass::visit(const syntax::GotoStatement& node)
             auto prim = it->second->tryAs<PrimitiveType>();
             if (prim && prim->getKind() != PrimitiveType::Integer)
             {
-                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getIndex()->begin(), m_context.source, *node.getIndex()->begin()));
+                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getIndex()->begin(), m_context.source,
+                                                                            *node.getIndex()->begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
             }
         }
@@ -169,10 +173,15 @@ void TypeCheckingPass::visit(const syntax::Declaration& node)
         visit(*parameterDeclaration);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::VariableDeclaration& node) {}
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node) {}
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::TableDeclaration& node) {}
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::OverlayDeclaration& node) {}
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::ParameterDeclaration& node) {}
 
 void TypeCheckingPass::visit(const syntax::ProcedureDeclaration& node)
@@ -208,6 +217,7 @@ void TypeCheckingPass::visit(const syntax::Expression& node)
         visit(*tyExpr);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
 {
     auto it = m_context.resolvedIdentifiers.find(&node);
@@ -241,41 +251,44 @@ void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::LiteralExpression& node)
 {
     if (node.getLiteral()->getType() == lexer::CToken::Floating)
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
+        m_context.expressionTypes.insert_or_assign(&node,
+                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
     else
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+        m_context.expressionTypes.insert_or_assign(&node,
+                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
 
-IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, const Type& t2)
+IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, const Type& t2) const
 {
     if (t1.is<ErrorType>() || t2.is<ErrorType>())
-        return IntrusiveVariantValue<Type>(ErrorType{});
-        
+        return {(ErrorType{})};
+
     auto p1 = t1.tryAs<PrimitiveType>();
     auto p2 = t2.tryAs<PrimitiveType>();
-    
+
     if (p1 && p2)
     {
         if (p1->getKind() == PrimitiveType::Floating || p2->getKind() == PrimitiveType::Floating)
         {
-            return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating});
+            return {(PrimitiveType{PrimitiveType::Floating})};
         }
-        return IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
+        return {(PrimitiveType{PrimitiveType::Integer})};
     }
-    return IntrusiveVariantValue<Type>(ErrorType{});
+    return {(ErrorType{})};
 }
 
 void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
 {
     visit(node.getLeft());
     visit(node.getRight());
-    
+
     auto it1 = m_context.expressionTypes.find(&node.getLeft());
     auto it2 = m_context.expressionTypes.find(&node.getRight());
-    
+
     if (it1 != m_context.expressionTypes.end() && it2 != m_context.expressionTypes.end())
     {
         auto common = getCommonType(*it1->second, *it2->second);
@@ -311,8 +324,9 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
     visit(node.getBase());
     visit(node.getStartBit());
     visit(node.getWidth());
-    
-    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+
+    m_context.expressionTypes.insert_or_assign(&node,
+                                               IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
 
 void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
@@ -320,10 +334,10 @@ void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
     visit(node.getCondition());
     visit(node.getThenBranch());
     visit(node.getElseBranch());
-    
+
     auto itThen = m_context.expressionTypes.find(&node.getThenBranch());
     auto itElse = m_context.expressionTypes.find(&node.getElseBranch());
-    
+
     if (itThen != m_context.expressionTypes.end() && itElse != m_context.expressionTypes.end())
     {
         m_context.expressionTypes.insert_or_assign(&node, getCommonType(*itThen->second, *itElse->second));
@@ -340,20 +354,20 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
     {
         visit(*arg);
     }
-    
+
     auto it = m_context.resolvedIdentifiers.find(&node);
     if (it != m_context.resolvedIdentifiers.end())
     {
         const Usable* usable = it->second;
         if (auto* proc = usable->tryAs<ProcedureDeclaration>())
         {
-            auto procType = proc->getType().tryAs<ProcedureType>();
-            if (procType)
+            if (auto procType = proc->getType().tryAs<ProcedureType>())
             {
                 // Check argument count
                 if (procType->getParameters().size() != node.getArguments().size())
                 {
-                    m_context.log(errors::semantics::PROCEDURE_ARGUMENT_COUNT_MISMATCH.args(*node.getFunction(), m_context.source, *node.getFunction()));
+                    m_context.log(errors::semantics::PROCEDURE_ARGUMENT_COUNT_MISMATCH.args(
+                        *node.getFunction(), m_context.source, *node.getFunction()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::PROCEDURE_ARGUMENT_COUNT_MISMATCH);
                 }
                 else
@@ -368,18 +382,20 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                         {
                             if (*param.type != *itArg->second && !itArg->second->is<ErrorType>())
                             {
-                                m_context.log(errors::semantics::PROCEDURE_ARGUMENT_TYPE_MISMATCH.args(*arg->begin(), m_context.source, *arg->begin()));
+                                m_context.log(errors::semantics::PROCEDURE_ARGUMENT_TYPE_MISMATCH.args(
+                                    *arg->begin(), m_context.source, *arg->begin()));
                                 DiagnosticCollector::addDiagnostic(errors::semantics::PROCEDURE_ARGUMENT_TYPE_MISMATCH);
                             }
                         }
                     }
                 }
-            
+
                 if (procType->getReturnType())
                 {
                     if (auto p = procType->getReturnType()->tryAs<PrimitiveType>())
                     {
-                        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
+                        m_context.expressionTypes.insert_or_assign(
+                            &node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
                     }
                     else
                     {
@@ -412,31 +428,32 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
     for (const auto& idx : node.getIndices())
     {
         visit(*idx);
-        
+
         auto it = m_context.expressionTypes.find(idx.get());
         if (it != m_context.expressionTypes.end())
         {
             auto prim = it->second->tryAs<PrimitiveType>();
             if (prim && prim->getKind() != PrimitiveType::Integer)
             {
-                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*idx->begin(), m_context.source, *idx->begin()));
+                m_context.log(
+                    errors::semantics::EXPECTED_INTEGER_TYPE.args(*idx->begin(), m_context.source, *idx->begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
             }
         }
     }
-    
+
     auto it = m_context.resolvedIdentifiers.find(&node);
     if (it != m_context.resolvedIdentifiers.end())
     {
         const Usable* usable = it->second;
         if (auto* arr = usable->tryAs<ArrayDeclaration>())
         {
-            auto arrType = arr->getType().tryAs<ArrayType>();
-            if (arrType)
+            if (auto arrType = arr->getType().tryAs<ArrayType>())
             {
                 if (auto p = arrType->getElementType().tryAs<PrimitiveType>())
                 {
-                    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
+                    m_context.expressionTypes.insert_or_assign(
+                        &node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
                 }
                 else
                 {
@@ -462,7 +479,8 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
 void TypeCheckingPass::visit(const syntax::LocationExpression& node)
 {
     visit(node.getWordReference());
-    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+    m_context.expressionTypes.insert_or_assign(&node,
+                                               IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
 
 void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
@@ -472,8 +490,9 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
     if (node.getFractionBits())
         visit(*node.getFractionBits());
     visit(node.getExpression());
-    
-    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+
+    m_context.expressionTypes.insert_or_assign(&node,
+                                               IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
 
 } // namespace coral66::semantics

@@ -41,7 +41,7 @@ private:
     void visit(const syntax::GotoStatement& node);
     void visit(const syntax::AnswerStatement& node);
     void visit(const syntax::ProcedureCallStatement& node);
-    
+
     // Declarations
     void visit(const syntax::Declaration& node);
     void visit(const syntax::VariableDeclaration& node);
@@ -50,7 +50,7 @@ private:
     void visit(const syntax::TableDeclaration& node);
     void visit(const syntax::OverlayDeclaration& node);
     void visit(const syntax::ParameterDeclaration& node);
-    
+
     // Expressions
     void visit(const syntax::Expression& node);
     void visit(const syntax::LiteralExpression& node);
@@ -65,7 +65,7 @@ private:
     void visit(const syntax::TypeChangeExpression& node);
 
     // Helper functions
-    IntrusiveVariantValue<Type> getCommonType(const Type& t1, const Type& t2);
+    IntrusiveVariantValue<Type> getCommonType(const Type& t1, const Type& t2) const;
 };
 
 } // namespace coral66::semantics

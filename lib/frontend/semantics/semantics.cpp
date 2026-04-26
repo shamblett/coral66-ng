@@ -6,6 +6,11 @@
 
 #include "semantics.hpp"
 
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
+#include "semantic_context.hpp"
+#include "symbol_resolution_pass.hpp"
+#include "type_checking_pass.hpp"
+
 namespace coral66::semantics
 {
 
@@ -34,7 +39,7 @@ bool Type::operator!=(const Type& rhs) const
 
 // PrimitiveType
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t PrimitiveType::getSizeOfImpl( // NOLINT(*-convert-member-functions-to-static)
+std::uint64_t PrimitiveType::getSizeOfImpl(                 // NOLINT(*-convert-member-functions-to-static)
     [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     // Simplified: 4 bytes for Integer/Floating, 4 for Bits
@@ -93,7 +98,7 @@ std::uint64_t TableType::getSizeOfImpl([[maybe_unused]] const ProgramInterface& 
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t TableType::getAlignOfImpl( // NOLINT(*-convert-member-functions-to-static
+std::uint64_t TableType::getAlignOfImpl(                    // NOLINT(*-convert-member-functions-to-static
     [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
@@ -106,14 +111,14 @@ bool TableType::equalsImpl(const TableType& rhs) const
 
 // OverlayType
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t OverlayType::getSizeOfImpl( // NOLINT(*-convert-member-functions-to-static
+std::uint64_t OverlayType::getSizeOfImpl(                   // NOLINT(*-convert-member-functions-to-static
     [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 0;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-std::uint64_t OverlayType::getAlignOfImpl( // NOLINT(*-convert-member-functions-to-static
+std::uint64_t OverlayType::getAlignOfImpl(                  // NOLINT(*-convert-member-functions-to-static
     [[maybe_unused]] const ProgramInterface& program) const // NOLINT(*-convert-member-functions-to-static)
 {
     return 4;
@@ -185,29 +190,19 @@ lexer::CTokenIterator UnaryOperator::end() const
     return m_operand->end();
 }
 
-} // namespace coral66::semantics
-
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
-#include "semantic_context.hpp"
-#include "symbol_resolution_pass.hpp"
-#include "type_checking_pass.hpp"
-
-namespace coral66::semantics
-{
-
 Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
 {
     CTRACK_NAME("Semantics");
     SemanticContext context(cTokens, reporter, errors);
     SymbolResolutionPass symPass(context);
     symPass.run(parseTree);
-    
+
     TypeCheckingPass typePass(context);
     typePass.run(parseTree);
 
     std::vector<lexer::CToken> syntheticTokens;
     std::vector<IntrVarPtr<Usable>> globals;
-    
+
     // TODO We can move ownership of usable's to the program if we want, but since backend generates code from globals,
     // we return an empty globals list so the backend gracefully generates an empty module.
     return {std::move(cTokens), std::move(syntheticTokens), std::move(globals)};

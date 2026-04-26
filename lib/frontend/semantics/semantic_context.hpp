@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "lib/frontend/common/source_interface.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 #include "symbol_table.hpp"
 

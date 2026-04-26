@@ -4,6 +4,8 @@
  * Date   : 25/04/2026
  */
 
+#include <algorithm>
+
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/semantics/semantic_context.hpp"
@@ -37,14 +39,11 @@ struct TypeCheckingResult
                 typePass.run(parsed.program);
         }
     }
-    
+
     bool hasDiagnostic(std::string_view name) const
     {
-        for (auto d : DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics())
-        {
-            if (d.getName() == name) return true;
-        }
-        return false;
+        return std::ranges::any_of(DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics(),
+                                   [name](const auto& d) { return d.getName() == name; });
     }
 };
 
@@ -141,7 +140,7 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("PROCEDURE_ARGUMENT_COUNT_MISMATCH"));
     }
-    
+
     SECTION("Valid Zero Argument Call")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
@@ -149,38 +148,42 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
         REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_COUNT_MISMATCH"));
         REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
     }
-    
+
     SECTION("Argument Type Mismatch")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN P(1.0) END");
         TypeCheckingResult res(parsed, false);
-        
+
         static PrimitiveType intType(PrimitiveType::Integer);
         std::vector<ProcedureType::Parameter> params;
         params.push_back({&intType, "X", true});
-        
+
         auto procType = IntrusiveVariantValue<Type>(ProcedureType{nullptr, std::move(params)});
-        
+
         auto it = parsed.cTokens.data().begin();
         auto nameToken = &(*it);
-        
-        auto pDecl = IntrVarPtr<Usable>(new semantics::ProcedureDeclaration(nameToken, std::move(procType)));
-        
-        res.context.symbolTable.insert("P", pDecl.get());
-        
-        if (parsed.program.hasBlock()) {
-            for (const auto& stmt : parsed.program.getBlock().getStatements()) {
-                if (auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get())) {
-                    if (auto callExpr = dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression())) {
-                        res.context.resolvedIdentifiers[callExpr] = pDecl.get();
+
+        auto pDeclaration = IntrVarPtr<Usable>(new semantics::ProcedureDeclaration(nameToken, std::move(procType)));
+
+        res.context.symbolTable.insert("P", pDeclaration.get());
+
+        if (parsed.program.hasBlock())
+        {
+            for (const auto& stmt : parsed.program.getBlock().getStatements())
+            {
+                if (auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get()))
+                {
+                    if (auto callExpr = dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression()))
+                    {
+                        res.context.resolvedIdentifiers[callExpr] = pDeclaration.get();
                     }
                 }
             }
         }
-        res.context.ownedUsables.push_back(std::move(pDecl));
-        
+        res.context.ownedUsables.push_back(std::move(pDeclaration));
+
         res.typePass.run(parsed.program);
-        
+
         REQUIRE(res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
     }
 }
