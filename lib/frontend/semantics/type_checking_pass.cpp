@@ -174,15 +174,66 @@ void TypeCheckingPass::visit(const syntax::Declaration& node)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-void TypeCheckingPass::visit(const syntax::VariableDeclaration& node) {}
+void TypeCheckingPass::visit(const syntax::VariableDeclaration& /*node*/) {}
+
+void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
+{
+    for (const auto& dim : node.getDimensions())
+    {
+        visit(*dim.first);
+        visit(*dim.second);
+
+        for (const auto* expr : {dim.first.get(), dim.second.get()})
+        {
+            auto it = m_context.expressionTypes.find(expr);
+            if (it != m_context.expressionTypes.end())
+            {
+                auto prim = it->second->tryAs<PrimitiveType>();
+                if (prim && prim->getKind() != PrimitiveType::Integer)
+                {
+                    m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
+                                                                                *expr->begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+                }
+            }
+        }
+    }
+}
+
+void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
+{
+    for (const auto* expr : {node.getWidth(), node.getLength()})
+    {
+        if (expr)
+        {
+            visit(*expr);
+            auto it = m_context.expressionTypes.find(expr);
+            if (it != m_context.expressionTypes.end())
+            {
+                auto prim = it->second->tryAs<PrimitiveType>();
+                if (prim && prim->getKind() != PrimitiveType::Integer)
+                {
+                    m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
+                                                                                *expr->begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+                }
+            }
+        }
+    }
+
+    for (const auto& element : node.getElements())
+    {
+        visit(*element);
+    }
+}
+
+void TypeCheckingPass::visit(const syntax::OverlayDeclaration& node)
+{
+    visit(node.getOverlayDeclaration());
+}
+
 // ReSharper disable once CppMemberFunctionMayBeConst
-void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node) {}
-// ReSharper disable once CppMemberFunctionMayBeConst
-void TypeCheckingPass::visit(const syntax::TableDeclaration& node) {}
-// ReSharper disable once CppMemberFunctionMayBeConst
-void TypeCheckingPass::visit(const syntax::OverlayDeclaration& node) {}
-// ReSharper disable once CppMemberFunctionMayBeConst
-void TypeCheckingPass::visit(const syntax::ParameterDeclaration& node) {}
+void TypeCheckingPass::visit(const syntax::ParameterDeclaration& /*node*/) {}
 
 void TypeCheckingPass::visit(const syntax::ProcedureDeclaration& node)
 {
