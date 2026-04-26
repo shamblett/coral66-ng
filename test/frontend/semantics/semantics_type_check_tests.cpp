@@ -187,3 +187,68 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
         REQUIRE(res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
     }
 }
+
+TEST_CASE("Type Checking - Array Declaration", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Integer Dimensions")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Floating Dimension First")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1.0:10] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Floating Dimension Second")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10.0] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
+
+TEST_CASE("Type Checking - Table Declaration", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Integer Width and Length")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10, 20] [ I INTEGER 0 ] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Floating Width")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10.0, 20] [ I INTEGER 0 ] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Floating Length")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10, 20.0] [ I INTEGER 0 ] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
+
+TEST_CASE("Type Checking - Overlay Declaration", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Inner Declaration")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1:10] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Inner Declaration")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1.0:10] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
