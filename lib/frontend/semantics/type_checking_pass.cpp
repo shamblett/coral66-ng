@@ -6,6 +6,14 @@
 namespace coral66::semantics
 {
 
+static bool isNumericType(const Type& t)
+{
+    if (auto p = t.tryAs<PrimitiveType>())
+        return p->getKind() == PrimitiveType::Integer || p->getKind() == PrimitiveType::Floating
+               || p->getKind() == PrimitiveType::Bits;
+    return t.is<FixedType>();
+}
+
 TypeCheckingPass::TypeCheckingPass(SemanticContext& context) : m_context(context) {}
 
 void TypeCheckingPass::run(const syntax::Program& program)
@@ -69,10 +77,10 @@ void TypeCheckingPass::visit(const syntax::IfStatement& node)
 {
     visit(node.getCondition());
     auto it = m_context.expressionTypes.find(&node.getCondition());
-    if (it != m_context.expressionTypes.end())
+    if (it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
     {
         auto prim = it->second->tryAs<PrimitiveType>();
-        if (prim && prim->getKind() == PrimitiveType::Floating)
+        if (!prim || prim->getKind() != PrimitiveType::Integer)
         {
             m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
                                                                         *node.getCondition().begin()));
@@ -96,7 +104,20 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
         if (element.until)
             visit(*element.until);
         if (element.whileCondition)
+        {
             visit(*element.whileCondition);
+            auto it = m_context.expressionTypes.find(element.whileCondition.get());
+            if (it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
+            {
+                auto prim = it->second->tryAs<PrimitiveType>();
+                if (!prim || prim->getKind() != PrimitiveType::Integer)
+                {
+                    m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(
+                        *element.whileCondition->begin(), m_context.source, *element.whileCondition->begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+                }
+            }
+        }
     }
     visit(node.getBody());
 }
@@ -117,8 +138,7 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
 
         if (!lType->is<ErrorType>() && !rType->is<ErrorType>())
         {
-            if (lType->is<ArrayType>() || lType->is<TableType>() || lType->is<ProcedureType>() || rType->is<ArrayType>()
-                || rType->is<TableType>() || rType->is<ProcedureType>())
+            if (!isNumericType(*lType) || !isNumericType(*rType))
             {
                 m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getVariable().begin(), m_context.source,
                                                                     *node.getVariable().begin()));
@@ -150,6 +170,29 @@ void TypeCheckingPass::visit(const syntax::GotoStatement& node)
 void TypeCheckingPass::visit(const syntax::AnswerStatement& node)
 {
     visit(node.getExpression());
+
+    if (m_currentProcedure)
+    {
+        if (!m_currentProcedure->getTypeToken())
+        {
+            m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getExpression().begin(), m_context.source,
+                                                                *node.getExpression().begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
+        }
+        else
+        {
+            auto it = m_context.expressionTypes.find(&node.getExpression());
+            if (it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
+            {
+                if (!isNumericType(*it->second))
+                {
+                    m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getExpression().begin(), m_context.source,
+                                                                        *node.getExpression().begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
+                }
+            }
+        }
+    }
 }
 
 void TypeCheckingPass::visit(const syntax::ProcedureCallStatement& node)
@@ -237,11 +280,16 @@ void TypeCheckingPass::visit(const syntax::ParameterDeclaration& /*node*/) {}
 
 void TypeCheckingPass::visit(const syntax::ProcedureDeclaration& node)
 {
+    auto* oldProc = m_currentProcedure;
+    m_currentProcedure = &node;
+
     for (const auto& param : node.getParameters())
     {
         visit(*param);
     }
     visit(node.getBody());
+
+    m_currentProcedure = oldProc;
 }
 
 void TypeCheckingPass::visit(const syntax::Expression& node)
@@ -318,15 +366,22 @@ IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, cons
     if (t1.is<ErrorType>() || t2.is<ErrorType>())
         return {(ErrorType{})};
 
-    auto p1 = t1.tryAs<PrimitiveType>();
-    auto p2 = t2.tryAs<PrimitiveType>();
-
-    if (p1 && p2)
+    if (isNumericType(t1) && isNumericType(t2))
     {
-        if (p1->getKind() == PrimitiveType::Floating || p2->getKind() == PrimitiveType::Floating)
+        auto p1 = t1.tryAs<PrimitiveType>();
+        auto p2 = t2.tryAs<PrimitiveType>();
+
+        if ((p1 && p1->getKind() == PrimitiveType::Floating) || (p2 && p2->getKind() == PrimitiveType::Floating))
         {
             return {(PrimitiveType{PrimitiveType::Floating})};
         }
+        auto f1 = t1.tryAs<FixedType>();
+        if (f1)
+            return {*f1};
+        auto f2 = t2.tryAs<FixedType>();
+        if (f2)
+            return {*f2};
+
         return {(PrimitiveType{PrimitiveType::Integer})};
     }
     return {(ErrorType{})};
@@ -429,9 +484,18 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                         auto& param = procType->getParameters()[i];
                         auto& arg = node.getArguments()[i];
                         auto itArg = m_context.expressionTypes.find(arg.get());
-                        if (itArg != m_context.expressionTypes.end())
+                        if (itArg != m_context.expressionTypes.end() && !itArg->second->is<ErrorType>())
                         {
-                            if (*param.type != *itArg->second && !itArg->second->is<ErrorType>())
+                            bool isCompatible = false;
+                            if (param.isValue)
+                            {
+                                if (isNumericType(*param.type) && isNumericType(*itArg->second))
+                                    isCompatible = true;
+                            }
+                            if (!isCompatible && *param.type == *itArg->second)
+                                isCompatible = true;
+
+                            if (!isCompatible)
                             {
                                 m_context.log(errors::semantics::PROCEDURE_ARGUMENT_TYPE_MISMATCH.args(
                                     *arg->begin(), m_context.source, *arg->begin()));
@@ -542,8 +606,25 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
         visit(*node.getFractionBits());
     visit(node.getExpression());
 
-    m_context.expressionTypes.insert_or_assign(&node,
-                                               IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+    auto kind = node.getType()->getTokenType();
+    if (kind == lexer::TokenType::IntegerKeyword)
+    {
+        m_context.expressionTypes.insert_or_assign(&node,
+                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+    }
+    else if (kind == lexer::TokenType::FloatingKeyword)
+    {
+        m_context.expressionTypes.insert_or_assign(&node,
+                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
+    }
+    else if (kind == lexer::TokenType::FixedKeyword)
+    {
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(FixedType(24, 0)));
+    }
+    else
+    {
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+    }
 }
 
 } // namespace coral66::semantics

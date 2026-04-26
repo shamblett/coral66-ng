@@ -156,7 +156,7 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
 
         static PrimitiveType intType(PrimitiveType::Integer);
         std::vector<ProcedureType::Parameter> params;
-        params.push_back({&intType, "X", true});
+        params.push_back({&intType, "X", false});
 
         auto procType = IntrusiveVariantValue<Type>(ProcedureType{nullptr, std::move(params)});
 
@@ -250,5 +250,46 @@ TEST_CASE("Type Checking - Overlay Declaration", "[Semantics][TypeChecking]")
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1.0:10] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
+
+TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]")
+{
+    SECTION("Argument Type Coercion for Value Parameters")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN P(1.0) END");
+        TypeCheckingResult res(parsed, false);
+
+        static PrimitiveType intType(PrimitiveType::Integer);
+        std::vector<ProcedureType::Parameter> params;
+        params.push_back({&intType, "X", true}); // isValue = true
+
+        auto procType = IntrusiveVariantValue<Type>(ProcedureType{nullptr, std::move(params)});
+
+        auto it = parsed.cTokens.data().begin();
+        auto nameToken = &(*it);
+
+        auto pDeclaration = IntrVarPtr<Usable>(new semantics::ProcedureDeclaration(nameToken, std::move(procType)));
+
+        res.context.symbolTable.insert("P", pDeclaration.get());
+
+        if (parsed.program.hasBlock())
+        {
+            for (const auto& stmt : parsed.program.getBlock().getStatements())
+            {
+                if (auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get()))
+                {
+                    if (auto callExpr = dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression()))
+                    {
+                        res.context.resolvedIdentifiers[callExpr] = pDeclaration.get();
+                    }
+                }
+            }
+        }
+        res.context.ownedUsables.push_back(std::move(pDeclaration));
+
+        res.typePass.run(parsed.program);
+
+        REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
     }
 }

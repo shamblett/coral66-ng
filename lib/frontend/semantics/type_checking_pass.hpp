@@ -21,6 +21,7 @@ namespace coral66::semantics
 class TypeCheckingPass
 {
     SemanticContext& m_context;
+    const syntax::ProcedureDeclaration* m_currentProcedure = nullptr;
 
 public:
     explicit TypeCheckingPass(SemanticContext& context);
