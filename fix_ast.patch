@@ -1,0 +1,53 @@
+--- lib/frontend/syntax/syntax.hpp
++++ lib/frontend/syntax/syntax.hpp
+@@ -20,7 +20,6 @@
+ class Declaration;
+ class Statement;
+ class Expression;
+-class PlaceReference;
+ class Communicator;
+ 
+ class Node
+@@ -282,18 +281,6 @@
+     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
+ };
+ 
+-class PlaceReference : public Node
+-{
+-    using Node::Node;
+-};
+-
+-class SwitchPlaceReference final : public PlaceReference
+-{
+-    lexer::CTokenIterator m_name;
+-    std::vector<lexer::CTokenIterator> m_labels;
+-
+-public:
+-    SwitchPlaceReference(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
+-                         std::vector<lexer::CTokenIterator> labels);
+-    [[nodiscard]] lexer::CTokenIterator getName() const;
+-    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getLabels() const;
+-};
+-
+ class Communicator : public Node
+ {
+     using Node::Node;
+@@ -428,21 +415,18 @@
+ {
+     std::vector<std::unique_ptr<Declaration>> m_declarations;
+     std::vector<std::unique_ptr<Statement>> m_statements;
+-    std::vector<std::unique_ptr<PlaceReference>> m_placeReferences;
+ 
+ public:
+     Block(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+           std::vector<std::unique_ptr<Declaration>>&& declarations,
+-          std::vector<std::unique_ptr<Statement>>&& statements,
+-          std::vector<std::unique_ptr<PlaceReference>>&& placeReferences);
++          std::vector<std::unique_ptr<Statement>>&& statements);
+     
+     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getDeclarations() const;
+     [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
+-    [[nodiscard]] const std::vector<std::unique_ptr<PlaceReference>>& getPlaceReferences() const;
+ };
+ 
+ class Program final : public Node

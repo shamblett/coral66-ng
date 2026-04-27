@@ -1,0 +1,50 @@
+--- lib/frontend/semantics/symbol_resolution_pass.cpp
++++ lib/frontend/semantics/symbol_resolution_pass.cpp
+@@ -37,21 +37,39 @@
+ {
+     m_context.symbolTable.enterScope();
+ 
+     // Pre-scan all statements for labels to ensure correct scope and forward-referencing
+-    for (const auto& stmt : node.getStatements())
++    std::function<void(const syntax::Statement&)> preScanLabels = [&](const syntax::Statement& stmt)
+     {
+-        for (const auto& label : stmt->getLabels())
++        for (const auto& label : stmt.getLabels())
+         {
+             auto declaration = makeIntrusiveVariant<LabelDeclaration>(label);
+             const auto& name = std::get<std::string>(label->getValue());
+             if (m_context.symbolTable.lookupInCurrentScope(name))
+             {
+                 m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*label, m_context.source, *label));
+                 DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+             }
+             else
+             {
+                 m_context.symbolTable.insert(name, declaration.get());
+             }
+             m_context.ownedUsables.push_back(std::move(declaration));
+         }
+-    }
++
++        if (auto* compStmt = dynamic_cast<const syntax::CompoundStatement*>(&stmt))
++        {
++            for (const auto& innerStmt : compStmt->getStatements()) preScanLabels(*innerStmt);
++        }
++        else if (auto* ifStmt = dynamic_cast<const syntax::IfStatement*>(&stmt))
++        {
++            preScanLabels(ifStmt->getThenBranch());
++            if (ifStmt->getElseBranch()) preScanLabels(*ifStmt->getElseBranch());
++        }
++        else if (auto* forStmt = dynamic_cast<const syntax::ForStatement*>(&stmt))
++        {
++            preScanLabels(forStmt->getBody());
++        }
++        // BlockStatements create a new scope, so we do NOT recurse into them.
++    };
++
++    for (const auto& stmt : node.getStatements())
++    {
++        preScanLabels(*stmt);
++    }
+ 
+     for (const auto& declaration : node.getDeclarations())

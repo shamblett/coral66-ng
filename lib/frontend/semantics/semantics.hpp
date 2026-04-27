@@ -810,9 +810,11 @@ class ArrayDeclaration;
 class TableDeclaration;
 class OverlayDeclaration;
 class SwitchDeclaration;
+class LabelDeclaration;
+class TableElementDeclaration;
 
 class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration,
-                                               TableDeclaration, OverlayDeclaration, SwitchDeclaration>
+                                               TableDeclaration, OverlayDeclaration, SwitchDeclaration, LabelDeclaration, TableElementDeclaration>
 {
     std::vector<const Usable*> m_uses;
 
@@ -892,6 +894,31 @@ public:
         return m_body;
     }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ProcedureDeclaration)
+};
+
+class LabelDeclaration final : public Declaration
+{
+public:
+    LabelDeclaration(lexer::CTokenIterator nameToken)
+        : Declaration(std::in_place_type<LabelDeclaration>, nameToken)
+    {
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelDeclaration)
+};
+
+class TableElementDeclaration final : public Declaration
+{
+    IntrusiveVariantValue<Type> m_type;
+public:
+    TableElementDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+        : Declaration(std::in_place_type<TableElementDeclaration>, nameToken), m_type(std::move(type))
+    {
+    }
+    [[nodiscard]] const Type& getType() const
+    {
+        return *m_type;
+    }
+    CORAL66_GEN_INTR_VAR_WARNING_FUNCS(TableElementDeclaration)
 };
 
 class ArrayDeclaration final : public Declaration
