@@ -159,6 +159,46 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
 
         CHECK(res.errors == false);
     }
+
+    SECTION("Switch Declaration")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN SWITCH sw := l1, l2, l3 ; GOTO sw[1]; l1: l2: l3: END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+        CHECK(coral66::DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics().empty());
+    }
+
+    SECTION("Table Element Declaration")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x INTEGER 0; y FIXED(16,8) 1 ] ; t[x] := 0 END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+        CHECK(coral66::DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics().empty());
+    }
+    
+    SECTION("Implicit Label Declarations Forward Reference")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN GOTO forwardLabel ; forwardLabel: END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+    }
+    
+    SECTION("Recursive Procedure Scope")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN RECURSIVE PROCEDURE P ; BEGIN P END ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+
+    SECTION("Non-Recursive Procedure Shadowing Outer Variable Scope")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER P ; PROCEDURE P2 ; BEGIN P := 1 END ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
 }
 
 TEST_CASE("Symbol Resolution - Identifier Resolution", "[Semantics][SymbolResolution]")

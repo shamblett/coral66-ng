@@ -48,6 +48,8 @@ private:
     void visit(const syntax::ProcedureDeclaration& node);
     void visit(const syntax::ArrayDeclaration& node);
     void visit(const syntax::TableDeclaration& node);
+    void visit(const syntax::TableElementDeclaration& node);
+    void visit(const syntax::SwitchDeclaration& node);
     void visit(const syntax::OverlayDeclaration& node);
     void visit(const syntax::ParameterDeclaration& node);
     

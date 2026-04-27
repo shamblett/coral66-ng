@@ -231,6 +231,21 @@ public:
     [[nodiscard]] const Declaration& getOverlayDeclaration() const;
 };
 
+class SwitchDeclaration final : public Declaration
+{
+    lexer::CTokenIterator m_identifier;
+    std::vector<lexer::CTokenIterator> m_labels;
+
+public:
+    SwitchDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
+                      std::vector<lexer::CTokenIterator> labels)
+        : Declaration(begin, end), m_identifier(identifier), m_labels(std::move(labels))
+    {
+    }
+    [[nodiscard]] lexer::CTokenIterator getIdentifier() const { return m_identifier; }
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getLabels() const { return m_labels; }
+};
+
 class PlaceSpecification final : public Declaration
 {
     std::vector<lexer::CTokenIterator> m_identifiers;

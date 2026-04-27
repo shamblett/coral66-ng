@@ -169,6 +169,10 @@ void SymbolResolutionPass::visit(const syntax::Declaration& node)
         visit(*overlayDeclaration);
     else if (auto* parameterDeclaration = dynamic_cast<const syntax::ParameterDeclaration*>(&node))
         visit(*parameterDeclaration);
+    else if (auto* switchDeclaration = dynamic_cast<const syntax::SwitchDeclaration*>(&node))
+        visit(*switchDeclaration);
+    else if (auto* tableElementDeclaration = dynamic_cast<const syntax::TableElementDeclaration*>(&node))
+        visit(*tableElementDeclaration);
 }
 
 void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
@@ -253,6 +257,47 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     {
         m_context.symbolTable.insert(name, declaration.get());
     }
+    m_context.ownedUsables.push_back(std::move(declaration));
+
+    for (const auto& element : node.getElements())
+    {
+        visit(*element);
+    }
+}
+
+void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
+{
+    auto type = createTypeFromToken(node.getType());
+    auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); // Default for now
+    if (type->is<PrimitiveType>())
+        typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
+    else if (type->is<FixedType>())
+        typeCopy = IntrusiveVariantValue(
+            FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
+
+    auto id = node.getIdentifier();
+    auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy));
+    const auto& name = std::get<std::string>(id->getValue());
+
+    if (m_context.symbolTable.lookupInCurrentScope(name))
+    {
+        m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
+        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+    }
+    else
+    {
+        m_context.symbolTable.insert(name, declaration.get());
+    }
+    m_context.ownedUsables.push_back(std::move(declaration));
+}
+
+void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
+{
+    auto id = node.getIdentifier();
+    auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::vector<const LabelStatement*>{});
+    const auto& name = std::get<std::string>(id->getValue());
+
+    m_context.symbolTable.insert(name, declaration.get());
     m_context.ownedUsables.push_back(std::move(declaration));
 }
 
