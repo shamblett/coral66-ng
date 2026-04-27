@@ -328,6 +328,17 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
 
 TEST_CASE("Coral Parse Statements - Blocks and Declarations", "[Parser][Statement][Block]")
 {
+    SECTION("Block with proper Switch Place Reference")
+    {
+        const ParsedStatement s("BEGIN SWITCH S <- L1, L2 ; END;");
+        REQUIRE(parser::DiagnosticCollector::getDiagnostics().empty());
+        auto blockStmt = dynamic_cast<BlockStatement*>(s.statement.get());
+        REQUIRE(blockStmt != nullptr);
+        REQUIRE(blockStmt->getBlock().getPlaceReferences().size() == 1);
+        auto* switchPref = dynamic_cast<SwitchPlaceReference*>(blockStmt->getBlock().getPlaceReferences()[0].get());
+        REQUIRE(switchPref != nullptr);
+        REQUIRE(switchPref->getLabels().size() == 2);
+    }
 
     SECTION("Single Label")
     {

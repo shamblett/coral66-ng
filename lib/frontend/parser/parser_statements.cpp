@@ -431,7 +431,7 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         auto blockStart = begin;
         if (auto block = parseBlock(begin, end, context))
         {
-            if (block->getDeclarations().empty())
+            if (block->getDeclarations().empty() && block->getPlaceReferences().empty())
             {
                 return std::make_unique<syntax::CompoundStatement>(blockStart, begin, block->takeStatements());
             }

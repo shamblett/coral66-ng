@@ -5,7 +5,6 @@
  * Date   : 31/01/2026
  */
 
-#include <functional>
 #include <string>
 
 #include "lib/frontend/common/messages/errors.hpp"
@@ -45,47 +44,8 @@ void SymbolResolutionPass::visit(const syntax::Block& node)
 {
     m_context.symbolTable.enterScope();
 
-    // Pre-scan all statements for labels to ensure correct scope and forward-referencing
-    std::function<void(const syntax::Statement&)> preScanLabels = [&](const syntax::Statement& stmt)
-    {
-        for (const auto& label : stmt.getLabels())
-        {
-            auto declaration = makeIntrusiveVariant<LabelDeclaration>(label);
-            const auto& name = std::get<std::string>(label->getValue());
-            if (m_context.symbolTable.lookupInCurrentScope(name))
-            {
-                m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*label, m_context.source, *label));
-                DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
-            }
-            else
-            {
-                m_context.symbolTable.insert(name, declaration.get());
-            }
-            m_context.ownedUsables.push_back(std::move(declaration));
-        }
-
-        if (auto* compStmt = dynamic_cast<const syntax::CompoundStatement*>(&stmt))
-        {
-            for (const auto& innerStmt : compStmt->getStatements())
-                preScanLabels(*innerStmt);
-        }
-        else if (auto* ifStmt = dynamic_cast<const syntax::IfStatement*>(&stmt))
-        {
-            preScanLabels(ifStmt->getThenBranch());
-            if (ifStmt->getElseBranch())
-                preScanLabels(*ifStmt->getElseBranch());
-        }
-        else if (auto* forStmt = dynamic_cast<const syntax::ForStatement*>(&stmt))
-        {
-            preScanLabels(forStmt->getBody());
-        }
-        // BlockStatements create a new scope, so we do NOT recurse into them during pre-scan.
-    };
-
-    for (const auto& stmt : node.getStatements())
-    {
-        preScanLabels(*stmt);
-    }
+    // In a full implementation, we might want to do a pre-pass to gather labels here.
+    // For now, we process declarations and statements in order.
 
     for (const auto& declaration : node.getDeclarations())
     {
@@ -209,10 +169,6 @@ void SymbolResolutionPass::visit(const syntax::Declaration& node)
         visit(*overlayDeclaration);
     else if (auto* parameterDeclaration = dynamic_cast<const syntax::ParameterDeclaration*>(&node))
         visit(*parameterDeclaration);
-    else if (auto* switchDeclaration = dynamic_cast<const syntax::SwitchDeclaration*>(&node))
-        visit(*switchDeclaration);
-    else if (auto* tableElementDeclaration = dynamic_cast<const syntax::TableElementDeclaration*>(&node))
-        visit(*tableElementDeclaration);
 }
 
 void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
@@ -298,55 +254,6 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
         m_context.symbolTable.insert(name, declaration.get());
     }
     m_context.ownedUsables.push_back(std::move(declaration));
-
-    for (const auto& element : node.getElements())
-    {
-        visit(*element);
-    }
-}
-
-void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
-{
-    auto type = createTypeFromToken(node.getType());
-    auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); // Default for now
-    if (type->is<PrimitiveType>())
-        typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
-    else if (type->is<FixedType>())
-        typeCopy = IntrusiveVariantValue(
-            FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
-
-    auto id = node.getIdentifier();
-    auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy));
-    const auto& name = std::get<std::string>(id->getValue());
-
-    if (m_context.symbolTable.lookupInCurrentScope(name))
-    {
-        m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
-        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
-    }
-    else
-    {
-        m_context.symbolTable.insert(name, declaration.get());
-    }
-    m_context.ownedUsables.push_back(std::move(declaration));
-}
-
-void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
-{
-    auto id = node.getIdentifier();
-    auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::vector<const LabelStatement*>{});
-    const auto& name = std::get<std::string>(id->getValue());
-
-    if (m_context.symbolTable.lookupInCurrentScope(name))
-    {
-        m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
-        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
-    }
-    else
-    {
-        m_context.symbolTable.insert(name, declaration.get());
-    }
-    m_context.ownedUsables.push_back(std::move(declaration));
 }
 
 void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
@@ -364,23 +271,16 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     auto declaration = makeIntrusiveVariant<ProcedureDeclaration>(id, std::move(typeCopy));
     const auto& name = std::get<std::string>(id->getValue());
 
-    auto registerProcedure = [&]()
+    if (m_context.symbolTable.lookupInCurrentScope(name))
     {
-        if (m_context.symbolTable.lookupInCurrentScope(name))
-        {
-            m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
-            DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
-        }
-        else
-        {
-            m_context.symbolTable.insert(name, declaration.get());
-        }
-    };
-
-    if (node.isRecursive())
-    {
-        registerProcedure();
+        m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
+        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
     }
+    else
+    {
+        m_context.symbolTable.insert(name, declaration.get());
+    }
+    m_context.ownedUsables.push_back(std::move(declaration));
 
     m_context.symbolTable.enterScope();
     for (const auto& param : node.getParameters())
@@ -389,13 +289,6 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     }
     visit(node.getBody());
     m_context.symbolTable.exitScope();
-
-    if (!node.isRecursive())
-    {
-        registerProcedure();
-    }
-
-    m_context.ownedUsables.push_back(std::move(declaration));
 }
 
 void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)

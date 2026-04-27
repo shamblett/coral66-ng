@@ -60,10 +60,12 @@ bool Program::getIsSegment() const
 // Block
 Block::Block(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
              std::vector<std::unique_ptr<Declaration>>&& declarations,
-             std::vector<std::unique_ptr<Statement>>&& statements)
+             std::vector<std::unique_ptr<Statement>>&& statements,
+             std::vector<std::unique_ptr<PlaceReference>>&& placeReferences)
     : Node(begin, end),
       m_declarations(std::move(declarations)),
-      m_statements(std::move(statements))
+      m_statements(std::move(statements)),
+      m_placeReferences(std::move(placeReferences))
 {
 }
 
@@ -77,6 +79,10 @@ const std::vector<std::unique_ptr<Statement>>& Block::getStatements() const
     return m_statements;
 }
 
+const std::vector<std::unique_ptr<PlaceReference>>& Block::getPlaceReferences() const
+{
+    return m_placeReferences;
+}
 
 std::vector<std::unique_ptr<Declaration>> Block::takeDeclarations()
 {
@@ -330,7 +336,20 @@ const Declaration& OverlayDeclaration::getOverlayDeclaration() const
 }
 
 // Place reference
+SwitchPlaceReference::SwitchPlaceReference(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const lexer::CTokenIterator name, std::vector<lexer::CTokenIterator> labels)
+    : PlaceReference(begin, end), m_name(name), m_labels(std::move(labels))
+{
+}
 
+lexer::CTokenIterator SwitchPlaceReference::getName() const
+{
+    return m_name;
+}
+std::vector<lexer::CTokenIterator> SwitchPlaceReference::getLabels() const
+{
+    return m_labels;
+}
 
 // DummyStatement
 // ReSharper disable once CppParameterMayBeConst

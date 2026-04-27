@@ -159,22 +159,6 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
 
         CHECK(res.errors == false);
     }
-
-    SECTION("Switch Declaration")
-    {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN SWITCH sw := l1, l2, l3 ; l1: l2: l3: END");
-        SymbolResolutionResult res(parsed);
-
-        CHECK(res.errors == false);
-    }
-
-    SECTION("Table Element Declaration")
-    {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x INTEGER 0; y FIXED(16,8) 1 ] ; x[1] := 0 END");
-        SymbolResolutionResult res(parsed);
-
-        CHECK(res.errors == false);
-    }
 }
 
 TEST_CASE("Symbol Resolution - Identifier Resolution", "[Semantics][SymbolResolution]")

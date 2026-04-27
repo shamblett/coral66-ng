@@ -42,6 +42,7 @@ private:
     rapidjson::Value dump(const syntax::Communicator* communicator);
 
     // Place references
+    rapidjson::Value dump(const syntax::PlaceReference* placeReference);
 
     // Declarations
     rapidjson::Value dump(const syntax::Declaration* declaration);

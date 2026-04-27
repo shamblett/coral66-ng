@@ -40,27 +40,6 @@
                 ],
                 "Preset": false,
                 "Preset Tokens": []
-            },
-            {
-                "NodeType": "SwitchDeclaration",
-                "Name": {
-                    "Class": "identifier",
-                    "Value": "mySwitch"
-                },
-                "Labels": [
-                    {
-                        "Class": "identifier",
-                        "Value": "stateZero"
-                    },
-                    {
-                        "Class": "identifier",
-                        "Value": "stateOne"
-                    },
-                    {
-                        "Class": "identifier",
-                        "Value": "stateTwo"
-                    }
-                ]
             }
         ],
         "Statements": [
@@ -192,6 +171,29 @@
                         }
                     }
                 }
+            }
+        ],
+        "PlaceReferences": [
+            {
+                "NodeType": "SwitchPlaceReference",
+                "name": {
+                    "Class": "identifier",
+                    "Value": "mySwitch"
+                },
+                "Labels": [
+                    {
+                        "Class": "identifier",
+                        "Value": "stateZero"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "stateOne"
+                    },
+                    {
+                        "Class": "identifier",
+                        "Value": "stateTwo"
+                    }
+                ]
             }
         ]
     }

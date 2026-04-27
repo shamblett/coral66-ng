@@ -11,6 +11,7 @@ cc_library(
         "ast_dump_communicators.cpp",
         "ast_dump_declarations.cpp",
         "ast_dump_expressions.cpp",
+        "ast_dump_place_references.cpp",
         "ast_dump_statements.cpp",
     ],
     hdrs = [

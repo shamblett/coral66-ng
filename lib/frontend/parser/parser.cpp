@@ -142,6 +142,7 @@ std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
 
     std::vector<std::unique_ptr<syntax::Declaration>> declarations;
     std::vector<std::unique_ptr<syntax::Statement>> statements;
+    std::vector<std::unique_ptr<syntax::PlaceReference>> placeReferences;
 
     bool declarationsAllowed = true;
     bool firstItem = true;
@@ -199,6 +200,12 @@ std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
                 firstItem = false;
                 continue;
             }
+            if (auto placeReference = parsePlaceReference(begin, end, context))
+            {
+                placeReferences.push_back(std::move(placeReference));
+                firstItem = false;
+                continue;
+            }
 
             declarationsAllowed = false;
         }
@@ -230,7 +237,8 @@ std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::C
         return nullptr;
     }
 
-    return std::make_unique<syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements));
+    return std::make_unique<syntax::Block>(blockStart, begin, std::move(declarations), std::move(statements),
+                                           std::move(placeReferences));
 }
 
 } // namespace coral66::parser
