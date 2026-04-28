@@ -909,15 +909,24 @@ public:
 class TableElementDeclaration final : public Declaration
 {
     IntrusiveVariantValue<Type> m_type;
+    bool m_unsigned;
+    std::optional<std::uint32_t> m_wordPosition;
+    std::optional<std::uint32_t> m_bitPosition;
+
 public:
-    TableElementDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
-        : Declaration(std::in_place_type<TableElementDeclaration>, nameToken), m_type(std::move(type))
+    TableElementDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type, bool isUnsigned = false,
+                            std::optional<std::uint32_t> wordPosition = std::nullopt, std::optional<std::uint32_t> bitPosition = std::nullopt)
+        : Declaration(std::in_place_type<TableElementDeclaration>, nameToken), m_type(std::move(type)),
+          m_unsigned(isUnsigned), m_wordPosition(wordPosition), m_bitPosition(bitPosition)
     {
     }
     [[nodiscard]] const Type& getType() const
     {
         return *m_type;
     }
+    [[nodiscard]] bool isUnsigned() const { return m_unsigned; }
+    [[nodiscard]] std::optional<std::uint32_t> getWordPosition() const { return m_wordPosition; }
+    [[nodiscard]] std::optional<std::uint32_t> getBitPosition() const { return m_bitPosition; }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(TableElementDeclaration)
 };
 

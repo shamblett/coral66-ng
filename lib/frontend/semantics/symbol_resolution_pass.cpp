@@ -315,8 +315,22 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
         typeCopy = IntrusiveVariantValue(
             FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
 
+    std::optional<std::uint32_t> wordPos;
+    if (node.getWordPosition())
+    {
+        if (auto* i = std::get_if<llvm::APSInt>(&node.getWordPosition().value()->getValue()))
+            wordPos = static_cast<std::uint32_t>(i->getZExtValue());
+    }
+
+    std::optional<std::uint32_t> bitPos;
+    if (node.getBitPosition())
+    {
+        if (auto* i = std::get_if<llvm::APSInt>(&node.getBitPosition().value()->getValue()))
+            bitPos = static_cast<std::uint32_t>(i->getZExtValue());
+    }
+
     auto id = node.getIdentifier();
-    auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy));
+    auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos);
     const auto& name = std::get<std::string>(id->getValue());
 
     if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -334,6 +348,23 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
 {
     auto id = node.getIdentifier();
+
+    for (const auto& labelToken : node.getLabels())
+    {
+        const auto& labelName = std::get<std::string>(labelToken->getValue());
+        const Usable* usable = m_context.symbolTable.lookup(labelName);
+        if (!usable)
+        {
+            m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*labelToken, m_context.source, *labelToken));
+            DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
+        }
+        else if (!usable->is<LabelDeclaration>())
+        {
+            m_context.log(errors::semantics::LABEL_NOT_FOUND_N.args(*labelToken, m_context.source, *labelToken));
+            DiagnosticCollector::addDiagnostic(errors::semantics::LABEL_NOT_FOUND_N);
+        }
+    }
+
     auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::vector<const LabelStatement*>{});
     const auto& name = std::get<std::string>(id->getValue());
 
@@ -351,6 +382,16 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
 
 void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
 {
+    auto baseToken = node.getBase();
+    const auto& baseName = std::get<std::string>(baseToken->getValue());
+    const Usable* usable = m_context.symbolTable.lookup(baseName);
+    
+    if (!usable)
+    {
+        m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*baseToken, m_context.source, *baseToken));
+        DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
+    }
+
     // Evaluate overlay target expressions
     visit(node.getOverlayDeclaration());
 }
@@ -403,7 +444,44 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
     auto type = createTypeFromToken(node.getType());
     for (auto id : node.getIdentifiers())
     {
-        auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
+        IntrusiveVariantValue<Type> typeCopy{PrimitiveType{PrimitiveType::Integer}};
+
+        switch (node.getMode())
+        {
+        case syntax::ParameterDeclaration::ParameterMode::Value:
+            if (type->is<PrimitiveType>())
+                typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
+            else if (type->is<FixedType>())
+                typeCopy = IntrusiveVariantValue(
+                    FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Value});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Location:
+            if (type->is<PrimitiveType>())
+                typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
+            else if (type->is<FixedType>())
+                typeCopy = IntrusiveVariantValue(
+                    FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Location});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Array:
+            typeCopy = IntrusiveVariantValue(ArrayType{&untypedType, {}});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Label:
+            typeCopy = IntrusiveVariantValue(LabelType{});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Switch:
+            typeCopy = IntrusiveVariantValue(SwitchType{});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Procedure:
+            typeCopy = IntrusiveVariantValue(ProcedureType{nullptr, {}});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
+            typeCopy = IntrusiveVariantValue(UntypedType{Type::Value});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
+            typeCopy = IntrusiveVariantValue(UntypedType{Type::Location});
+            break;
+        }
+
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
         const auto& name = std::get<std::string>(id->getValue());
 
