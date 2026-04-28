@@ -14,7 +14,7 @@
 #include "parser_utilities.hpp"
 
 /*
- * Section 4
+ * Section 4 + 5
  *
  * Coral 66 declarations comprise  :-
  *
@@ -32,6 +32,7 @@
  *
  * Overlay
  *
+ * Switches
  */
 
 namespace coral66::parser
@@ -680,6 +681,51 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
         else
         {
             begin = start;
+        }
+        return result;
+    }
+
+    if (type == lexer::TokenType::SwitchKeyword)
+    {
+        auto start = begin;
+        begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+        {
+            auto id = begin;
+            begin++;
+            
+            if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
+            {
+                begin++;
+                std::vector<lexer::CTokenIterator> labels;
+                while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+                {
+                    labels.push_back(begin);
+                    begin++;
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                    {
+                        begin++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (!labels.empty())
+                {
+                    result.push_back(std::make_unique<syntax::SwitchDeclaration>(start, begin, id, std::move(labels)));
+                }
+                else
+                {
+                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+                }
+            }
+            else
+            {
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
+            }
         }
         return result;
     }

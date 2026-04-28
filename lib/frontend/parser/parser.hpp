@@ -90,8 +90,6 @@ std::unique_ptr<syntax::Expression> parseExpression(lexer::CTokenIterator& begin
                                                     Context& context);
 std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                         Context& context);
-std::unique_ptr<syntax::PlaceReference> parsePlaceReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
-                                                            Context& context);
 std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
     parseProcedureParameters(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
 std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,

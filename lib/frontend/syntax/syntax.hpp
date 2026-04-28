@@ -18,7 +18,6 @@ class Block;
 class Declaration;
 class Statement;
 class Expression;
-class PlaceReference;
 class Communicator;
 
 class Node
@@ -59,16 +58,15 @@ class Block final : public Node
 {
     std::vector<std::unique_ptr<Declaration>> m_declarations;
     std::vector<std::unique_ptr<Statement>> m_statements;
-    std::vector<std::unique_ptr<PlaceReference>> m_placeReferences;
+    
 
 public:
     Block(lexer::CTokenIterator begin, lexer::CTokenIterator end,
           std::vector<std::unique_ptr<Declaration>>&& declarations,
-          std::vector<std::unique_ptr<Statement>>&& statements,
-          std::vector<std::unique_ptr<PlaceReference>>&& placeReferences);
+          std::vector<std::unique_ptr<Statement>>&& statements);
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getDeclarations() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
-    [[nodiscard]] const std::vector<std::unique_ptr<PlaceReference>>& getPlaceReferences() const;
+    
     std::vector<std::unique_ptr<Declaration>> takeDeclarations();
     std::vector<std::unique_ptr<Statement>> takeStatements();
 };
@@ -274,22 +272,7 @@ public:
 };
 
 // Place references
-class PlaceReference : public Node
-{
-    using Node::Node;
-};
 
-class SwitchPlaceReference final : public PlaceReference
-{
-    lexer::CTokenIterator m_name;
-    std::vector<lexer::CTokenIterator> m_labels;
-
-public:
-    SwitchPlaceReference(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator name,
-                         std::vector<lexer::CTokenIterator> labels);
-    [[nodiscard]] lexer::CTokenIterator getName() const;
-    [[nodiscard]] std::vector<lexer::CTokenIterator> getLabels() const;
-};
 
 // Statements
 class Statement : public Node

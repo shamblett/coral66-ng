@@ -104,16 +104,6 @@ rapidjson::Value AstDump::dump(const syntax::Block& block)
         obj.AddMember("Statements", statements, m_alloc);
     }
 
-    // Dump Place References
-    rapidjson::Value placeReferences(rapidjson::kArrayType);
-    for (const auto& placeReference : block.getPlaceReferences())
-    {
-        placeReferences.PushBack(dump(placeReference.get()), m_alloc);
-    }
-    if (!placeReferences.Empty())
-    {
-        obj.AddMember("PlaceReferences", placeReferences, m_alloc);
-    }
     return obj;
 }
 
@@ -141,10 +131,6 @@ rapidjson::Value AstDump::dump(const syntax::Node* node)
         obj.AddMember("Expression", dump(expression), m_alloc);
     }
     // Place references
-    else if (auto* placeReference = dynamic_cast<const syntax::PlaceReference*>(node))
-    {
-        obj.AddMember("Place Reference", dump(placeReference), m_alloc);
-    }
     else
     {
         obj.AddMember("NodeType", "UnknownNode", m_alloc);

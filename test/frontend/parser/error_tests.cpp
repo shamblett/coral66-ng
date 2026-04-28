@@ -404,7 +404,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
         REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
     }
 
-    SECTION("Block with bad Switch Place Reference")
+    SECTION("Block with bad Switch Declaration")
     {
         const ParsedStatement s("BEGIN SWITCH S ; L1, L2; GOTO L1; END;");
         REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
@@ -499,37 +499,6 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
 
 TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
 {
-    SECTION("SWITCH No Name")
-    {
-        const ParsedPlaceReference p("SWITCH ");
-        CHECK(p.placeReference.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
-    }
-
-    SECTION("SWITCH No Label")
-    {
-        const ParsedPlaceReference p("SWITCH SW <- ");
-        CHECK(p.placeReference.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_LABELS));
-    }
-
-    SECTION("SWITCH Missing Assignment")
-    {
-        const ParsedPlaceReference p("SWITCH SW ; LABEL1, LABEL2");
-        CHECK(p.placeReference.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_ASSIGNMENT));
-    }
-
-    SECTION("SWITCH Bad Identifier in List")
-    {
-        const ParsedPlaceReference p("SWITCH SW <- LABEL1, 123");
-        CHECK(p.placeReference.get() == nullptr);
-        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
-        CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_IDENTIFIER));
-    }
 }
 
 TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
