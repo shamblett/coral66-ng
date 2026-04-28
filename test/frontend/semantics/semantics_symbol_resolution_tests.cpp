@@ -147,6 +147,52 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         CHECK(arrayDeclaration->as<semantics::ArrayDeclaration>().getType().is<ArrayType>());
     }
 
+    SECTION("Parameter Modes")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN "
+                             "PROCEDURE P(VALUE INTEGER A; LOCATION INTEGER B; INTEGER ARRAY C; LABEL D; SWITCH E; PROCEDURE F; VALUE G; LOCATION H) ; "
+                             "BEGIN END ; END");
+        SymbolResolutionResult res(parsed);
+
+        REQUIRE(findDeclaration(res.context, "A") != nullptr);
+        auto& aDecl = findDeclaration(res.context, "A")->as<semantics::VariableDeclaration>();
+        CHECK(aDecl.getType().is<PrimitiveType>());
+        CHECK(aDecl.getType().isValue());
+        CHECK(!aDecl.getType().isLocation());
+
+        REQUIRE(findDeclaration(res.context, "B") != nullptr);
+        auto& bDecl = findDeclaration(res.context, "B")->as<semantics::VariableDeclaration>();
+        CHECK(bDecl.getType().is<PrimitiveType>());
+        CHECK(!bDecl.getType().isValue());
+        CHECK(bDecl.getType().isLocation());
+
+        REQUIRE(findDeclaration(res.context, "C") != nullptr);
+        auto& cDecl = findDeclaration(res.context, "C")->as<semantics::ArrayDeclaration>();
+        CHECK(cDecl.getType().is<ArrayType>());
+
+        REQUIRE(findDeclaration(res.context, "D") != nullptr);
+        auto& dDecl = findDeclaration(res.context, "D")->as<semantics::VariableDeclaration>();
+        CHECK(dDecl.getType().is<LabelType>());
+
+        REQUIRE(findDeclaration(res.context, "E") != nullptr);
+        auto& eDecl = findDeclaration(res.context, "E")->as<semantics::VariableDeclaration>();
+        CHECK(eDecl.getType().is<SwitchType>());
+
+        REQUIRE(findDeclaration(res.context, "F") != nullptr);
+        auto& fDecl = findDeclaration(res.context, "F")->as<semantics::VariableDeclaration>();
+        CHECK(fDecl.getType().is<ProcedureType>());
+
+        REQUIRE(findDeclaration(res.context, "G") != nullptr);
+        auto& gDecl = findDeclaration(res.context, "G")->as<semantics::VariableDeclaration>();
+        CHECK(gDecl.getType().is<UntypedType>());
+        CHECK(gDecl.getType().isValue());
+
+        REQUIRE(findDeclaration(res.context, "H") != nullptr);
+        auto& hDecl = findDeclaration(res.context, "H")->as<semantics::VariableDeclaration>();
+        CHECK(hDecl.getType().is<UntypedType>());
+        CHECK(hDecl.getType().isLocation());
+    }
+
     SECTION("Procedure Declaration and Parameters")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P(VALUE INTEGER X) ; BEGIN END ; END");
@@ -174,6 +220,109 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         CHECK(res.errors == false);
+    }
+
+    SECTION("Table Element Properties (Part-Word)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x UNSIGNED (10) 0, 5 ; y FIXED(16,8) 1; z (4) 2, 10 ] ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+
+        const Usable* xUsable = nullptr;
+        const Usable* yUsable = nullptr;
+        const Usable* zUsable = nullptr;
+        for (const auto& u : res.context.ownedUsables)
+        {
+            if (u->is<semantics::TableElementDeclaration>())
+            {
+                auto name = u->as<semantics::TableElementDeclaration>().getName();
+                if (name == "x") xUsable = u.get();
+                if (name == "y") yUsable = u.get();
+                if (name == "z") zUsable = u.get();
+            }
+        }
+        
+        REQUIRE(xUsable != nullptr);
+        auto& xDecl = xUsable->as<semantics::TableElementDeclaration>();
+        CHECK(xDecl.isUnsigned() == true);
+        REQUIRE(xDecl.getWordPosition().has_value());
+        CHECK(xDecl.getWordPosition().value() == 0);
+        REQUIRE(xDecl.getBitPosition().has_value());
+        CHECK(xDecl.getBitPosition().value() == 5);
+        CHECK(xDecl.getType().is<PrimitiveType>());
+        CHECK(xDecl.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
+
+        REQUIRE(yUsable != nullptr);
+        auto& yDecl = yUsable->as<semantics::TableElementDeclaration>();
+        CHECK(yDecl.isUnsigned() == false);
+        REQUIRE(yDecl.getWordPosition().has_value());
+        CHECK(yDecl.getWordPosition().value() == 1);
+        CHECK(yDecl.getBitPosition().has_value() == false);
+        CHECK(yDecl.getType().is<FixedType>());
+
+        REQUIRE(zUsable != nullptr);
+        auto& zDecl = zUsable->as<semantics::TableElementDeclaration>();
+        CHECK(zDecl.isUnsigned() == false);
+        REQUIRE(zDecl.getWordPosition().has_value());
+        CHECK(zDecl.getWordPosition().value() == 2);
+        REQUIRE(zDecl.getBitPosition().has_value());
+        CHECK(zDecl.getBitPosition().value() == 10);
+        CHECK(zDecl.getType().is<PrimitiveType>());
+        CHECK(zDecl.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Switch Label Target Resolution", "[Semantics][SymbolResolution]")
+{
+    SECTION("Valid Switch Label Targets")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN SWITCH sw := l1, l2 ; l1: l2: END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+        CHECK(coral66::DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics().empty());
+    }
+
+    SECTION("Undeclared Switch Label Target")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN SWITCH sw := l1, l2 ; l1: END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundError = false;
+        for (auto& d : diagnostics) if (d.getName() == "UNDECLARED_IDENTIFIER_N") foundError = true;
+        CHECK(foundError);
+    }
+
+    SECTION("Invalid Switch Label Target (Not a Label)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; SWITCH sw := I ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundError = false;
+        for (auto& d : diagnostics) if (d.getName() == "LABEL_NOT_FOUND_N") foundError = true;
+        CHECK(foundError);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Overlay Base Verification", "[Semantics][SymbolResolution]")
+{
+    SECTION("Valid Overlay Base")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER J ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+
+    SECTION("Undeclared Overlay Base")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN OVERLAY I WITH INTEGER J ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundError = false;
+        for (auto& d : diagnostics) if (d.getName() == "UNDECLARED_IDENTIFIER_N") foundError = true;
+        CHECK(foundError);
     }
 }
 

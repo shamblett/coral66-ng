@@ -450,35 +450,35 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
         {
         case syntax::ParameterDeclaration::ParameterMode::Value:
             if (type->is<PrimitiveType>())
-                typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
+                typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
             else if (type->is<FixedType>())
-                typeCopy = IntrusiveVariantValue(
+                typeCopy = IntrusiveVariantValue<Type>(
                     FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Value});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Location:
             if (type->is<PrimitiveType>())
-                typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
+                typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
             else if (type->is<FixedType>())
-                typeCopy = IntrusiveVariantValue(
+                typeCopy = IntrusiveVariantValue<Type>(
                     FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Location});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Array:
-            typeCopy = IntrusiveVariantValue(ArrayType{&untypedType, {}});
+            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Label:
-            typeCopy = IntrusiveVariantValue(LabelType{});
+            typeCopy = IntrusiveVariantValue<Type>(LabelType{});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Switch:
-            typeCopy = IntrusiveVariantValue(SwitchType{});
+            typeCopy = IntrusiveVariantValue<Type>(SwitchType{});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Procedure:
-            typeCopy = IntrusiveVariantValue(ProcedureType{nullptr, {}});
+            typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
             break;
         case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
-            typeCopy = IntrusiveVariantValue(UntypedType{Type::Value});
+            typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
             break;
         case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
-            typeCopy = IntrusiveVariantValue(UntypedType{Type::Location});
+            typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
             break;
         }
 
