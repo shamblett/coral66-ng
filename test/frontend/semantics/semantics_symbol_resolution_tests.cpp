@@ -291,3 +291,151 @@ TEST_CASE("Symbol Resolution - Diagnostics", "[Semantics][SymbolResolution]")
         CHECK(hasUndeclared);
     }
 }
+
+TEST_CASE("Symbol Resolution - Labels", "[Semantics][SymbolResolution]")
+{
+    SECTION("Label Declaration and Pre-scanning")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; l1: I := 1 END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+        CHECK(coral66::DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics().empty());
+    }
+
+    SECTION("Label Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; l1: l1: I := 1 END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundRedef = false;
+        for(auto& d : diagnostics) if(d.getName() == "REDEFINITION_OF_SYMBOL_N") foundRedef = true;
+        CHECK(foundRedef);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Extended Redefinitions", "[Semantics][SymbolResolution]")
+{
+    SECTION("Recursive Procedure")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN RECURSIVE PROCEDURE P ; BEGIN P END ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Procedure Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P; BEGIN END; PROCEDURE P; BEGIN END; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+    }
+    SECTION("Parameter Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P(VALUE INTEGER X; VALUE INTEGER X); BEGIN END; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+    }
+    SECTION("Array Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10]; INTEGER ARRAY A[1:10]; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+    }
+    SECTION("Table Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x INTEGER 0 ] ; TABLE t[1, 10] [ x INTEGER 0 ] ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+    }
+    SECTION("Table Element Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x INTEGER 0; x INTEGER 1 ] ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+    }
+    SECTION("Switch Redefinition Error")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN SWITCH sw := l1; SWITCH sw := l1; l1: END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == true);
+    }
+    SECTION("Overlay Declaration")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER J ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Complex Statements", "[Semantics][SymbolResolution]")
+{
+    SECTION("For Statement")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 STEP 1 UNTIL 10 WHILE I < 5 DO I := 1 END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("If Statement")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; IF I = 1 THEN I := 2 ELSE I := 3 END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Compound Statement")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; BEGIN I := 1; I := 2 END END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Answer Statement")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; INTEGER PROCEDURE P; BEGIN ANSWER I END ; END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Goto Statement Switch")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN SWITCH sw := l1; GOTO sw[1]; l1: END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Expressions", "[Semantics][SymbolResolution]")
+{
+    SECTION("Binary and Unary Expressions")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I, J, K ; I := J + -K END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Part Word Expression")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I, J ; I := BITS [8, 4] J END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Conditional Expression")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := IF I = 0 THEN 1 ELSE 2 END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Function Call Expression")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P; BEGIN ANSWER 1 END ; INTEGER I ; I := P END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Location Expression")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I, J ; I := LOCATION ( J ) END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("Type Change Expression")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FLOATING F ; I := INTEGER ( F ) END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+}
