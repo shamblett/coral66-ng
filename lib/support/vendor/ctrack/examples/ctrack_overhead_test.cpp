@@ -1,21 +1,26 @@
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <chrono>
 #include "ctrack.hpp"
 
-void empty_function() {
+#include <chrono>
+#include <iostream>
+#include <thread>
+#include <vector>
+
+void empty_function()
+{
     CTRACK;
     // Function is intentionally empty
 }
 
-void run_empty_functions(int count) {
-    for (int i = 0; i < count; ++i) {
+void run_empty_functions(int count)
+{
+    for (int i = 0; i < count; ++i)
+    {
         empty_function();
     }
 }
 
-int main() {
+int main()
+{
     const int total_calls = 10000000; // 10 million calls in total
     const int thread_count = std::thread::hardware_concurrency();
     const int calls_per_thread = total_calls / thread_count;
@@ -27,11 +32,13 @@ int main() {
 
     auto start_time = std::chrono::high_resolution_clock::now();
 
-    for (int i = 0; i < thread_count; ++i) {
+    for (int i = 0; i < thread_count; ++i)
+    {
         threads.emplace_back(run_empty_functions, calls_per_thread);
     }
 
-    for (auto& thread : threads) {
+    for (auto& thread : threads)
+    {
         thread.join();
     }
 

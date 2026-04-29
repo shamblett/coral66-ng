@@ -139,7 +139,6 @@ struct StringConverter<lexer::TokenBase>
 {
     static std::string inFormat(const lexer::TokenBase& arg, const source_interface& sourceInterface)
     {
-        
         auto spelling = lexer::normalizeSpelling(arg.getRepresentation(sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {
@@ -154,7 +153,6 @@ struct StringConverter<lexer::TokenBase>
 
     static std::string inArg(const lexer::TokenBase& arg, const source_interface& sourceInterface)
     {
-        
         auto spelling = lexer::normalizeSpelling(arg.getRepresentation(sourceInterface));
         for (std::size_t i = 0; i < spelling.size(); i++)
         {

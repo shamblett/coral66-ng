@@ -497,9 +497,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     }
 }
 
-TEST_CASE("Place References - Errors", "[Parser][PlaceReference]")
-{
-}
+TEST_CASE("Place References - Errors", "[Parser][PlaceReference]") {}
 
 TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
 {

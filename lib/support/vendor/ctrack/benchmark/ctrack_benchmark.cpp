@@ -1,25 +1,26 @@
-#include <ctrack.hpp>
+#include <algorithm>
+#include <atomic>
 #include <chrono>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <numeric>
+#include <sstream>
 #include <thread>
 #include <vector>
-#include <atomic>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#include <cmath>
-#include <numeric>
-#include <algorithm>
-#include <filesystem>
-#include <cstring>
-#include <cstdio>
+
+#include <ctrack.hpp>
 
 #ifdef _WIN32
-#include <windows.h>
-#include <psapi.h>
+    #include <psapi.h>
+    #include <windows.h>
 #else
-#include <sys/resource.h>
-#include <unistd.h>
+    #include <sys/resource.h>
+    #include <unistd.h>
 #endif
 
 // Configuration
@@ -58,7 +59,7 @@ size_t get_memory_usage()
 {
 #ifdef _WIN32
     PROCESS_MEMORY_COUNTERS_EX pmc;
-    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc));
+    GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
     return pmc.WorkingSetSize;
 #else
     struct rusage usage;
@@ -153,7 +154,7 @@ void level_1_function_no_track(int iterations)
 }
 
 // Worker thread function
-void benchmark_worker(size_t events_per_thread, std::atomic<bool> &start_flag)
+void benchmark_worker(size_t events_per_thread, std::atomic<bool>& start_flag)
 {
     // Wait for start signal
     while (!start_flag.load())
@@ -175,7 +176,7 @@ void benchmark_worker(size_t events_per_thread, std::atomic<bool> &start_flag)
 }
 
 // Worker thread function without tracking
-void benchmark_worker_no_track(size_t events_per_thread, std::atomic<bool> &start_flag)
+void benchmark_worker_no_track(size_t events_per_thread, std::atomic<bool>& start_flag)
 {
     while (!start_flag.load())
     {
@@ -193,7 +194,7 @@ void benchmark_worker_no_track(size_t events_per_thread, std::atomic<bool> &star
 }
 
 // Parse timing from CTRACK results string for a specific function
-double parse_function_timing(const std::string &results, const std::string &function_name)
+double parse_function_timing(const std::string& results, const std::string& function_name)
 {
     // Look for the Details section first
     size_t details_pos = results.find("Details");
@@ -312,7 +313,7 @@ std::pair<double, double> measure_accuracy()
         std::cout << "Function accuracy analysis:" << std::endl;
     }
 
-    for (const auto &timing : expected_timings)
+    for (const auto& timing : expected_timings)
     {
         double actual_ns = parse_function_timing(results, timing.name);
         if (actual_ns > 0)
@@ -327,8 +328,8 @@ std::pair<double, double> measure_accuracy()
 
             if (g_config.verbose)
             {
-                std::cout << "  " << timing.name << ": expected " << expected_ns / 1e6 << " ms, got "
-                          << actual_ns / 1e6 << " ms (error: " << percent_error << "%)" << std::endl;
+                std::cout << "  " << timing.name << ": expected " << expected_ns / 1e6 << " ms, got " << actual_ns / 1e6
+                          << " ms (error: " << percent_error << "%)" << std::endl;
             }
         }
         else if (g_config.verbose)
@@ -347,7 +348,7 @@ std::pair<double, double> measure_accuracy()
 
         // Calculate total number of events across all functions
         double total_events = 0;
-        for (const auto &timing : expected_timings)
+        for (const auto& timing : expected_timings)
         {
             total_events += timing.call_count;
         }
@@ -358,7 +359,8 @@ std::pair<double, double> measure_accuracy()
 
     if (g_config.verbose)
     {
-        std::cout << "Overall accuracy error: " << overall_error_percent << "% (" << overall_error_ms << " ms per event)" << std::endl;
+        std::cout << "Overall accuracy error: " << overall_error_percent << "% (" << overall_error_ms
+                  << " ms per event)" << std::endl;
     }
 
     return {overall_error_percent, overall_error_ms};
@@ -385,13 +387,14 @@ std::tuple<double, double, double> measure_overhead()
 
         start_flag = true;
 
-        for (auto &t : threads)
+        for (auto& t : threads)
         {
             t.join();
         }
     }
     auto end_no_track = std::chrono::high_resolution_clock::now();
-    auto duration_no_track = std::chrono::duration_cast<std::chrono::microseconds>(end_no_track - start_no_track).count();
+    auto duration_no_track =
+        std::chrono::duration_cast<std::chrono::microseconds>(end_no_track - start_no_track).count();
 
     // Clear tracking data by getting and discarding results
     ctrack::result_as_string();
@@ -409,7 +412,7 @@ std::tuple<double, double, double> measure_overhead()
 
         start_flag = true;
 
-        for (auto &t : threads)
+        for (auto& t : threads)
         {
             t.join();
         }
@@ -418,15 +421,16 @@ std::tuple<double, double, double> measure_overhead()
     auto duration_track = std::chrono::duration_cast<std::chrono::microseconds>(end_track - start_track).count();
 
     double overhead_percent = ((double)(duration_track - duration_no_track) / duration_no_track) * 100.0;
-    double overhead_ms = (duration_track - duration_no_track) / 1000.0;                               // Convert microseconds to milliseconds
-    double overhead_ns_per_event = ((duration_track - duration_no_track) * 1000.0) / overhead_events; // nanoseconds per event
+    double overhead_ms = (duration_track - duration_no_track) / 1000.0; // Convert microseconds to milliseconds
+    double overhead_ns_per_event =
+        ((duration_track - duration_no_track) * 1000.0) / overhead_events; // nanoseconds per event
 
     if (g_config.verbose)
     {
         std::cout << "Without CTRACK: " << duration_no_track << " µs" << std::endl;
         std::cout << "With CTRACK: " << duration_track << " µs" << std::endl;
-        std::cout << "Overhead: " << overhead_percent << "% (" << overhead_ms << " ms total, "
-                  << overhead_ns_per_event << " ns per event)" << std::endl;
+        std::cout << "Overhead: " << overhead_percent << "% (" << overhead_ms << " ms total, " << overhead_ns_per_event
+                  << " ns per event)" << std::endl;
     }
 
     return {overhead_percent, overhead_ms, overhead_ns_per_event};
@@ -448,8 +452,8 @@ std::tuple<double, double, double> measure_memory_and_calculation_time()
 
     if (g_config.verbose)
     {
-        std::cout << "Generating " << g_config.total_events << " events across "
-                  << g_config.thread_count << " threads..." << std::endl;
+        std::cout << "Generating " << g_config.total_events << " events across " << g_config.thread_count
+                  << " threads..." << std::endl;
     }
 
     auto gen_start = std::chrono::high_resolution_clock::now();
@@ -464,7 +468,7 @@ std::tuple<double, double, double> measure_memory_and_calculation_time()
 
         start_flag = true;
 
-        for (auto &t : threads)
+        for (auto& t : threads)
         {
             t.join();
         }
@@ -489,15 +493,20 @@ std::tuple<double, double, double> measure_memory_and_calculation_time()
     std::atomic<size_t> peak_memory{post_event_memory};
 
     // Start memory monitoring thread
-    std::thread monitor_thread([&monitoring, &peak_memory, initial_memory]()
-                               {
-        while (monitoring.load()) {
-            size_t current_memory = get_memory_usage();
-            size_t current_peak = peak_memory.load();
-            while (current_memory > current_peak && 
-                   !peak_memory.compare_exchange_weak(current_peak, current_memory)) {}
-            std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Poll every 10ms
-        } });
+    std::thread monitor_thread(
+        [&monitoring, &peak_memory, initial_memory]()
+        {
+            while (monitoring.load())
+            {
+                size_t current_memory = get_memory_usage();
+                size_t current_peak = peak_memory.load();
+                while (current_memory > current_peak
+                       && !peak_memory.compare_exchange_weak(current_peak, current_memory))
+                {
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(10)); // Poll every 10ms
+            }
+        });
 
     auto calc_start = std::chrono::high_resolution_clock::now();
     auto results = ctrack::result_as_string();
@@ -520,7 +529,7 @@ std::tuple<double, double, double> measure_memory_and_calculation_time()
 }
 
 // Save baseline to file
-void save_baseline(const BaselineData &data)
+void save_baseline(const BaselineData& data)
 {
     std::ofstream file(g_config.baseline_file);
     if (!file)
@@ -549,7 +558,7 @@ void save_baseline(const BaselineData &data)
 }
 
 // Load baseline from file
-bool load_baseline(BaselineData &data)
+bool load_baseline(BaselineData& data)
 {
     std::ifstream file(g_config.baseline_file);
     if (!file)
@@ -627,7 +636,7 @@ bool load_baseline(BaselineData &data)
 }
 
 // Compare current results with baseline
-void compare_with_baseline(const BaselineData &current)
+void compare_with_baseline(const BaselineData& current)
 {
     BaselineData baseline;
     if (!load_baseline(baseline))
@@ -638,7 +647,8 @@ void compare_with_baseline(const BaselineData &current)
 
     std::cout << "\n=== Baseline Comparison ===" << std::endl;
     std::cout << std::fixed << std::setprecision(2);
-    auto print_comparison = [](const std::string &metric, double baseline_val, double current_val, bool lower_is_better = true)
+    auto print_comparison =
+        [](const std::string& metric, double baseline_val, double current_val, bool lower_is_better = true)
     {
         double diff = current_val - baseline_val;
         double percent_change = (diff / baseline_val) * 100.0;
@@ -653,7 +663,8 @@ void compare_with_baseline(const BaselineData &current)
     };
 
     print_comparison("Accuracy Error %", baseline.accuracy_error_percent, current.accuracy_error_percent);
-    print_comparison("Accuracy Error (ms/event)", baseline.accuracy_error_ms_per_event, current.accuracy_error_ms_per_event);
+    print_comparison("Accuracy Error (ms/event)", baseline.accuracy_error_ms_per_event,
+                     current.accuracy_error_ms_per_event);
     print_comparison("Overhead %", std::abs(baseline.overhead_percent), std::abs(current.overhead_percent));
     print_comparison("Overhead Time (ms)", std::abs(baseline.overhead_ms), std::abs(current.overhead_ms));
     print_comparison("Overhead per Event (ns)", baseline.overhead_ns_per_event, current.overhead_ns_per_event);
@@ -693,7 +704,7 @@ std::string get_timestamp()
 }
 
 // Print usage
-void print_usage(const char *program_name)
+void print_usage(const char* program_name)
 {
     std::cout << "Usage: " << program_name << " [options]\n";
     std::cout << "Options:\n";
@@ -707,7 +718,7 @@ void print_usage(const char *program_name)
 }
 
 // Parse command line arguments
-bool parse_args(int argc, char *argv[])
+bool parse_args(int argc, char* argv[])
 {
     for (int i = 1; i < argc; ++i)
     {
@@ -753,7 +764,7 @@ bool parse_args(int argc, char *argv[])
     return true;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     if (!parse_args(argc, argv))
     {
@@ -789,9 +800,10 @@ int main(int argc, char *argv[])
     // Print summary
     std::cout << "\n=== Benchmark Results ===" << std::endl;
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Accuracy error: " << accuracy_error_percent << "% (" << accuracy_error_ms_per_event << " ms per event)" << std::endl;
-    std::cout << "Overhead: " << overhead_percent << "% (" << overhead_ms << " ms total, "
-              << overhead_ns_per_event << " ns per event)" << std::endl;
+    std::cout << "Accuracy error: " << accuracy_error_percent << "% (" << accuracy_error_ms_per_event
+              << " ms per event)" << std::endl;
+    std::cout << "Overhead: " << overhead_percent << "% (" << overhead_ms << " ms total, " << overhead_ns_per_event
+              << " ns per event)" << std::endl;
     std::cout << "Memory per event: " << bytes_per_event << " bytes" << std::endl;
     std::cout << "Calculation time: " << calc_time << " ms" << std::endl;
     std::cout << "Peak calculation memory: " << peak_calc_memory << " MB" << std::endl;

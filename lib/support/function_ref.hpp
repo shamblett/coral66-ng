@@ -39,8 +39,7 @@ public:
     FunctionRef() = default;
 
     template <class Callable>
-        requires(!std::is_same_v<std::decay_t<Callable>, FunctionRef>)
-    FunctionRef(Callable&& callable)
+    requires(!std::is_same_v<std::decay_t<Callable>, FunctionRef>) FunctionRef(Callable&& callable)
         : m_callback(+[](void* callable, Params... params) -> Ret
                      {
                          return (*static_cast<std::remove_reference_t<Callable>*>(callable))(

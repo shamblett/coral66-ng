@@ -14,13 +14,13 @@
 #include "lib/frontend/common/diagnostic.hpp"
 #include "lib/support/constexpr.hpp"
 
-#define CREATE_NOTE_2(variableName, format)                                                           \
-namespace detail                                                                                  \
-{                                                                                                 \
-constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-}                                                                                                 \
-constexpr auto variableName =                                                                     \
-::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text)>(::coral66::Severity::Note, "")
+#define CREATE_NOTE_2(variableName, format)                                                               \
+    namespace detail                                                                                      \
+    {                                                                                                     \
+    constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
+    }                                                                                                     \
+    constexpr auto variableName =                                                                         \
+        ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text)>(::coral66::Severity::Note, "")
 
 #define CREATE_NOTE_3(...) CREATE_NOTE_VAARG(__VA_ARGS__)
 #define CREATE_NOTE_4(...) CREATE_NOTE_VAARG(__VA_ARGS__)
@@ -31,13 +31,13 @@ constexpr auto variableName =                                                   
 
 #define CREATE_NOTE(...) CORAL66_PASTE2(CREATE_NOTE_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_NOTE_VAARG(variableName, format, ...)                                                  \
-namespace detail                                                                                  \
-{                                                                                                 \
-constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format}; \
-}                                                                                                 \
-constexpr auto variableName =                                                                     \
-::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text), __VA_ARGS__>(::coral66::Severity::Note, "")
+#define CREATE_NOTE_VAARG(variableName, format, ...)                                                                  \
+    namespace detail                                                                                                  \
+    {                                                                                                                 \
+    constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
+    }                                                                                                                 \
+    constexpr auto variableName = ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text), __VA_ARGS__>( \
+        ::coral66::Severity::Note, "")
 
 namespace coral66::notes
 {
@@ -54,8 +54,8 @@ namespace pp
 {
 CREATE_NOTE(WHEN_CONCATENATING_N_AND_N, "When concatenating %0 and %2", Underline<0>, PointAt<1>, Underline<2>);
 CREATE_NOTE(PREVIOUSLY_DECLARED_HERE, "Previously declared here:", Underline<0>);
-}
-} // namespace coral66::notes pp
+} // namespace pp
+} // namespace coral66::notes
 
 #undef CREATE_NOTE
 #undef CREATE_NOTE_2

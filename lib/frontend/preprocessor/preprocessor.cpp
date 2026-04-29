@@ -9,11 +9,11 @@
 #include <algorithm>
 #include <vector>
 
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/notes.hpp"
 #include "lib/frontend/lexer/lexer_support.hpp"
 #include "lib/support/scope_exit.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "preprocessor_support.hpp"
 
 void coral66::pp::Preprocessor::pushLine(std::vector<lexer::PPToken>&& tokens)
@@ -205,7 +205,6 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
 
     return {Macro{identifierPos, std::move(argumentList)}, curr + 1};
 }
-
 
 std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileID,
                                                        const std::uint64_t offset) const noexcept

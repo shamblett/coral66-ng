@@ -14,7 +14,8 @@ void SemanticContext::log(const Message& message)
     if (message.getSeverity() == Severity::Error)
     {
         m_errorCount++;
-        if (m_errors) *m_errors = true;
+        if (m_errors)
+            *m_errors = true;
     }
     if (m_reporter)
     {

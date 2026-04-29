@@ -4107,8 +4107,8 @@ void writeToDebugConsole(std::string const& text)
     #include <unistd.h>
 
     #ifdef __apple_build_version__
-    // These headers will only compile with AppleClang (XCode)
-    // For other compilers (Clang, GCC, ... ) we need to exclude them
+  // These headers will only compile with AppleClang (XCode)
+  // For other compilers (Clang, GCC, ... ) we need to exclude them
         #include <sys/sysctl.h>
     #endif
 
@@ -10083,7 +10083,7 @@ CompactReporter::~CompactReporter() = default;
 
 #if defined(__clang__)
     #pragma clang diagnostic push
-    // For simplicity, benchmarking-only helpers are always enabled
+  // For simplicity, benchmarking-only helpers are always enabled
     #pragma clang diagnostic ignored "-Wunused-function"
 #endif
 

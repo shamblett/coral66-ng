@@ -85,7 +85,6 @@ struct ParsedStatement
     }
 };
 
-
 struct ParsedProcedure
 {
     std::string source;
@@ -196,4 +195,3 @@ struct ParsedProgram
         program = parser::parseProgram(cTokens, &ss);
     }
 };
-

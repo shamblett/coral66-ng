@@ -58,7 +58,6 @@ class Block final : public Node
 {
     std::vector<std::unique_ptr<Declaration>> m_declarations;
     std::vector<std::unique_ptr<Statement>> m_statements;
-    
 
 public:
     Block(lexer::CTokenIterator begin, lexer::CTokenIterator end,
@@ -66,7 +65,7 @@ public:
           std::vector<std::unique_ptr<Statement>>&& statements);
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getDeclarations() const;
     [[nodiscard]] const std::vector<std::unique_ptr<Statement>>& getStatements() const;
-    
+
     std::vector<std::unique_ptr<Declaration>> takeDeclarations();
     std::vector<std::unique_ptr<Statement>> takeStatements();
 };
@@ -240,8 +239,14 @@ public:
         : Declaration(begin, end), m_identifier(identifier), m_labels(std::move(labels))
     {
     }
-    [[nodiscard]] lexer::CTokenIterator getIdentifier() const { return m_identifier; }
-    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getLabels() const { return m_labels; }
+    [[nodiscard]] lexer::CTokenIterator getIdentifier() const
+    {
+        return m_identifier;
+    }
+    [[nodiscard]] const std::vector<lexer::CTokenIterator>& getLabels() const
+    {
+        return m_labels;
+    }
 };
 
 class PlaceSpecification final : public Declaration
@@ -272,7 +277,6 @@ public:
 };
 
 // Place references
-
 
 // Statements
 class Statement : public Node

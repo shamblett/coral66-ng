@@ -328,7 +328,6 @@ TEST_CASE("Coral Parse Statements - Compound", "[Parser][Statement]")
 
 TEST_CASE("Coral Parse Statements - Blocks and Declarations", "[Parser][Statement][Block]")
 {
-
     SECTION("Single Label")
     {
         const ParsedStatement s("L1: ANSWER B;", true, false);

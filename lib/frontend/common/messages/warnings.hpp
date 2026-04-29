@@ -14,13 +14,13 @@
 #include "lib/frontend/common/diagnostic.hpp"
 #include "lib/support/constexpr.hpp"
 
-#define CREATE_WARNING_3(variableName, cliName, format)                                                        \
-    namespace detail                                                                                           \
-    {                                                                                                          \
+#define CREATE_WARNING_3(variableName, cliName, format)                                                            \
+    namespace detail                                                                                               \
+    {                                                                                                              \
     constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};          \
     inline auto CORAL66_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName); \
-    }                                                                                                          \
-    constexpr auto variableName =                                                                              \
+    }                                                                                                              \
+    constexpr auto variableName =                                                                                  \
         ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text)>(::coral66::Severity::Warning, cliName)
 
 #define CREATE_WARNING_4(...) CREATE_WARNING_VAARG(__VA_ARGS__)
@@ -32,12 +32,12 @@
 
 #define CREATE_WARNING(...) CORAL66_PASTE2(CREATE_WARNING_, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__))(__VA_ARGS__)
 
-#define CREATE_WARNING_VAARG(variableName, cliName, format, ...)                                                  \
-    namespace detail                                                                                              \
-    {                                                                                                             \
+#define CREATE_WARNING_VAARG(variableName, cliName, format, ...)                                                      \
+    namespace detail                                                                                                  \
+    {                                                                                                                 \
     constexpr auto CORAL66_PASTE2(variableName, Text) = ::coral66::Constexpr::basic_fixed_string{format};             \
     inline auto CORAL66_PASTE2(variableName, Register) = ::coral66::detail::Diagnostic::WarningRegistrar(cliName);    \
-    }                                                                                                             \
+    }                                                                                                                 \
     constexpr auto variableName = ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text), __VA_ARGS__>( \
         ::coral66::Severity::Warning, cliName)
 

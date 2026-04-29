@@ -9,7 +9,8 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "parser_support.hpp"
 
-void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
+void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+                                          Context& context)
 {
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
@@ -18,11 +19,13 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
         auto tBits = parseExpression(begin, end, context);
         if (!tBits || begin == end || begin->getTokenType() != lexer::TokenType::Comma)
         {
-            context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(), *openParenToken));
+            context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(),
+                                                                  *openParenToken));
             DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
             while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
                 begin++;
-            if (begin != end) begin++;
+            if (begin != end)
+                begin++;
         }
         else
         {
@@ -30,11 +33,13 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
             auto fBits = parseExpression(begin, end, context);
             if (!fBits || begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
             {
-                context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(), *openParenToken));
+                context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(),
+                                                                      *openParenToken));
                 DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
                 while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
                     begin++;
-                if (begin != end) begin++;
+                if (begin != end)
+                    begin++;
             }
             else
             {
@@ -44,7 +49,8 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
     }
     else
     {
-        context.log(errors::parser::INVALID_FIXED_FORMAT.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        context.log(errors::parser::INVALID_FIXED_FORMAT.args(
+            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
     }
 }
@@ -57,12 +63,12 @@ bool coral66::parser::expectIdentifier(lexer::CTokenIterator& begin, const lexer
         if (begin == end)
         {
             context.log(errors::parser::EXPECTED_N.args(*(end - 1), context.getSourceInterface(),
-                                                                 lexer::TokenType::Identifier, *(end - 1)));
+                                                        lexer::TokenType::Identifier, *(end - 1)));
         }
         else
         {
             context.log(errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
-                                                                              lexer::TokenType::Identifier, *begin));
+                                                                     lexer::TokenType::Identifier, *begin));
         }
         if (additional)
         {
@@ -82,13 +88,13 @@ bool coral66::parser::expect(lexer::TokenType expected, lexer::CTokenIterator& b
     {
         if (begin == end)
         {
-            context.log(errors::parser::EXPECTED_N.args(diag::after(*(end - 1)), context.getSourceInterface(),
-                                                                 expected, *(end - 1)));
+            context.log(errors::parser::EXPECTED_N.args(diag::after(*(end - 1)), context.getSourceInterface(), expected,
+                                                        *(end - 1)));
         }
         else
         {
-            context.log(errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(),
-                                                                              expected, *begin));
+            context.log(
+                errors::parser::EXPECTED_N_INSTEAD_OF_N.args(*begin, context.getSourceInterface(), expected, *begin));
         }
         if (additional)
         {
@@ -132,8 +138,7 @@ bool coral66::parser::firstIsInInitializer(const lexer::CToken& token, const Con
     return firstIsInAssignmentExpression(token, context);
 }
 
-[[maybe_unused]] bool coral66::parser::firstIsInInitializerList(const lexer::CToken& token,
-                                                                const Context& context)
+[[maybe_unused]] bool coral66::parser::firstIsInInitializerList(const lexer::CToken& token, const Context& context)
 {
     return token.getTokenType() == lexer::TokenType::OpenSquareBracket || token.getTokenType() == lexer::TokenType::Dot
            || firstIsInInitializer(token, context);
@@ -159,8 +164,7 @@ bool coral66::parser::firstIsInAssignmentExpression(const lexer::CToken& token, 
     return firstIsInConditionalExpression(token, context);
 }
 
-bool coral66::parser::firstIsInConditionalExpression(const lexer::CToken& token,
-                                                     const Context& context)
+bool coral66::parser::firstIsInConditionalExpression(const lexer::CToken& token, const Context& context)
 {
     return firstIsInLogicalOrExpression(token, context);
 }

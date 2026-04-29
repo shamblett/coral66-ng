@@ -6,13 +6,13 @@
 
 #pragma once
 
+#include <concepts>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <string_view>
 #include <tuple>
 #include <variant>
-#include <concepts>
 #include <vector>
 
 #include "utilities.hpp"
@@ -129,52 +129,79 @@ using suitableInt =
 #pragma GCC diagnostic pop
 
 template <class T>
-concept TupleLike = requires { typename std::tuple_size<T>::type; };
+concept TupleLike = requires
+{
+    typename std::tuple_size<T>::type;
+};
 
 template <class T>
-struct is_tuple_impl : std::false_type {};
+struct is_tuple_impl : std::false_type
+{
+};
 template <class... T>
-struct is_tuple_impl<std::tuple<T...>> : std::true_type {};
+struct is_tuple_impl<std::tuple<T...>> : std::true_type
+{
+};
 
 template <class T>
 concept Tuple = is_tuple_impl<T>::value;
 
 template <class T>
-struct is_variant_impl : std::false_type {};
+struct is_variant_impl : std::false_type
+{
+};
 template <class... T>
-struct is_variant_impl<std::variant<T...>> : std::true_type {};
+struct is_variant_impl<std::variant<T...>> : std::true_type
+{
+};
 
 template <class T>
 concept Variant = is_variant_impl<T>::value;
 
 template <class T>
-struct is_unique_ptr_impl : std::false_type {};
+struct is_unique_ptr_impl : std::false_type
+{
+};
 template <class T, class Del>
-struct is_unique_ptr_impl<std::unique_ptr<T, Del>> : std::true_type {};
+struct is_unique_ptr_impl<std::unique_ptr<T, Del>> : std::true_type
+{
+};
 
 template <class T>
 concept UniquePtr = is_unique_ptr_impl<T>::value;
 
 template <class T>
-struct is_optional_impl : std::false_type {};
+struct is_optional_impl : std::false_type
+{
+};
 template <class T>
-struct is_optional_impl<std::optional<T>> : std::true_type {};
+struct is_optional_impl<std::optional<T>> : std::true_type
+{
+};
 
 template <class T>
 concept Optional = is_optional_impl<T>::value;
 
 template <class T>
-struct is_vector_impl : std::false_type {};
+struct is_vector_impl : std::false_type
+{
+};
 template <class T>
-struct is_vector_impl<std::vector<T>> : std::true_type {};
+struct is_vector_impl<std::vector<T>> : std::true_type
+{
+};
 
 template <class T>
 concept Vector = is_vector_impl<T>::value;
 
 template <class T>
-struct is_shared_ptr_impl : std::false_type {};
+struct is_shared_ptr_impl : std::false_type
+{
+};
 template <class T>
-struct is_shared_ptr_impl<std::shared_ptr<T>> : std::true_type {};
+struct is_shared_ptr_impl<std::shared_ptr<T>> : std::true_type
+{
+};
 
 template <class T>
 concept SharedPtr = is_shared_ptr_impl<T>::value;
@@ -183,8 +210,9 @@ template <class T>
 concept SmartPtr = UniquePtr<T> || SharedPtr<T>;
 
 template <class T, class U>
-concept EqualComparable = requires(std::remove_cvref_t<T> const& a, std::remove_cvref_t<U> const& b) {
-    { a.operator==(b) } -> std::convertible_to<bool>;
+concept EqualComparable = requires(std::remove_cvref_t<T> const& a, std::remove_cvref_t<U> const& b)
+{
+    {a.operator==(b)}->std::convertible_to<bool>;
 };
 
 template <class T>
@@ -194,7 +222,10 @@ template <class T>
 constexpr bool always_true = true;
 
 template <typename T>
-concept CompleteType = requires { sizeof(T); };
+concept CompleteType = requires
+{
+    sizeof(T);
+};
 
 namespace detail
 {
@@ -255,9 +286,9 @@ using VariantUnion = decltype(detail::variantTypeUnion(std::declval<VariantType>
                                   _53, _54, _55, _56, _57, _58, _59, _60, _61, _62, _63, N, ...)                       \
     N
 
-#define CORAL66_MACRO_RSEQ_N()                                                                                         \
-    63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36,    \
-        35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8,  \
+#define CORAL66_MACRO_RSEQ_N()                                                                                        \
+    63, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36,   \
+        35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, \
         7, 6, 5, 4, 3, 2, 1, 0
 
 #define P00_FOR1(NAME, OP, FUNC, _1) FUNC(NAME, _1)
@@ -300,4 +331,3 @@ using VariantUnion = decltype(detail::variantTypeUnion(std::declval<VariantType>
     CORAL66_FOR(NAME, CORAL66_MACRO_COUNT_ARGUMENTS(__VA_ARGS__), , FUNC, __VA_ARGS__)
 
 } // namespace coral66
-
