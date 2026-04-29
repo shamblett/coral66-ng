@@ -27,6 +27,7 @@ namespace coral66::syntax
 {
 class Node;
 class Program;
+class Declaration;
 } // namespace coral66::syntax
 
 namespace coral66::semantics
@@ -838,6 +839,7 @@ public:
 class Declaration : public Usable
 {
     lexer::CTokenIterator m_nameToken;
+    const syntax::Declaration* m_astNode = nullptr;
 
 protected:
     template <class T>
@@ -853,6 +855,16 @@ public:
         return m_nameToken;
     }
     [[nodiscard]] std::string_view getName() const;
+
+    void setAstNode(const syntax::Declaration* node)
+    {
+        m_astNode = node;
+    }
+
+    [[nodiscard]] const syntax::Declaration* getAstNode() const
+    {
+        return m_astNode;
+    }
 };
 
 class VariableDeclaration final : public Declaration

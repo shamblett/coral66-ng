@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <deque>
 #include <unordered_map>
 #include <vector>
 
@@ -44,6 +45,12 @@ public:
 
     // Owns the semantic usable objects (declarations)
     std::vector<IntrVarPtr<Usable>> ownedUsables;
+
+    // Owns auxiliary types allocated during resolution (e.g. return types, parameter types)
+    std::deque<IntrusiveVariantValue<Type>> ownedTypes;
+
+    // Owns TableInfo structures
+    std::deque<TableInfo> ownedTableInfos;
 
     SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag)
         : source(sourceInterface), m_reporter(reporterStream), m_errors(errorFlag)

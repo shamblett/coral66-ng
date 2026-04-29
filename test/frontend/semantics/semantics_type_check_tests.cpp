@@ -131,7 +131,7 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
 {
     SECTION("Argument Count Mismatch")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P(VALUE INTEGER X) ; BEGIN END ; P(1) END");
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P(VALUE INTEGER X) ; BEGIN END ; P(1, 2) END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("PROCEDURE_ARGUMENT_COUNT_MISMATCH"));
     }

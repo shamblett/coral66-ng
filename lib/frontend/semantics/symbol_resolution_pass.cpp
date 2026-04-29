@@ -164,7 +164,27 @@ void SymbolResolutionPass::visit(const syntax::AssignmentStatement& node)
 
 void SymbolResolutionPass::visit(const syntax::GotoStatement& node)
 {
-    // Goto target label resolution is typically verified in ControlFlowPass
+    const auto& labelToken = node.getLabel();
+    const auto& labelName = std::get<std::string>(labelToken->getValue());
+    
+    if (const Usable* usable = m_context.symbolTable.lookup(labelName))
+    {
+        if (!usable->is<LabelDeclaration>() && !usable->is<SwitchDeclaration>())
+        {
+            m_context.log(errors::semantics::LABEL_NOT_FOUND_N.args(*labelToken, m_context.source, *labelToken));
+            DiagnosticCollector::addDiagnostic(errors::semantics::LABEL_NOT_FOUND_N);
+        }
+        else
+        {
+            m_context.resolvedIdentifiers[&node] = usable;
+        }
+    }
+    else
+    {
+        m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*labelToken, m_context.source, *labelToken));
+        DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
+    }
+
     if (node.getIndex())
         visit(*node.getIndex());
 }
@@ -228,6 +248,7 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
                 FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
 
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
+        declaration->setAstNode(&node);
         const auto& name = std::get<std::string>(id->getValue());
 
         if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -247,10 +268,11 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
 {
     for (auto id : node.getIdentifiers())
     {
-        std::vector<std::uint64_t> dims(node.getDimensions().size(), 10); // Dummy dimensions
+        std::vector<std::uint64_t> dims(node.getDimensions().size(), 0); // Defer exact evaluation
         auto typeCopy = IntrusiveVariantValue(ArrayType{&untypedType, dims});
 
         auto declaration = makeIntrusiveVariant<ArrayDeclaration>(id, std::move(typeCopy));
+        declaration->setAstNode(&node);
         const auto& name = std::get<std::string>(id->getValue());
 
         if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -283,9 +305,14 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
         visit(*node.getLength());
 
     auto id = node.getIdentifier();
-    auto typeCopy = IntrusiveVariantValue(
-        TableType{*new TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 1, 1}}});
+    
+    m_context.ownedTableInfos.push_back(
+        TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 0, 0}});
+        
+    auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
+    declaration->setAstNode(&node);
+    
     const auto& name = std::get<std::string>(id->getValue());
 
     if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -331,6 +358,7 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 
     auto id = node.getIdentifier();
     auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos);
+    declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 
     if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -399,10 +427,66 @@ void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 {
     auto id = node.getName();
-    auto type = createTypeFromToken(node.getTypeToken());
-    auto typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}}); // Dummy procedure type
+    
+    auto returnTypeVal = createTypeFromToken(node.getTypeToken());
+    m_context.ownedTypes.push_back(std::move(returnTypeVal));
+    const Type* returnTypePtr = node.getTypeToken() ? m_context.ownedTypes.back().data() : nullptr;
+
+    std::vector<ProcedureType::Parameter> parameters;
+    for (const auto& paramDeclNode : node.getParameters())
+    {
+        auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclNode.get());
+        if (!paramNode) continue;
+
+        auto baseTypeVal = createTypeFromToken(paramNode->getType());
+        
+        IntrusiveVariantValue<Type> paramTypeVal{UntypedType{}};
+        
+        bool isValue = false;
+        switch (paramNode->getMode())
+        {
+        case syntax::ParameterDeclaration::ParameterMode::Value:
+            paramTypeVal = std::move(baseTypeVal);
+            isValue = true;
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Location:
+            paramTypeVal = std::move(baseTypeVal);
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Array:
+            m_context.ownedTypes.push_back(std::move(baseTypeVal));
+            paramTypeVal = IntrusiveVariantValue<Type>(ArrayType{m_context.ownedTypes.back().data(), {}});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Label:
+            paramTypeVal = IntrusiveVariantValue<Type>(LabelType{});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Switch:
+            paramTypeVal = IntrusiveVariantValue<Type>(SwitchType{});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::Procedure:
+            paramTypeVal = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
+            paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
+            isValue = true;
+            break;
+        case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
+            paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
+            break;
+        }
+
+        m_context.ownedTypes.push_back(std::move(paramTypeVal));
+        const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+        for (auto paramId : paramNode->getIdentifiers())
+        {
+            parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), isValue});
+        }
+    }
+
+    auto typeCopy = IntrusiveVariantValue<Type>(ProcedureType{returnTypePtr, std::move(parameters)});
 
     auto declaration = makeIntrusiveVariant<ProcedureDeclaration>(id, std::move(typeCopy));
+    declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 
     auto registerProcedure = [&]()
@@ -442,6 +526,15 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
 {
     auto type = createTypeFromToken(node.getType());
+    
+    // We should allocate a base type if we need to point to it (e.g., for Array parameters)
+    const Type* baseTypePtr = nullptr;
+    if (node.getMode() == syntax::ParameterDeclaration::ParameterMode::Array)
+    {
+        m_context.ownedTypes.push_back(createTypeFromToken(node.getType()));
+        baseTypePtr = m_context.ownedTypes.back().data();
+    }
+
     for (auto id : node.getIdentifiers())
     {
         IntrusiveVariantValue<Type> typeCopy{PrimitiveType{PrimitiveType::Integer}};
@@ -463,7 +556,7 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
                     FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Location});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Array:
-            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer});
+            typeCopy = IntrusiveVariantValue<Type>(ArrayType{baseTypePtr, {}});
             break;
         case syntax::ParameterDeclaration::ParameterMode::Label:
             typeCopy = IntrusiveVariantValue<Type>(LabelType{});
@@ -483,6 +576,7 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
         }
 
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
+        declaration->setAstNode(&node);
         const auto& name = std::get<std::string>(id->getValue());
 
         if (m_context.symbolTable.lookupInCurrentScope(name))
