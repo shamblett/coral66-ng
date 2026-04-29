@@ -1,7 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "ctrack.hpp"
 #include "doctest.h"
 #include "test_helpers.hpp"
-#include "ctrack.hpp"
 
 // Test functions with predictable timing
 void simple_function_5ms()
@@ -71,7 +71,7 @@ TEST_CASE("Basic single function tracking - 5ms sleep")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "simple_function_5ms");
@@ -79,7 +79,6 @@ TEST_CASE("Basic single function tracking - 5ms sleep")
     CHECK(stats.threads == 1);
     CHECK(stats.line > 0);
 
-    
     CHECK(test_helpers::within_tolerance(stats.center_mean, std::chrono::milliseconds(5)));
     CHECK(test_helpers::within_tolerance(stats.center_med, std::chrono::milliseconds(5)));
     CHECK(stats.center_min <= stats.center_mean);
@@ -110,7 +109,7 @@ TEST_CASE("Basic single function tracking - 10ms sleep")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "simple_function_10ms");
@@ -139,7 +138,7 @@ TEST_CASE("Basic single function tracking - 20ms sleep")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "simple_function_20ms");
@@ -164,7 +163,7 @@ TEST_CASE("Zero duration function tracking")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "zero_duration_function");
@@ -191,7 +190,7 @@ TEST_CASE("Single call scenario")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "simple_function_10ms");
@@ -222,7 +221,7 @@ TEST_CASE("Varying sleep times statistics")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "varying_sleep_function");
@@ -230,14 +229,16 @@ TEST_CASE("Varying sleep times statistics")
     CHECK(stats.threads == 1);
 
     // Expected mean: (5+8+10+15+20)/5 = 11.6ms
-    CHECK(test_helpers::within_tolerance(stats.center_mean, std::chrono::milliseconds(12), std::chrono::milliseconds(3))); // 20% tolerance for variance
+    CHECK(test_helpers::within_tolerance(stats.center_mean, std::chrono::milliseconds(12),
+                                         std::chrono::milliseconds(3))); // 20% tolerance for variance
 
     // Expected total: 5+8+10+15+20 = 58ms
     CHECK(test_helpers::within_tolerance(stats.time_acc, std::chrono::milliseconds(58)));
 
     // Min should be close to 5ms, max close to 20ms
-    CHECK(test_helpers::within_tolerance(stats.center_min, std::chrono::milliseconds(5) ,std::chrono::milliseconds(2)));
-    CHECK(test_helpers::within_tolerance(stats.center_max, std::chrono::milliseconds(20), std::chrono::milliseconds(5)));
+    CHECK(test_helpers::within_tolerance(stats.center_min, std::chrono::milliseconds(5), std::chrono::milliseconds(2)));
+    CHECK(
+        test_helpers::within_tolerance(stats.center_max, std::chrono::milliseconds(20), std::chrono::milliseconds(5)));
 
     // CV should be higher due to variance
     CHECK(stats.cv > 0.2); // Should have significant coefficient of variation
@@ -257,10 +258,10 @@ TEST_CASE("Nested function calls tracking")
     REQUIRE(tables.details.rows.size() == 2); // Parent and child functions
 
     // Find parent and child functions in results
-    const ctrack::detail_stats *parent_stats = nullptr;
-    const ctrack::detail_stats *child_stats = nullptr;
+    const ctrack::detail_stats* parent_stats = nullptr;
+    const ctrack::detail_stats* child_stats = nullptr;
 
-    for (const auto &stats : tables.details.rows)
+    for (const auto& stats : tables.details.rows)
     {
         if (stats.function_name == "nested_parent_function")
         {
@@ -301,7 +302,7 @@ TEST_CASE("Recursive function calls tracking")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify basic properties
     CHECK(stats.function_name == "recursive_factorial");
@@ -310,7 +311,7 @@ TEST_CASE("Recursive function calls tracking")
 
     CHECK(test_helpers::within_tolerance(stats.center_mean, std::chrono::milliseconds(12)));
 
-	// Total time should be around 5+10+15+20 = 50ms (approx)
+    // Total time should be around 5+10+15+20 = 50ms (approx)
     CHECK(test_helpers::within_tolerance(stats.time_acc, std::chrono::milliseconds(50)));
 
     // All calls should have similar timing
@@ -332,7 +333,7 @@ TEST_CASE("Multiple different functions tracking")
 
     // Verify we have all four functions
     std::set<std::string> function_names;
-    for (const auto &stats : tables.details.rows)
+    for (const auto& stats : tables.details.rows)
     {
         function_names.insert(stats.function_name);
 
@@ -369,7 +370,7 @@ TEST_CASE("Summary table validation")
     CHECK(tables.summary.rows.size() == 2);
 
     // Verify summary table entries
-    for (const auto &summary_row : tables.summary.rows)
+    for (const auto& summary_row : tables.summary.rows)
     {
         CHECK(summary_row.line > 0);
         CHECK(summary_row.calls > 0);
@@ -381,8 +382,8 @@ TEST_CASE("Summary table validation")
         CHECK(summary_row.time_a_all.count() >= 0);
 
         // Function name should be one of our test functions
-        CHECK((summary_row.function_name == "simple_function_5ms" ||
-               summary_row.function_name == "simple_function_10ms"));
+        CHECK((summary_row.function_name == "simple_function_5ms"
+               || summary_row.function_name == "simple_function_10ms"));
     }
 }
 
@@ -399,13 +400,13 @@ TEST_CASE("Timing relationships validation")
     auto tables = ctrack::result_get_tables();
     REQUIRE(tables.details.rows.size() == 1);
 
-    const auto &stats = tables.details.rows[0];
+    const auto& stats = tables.details.rows[0];
 
     // Verify all timing relationships
     CHECK(stats.fastest_min <= stats.fastest_mean);
     CHECK(stats.fastest_mean <= stats.center_min);
     CHECK(stats.center_min <= stats.center_mean);
-	CHECK(test_helpers::within_tolerance(stats.center_med, stats.center_mean, std::chrono::milliseconds(1)));
+    CHECK(test_helpers::within_tolerance(stats.center_med, stats.center_mean, std::chrono::milliseconds(1)));
     CHECK(stats.center_med <= stats.center_max);
     CHECK(stats.center_max <= stats.slowest_mean);
     CHECK(stats.slowest_mean <= stats.slowest_max);
@@ -443,5 +444,6 @@ TEST_CASE("Meta information validation")
     CHECK(tables.time_ctracked <= tables.time_total);
 
     // Should have tracked approximately 15ms (5ms + 10ms)
-    CHECK(test_helpers::within_tolerance(tables.time_ctracked, std::chrono::milliseconds(15), std::chrono::milliseconds(5)));
+    CHECK(test_helpers::within_tolerance(tables.time_ctracked, std::chrono::milliseconds(15),
+                                         std::chrono::milliseconds(5)));
 }

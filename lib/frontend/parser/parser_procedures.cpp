@@ -50,6 +50,18 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                     {
                         validateFixedFormat(begin, end, context);
                     }
+
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::ArrayKeyword)
+                    {
+                        mode = syntax::ParameterDeclaration::ParameterMode::Array;
+                        begin++;
+                    }
+                    else if (begin != end && begin->getTokenType() == lexer::TokenType::ProcedureKeyword)
+                    {
+                        mode = syntax::ParameterDeclaration::ParameterMode::Procedure;
+                        begin++;
+                    }
+
                     std::vector<lexer::CTokenIterator> ids;
                     while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
                     {
@@ -214,7 +226,6 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
 std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                              Context& context)
 {
-
     if (begin == end)
     {
         return nullptr;

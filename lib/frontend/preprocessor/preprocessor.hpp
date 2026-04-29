@@ -315,8 +315,6 @@ class Preprocessor final : PPSourceInterface
 
     std::pair<std::optional<Macro>, const lexer::PPToken*> parseDefineDirective(const DefineDirective& defineDirective);
 
-
-
 public:
     explicit Preprocessor(llvm::raw_ostream* report) noexcept : m_reporter(report) {}
 

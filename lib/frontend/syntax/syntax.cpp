@@ -61,9 +61,7 @@ bool Program::getIsSegment() const
 Block::Block(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
              std::vector<std::unique_ptr<Declaration>>&& declarations,
              std::vector<std::unique_ptr<Statement>>&& statements)
-    : Node(begin, end),
-      m_declarations(std::move(declarations)),
-      m_statements(std::move(statements))
+    : Node(begin, end), m_declarations(std::move(declarations)), m_statements(std::move(statements))
 {
 }
 
@@ -76,7 +74,6 @@ const std::vector<std::unique_ptr<Statement>>& Block::getStatements() const
 {
     return m_statements;
 }
-
 
 std::vector<std::unique_ptr<Declaration>> Block::takeDeclarations()
 {
@@ -330,7 +327,6 @@ const Declaration& OverlayDeclaration::getOverlayDeclaration() const
 }
 
 // Place reference
-
 
 // DummyStatement
 // ReSharper disable once CppParameterMayBeConst

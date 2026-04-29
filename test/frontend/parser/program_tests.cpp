@@ -1,5 +1,5 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 06/04/2026
  */
@@ -30,13 +30,13 @@ TEST_CASE("Coral Parse Program with Communicator", "[Parser][Program]")
         REQUIRE(communicatorReference != nullptr);
         const auto& items = communicatorReference->getItems();
         REQUIRE(items.size() == 2);
-        
+
         auto varDecl = dynamic_cast<const VariableDeclaration*>(items[0].get());
         REQUIRE(varDecl != nullptr);
         CHECK(varDecl->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
         CHECK(varDecl->getIdentifiers().size() == 1);
         CHECK(varDecl->getIdentifiers()[0]->getText() == "A");
-        
+
         auto placeSpec = dynamic_cast<const PlaceSpecification*>(items[1].get());
         REQUIRE(placeSpec != nullptr);
         CHECK(placeSpec->getIdentifiers().size() == 1);

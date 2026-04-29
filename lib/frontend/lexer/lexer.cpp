@@ -15,11 +15,11 @@
 #include <numeric>
 #include <optional>
 
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "lexer_support.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/support/text.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
 
 using namespace coral66::lexer;
 using namespace coral66::detail;

@@ -41,7 +41,7 @@ private:
     void visit(const syntax::GotoStatement& node);
     void visit(const syntax::AnswerStatement& node);
     void visit(const syntax::ProcedureCallStatement& node);
-    
+
     // Declarations
     void visit(const syntax::Declaration& node);
     void visit(const syntax::VariableDeclaration& node);
@@ -52,7 +52,7 @@ private:
     void visit(const syntax::OverlayDeclaration& node);
     void visit(const syntax::SwitchDeclaration& node);
     void visit(const syntax::ParameterDeclaration& node);
-    
+
     // Expressions
     void visit(const syntax::Expression& node);
     void visit(const syntax::IdentifierExpression& node);
@@ -64,7 +64,7 @@ private:
     void visit(const syntax::ArrayAccessExpression& node);
     void visit(const syntax::LocationExpression& node);
     void visit(const syntax::TypeChangeExpression& node);
-    
+
     IntrusiveVariantValue<Type> createTypeFromToken(std::optional<lexer::CTokenIterator> token);
 };
 

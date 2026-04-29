@@ -693,7 +693,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
         {
             auto id = begin;
             begin++;
-            
+
             if (begin != end && begin->getTokenType() == lexer::TokenType::Assignment)
             {
                 begin++;
@@ -717,13 +717,17 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                                                                         context.getSourceInterface(),
+                                                                         *(begin == end ? (end - 1) : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                 }
             }
             else
             {
-                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? (end - 1) : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
             }
         }

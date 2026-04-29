@@ -67,7 +67,9 @@ static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIter
     return false;
 }
 
-static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
+static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin,
+                                                             const lexer::CTokenIterator end, Context& context,
+                                                             bool isConsequence)
 {
     if (begin == end)
     {
@@ -169,17 +171,17 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         auto start = begin;
         begin++;
         auto expr = parseExpression(begin, end, context);
-        
-        if (!context.isInsideProcedure()) {
-            context.log(errors::parser::ANSWER_OUTSIDE_PROCEDURE.args(
-                *start, context.getSourceInterface(), *start));
+
+        if (!context.isInsideProcedure())
+        {
+            context.log(errors::parser::ANSWER_OUTSIDE_PROCEDURE.args(*start, context.getSourceInterface(), *start));
             DiagnosticCollector::addDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE);
             return nullptr;
         }
-        
-        if (context.isInsideUntypedProcedure()) {
-            context.log(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE.args(
-                *start, context.getSourceInterface(), *start));
+
+        if (context.isInsideUntypedProcedure())
+        {
+            context.log(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE.args(*start, context.getSourceInterface(), *start));
             DiagnosticCollector::addDiagnostic(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE);
             return nullptr;
         }
@@ -241,8 +243,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         if (isConsequence)
         {
             context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(*(begin == end ? (end - 1) : begin),
-                                                                        context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
+                                                                       context.getSourceInterface(),
+                                                                       *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT);
             return nullptr;
         }
@@ -296,8 +298,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         if (isConsequence)
         {
             context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(*(begin == end ? (end - 1) : begin),
-                                                                        context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
+                                                                       context.getSourceInterface(),
+                                                                       *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT);
             return nullptr;
         }
@@ -412,16 +414,15 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         else
         {
             context.log(errors::parser::EXPECTED_VARIABLE.args(*(begin == end ? (end - 1) : begin),
-                                                                 context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                               context.getSourceInterface(),
+                                                               *(begin == end ? (end - 1) : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_VARIABLE);
         }
         return nullptr;
     }
 
-    if (begin->getTokenType() == lexer::TokenType::SemiColon ||
-        begin->getTokenType() == lexer::TokenType::EndKeyword ||
-        begin->getTokenType() == lexer::TokenType::ElseKeyword)
+    if (begin->getTokenType() == lexer::TokenType::SemiColon || begin->getTokenType() == lexer::TokenType::EndKeyword
+        || begin->getTokenType() == lexer::TokenType::ElseKeyword)
     {
         return std::make_unique<syntax::DummyStatement>(begin, begin);
     }
@@ -446,7 +447,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     return nullptr;
 }
 
-std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context, bool isConsequence)
+std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+                                                  Context& context, bool isConsequence)
 {
     if (begin == end)
     {
@@ -476,4 +478,3 @@ std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     return stmt;
 }
 } // namespace coral66::parser
-

@@ -114,11 +114,10 @@ TEST_CASE("CustomFormat for TokenType", "[lexer]")
 
 TEST_CASE("StringConverter for TokenType", "[lexer]")
 {
-    std::string inFormatStr = diag::StringConverter<coral66::lexer::TokenType>::inFormat(
-        TokenType::Identifier, nullptr);
+    std::string inFormatStr =
+        diag::StringConverter<coral66::lexer::TokenType>::inFormat(TokenType::Identifier, nullptr);
     REQUIRE(!inFormatStr.empty());
 
-    std::string inArgStr = diag::StringConverter<coral66::lexer::TokenType>::inArg(
-        TokenType::Identifier, nullptr);
+    std::string inArgStr = diag::StringConverter<coral66::lexer::TokenType>::inArg(TokenType::Identifier, nullptr);
     REQUIRE(!inArgStr.empty());
 }

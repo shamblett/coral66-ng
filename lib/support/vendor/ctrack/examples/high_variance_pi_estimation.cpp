@@ -1,20 +1,24 @@
 #include <iostream>
 #include <random>
-#include <vector>
 #include <thread>
+#include <vector>
+
 #include "ctrack.hpp"
 
-double estimate_pi(int points) {
+double estimate_pi(int points)
+{
     CTRACK;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(-1.0, 1.0);
 
     int inside_circle = 0;
-    for (int i = 0; i < points; ++i) {
+    for (int i = 0; i < points; ++i)
+    {
         double x = dis(gen);
         double y = dis(gen);
-        if (x*x + y*y <= 1.0) {
+        if (x * x + y * y <= 1.0)
+        {
             inside_circle++;
         }
     }
@@ -22,13 +26,16 @@ double estimate_pi(int points) {
     return 4.0 * inside_circle / points;
 }
 
-void run_estimations(int iterations, int points_per_estimation) {
-    for (int i = 0; i < iterations; ++i) {
+void run_estimations(int iterations, int points_per_estimation)
+{
+    for (int i = 0; i < iterations; ++i)
+    {
         estimate_pi(points_per_estimation);
     }
 }
 
-int main() {
+int main()
+{
     const int total_estimations = 1000;
     const int points_per_estimation = 100000;
     const int thread_count = std::thread::hardware_concurrency();
@@ -36,11 +43,13 @@ int main() {
 
     std::vector<std::thread> threads;
 
-    for (int i = 0; i < thread_count; ++i) {
+    for (int i = 0; i < thread_count; ++i)
+    {
         threads.emplace_back(run_estimations, estimations_per_thread, points_per_estimation);
     }
 
-    for (auto& thread : threads) {
+    for (auto& thread : threads)
+    {
         thread.join();
     }
 

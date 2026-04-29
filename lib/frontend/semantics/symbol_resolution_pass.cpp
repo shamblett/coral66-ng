@@ -9,7 +9,6 @@
 #include <string>
 
 #include "lib/frontend/common/messages/errors.hpp"
-
 #include "semantic_support.hpp"
 #include "symbol_resolution_pass.hpp"
 
@@ -166,7 +165,7 @@ void SymbolResolutionPass::visit(const syntax::GotoStatement& node)
 {
     const auto& labelToken = node.getLabel();
     const auto& labelName = std::get<std::string>(labelToken->getValue());
-    
+
     if (const Usable* usable = m_context.symbolTable.lookup(labelName))
     {
         if (!usable->is<LabelDeclaration>() && !usable->is<SwitchDeclaration>())
@@ -305,14 +304,13 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
         visit(*node.getLength());
 
     auto id = node.getIdentifier();
-    
-    m_context.ownedTableInfos.push_back(
-        TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 0, 0}});
-        
+
+    m_context.ownedTableInfos.push_back(TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 0, 0}});
+
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
     declaration->setAstNode(&node);
-    
+
     const auto& name = std::get<std::string>(id->getValue());
 
     if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -357,7 +355,8 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     }
 
     auto id = node.getIdentifier();
-    auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos);
+    auto declaration =
+        makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos);
     declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 
@@ -413,7 +412,7 @@ void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
     auto baseToken = node.getBase();
     const auto& baseName = std::get<std::string>(baseToken->getValue());
     const Usable* usable = m_context.symbolTable.lookup(baseName);
-    
+
     if (!usable)
     {
         m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*baseToken, m_context.source, *baseToken));
@@ -427,7 +426,7 @@ void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 {
     auto id = node.getName();
-    
+
     auto returnTypeVal = createTypeFromToken(node.getTypeToken());
     m_context.ownedTypes.push_back(std::move(returnTypeVal));
     const Type* returnTypePtr = node.getTypeToken() ? m_context.ownedTypes.back().data() : nullptr;
@@ -435,51 +434,65 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     std::vector<ProcedureType::Parameter> parameters;
     for (const auto& paramDeclNode : node.getParameters())
     {
-        auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclNode.get());
-        if (!paramNode) continue;
-
-        auto baseTypeVal = createTypeFromToken(paramNode->getType());
-        
-        IntrusiveVariantValue<Type> paramTypeVal{UntypedType{}};
-        
-        bool isValue = false;
-        switch (paramNode->getMode())
+        if (auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclNode.get()))
         {
-        case syntax::ParameterDeclaration::ParameterMode::Value:
-            paramTypeVal = std::move(baseTypeVal);
-            isValue = true;
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Location:
-            paramTypeVal = std::move(baseTypeVal);
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Array:
-            m_context.ownedTypes.push_back(std::move(baseTypeVal));
-            paramTypeVal = IntrusiveVariantValue<Type>(ArrayType{m_context.ownedTypes.back().data(), {}});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Label:
-            paramTypeVal = IntrusiveVariantValue<Type>(LabelType{});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Switch:
-            paramTypeVal = IntrusiveVariantValue<Type>(SwitchType{});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Procedure:
-            paramTypeVal = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
-            paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
-            isValue = true;
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
-            paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
-            break;
+            auto baseTypeVal = createTypeFromToken(paramNode->getType());
+
+            IntrusiveVariantValue<Type> paramTypeVal{UntypedType{}};
+
+            bool isValue = false;
+            switch (paramNode->getMode())
+            {
+                case syntax::ParameterDeclaration::ParameterMode::Value:
+                    paramTypeVal = std::move(baseTypeVal);
+                    isValue = true;
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Location:
+                    paramTypeVal = std::move(baseTypeVal);
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Array:
+                    m_context.ownedTypes.push_back(std::move(baseTypeVal));
+                    paramTypeVal = IntrusiveVariantValue<Type>(ArrayType{m_context.ownedTypes.back().data(), {}});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Label:
+                    paramTypeVal = IntrusiveVariantValue<Type>(LabelType{});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Switch:
+                    paramTypeVal = IntrusiveVariantValue<Type>(SwitchType{});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Procedure:
+                    paramTypeVal = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
+                    paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
+                    isValue = true;
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
+                    paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
+                    break;
+            }
+
+            m_context.ownedTypes.push_back(std::move(paramTypeVal));
+            const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+            for (auto paramId : paramNode->getIdentifiers())
+            {
+                parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), isValue});
+            }
         }
-
-        m_context.ownedTypes.push_back(std::move(paramTypeVal));
-        const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
-
-        for (auto paramId : paramNode->getIdentifiers())
+        else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclNode.get()))
         {
-            parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), isValue});
+            auto baseTypeVal = createTypeFromToken(arrayNode->getType());
+            m_context.ownedTypes.push_back(std::move(baseTypeVal));
+            const Type* baseTypePtr = m_context.ownedTypes.back().data();
+
+            m_context.ownedTypes.push_back(IntrusiveVariantValue<Type>(ArrayType{baseTypePtr, {}}));
+            const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+            for (auto paramId : arrayNode->getIdentifiers())
+            {
+                parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), false});
+            }
         }
     }
 
@@ -526,7 +539,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
 {
     auto type = createTypeFromToken(node.getType());
-    
+
     // We should allocate a base type if we need to point to it (e.g., for Array parameters)
     const Type* baseTypePtr = nullptr;
     if (node.getMode() == syntax::ParameterDeclaration::ParameterMode::Array)
@@ -541,38 +554,41 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
 
         switch (node.getMode())
         {
-        case syntax::ParameterDeclaration::ParameterMode::Value:
-            if (type->is<PrimitiveType>())
-                typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
-            else if (type->is<FixedType>())
-                typeCopy = IntrusiveVariantValue<Type>(
-                    FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Value});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Location:
-            if (type->is<PrimitiveType>())
-                typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
-            else if (type->is<FixedType>())
-                typeCopy = IntrusiveVariantValue<Type>(
-                    FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Location});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Array:
-            typeCopy = IntrusiveVariantValue<Type>(ArrayType{baseTypePtr, {}});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Label:
-            typeCopy = IntrusiveVariantValue<Type>(LabelType{});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Switch:
-            typeCopy = IntrusiveVariantValue<Type>(SwitchType{});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::Procedure:
-            typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
-            typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
-            break;
-        case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
-            typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
-            break;
+            case syntax::ParameterDeclaration::ParameterMode::Value:
+                if (type->is<PrimitiveType>())
+                    typeCopy =
+                        IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
+                else if (type->is<FixedType>())
+                    typeCopy = IntrusiveVariantValue<Type>(FixedType{
+                        type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Value});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::Location:
+                if (type->is<PrimitiveType>())
+                    typeCopy =
+                        IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
+                else if (type->is<FixedType>())
+                    typeCopy = IntrusiveVariantValue<Type>(FixedType{type->as<FixedType>().getTotalBits(),
+                                                                     type->as<FixedType>().getFractionalBits(),
+                                                                     Type::Location});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::Array:
+                typeCopy = IntrusiveVariantValue<Type>(ArrayType{baseTypePtr, {}});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::Label:
+                typeCopy = IntrusiveVariantValue<Type>(LabelType{});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::Switch:
+                typeCopy = IntrusiveVariantValue<Type>(SwitchType{});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::Procedure:
+                typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
+                typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
+                break;
+            case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
+                typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
+                break;
         }
 
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));

@@ -815,7 +815,8 @@ class LabelDeclaration;
 class TableElementDeclaration;
 
 class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration,
-                                               TableDeclaration, OverlayDeclaration, SwitchDeclaration, LabelDeclaration, TableElementDeclaration>
+                                               TableDeclaration, OverlayDeclaration, SwitchDeclaration,
+                                               LabelDeclaration, TableElementDeclaration>
 {
     std::vector<const Usable*> m_uses;
 
@@ -911,10 +912,7 @@ public:
 class LabelDeclaration final : public Declaration
 {
 public:
-    LabelDeclaration(lexer::CTokenIterator nameToken)
-        : Declaration(std::in_place_type<LabelDeclaration>, nameToken)
-    {
-    }
+    LabelDeclaration(lexer::CTokenIterator nameToken) : Declaration(std::in_place_type<LabelDeclaration>, nameToken) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelDeclaration)
 };
 
@@ -927,18 +925,31 @@ class TableElementDeclaration final : public Declaration
 
 public:
     TableElementDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type, bool isUnsigned = false,
-                            std::optional<std::uint32_t> wordPosition = std::nullopt, std::optional<std::uint32_t> bitPosition = std::nullopt)
-        : Declaration(std::in_place_type<TableElementDeclaration>, nameToken), m_type(std::move(type)),
-          m_unsigned(isUnsigned), m_wordPosition(wordPosition), m_bitPosition(bitPosition)
+                            std::optional<std::uint32_t> wordPosition = std::nullopt,
+                            std::optional<std::uint32_t> bitPosition = std::nullopt)
+        : Declaration(std::in_place_type<TableElementDeclaration>, nameToken),
+          m_type(std::move(type)),
+          m_unsigned(isUnsigned),
+          m_wordPosition(wordPosition),
+          m_bitPosition(bitPosition)
     {
     }
     [[nodiscard]] const Type& getType() const
     {
         return *m_type;
     }
-    [[nodiscard]] bool isUnsigned() const { return m_unsigned; }
-    [[nodiscard]] std::optional<std::uint32_t> getWordPosition() const { return m_wordPosition; }
-    [[nodiscard]] std::optional<std::uint32_t> getBitPosition() const { return m_bitPosition; }
+    [[nodiscard]] bool isUnsigned() const
+    {
+        return m_unsigned;
+    }
+    [[nodiscard]] std::optional<std::uint32_t> getWordPosition() const
+    {
+        return m_wordPosition;
+    }
+    [[nodiscard]] std::optional<std::uint32_t> getBitPosition() const
+    {
+        return m_bitPosition;
+    }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(TableElementDeclaration)
 };
 
