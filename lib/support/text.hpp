@@ -40,7 +40,18 @@ std::uint8_t getNumBytesForUTF8(Iter begin, Iter end)
     std::uint8_t des;
     std::int8_t temp = *begin;
     std::memcpy(&des, &temp, 1);
-    auto step = llvm::getNumBytesForUTF8(*begin);
+    
+    std::uint8_t step = 0;
+    if (des < 0x80) step = 1;
+    else if (des < 0xC0) step = 0;
+    else if (des < 0xE0) step = 2;
+    else if (des < 0xF0) step = 3;
+    else if (des < 0xF8) step = 4;
+    
+    if (step == 0)
+    {
+        return 1;
+    }
     for (std::uint8_t i = 1; i < step; i++)
     {
         if (begin + i == end || (*(begin + i) & 0b11000000) != 0b10000000)
@@ -63,11 +74,13 @@ void toSafeUTF8(std::string_view const inputLine, OutputIter1 outputIter, Output
         do
         {
             llvm::UTF32 utf32;
+            llvm::UTF32* targetStart = &utf32;
             const auto* const prev = sourceStart;
-            if (llvm::convertUTF8Sequence(reinterpret_cast<const llvm::UTF8**>(&sourceStart),
-                                          reinterpret_cast<const llvm::UTF8*>(sourceEnd), &utf32,
-                                          llvm::strictConversion)
-                != llvm::conversionOK)
+            auto convRes = llvm::ConvertUTF8toUTF32(
+                reinterpret_cast<const llvm::UTF8**>(&sourceStart),
+                reinterpret_cast<const llvm::UTF8*>(sourceEnd), &targetStart, targetStart + 1,
+                llvm::strictConversion);
+            if (convRes != llvm::conversionOK && convRes != llvm::targetExhausted)
             {
                 break;
             }

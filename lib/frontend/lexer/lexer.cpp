@@ -89,11 +89,15 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
             {
                 llvm::UTF32 result;
                 const auto* start = iter;
-                if (llvm::convertUTF8Sequence(reinterpret_cast<const llvm::UTF8**>(&start),
-                                              reinterpret_cast<const llvm::UTF8*>(end), &result, llvm::strictConversion)
-                    != llvm::conversionOK)
+                llvm::UTF32* targetStart = &result;
+                auto convRes = llvm::ConvertUTF8toUTF32(
+                    reinterpret_cast<const llvm::UTF8**>(&start),
+                    reinterpret_cast<const llvm::UTF8*>(end),
+                    &targetStart, targetStart + 1, llvm::strictConversion);
+
+                if (convRes != llvm::conversionOK && convRes != llvm::targetExhausted)
                 {
-                    step = getNumBytesForUTF8(start, end);
+                    step = getNumBytesForUTF8(iter, end);
                     context.report(errors::lexer::INVALID_UTF8_SEQUENCE, offset, std::pair{offset, offset + step});
                     DiagnosticCollector::addDiagnostic(errors::lexer::INVALID_UTF8_SEQUENCE);
                     return false;

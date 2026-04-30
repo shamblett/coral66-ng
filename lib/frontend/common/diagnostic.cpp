@@ -144,13 +144,14 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                     while (ptr != textAbove.data() + textAbove.size())
                     {
                         llvm::UTF32 utf32;
+                        llvm::UTF32* targetStart = &utf32;
                         const auto* before = ptr;
-                        auto result = llvm::convertUTF8Sequence(
+                        auto result = llvm::ConvertUTF8toUTF32(
                             reinterpret_cast<const llvm::UTF8**>(&ptr),
-                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &utf32,
+                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart, targetStart + 1,
                             llvm::strictConversion);
                         (void)result;
-                        CORAL66_ASSERT(result == llvm::conversionOK);
+                        CORAL66_ASSERT(result == llvm::conversionOK || result == llvm::targetExhausted);
                         if (!coral66::isWhitespace(utf32))
                         {
                             ptr = before;
@@ -163,13 +164,14 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                     while (start != textAbove.data() + textAbove.size())
                     {
                         llvm::UTF32 utf32;
+                        llvm::UTF32* targetStart = &utf32;
                         const auto* before = start;
-                        auto result = llvm::convertUTF8Sequence(
+                        auto result = llvm::ConvertUTF8toUTF32(
                             reinterpret_cast<const llvm::UTF8**>(&start),
-                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &utf32,
+                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart, targetStart + 1,
                             llvm::strictConversion);
                         (void)result;
-                        CORAL66_ASSERT(result == llvm::conversionOK);
+                        CORAL66_ASSERT(result == llvm::conversionOK || result == llvm::targetExhausted);
                         if (coral66::isWhitespace(utf32))
                         {
                             start = before;

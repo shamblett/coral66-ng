@@ -122,7 +122,7 @@ unsigned coral66::unsafeColumnWidth(std::string_view const text)
     unsigned int length;
     for (size_t i = 0, e = text.size(); i < e; i += length)
     {
-        length = llvm::getNumBytesForUTF8(text[i]);
+        length = coral66::getNumBytesForUTF8(text.begin() + i, text.end());
         std::array<llvm::UTF32, 1> buf{};
         const auto* start = reinterpret_cast<const llvm::UTF8*>(text.data() + i);
         llvm::UTF32* target = buf.data();
