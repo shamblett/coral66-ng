@@ -96,6 +96,18 @@ void TypeCheckingPass::visit(const syntax::IfStatement& node)
 void TypeCheckingPass::visit(const syntax::ForStatement& node)
 {
     visit(node.getVariable());
+    
+    auto varIt = m_context.expressionTypes.find(&node.getVariable());
+    if (varIt != m_context.expressionTypes.end() && !varIt->second->is<ErrorType>())
+    {
+        if (!isNumericType(*varIt->second))
+        {
+            m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
+                *node.getVariable().begin(), m_context.source, *node.getVariable().begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
+        }
+    }
+
     for (const auto& element : node.getElements())
     {
         visit(*element.expression);
@@ -339,6 +351,18 @@ void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
         {
             m_context.expressionTypes.insert_or_assign(&node, table->getType());
         }
+        else if (auto* tableElement = usable->tryAs<TableElementDeclaration>())
+        {
+            m_context.expressionTypes.insert_or_assign(&node, tableElement->getType());
+        }
+        else if (usable->is<LabelDeclaration>())
+        {
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(LabelType{}));
+        }
+        else if (usable->is<SwitchDeclaration>())
+        {
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(SwitchType{}));
+        }
         else
         {
             m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
@@ -506,6 +530,18 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                             }
                             if (!isCompatible && *param.type == *itArg->second)
                                 isCompatible = true;
+                            
+                            if (!isCompatible)
+                            {
+                                if (auto* paramArr = param.type->tryAs<ArrayType>())
+                                {
+                                    if (auto* argArr = itArg->second->tryAs<ArrayType>())
+                                    {
+                                        if (paramArr->getElementType() == argArr->getElementType())
+                                            isCompatible = true;
+                                    }
+                                }
+                            }
 
                             if (!isCompatible)
                             {
@@ -569,6 +605,12 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
         }
     }
 
+    if (node.getArray() == nullptr)
+    {
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+        return;
+    }
+
     auto it = m_context.resolvedIdentifiers.find(&node);
     if (it != m_context.resolvedIdentifiers.end())
     {
@@ -577,6 +619,13 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
         {
             if (auto arrType = arr->getType().tryAs<ArrayType>())
             {
+                if (node.getIndices().size() != arrType->getDimensions().size())
+                {
+                    m_context.log(
+                        errors::semantics::INCORRECT_NUMBER_OF_INDICES.args(*node.begin(), m_context.source, *node.begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_NUMBER_OF_INDICES);
+                }
+
                 if (auto p = arrType->getElementType().tryAs<PrimitiveType>())
                 {
                     m_context.expressionTypes.insert_or_assign(
@@ -591,6 +640,10 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
             {
                 m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
             }
+        }
+        else if (auto* tableElement = usable->tryAs<TableElementDeclaration>())
+        {
+            m_context.expressionTypes.insert_or_assign(&node, tableElement->getType());
         }
         else
         {
