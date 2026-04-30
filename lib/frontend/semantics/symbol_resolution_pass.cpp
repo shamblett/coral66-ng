@@ -210,6 +210,8 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
         return {(PrimitiveType{PrimitiveType::Floating})};
     if (type == lexer::TokenType::FixedKeyword)
         return {(FixedType{16, 8})};
+    if (type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword)
+        return {(PrimitiveType{PrimitiveType::Bits})};
 
     return {(PrimitiveType{PrimitiveType::Integer})};
 }

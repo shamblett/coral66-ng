@@ -9,9 +9,15 @@ namespace coral66::semantics
 static bool isNumericType(const Type& t)
 {
     if (auto p = t.tryAs<PrimitiveType>())
-        return p->getKind() == PrimitiveType::Integer || p->getKind() == PrimitiveType::Floating
-               || p->getKind() == PrimitiveType::Bits;
+        return p->getKind() == PrimitiveType::Integer || p->getKind() == PrimitiveType::Floating;
     return t.is<FixedType>();
+}
+
+static bool isBitsType(const Type& t)
+{
+    if (auto p = t.tryAs<PrimitiveType>())
+        return p->getKind() == PrimitiveType::Bits;
+    return false;
 }
 
 static bool isLValue(const syntax::Expression& expr, const SemanticContext& ctx)
@@ -132,9 +138,33 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
     {
         visit(*element.expression);
         if (element.step)
+        {
             visit(*element.step);
+            auto itStep = m_context.expressionTypes.find(element.step.get());
+            if (itStep != m_context.expressionTypes.end() && !itStep->second->is<ErrorType>())
+            {
+                if (!isNumericType(*itStep->second))
+                {
+                    m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
+                        *element.step->begin(), m_context.source, *element.step->begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
+                }
+            }
+        }
         if (element.until)
+        {
             visit(*element.until);
+            auto itUntil = m_context.expressionTypes.find(element.until.get());
+            if (itUntil != m_context.expressionTypes.end() && !itUntil->second->is<ErrorType>())
+            {
+                if (!isNumericType(*itUntil->second))
+                {
+                    m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
+                        *element.until->begin(), m_context.source, *element.until->begin()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
+                }
+            }
+        }
         if (element.whileCondition)
         {
             visit(*element.whileCondition);
@@ -184,7 +214,23 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
 
         if (!lType->is<ErrorType>() && !rType->is<ErrorType>())
         {
-            if (!isNumericType(*lType) || !isNumericType(*rType))
+            bool mismatch = false;
+            
+            if (isBitsType(*lType) && isNumericType(*rType))
+            {
+                auto p = rType->tryAs<PrimitiveType>();
+                if (!p || p->getKind() == PrimitiveType::Floating) mismatch = true;
+            }
+            else if (isBitsType(*rType) && isNumericType(*lType))
+            {
+                auto p = lType->tryAs<PrimitiveType>();
+                if (!p || p->getKind() == PrimitiveType::Floating) mismatch = true;
+            }
+            else if (isBitsType(*lType) && !isBitsType(*rType)) mismatch = true;
+            else if (!isBitsType(*lType) && isBitsType(*rType)) mismatch = true;
+            else if (!isNumericType(*lType) || !isNumericType(*rType)) mismatch = true;
+
+            if (mismatch)
             {
                 m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getVariable().begin(), m_context.source,
                                                                     *node.getVariable().begin()));
@@ -414,6 +460,9 @@ void TypeCheckingPass::visit(const syntax::LiteralExpression& node)
     if (node.getLiteral()->getType() == lexer::CToken::Floating)
         m_context.expressionTypes.insert_or_assign(&node,
                                                    IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
+    else if (node.begin()->getTokenType() == lexer::TokenType::OctalKeyword || node.begin()->getTokenType() == lexer::TokenType::LiteralKeyword)
+        m_context.expressionTypes.insert_or_assign(&node,
+                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Bits}));
     else
         m_context.expressionTypes.insert_or_assign(&node,
                                                    IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
@@ -442,6 +491,12 @@ IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, cons
 
         return {(PrimitiveType{PrimitiveType::Integer})};
     }
+    
+    if (isBitsType(t1) && isBitsType(t2))
+    {
+        return {(PrimitiveType{PrimitiveType::Bits})};
+    }
+    
     return {(ErrorType{})};
 }
 
@@ -455,20 +510,52 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
 
     if (it1 != m_context.expressionTypes.end() && it2 != m_context.expressionTypes.end())
     {
-        auto common = getCommonType(*it1->second, *it2->second);
-        if (common->is<ErrorType>() && !it1->second->is<ErrorType>() && !it2->second->is<ErrorType>())
+        auto type1 = it1->second;
+        auto type2 = it2->second;
+        auto opType = node.getOp()->getTokenType();
+
+        bool isBitwiseOp = (opType == lexer::TokenType::DifferKeyword || opType == lexer::TokenType::UnionKeyword || opType == lexer::TokenType::MaskKeyword);
+        
+        bool operandsValid = true;
+        if (isBitwiseOp)
+        {
+            auto isBitsOrInt = [](const Type& t) {
+                if (isBitsType(t)) return true;
+                if (auto p = t.tryAs<PrimitiveType>()) return p->getKind() != PrimitiveType::Floating;
+                return true; // Consider FIXED as numeric integer
+            };
+            if (!isBitsOrInt(*type1) || !isBitsOrInt(*type2))
+                operandsValid = false;
+        }
+        else
+        {
+            if (isBitsType(*type1) || isBitsType(*type2))
+                operandsValid = false;
+        }
+
+        auto common = getCommonType(*type1, *type2);
+        if (isBitwiseOp)
+        {
+            common = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Bits});
+        }
+        
+        if ((common->is<ErrorType>() || !operandsValid) && !type1->is<ErrorType>() && !type2->is<ErrorType>())
         {
             m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getOp(), m_context.source, *node.getOp()));
             DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
         }
 
-        auto opType = node.getOp()->getTokenType();
         if (opType == lexer::TokenType::LessThan || opType == lexer::TokenType::LessThanOrEqual
             || opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual
             || opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
         {
             m_context.expressionTypes.insert_or_assign(
                 &node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+        }
+        else if (isBitwiseOp)
+        {
+            m_context.expressionTypes.insert_or_assign(
+                &node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Bits}));
         }
         else
         {
@@ -487,6 +574,11 @@ void TypeCheckingPass::visit(const syntax::UnaryExpression& node)
     auto it = m_context.expressionTypes.find(&node.getOperand());
     if (it != m_context.expressionTypes.end())
     {
+        if (!it->second->is<ErrorType>() && !isNumericType(*it->second) && !isBitsType(*it->second))
+        {
+            m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getOp(), m_context.source, *node.getOp()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
+        }
         m_context.expressionTypes.insert_or_assign(&node, it->second);
     }
     else
@@ -781,6 +873,16 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
     // TODO (Control Flow): Verify that fractionBits <= totalBits and ranges are sensible, emitting INVALID_SCALE_FOR_FIXED otherwise.
 
     visit(node.getExpression());
+    auto exprIt = m_context.expressionTypes.find(&node.getExpression());
+    if (exprIt != m_context.expressionTypes.end() && !exprIt->second->is<ErrorType>())
+    {
+        if (!isNumericType(*exprIt->second) && !isBitsType(*exprIt->second))
+        {
+            m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getExpression().begin(), m_context.source,
+                                                                *node.getExpression().begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
+        }
+    }
 
     auto kind = node.getType()->getTokenType();
     if (kind == lexer::TokenType::IntegerKeyword)

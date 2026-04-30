@@ -449,3 +449,74 @@ TEST_CASE("Type Checking - Table Access", "[Semantics][TypeChecking]")
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 }
+
+TEST_CASE("Type Checking - BITS Operations", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid BITS assignment")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 10 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Invalid Floating assignment to BITS")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 10.5 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Valid BITS differ operation")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1 DIFFER 2 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Invalid floating DIFFER")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1.5 DIFFER 2.5 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+}
+
+TEST_CASE("Type Checking - Type Change Wrappers", "[Semantics][TypeChecking]")
+{
+    SECTION("Invalid parameter to type change")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+                             "MYLABEL: I := INTEGER(MYLABEL) END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+}
+
+TEST_CASE("Type Checking - Dummy Test", "[Semantics][TypeChecking]")
+{
+    REQUIRE(true);
+}
+
+TEST_CASE("Type Checking - PartWord Bounds", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid PartWord indices")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1 , 2 ] I END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Floating startBit")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1.5 , 2 ] I END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+
+    SECTION("Invalid Floating width")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1 , 2.5 ] I END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
