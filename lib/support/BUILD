@@ -37,5 +37,5 @@ cc_library(
         "//test:__subpackages__",
         "//tools:__subpackages__",
     ],
-    deps = ["//lib/llvm:llvm-21"],
+    deps = ["//lib/llvm:llvm-22"],
 )
