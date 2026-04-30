@@ -11,9 +11,7 @@
  *
  */
 
-#include <cstdint>
 #include <memory>
-#include <string>
 #include <unordered_set>
 
 #include "lib/support/triple.hpp"
