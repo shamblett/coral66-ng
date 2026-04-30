@@ -265,10 +265,14 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
 
 void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
 {
+    auto baseTypeVal = createTypeFromToken(node.getType());
+    m_context.ownedTypes.push_back(std::move(baseTypeVal));
+    const Type* baseTypePtr = m_context.ownedTypes.back().data();
+
     for (auto id : node.getIdentifiers())
     {
         std::vector<std::uint64_t> dims(node.getDimensions().size(), 0); // Defer exact evaluation
-        auto typeCopy = IntrusiveVariantValue(ArrayType{&untypedType, dims});
+        auto typeCopy = IntrusiveVariantValue(ArrayType{baseTypePtr, dims});
 
         auto declaration = makeIntrusiveVariant<ArrayDeclaration>(id, std::move(typeCopy));
         declaration->setAstNode(&node);

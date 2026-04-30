@@ -615,30 +615,33 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
     if (it != m_context.resolvedIdentifiers.end())
     {
         const Usable* usable = it->second;
+        const ArrayType* arrType = nullptr;
         if (auto* arr = usable->tryAs<ArrayDeclaration>())
         {
-            if (auto arrType = arr->getType().tryAs<ArrayType>())
-            {
-                if (node.getIndices().size() != arrType->getDimensions().size())
-                {
-                    m_context.log(
-                        errors::semantics::INCORRECT_NUMBER_OF_INDICES.args(*node.begin(), m_context.source, *node.begin()));
-                    DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_NUMBER_OF_INDICES);
-                }
+            arrType = arr->getType().tryAs<ArrayType>();
+        }
+        else if (auto* var = usable->tryAs<VariableDeclaration>())
+        {
+            arrType = var->getType().tryAs<ArrayType>();
+        }
 
-                if (auto p = arrType->getElementType().tryAs<PrimitiveType>())
-                {
-                    m_context.expressionTypes.insert_or_assign(
-                        &node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
-                }
-                else
-                {
-                    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(UntypedType{}));
-                }
+        if (arrType)
+        {
+            if (!arrType->getDimensions().empty() && node.getIndices().size() != arrType->getDimensions().size())
+            {
+                m_context.log(
+                    errors::semantics::INCORRECT_NUMBER_OF_INDICES.args(*node.begin(), m_context.source, *node.begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_NUMBER_OF_INDICES);
+            }
+
+            if (auto p = arrType->getElementType().tryAs<PrimitiveType>())
+            {
+                m_context.expressionTypes.insert_or_assign(
+                    &node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
             }
             else
             {
-                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(UntypedType{}));
             }
         }
         else if (auto* tableElement = usable->tryAs<TableElementDeclaration>())

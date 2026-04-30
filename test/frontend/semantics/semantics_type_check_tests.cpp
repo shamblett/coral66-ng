@@ -354,3 +354,98 @@ TEST_CASE("Type Checking - Fixed Type", "[Semantics][TypeChecking]")
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 }
+
+TEST_CASE("Type Checking - Array Indices", "[Semantics][TypeChecking]")
+{
+    SECTION("Incorrect Number of Indices - Too Few")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10, 1:10] ; INTEGER I ; A[I] := 1 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("INCORRECT_NUMBER_OF_INDICES"));
+    }
+
+    SECTION("Incorrect Number of Indices - Too Many")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A[I, I] := 1 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("INCORRECT_NUMBER_OF_INDICES"));
+    }
+
+    SECTION("Anonymous Array Reference")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := [ 1234 ] END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
+        REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
+    }
+}
+
+TEST_CASE("Type Checking - Array Parameter Matching", "[Semantics][TypeChecking]")
+{
+    SECTION("Different Bounds but Same Type")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; "
+                             "PROCEDURE P (INTEGER ARRAY X) ; BEGIN INTEGER I ; I := X[1] END ; "
+                             "P(A) END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+    }
+
+    SECTION("Different Types")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN FLOATING ARRAY A[1:10] ; "
+                             "PROCEDURE P (INTEGER ARRAY X) ; BEGIN INTEGER I ; I := X[1] END ; "
+                             "P(A) END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+    }
+}
+
+TEST_CASE("Type Checking - For Loop Variables", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Numeric Loop Variable")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 STEP 1 UNTIL 10 DO I := I + 1 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("EXPECTED_NUMERIC_TYPE"));
+    }
+
+    SECTION("Invalid Loop Variable - Array")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; FOR A := 1 STEP 1 UNTIL 10 DO A[1] := 1 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("EXPECTED_NUMERIC_TYPE"));
+    }
+}
+
+TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]")
+{
+    SECTION("Passing a Label")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN "
+                             "PROCEDURE P (LABEL L) ; GOTO L ; "
+                             "MYLABEL: P(MYLABEL) END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+    }
+
+    SECTION("Passing a Switch")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN "
+                             "SWITCH S := MYLABEL ; "
+                             "PROCEDURE P (SWITCH SW) ; GOTO SW[1] ; "
+                             "MYLABEL: P(S) END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+    }
+}
+
+TEST_CASE("Type Checking - Table Access", "[Semantics][TypeChecking]")
+{
+    SECTION("Valid Table Element Access")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[2, 2] [ I INTEGER 0, 0 ] ; I[0] := 1 END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+}
