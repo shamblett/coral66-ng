@@ -14,6 +14,26 @@ static bool isNumericType(const Type& t)
     return t.is<FixedType>();
 }
 
+static bool isLValue(const syntax::Expression& expr, const SemanticContext& ctx)
+{
+    if (auto* id = dynamic_cast<const syntax::IdentifierExpression*>(&expr))
+    {
+        auto it = ctx.resolvedIdentifiers.find(id);
+        if (it != ctx.resolvedIdentifiers.end())
+        {
+            const Usable* usable = it->second;
+            return usable->is<VariableDeclaration>() || usable->is<ArrayDeclaration>() ||
+                   usable->is<TableDeclaration>() || usable->is<TableElementDeclaration>();
+        }
+        return false;
+    }
+    if (dynamic_cast<const syntax::ArrayAccessExpression*>(&expr))
+        return true;
+    if (auto* pw = dynamic_cast<const syntax::PartWordExpression*>(&expr))
+        return isLValue(pw->getBase(), ctx);
+    return false;
+}
+
 TypeCheckingPass::TypeCheckingPass(SemanticContext& context) : m_context(context) {}
 
 void TypeCheckingPass::run(const syntax::Program& program)
@@ -139,6 +159,13 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
     visit(node.getVariable());
     visit(node.getExpression());
 
+    if (!isLValue(node.getVariable(), m_context))
+    {
+        m_context.log(errors::semantics::CANNOT_ASSIGN_TO_CONST.args(*node.getVariable().begin(), m_context.source,
+                                                                     *node.getVariable().begin()));
+        DiagnosticCollector::addDiagnostic(errors::semantics::CANNOT_ASSIGN_TO_CONST);
+    }
+
     // Check type compatibility
     auto itL = m_context.expressionTypes.find(&node.getVariable());
     auto itR = m_context.expressionTypes.find(&node.getExpression());
@@ -147,6 +174,13 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
     {
         auto lType = itL->second;
         auto rType = itR->second;
+
+        if (lType->isValue())
+        {
+            m_context.log(errors::semantics::CANNOT_ASSIGN_TO_CONST.args(*node.getVariable().begin(), m_context.source,
+                                                                         *node.getVariable().begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::CANNOT_ASSIGN_TO_CONST);
+        }
 
         if (!lType->is<ErrorType>() && !rType->is<ErrorType>())
         {
@@ -467,6 +501,22 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
     visit(node.getStartBit());
     visit(node.getWidth());
 
+    for (const auto* expr : {&node.getStartBit(), &node.getWidth()})
+    {
+        auto it = m_context.expressionTypes.find(expr);
+        if (it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
+        {
+            auto prim = it->second->tryAs<PrimitiveType>();
+            if (!prim || prim->getKind() != PrimitiveType::Integer)
+            {
+                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
+                                                                            *expr->begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+            }
+        }
+    }
+    // TODO (Control Flow): Verify that startBit + width <= Target Machine Word Size, emitting INVALID_BIT_RANGE otherwise.
+
     m_context.expressionTypes.insert_or_assign(&node,
                                                IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
@@ -474,6 +524,18 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
 void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
 {
     visit(node.getCondition());
+    auto itCond = m_context.expressionTypes.find(&node.getCondition());
+    if (itCond != m_context.expressionTypes.end() && !itCond->second->is<ErrorType>())
+    {
+        auto prim = itCond->second->tryAs<PrimitiveType>();
+        if (!prim || prim->getKind() != PrimitiveType::Integer)
+        {
+            m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
+                                                                        *node.getCondition().begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+        }
+    }
+
     visit(node.getThenBranch());
     visit(node.getElseBranch());
 
@@ -519,6 +581,17 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                     {
                         auto& param = procType->getParameters()[i];
                         auto& arg = node.getArguments()[i];
+                        
+                        if (!param.isValue)
+                        {
+                            if (!isLValue(*arg, m_context))
+                            {
+                                m_context.log(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE.args(
+                                    *arg->begin(), m_context.source, *arg->begin()));
+                                DiagnosticCollector::addDiagnostic(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
+                            }
+                        }
+
                         auto itArg = m_context.expressionTypes.find(arg.get());
                         if (itArg != m_context.expressionTypes.end() && !itArg->second->is<ErrorType>())
                         {
@@ -662,6 +735,13 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
 void TypeCheckingPass::visit(const syntax::LocationExpression& node)
 {
     visit(node.getWordReference());
+    if (!isLValue(node.getWordReference(), m_context))
+    {
+        m_context.log(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE.args(*node.getWordReference().begin(),
+                                                                                 m_context.source,
+                                                                                 *node.getWordReference().begin()));
+        DiagnosticCollector::addDiagnostic(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
+    }
     m_context.expressionTypes.insert_or_assign(&node,
                                                IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
 }
@@ -669,9 +749,37 @@ void TypeCheckingPass::visit(const syntax::LocationExpression& node)
 void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
 {
     if (node.getTotalBits())
+    {
         visit(*node.getTotalBits());
+        auto it = m_context.expressionTypes.find(node.getTotalBits());
+        if (it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
+        {
+            auto prim = it->second->tryAs<PrimitiveType>();
+            if (!prim || prim->getKind() != PrimitiveType::Integer)
+            {
+                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getTotalBits()->begin(), m_context.source,
+                                                                            *node.getTotalBits()->begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+            }
+        }
+    }
     if (node.getFractionBits())
+    {
         visit(*node.getFractionBits());
+        auto it = m_context.expressionTypes.find(node.getFractionBits());
+        if (it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
+        {
+            auto prim = it->second->tryAs<PrimitiveType>();
+            if (!prim || prim->getKind() != PrimitiveType::Integer)
+            {
+                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getFractionBits()->begin(), m_context.source,
+                                                                            *node.getFractionBits()->begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
+            }
+        }
+    }
+    // TODO (Control Flow): Verify that fractionBits <= totalBits and ranges are sensible, emitting INVALID_SCALE_FOR_FIXED otherwise.
+
     visit(node.getExpression());
 
     auto kind = node.getType()->getTokenType();
