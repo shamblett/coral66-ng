@@ -108,7 +108,6 @@ CREATE_ERROR(EXPECTED_NUMERIC_TYPE, "Expected numeric type", Underline<0>);
 CREATE_ERROR(INCORRECT_NUMBER_OF_INDICES, "Incorrect number of indices for array access", Underline<0>);
 CREATE_ERROR(ARRAY_INDEX_OUT_OF_BOUNDS, "Array index out of bounds", Underline<0>);
 CREATE_ERROR(INVALID_ARRAY_BOUNDS, "Invalid array bounds: lower bound must be <= upper bound", Underline<0>);
-CREATE_ERROR(ILLEGAL_BLOCK_JUMP, "Goto statement must not lead from outside into a block", Underline<0>);
 CREATE_ERROR(SWITCH_INDEX_OUT_OF_BOUNDS, "Switch index out of bounds", Underline<0>);
 CREATE_ERROR(INCORRECT_PRESET_COUNT, "Incorrect number of presets for declaration", Underline<0>);
 CREATE_ERROR(TABLE_INVALID_DIMENSIONS, "Table width and length must be strictly positive", Underline<0>);

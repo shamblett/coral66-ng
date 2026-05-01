@@ -8,6 +8,7 @@
 #include "control_flow_pass.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
+#include <iostream>
 
 namespace coral66::semantics
 {
@@ -182,23 +183,11 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
     auto id = node.getLabel();
     const auto& name = std::get<std::string>(id->getValue());
 
-    auto targetDepth = m_context.symbolTable.lookupScopeDepth(name);
-    // Labels from current block are technically at depth currentDepth+1 during statement visit if statement is inside block, 
-    // but we enter scope BEFORE statement visits, so the label declaration was processed in THIS scope.
-    // Since preScan inserts them here, they are found at currentDepth. 
-    if (targetDepth == 0 && m_context.symbolTable.lookupScopeDepth(name) == 0)
-    {
-        // Was not pre-scanned locally, which means its either missing, or we jumped DOWN into a nested block
-        // where it was declared. That is an illegal jump into block.
-        m_context.log(errors::semantics::ILLEGAL_BLOCK_JUMP.args(*id, m_context.source, *id));
-        DiagnosticCollector::addDiagnostic(errors::semantics::ILLEGAL_BLOCK_JUMP);
-    }
-    
     // Gotos into blocks are forbidden. Target label must be at or above our lexical scope.
 
-    if (auto usable = m_context.symbolTable.lookup(name))
+    if (auto usable = m_context.resolvedIdentifiers.find(&node); usable != m_context.resolvedIdentifiers.end())
     {
-        if (auto sw = usable->tryAs<SwitchDeclaration>())
+        if (auto sw = usable->second->tryAs<SwitchDeclaration>())
         {
             if (node.getIndex())
             {
