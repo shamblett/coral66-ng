@@ -156,7 +156,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
         return false;
     };
 
-    if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+    if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword
         || type == lexer::TokenType::FixedKeyword)
     {
         auto typeToken = begin;
@@ -469,7 +469,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         else if (!isPartWord
                                  && (begin->getTokenType() == lexer::TokenType::FloatingKeyword
                                      || begin->getTokenType() == lexer::TokenType::IntegerKeyword
-                                     || begin->getTokenType() == lexer::TokenType::FixedKeyword))
+                                     || begin->getTokenType() == lexer::TokenType::FixedKeyword || begin->getTokenType() == lexer::TokenType::BitsKeyword))
                         {
                             typeToken = begin;
                             begin++;

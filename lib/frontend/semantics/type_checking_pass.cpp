@@ -216,7 +216,11 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
         {
             bool mismatch = false;
             
-            if (isBitsType(*lType) && isNumericType(*rType))
+            if (isBitsType(*lType) && isBitsType(*rType))
+            {
+                // Match
+            }
+            else if (isBitsType(*lType) && isNumericType(*rType))
             {
                 auto p = rType->tryAs<PrimitiveType>();
                 if (!p || p->getKind() == PrimitiveType::Floating) mismatch = true;
@@ -226,9 +230,14 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
                 auto p = lType->tryAs<PrimitiveType>();
                 if (!p || p->getKind() == PrimitiveType::Floating) mismatch = true;
             }
-            else if (isBitsType(*lType) && !isBitsType(*rType)) mismatch = true;
-            else if (!isBitsType(*lType) && isBitsType(*rType)) mismatch = true;
-            else if (!isNumericType(*lType) || !isNumericType(*rType)) mismatch = true;
+            else if (isBitsType(*lType) || isBitsType(*rType))
+            {
+                mismatch = true;
+            }
+            else if (!isNumericType(*lType) || !isNumericType(*rType))
+            {
+                mismatch = true;
+            }
 
             if (mismatch)
             {
