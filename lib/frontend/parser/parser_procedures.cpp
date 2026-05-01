@@ -46,9 +46,11 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 {
                     auto paramTypeToken = begin;
                     begin++;
+
+                    std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> fixedScale;
                     if (nextType == lexer::TokenType::FixedKeyword)
                     {
-                        validateFixedFormat(begin, end, context);
+                        fixedScale = parseFixedFormat(begin, end, context);
                     }
 
                     if (begin != end && begin->getTokenType() == lexer::TokenType::ArrayKeyword)
@@ -77,7 +79,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                         }
                     }
                     parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(
-                        startMode, begin, mode, paramTypeToken, std::move(ids)));
+                        startMode, begin, mode, paramTypeToken, std::move(ids),
+                        std::move(fixedScale.first), std::move(fixedScale.second)));
                 }
                 else if (nextType == lexer::TokenType::Identifier)
                 {

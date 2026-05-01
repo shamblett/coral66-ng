@@ -65,7 +65,9 @@ private:
     void visit(const syntax::LocationExpression& node);
     void visit(const syntax::TypeChangeExpression& node);
 
-    IntrusiveVariantValue<Type> createTypeFromToken(std::optional<lexer::CTokenIterator> token);
+    IntrusiveVariantValue<Type> createTypeFromToken(std::optional<lexer::CTokenIterator> typeToken,
+                                                    const syntax::Expression* fixedTotalBits = nullptr,
+                                                    const syntax::Expression* fixedFractionBits = nullptr);
 };
 
 } // namespace coral66::semantics

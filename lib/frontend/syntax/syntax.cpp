@@ -89,9 +89,14 @@ std::vector<std::unique_ptr<Statement>> Block::takeStatements()
 
 ParameterDeclaration::ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode,
                                            std::optional<lexer::CTokenIterator> type,
-                                           std::vector<lexer::CTokenIterator>&& identifiers)
+                                           std::vector<lexer::CTokenIterator>&& identifiers,
+                                           std::unique_ptr<Expression> fixedTotalBits,
+                                           std::unique_ptr<Expression> fixedFractionBits)
 
-    : Declaration(begin, end), m_mode(mode), m_type(type), m_identifiers(std::move(identifiers))
+    : Declaration(begin, end), m_mode(mode), m_type(type), 
+      m_fixedTotalBits(std::move(fixedTotalBits)),
+      m_fixedFractionBits(std::move(fixedFractionBits)),
+      m_identifiers(std::move(identifiers))
 
 {
 }
@@ -117,10 +122,15 @@ const std::vector<lexer::CTokenIterator>& ParameterDeclaration::getIdentifiers()
 // VariableDeclaration
 VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                          const lexer::CTokenIterator type,
-                                         std::vector<lexer::CTokenIterator>&& identifiers, bool hasPreset,
+                                         std::vector<lexer::CTokenIterator>&& identifiers, 
+                                         std::unique_ptr<Expression> fixedTotalBits,
+                                         std::unique_ptr<Expression> fixedFractionBits,
+                                         bool hasPreset,
                                          std::vector<lexer::CTokenIterator>&& presetTokens)
     : Declaration(begin, end),
       m_type(type),
+      m_fixedTotalBits(std::move(fixedTotalBits)),
+      m_fixedFractionBits(std::move(fixedFractionBits)),
       m_identifiers(std::move(identifiers)),
       m_hasPreset(hasPreset),
       m_presetTokens(std::move(presetTokens))
@@ -181,10 +191,15 @@ const Statement& ProcedureDeclaration::getBody() const
 ArrayDeclaration::ArrayDeclaration(
     const lexer::CTokenIterator begin, const lexer::CTokenIterator end, const lexer::CTokenIterator type,
     std::vector<lexer::CTokenIterator>&& identifiers,
-    std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions, bool hasPreset,
+    std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
+    std::unique_ptr<Expression> fixedTotalBits,
+    std::unique_ptr<Expression> fixedFractionBits,
+    bool hasPreset,
     std::vector<lexer::CTokenIterator>&& presetTokens)
     : Declaration(begin, end),
       m_type(type),
+      m_fixedTotalBits(std::move(fixedTotalBits)),
+      m_fixedFractionBits(std::move(fixedFractionBits)),
       m_identifiers(std::move(identifiers)),
       m_dimensions(std::move(dimensions)),
       m_hasPreset(hasPreset),

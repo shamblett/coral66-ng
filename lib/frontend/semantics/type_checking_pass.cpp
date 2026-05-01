@@ -521,6 +521,14 @@ void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
         }
         else if (auto* proc = usable->tryAs<ProcedureDeclaration>())
         {
+            if (m_currentProcedure && proc->getAstNode() == m_currentProcedure)
+            {
+                if (!m_currentProcedure->isRecursive())
+                {
+                    m_context.log(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE.args(*node.getIdentifier(), m_context.source, *node.getIdentifier()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE);
+                }
+            }
             m_context.expressionTypes.insert_or_assign(&node, proc->getType());
         }
         else if (auto* table = usable->tryAs<TableDeclaration>())
@@ -752,6 +760,14 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
         const Usable* usable = it->second;
         if (auto* proc = usable->tryAs<ProcedureDeclaration>())
         {
+            if (m_currentProcedure && proc->getAstNode() == m_currentProcedure)
+            {
+                if (!m_currentProcedure->isRecursive())
+                {
+                    m_context.log(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE.args(*node.getFunction(), m_context.source, *node.getFunction()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE);
+                }
+            }
             if (auto procType = proc->getType().tryAs<ProcedureType>())
             {
                 // Check argument count

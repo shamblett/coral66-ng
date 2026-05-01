@@ -202,7 +202,9 @@ void SymbolResolutionPass::visit(const syntax::ProcedureCallStatement& node)
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT(*-convert-member-functions-to-static)
-    std::optional<lexer::CTokenIterator> typeToken)                    // NOLINT(*-convert-member-functions-to-static)
+    std::optional<lexer::CTokenIterator> typeToken,
+    const syntax::Expression* fixedTotalBits,
+    const syntax::Expression* fixedFractionBits)                    // NOLINT(*-convert-member-functions-to-static)
 {
     if (!typeToken)
         return {(UntypedType{})};
@@ -211,7 +213,21 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
     if (type == lexer::TokenType::FloatingKeyword)
         return {(PrimitiveType{PrimitiveType::Floating})};
     if (type == lexer::TokenType::FixedKeyword)
-        return {(FixedType{16, 8})};
+    {
+        uint32_t total = 16;
+        uint32_t frac = 8;
+        if (fixedTotalBits)
+        {
+            auto tVal = evaluateConstantInteger(*fixedTotalBits);
+            if (tVal && *tVal > 0) total = static_cast<uint32_t>(*tVal);
+        }
+        if (fixedFractionBits)
+        {
+            auto fVal = evaluateConstantInteger(*fixedFractionBits);
+            if (fVal && *fVal >= 0) frac = static_cast<uint32_t>(*fVal);
+        }
+        return {(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)})};
+    }
     if (type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword)
         return {(PrimitiveType{PrimitiveType::Bits})};
 
@@ -240,15 +256,15 @@ void SymbolResolutionPass::visit(const syntax::Declaration& node)
 
 void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
 {
-    auto type = createTypeFromToken(node.getType());
+    auto type = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
     for (auto id : node.getIdentifiers())
     {
         auto typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer});
         if (type->is<PrimitiveType>())
-            typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
+            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind()});
         else if (type->is<FixedType>())
-            typeCopy = IntrusiveVariantValue(
-                FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
+            typeCopy = IntrusiveVariantValue<Type>(
+                FixedType{static_cast<uint8_t>(type->as<FixedType>().getTotalBits()), static_cast<uint8_t>(type->as<FixedType>().getFractionalBits())});
 
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
         declaration->setAstNode(&node);
@@ -269,7 +285,7 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
 
 void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
 {
-    auto baseTypeVal = createTypeFromToken(node.getType());
+    auto baseTypeVal = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
     m_context.ownedTypes.push_back(std::move(baseTypeVal));
     const Type* baseTypePtr = m_context.ownedTypes.back().data();
 
@@ -374,11 +390,11 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 {
     auto type = createTypeFromToken(node.getType());
     auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); // Default for now
-    if (type->is<PrimitiveType>())
-        typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
-    else if (type->is<FixedType>())
-        typeCopy = IntrusiveVariantValue(
-            FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
+        if (type->is<PrimitiveType>())
+            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind()});
+        else if (type->is<FixedType>())
+            typeCopy = IntrusiveVariantValue<Type>(
+                FixedType{static_cast<uint8_t>(type->as<FixedType>().getTotalBits()), static_cast<uint8_t>(type->as<FixedType>().getFractionalBits())});
 
     std::optional<std::uint32_t> wordPos;
     if (node.getWordPosition())
@@ -484,7 +500,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     {
         if (auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclNode.get()))
         {
-            auto baseTypeVal = createTypeFromToken(paramNode->getType());
+            auto baseTypeVal = createTypeFromToken(paramNode->getType(), paramNode->getFixedTotalBits(), paramNode->getFixedFractionBits());
 
             IntrusiveVariantValue<Type> paramTypeVal{UntypedType{}};
 
@@ -571,10 +587,8 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
         }
     };
 
-    if (node.isRecursive())
-    {
-        registerProcedure();
-    }
+    // Always register before entering scope so it resolves its own calls!
+    registerProcedure();
 
     m_context.symbolTable.enterScope();
     for (const auto& param : node.getParameters())
@@ -584,23 +598,18 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     visit(node.getBody());
     m_context.symbolTable.exitScope();
 
-    if (!node.isRecursive())
-    {
-        registerProcedure();
-    }
-
     m_context.ownedUsables.push_back(std::move(declaration));
 }
 
 void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
 {
-    auto type = createTypeFromToken(node.getType());
+    auto type = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
 
     // We should allocate a base type if we need to point to it (e.g., for Array parameters)
     const Type* baseTypePtr = nullptr;
     if (node.getMode() == syntax::ParameterDeclaration::ParameterMode::Array)
     {
-        m_context.ownedTypes.push_back(createTypeFromToken(node.getType()));
+        m_context.ownedTypes.push_back(createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits()));
         baseTypePtr = m_context.ownedTypes.back().data();
     }
 

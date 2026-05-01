@@ -12,12 +12,19 @@
 void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                           Context& context)
 {
+    parseFixedFormat(begin, end, context);
+}
+
+std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>> coral66::parser::parseFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+                                          Context& context)
+{
+    std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>> result;
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
         auto openParenToken = begin;
         begin++;
-        auto tBits = parseExpression(begin, end, context);
-        if (!tBits || begin == end || begin->getTokenType() != lexer::TokenType::Comma)
+        result.first = parseExpression(begin, end, context);
+        if (!result.first || begin == end || begin->getTokenType() != lexer::TokenType::Comma)
         {
             context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(),
                                                                   *openParenToken));
@@ -30,8 +37,8 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
         else
         {
             begin++;
-            auto fBits = parseExpression(begin, end, context);
-            if (!fBits || begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
+            result.second = parseExpression(begin, end, context);
+            if (!result.second || begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
             {
                 context.log(errors::parser::INVALID_FIXED_FORMAT.args(*openParenToken, context.getSourceInterface(),
                                                                       *openParenToken));
@@ -53,6 +60,7 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
             *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
     }
+    return result;
 }
 
 bool coral66::parser::expectIdentifier(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context,

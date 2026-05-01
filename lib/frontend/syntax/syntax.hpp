@@ -94,32 +94,45 @@ public:
 private:
     ParameterMode m_mode;
     std::optional<lexer::CTokenIterator> m_type;
+    std::unique_ptr<Expression> m_fixedTotalBits;
+    std::unique_ptr<Expression> m_fixedFractionBits;
     std::vector<lexer::CTokenIterator> m_identifiers;
 
 public:
     ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode,
-                         std::optional<lexer::CTokenIterator> type, std::vector<lexer::CTokenIterator>&& identifiers);
+                         std::optional<lexer::CTokenIterator> type, std::vector<lexer::CTokenIterator>&& identifiers,
+                         std::unique_ptr<Expression> fixedTotalBits = nullptr,
+                         std::unique_ptr<Expression> fixedFractionBits = nullptr);
     [[nodiscard]] ParameterMode getMode() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
+    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
+    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
 };
 
 class VariableDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_type; // INTEGER, FLOATING, FIXED
+    std::unique_ptr<Expression> m_fixedTotalBits;
+    std::unique_ptr<Expression> m_fixedFractionBits;
     std::vector<lexer::CTokenIterator> m_identifiers;
     bool m_hasPreset;
     std::vector<lexer::CTokenIterator> m_presetTokens;
 
 public:
     VariableDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
-                        std::vector<lexer::CTokenIterator>&& identifiers, bool hasPreset = false,
+                        std::vector<lexer::CTokenIterator>&& identifiers, 
+                        std::unique_ptr<Expression> fixedTotalBits = nullptr,
+                        std::unique_ptr<Expression> fixedFractionBits = nullptr,
+                        bool hasPreset = false,
                         std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
     [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
     void setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens);
+    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
+    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
 };
 
 class ProcedureDeclaration final : public Declaration
@@ -150,6 +163,8 @@ public:
 class ArrayDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_type;
+    std::unique_ptr<Expression> m_fixedTotalBits;
+    std::unique_ptr<Expression> m_fixedFractionBits;
     std::vector<lexer::CTokenIterator> m_identifiers;
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>> m_dimensions;
     bool m_hasPreset;
@@ -159,6 +174,8 @@ public:
     ArrayDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
                      std::vector<lexer::CTokenIterator>&& identifiers,
                      std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
+                     std::unique_ptr<Expression> fixedTotalBits = nullptr,
+                     std::unique_ptr<Expression> fixedFractionBits = nullptr,
                      bool hasPreset = false, std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
@@ -167,6 +184,8 @@ public:
     [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
     void setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens);
+    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
+    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
 };
 
 class TableElementDeclaration final : public Declaration

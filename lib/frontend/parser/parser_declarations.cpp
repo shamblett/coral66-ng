@@ -162,9 +162,10 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
         auto typeToken = begin;
         begin++;
 
+        std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> fixedScale;
         if (type == lexer::TokenType::FixedKeyword)
         {
-            validateFixedFormat(begin, end, context);
+            fixedScale = parseFixedFormat(begin, end, context);
         }
 
         if (begin != end && begin->getTokenType() == lexer::TokenType::ArrayKeyword)
@@ -252,7 +253,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
 
                 result.push_back(std::make_unique<syntax::ArrayDeclaration>(typeToken, begin, typeToken, std::move(ids),
-                                                                            std::move(dims)));
+                                                                            std::move(dims), 
+                                                                            std::move(fixedScale.first), 
+                                                                            std::move(fixedScale.second)));
 
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 {
@@ -289,7 +292,8 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
             }
             if (!identifiers.empty())
                 result.push_back(
-                    std::make_unique<syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers)));
+                    std::make_unique<syntax::VariableDeclaration>(typeToken, begin, typeToken, std::move(identifiers),
+                                                                  std::move(fixedScale.first), std::move(fixedScale.second)));
         }
 
         std::vector<lexer::CTokenIterator> presetTokens;

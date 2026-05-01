@@ -520,3 +520,20 @@ TEST_CASE("Type Checking - PartWord Bounds", "[Semantics][TypeChecking]")
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 }
+
+TEST_CASE("Type Checking - Recursive Validations", "[Semantics][TypeCheck]")
+{
+    SECTION("Procedure calls itself without RECURSIVE")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN P ; END ; END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(res.hasDiagnostic("RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE"));
+    }
+    
+    SECTION("Procedure calls itself with RECURSIVE")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN RECURSIVE PROCEDURE P ; BEGIN P ; END ; END");
+        TypeCheckingResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE"));
+    }
+}
