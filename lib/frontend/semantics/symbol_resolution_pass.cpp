@@ -388,7 +388,7 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
 
 void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 {
-    auto type = createTypeFromToken(node.getType());
+    auto type = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
     auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); // Default for now
         if (type->is<PrimitiveType>())
             typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind()});

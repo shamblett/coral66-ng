@@ -192,6 +192,8 @@ class TableElementDeclaration final : public Declaration
 {
     lexer::CTokenIterator m_identifier;
     std::optional<lexer::CTokenIterator> m_type; // integer, floating, fixed (can be nullopt if just a bitfield)
+    std::unique_ptr<Expression> m_fixedTotalBits;
+    std::unique_ptr<Expression> m_fixedFractionBits;
     bool m_unsigned;
     std::optional<lexer::CTokenIterator> m_wordPosition;
     std::optional<lexer::CTokenIterator> m_bitPosition;
@@ -200,12 +202,16 @@ public:
     TableElementDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
                             std::optional<lexer::CTokenIterator> type, bool isUnsigned,
                             std::optional<lexer::CTokenIterator> wordPosition,
-                            std::optional<lexer::CTokenIterator> bitPosition);
+                            std::optional<lexer::CTokenIterator> bitPosition,
+                            std::unique_ptr<Expression> fixedTotalBits = nullptr,
+                            std::unique_ptr<Expression> fixedFractionBits = nullptr);
     [[nodiscard]] lexer::CTokenIterator getIdentifier() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
     [[nodiscard]] bool isUnsigned() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getWordPosition() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getBitPosition() const;
+    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
+    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
 };
 
 class TableDeclaration final : public Declaration

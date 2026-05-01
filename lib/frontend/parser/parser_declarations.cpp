@@ -455,6 +455,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
                         std::optional<lexer::CTokenIterator> wordPosition = std::nullopt;
                         std::optional<lexer::CTokenIterator> bitPosition = std::nullopt;
+                        std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> fixedScale;
 
                         if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
                         {
@@ -479,7 +480,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                             begin++;
                             if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword)
                             {
-                                validateFixedFormat(begin, end, context);
+                                fixedScale = parseFixedFormat(begin, end, context);
                             }
                         }
                         else if (!isPartWord)
@@ -523,7 +524,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         }
 
                         elements.push_back(std::make_unique<syntax::TableElementDeclaration>(
-                            elemStart, begin, elemId, typeToken, isUnsigned, wordPosition, bitPosition));
+                            elemStart, begin, elemId, typeToken, isUnsigned, wordPosition, bitPosition, std::move(fixedScale.first), std::move(fixedScale.second)));
 
                         if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
                         {

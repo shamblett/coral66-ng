@@ -82,7 +82,7 @@ TEST_CASE("Symbol Resolution - Basic Declarations", "[Semantics][SymbolResolutio
 
     SECTION("Different Type Declarations")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FLOATING F ; FIXED (16,8) X ; END");
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FLOATING F ; FIXED (20,12) X ; END");
         SymbolResolutionResult res(parsed);
 
         auto iDeclaration = findDeclaration(res.context, "I");
@@ -98,6 +98,8 @@ TEST_CASE("Symbol Resolution - Basic Declarations", "[Semantics][SymbolResolutio
         auto xDeclaration = findDeclaration(res.context, "X");
         REQUIRE(xDeclaration != nullptr);
         REQUIRE(xDeclaration->as<semantics::VariableDeclaration>().getType().is<FixedType>());
+        CHECK(xDeclaration->as<semantics::VariableDeclaration>().getType().as<FixedType>().getTotalBits() == 20);
+        CHECK(xDeclaration->as<semantics::VariableDeclaration>().getType().as<FixedType>().getFractionalBits() == 12);
     }
 }
 
@@ -231,7 +233,7 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
     SECTION("Table Element Properties (Part-Word)")
     {
         ParsedProgram parsed(
-            "PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x UNSIGNED (10) 0, 5 ; y FIXED(16,8) 1; z (4) 2, 10 ] ; END");
+            "PROGRAM TEST COMMON() BEGIN TABLE t[1, 10] [ x UNSIGNED (10) 0, 5 ; y FIXED(22,11) 1; z (4) 2, 10 ] ; END");
         SymbolResolutionResult res(parsed);
         CHECK(res.errors == false);
 
@@ -269,6 +271,8 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         CHECK(yDecl.getWordPosition().value() == 1);
         CHECK(yDecl.getBitPosition().has_value() == false);
         CHECK(yDecl.getType().is<FixedType>());
+        CHECK(yDecl.getType().as<FixedType>().getTotalBits() == 22);
+        CHECK(yDecl.getType().as<FixedType>().getFractionalBits() == 11);
 
         REQUIRE(zUsable != nullptr);
         auto& zDecl = zUsable->as<semantics::TableElementDeclaration>();

@@ -239,10 +239,14 @@ TableElementDeclaration::TableElementDeclaration(const lexer::CTokenIterator beg
                                                  const lexer::CTokenIterator identifier,
                                                  std::optional<lexer::CTokenIterator> type, bool isUnsigned,
                                                  std::optional<lexer::CTokenIterator> wordPosition,
-                                                 std::optional<lexer::CTokenIterator> bitPosition)
+                                                 std::optional<lexer::CTokenIterator> bitPosition,
+                                                 std::unique_ptr<Expression> fixedTotalBits,
+                                                 std::unique_ptr<Expression> fixedFractionBits)
     : Declaration(begin, end),
       m_identifier(identifier),
       m_type(type),
+      m_fixedTotalBits(std::move(fixedTotalBits)),
+      m_fixedFractionBits(std::move(fixedFractionBits)),
       m_unsigned(isUnsigned),
       m_wordPosition(wordPosition),
       m_bitPosition(bitPosition)
