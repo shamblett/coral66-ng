@@ -1,3 +1,4 @@
+#include "semantic_utilities.hpp"
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
@@ -18,60 +19,6 @@ void ControlFlowPass::run(const syntax::Program& program)
     visit(program);
 }
 
-std::optional<std::int64_t> ControlFlowPass::evaluateConstantInteger(const syntax::Expression& expr)
-{
-    if (auto* lit = dynamic_cast<const syntax::LiteralExpression*>(&expr))
-    {
-        if (lit->getLiteral()->getType() == lexer::CToken::Integer
-            || lit->getLiteral()->getType() == lexer::CToken::Floating)
-        {
-            if (auto* intVal = std::get_if<llvm::APSInt>(&lit->getLiteral()->getValue()))
-            {
-                return intVal->getExtValue();
-            }
-        }
-        if (lit->begin()->getTokenType() == lexer::TokenType::OctalKeyword)
-        {
-            if (auto* intVal = std::get_if<llvm::APSInt>(&lit->getLiteral()->getValue()))
-                return intVal->getExtValue();
-        }
-    }
-    else if (auto* unary = dynamic_cast<const syntax::UnaryExpression*>(&expr))
-    {
-        auto opType = unary->getOp()->getTokenType();
-        if (opType == lexer::TokenType::Plus || opType == lexer::TokenType::Minus)
-        {
-            auto val = evaluateConstantInteger(unary->getOperand());
-            if (val)
-            {
-                if (opType == lexer::TokenType::Minus)
-                    return -(*val);
-                return *val;
-            }
-        }
-    }
-    else if (auto* binary = dynamic_cast<const syntax::BinaryExpression*>(&expr))
-    {
-        auto left = evaluateConstantInteger(binary->getLeft());
-        auto right = evaluateConstantInteger(binary->getRight());
-        if (left && right)
-        {
-            auto opType = binary->getOp()->getTokenType();
-            if (opType == lexer::TokenType::Plus)
-                return (*left) + (*right);
-            if (opType == lexer::TokenType::Minus)
-                return (*left) - (*right);
-            if (opType == lexer::TokenType::Asterisk)
-                return (*left) * (*right);
-            if (opType == lexer::TokenType::Division)
-            {
-                if (*right != 0)
-                    return (*left) / (*right);
-            }
-        }
-    }
-    return std::nullopt;
-}
 
 void ControlFlowPass::visit(const syntax::Program& node)
 {
@@ -91,6 +38,57 @@ void ControlFlowPass::visit(const syntax::Declaration& node)
 {
     if (auto* proc = dynamic_cast<const syntax::ProcedureDeclaration*>(&node))
         visit(*proc);
+    else if (auto* arr = dynamic_cast<const syntax::ArrayDeclaration*>(&node))
+        visit(*arr);
+    else if (auto* tab = dynamic_cast<const syntax::TableDeclaration*>(&node))
+        visit(*tab);
+}
+
+void ControlFlowPass::visit(const syntax::ArrayDeclaration& node)
+{
+    for (const auto& d : node.getDimensions())
+    {
+        auto lower = evaluateConstantInteger(*d.first);
+        auto upper = evaluateConstantInteger(*d.second);
+
+        if (lower && upper)
+        {
+            if (*lower > *upper)
+            {
+                m_context.log(
+                    errors::semantics::INVALID_ARRAY_BOUNDS.args(*node.begin(), m_context.source, *node.begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::INVALID_ARRAY_BOUNDS);
+            }
+        }
+    }
+}
+
+void ControlFlowPass::visit(const syntax::TableDeclaration& node)
+{
+    if (node.getWidth())
+    {
+        if (auto width = evaluateConstantInteger(*node.getWidth()))
+        {
+            if (*width <= 0)
+            {
+                m_context.log(
+                    errors::semantics::TABLE_INVALID_DIMENSIONS.args(*node.begin(), m_context.source, *node.begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::TABLE_INVALID_DIMENSIONS);
+            }
+        }
+    }
+    if (node.getLength())
+    {
+        if (auto length = evaluateConstantInteger(*node.getLength()))
+        {
+            if (*length <= 0)
+            {
+                m_context.log(
+                    errors::semantics::TABLE_INVALID_DIMENSIONS.args(*node.begin(), m_context.source, *node.begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::TABLE_INVALID_DIMENSIONS);
+            }
+        }
+    }
 }
 
 void ControlFlowPass::visit(const syntax::ProcedureDeclaration& node)
@@ -180,6 +178,42 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
 {
     if (node.getIndex())
         visit(*node.getIndex());
+
+    auto id = node.getLabel();
+    const auto& name = std::get<std::string>(id->getValue());
+
+    auto targetDepth = m_context.symbolTable.lookupScopeDepth(name);
+    // Labels from current block are technically at depth currentDepth+1 during statement visit if statement is inside block, 
+    // but we enter scope BEFORE statement visits, so the label declaration was processed in THIS scope.
+    // Since preScan inserts them here, they are found at currentDepth. 
+    if (targetDepth == 0 && m_context.symbolTable.lookupScopeDepth(name) == 0)
+    {
+        // Was not pre-scanned locally, which means its either missing, or we jumped DOWN into a nested block
+        // where it was declared. That is an illegal jump into block.
+        m_context.log(errors::semantics::ILLEGAL_BLOCK_JUMP.args(*id, m_context.source, *id));
+        DiagnosticCollector::addDiagnostic(errors::semantics::ILLEGAL_BLOCK_JUMP);
+    }
+    
+    // Gotos into blocks are forbidden. Target label must be at or above our lexical scope.
+
+    if (auto usable = m_context.symbolTable.lookup(name))
+    {
+        if (auto sw = usable->tryAs<SwitchDeclaration>())
+        {
+            if (node.getIndex())
+            {
+                if (auto constIdx = evaluateConstantInteger(*node.getIndex()))
+                {
+                    // Coral 66 switch indices are 1-based
+                    if (*constIdx < 1 || *constIdx > static_cast<std::int64_t>(sw->getLabels().size()))
+                    {
+                         m_context.log(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS.args(*node.getIndex()->begin(), m_context.source, *node.getIndex()->begin()));
+                         DiagnosticCollector::addDiagnostic(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void ControlFlowPass::visit(const syntax::AnswerStatement& node)

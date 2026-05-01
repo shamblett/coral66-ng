@@ -92,6 +92,13 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
         REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
+    SECTION("Array Declaration Bounds Cross-Over")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[10:1] ; END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("INVALID_ARRAY_BOUNDS"));
+    }
+
     SECTION("Multi-Dimensional Array Access Valid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:5, -5:5] ; INTEGER I ; I := A[3, 0] END");
@@ -205,5 +212,46 @@ TEST_CASE("Control Flow - Answer Statement", "[Semantics][ControlFlow]")
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
+    }
+}
+
+TEST_CASE("Control Flow - Block Jumps", "[Semantics][ControlFlow]")
+{
+    SECTION("Valid Jump Out of Block")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN LABEL: BEGIN GOTO LABEL END END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("ILLEGAL_BLOCK_JUMP"));
+    }
+
+    SECTION("Invalid Jump Into Block")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO MYLABEL ; BEGIN INTEGER J ; MYLABEL: I := 1 ; END ; END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("ILLEGAL_BLOCK_JUMP"));
+    }
+}
+
+TEST_CASE("Control Flow - Switch & Presets", "[Semantics][ControlFlow]")
+{
+    SECTION("Switch bounds constant evaluation valid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[1] ; END ; END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Switch bounds constant evaluation too small")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ; END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Switch bounds constant evaluation too large")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ; END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     }
 }

@@ -342,6 +342,49 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
             }
         }
     }
+
+    if (node.hasPreset())
+    {
+        std::uint64_t totalElements = 1;
+        auto id = node.getIdentifiers().front();
+        const auto& name = std::get<std::string>(id->getValue());
+        if (auto usable = m_context.symbolTable.lookupInCurrentScope(name))
+        {
+            if (auto* decl = usable->tryAs<ArrayDeclaration>())
+            {
+                if (auto* arrType = decl->getType().tryAs<ArrayType>())
+                {
+                    for (auto dimSize : arrType->getDimensions())
+                    {
+                        totalElements *= dimSize;
+                    }
+                }
+            }
+        }
+        
+        // Count comma separated preset items
+        std::uint64_t presetCount = 0;
+        bool inPreset = false;
+        for (auto token : node.getPresetTokens())
+        {
+             if (token->getTokenType() == lexer::TokenType::Comma)
+             {
+                 if (inPreset) presetCount++;
+                 inPreset = false;
+             }
+             else
+             {
+                 inPreset = true;
+             }
+        }
+        if (inPreset) presetCount++;
+
+        if (presetCount > totalElements)
+        {
+            m_context.log(errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_PRESET_COUNT);
+        }
+    }
 }
 
 void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
@@ -368,6 +411,50 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
     for (const auto& element : node.getElements())
     {
         visit(*element);
+    }
+
+    if (node.hasPreset())
+    {
+        std::uint64_t totalElements = 1;
+        auto id = node.getIdentifier();
+        const auto& name = std::get<std::string>(id->getValue());
+        if (auto usable = m_context.symbolTable.lookupInCurrentScope(name))
+        {
+            if (auto* decl = usable->tryAs<TableDeclaration>())
+            {
+                if (auto* tableType = decl->getType().tryAs<TableType>())
+                {
+                    if (auto* def = std::get_if<TableDefinition>(&tableType->getInfo().type))
+                    {
+                        totalElements = def->getLength();
+                        // A table preset list provides one preset per word, so it's length * width
+                        totalElements *= def->getWidth(); 
+                    }
+                }
+            }
+        }
+        
+        std::uint64_t presetCount = 0;
+        bool inPreset = false;
+        for (auto token : node.getPresetTokens())
+        {
+             if (token->getTokenType() == lexer::TokenType::Comma)
+             {
+                 if (inPreset) presetCount++;
+                 inPreset = false;
+             }
+             else
+             {
+                 inPreset = true;
+             }
+        }
+        if (inPreset) presetCount++;
+
+        if (presetCount > totalElements)
+        {
+            m_context.log(errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_PRESET_COUNT);
+        }
     }
 }
 

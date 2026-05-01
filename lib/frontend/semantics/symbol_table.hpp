@@ -32,6 +32,7 @@ public:
     bool insert(std::string_view name, const Usable* symbol);
     [[nodiscard]] const Usable* lookup(std::string_view name) const;
     [[nodiscard]] const Usable* lookupInCurrentScope(std::string_view name) const;
+    [[nodiscard]] int lookupScopeDepth(std::string_view name) const;
     [[nodiscard]] int scopeCount() const;
 };
 

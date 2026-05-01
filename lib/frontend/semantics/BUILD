@@ -8,6 +8,7 @@ cc_library(
     name = "semantics",
     srcs = [
         "control_flow_pass.cpp",
+        "evaluate_constant.cpp",
         "program.cpp",
         "program_interface.cpp",
         "semantic_context.cpp",

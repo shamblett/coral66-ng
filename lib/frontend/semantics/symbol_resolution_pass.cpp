@@ -1,3 +1,4 @@
+#include "control_flow_pass.hpp"
 #include "lib/frontend/common/diagnostic_collection.hpp"
 /*
  * Project: coral66
@@ -11,6 +12,7 @@
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
 #include "symbol_resolution_pass.hpp"
+#include "semantic_utilities.hpp"
 
 namespace coral66::semantics
 {
@@ -271,9 +273,30 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
     m_context.ownedTypes.push_back(std::move(baseTypeVal));
     const Type* baseTypePtr = m_context.ownedTypes.back().data();
 
+    std::vector<std::uint64_t> dims;
+    for (const auto& d : node.getDimensions())
+    {
+        auto lower = evaluateConstantInteger(*d.first);
+        auto upper = evaluateConstantInteger(*d.second);
+        if (lower && upper)
+        {
+            if (*lower <= *upper)
+            {
+                dims.push_back(static_cast<std::uint64_t>(*upper - *lower + 1));
+            }
+            else
+            {
+                dims.push_back(0); // Handled by Control Flow validation
+            }
+        }
+        else
+        {
+            dims.push_back(0);
+        }
+    }
+
     for (auto id : node.getIdentifiers())
     {
-        std::vector<std::uint64_t> dims(node.getDimensions().size(), 0); // Defer exact evaluation
         auto typeCopy = IntrusiveVariantValue(ArrayType{baseTypePtr, dims});
 
         auto declaration = makeIntrusiveVariant<ArrayDeclaration>(id, std::move(typeCopy));
@@ -311,7 +334,18 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
 
     auto id = node.getIdentifier();
 
-    m_context.ownedTableInfos.push_back(TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, 0, 0}});
+    std::uint64_t widthVal = 0;
+    std::uint64_t lengthVal = 0;
+    if (node.getWidth())
+    {
+        if (auto w = evaluateConstantInteger(*node.getWidth())) widthVal = static_cast<std::uint64_t>(*w);
+    }
+    if (node.getLength())
+    {
+        if (auto l = evaluateConstantInteger(*node.getLength())) lengthVal = static_cast<std::uint64_t>(*l);
+    }
+
+    m_context.ownedTableInfos.push_back(TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, widthVal, lengthVal}});
 
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
@@ -381,6 +415,8 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
 {
     auto id = node.getIdentifier();
+    
+    std::vector<const LabelStatement*> switchLabels;
 
     for (const auto& labelToken : node.getLabels())
     {
@@ -396,9 +432,15 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
             m_context.log(errors::semantics::LABEL_NOT_FOUND_N.args(*labelToken, m_context.source, *labelToken));
             DiagnosticCollector::addDiagnostic(errors::semantics::LABEL_NOT_FOUND_N);
         }
+        else
+        {
+             // We cast the usable directly; true node links are handled if we needed them, but we only strictly need size later
+             switchLabels.push_back(nullptr); 
+        }
     }
 
-    auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::vector<const LabelStatement*>{});
+    // We store the array of nullptrs just so the size() correctly evaluates to the length of the switch later on
+    auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::move(switchLabels));
     const auto& name = std::get<std::string>(id->getValue());
 
     if (m_context.symbolTable.lookupInCurrentScope(name))

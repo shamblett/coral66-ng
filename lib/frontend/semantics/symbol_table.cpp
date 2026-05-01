@@ -57,6 +57,20 @@ const Usable* SymbolTable::lookup(const std::string_view name) const
     return nullptr;
 }
 
+int SymbolTable::lookupScopeDepth(const std::string_view name) const
+{
+    int depth = m_scopes.size();
+    for (const auto& m_scope : std::views::reverse(m_scopes))
+    {
+        if (auto found = m_scope.find(name); found != m_scope.end())
+        {
+            return depth;
+        }
+        depth--;
+    }
+    return 0;
+}
+
 const Usable* SymbolTable::lookupInCurrentScope(const std::string_view name) const
 {
     if (m_scopes.empty())
