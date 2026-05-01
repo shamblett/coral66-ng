@@ -1,4 +1,3 @@
-#include <iostream>
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
@@ -249,7 +248,6 @@ void ControlFlowPass::visit(const syntax::TypeChangeExpression& node)
 
         if (total && frac)
         {
-            std::cout << "total=" << *total << " frac=" << *frac << "\n";
             if (*total <= 0 || *frac < 0 || *frac > *total)
             {
                 m_context.log(

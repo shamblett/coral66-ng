@@ -64,9 +64,58 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
         REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
+    SECTION("Array Access Evaluated Bound Valid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[1 + 4] END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Array Access Evaluated Bound Invalid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[5 + 6] END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Array Declaration Evaluated Bounds Valid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1+1 : 3*3] ; INTEGER I ; I := A[9] END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Array Declaration Evaluated Bounds Invalid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1+1 : 3*3] ; INTEGER I ; I := A[10] END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Multi-Dimensional Array Access Valid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:5, -5:5] ; INTEGER I ; I := A[3, 0] END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Multi-Dimensional Array Access Invalid")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:5, -5:5] ; INTEGER I ; I := A[3, -6] END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+    }
+
     SECTION("Valid Part Word Bounds")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 10 , 5 ] I END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("INVALID_BIT_RANGE"));
+    }
+
+    SECTION("Valid Part Word Bounds Evaluated")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 5 * 2 , 10 / 2 ] I END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
@@ -78,9 +127,16 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
         REQUIRE(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
-    SECTION("Invalid Part Word Range (Negative)")
+    SECTION("Invalid Part Word Range (Negative Start)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ -1 , 5 ] I END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("INVALID_BIT_RANGE"));
+    }
+
+    SECTION("Invalid Part Word Range (Negative Width)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 5 , -1 ] I END");
         ControlFlowResult res(parsed);
         REQUIRE(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
@@ -105,6 +161,20 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
         ControlFlowResult res(parsed);
         REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
     }
+
+    SECTION("Invalid Fixed Scaling (Zero Total)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( 0 , 0 ) ( I ) END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+    }
+
+    SECTION("Invalid Fixed Scaling (Negative Fraction)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( 16 , -2 ) ( I ) END");
+        ControlFlowResult res(parsed);
+        REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+    }
 }
 
 TEST_CASE("Control Flow - Answer Statement", "[Semantics][ControlFlow]")
@@ -112,6 +182,13 @@ TEST_CASE("Control Flow - Answer Statement", "[Semantics][ControlFlow]")
     SECTION("Typed Procedure with Answer")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; P END");
+        ControlFlowResult res(parsed);
+        REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
+    }
+
+    SECTION("Typed Procedure with deeply nested Answer")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN BEGIN ANSWER 1 END ; END ; P END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
