@@ -6,6 +6,7 @@
 
 #include "semantics.hpp"
 
+#include "control_flow_pass.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "semantic_context.hpp"
 #include "symbol_resolution_pass.hpp"
@@ -199,6 +200,9 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
 
     TypeCheckingPass typePass(context);
     typePass.run(parseTree);
+
+    ControlFlowPass cfPass(context);
+    cfPass.run(parseTree);
 
     std::vector<lexer::CToken> syntheticTokens;
     std::vector<IntrVarPtr<Usable>> globals;

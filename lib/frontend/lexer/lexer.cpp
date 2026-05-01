@@ -90,10 +90,9 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
                 llvm::UTF32 result;
                 const auto* start = iter;
                 llvm::UTF32* targetStart = &result;
-                auto convRes = llvm::ConvertUTF8toUTF32(
-                    reinterpret_cast<const llvm::UTF8**>(&start),
-                    reinterpret_cast<const llvm::UTF8*>(end),
-                    &targetStart, targetStart + 1, llvm::strictConversion);
+                auto convRes = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
+                                                        reinterpret_cast<const llvm::UTF8*>(end), &targetStart,
+                                                        targetStart + 1, llvm::strictConversion);
 
                 if (convRes != llvm::conversionOK && convRes != llvm::targetExhausted)
                 {
@@ -362,7 +361,7 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
     // For now, let's make it 64-bit signed APSInt
     if (value.getBitWidth() < 64)
     {
-        value = value.sextOrTrunc(64);
+        value = value.zextOrTrunc(64);
     }
     return {{llvm::APSInt(value, false), CToken::Integer}};
 }

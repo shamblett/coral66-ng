@@ -616,7 +616,6 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
             }
         }
     }
-    // TODO (Control Flow): Verify that startBit + width <= Target Machine Word Size, emitting INVALID_BIT_RANGE otherwise.
 
     m_context.expressionTypes.insert_or_assign(&node,
                                                IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
@@ -879,7 +878,6 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
             }
         }
     }
-    // TODO (Control Flow): Verify that fractionBits <= totalBits and ranges are sensible, emitting INVALID_SCALE_FOR_FIXED otherwise.
 
     visit(node.getExpression());
     auto exprIt = m_context.expressionTypes.find(&node.getExpression());

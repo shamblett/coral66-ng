@@ -106,6 +106,7 @@ CREATE_ERROR(EXPECTED_INTEGER_TYPE, "Expected INTEGER type", Underline<0>);
 CREATE_ERROR(EXPECTED_FLOATING_TYPE, "Expected FLOATING type", Underline<0>);
 CREATE_ERROR(EXPECTED_NUMERIC_TYPE, "Expected numeric type", Underline<0>);
 CREATE_ERROR(INCORRECT_NUMBER_OF_INDICES, "Incorrect number of indices for array access", Underline<0>);
+CREATE_ERROR(ARRAY_INDEX_OUT_OF_BOUNDS, "Array index out of bounds", Underline<0>);
 CREATE_ERROR(CANNOT_ASSIGN_TO_CONST, "Cannot assign to constant or value parameter", Underline<0>);
 CREATE_ERROR(TABLE_ELEMENT_NOT_FOUND_N, "Element %0 not found in table", Underline<0>);
 CREATE_ERROR(INVALID_BIT_RANGE, "Invalid bit range specified", Underline<0>);
