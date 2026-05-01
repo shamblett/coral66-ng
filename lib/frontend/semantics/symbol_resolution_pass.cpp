@@ -467,8 +467,16 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
                     paramTypeVal = IntrusiveVariantValue<Type>(SwitchType{});
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Procedure:
-                    paramTypeVal = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
+                {
+                    const Type* procReturnType = nullptr;
+                    if (paramNode->getType())
+                    {
+                        m_context.ownedTypes.push_back(std::move(baseTypeVal));
+                        procReturnType = m_context.ownedTypes.back().data();
+                    }
+                    paramTypeVal = IntrusiveVariantValue<Type>(ProcedureType{procReturnType, {}});
                     break;
+                }
                 case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
                     paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
                     isValue = true;
@@ -587,8 +595,16 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
                 typeCopy = IntrusiveVariantValue<Type>(SwitchType{});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Procedure:
-                typeCopy = IntrusiveVariantValue<Type>(ProcedureType{nullptr, {}});
+            {
+                const Type* procReturnType = nullptr;
+                if (node.getType())
+                {
+                    m_context.ownedTypes.push_back(createTypeFromToken(node.getType()));
+                    procReturnType = m_context.ownedTypes.back().data();
+                }
+                typeCopy = IntrusiveVariantValue<Type>(ProcedureType{procReturnType, {}});
                 break;
+            }
             case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
                 typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
                 break;
