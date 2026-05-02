@@ -88,7 +88,7 @@ class TableDefinition
     std::uint64_t m_length;
 
 public:
-    explicit TableDefinition(std::vector<Field> fields, std::uint64_t width, std::uint64_t length)
+    explicit TableDefinition(std::vector<Field> fields, const std::uint64_t width, const std::uint64_t length)
         : m_fields(std::move(fields)), m_width(width), m_length(length)
     {
     }
@@ -197,7 +197,8 @@ private:
     lexer::CTokenIterator m_end;
 
 public:
-    Constant(IntrusiveVariantValue<Type> type, Variant value, lexer::CTokenIterator begin, lexer::CTokenIterator end)
+    Constant(IntrusiveVariantValue<Type> type, Variant value, const lexer::CTokenIterator begin,
+             const lexer::CTokenIterator end)
         : ExpressionBase(std::in_place_type<Constant>, std::move(type), ValueCategory::Rvalue),
           m_value(std::move(value)),
           m_begin(begin),
@@ -228,7 +229,7 @@ class DeclarationRead final : public ExpressionBase
     lexer::CTokenIterator m_identifierToken;
 
 public:
-    DeclarationRead(IntrusiveVariantValue<Type> type, const Usable& usable, lexer::CTokenIterator identifierToken)
+    DeclarationRead(IntrusiveVariantValue<Type> type, const Usable& usable, const lexer::CTokenIterator identifierToken)
         : ExpressionBase(std::in_place_type<DeclarationRead>, std::move(type), ValueCategory::Lvalue),
           m_declarationRead(&usable),
           m_identifierToken(identifierToken)
@@ -277,8 +278,8 @@ private:
     IntrVarPtr<ExpressionBase> m_rightOperand;
 
 public:
-    BinaryOperator(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& left, Kind kind,
-                   lexer::CTokenIterator opToken, IntrVarPtr<ExpressionBase>&& right)
+    BinaryOperator(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& left, const Kind kind,
+                   const lexer::CTokenIterator opToken, IntrVarPtr<ExpressionBase>&& right)
         : ExpressionBase(std::in_place_type<BinaryOperator>, std::move(type), ValueCategory::Rvalue),
           m_leftOperand(std::move(left)),
           m_kind(kind),
@@ -320,7 +321,7 @@ private:
     IntrVarPtr<ExpressionBase> m_operand;
 
 public:
-    UnaryOperator(IntrusiveVariantValue<Type> type, Kind kind, lexer::CTokenIterator opToken,
+    UnaryOperator(IntrusiveVariantValue<Type> type, const Kind kind, const lexer::CTokenIterator opToken,
                   IntrVarPtr<ExpressionBase>&& operand)
         : ExpressionBase(std::in_place_type<UnaryOperator>, std::move(type), ValueCategory::Rvalue),
           m_kind(kind),
@@ -351,8 +352,8 @@ class PartWordAccess final : public ExpressionBase
     lexer::CTokenIterator m_end;
 
 public:
-    PartWordAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& base, std::uint32_t start,
-                   std::uint32_t width, lexer::CTokenIterator beginLoc, lexer::CTokenIterator endLoc)
+    PartWordAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& base, const std::uint32_t start,
+                   const std::uint32_t width, const lexer::CTokenIterator beginLoc, const lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<PartWordAccess>, std::move(type), ValueCategory::Lvalue),
           m_base(std::move(base)),
           m_startBit(start),
@@ -394,8 +395,8 @@ class CallExpression final : public ExpressionBase
 
 public:
     CallExpression(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& func,
-                   std::vector<IntrVarPtr<ExpressionBase>>&& args, lexer::CTokenIterator beginLoc,
-                   lexer::CTokenIterator endLoc)
+                   std::vector<IntrVarPtr<ExpressionBase>>&& args, const lexer::CTokenIterator beginLoc,
+                   const lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<CallExpression>, std::move(type), ValueCategory::Rvalue),
           m_functionExpression(std::move(func)),
           m_arguments(std::move(args)),
@@ -470,7 +471,7 @@ class ArrayAccess final : public ExpressionBase
 
 public:
     ArrayAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& array,
-                std::vector<IntrVarPtr<ExpressionBase>>&& indices, lexer::CTokenIterator endLoc)
+                std::vector<IntrVarPtr<ExpressionBase>>&& indices, const lexer::CTokenIterator endLoc)
         : ExpressionBase(std::in_place_type<ArrayAccess>, std::move(type), ValueCategory::Lvalue),
           m_array(std::move(array)),
           m_indices(std::move(indices)),
@@ -504,7 +505,7 @@ class LocationAccess final : public ExpressionBase
 
 public:
     LocationAccess(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& wordReference,
-                   lexer::CTokenIterator beginLoc)
+                   const lexer::CTokenIterator beginLoc)
         : ExpressionBase(std::in_place_type<LocationAccess>, std::move(type), ValueCategory::Rvalue),
           m_wordReference(std::move(wordReference)),
           m_beginLoc(beginLoc)
@@ -533,7 +534,7 @@ class TypeChange final : public ExpressionBase
 
 public:
     TypeChange(IntrusiveVariantValue<Type> type, IntrVarPtr<ExpressionBase>&& expression,
-               lexer::CTokenIterator beginLoc)
+               const lexer::CTokenIterator beginLoc)
         : ExpressionBase(std::in_place_type<TypeChange>, std::move(type), ValueCategory::Rvalue),
           m_expression(std::move(expression)),
           m_beginLoc(beginLoc)
@@ -561,7 +562,8 @@ class ErrorExpression final : public ExpressionBase
     lexer::CTokenIterator m_end;
 
 public:
-    ErrorExpression(IntrusiveVariantValue<Type> type, lexer::CTokenIterator begin, lexer::CTokenIterator end)
+    ErrorExpression(IntrusiveVariantValue<Type> type, const lexer::CTokenIterator begin,
+                    const lexer::CTokenIterator end)
         : ExpressionBase(std::in_place_type<ErrorExpression>, std::move(type), {}), m_begin(begin), m_end(end)
     {
     }
@@ -616,8 +618,8 @@ class AssignmentStatement final : public Statement
     IntrVarPtr<ExpressionBase> m_value;
 
 public:
-    AssignmentStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& target,
-                        IntrVarPtr<ExpressionBase>&& value) // NOLINT(*-pro-type-member-init)
+    AssignmentStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& target, // NOLINT(*-pro-type-member-init)
+                        IntrVarPtr<ExpressionBase>&& value)                 // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AssignmentStatement>), m_target(std::move(target)), m_value(std::move(value))
     {
     }
@@ -639,8 +641,9 @@ class IfStatement final : public Statement
     IntrVarPtr<Statement> m_elseBranch;
 
 public:
-    IfStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& condition, IntrVarPtr<Statement>&& thenBranch,
-                IntrVarPtr<Statement>&& elseBranch) // NOLINT(*-pro-type-member-init)
+    IfStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& condition, // NOLINT(*-pro-type-member-init
+                IntrVarPtr<Statement>&& thenBranch,                    // NOLINT(*-pro-type-member-init
+                IntrVarPtr<Statement>&& elseBranch)                    // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<IfStatement>),
           m_condition(std::move(condition)),
           m_thenBranch(std::move(thenBranch)),
@@ -679,7 +682,7 @@ class LabelStatement final : public Statement
     const Statement* m_target;
 
 public:
-    LabelStatement(lexer::CTokenIterator name, const Statement* target) // NOLINT(*-pro-type-member-init)
+    LabelStatement(const lexer::CTokenIterator name, const Statement* target) // NOLINT(*-pro-type-member-init)
         : Statement(ScopePoint{0}, std::in_place_type<LabelStatement>), m_name(name), m_target(target)
     {
     }
@@ -726,7 +729,8 @@ class ForStatement final : public Statement
     IntrVarPtr<Statement> m_body;
 
 public:
-    ForStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& variable, std::vector<ForElement>&& elements,
+    ForStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& variable, // NOLINT(*-pro-type-member-init
+                 std::vector<ForElement>&& elements,                   // NOLINT(*-pro-type-member-init
                  IntrVarPtr<Statement>&& body)
         : Statement(sp, std::in_place_type<ForStatement>),
           m_variable(std::move(variable)),
@@ -756,7 +760,7 @@ class AnswerStatement final : public Statement
     IntrVarPtr<ExpressionBase> m_expression;
 
 public:
-    explicit AnswerStatement(ScopePoint sp,
+    explicit AnswerStatement(ScopePoint sp,                           // NOLINT(*-pro-type-member-init
                              IntrVarPtr<ExpressionBase>&& expression) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AnswerStatement>), m_expression(std::move(expression))
     {
@@ -773,7 +777,7 @@ class CodeStatement final : public Statement
     std::string m_code;
 
 public:
-    CodeStatement(ScopePoint sp, std::string code) // NOLINT(*-pro-type-member-init)
+    CodeStatement(const ScopePoint sp, std::string code) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<CodeStatement>), m_code(std::move(code))
     {
     }
@@ -789,7 +793,7 @@ class ProcedureCallStatement final : public Statement
     IntrVarPtr<ExpressionBase> m_callExpr;
 
 public:
-    explicit ProcedureCallStatement(ScopePoint sp,
+    explicit ProcedureCallStatement(ScopePoint sp,                         // NOLINT(*-pro-type-member-init
                                     IntrVarPtr<ExpressionBase>&& callExpr) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<ProcedureCallStatement>), m_callExpr(std::move(callExpr))
     {
@@ -873,7 +877,7 @@ class VariableDeclaration final : public Declaration
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    VariableDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    VariableDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<VariableDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -890,7 +894,7 @@ class ProcedureDeclaration final : public Declaration
     std::vector<IntrVarPtr<Statement>> m_body;
 
 public:
-    ProcedureDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    ProcedureDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<ProcedureDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -912,7 +916,7 @@ public:
 class LabelDeclaration final : public Declaration
 {
 public:
-    LabelDeclaration(lexer::CTokenIterator nameToken) : Declaration(std::in_place_type<LabelDeclaration>, nameToken) {}
+    LabelDeclaration(const lexer::CTokenIterator nameToken) : Declaration(std::in_place_type<LabelDeclaration>, nameToken) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelDeclaration)
 };
 
@@ -924,9 +928,10 @@ class TableElementDeclaration final : public Declaration
     std::optional<std::uint32_t> m_bitPosition;
 
 public:
-    TableElementDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type, bool isUnsigned = false,
-                            std::optional<std::uint32_t> wordPosition = std::nullopt,
-                            std::optional<std::uint32_t> bitPosition = std::nullopt)
+    TableElementDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type,
+                            const bool isUnsigned = false,
+                            const std::optional<std::uint32_t> wordPosition = std::nullopt,
+                            const std::optional<std::uint32_t> bitPosition = std::nullopt)
         : Declaration(std::in_place_type<TableElementDeclaration>, nameToken),
           m_type(std::move(type)),
           m_unsigned(isUnsigned),
@@ -958,7 +963,7 @@ class ArrayDeclaration final : public Declaration
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    ArrayDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    ArrayDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<ArrayDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -974,7 +979,7 @@ class TableDeclaration final : public Declaration
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    TableDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    TableDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<TableDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -990,7 +995,7 @@ class OverlayDeclaration final : public Declaration
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    OverlayDeclaration(lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
+    OverlayDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type)
         : Declaration(std::in_place_type<OverlayDeclaration>, nameToken), m_type(std::move(type))
     {
     }
@@ -1007,7 +1012,7 @@ class SwitchDeclaration final : public Declaration
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    SwitchDeclaration(lexer::CTokenIterator nameToken, std::vector<const LabelStatement*> labels)
+    SwitchDeclaration(const lexer::CTokenIterator nameToken, std::vector<const LabelStatement*> labels)
         : Declaration(std::in_place_type<SwitchDeclaration>, nameToken),
           m_labels(std::move(labels)),
           m_type(std::in_place_type<SwitchType>)
@@ -1034,7 +1039,7 @@ class BlockStatement final : public Statement
     std::vector<IntrVarPtr<Statement>> m_statements;
 
 public:
-    BlockStatement(ScopePoint scopePoint, std::vector<IntrVarPtr<Usable>> declarations,
+    BlockStatement(ScopePoint scopePoint, std::vector<IntrVarPtr<Usable>> declarations, // NOLINT(*-pro-type-member-init
                    std::vector<IntrVarPtr<Statement>> statements)
         : Statement(scopePoint, std::in_place_type<BlockStatement>),
           m_declarations(std::move(declarations)),
@@ -1058,7 +1063,8 @@ class CompoundStatement final : public Statement
     std::vector<IntrVarPtr<Statement>> m_statements;
 
 public:
-    CompoundStatement(ScopePoint scopePoint, std::vector<IntrVarPtr<Statement>> statements)
+    CompoundStatement(ScopePoint scopePoint,                         // NOLINT(*-pro-type-member-init
+                      std::vector<IntrVarPtr<Statement>> statements) // NOLINT(*-pro-type-member-init
         : Statement(scopePoint, std::in_place_type<CompoundStatement>), m_statements(std::move(statements))
     {
     }
