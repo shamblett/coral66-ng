@@ -1,12 +1,11 @@
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
- * Date   : 31/01/2026
+ * Date   : 02/05/2026
  */
 
 #pragma once
 
-#include <cstdint>
 #include <optional>
 
 #include "lib/frontend/syntax/syntax.hpp"

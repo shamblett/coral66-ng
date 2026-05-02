@@ -1,14 +1,14 @@
-#include "semantic_utilities.hpp"
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
- * Date   : 31/01/2026
+ * Date   : 02/05/2026
  */
 
-#include "control_flow_pass.hpp"
+
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
-#include <iostream>
+
+#include "control_flow_pass.hpp"
 
 namespace coral66::semantics
 {
@@ -29,8 +29,8 @@ void ControlFlowPass::visit(const syntax::Program& node)
 
 void ControlFlowPass::visit(const syntax::Block& node)
 {
-    for (const auto& decl : node.getDeclarations())
-        visit(*decl);
+    for (const auto& declaration : node.getDeclarations())
+        visit(*declaration);
     for (const auto& stmt : node.getStatements())
         visit(*stmt);
 }
@@ -45,6 +45,7 @@ void ControlFlowPass::visit(const syntax::Declaration& node)
         visit(*tab);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ControlFlowPass::visit(const syntax::ArrayDeclaration& node)
 {
     for (const auto& d : node.getDimensions())
@@ -64,6 +65,7 @@ void ControlFlowPass::visit(const syntax::ArrayDeclaration& node)
     }
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void ControlFlowPass::visit(const syntax::TableDeclaration& node)
 {
     if (node.getWidth())
@@ -181,7 +183,6 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
         visit(*node.getIndex());
 
     // Gotos into blocks are forbidden. Target label must be at or above our lexical scope.
-
     if (auto usable = m_context.resolvedIdentifiers.find(&node); usable != m_context.resolvedIdentifiers.end())
     {
         if (auto sw = usable->second->tryAs<SwitchDeclaration>())
@@ -289,19 +290,19 @@ void ControlFlowPass::visit(const syntax::ArrayAccessExpression& node)
         if (it != m_context.resolvedIdentifiers.end())
         {
             const Usable* usable = it->second;
-            const syntax::ArrayDeclaration* arrDecl = nullptr;
+            const syntax::ArrayDeclaration* arrDeclaration = nullptr;
             if (auto* arr = usable->tryAs<ArrayDeclaration>())
             {
-                arrDecl = dynamic_cast<const syntax::ArrayDeclaration*>(arr->getAstNode());
+                arrDeclaration = dynamic_cast<const syntax::ArrayDeclaration*>(arr->getAstNode());
             }
 
-            if (arrDecl && arrDecl->getDimensions().size() == node.getIndices().size())
+            if (arrDeclaration && arrDeclaration->getDimensions().size() == node.getIndices().size())
             {
                 for (size_t i = 0; i < node.getIndices().size(); ++i)
                 {
                     auto idxVal = evaluateConstantInteger(*node.getIndices()[i]);
-                    auto lowerVal = evaluateConstantInteger(*arrDecl->getDimensions()[i].first);
-                    auto upperVal = evaluateConstantInteger(*arrDecl->getDimensions()[i].second);
+                    auto lowerVal = evaluateConstantInteger(*arrDeclaration->getDimensions()[i].first);
+                    auto upperVal = evaluateConstantInteger(*arrDeclaration->getDimensions()[i].second);
 
                     if (idxVal && lowerVal && upperVal)
                     {
