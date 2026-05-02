@@ -49,10 +49,5 @@ inline bool isScalar(const Type& type)
     return isArithmetic(type); // Pointers? Coral uses Location?
 }
 
-// Stub for template specializations used in diagnostics
 } // namespace coral66::semantics
 
-namespace coral66::diag
-{
-// Add necessary string converters if needed
-}

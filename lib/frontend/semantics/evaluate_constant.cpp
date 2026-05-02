@@ -1,6 +1,11 @@
+/*
+* Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 02/05/2026
+ */
+
 #include "control_flow_pass.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
-#include "semantic_support.hpp"
 
 namespace coral66::semantics
 {
@@ -28,8 +33,7 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
         auto opType = unary->getOp()->getTokenType();
         if (opType == lexer::TokenType::Plus || opType == lexer::TokenType::Minus)
         {
-            auto val = evaluateConstantInteger(unary->getOperand());
-            if (val)
+            if (auto val = evaluateConstantInteger(unary->getOperand()))
             {
                 if (opType == lexer::TokenType::Minus)
                     return -(*val);
