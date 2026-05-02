@@ -180,9 +180,6 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
     if (node.getIndex())
         visit(*node.getIndex());
 
-    auto id = node.getLabel();
-    const auto& name = std::get<std::string>(id->getValue());
-
     // Gotos into blocks are forbidden. Target label must be at or above our lexical scope.
 
     if (auto usable = m_context.resolvedIdentifiers.find(&node); usable != m_context.resolvedIdentifiers.end())
