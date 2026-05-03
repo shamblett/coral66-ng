@@ -185,7 +185,7 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
     // Gotos into blocks are forbidden. Target label must be at or above our lexical scope.
     if (auto usable = m_context.resolvedIdentifiers.find(&node); usable != m_context.resolvedIdentifiers.end())
     {
-        if (auto sw = usable->second->tryAs<SwitchDeclaration>())
+        if (const auto sw = usable->second->tryAs<SwitchDeclaration>())
         {
             if (node.getIndex())
             {

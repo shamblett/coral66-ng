@@ -1,23 +1,23 @@
-#include "control_flow_pass.hpp"
-#include "lib/frontend/common/diagnostic_collection.hpp"
+
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
- * Date   : 31/01/2026
+ * Date   : 02/05/2026
  */
 
 #include <functional>
 #include <string>
 
+#include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
 #include "symbol_resolution_pass.hpp"
 #include "semantic_utilities.hpp"
 
+#include "control_flow_pass.hpp"
+
 namespace coral66::semantics
 {
-
-static UntypedType untypedType{};
 
 template <class T, class... Args>
 IntrVarPtr<T> makeIntrusiveVariant(Args&&... args)
@@ -218,13 +218,11 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
         uint32_t frac = 8;
         if (fixedTotalBits)
         {
-            auto tVal = evaluateConstantInteger(*fixedTotalBits);
-            if (tVal && *tVal > 0) total = static_cast<uint32_t>(*tVal);
+            if (const auto tVal = evaluateConstantInteger(*fixedTotalBits); tVal && *tVal > 0) total = static_cast<uint32_t>(*tVal);
         }
         if (fixedFractionBits)
         {
-            auto fVal = evaluateConstantInteger(*fixedFractionBits);
-            if (fVal && *fVal >= 0) frac = static_cast<uint32_t>(*fVal);
+            if (const auto fVal = evaluateConstantInteger(*fixedFractionBits); fVal && *fVal >= 0) frac = static_cast<uint32_t>(*fVal);
         }
         return {(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)})};
     }
@@ -428,6 +426,7 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     m_context.ownedUsables.push_back(std::move(declaration));
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
 {
     auto id = node.getIdentifier();
@@ -455,7 +454,7 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
         }
     }
 
-    // We store the array of nullptrs just so the size() correctly evaluates to the length of the switch later on
+    // We store the array of null pointers just so the size() correctly evaluates to the length of the switch later on
     auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::move(switchLabels));
     const auto& name = std::get<std::string>(id->getValue());
 
@@ -496,9 +495,9 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     const Type* returnTypePtr = node.getTypeToken() ? m_context.ownedTypes.back().data() : nullptr;
 
     std::vector<ProcedureType::Parameter> parameters;
-    for (const auto& paramDeclNode : node.getParameters())
+    for (const auto& paramDeclarationNode : node.getParameters())
     {
-        if (auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclNode.get()))
+        if (auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclarationNode.get()))
         {
             auto baseTypeVal = createTypeFromToken(paramNode->getType(), paramNode->getFixedTotalBits(), paramNode->getFixedFractionBits());
 
@@ -552,13 +551,13 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
                 parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), isValue});
             }
         }
-        else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclNode.get()))
+        else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclarationNode.get()))
         {
             auto baseTypeVal = createTypeFromToken(arrayNode->getType());
             m_context.ownedTypes.push_back(std::move(baseTypeVal));
             const Type* baseTypePtr = m_context.ownedTypes.back().data();
 
-            m_context.ownedTypes.push_back(IntrusiveVariantValue<Type>(ArrayType{baseTypePtr, {}}));
+            m_context.ownedTypes.emplace_back(ArrayType{baseTypePtr, {}});
             const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
 
             for (auto paramId : arrayNode->getIdentifiers())
