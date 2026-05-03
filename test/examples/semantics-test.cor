@@ -1,7 +1,0 @@
-PROGRAM test
-        BEGIN
-            INTEGER a;
-            BEGIN
-                FLOATING a; 
-            END;
-        END
