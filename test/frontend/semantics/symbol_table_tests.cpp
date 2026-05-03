@@ -1,7 +1,7 @@
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
- * Date   : 31/01/2026
+ * Date   : 02/05/2026
  */
 
 #include "lib/frontend/semantics/symbol_table.hpp"
@@ -16,7 +16,7 @@ using namespace coral66::lexer;
 
 TEST_CASE("Construction", "[Semantics][SymbolTable]")
 {
-    auto st = SymbolTable();
+    const auto st = SymbolTable();
     CHECK(st.scopeCount() == 1);
 }
 

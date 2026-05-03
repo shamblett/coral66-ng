@@ -1,3 +1,9 @@
+/*
+* Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 02/05/2026
+ */
+
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/semantics/control_flow_pass.hpp"
@@ -21,7 +27,7 @@ struct ControlFlowResult
     TypeCheckingPass typePass;
     ControlFlowPass cfPass;
 
-    ControlFlowResult(const ParsedProgram& parsed)
+    explicit ControlFlowResult(const ParsedProgram& parsed)
         : ss(outStr), context(parsed.cTokens, &ss, &errors), symPass(context), typePass(context), cfPass(context)
     {
         DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::clearDiagnostics();
@@ -34,7 +40,7 @@ struct ControlFlowResult
         }
     }
 
-    bool hasDiagnostic(std::string_view name) const
+    static bool hasDiagnostic(std::string_view name)
     {
         return std::ranges::any_of(DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics(),
                                    [name](const auto& d) { return d.getName() == name; });
@@ -188,28 +194,28 @@ TEST_CASE("Control Flow - Answer Statement", "[Semantics][ControlFlow]")
 {
     SECTION("Typed Procedure with Answer")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; P END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; P END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 
     SECTION("Typed Procedure with deeply nested Answer")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN BEGIN ANSWER 1 END ; END ; P END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN BEGIN ANSWER 1 END ; END ; P END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 
     SECTION("Typed Procedure missing Answer")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN END ; P END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN END ; P END");
         ControlFlowResult res(parsed);
         REQUIRE(res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 
     SECTION("Untyped Procedure without Answer")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
@@ -219,14 +225,14 @@ TEST_CASE("Control Flow - Block Jumps", "[Semantics][ControlFlow]")
 {
     SECTION("Valid Jump Out of Block")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN GOTO MYLABEL ; END ; END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN GOTO MYLABEL ; END ; END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("ILLEGAL_BLOCK_JUMP"));
     }
 
     SECTION("Invalid Jump Into Block")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO MYLABEL ; BEGIN INTEGER J ; MYLABEL: I := 1 ; END ; END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO MYLABEL ; BEGIN INTEGER J ; MYLABEL: I := 1 ; END ; END");
         ControlFlowResult res(parsed);
         REQUIRE(res.hasDiagnostic("UNDECLARED_IDENTIFIER_N"));
     }
@@ -236,7 +242,7 @@ TEST_CASE("Control Flow - Switch & Presets", "[Semantics][ControlFlow]")
 {
     SECTION("Switch bounds constant evaluation valid")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[1] ; END ; END");
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[1] ; END ; END");
         ControlFlowResult res(parsed);
         REQUIRE(!res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     }

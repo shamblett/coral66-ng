@@ -1,7 +1,7 @@
 /*
  * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
- * Date   : 31/01/2026
+ * Date   : 02/05/2026
  */
 
 #include "lib/frontend/common/diagnostic_collection.hpp"
@@ -24,7 +24,7 @@ struct SymbolResolutionResult
     SemanticContext context;
     SymbolResolutionPass pass;
 
-    SymbolResolutionResult(const ParsedProgram& parsed)
+    explicit SymbolResolutionResult(const ParsedProgram& parsed)
         : ss(outStr), context(parsed.cTokens, &ss, &errors), pass(context)
     {
         DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::clearDiagnostics();
@@ -255,34 +255,34 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         }
 
         REQUIRE(xUsable != nullptr);
-        auto& xDecl = xUsable->as<semantics::TableElementDeclaration>();
-        CHECK(xDecl.isUnsigned() == true);
-        REQUIRE(xDecl.getWordPosition().has_value());
-        CHECK(xDecl.getWordPosition().value() == 0);
-        REQUIRE(xDecl.getBitPosition().has_value());
-        CHECK(xDecl.getBitPosition().value() == 5);
-        CHECK(xDecl.getType().is<PrimitiveType>());
-        CHECK(xDecl.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
+        auto& xDeclaration = xUsable->as<semantics::TableElementDeclaration>();
+        CHECK(xDeclaration.isUnsigned() == true);
+        REQUIRE(xDeclaration.getWordPosition().has_value());
+        CHECK(xDeclaration.getWordPosition().value() == 0);
+        REQUIRE(xDeclaration.getBitPosition().has_value());
+        CHECK(xDeclaration.getBitPosition().value() == 5);
+        CHECK(xDeclaration.getType().is<PrimitiveType>());
+        CHECK(xDeclaration.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
 
         REQUIRE(yUsable != nullptr);
-        auto& yDecl = yUsable->as<semantics::TableElementDeclaration>();
-        CHECK(yDecl.isUnsigned() == false);
-        REQUIRE(yDecl.getWordPosition().has_value());
-        CHECK(yDecl.getWordPosition().value() == 1);
-        CHECK(yDecl.getBitPosition().has_value() == false);
-        CHECK(yDecl.getType().is<FixedType>());
-        CHECK(yDecl.getType().as<FixedType>().getTotalBits() == 22);
-        CHECK(yDecl.getType().as<FixedType>().getFractionalBits() == 11);
+        auto& yDeclaration = yUsable->as<semantics::TableElementDeclaration>();
+        CHECK(yDeclaration.isUnsigned() == false);
+        REQUIRE(yDeclaration.getWordPosition().has_value());
+        CHECK(yDeclaration.getWordPosition().value() == 1);
+        CHECK(yDeclaration.getBitPosition().has_value() == false);
+        CHECK(yDeclaration.getType().is<FixedType>());
+        CHECK(yDeclaration.getType().as<FixedType>().getTotalBits() == 22);
+        CHECK(yDeclaration.getType().as<FixedType>().getFractionalBits() == 11);
 
         REQUIRE(zUsable != nullptr);
-        auto& zDecl = zUsable->as<semantics::TableElementDeclaration>();
-        CHECK(zDecl.isUnsigned() == false);
-        REQUIRE(zDecl.getWordPosition().has_value());
-        CHECK(zDecl.getWordPosition().value() == 2);
-        REQUIRE(zDecl.getBitPosition().has_value());
-        CHECK(zDecl.getBitPosition().value() == 10);
-        CHECK(zDecl.getType().is<PrimitiveType>());
-        CHECK(zDecl.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
+        auto& zDeclaration = zUsable->as<semantics::TableElementDeclaration>();
+        CHECK(zDeclaration.isUnsigned() == false);
+        REQUIRE(zDeclaration.getWordPosition().has_value());
+        CHECK(zDeclaration.getWordPosition().value() == 2);
+        REQUIRE(zDeclaration.getBitPosition().has_value());
+        CHECK(zDeclaration.getBitPosition().value() == 10);
+        CHECK(zDeclaration.getType().is<PrimitiveType>());
+        CHECK(zDeclaration.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
     }
 }
 
@@ -327,17 +327,17 @@ TEST_CASE("Symbol Resolution - Overlay Base Verification", "[Semantics][SymbolRe
 {
     SECTION("Valid Overlay Base")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER J ; END");
-        SymbolResolutionResult res(parsed);
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER J ; END");
+        const SymbolResolutionResult res(parsed);
         CHECK(res.errors == false);
     }
 
     SECTION("Undeclared Overlay Base")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN OVERLAY I WITH INTEGER J ; END");
-        SymbolResolutionResult res(parsed);
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN OVERLAY I WITH INTEGER J ; END");
+        const SymbolResolutionResult res(parsed);
         CHECK(res.errors == true);
-        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        const auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
         bool foundError = false;
         for (auto& d : diagnostics)
             if (d.getName() == "UNDECLARED_IDENTIFIER_N")
@@ -465,18 +465,18 @@ TEST_CASE("Symbol Resolution - Labels", "[Semantics][SymbolResolution]")
 {
     SECTION("Label Declaration and Pre-scanning")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; l1: I := 1 END");
-        SymbolResolutionResult res(parsed);
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; l1: I := 1 END");
+        const SymbolResolutionResult res(parsed);
         CHECK(res.errors == false);
         CHECK(coral66::DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics().empty());
     }
 
     SECTION("Label Redefinition Error")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; l1: l1: I := 1 END");
-        SymbolResolutionResult res(parsed);
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; l1: l1: I := 1 END");
+        const SymbolResolutionResult res(parsed);
         CHECK(res.errors == true);
-        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        const auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
         bool foundRedef = false;
         for (auto& d : diagnostics)
             if (d.getName() == "REDEFINITION_OF_SYMBOL_N")
@@ -630,10 +630,10 @@ TEST_CASE("Symbol Resolution - Procedure Signatures", "[Semantics][SymbolResolut
         auto usable = findDeclaration(res.context, "P");
         REQUIRE(usable != nullptr);
         REQUIRE(usable->is<semantics::ProcedureDeclaration>());
-        auto& procDecl = usable->as<semantics::ProcedureDeclaration>();
+        auto& procDeclaration = usable->as<semantics::ProcedureDeclaration>();
 
-        REQUIRE(procDecl.getType().is<ProcedureType>());
-        auto& procType = procDecl.getType().as<ProcedureType>();
+        REQUIRE(procDeclaration.getType().is<ProcedureType>());
+        auto& procType = procDeclaration.getType().as<ProcedureType>();
 
         REQUIRE(procType.getParameters().size() == 3);
 
@@ -680,12 +680,12 @@ TEST_CASE("Symbol Resolution - Array AST Linking", "[Semantics][SymbolResolution
         REQUIRE(usable != nullptr);
         REQUIRE(usable->is<semantics::ArrayDeclaration>());
 
-        auto& arrayDecl = usable->as<semantics::ArrayDeclaration>();
-        REQUIRE(arrayDecl.getAstNode() != nullptr);
+        auto& arrayDeclaration = usable->as<semantics::ArrayDeclaration>();
+        REQUIRE(arrayDeclaration.getAstNode() != nullptr);
 
-        auto* syntaxDecl = dynamic_cast<const syntax::ArrayDeclaration*>(arrayDecl.getAstNode());
-        REQUIRE(syntaxDecl != nullptr);
-        CHECK(syntaxDecl->getDimensions().size() == 1);
+        auto* syntaxDeclaration = dynamic_cast<const syntax::ArrayDeclaration*>(arrayDeclaration.getAstNode());
+        REQUIRE(syntaxDeclaration != nullptr);
+        CHECK(syntaxDeclaration->getDimensions().size() == 1);
     }
 }
 
@@ -708,17 +708,17 @@ TEST_CASE("Symbol Resolution - Table Memory and AST Linking", "[Semantics][Symbo
 
         REQUIRE(tableUsable != nullptr);
         REQUIRE(tableUsable->is<semantics::TableDeclaration>());
-        auto& tableDecl = tableUsable->as<semantics::TableDeclaration>();
+        auto& tableDeclaration = tableUsable->as<semantics::TableDeclaration>();
 
         // AST Node Verification
-        REQUIRE(tableDecl.getAstNode() != nullptr);
-        auto* syntaxDecl = dynamic_cast<const syntax::TableDeclaration*>(tableDecl.getAstNode());
-        REQUIRE(syntaxDecl != nullptr);
-        CHECK(std::get<std::string>(syntaxDecl->getIdentifier()->getValue()) == "t");
+        REQUIRE(tableDeclaration.getAstNode() != nullptr);
+        auto* syntaxDeclaration = dynamic_cast<const syntax::TableDeclaration*>(tableDeclaration.getAstNode());
+        REQUIRE(syntaxDeclaration != nullptr);
+        CHECK(std::get<std::string>(syntaxDeclaration->getIdentifier()->getValue()) == "t");
 
         // Type Memory Verification
-        REQUIRE(tableDecl.getType().is<TableType>());
-        CHECK(tableDecl.getType().as<TableType>().getInfo().name == "t");
+        REQUIRE(tableDeclaration.getType().is<TableType>());
+        CHECK(tableDeclaration.getType().as<TableType>().getInfo().name == "t");
         CHECK(res.context.ownedTableInfos.size() == 1); // Ensure memory is tracked
     }
 }

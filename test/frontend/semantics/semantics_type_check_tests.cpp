@@ -27,7 +27,7 @@ struct TypeCheckingResult
     SymbolResolutionPass symPass;
     TypeCheckingPass typePass;
 
-    TypeCheckingResult(const ParsedProgram& parsed, bool runTypePass = true)
+    explicit TypeCheckingResult(const ParsedProgram& parsed, bool runTypePass = true)
         : ss(outStr), context(parsed.cTokens, &ss, &errors), symPass(context), typePass(context)
     {
         DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::clearDiagnostics();
@@ -40,7 +40,7 @@ struct TypeCheckingResult
         }
     }
 
-    bool hasDiagnostic(std::string_view name) const
+    static bool hasDiagnostic(std::string_view name)
     {
         return std::ranges::any_of(DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics(),
                                    [name](const auto& d) { return d.getName() == name; });
@@ -51,7 +51,7 @@ TEST_CASE("Type Checking - IF Condition", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Integer Condition")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; IF I = 0 THEN I := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; IF I = 0 THEN I := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -63,14 +63,14 @@ TEST_CASE("Type Checking - GOTO Index", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Integer Index")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO s[I] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO s[I] END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating Index")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN FLOATING F ; GOTO s[F] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN FLOATING F ; GOTO s[F] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -80,14 +80,14 @@ TEST_CASE("Type Checking - Array Access", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Integer Index")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A[I] := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A[I] := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating Index")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; FLOATING F ; A[F] := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; FLOATING F ; A[F] := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -97,14 +97,14 @@ TEST_CASE("Type Checking - Assignment", "[Semantics][TypeChecking]")
 {
     SECTION("Type Mismatch Assigning Array to Variable")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Type Mismatch Assigning Variable to Array")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A := I END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A := I END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -114,14 +114,14 @@ TEST_CASE("Type Checking - Binary Expression", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Binary Expression")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := I + 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := I + 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Type Mismatch Array in Binary Expression")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A + 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A + 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -131,14 +131,14 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
 {
     SECTION("Argument Count Mismatch")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P(VALUE INTEGER X) ; BEGIN END ; P(1, 2) END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P(VALUE INTEGER X) ; BEGIN END ; P(1, 2) END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("PROCEDURE_ARGUMENT_COUNT_MISMATCH"));
     }
 
     SECTION("Valid Zero Argument Call")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_COUNT_MISMATCH"));
         REQUIRE(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
@@ -146,7 +146,7 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
 
     SECTION("Argument Type Mismatch")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN P(1.0) END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN P(1.0) END");
         TypeCheckingResult res(parsed, false);
 
         static PrimitiveType intType(PrimitiveType::Integer);
@@ -187,21 +187,21 @@ TEST_CASE("Type Checking - Array Declaration", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Integer Dimensions")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating Dimension First")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1.0:10] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1.0:10] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating Dimension Second")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10.0] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10.0] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -211,21 +211,21 @@ TEST_CASE("Type Checking - Table Declaration", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Integer Width and Length")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10, 20] [ I INTEGER 0 ] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10, 20] [ I INTEGER 0 ] END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating Width")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10.0, 20] [ I INTEGER 0 ] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10.0, 20] [ I INTEGER 0 ] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating Length")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10, 20.0] [ I INTEGER 0 ] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN TABLE T[10, 20.0] [ I INTEGER 0 ] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -235,14 +235,14 @@ TEST_CASE("Type Checking - Overlay Declaration", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Inner Declaration")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1:10] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1:10] END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Inner Declaration")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1.0:10] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; OVERLAY I WITH INTEGER ARRAY A[1.0:10] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -252,7 +252,7 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
 {
     SECTION("Argument Type Coercion for Value Parameters")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN P(1.0) END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN P(1.0) END");
         TypeCheckingResult res(parsed, false);
 
         static PrimitiveType intType(PrimitiveType::Integer);
@@ -261,8 +261,8 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
 
         auto procType = IntrusiveVariantValue<Type>(ProcedureType{nullptr, std::move(params)});
 
-        auto it = parsed.cTokens.data().begin();
-        auto nameToken = &(*it);
+        const auto it = parsed.cTokens.data().begin();
+        const auto nameToken = &(*it);
 
         auto pDeclaration = IntrVarPtr<Usable>(new semantics::ProcedureDeclaration(nameToken, std::move(procType)));
 
@@ -272,9 +272,9 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
         {
             for (const auto& stmt : parsed.program.getBlock().getStatements())
             {
-                if (auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get()))
+                if (const auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get()))
                 {
-                    if (auto callExpr = dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression()))
+                    if (const auto callExpr = dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression()))
                     {
                         res.context.resolvedIdentifiers[callExpr] = pDeclaration.get();
                     }
@@ -293,7 +293,7 @@ TEST_CASE("Type Checking - FOR WHILE Condition", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Integer Condition")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 WHILE 1 = 1 DO I := 2 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 WHILE 1 = 1 DO I := 2 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -305,21 +305,21 @@ TEST_CASE("Type Checking - ANSWER Statement", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Answer in Typed Procedure")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Invalid Answer in Untyped Procedure")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN ANSWER 1 END ; END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN ANSWER 1 END ; END");
         REQUIRE(std::ranges::any_of(DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics(),
                                     [](const auto& d) { return d.getName() == "ANSWER_IN_UNTYPED_PROCEDURE"; }));
     }
 
     SECTION("Invalid Answer Type")
     {
-        ParsedProgram parsed(
+        ParsedProgram const parsed(
             "PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER PROCEDURE P ; BEGIN ANSWER A END ; END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
@@ -330,7 +330,7 @@ TEST_CASE("Type Checking - Type Change Expression", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Cast to Integer used as Array Index")
     {
-        ParsedProgram parsed(
+        ParsedProgram const parsed(
             "PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[INTEGER (1.0)] END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
@@ -338,7 +338,7 @@ TEST_CASE("Type Checking - Type Change Expression", "[Semantics][TypeChecking]")
 
     SECTION("Invalid Cast to Floating used as Array Index")
     {
-        ParsedProgram parsed(
+        ParsedProgram const parsed(
             "PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[FLOATING (1)] END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
@@ -349,7 +349,7 @@ TEST_CASE("Type Checking - Fixed Type", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Mixed Arithmetic")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN FIXED(24,2) F ; INTEGER I ; F := F + I END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN FIXED(24,2) F ; INTEGER I ; F := F + I END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -359,21 +359,21 @@ TEST_CASE("Type Checking - Array Indices", "[Semantics][TypeChecking]")
 {
     SECTION("Incorrect Number of Indices - Too Few")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10, 1:10] ; INTEGER I ; A[I] := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10, 1:10] ; INTEGER I ; A[I] := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("INCORRECT_NUMBER_OF_INDICES"));
     }
 
     SECTION("Incorrect Number of Indices - Too Many")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A[I, I] := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; A[I, I] := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("INCORRECT_NUMBER_OF_INDICES"));
     }
 
     SECTION("Anonymous Array Reference")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := [ 1234 ] END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := [ 1234 ] END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
@@ -384,7 +384,7 @@ TEST_CASE("Type Checking - Array Parameter Matching", "[Semantics][TypeChecking]
 {
     SECTION("Different Bounds but Same Type")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; "
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; "
                              "PROCEDURE P (INTEGER ARRAY X) ; BEGIN INTEGER I ; I := X[1] END ; "
                              "P(A) END");
         TypeCheckingResult res(parsed);
@@ -393,7 +393,7 @@ TEST_CASE("Type Checking - Array Parameter Matching", "[Semantics][TypeChecking]
 
     SECTION("Different Types")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN FLOATING ARRAY A[1:10] ; "
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN FLOATING ARRAY A[1:10] ; "
                              "PROCEDURE P (INTEGER ARRAY X) ; BEGIN INTEGER I ; I := X[1] END ; "
                              "P(A) END");
         TypeCheckingResult res(parsed);
@@ -405,14 +405,14 @@ TEST_CASE("Type Checking - For Loop Variables", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Numeric Loop Variable")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 STEP 1 UNTIL 10 DO I := I + 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 STEP 1 UNTIL 10 DO I := I + 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_NUMERIC_TYPE"));
     }
 
     SECTION("Invalid Loop Variable - Array")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; FOR A := 1 STEP 1 UNTIL 10 DO A[1] := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; FOR A := 1 STEP 1 UNTIL 10 DO A[1] := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_NUMERIC_TYPE"));
     }
@@ -422,7 +422,7 @@ TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]"
 {
     SECTION("Passing a Label")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN "
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
                              "PROCEDURE P (LABEL L) ; GOTO L ; "
                              "MYLABEL: P(MYLABEL) END");
         TypeCheckingResult res(parsed);
@@ -431,7 +431,7 @@ TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]"
 
     SECTION("Passing a Switch")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN "
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
                              "SWITCH S := MYLABEL ; "
                              "PROCEDURE P (SWITCH SW) ; GOTO SW[1] ; "
                              "MYLABEL: P(S) END");
@@ -444,7 +444,7 @@ TEST_CASE("Type Checking - Table Access", "[Semantics][TypeChecking]")
 {
     SECTION("Valid Table Element Access")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN TABLE T[2, 2] [ I INTEGER 0, 0 ] ; I[0] := 1 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN TABLE T[2, 2] [ I INTEGER 0, 0 ] ; I[0] := 1 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -454,28 +454,28 @@ TEST_CASE("Type Checking - BITS Operations", "[Semantics][TypeChecking]")
 {
     SECTION("Valid BITS assignment")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 10 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 10 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Invalid Floating assignment to BITS")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 10.5 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 10.5 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Valid BITS differ operation")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1 DIFFER 2 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1 DIFFER 2 END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Invalid floating DIFFER")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1.5 DIFFER 2.5 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1.5 DIFFER 2.5 END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -485,7 +485,7 @@ TEST_CASE("Type Checking - Type Change Wrappers", "[Semantics][TypeChecking]")
 {
     SECTION("Invalid parameter to type change")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; "
                              "MYLABEL: I := INTEGER(MYLABEL) END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("TYPE_MISMATCH"));
@@ -501,21 +501,21 @@ TEST_CASE("Type Checking - PartWord Bounds", "[Semantics][TypeChecking]")
 {
     SECTION("Valid PartWord indices")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1 , 2 ] I END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1 , 2 ] I END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating startBit")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1.5 , 2 ] I END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1.5 , 2 ] I END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
 
     SECTION("Invalid Floating width")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1 , 2.5 ] I END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 1 , 2.5 ] I END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
@@ -525,14 +525,14 @@ TEST_CASE("Type Checking - Recursive Validations", "[Semantics][TypeCheck]")
 {
     SECTION("Procedure calls itself without RECURSIVE")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN P ; END ; END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN P ; END ; END");
         TypeCheckingResult res(parsed);
         REQUIRE(res.hasDiagnostic("RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE"));
     }
     
     SECTION("Procedure calls itself with RECURSIVE")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN RECURSIVE PROCEDURE P ; BEGIN P ; END ; END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN RECURSIVE PROCEDURE P ; BEGIN P ; END ; END");
         TypeCheckingResult res(parsed);
         REQUIRE(!res.hasDiagnostic("RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE"));
     }
