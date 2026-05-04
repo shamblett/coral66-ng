@@ -26,7 +26,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/ackermann/ackerman.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -40,7 +40,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/ackermann/ackerman_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }
@@ -49,7 +49,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/sieve/sieve.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -63,7 +63,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/sieve/sieve_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }
@@ -75,7 +75,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/generated/g1.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -89,7 +89,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/generated/g1_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }
@@ -98,7 +98,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/generated/g2.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -112,7 +112,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/generated/g2_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }
@@ -121,7 +121,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/generated/g3.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -135,7 +135,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/generated/g3_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }
@@ -144,7 +144,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/generated/g4.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -158,7 +158,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/generated/g4_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }
@@ -167,7 +167,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
     {
         auto sourcePath = getTestDataPath("golden/generated/g5.cor", "frontend/parser");
         auto source = readFile(sourcePath);
-        REQUIRE(!source.empty());
+        CHECK(!source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -181,7 +181,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("golden/generated/g5_ast.json", "frontend/parser");
         auto ast = readFile(astPath);
-        REQUIRE(!ast.empty());
+        CHECK(!ast.empty());
 
         CHECK(sourceAst == ast);
     }

@@ -22,26 +22,26 @@ TEST_CASE("needsWhitespaceInBetween", "[lexer]")
     // isText(left)
     // left is Identifier, Keyword, etc.
     // right is StringLiteral, Literal, PPNumber -> true
-    REQUIRE(needsWhitespaceInBetween(TokenType::Identifier, TokenType::StringLiteral) == true);
-    REQUIRE(needsWhitespaceInBetween(TokenType::Identifier, TokenType::Literal) == true);
-    REQUIRE(needsWhitespaceInBetween(TokenType::Identifier, TokenType::PPNumber) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::Identifier, TokenType::StringLiteral) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::Identifier, TokenType::Literal) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::Identifier, TokenType::PPNumber) == true);
     // right is Text -> true
-    REQUIRE(needsWhitespaceInBetween(TokenType::Identifier, TokenType::Identifier) == true);
-    REQUIRE(needsWhitespaceInBetween(TokenType::Identifier, TokenType::BeginKeyword) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::Identifier, TokenType::Identifier) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::Identifier, TokenType::BeginKeyword) == true);
     // right is not Text -> false
-    REQUIRE(needsWhitespaceInBetween(TokenType::Identifier, TokenType::Plus) == false);
+    CHECK(needsWhitespaceInBetween(TokenType::Identifier, TokenType::Plus) == false);
 
     // left is PPNumber
     // right is Text -> true
-    REQUIRE(needsWhitespaceInBetween(TokenType::PPNumber, TokenType::Identifier) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::PPNumber, TokenType::Identifier) == true);
     // right is PPNumber -> true
-    REQUIRE(needsWhitespaceInBetween(TokenType::PPNumber, TokenType::PPNumber) == true);
+    CHECK(needsWhitespaceInBetween(TokenType::PPNumber, TokenType::PPNumber) == true);
     // right is not Text or PPNumber -> false
-    REQUIRE(needsWhitespaceInBetween(TokenType::PPNumber, TokenType::Plus) == false);
+    CHECK(needsWhitespaceInBetween(TokenType::PPNumber, TokenType::Plus) == false);
 
     // left is neither Text nor PPNumber -> false
-    REQUIRE(needsWhitespaceInBetween(TokenType::Plus, TokenType::Identifier) == false);
-    REQUIRE(needsWhitespaceInBetween(TokenType::Plus, TokenType::PPNumber) == false);
+    CHECK(needsWhitespaceInBetween(TokenType::Plus, TokenType::Identifier) == false);
+    CHECK(needsWhitespaceInBetween(TokenType::Plus, TokenType::PPNumber) == false);
 }
 
 TEST_CASE("parseStringLiteral", "[lexer]")
@@ -53,20 +53,20 @@ TEST_CASE("parseStringLiteral", "[lexer]")
     // Normal string
     PPToken normalToken(TokenType::StringLiteral, 0, 4, 0, 4, 0, 0, "\"AB\"");
     auto resultNormal = parseStringLiteral(normalToken, sourceObject, &reporter);
-    REQUIRE(resultNormal.has_value());
-    REQUIRE(resultNormal->getText() == "AB");
+    CHECK(resultNormal.has_value());
+    CHECK(resultNormal->getText() == "AB");
 
     // String with escaped quote ""
     PPToken escapedToken(TokenType::StringLiteral, 0, 6, 0, 6, 0, 0, R"("A""B")");
     auto resultEscaped = parseStringLiteral(escapedToken, sourceObject, &reporter);
-    REQUIRE(resultEscaped.has_value());
-    REQUIRE(resultEscaped->getText() == "A\"B");
+    CHECK(resultEscaped.has_value());
+    CHECK(resultEscaped->getText() == "A\"B");
 
     // Empty string
     PPToken emptyToken(TokenType::StringLiteral, 0, 2, 0, 2, 0, 0, "\"\"");
     auto resultEmpty = parseStringLiteral(emptyToken, sourceObject, &reporter);
-    REQUIRE(resultEmpty.has_value());
-    REQUIRE(resultEmpty->getText().empty());
+    CHECK(resultEmpty.has_value());
+    CHECK(resultEmpty->getText().empty());
 }
 
 TEST_CASE("toCTokens with PPSourceObject lvalue", "[lexer]")
@@ -83,7 +83,7 @@ TEST_CASE("toCTokens with PPSourceObject lvalue", "[lexer]")
     const PPSourceObject& lvalueRef = ppSource;
     auto cSource = toCTokens(lvalueRef, &reporter, &errorsOccurred);
     REQUIRE_FALSE(errorsOccurred);
-    REQUIRE(!cSource.data().empty());
+    CHECK(!cSource.data().empty());
 }
 
 TEST_CASE("toCTokens with PPTokenIterator", "[lexer]")
@@ -101,7 +101,7 @@ TEST_CASE("toCTokens with PPTokenIterator", "[lexer]")
                              &reporter, &errorsOccurred);
 
     REQUIRE_FALSE(errorsOccurred);
-    REQUIRE(!cTokens.empty());
+    CHECK(!cTokens.empty());
 }
 
 TEST_CASE("CustomFormat for TokenType", "[lexer]")
@@ -109,15 +109,15 @@ TEST_CASE("CustomFormat for TokenType", "[lexer]")
     diag::CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'> formatter;
     const PPToken token(coral66::lexer::TokenType::Identifier, 0, 5, 0, 5, 0, 0, "dummy");
     std::string formatted = formatter(token);
-    REQUIRE(!formatted.empty());
+    CHECK(!formatted.empty());
 }
 
 TEST_CASE("StringConverter for TokenType", "[lexer]")
 {
     std::string inFormatStr =
         diag::StringConverter<coral66::lexer::TokenType>::inFormat(TokenType::Identifier, nullptr);
-    REQUIRE(!inFormatStr.empty());
+    CHECK(!inFormatStr.empty());
 
     std::string inArgStr = diag::StringConverter<coral66::lexer::TokenType>::inArg(TokenType::Identifier, nullptr);
-    REQUIRE(!inArgStr.empty());
+    CHECK(!inArgStr.empty());
 }

@@ -21,20 +21,20 @@ TEST_CASE("Array Declarations", "[Parser][Declarations]")
     SECTION("Multiple identifiers sharing bounds")
     {
         ParsedDeclaration p("INTEGER ARRAY p, q[1:3], r[0:5]");
-        REQUIRE(p.declaration.size() == 2);
+        CHECK(p.declaration.size() == 2);
 
         auto arr1 = dynamic_cast<const ArrayDeclaration*>(p.declaration[0].get());
-        REQUIRE(arr1 != nullptr);
-        REQUIRE(arr1->getIdentifiers().size() == 2);
+        CHECK(arr1 != nullptr);
+        CHECK(arr1->getIdentifiers().size() == 2);
         CHECK(arr1->getIdentifiers()[0]->getText() == "p");
         CHECK(arr1->getIdentifiers()[1]->getText() == "q");
-        REQUIRE(arr1->getDimensions().size() == 1);
+        CHECK(arr1->getDimensions().size() == 1);
 
         auto arr2 = dynamic_cast<const ArrayDeclaration*>(p.declaration[1].get());
-        REQUIRE(arr2 != nullptr);
-        REQUIRE(arr2->getIdentifiers().size() == 1);
+        CHECK(arr2 != nullptr);
+        CHECK(arr2->getIdentifiers().size() == 1);
         CHECK(arr2->getIdentifiers()[0]->getText() == "r");
-        REQUIRE(arr2->getDimensions().size() == 1);
+        CHECK(arr2->getDimensions().size() == 1);
     }
 }
 
@@ -43,42 +43,42 @@ TEST_CASE("Table Declarations", "[Parser][Declarations]")
     SECTION("Basic Table With Elements")
     {
         ParsedDeclaration p("TABLE t[10, 20] [ x INTEGER 0 ; y UNSIGNED (4,2) 1, 4 ; z (24) -1 BIT 2 ] PRESET 5(1, 2)");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
 
         auto table = dynamic_cast<const TableDeclaration*>(p.declaration[0].get());
-        REQUIRE(table != nullptr);
-        REQUIRE(table->getIdentifier()->getText() == "t");
-        REQUIRE(table->getElements().size() == 3);
+        CHECK(table != nullptr);
+        CHECK(table->getIdentifier()->getText() == "t");
+        CHECK(table->getElements().size() == 3);
 
         auto el1 = dynamic_cast<const TableElementDeclaration*>(table->getElements()[0].get());
-        REQUIRE(el1 != nullptr);
+        CHECK(el1 != nullptr);
         CHECK(el1->getIdentifier()->getText() == "x");
         CHECK(el1->getType().has_value());
         CHECK(el1->getType().value()->getTokenType() == lexer::TokenType::IntegerKeyword);
         CHECK(!el1->isUnsigned());
-        REQUIRE(el1->getWordPosition().has_value());
+        CHECK(el1->getWordPosition().has_value());
         CHECK(std::get<llvm::APSInt>(el1->getWordPosition().value()->getValue()).getZExtValue() == 0);
 
         auto el2 = dynamic_cast<const TableElementDeclaration*>(table->getElements()[1].get());
-        REQUIRE(el2 != nullptr);
+        CHECK(el2 != nullptr);
         CHECK(el2->getIdentifier()->getText() == "y");
         CHECK(!el2->getType().has_value());
         CHECK(el2->isUnsigned());
-        REQUIRE(el2->getWordPosition().has_value());
+        CHECK(el2->getWordPosition().has_value());
         CHECK(std::get<llvm::APSInt>(el2->getWordPosition().value()->getValue()).getZExtValue() == 1);
-        REQUIRE(el2->getBitPosition().has_value());
+        CHECK(el2->getBitPosition().has_value());
         CHECK(std::get<llvm::APSInt>(el2->getBitPosition().value()->getValue()).getZExtValue() == 4);
 
         auto el3 = dynamic_cast<const TableElementDeclaration*>(table->getElements()[2].get());
-        REQUIRE(el3 != nullptr);
+        CHECK(el3 != nullptr);
         CHECK(el3->getIdentifier()->getText() == "z");
         CHECK(!el3->getType().has_value());
         CHECK(!el3->isUnsigned());
-        REQUIRE(el3->getWordPosition().has_value());
+        CHECK(el3->getWordPosition().has_value());
         CHECK(std::get<llvm::APSInt>(el3->getWordPosition().value()->getValue()).getZExtValue()
               == 1); // Negative value check needs special handling, we'll just check it has value and skip value check
                      // for -1 since it's signed
-        REQUIRE(el3->getBitPosition().has_value());
+        CHECK(el3->getBitPosition().has_value());
         CHECK(std::get<llvm::APSInt>(el3->getBitPosition().value()->getValue()).getZExtValue() == 2);
 
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
@@ -90,24 +90,24 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
     SECTION("Simple Assignment")
     {
         ParsedDeclaration p("INTEGER a := 10");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
     SECTION("Preset Keyword")
     {
         ParsedDeclaration p("FLOATING f PRESET 10.5, -2.0, +3.1");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
     SECTION("Octal and Grouping")
     {
         ParsedDeclaration p("INTEGER ARRAY a[1:10] := (1, (OCTAL(77)))");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         auto arr = dynamic_cast<const ArrayDeclaration*>(p.declaration[0].get());
-        REQUIRE(arr != nullptr);
-        REQUIRE(!arr->getPresetTokens().empty());
+        CHECK(arr != nullptr);
+        CHECK(!arr->getPresetTokens().empty());
         CHECK(arr->getPresetTokens()[0]->getTokenType() == lexer::TokenType::OpenParentheses);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
@@ -115,14 +115,14 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
     SECTION("String Literals")
     {
         ParsedDeclaration p(R"(INTEGER ARRAY a[1:10] := "HELLO", "WORLD")");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
     SECTION("Void Presetting")
     {
         ParsedDeclaration p("INTEGER ARRAY a[1:10] := 1, , 3, , , 6");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 }
@@ -132,9 +132,9 @@ TEST_CASE("Overlay Declarations", "[Parser][Declarations]")
     SECTION("Base only")
     {
         ParsedDeclaration p("OVERLAY x WITH INTEGER y");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         auto overlay = dynamic_cast<const OverlayDeclaration*>(p.declaration[0].get());
-        REQUIRE(overlay != nullptr);
+        CHECK(overlay != nullptr);
         CHECK(overlay->getBase()->getText() == "x");
         CHECK(overlay->getOffset()->getText() == "x");
     }
@@ -142,9 +142,9 @@ TEST_CASE("Overlay Declarations", "[Parser][Declarations]")
     SECTION("With positive offset")
     {
         ParsedDeclaration p("OVERLAY arr[5] WITH INTEGER y");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         auto overlay = dynamic_cast<const OverlayDeclaration*>(p.declaration[0].get());
-        REQUIRE(overlay != nullptr);
+        CHECK(overlay != nullptr);
         CHECK(overlay->getBase()->getText() == "arr");
         CHECK(std::get<llvm::APSInt>(overlay->getOffset()->getValue()).getZExtValue() == 5);
     }
@@ -152,9 +152,9 @@ TEST_CASE("Overlay Declarations", "[Parser][Declarations]")
     SECTION("With negative offset")
     {
         ParsedDeclaration p("OVERLAY arr[-10] WITH INTEGER y");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         auto overlay = dynamic_cast<const OverlayDeclaration*>(p.declaration[0].get());
-        REQUIRE(overlay != nullptr);
+        CHECK(overlay != nullptr);
         CHECK(overlay->getBase()->getText() == "arr");
         CHECK(std::get<llvm::APSInt>(overlay->getOffset()->getValue()).getZExtValue() == 10);
         CHECK(!overlay->getOffset2().has_value());
@@ -163,12 +163,12 @@ TEST_CASE("Overlay Declarations", "[Parser][Declarations]")
     SECTION("With two offsets")
     {
         ParsedDeclaration p("OVERLAY arr[15, -20] WITH INTEGER y");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         auto overlay = dynamic_cast<const OverlayDeclaration*>(p.declaration[0].get());
-        REQUIRE(overlay != nullptr);
+        CHECK(overlay != nullptr);
         CHECK(overlay->getBase()->getText() == "arr");
         CHECK(std::get<llvm::APSInt>(overlay->getOffset()->getValue()).getZExtValue() == 15);
-        REQUIRE(overlay->getOffset2().has_value());
+        CHECK(overlay->getOffset2().has_value());
         CHECK(std::get<llvm::APSInt>(overlay->getOffset2().value()->getValue()).getZExtValue() == 20);
     }
 }

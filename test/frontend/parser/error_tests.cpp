@@ -325,7 +325,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("Answer No Expression")
     {
         const ParsedStatement s("ANSWER ;", true);
-        REQUIRE(s.statement.get() == nullptr);
+        CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_EXPRESSION));
     }
@@ -333,21 +333,21 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("Answer in Untyped Procedure")
     {
         const ParsedStatement s("ANSWER B;", false, true);
-        REQUIRE(s.statement == nullptr);
+        CHECK(s.statement == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_IN_UNTYPED_PROCEDURE));
     }
 
     SECTION("Answer outside Procedure")
     {
         const ParsedStatement s("ANSWER B;", false, false);
-        REQUIRE(s.statement == nullptr);
+        CHECK(s.statement == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::ANSWER_OUTSIDE_PROCEDURE));
     }
 
     SECTION("Code No Begin")
     {
         const ParsedStatement s("CODE \"mov eax\" END;");
-        REQUIRE(s.statement.get() == nullptr);
+        CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_BEGIN));
     }
@@ -355,7 +355,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("Code No Code")
     {
         const ParsedStatement s("CODE BEGIN END;");
-        REQUIRE(s.statement.get() == nullptr);
+        CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_STRING_LITERAL));
     }
@@ -363,7 +363,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("Code No End")
     {
         const ParsedStatement s("CODE BEGIN \"mov eax\" ;");
-        REQUIRE(s.statement.get() == nullptr);
+        CHECK(s.statement.get() == nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_END));
     }
@@ -379,7 +379,7 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("Compound Statement - Missing Semicolon")
     {
         const ParsedStatement s("BEGIN A := 1 B := 2 END;");
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
     }
 
     SECTION("Conditional Statement - IF No Condition")
@@ -393,22 +393,22 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("Block missing semicolon between declarations")
     {
         const ParsedStatement s("BEGIN INTEGER A INTEGER B; A := 1 END;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
     }
 
     SECTION("Block missing semicolon between decl and stmt")
     {
         const ParsedStatement s("BEGIN INTEGER A A := 1 END;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SEMICOLON));
     }
 
     SECTION("Block with bad Switch Declaration")
     {
         const ParsedStatement s("BEGIN SWITCH S ; L1, L2; GOTO L1; END;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_ASSIGNMENT));
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_ASSIGNMENT));
     }
 
     SECTION("Conditional Statement - IF No THEN")
@@ -438,22 +438,22 @@ TEST_CASE("Statements - Errors", "[Parser][Statement]")
     SECTION("If Then - Labeled Nested If Forbidden")
     {
         const ParsedStatement s("IF A = 1 THEN L1: IF B = 2 THEN C := 3;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
     }
 
     SECTION("If Then - Nested If Forbidden")
     {
         const ParsedStatement s("IF A = 1 THEN IF B = 2 THEN C := 3;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
     }
 
     SECTION("If Then - Nested For Forbidden")
     {
         const ParsedStatement s("IF A = 1 THEN FOR I := 1 STEP 1 UNTIL 10 DO C := 3;");
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT));
     }
 
     SECTION("For Statement - Missing Identifier")
@@ -504,25 +504,25 @@ TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
     SECTION("Missing Identifier")
     {
         ParsedProcedure p("PROCEDURE ; BEGIN END");
-        REQUIRE(p.procedure != nullptr);
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
+        CHECK(p.procedure != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
     }
 
     SECTION("Typed Procedure Missing ANSWER statement")
     {
         ParsedProcedure p("INTEGER PROCEDURE p; BEGIN END");
-        REQUIRE(p.procedure != nullptr);
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT));
+        CHECK(p.procedure != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_ANSWER_STATEMENT));
     }
 
     SECTION("Missing Body Statement")
     {
         ParsedProcedure p("PROCEDURE p; BEGIN");
-        REQUIRE(p.procedure != nullptr);
-        REQUIRE(!parser::DiagnosticCollector::getDiagnostics().empty());
-        REQUIRE(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_STATEMENT));
+        CHECK(p.procedure != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_STATEMENT));
     }
 }
 
@@ -531,28 +531,28 @@ TEST_CASE("Communicators - Errors", "[Parser][Communicator]")
     SECTION("Common Missing Open Parenthesis")
     {
         const ParsedCommunicator p("COMMON INTEGER A ; LABEL B )");
-        REQUIRE(p.communicator == nullptr);
+        CHECK(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS));
     }
 
     SECTION("Common Missing Close Parenthesis")
     {
         const ParsedCommunicator p("COMMON ( INTEGER A ; LABEL B ");
-        REQUIRE(p.communicator == nullptr);
+        CHECK(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS));
     }
 
     SECTION("Common Missing Identifier In Procedure Specification")
     {
         const ParsedCommunicator p("COMMON ( PROCEDURE (INTEGER) )");
-        REQUIRE(p.communicator == nullptr);
+        CHECK(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
     }
 
     SECTION("Common Missing Semicolon Between Items")
     {
         const ParsedCommunicator p("COMMON ( LABEL A LABEL B )");
-        REQUIRE(p.communicator == nullptr);
+        CHECK(p.communicator == nullptr);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_N));
     }
 }
@@ -562,56 +562,56 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
     SECTION("Missing Identifier")
     {
         ParsedDeclaration p("INTEGER ARRAY [1:2]");
-        REQUIRE(p.declaration.empty());
+        CHECK(p.declaration.empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
     }
 
     SECTION("Missing Colon")
     {
         ParsedDeclaration p("INTEGER ARRAY a[1]");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_COLON));
     }
 
     SECTION("Missing Close Bracket")
     {
         ParsedDeclaration p("INTEGER ARRAY a[1:2");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET));
     }
 
     SECTION("Missing Element Type")
     {
         ParsedDeclaration p("TABLE t[10] [ x 0 ]");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_TYPE));
     }
 
     SECTION("Missing Element Identifier")
     {
         ParsedDeclaration p("TABLE t[10] [ INTEGER 0 ]");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_IDENTIFIER));
     }
 
     SECTION("Missing Expression")
     {
         ParsedDeclaration p("INTEGER a := *");
-        REQUIRE(p.declaration.size() == 1);
+        CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
     }
 
     SECTION("Expected Declaration")
     {
         ParsedDeclaration p("OVERLAY x WITH");
-        REQUIRE(p.declaration.empty());
+        CHECK(p.declaration.empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
     }
 
     SECTION("Overlay Missing Declaration")
     {
         const ParsedStatement s("BEGIN OVERLAY x WITH ; END");
-        REQUIRE(s.statement.get() != nullptr);
+        CHECK(s.statement.get() != nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_DECLARATION));
     }

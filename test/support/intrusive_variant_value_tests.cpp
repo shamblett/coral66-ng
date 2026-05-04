@@ -111,21 +111,21 @@ TEST_CASE("IntrusiveVariantValue non trivial", "[IVV]")
     SECTION("Simple usage")
     {
         coral66::IntrusiveVariantValue value = Derived1(5, 3.0);
-        REQUIRE(value->is<Derived1>());
+        CHECK(value->is<Derived1>());
         CHECK(value->as<Derived1>().size == 5);
         CHECK(value->as<Derived1>().thing == 3.0);
     }
     SECTION("In place construction")
     {
         coral66::IntrusiveVariantValue value(std::in_place_type<Derived1>, 5, 3.0);
-        REQUIRE(value->is<Derived1>());
+        CHECK(value->is<Derived1>());
         CHECK(value->as<Derived1>().size == 5);
         CHECK(value->as<Derived1>().thing == 3.0);
     }
     SECTION("Emplace construction")
     {
         coral66::IntrusiveVariantValue value(std::in_place_type<Derived1>, 5, 3.0);
-        REQUIRE(value->is<Derived1>());
+        CHECK(value->is<Derived1>());
         CHECK(value->as<Derived1>().size == 5);
         CHECK(value->as<Derived1>().thing == 3.0);
         auto& derived = value.emplace<Derived1>(8, 5.0);
@@ -145,7 +145,7 @@ TEST_CASE("IntrusiveVariantValue non trivial", "[IVV]")
     {
         auto d = Derived1(5, 3.0);
         coral66::IntrusiveVariantValue value = d;
-        REQUIRE(value->is<Derived1>());
+        CHECK(value->is<Derived1>());
         value->as<Derived1>().size = 3;
         CHECK(value->as<Derived1>().size == 3);
         value->as<Derived1>().thing = 2;

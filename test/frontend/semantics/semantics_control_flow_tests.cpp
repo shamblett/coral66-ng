@@ -1,5 +1,5 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
@@ -31,7 +31,7 @@ struct ControlFlowResult
         : ss(outStr), context(parsed.cTokens, &ss, &errors), symPass(context), typePass(context), cfPass(context)
     {
         DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::clearDiagnostics();
-        REQUIRE(parsed.program.hasBlock());
+        CHECK(parsed.program.hasBlock());
         if (parsed.program.hasBlock())
         {
             symPass.run(parsed.program);
@@ -53,140 +53,140 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[5] END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Access Out of Bounds (Lower)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[0] END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Access Out of Bounds (Upper)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[11] END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Access Evaluated Bound Valid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[1 + 4] END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Access Evaluated Bound Invalid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:10] ; INTEGER I ; I := A[5 + 6] END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Declaration Evaluated Bounds Valid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1+1 : 3*3] ; INTEGER I ; I := A[9] END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Declaration Evaluated Bounds Invalid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1+1 : 3*3] ; INTEGER I ; I := A[10] END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Array Declaration Bounds Cross-Over")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[10:1] ; END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_ARRAY_BOUNDS"));
+        CHECK(res.hasDiagnostic("INVALID_ARRAY_BOUNDS"));
     }
 
     SECTION("Multi-Dimensional Array Access Valid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:5, -5:5] ; INTEGER I ; I := A[3, 0] END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(!res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Multi-Dimensional Array Access Invalid")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER ARRAY A[1:5, -5:5] ; INTEGER I ; I := A[3, -6] END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
+        CHECK(res.hasDiagnostic("ARRAY_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Valid Part Word Bounds")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 10 , 5 ] I END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("INVALID_BIT_RANGE"));
+        CHECK(!res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
     SECTION("Valid Part Word Bounds Evaluated")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 5 * 2 , 10 / 2 ] I END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("INVALID_BIT_RANGE"));
+        CHECK(!res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
     SECTION("Invalid Part Word Range (Too large)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 20 , 10 ] I END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_BIT_RANGE"));
+        CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
     SECTION("Invalid Part Word Range (Negative Start)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ -1 , 5 ] I END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_BIT_RANGE"));
+        CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
     SECTION("Invalid Part Word Range (Negative Width)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 5 , -1 ] I END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_BIT_RANGE"));
+        CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
     SECTION("Valid Fixed Scaling")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( 16 , 8 ) ( I ) END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+        CHECK(!res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
     }
 
     SECTION("Invalid Fixed Scaling (Fraction > Total)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( 16 , 20 ) ( I ) END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+        CHECK(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
     }
 
     SECTION("Invalid Fixed Scaling (Negative Total)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( -10 , 5 ) ( I ) END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+        CHECK(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
     }
 
     SECTION("Invalid Fixed Scaling (Zero Total)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( 0 , 0 ) ( I ) END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+        CHECK(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
     }
 
     SECTION("Invalid Fixed Scaling (Negative Fraction)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := FIXED ( 16 , -2 ) ( I ) END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
+        CHECK(res.hasDiagnostic("INVALID_SCALE_FOR_FIXED"));
     }
 }
 
@@ -196,28 +196,29 @@ TEST_CASE("Control Flow - Answer Statement", "[Semantics][ControlFlow]")
     {
         const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; P END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
+        CHECK(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 
     SECTION("Typed Procedure with deeply nested Answer")
     {
-        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN BEGIN ANSWER 1 END ; END ; P END");
+        const ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN BEGIN ANSWER 1 END ; END ; P END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
+        CHECK(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 
     SECTION("Typed Procedure missing Answer")
     {
         const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER PROCEDURE P ; BEGIN END ; P END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
+        CHECK(res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 
     SECTION("Untyped Procedure without Answer")
     {
         const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN END ; P END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
+        CHECK(!res.hasDiagnostic("MISSING_ANSWER_STATEMENT"));
     }
 }
 
@@ -227,14 +228,15 @@ TEST_CASE("Control Flow - Block Jumps", "[Semantics][ControlFlow]")
     {
         const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN GOTO MYLABEL ; END ; END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("ILLEGAL_BLOCK_JUMP"));
+        CHECK(!res.hasDiagnostic("ILLEGAL_BLOCK_JUMP"));
     }
 
     SECTION("Invalid Jump Into Block")
     {
-        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO MYLABEL ; BEGIN INTEGER J ; MYLABEL: I := 1 ; END ; END");
+        const ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; GOTO MYLABEL ; BEGIN INTEGER J ; MYLABEL: I := 1 ; END ; END");
         ControlFlowResult res(parsed);
-        REQUIRE(res.hasDiagnostic("UNDECLARED_IDENTIFIER_N"));
+        CHECK(res.hasDiagnostic("UNDECLARED_IDENTIFIER_N"));
     }
 }
 
@@ -242,22 +244,21 @@ TEST_CASE("Control Flow - Switch & Presets", "[Semantics][ControlFlow]")
 {
     SECTION("Switch bounds constant evaluation valid")
     {
-        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[1] ; END ; END");
+        const ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[1] ; END ; END");
         ControlFlowResult res(parsed);
-        REQUIRE(!res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+        CHECK(!res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     }
 
     // TODO SECTION("Switch bounds constant evaluation too small")
     // {
-    //     ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ; END");
-    //     ControlFlowResult res(parsed);
-    //     REQUIRE(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+    //     ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ;
+    //     END"); ControlFlowResult res(parsed); CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     // }
     //
     // SECTION("Switch bounds constant evaluation too large")
     // {
-    //     ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ; END");
-    //     ControlFlowResult res(parsed);
-    //     REQUIRE(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+    //     ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ;
+    //     END"); ControlFlowResult res(parsed); CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     // }
 }

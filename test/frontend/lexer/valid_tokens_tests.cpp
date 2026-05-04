@@ -95,7 +95,7 @@ TEST_CASE("Coral Lexing Identifiers", "[lexer]")
     // Although Coral66 does not allow identifiers that contain uppercase characters
     // these are valid at this stage of lexing
     auto result = lex("myidentifier var123 BILLY frEd");
-    REQUIRE(result.data().size() == 4);
+    CHECK(result.data().size() == 4);
     CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "myidentifier");
     CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Identifier);
@@ -111,7 +111,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
     SECTION("Integers")
     {
         auto result = lex("123 0 9999");
-        REQUIRE(result.data().size() == 3);
+        CHECK(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 123);
@@ -126,7 +126,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
     SECTION("Floating Point")
     {
         auto result = lex("3.14 0.0 .5 1.2");
-        REQUIRE(result.data().size() == 4);
+        CHECK(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);
         CHECK(std::get<llvm::APFloat>(result.data()[0].getValue()) == llvm::APFloat(3.14));
@@ -144,7 +144,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
     SECTION("Exponents")
     {
         auto result = lex("2.5'3 ' 3 10 '-2");
-        REQUIRE(result.data().size() == 3);
+        CHECK(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);
         CHECK(std::get<llvm::APFloat>(result.data()[0].getValue()) == llvm::APFloat(2500.0));
@@ -161,7 +161,7 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
     SECTION("Strings")
     {
         auto result = lex(R"("Hello World" "It's me" "")");
-        REQUIRE(result.data().size() == 3);
+        CHECK(result.data().size() == 3);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
 
@@ -178,7 +178,7 @@ TEST_CASE("Nested Quotes in String Literals", "[lexer]")
     SECTION("String with nested quotes")
     {
         auto result = lex(" \"a \"\" b\" ");
-        REQUIRE(result.data().size() == 1);
+        CHECK(result.data().size() == 1);
         CHECK(result.data()[0].getTokenType() == TokenType::StringLiteral);
         CHECK(result.data()[0].getText() == "a \" b");
     }
@@ -186,7 +186,7 @@ TEST_CASE("Nested Quotes in String Literals", "[lexer]")
     SECTION("Empty string")
     {
         auto result = lex(" \"\" ");
-        REQUIRE(result.data().size() == 1);
+        CHECK(result.data().size() == 1);
         CHECK(result.data()[0].getTokenType() == TokenType::StringLiteral);
         CHECK(result.data()[0].getText() == "");
     }
@@ -194,7 +194,7 @@ TEST_CASE("Nested Quotes in String Literals", "[lexer]")
     SECTION("String with quotes at the ends")
     {
         auto result = lex(" \"\"\"hello\"\"\" ");
-        REQUIRE(result.data().size() == 1);
+        CHECK(result.data().size() == 1);
         CHECK(result.data()[0].getTokenType() == TokenType::StringLiteral);
         CHECK(result.data()[0].getText() == "\"hello\"");
     }

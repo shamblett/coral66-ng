@@ -45,7 +45,7 @@ TEST_CASE("Coral Lexing Identifiers - Invalid Identifier Strings", "[lexer]")
 {
     bool errors = false;
     auto result = lex("my/identifier var1?23 st+art", errors);
-    REQUIRE(result.data().size() == 8);
+    CHECK(result.data().size() == 8);
     CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Identifier);
     CHECK(std::get<std::string>(result.data()[0].getValue()) == "my");
     CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Division);
@@ -122,7 +122,7 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
     {
         bool errors = false;
         auto result = lex("12#3 !0 9999g", errors);
-        REQUIRE(result.data().size() == 5);
+        CHECK(result.data().size() == 5);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 12);
@@ -144,7 +144,7 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
     {
         bool errors = false;
         auto result = lex("3.14h 0.gg0 rr.5 1.2eo", errors);
-        REQUIRE(result.data().size() == 8);
+        CHECK(result.data().size() == 8);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);
         CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(result.data()[2].getType() == coral66::lexer::CToken::Floating);
@@ -160,7 +160,7 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
     {
         bool errors = false;
         auto result = lex(R"("Hello World" "It"s me" "")", errors);
-        REQUIRE(result.data().size() == 4);
+        CHECK(result.data().size() == 4);
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[0].getValue()) == "Hello World");
         CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::StringLiteral);

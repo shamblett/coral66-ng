@@ -59,8 +59,8 @@ TEST_CASE("Symbol Resolution - Basic Declarations", "[Semantics][SymbolResolutio
         SymbolResolutionResult res(parsed);
 
         auto usable = findDeclaration(res.context, "I");
-        REQUIRE(usable != nullptr);
-        REQUIRE(usable->is<semantics::VariableDeclaration>());
+        CHECK(usable != nullptr);
+        CHECK(usable->is<semantics::VariableDeclaration>());
         auto& variableDeclaration = usable->as<semantics::VariableDeclaration>();
         CHECK(variableDeclaration.getType().is<PrimitiveType>());
         CHECK(variableDeclaration.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
@@ -74,9 +74,9 @@ TEST_CASE("Symbol Resolution - Basic Declarations", "[Semantics][SymbolResolutio
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I, J, K ; END");
         SymbolResolutionResult res(parsed);
 
-        REQUIRE(findDeclaration(res.context, "I") != nullptr);
-        REQUIRE(findDeclaration(res.context, "J") != nullptr);
-        REQUIRE(findDeclaration(res.context, "K") != nullptr);
+        CHECK(findDeclaration(res.context, "I") != nullptr);
+        CHECK(findDeclaration(res.context, "J") != nullptr);
+        CHECK(findDeclaration(res.context, "K") != nullptr);
         CHECK(res.errors == false);
     }
 
@@ -86,18 +86,18 @@ TEST_CASE("Symbol Resolution - Basic Declarations", "[Semantics][SymbolResolutio
         SymbolResolutionResult res(parsed);
 
         auto iDeclaration = findDeclaration(res.context, "I");
-        REQUIRE(iDeclaration != nullptr);
+        CHECK(iDeclaration != nullptr);
         CHECK(iDeclaration->as<semantics::VariableDeclaration>().getType().as<PrimitiveType>().getKind()
               == PrimitiveType::Integer);
 
         auto fDeclaration = findDeclaration(res.context, "F");
-        REQUIRE(fDeclaration != nullptr);
+        CHECK(fDeclaration != nullptr);
         CHECK(fDeclaration->as<semantics::VariableDeclaration>().getType().as<PrimitiveType>().getKind()
               == PrimitiveType::Floating);
 
         auto xDeclaration = findDeclaration(res.context, "X");
-        REQUIRE(xDeclaration != nullptr);
-        REQUIRE(xDeclaration->as<semantics::VariableDeclaration>().getType().is<FixedType>());
+        CHECK(xDeclaration != nullptr);
+        CHECK(xDeclaration->as<semantics::VariableDeclaration>().getType().is<FixedType>());
         CHECK(xDeclaration->as<semantics::VariableDeclaration>().getType().as<FixedType>().getTotalBits() == 20);
         CHECK(xDeclaration->as<semantics::VariableDeclaration>().getType().as<FixedType>().getFractionalBits() == 12);
     }
@@ -120,7 +120,7 @@ TEST_CASE("Symbol Resolution - Scopes", "[Semantics][SymbolResolution]")
 
         CHECK(res.errors == true);
         auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
-        REQUIRE(diagnostics.size() == 1);
+        CHECK(diagnostics.size() == 1);
         CHECK(diagnostics[0].getName() == "REDEFINITION_OF_SYMBOL_N");
     }
 
@@ -143,8 +143,8 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         auto arrayDeclaration = findDeclaration(res.context, "A");
-        REQUIRE(arrayDeclaration != nullptr);
-        REQUIRE(arrayDeclaration->is<semantics::ArrayDeclaration>());
+        CHECK(arrayDeclaration != nullptr);
+        CHECK(arrayDeclaration->is<semantics::ArrayDeclaration>());
         CHECK(arrayDeclaration->as<semantics::ArrayDeclaration>().getName() == "A");
         CHECK(arrayDeclaration->as<semantics::ArrayDeclaration>().getType().is<ArrayType>());
     }
@@ -158,45 +158,45 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         auto usable = findDeclaration(res.context, "P");
-        REQUIRE(usable != nullptr);
-        REQUIRE(usable->is<semantics::ProcedureDeclaration>());
+        CHECK(usable != nullptr);
+        CHECK(usable->is<semantics::ProcedureDeclaration>());
         auto& procType = usable->as<semantics::ProcedureDeclaration>().getType().as<ProcedureType>();
-        REQUIRE(procType.getParameters().size() == 8);
+        CHECK(procType.getParameters().size() == 8);
 
         CHECK(procType.getParameters()[0].name == "A");
         CHECK(procType.getParameters()[0].isValue == true);
-        REQUIRE(procType.getParameters()[0].type != nullptr);
+        CHECK(procType.getParameters()[0].type != nullptr);
         CHECK(procType.getParameters()[0].type->is<PrimitiveType>());
 
         CHECK(procType.getParameters()[1].name == "B");
         CHECK(procType.getParameters()[1].isValue == false);
-        REQUIRE(procType.getParameters()[1].type != nullptr);
+        CHECK(procType.getParameters()[1].type != nullptr);
         CHECK(procType.getParameters()[1].type->is<PrimitiveType>());
 
         CHECK(procType.getParameters()[2].name == "C");
-        REQUIRE(procType.getParameters()[2].type != nullptr);
+        CHECK(procType.getParameters()[2].type != nullptr);
         CHECK(procType.getParameters()[2].type->is<ArrayType>());
 
         CHECK(procType.getParameters()[3].name == "D");
-        REQUIRE(procType.getParameters()[3].type != nullptr);
+        CHECK(procType.getParameters()[3].type != nullptr);
         CHECK(procType.getParameters()[3].type->is<LabelType>());
 
         CHECK(procType.getParameters()[4].name == "E");
-        REQUIRE(procType.getParameters()[4].type != nullptr);
+        CHECK(procType.getParameters()[4].type != nullptr);
         CHECK(procType.getParameters()[4].type->is<SwitchType>());
 
         CHECK(procType.getParameters()[5].name == "F");
-        REQUIRE(procType.getParameters()[5].type != nullptr);
+        CHECK(procType.getParameters()[5].type != nullptr);
         CHECK(procType.getParameters()[5].type->is<ProcedureType>());
 
         CHECK(procType.getParameters()[6].name == "G");
         CHECK(procType.getParameters()[6].isValue == true);
-        REQUIRE(procType.getParameters()[6].type != nullptr);
+        CHECK(procType.getParameters()[6].type != nullptr);
         CHECK(procType.getParameters()[6].type->is<UntypedType>());
 
         CHECK(procType.getParameters()[7].name == "H");
         CHECK(procType.getParameters()[7].isValue == false); // Location
-        REQUIRE(procType.getParameters()[7].type != nullptr);
+        CHECK(procType.getParameters()[7].type != nullptr);
         CHECK(procType.getParameters()[7].type->is<UntypedType>());
     }
 
@@ -206,8 +206,8 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         auto procedureDeclaration = findDeclaration(res.context, "P");
-        REQUIRE(procedureDeclaration != nullptr);
-        REQUIRE(procedureDeclaration->is<semantics::ProcedureDeclaration>());
+        CHECK(procedureDeclaration != nullptr);
+        CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getName() == "P");
 
         CHECK(res.errors == false);
@@ -254,32 +254,32 @@ TEST_CASE("Symbol Resolution - Complex Declarations", "[Semantics][SymbolResolut
             }
         }
 
-        REQUIRE(xUsable != nullptr);
+        CHECK(xUsable != nullptr);
         auto& xDeclaration = xUsable->as<semantics::TableElementDeclaration>();
         CHECK(xDeclaration.isUnsigned() == true);
-        REQUIRE(xDeclaration.getWordPosition().has_value());
+        CHECK(xDeclaration.getWordPosition().has_value());
         CHECK(xDeclaration.getWordPosition().value() == 0);
-        REQUIRE(xDeclaration.getBitPosition().has_value());
+        CHECK(xDeclaration.getBitPosition().has_value());
         CHECK(xDeclaration.getBitPosition().value() == 5);
         CHECK(xDeclaration.getType().is<PrimitiveType>());
         CHECK(xDeclaration.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
 
-        REQUIRE(yUsable != nullptr);
+        CHECK(yUsable != nullptr);
         auto& yDeclaration = yUsable->as<semantics::TableElementDeclaration>();
         CHECK(yDeclaration.isUnsigned() == false);
-        REQUIRE(yDeclaration.getWordPosition().has_value());
+        CHECK(yDeclaration.getWordPosition().has_value());
         CHECK(yDeclaration.getWordPosition().value() == 1);
         CHECK(yDeclaration.getBitPosition().has_value() == false);
         CHECK(yDeclaration.getType().is<FixedType>());
         CHECK(yDeclaration.getType().as<FixedType>().getTotalBits() == 22);
         CHECK(yDeclaration.getType().as<FixedType>().getFractionalBits() == 11);
 
-        REQUIRE(zUsable != nullptr);
+        CHECK(zUsable != nullptr);
         auto& zDeclaration = zUsable->as<semantics::TableElementDeclaration>();
         CHECK(zDeclaration.isUnsigned() == false);
-        REQUIRE(zDeclaration.getWordPosition().has_value());
+        CHECK(zDeclaration.getWordPosition().has_value());
         CHECK(zDeclaration.getWordPosition().value() == 2);
-        REQUIRE(zDeclaration.getBitPosition().has_value());
+        CHECK(zDeclaration.getBitPosition().has_value());
         CHECK(zDeclaration.getBitPosition().value() == 10);
         CHECK(zDeclaration.getType().is<PrimitiveType>());
         CHECK(zDeclaration.getType().as<PrimitiveType>().getKind() == PrimitiveType::Integer);
@@ -364,7 +364,7 @@ TEST_CASE("Symbol Resolution - Identifier Resolution", "[Semantics][SymbolResolu
                 if (std::get<std::string>(idExpr->getIdentifier()->getValue()) == "I")
                 {
                     found = true;
-                    REQUIRE(usable != nullptr);
+                    CHECK(usable != nullptr);
                     CHECK(usable->is<semantics::VariableDeclaration>());
                 }
             }
@@ -388,7 +388,7 @@ TEST_CASE("Symbol Resolution - Identifier Resolution", "[Semantics][SymbolResolu
                 if (std::get<std::string>(idExpr->getIdentifier()->getValue()) == "I")
                 {
                     found = true;
-                    REQUIRE(usable != nullptr);
+                    CHECK(usable != nullptr);
                     CHECK(usable->is<semantics::VariableDeclaration>());
                 }
             }
@@ -406,7 +406,7 @@ TEST_CASE("Symbol Resolution - Diagnostics", "[Semantics][SymbolResolution]")
 
         CHECK(res.errors == true);
         auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
-        REQUIRE(diagnostics.size() == 1);
+        CHECK(diagnostics.size() == 1);
         CHECK(diagnostics[0].getName() == "UNDECLARED_IDENTIFIER_N");
     }
 
@@ -425,7 +425,7 @@ TEST_CASE("Symbol Resolution - Diagnostics", "[Semantics][SymbolResolution]")
 
         CHECK(res.errors == true);
         auto diagnostic = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
-        REQUIRE(!diagnostic.empty());
+        CHECK(!diagnostic.empty());
         bool hasUndeclared = false;
         for (const auto& diagnostics : diagnostic)
         {
@@ -450,7 +450,7 @@ TEST_CASE("Symbol Resolution - Diagnostics", "[Semantics][SymbolResolution]")
 
         CHECK(res.errors == true);
         auto diagnostic = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
-        REQUIRE(!diagnostic.empty());
+        CHECK(!diagnostic.empty());
         bool hasUndeclared = false;
         for (const auto& diagnostics : diagnostic)
         {
@@ -628,28 +628,28 @@ TEST_CASE("Symbol Resolution - Procedure Signatures", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         auto usable = findDeclaration(res.context, "P");
-        REQUIRE(usable != nullptr);
-        REQUIRE(usable->is<semantics::ProcedureDeclaration>());
+        CHECK(usable != nullptr);
+        CHECK(usable->is<semantics::ProcedureDeclaration>());
         auto& procDeclaration = usable->as<semantics::ProcedureDeclaration>();
 
-        REQUIRE(procDeclaration.getType().is<ProcedureType>());
+        CHECK(procDeclaration.getType().is<ProcedureType>());
         auto& procType = procDeclaration.getType().as<ProcedureType>();
 
-        REQUIRE(procType.getParameters().size() == 3);
+        CHECK(procType.getParameters().size() == 3);
 
         CHECK(procType.getParameters()[0].name == "X");
         CHECK(procType.getParameters()[0].isValue == true);
-        REQUIRE(procType.getParameters()[0].type != nullptr);
+        CHECK(procType.getParameters()[0].type != nullptr);
         CHECK(procType.getParameters()[0].type->is<PrimitiveType>());
 
         CHECK(procType.getParameters()[1].name == "Y");
         CHECK(procType.getParameters()[1].isValue == false);
-        REQUIRE(procType.getParameters()[1].type != nullptr);
+        CHECK(procType.getParameters()[1].type != nullptr);
         CHECK(procType.getParameters()[1].type->is<PrimitiveType>());
 
         CHECK(procType.getParameters()[2].name == "Z");
         CHECK(procType.getParameters()[2].isValue == false);
-        REQUIRE(procType.getParameters()[2].type != nullptr);
+        CHECK(procType.getParameters()[2].type != nullptr);
         CHECK(procType.getParameters()[2].type->is<ArrayType>());
     }
 
@@ -659,11 +659,11 @@ TEST_CASE("Symbol Resolution - Procedure Signatures", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         auto usable = findDeclaration(res.context, "P");
-        REQUIRE(usable != nullptr);
-        REQUIRE(usable->is<semantics::ProcedureDeclaration>());
+        CHECK(usable != nullptr);
+        CHECK(usable->is<semantics::ProcedureDeclaration>());
 
         auto& procType = usable->as<semantics::ProcedureDeclaration>().getType().as<ProcedureType>();
-        REQUIRE(procType.getReturnType() != nullptr);
+        CHECK(procType.getReturnType() != nullptr);
         CHECK(procType.getReturnType()->is<PrimitiveType>());
         CHECK(procType.getReturnType()->as<PrimitiveType>().getKind() == PrimitiveType::Integer);
     }
@@ -677,14 +677,14 @@ TEST_CASE("Symbol Resolution - Array AST Linking", "[Semantics][SymbolResolution
         SymbolResolutionResult res(parsed);
 
         auto usable = findDeclaration(res.context, "A");
-        REQUIRE(usable != nullptr);
-        REQUIRE(usable->is<semantics::ArrayDeclaration>());
+        CHECK(usable != nullptr);
+        CHECK(usable->is<semantics::ArrayDeclaration>());
 
         auto& arrayDeclaration = usable->as<semantics::ArrayDeclaration>();
-        REQUIRE(arrayDeclaration.getAstNode() != nullptr);
+        CHECK(arrayDeclaration.getAstNode() != nullptr);
 
         auto* syntaxDeclaration = dynamic_cast<const syntax::ArrayDeclaration*>(arrayDeclaration.getAstNode());
-        REQUIRE(syntaxDeclaration != nullptr);
+        CHECK(syntaxDeclaration != nullptr);
         CHECK(syntaxDeclaration->getDimensions().size() == 1);
     }
 }
@@ -706,18 +706,18 @@ TEST_CASE("Symbol Resolution - Table Memory and AST Linking", "[Semantics][Symbo
             }
         }
 
-        REQUIRE(tableUsable != nullptr);
-        REQUIRE(tableUsable->is<semantics::TableDeclaration>());
+        CHECK(tableUsable != nullptr);
+        CHECK(tableUsable->is<semantics::TableDeclaration>());
         auto& tableDeclaration = tableUsable->as<semantics::TableDeclaration>();
 
         // AST Node Verification
-        REQUIRE(tableDeclaration.getAstNode() != nullptr);
+        CHECK(tableDeclaration.getAstNode() != nullptr);
         auto* syntaxDeclaration = dynamic_cast<const syntax::TableDeclaration*>(tableDeclaration.getAstNode());
-        REQUIRE(syntaxDeclaration != nullptr);
+        CHECK(syntaxDeclaration != nullptr);
         CHECK(std::get<std::string>(syntaxDeclaration->getIdentifier()->getValue()) == "t");
 
         // Type Memory Verification
-        REQUIRE(tableDeclaration.getType().is<TableType>());
+        CHECK(tableDeclaration.getType().is<TableType>());
         CHECK(tableDeclaration.getType().as<TableType>().getInfo().name == "t");
         CHECK(res.context.ownedTableInfos.size() == 1); // Ensure memory is tracked
     }
