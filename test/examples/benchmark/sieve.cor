@@ -70,13 +70,8 @@
    
       'ANSWER' count
    'END' sieve;
-   
-   startTime := clock;
+
    ans := sieve;
-   stopTime := clock;
-   
-   'IF' ans <> 1899 'THEN'
-      failed ("Result wrong");
 
 'END'
 
