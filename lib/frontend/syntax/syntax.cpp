@@ -87,8 +87,8 @@ std::vector<std::unique_ptr<Statement>> Block::takeStatements()
 
 // ParameterDeclaration
 
-ParameterDeclaration::ParameterDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, ParameterMode mode,
-                                           std::optional<lexer::CTokenIterator> type,
+ParameterDeclaration::ParameterDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           const ParameterMode mode, const std::optional<lexer::CTokenIterator> type,
                                            std::vector<lexer::CTokenIterator>&& identifiers,
                                            std::unique_ptr<Expression> fixedTotalBits,
                                            std::unique_ptr<Expression> fixedFractionBits)
@@ -124,8 +124,7 @@ VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, cons
                                          const lexer::CTokenIterator type,
                                          std::vector<lexer::CTokenIterator>&& identifiers, 
                                          std::unique_ptr<Expression> fixedTotalBits,
-                                         std::unique_ptr<Expression> fixedFractionBits,
-                                         bool hasPreset,
+                                         std::unique_ptr<Expression> fixedFractionBits, const bool hasPreset,
                                          std::vector<lexer::CTokenIterator>&& presetTokens)
     : Declaration(begin, end),
       m_type(type),
@@ -153,7 +152,7 @@ const std::vector<lexer::CTokenIterator>& VariableDeclaration::getPresetTokens()
 {
     return m_presetTokens;
 }
-void VariableDeclaration::setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens)
+void VariableDeclaration::setPreset(const bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens)
 {
     m_hasPreset = hasPreset;
     m_presetTokens = tokens;
@@ -164,7 +163,7 @@ ProcedureDeclaration::ProcedureDeclaration(const lexer::CTokenIterator begin, co
                                            const lexer::CTokenIterator name,
                                            std::vector<std::unique_ptr<Declaration>>&& parameters,
                                            std::unique_ptr<Statement>&& body,
-                                           std::optional<lexer::CTokenIterator> typeToken, bool isRecursive)
+                                           const std::optional<lexer::CTokenIterator> typeToken, const bool isRecursive)
     : Declaration(begin, end),
       m_typeToken(typeToken),
       m_name(name),
@@ -193,8 +192,7 @@ ArrayDeclaration::ArrayDeclaration(
     std::vector<lexer::CTokenIterator>&& identifiers,
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
     std::unique_ptr<Expression> fixedTotalBits,
-    std::unique_ptr<Expression> fixedFractionBits,
-    bool hasPreset,
+    std::unique_ptr<Expression> fixedFractionBits, const bool hasPreset,
     std::vector<lexer::CTokenIterator>&& presetTokens)
     : Declaration(begin, end),
       m_type(type),
@@ -228,7 +226,7 @@ const std::vector<lexer::CTokenIterator>& ArrayDeclaration::getPresetTokens() co
 {
     return m_presetTokens;
 }
-void ArrayDeclaration::setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens)
+void ArrayDeclaration::setPreset(const bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens)
 {
     m_hasPreset = hasPreset;
     m_presetTokens = tokens;
@@ -237,9 +235,9 @@ void ArrayDeclaration::setPreset(bool hasPreset, const std::vector<lexer::CToken
 // TableElementDeclaration
 TableElementDeclaration::TableElementDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                                  const lexer::CTokenIterator identifier,
-                                                 std::optional<lexer::CTokenIterator> type, bool isUnsigned,
-                                                 std::optional<lexer::CTokenIterator> wordPosition,
-                                                 std::optional<lexer::CTokenIterator> bitPosition,
+                                                 const std::optional<lexer::CTokenIterator> type, const bool isUnsigned,
+                                                 const std::optional<lexer::CTokenIterator> wordPosition,
+                                                 const std::optional<lexer::CTokenIterator> bitPosition,
                                                  std::unique_ptr<Expression> fixedTotalBits,
                                                  std::unique_ptr<Expression> fixedFractionBits)
     : Declaration(begin, end),
@@ -278,7 +276,7 @@ std::optional<lexer::CTokenIterator> TableElementDeclaration::getBitPosition() c
 TableDeclaration::TableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                    const lexer::CTokenIterator identifier, std::unique_ptr<Expression>&& width,
                                    std::unique_ptr<Expression>&& length,
-                                   std::vector<std::unique_ptr<Declaration>>&& elements, bool hasPreset,
+                                   std::vector<std::unique_ptr<Declaration>>&& elements, const bool hasPreset,
                                    std::vector<lexer::CTokenIterator>&& presetTokens)
     : Declaration(begin, end),
       m_identifier(identifier),
@@ -318,13 +316,13 @@ const std::vector<lexer::CTokenIterator>& TableDeclaration::getPresetTokens() co
 // OverlayDeclaration
 OverlayDeclaration::OverlayDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                        const lexer::CTokenIterator base, const lexer::CTokenIterator offset,
-                                       std::optional<lexer::CTokenIterator> offset2,
-                                       std::unique_ptr<Declaration>&& overlayedDeclaration)
+                                       const std::optional<lexer::CTokenIterator> offset2,
+                                       std::unique_ptr<Declaration>&& overlayDeclaration)
     : Declaration(begin, end),
       m_base(base),
       m_offset(offset),
       m_offset2(offset2),
-      m_overlayDeclaration(std::move(overlayedDeclaration))
+      m_overlayDeclaration(std::move(overlayDeclaration))
 {
 }
 
@@ -349,7 +347,7 @@ const Declaration& OverlayDeclaration::getOverlayDeclaration() const
 
 // DummyStatement
 // ReSharper disable once CppParameterMayBeConst
-DummyStatement::DummyStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end)
+DummyStatement::DummyStatement(lexer::CTokenIterator begin, const lexer::CTokenIterator end)
 
     : Statement(begin, end)
 {
@@ -704,7 +702,8 @@ const std::vector<lexer::CTokenIterator>& PlaceSpecification::getIdentifiers() c
 
 // ProcedureSpecification
 ProcedureSpecification::ProcedureSpecification(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                                               std::optional<lexer::CTokenIterator> type, lexer::CTokenIterator name,
+                                               const std::optional<lexer::CTokenIterator> type,
+                                               const lexer::CTokenIterator name,
                                                std::vector<std::unique_ptr<Declaration>>&& parameters)
     : Declaration(begin, end), m_type(type), m_name(name), m_parameters(std::move(parameters))
 {

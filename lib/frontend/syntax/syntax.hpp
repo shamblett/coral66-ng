@@ -259,7 +259,8 @@ class SwitchDeclaration final : public Declaration
     std::vector<lexer::CTokenIterator> m_labels;
 
 public:
-    SwitchDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator identifier,
+    SwitchDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                      const lexer::CTokenIterator identifier,
                       std::vector<lexer::CTokenIterator> labels)
         : Declaration(begin, end), m_identifier(identifier), m_labels(std::move(labels))
     {
@@ -310,7 +311,7 @@ class Statement : public Node
 
 public:
     using Node::Node;
-    Statement(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::vector<lexer::CTokenIterator> labels)
+    Statement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::vector<lexer::CTokenIterator> labels)
         : Node(begin, end), m_labels(std::move(labels))
     {
     }
