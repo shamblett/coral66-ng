@@ -19,7 +19,7 @@ bool coral66::x86_target_features::hasFeature(Features const features) const
     }
 }
 
-bool coral66::x86_target_features::setFeature(Features const features, bool value)
+bool coral66::x86_target_features::setFeature(Features const features, const bool value)
 {
     switch (features)
     {

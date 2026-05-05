@@ -146,7 +146,7 @@ public:
                                               std::uint64_t const offset) const noexcept override
     {
         CORAL66_ASSERT(fileID < m_files.size());
-        auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
+        const auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
         CORAL66_ASSERT(result != m_files[fileID].starts.end());
         return std::distance(m_files[fileID].starts.begin(), result) + (*result == offset ? 1 : 0);
     }

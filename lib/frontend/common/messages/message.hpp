@@ -33,7 +33,7 @@ class Message final
 public:
     Message() = default;
 
-    Message(Severity severity, std::string text) : m_severity(severity), m_text(std::move(text)) {}
+    Message(const Severity severity, std::string text) : m_severity(severity), m_text(std::move(text)) {}
 
     [[nodiscard]] Severity getSeverity() const
     {

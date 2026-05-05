@@ -148,7 +148,7 @@ protected:
     TokenBase() = default;
 
     TokenBase(TokenType const tokenType, std::uint64_t const offset, std::uint64_t const length,
-              std::uint32_t const fileID, std::uint32_t macroID)
+              std::uint32_t const fileID, const std::uint32_t macroID)
         : m_leadingWhitespace(false),
           m_tokenType(tokenType),
           m_macroId(macroID),
@@ -190,7 +190,7 @@ public:
         return m_macroId;
     }
 
-    void setMacroId(std::uint32_t macroId) noexcept
+    void setMacroId(const std::uint32_t macroId) noexcept
     {
         m_macroId = macroId;
     }
@@ -200,7 +200,7 @@ public:
         return m_fileID;
     }
 
-    void setFileId(std::uint32_t fileId) noexcept
+    void setFileId(const std::uint32_t fileId) noexcept
     {
         m_fileID = fileId;
     }
@@ -210,7 +210,7 @@ public:
         return m_leadingWhitespace;
     }
 
-    void setLeadingWhitespace(bool leadingWhitespace) noexcept
+    void setLeadingWhitespace(const bool leadingWhitespace) noexcept
     {
         m_leadingWhitespace = leadingWhitespace;
     }
@@ -230,7 +230,7 @@ class PPToken final : public TokenBase
                                       representation have been removed*/
 
 public:
-    PPToken(TokenType tokenType, std::uint64_t const offset, std::uint64_t const length,
+    PPToken(const TokenType tokenType, std::uint64_t const offset, std::uint64_t const length,
             std::uint64_t const charSpaceOffset, std::uint64_t const charSpaceLength, std::uint32_t const fileID,
             std::uint32_t const macroID = 0, std::string_view const value = {})
         : TokenBase(tokenType, offset, length, fileID, macroID),
@@ -331,7 +331,7 @@ public:
         return m_type;
     }
 
-    void setType(Type type) noexcept
+    void setType(const Type type) noexcept
     {
         m_type = type;
     }

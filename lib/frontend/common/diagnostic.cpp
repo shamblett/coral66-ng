@@ -111,6 +111,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
     const auto widthOfText = coral66::unsafeColumnWidth(text);
     std::vector<std::string> canvas;
     std::string extraAtEnd;
+    // ReSharper disable once CppUseStructuredBinding
     for (auto& iter : modifiersOfLine)
     {
         coral66::match(
@@ -146,7 +147,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                         llvm::UTF32 utf32;
                         llvm::UTF32* targetStart = &utf32;
                         const auto* before = ptr;
-                        auto result = llvm::ConvertUTF8toUTF32(
+                        const auto result = llvm::ConvertUTF8toUTF32(
                             reinterpret_cast<const llvm::UTF8**>(&ptr),
                             reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart, targetStart + 1,
                             llvm::strictConversion);
@@ -166,7 +167,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                         llvm::UTF32 utf32;
                         llvm::UTF32* targetStart = &utf32;
                         const auto* before = start;
-                        auto result = llvm::ConvertUTF8toUTF32(
+                        const auto result = llvm::ConvertUTF8toUTF32(
                             reinterpret_cast<const llvm::UTF8**>(&start),
                             reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart, targetStart + 1,
                             llvm::strictConversion);
@@ -245,7 +246,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                 }
                 indent = coral66::unsafeColumnWidth(text.substr(0, annotate.pos - lineStartOffset));
                 // Check if we need to expand height
-                bool allAreSpace =
+                const bool allAreSpace =
                     std::all_of(canvas.back().begin() + indent,
                                 canvas.back().begin()
                                     + std::min<std::size_t>(indent + annotate.text.size() + 1, canvas.back().size()),
@@ -303,12 +304,12 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             file = sourceInterface.getFiles()[file->first].includedBy;
         }
         std::ranges::reverse(includeTrace);
-        for (auto& iter : includeTrace)
+        for (auto& [fst, snd] : includeTrace)
         {
-            auto line = sourceInterface.getLineNumber(iter.first, iter.second);
-            const auto& range = sourceInterface.getFiles()[iter.first].lineAndFileMapping;
+            auto line = sourceInterface.getLineNumber(fst, snd);
+            const auto& range = sourceInterface.getFiles()[fst].lineAndFileMapping;
             auto map =
-                llvm::upper_bound(range, line, [](auto line, const auto& tuple) { return line < std::get<0>(tuple); });
+                llvm::upper_bound(range, line, [](auto line1, const auto& tuple) { return line1 < std::get<0>(tuple); });
             if (!range.empty() && map == range.end())
             {
                 --map;
@@ -317,11 +318,11 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             {
                 // The element was not found. That means that any #lines appeared after this line or that none exist
                 llvm::WithColor(ss, llvm::raw_string_ostream::WHITE, true)
-                    << "In file included from " << sourceInterface.getFiles()[iter.first].path << ':' << line << ':';
+                    << "In file included from " << sourceInterface.getFiles()[fst].path << ':' << line << ':';
             }
             else
             {
-                const auto path = std::get<1>(*map).value_or(sourceInterface.getFiles()[iter.first].path);
+                const auto path = std::get<1>(*map).value_or(sourceInterface.getFiles()[fst].path);
                 const auto printedLine = std::get<2>(*map) + line - std::get<0>(*map);
                 llvm::WithColor(ss, llvm::raw_string_ostream::WHITE, true)
                     << "In file included from " << path << ':' << printedLine << ':';
@@ -335,7 +336,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         const auto [line, column] = getLineCol(location.first, sourceInterface);
         const auto& range = sourceInterface.getFiles()[location.first.fileId].lineAndFileMapping;
         auto iter =
-            llvm::upper_bound(range, line, [](auto line, const auto& tuple) { return line < std::get<0>(tuple); });
+            llvm::upper_bound(range, line, [](auto line1, const auto& tuple) { return line1 < std::get<0>(tuple); });
         if (!range.empty() && iter == range.end())
         {
             --iter;
@@ -452,16 +453,16 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             thisLineEndOffset += mapping[thisLineEndOffset - startOffset];
 
             auto& modifierForLine = fileAndLineToModifiers[{fileId, i}];
-            for (auto& iter : modifierForLine)
+            for (auto& [fromToInLine, value] : modifierForLine)
             {
-                iter.fromToInLine.first += mapping[iter.fromToInLine.first - startOffset];
-                iter.fromToInLine.second += mapping[iter.fromToInLine.second - startOffset];
-                if (std::holds_alternative<ModifierOfLine::Annotate>(iter.value))
+                fromToInLine.first += mapping[fromToInLine.first - startOffset];
+                fromToInLine.second += mapping[fromToInLine.second - startOffset];
+                if (std::holds_alternative<ModifierOfLine::Annotate>(value))
                 {
-                    auto& annotate = coral66::get<ModifierOfLine::Annotate>(iter.value);
-                    if (annotate.pos >= thisLineStartOffset && annotate.pos <= thisLineEndOffset)
+                    if (auto& [text, pos] = coral66::get<ModifierOfLine::Annotate>(value);
+                        pos >= thisLineStartOffset && pos <= thisLineEndOffset)
                     {
-                        annotate.pos += mapping[annotate.pos - startOffset];
+                        pos += mapping[pos - startOffset];
                     }
                 }
             }
@@ -510,7 +511,7 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
     const char* last = copy.data();
     while (const auto iter = nextArg(copy))
     {
-        auto index = iter->index;
+        const auto index = iter->index;
         auto mods = iter->modifier;
 
         ss.write(last, iter->view.data() - last);
@@ -533,8 +534,8 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
     ss << '\n';
 }
 
-coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(std::string_view message,
-                                                                    std::span<Argument> arguments) const
+coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(const std::string_view message,
+                                                                    const std::span<Argument> arguments) const
 {
     std::string result;
     ColorStringOstream ss(result);

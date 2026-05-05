@@ -93,7 +93,9 @@ PointRange getPointRange(const T& arg)
         {
             auto& [arg1, arg2] = arg;
             // ReSharper disable once CppDFAUnusedValue
-            PointLocation first{}, second{};
+            PointLocation first{};
+            // ReSharper disable once CppDFAUnusedValue
+            PointLocation second{};
             if constexpr (std::is_pointer_v<T1>)
             {
                 CORAL66_ASSERT(arg1);

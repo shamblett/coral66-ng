@@ -69,7 +69,7 @@ constexpr std::optional<Arg> nextArg(std::string_view& text)
     for (; modifierEnd != text.size() && !(text[modifierEnd] >= '0' && text[modifierEnd] <= '9'); modifierEnd++)
         ;
     CORAL66_ASSERT(modifierEnd != text.size());
-    auto view = text.substr(result, modifierEnd - result + 1);
+    const auto view = text.substr(result, modifierEnd - result + 1);
     auto modifier = view;
     modifier.remove_prefix(1);
     modifier.remove_suffix(1);
@@ -252,7 +252,7 @@ protected:
                                   llvm::raw_string_ostream& ss) const;
 
 public:
-    constexpr DiagnosticBase(Severity severity, std::string_view name) : m_severity(severity), m_name(name) {}
+    constexpr DiagnosticBase(const Severity severity, const std::string_view name) : m_severity(severity), m_name(name) {}
 
     [[nodiscard]] constexpr Severity getSeverity() const noexcept
     {
@@ -542,7 +542,7 @@ private:
     template <class Tuple, class... Ctx, std::size_t... ints>
     static std::array<Argument, N> createArgumentArray(Tuple&& args, std::index_sequence<ints...>, Ctx&&... ctx);
 
-    constexpr static MaxVector<std::string_view, N> customModifiersFor(std::size_t i)
+    constexpr static MaxVector<std::string_view, N> customModifiersFor(const std::size_t i)
     {
         coral66::MaxVector<std::string_view, N> result{};
         auto text = getFormat();

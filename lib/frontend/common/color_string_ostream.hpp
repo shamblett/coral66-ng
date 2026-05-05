@@ -31,12 +31,12 @@ public:
         return true;
     } // To let WithColor use color
 
-    llvm::raw_ostream& changeColor(const enum Colors Color, bool Bold = false, const bool BG = false) override
+    llvm::raw_ostream& changeColor(const enum Colors Color, const bool Bold = false, const bool BG = false) override
     { // NOLINT(*-default-arguments)
         if (!colors_enabled())
             return *this;
 
-        const char* color_code = "";
+        auto color_code = "";
         if (BG)
         {
             switch (Color)

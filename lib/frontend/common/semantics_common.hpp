@@ -51,7 +51,7 @@ protected:
     TypeFlags m_flags;
 
     template <class T>
-    Type(std::in_place_type_t<T>, TypeFlags flags)
+    Type(std::in_place_type_t<T>, const TypeFlags flags)
         : AbstractIntrusiveVariant(std::in_place_type<T>), m_flags(static_cast<TypeFlags>(flags))
     {
     }
@@ -126,7 +126,7 @@ private:
     }
 
 public:
-    explicit PrimitiveType(Kind kind, TypeFlags flags = Nothing)
+    explicit PrimitiveType(const Kind kind, const TypeFlags flags = Nothing)
         : Type(std::in_place_type<PrimitiveType>, flags), m_kind(kind)
     {
     }
@@ -156,7 +156,7 @@ class UntypedType final : public Type
     }
 
 public:
-    explicit UntypedType(TypeFlags flags = Nothing) : Type(std::in_place_type<UntypedType>, flags) {}
+    explicit UntypedType(const TypeFlags flags = Nothing) : Type(std::in_place_type<UntypedType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(UntypedType)
 };
 
@@ -175,7 +175,7 @@ class FixedType final : public Type
     }
 
 public:
-    FixedType(std::uint8_t totalBits, std::uint8_t fractionalBits, TypeFlags flags = Nothing)
+    FixedType(const std::uint8_t totalBits, const std::uint8_t fractionalBits, const TypeFlags flags = Nothing)
         : Type(std::in_place_type<FixedType>, flags), m_totalBits(totalBits), m_fractionalBits(fractionalBits)
     {
     }
@@ -204,8 +204,8 @@ class ArrayType final : public Type
     [[nodiscard]] bool equalsImpl(const ArrayType& rhs) const;
 
 public:
-    ArrayType(coral66::not_null<const Type> elementType, std::vector<std::uint64_t> dimensions,
-              TypeFlags flags = Nothing)
+    ArrayType(const not_null<const Type> elementType, std::vector<std::uint64_t> dimensions,
+              const TypeFlags flags = Nothing)
         : Type(std::in_place_type<ArrayType>, flags), m_elementType(elementType), m_dimensions(std::move(dimensions))
     {
     }
@@ -231,7 +231,7 @@ class TableType final : public Type
     [[nodiscard]] bool equalsImpl(const TableType& rhs) const;
 
 public:
-    explicit TableType(const TableInfo& info, TypeFlags flags = Nothing)
+    explicit TableType(const TableInfo& info, const TypeFlags flags = Nothing)
         : Type(std::in_place_type<TableType>, flags), m_info(&info)
     {
     }
@@ -251,7 +251,7 @@ class OverlayType final : public Type
     [[nodiscard]] bool equalsImpl(const OverlayType& rhs) const;
 
 public:
-    explicit OverlayType(const OverlayInfo& info, TypeFlags flags = Nothing)
+    explicit OverlayType(const OverlayInfo& info, const TypeFlags flags = Nothing)
         : Type(std::in_place_type<OverlayType>, flags), m_info(&info)
     {
     }
@@ -288,7 +288,7 @@ private:
     [[nodiscard]] bool equalsImpl(const ProcedureType& rhs) const;
 
 public:
-    ProcedureType(const Type* returnType, std::vector<Parameter> parameters, TypeFlags flags = Nothing)
+    ProcedureType(const Type* returnType, std::vector<Parameter> parameters, const TypeFlags flags = Nothing)
         : Type(std::in_place_type<ProcedureType>, flags), m_returnType(returnType), m_parameters(std::move(parameters))
     {
     }
@@ -322,7 +322,7 @@ class ErrorType : public Type
     }
 
 public:
-    explicit ErrorType(TypeFlags flags = Nothing) : Type(std::in_place_type<ErrorType>, flags) {}
+    explicit ErrorType(const TypeFlags flags = Nothing) : Type(std::in_place_type<ErrorType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(ErrorType)
 };
 
@@ -343,7 +343,7 @@ class LabelType : public Type
     }
 
 public:
-    explicit LabelType(TypeFlags flags = Nothing) : Type(std::in_place_type<LabelType>, flags) {}
+    explicit LabelType(const TypeFlags flags = Nothing) : Type(std::in_place_type<LabelType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelType)
 };
 
@@ -364,7 +364,7 @@ class SwitchType : public Type
     }
 
 public:
-    explicit SwitchType(TypeFlags flags = Nothing) : Type(std::in_place_type<SwitchType>, flags) {}
+    explicit SwitchType(const TypeFlags flags = Nothing) : Type(std::in_place_type<SwitchType>, flags) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(SwitchType)
 };
 
