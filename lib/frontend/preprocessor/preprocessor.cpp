@@ -18,10 +18,6 @@
 
 void coral66::pp::Preprocessor::pushLine(std::vector<lexer::PPToken>&& tokens)
 {
-    if (m_visitingScratchPad)
-    {
-        return;
-    }
     append(m_result, std::move(tokens));
 }
 
@@ -210,7 +206,7 @@ std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileI
                                                        const std::uint64_t offset) const noexcept
 {
     CORAL66_ASSERT(fileID < m_files.size());
-    auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
+    const auto result = std::ranges::lower_bound(m_files[fileID].starts, offset);
     return std::distance(m_files[fileID].starts.begin(), result) + (*result == offset ? 1 : 0);
 }
 
@@ -258,18 +254,18 @@ void coral66::pp::Preprocessor::visit(const ControlLine& controlLine)
 
 void coral66::pp::Preprocessor::visit(const DefineDirective& define)
 {
-    auto parse_res = parseDefineDirective(define);
-    if (!parse_res.first)
+    auto [fst, snd] = parseDefineDirective(define);
+    if (!fst)
         return;
-    auto optMacro = *parse_res.first;
-    auto iterPtr = parse_res.second;
+    auto optMacro = *fst;
+    const auto iterPtr = snd;
 
     auto iter = define.tokens.begin() + (iterPtr - define.tokens.data());
 
     std::vector<lexer::PPToken> replacementTokens;
     if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::StringLiteral)
     {
-        auto stringVal = iter->getValue();
+        const auto stringVal = iter->getValue();
         std::string innerString(stringVal);
         if (innerString.size() >= 2 && innerString.front() == '"' && innerString.back() == '"')
         {
@@ -283,7 +279,7 @@ void coral66::pp::Preprocessor::visit(const DefineDirective& define)
             m_errorsOccurred = true;
         }
 
-        auto fileOffset = m_files.size();
+        const auto fileOffset = m_files.size();
         for (auto& file : innerSource.getFiles())
         {
             m_files.push_back(std::move(file));
@@ -305,8 +301,8 @@ void coral66::pp::Preprocessor::visit(const DefineDirective& define)
     else if (iter != define.tokens.end() && iter->getTokenType() == lexer::TokenType::Miscellaneous)
     {
         ++iter;
-        auto last = define.tokens.end();
-        if (last - iter >= 1 && (last - 1)->getTokenType() == lexer::TokenType::Miscellaneous)
+        if (const auto last = define.tokens.end();
+            last - iter >= 1 && (last - 1)->getTokenType() == lexer::TokenType::Miscellaneous)
         {
             replacementTokens.assign(iter, last - 1);
         }
@@ -321,7 +317,7 @@ void coral66::pp::Preprocessor::visit(const DefineDirective& define)
     }
 
     m_fileTokens.push_back(std::move(replacementTokens));
-    std::span<const lexer::PPToken> replacementSpan(m_fileTokens.back().data(), m_fileTokens.back().size());
+    const std::span<const lexer::PPToken> replacementSpan(m_fileTokens.back().data(), m_fileTokens.back().size());
 
     optMacro.replacement = replacementSpan;
     m_defines[optMacro.identifierPos->getValue()].push_back(optMacro);
@@ -337,8 +333,7 @@ void coral66::pp::Preprocessor::visit(const lexer::PPTokenIterator& name)
     if (name == lexer::PPTokenIterator{})
         return;
 
-    auto it = m_defines.find(name->getValue());
-    if (it != m_defines.end() && !it->second.empty())
+    if (const auto it = m_defines.find(name->getValue()); it != m_defines.end() && !it->second.empty())
     {
         it->second.pop_back();
         if (it->second.empty())

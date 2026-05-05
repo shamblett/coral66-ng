@@ -116,7 +116,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     {
         if (begin->getTokenType() == lexer::TokenType::Identifier)
         {
-            if (auto value = begin->getValue(); value == lexer::tokenName(lexer::TokenType::DefineKeyword)
+            if (const auto value = begin->getValue(); value == lexer::tokenName(lexer::TokenType::DefineKeyword)
                                                 || value == tokenName(lexer::TokenType::DeleteKeyword))
             {
                 flushText();
@@ -135,7 +135,7 @@ coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& b
                                                        Context& context)
 {
     CORAL66_ASSERT(begin != end && begin->getTokenType() == lexer::TokenType::Identifier);
-    auto value = begin->getValue();
+    const auto value = begin->getValue();
     if (value == lexer::tokenName(lexer::TokenType::DefineKeyword))
     {
         begin++;

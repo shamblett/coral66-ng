@@ -122,8 +122,8 @@ class Preprocessor final : PPSourceInterface
 
                 if (current_macro_id - 1 < m_substitutions.size())
                 {
-                    const auto& record = m_substitutions[current_macro_id - 1];
-                    if (std::holds_alternative<Source::Substitution>(record))
+                    if (const auto& record = m_substitutions[current_macro_id - 1];
+                        std::holds_alternative<Source::Substitution>(record))
                     {
                         const auto& sub = std::get<Source::Substitution>(record);
                         if (sub.macroIdentifier.getValue() == name)
@@ -446,8 +446,8 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
             return tuple;
         };
         auto beginValues = toMacroId0(begin->getMacroId(), begin->getFileId(), begin->getOffset(), false);
-        auto prevValues = toMacroId0(prev->getMacroId(), prev->getFileId(), prev->getOffset(), true);
-        if (std::get<2>(beginValues) >= std::get<2>(prevValues))
+        if (auto prevValues = toMacroId0(prev->getMacroId(), prev->getFileId(), prev->getOffset(), true);
+            std::get<2>(beginValues) >= std::get<2>(prevValues))
         {
             newLines = std::min<std::size_t>(
                 sourceInterface.getLineNumber(std::get<1>(beginValues), std::get<2>(beginValues))
