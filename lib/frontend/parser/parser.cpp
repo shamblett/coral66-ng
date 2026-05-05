@@ -131,7 +131,7 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     return {sourceObject.data().data(), end, std::move(block), std::move(communicator), name, isSegment};
 }
 
-std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
 {
     if (begin == end || begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {

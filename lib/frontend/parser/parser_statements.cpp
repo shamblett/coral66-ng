@@ -37,7 +37,7 @@ namespace coral66::parser
  * For
  */
 
-static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end)
+static bool isAssignmentStatement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end)
 {
     int parens = 0;
     int brackets = 0;
@@ -69,7 +69,7 @@ static bool isAssignmentStatement(lexer::CTokenIterator begin, lexer::CTokenIter
 
 static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterator& begin,
                                                              const lexer::CTokenIterator end, Context& context,
-                                                             bool isConsequence)
+                                                             const bool isConsequence)
 {
     if (begin == end)
     {
@@ -448,7 +448,7 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
 }
 
 std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                                  Context& context, bool isConsequence)
+                                                  Context& context, const bool isConsequence)
 {
     if (begin == end)
     {
@@ -458,8 +458,7 @@ std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, 
     std::vector<lexer::CTokenIterator> labels;
     while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
     {
-        auto next = begin + 1;
-        if (next != end && next->getTokenType() == lexer::TokenType::Colon)
+        if (const auto next = begin + 1; next != end && next->getTokenType() == lexer::TokenType::Colon)
         {
             labels.push_back(begin);
             begin += 2;

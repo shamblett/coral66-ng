@@ -21,7 +21,7 @@ std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66:
     std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>> result;
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
-        auto openParenToken = begin;
+        const auto openParenToken = begin;
         begin++;
         result.first = parseExpression(begin, end, context);
         if (!result.first || begin == end || begin->getTokenType() != lexer::TokenType::Comma)

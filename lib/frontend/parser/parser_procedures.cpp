@@ -22,7 +22,7 @@ namespace coral66::parser
  */
 
 std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
-    parseProcedureParameters(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+    parseProcedureParameters(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
 {
     std::vector<std::unique_ptr<syntax::Declaration>> parameters;
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -30,9 +30,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
         begin++;
         while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
-            auto type = begin->getTokenType();
-
-            if (type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
+            if (const auto type = begin->getTokenType();
+                type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
             {
                 auto startMode = begin;
                 begin++;
@@ -40,8 +39,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                                 syntax::ParameterDeclaration::ParameterMode::Value :
                                 syntax::ParameterDeclaration::ParameterMode::Location;
 
-                auto nextType = begin->getTokenType();
-                if (nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
+                if (const auto nextType = begin->getTokenType();
+                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
                     || nextType == lexer::TokenType::FixedKeyword)
                 {
                     auto paramTypeToken = begin;
@@ -180,8 +179,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
             else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
                      || type == lexer::TokenType::FixedKeyword)
             {
-                auto declarations = parseDeclaration(begin, end, context);
-                if (!declarations.empty())
+                if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
                 {
                     for (auto& d : declarations)
                         parameters.push_back(std::move(d));
@@ -197,8 +195,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
             }
             else
             {
-                auto declarations = parseDeclaration(begin, end, context);
-                if (!declarations.empty())
+                if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
                 {
                     for (auto& d : declarations)
                         parameters.push_back(std::move(d));
@@ -226,7 +223,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
     return parameters;
 }
 
-std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin,
+                                                             const lexer::CTokenIterator end,
                                                              Context& context)
 {
     if (begin == end)

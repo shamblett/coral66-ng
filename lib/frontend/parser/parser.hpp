@@ -33,7 +33,7 @@ public:
     [[nodiscard]] const source_interface& getSourceInterface() const;
     [[nodiscard]] std::size_t getErrorCount() const;
 
-    void enterProcedure(bool isTyped)
+    void enterProcedure(const bool isTyped)
     {
         m_procedureStack.push_back({isTyped, false});
     }

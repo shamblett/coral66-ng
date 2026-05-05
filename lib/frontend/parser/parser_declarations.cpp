@@ -53,7 +53,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
         if (begin == end)
             return false;
 
-        auto tType = begin->getTokenType();
+        const auto tType = begin->getTokenType();
         if (tType == lexer::TokenType::Comma || tType == lexer::TokenType::CloseParentheses
             || tType == lexer::TokenType::CloseSquareBracket || tType == lexer::TokenType::SemiColon)
         {
@@ -182,13 +182,12 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                     if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                     {
                         // Check if the next token is an identifier and the token after is NOT a bracket.
-                        // Actually, if it's an Arrayitem, it's Idlist [ Sizelist ].
+                        // Actually, if it's an ArrayItem, it's Idlist [ Sizelist ].
                         // So we keep gathering identifiers separated by comma as long as we haven't seen '['
                         // Wait, no. "p, q[1:3]" means p and q share [1:3]. So we just unconditionally consume the
                         // comma. But what if it's "p[1:3], q[1:4]"? Then the comma is AFTER the bracket! So if we are
                         // here, we just saw an identifier. Next is a comma. We peek ahead.
-                        auto peek = begin + 1;
-                        if (peek != end && peek->getTokenType() == lexer::TokenType::Identifier)
+                        if (auto peek = begin + 1; peek != end && peek->getTokenType() == lexer::TokenType::Identifier)
                         {
                             begin++; // consume comma
                         }
@@ -508,7 +507,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
 
                         if (isPartWord)
                         {
-                            // A bit position
+                            // Bit position
                             if (begin != end
                                 && (begin->getTokenType() == lexer::TokenType::Comma
                                     || begin->getTokenType() == lexer::TokenType::BitKeyword))
@@ -668,8 +667,7 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 begin++;
             }
 
-            auto decls = parseDeclaration(begin, end, context);
-            if (!decls.empty())
+            if (auto decls = parseDeclaration(begin, end, context); !decls.empty())
             {
                 result.push_back(std::make_unique<syntax::OverlayDeclaration>(start, begin, base, offset, offset2,
                                                                               std::move(decls[0])));

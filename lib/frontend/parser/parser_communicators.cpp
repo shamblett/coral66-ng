@@ -15,7 +15,7 @@ namespace coral66::parser
 namespace
 {
 std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
-    parseAnonymousTypeList(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context)
+    parseAnonymousTypeList(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
 {
     std::vector<std::unique_ptr<syntax::Declaration>> result;
     if (begin == end || begin->getTokenType() != lexer::TokenType::OpenParentheses)
@@ -26,9 +26,9 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
     while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
     {
         auto startMode = begin;
-        auto type = begin->getTokenType();
+        const auto type = begin->getTokenType();
 
-        syntax::ParameterDeclaration::ParameterMode mode = syntax::ParameterDeclaration::ParameterMode::Value;
+        auto mode = syntax::ParameterDeclaration::ParameterMode::Value;
         std::optional<lexer::CTokenIterator> paramTypeToken = std::nullopt;
 
         if (type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
@@ -42,7 +42,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                     || begin->getTokenType() == lexer::TokenType::FloatingKeyword || begin->getTokenType() == lexer::TokenType::BitsKeyword || begin->getTokenType() == lexer::TokenType::BitKeyword
                     || begin->getTokenType() == lexer::TokenType::FixedKeyword))
             {
-                auto currentType = begin->getTokenType();
+                const auto currentType = begin->getTokenType();
                 begin++;
                 if (currentType == lexer::TokenType::FixedKeyword)
                 {
