@@ -111,17 +111,16 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
     const auto widthOfText = coral66::unsafeColumnWidth(text);
     std::vector<std::string> canvas;
     std::string extraAtEnd;
-    // ReSharper disable once CppUseStructuredBinding
-    for (auto& iter : modifiersOfLine)
+    for (auto& [fromToInLine, value] : modifiersOfLine)
     {
         coral66::match(
-            iter.value,
+            value,
             [&](const ModifierOfLine::Underline& underline)
             {
-                auto indent = coral66::unsafeColumnWidth(text.substr(0, iter.fromToInLine.first - lineStartOffset));
+                auto indent = coral66::unsafeColumnWidth(text.substr(0, fromToInLine.first - lineStartOffset));
                 canvas.resize(std::max<std::size_t>(1, canvas.size()), std::string(widthOfText, ' '));
 
-                if (iter.fromToInLine.first == iter.fromToInLine.second && text.size() == iter.fromToInLine.first)
+                if (fromToInLine.first == fromToInLine.second && text.size() == fromToInLine.first)
                 {
                     // Special case when we are pointing at a newline character
                     canvas[0].resize(std::max<std::size_t>(indent + 1, canvas[0].size()), ' ');
@@ -132,13 +131,13 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                 if (underline.continuous)
                 {
                     const auto sizeOfTextAbove = coral66::unsafeColumnWidth(text.substr(
-                        iter.fromToInLine.first - lineStartOffset, iter.fromToInLine.second - iter.fromToInLine.first));
+                        fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first));
                     std::fill_n(canvas[0].begin() + indent, sizeOfTextAbove, underline.character);
                     return;
                 }
 
-                const auto textAbove = text.substr(iter.fromToInLine.first - lineStartOffset,
-                                                   iter.fromToInLine.second - iter.fromToInLine.first);
+                const auto textAbove = text.substr(fromToInLine.first - lineStartOffset,
+                                                   fromToInLine.second - fromToInLine.first);
                 for (const auto* ptr = textAbove.data(); ptr != textAbove.data() + textAbove.size();)
                 {
                     // Skip all whitespace first
@@ -181,21 +180,21 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                     }
                     const auto size = coral66::unsafeColumnWidth({ptr, static_cast<std::size_t>(start - ptr)});
                     indent = coral66::unsafeColumnWidth(
-                        text.substr(0, iter.fromToInLine.first - lineStartOffset + ptr - textAbove.data()));
+                        text.substr(0, fromToInLine.first - lineStartOffset + ptr - textAbove.data()));
                     std::fill_n(canvas[0].begin() + indent, size, underline.character);
                     ptr = start;
                 }
             },
             [&](const ModifierOfLine::InsertAfter& insertAfter)
             {
-                if (iter.fromToInLine.first == iter.fromToInLine.second)
+                if (fromToInLine.first == fromToInLine.second)
                 {
                     // We are inserting after a Newline
                     extraAtEnd = std::string(width, ' ') + " > " + coral66::to_string(insertAfter.text);
                     return;
                 }
                 const auto indent =
-                    coral66::unsafeColumnWidth(text.substr(0, iter.fromToInLine.second - lineStartOffset));
+                    coral66::unsafeColumnWidth(text.substr(0, fromToInLine.second - lineStartOffset));
                 canvas.resize(std::max<std::size_t>(1, canvas.size()), std::string(widthOfText, ' '));
                 canvas[0].resize(std::max<std::size_t>(canvas[0].size(), indent + 1));
                 canvas[0][indent] = '^';
@@ -231,12 +230,12 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
             },
             [&](const ModifierOfLine::Annotate& annotate)
             {
-                auto indent = coral66::unsafeColumnWidth(text.substr(0, iter.fromToInLine.first - lineStartOffset));
+                auto indent = coral66::unsafeColumnWidth(text.substr(0, fromToInLine.first - lineStartOffset));
                 canvas.resize(std::max<std::size_t>(1, canvas.size()), std::string(widthOfText, ' '));
                 const auto sizeOfTextAbove = coral66::unsafeColumnWidth(text.substr(
-                    iter.fromToInLine.first - lineStartOffset, iter.fromToInLine.second - iter.fromToInLine.first));
+                    fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first));
                 std::fill_n(canvas[0].begin() + indent, sizeOfTextAbove, sizeOfTextAbove == 1 ? '^' : '~');
-                if (iter.fromToInLine.first > annotate.pos || annotate.pos > iter.fromToInLine.second)
+                if (fromToInLine.first > annotate.pos || annotate.pos > fromToInLine.second)
                 {
                     return;
                 }
