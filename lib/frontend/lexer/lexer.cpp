@@ -12,7 +12,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <numeric>
 #include <optional>
 
 #include "lexer_support.hpp"
@@ -25,7 +24,7 @@ using namespace coral66::lexer;
 using namespace coral66::detail;
 
 coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_ostream* reporter, bool* errorsOccurred,
-                                                 std::string_view const sourcePath, bool clearDiagnostics)
+                                                 std::string_view const sourcePath, const bool clearDiagnostics)
 {
     CTRACK_NAME("Lexer");
     if (clearDiagnostics)
@@ -56,7 +55,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     StateMachine stateMachine;
     std::uint64_t offset = 0;
     std::vector<std::uint64_t> starts = {0};
-    for (auto iter : source)
+    for (const auto iter : source)
     {
         offset++;
         if (iter == '\n')
@@ -68,7 +67,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     starts.shrink_to_fit();
     offset = 0;
 
-    std::string charactersSpace = source;
+    const std::string charactersSpace = source;
     IntervalMap characterToSourceSpace;
     characterToSourceSpace.emplace_back(0, 0, source.size());
     characterToSourceSpace.emplace_back(source.size(), 0, 0);
@@ -90,7 +89,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
                 llvm::UTF32 result;
                 const auto* start = iter;
                 llvm::UTF32* targetStart = &result;
-                auto convRes = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
+                const auto convRes = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
                                                         reinterpret_cast<const llvm::UTF8*>(end), &targetStart,
                                                         targetStart + 1, llvm::strictConversion);
 
@@ -190,8 +189,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
             {
                 return false;
             }
-            std::uint32_t c = '\n';
-            if constexpr (std::is_convertible_v<decltype(state.advance(c, context)), bool>)
+            if constexpr (std::uint32_t c = '\n'; std::is_convertible_v<decltype(state.advance(c, context)), bool>)
             {
                 return !state.advance(c, context);
             }
@@ -279,7 +277,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
 
 [[nodiscard]] std::uint64_t TokenBase::getColumn(const source_interface& sourceObject) const noexcept
 {
-    auto line = sourceObject.getLineNumber(m_fileID, m_offset);
+    const auto line = sourceObject.getLineNumber(m_fileID, m_offset);
     return m_offset - sourceObject.getLineStartOffset(m_fileID, line) + 1;
 }
 
@@ -403,13 +401,12 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
         if (iter->getTokenType() == TokenType::PPNumber || iter->getTokenType() == TokenType::Apostrophe)
         {
             std::string numberText;
-            auto startIter = iter;
+            const auto startIter = iter;
 
             if (iter->getTokenType() == TokenType::PPNumber)
             {
                 numberText += std::string(iter->getValue());
-                auto next = iter + 1;
-                if (next != end && next->getTokenType() == TokenType::Apostrophe)
+                if (auto next = iter + 1; next != end && next->getTokenType() == TokenType::Apostrophe)
                 {
                     numberText += "e";
                     iter = next;
@@ -499,8 +496,7 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                 break;
             case TokenType::StringLiteral:
             {
-                auto maybeToken = parseStringLiteral(*iter, sourceInterface, reporter);
-                if (!maybeToken)
+                if (auto maybeToken = parseStringLiteral(*iter, sourceInterface, reporter); !maybeToken)
                 {
                     if (errorsOccurred)
                     {
@@ -527,7 +523,7 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
                                                          llvm::raw_ostream* reporter)
 {
     CORAL66_ASSERT(PPToken.getTokenType() == coral66::lexer::TokenType::StringLiteral);
-    std::string value = std::string(PPToken.getValue());
+    auto value = std::string(PPToken.getValue());
     if (value.size() >= 2 && value.front() == '"' && value.back() == '"')
     {
         value = value.substr(1, value.size() - 2);

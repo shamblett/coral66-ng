@@ -122,13 +122,13 @@ template <>
 struct StringConverter<lexer::TokenType>
 {
     template <class... Ctx>
-    static std::string inFormat(lexer::TokenType arg, Ctx&&... /*ctx*/)
+    static std::string inFormat(const lexer::TokenType arg, Ctx&&... /*ctx*/)
     {
         return coral66::to_string(tokenName(arg));
     }
 
     template <class... Ctx>
-    static std::string inArg(lexer::TokenType arg, Ctx&&... /*ctx*/)
+    static std::string inArg(const lexer::TokenType arg, Ctx&&... /*ctx*/)
     {
         return coral66::to_string(tokenName(arg, false));
     }

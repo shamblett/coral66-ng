@@ -127,7 +127,7 @@ TokenType charactersToKeyword(const std::string_view characters)
     CORAL66_UNREACHABLE;
 }
 
-std::uint8_t getNumUTF8ForUTF32(std::uint32_t c)
+std::uint8_t getNumUTF8ForUTF32(const std::uint32_t c)
 {
     if (c <= 0x007F)
     {
