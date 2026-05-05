@@ -48,12 +48,11 @@ void ControlFlowPass::visit(const syntax::Declaration& node)
 // ReSharper disable once CppMemberFunctionMayBeConst
 void ControlFlowPass::visit(const syntax::ArrayDeclaration& node)
 {
-    for (const auto& d : node.getDimensions())
+    for (const auto& [fst, snd] : node.getDimensions())
     {
-        auto lower = evaluateConstantInteger(*d.first);
-        auto upper = evaluateConstantInteger(*d.second);
+        auto lower = evaluateConstantInteger(*fst);
 
-        if (lower && upper)
+        if (auto upper = evaluateConstantInteger(*snd); lower && upper)
         {
             if (*lower > *upper)
             {
@@ -70,7 +69,7 @@ void ControlFlowPass::visit(const syntax::TableDeclaration& node)
 {
     if (node.getWidth())
     {
-        if (auto width = evaluateConstantInteger(*node.getWidth()))
+        if (const auto width = evaluateConstantInteger(*node.getWidth()))
         {
             if (*width <= 0)
             {
@@ -82,7 +81,7 @@ void ControlFlowPass::visit(const syntax::TableDeclaration& node)
     }
     if (node.getLength())
     {
-        if (auto length = evaluateConstantInteger(*node.getLength()))
+        if (const auto length = evaluateConstantInteger(*node.getLength()))
         {
             if (*length <= 0)
             {
@@ -97,7 +96,7 @@ void ControlFlowPass::visit(const syntax::TableDeclaration& node)
 void ControlFlowPass::visit(const syntax::ProcedureDeclaration& node)
 {
     auto* oldProc = m_currentProcedure;
-    bool oldHasAnswer = m_hasAnswer;
+    const bool oldHasAnswer = m_hasAnswer;
 
     m_currentProcedure = &node;
     m_hasAnswer = false;
@@ -158,15 +157,15 @@ void ControlFlowPass::visit(const syntax::IfStatement& node)
 void ControlFlowPass::visit(const syntax::ForStatement& node)
 {
     visit(node.getVariable());
-    for (const auto& el : node.getElements())
+    for (const auto& [expression, step, until, whileCondition] : node.getElements())
     {
-        visit(*el.expression);
-        if (el.step)
-            visit(*el.step);
-        if (el.until)
-            visit(*el.until);
-        if (el.whileCondition)
-            visit(*el.whileCondition);
+        visit(*expression);
+        if (step)
+            visit(*step);
+        if (until)
+            visit(*until);
+        if (whileCondition)
+            visit(*whileCondition);
     }
     visit(node.getBody());
 }
@@ -183,13 +182,13 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
         visit(*node.getIndex());
 
     // Gotos into blocks are forbidden. Target label must be at or above our lexical scope.
-    if (auto usable = m_context.resolvedIdentifiers.find(&node); usable != m_context.resolvedIdentifiers.end())
+    if (const auto usable = m_context.resolvedIdentifiers.find(&node); usable != m_context.resolvedIdentifiers.end())
     {
         if (const auto sw = usable->second->tryAs<SwitchDeclaration>())
         {
             if (node.getIndex())
             {
-                if (auto constIdx = evaluateConstantInteger(*node.getIndex()))
+                if (const auto constIdx = evaluateConstantInteger(*node.getIndex()))
                 {
                     // Coral 66 switch indices are 1-based
                     if (*constIdx < 1 || *constIdx > static_cast<std::int64_t>(sw->getLabels().size()))
@@ -241,10 +240,9 @@ void ControlFlowPass::visit(const syntax::PartWordExpression& node)
     visit(node.getStartBit());
     visit(node.getWidth());
 
-    auto start = evaluateConstantInteger(node.getStartBit());
-    auto width = evaluateConstantInteger(node.getWidth());
+    const auto start = evaluateConstantInteger(node.getStartBit());
 
-    if (start && width)
+    if (const auto width = evaluateConstantInteger(node.getWidth()); start && width)
     {
         if (*start < 0 || *width < 0 || (*start + *width) > 24) // Assuming 24-bit target word
         {
@@ -264,10 +262,9 @@ void ControlFlowPass::visit(const syntax::TypeChangeExpression& node)
 
     if (node.getTotalBits() && node.getFractionBits())
     {
-        auto total = evaluateConstantInteger(*node.getTotalBits());
-        auto frac = evaluateConstantInteger(*node.getFractionBits());
+        const auto total = evaluateConstantInteger(*node.getTotalBits());
 
-        if (total && frac)
+        if (const auto frac = evaluateConstantInteger(*node.getFractionBits()); total && frac)
         {
             if (*total <= 0 || *frac < 0 || *frac > *total)
             {
@@ -286,8 +283,7 @@ void ControlFlowPass::visit(const syntax::ArrayAccessExpression& node)
 
     if (node.getArray())
     {
-        auto it = m_context.resolvedIdentifiers.find(&node);
-        if (it != m_context.resolvedIdentifiers.end())
+        if (const auto it = m_context.resolvedIdentifiers.find(&node); it != m_context.resolvedIdentifiers.end())
         {
             const Usable* usable = it->second;
             const syntax::ArrayDeclaration* arrDeclaration = nullptr;
@@ -302,9 +298,9 @@ void ControlFlowPass::visit(const syntax::ArrayAccessExpression& node)
                 {
                     auto idxVal = evaluateConstantInteger(*node.getIndices()[i]);
                     auto lowerVal = evaluateConstantInteger(*arrDeclaration->getDimensions()[i].first);
-                    auto upperVal = evaluateConstantInteger(*arrDeclaration->getDimensions()[i].second);
 
-                    if (idxVal && lowerVal && upperVal)
+                    if (auto upperVal = evaluateConstantInteger(*arrDeclaration->getDimensions()[i].second);
+                        idxVal && lowerVal && upperVal)
                     {
                         if (*idxVal < *lowerVal || *idxVal > *upperVal)
                         {

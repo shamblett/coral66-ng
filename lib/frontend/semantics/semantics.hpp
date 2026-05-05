@@ -60,7 +60,7 @@ class ScopePoint
     std::size_t m_scopeId;
 
 public:
-    ScopePoint(std::size_t scopeId) : m_scopeId(scopeId) {}
+    explicit ScopePoint(const std::size_t scopeId) : m_scopeId(scopeId) {}
     [[nodiscard]] std::size_t getScopeId() const
     {
         return m_scopeId;
@@ -601,7 +601,7 @@ class Statement : public AbstractIntrusiveVariant<Statement, AssignmentStatement
 
 protected:
     template <class T>
-    Statement(ScopePoint scopePoint, std::in_place_type_t<T>)
+    Statement(const ScopePoint scopePoint, std::in_place_type_t<T>)
         : AbstractIntrusiveVariant(std::in_place_type<T>), m_scopePoint(scopePoint)
     {
     }
@@ -618,7 +618,7 @@ class AssignmentStatement final : public Statement
     IntrVarPtr<ExpressionBase> m_value;
 
 public:
-    AssignmentStatement(ScopePoint sp, IntrVarPtr<ExpressionBase>&& target, // NOLINT(*-pro-type-member-init)
+    AssignmentStatement(const ScopePoint sp, IntrVarPtr<ExpressionBase>&& target, // NOLINT(*-pro-type-member-init)
                         IntrVarPtr<ExpressionBase>&& value)                 // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AssignmentStatement>), m_target(std::move(target)), m_value(std::move(value))
     {
@@ -668,7 +668,7 @@ public:
 class DummyStatement final : public Statement
 {
 public:
-    DummyStatement(ScopePoint sp) // NOLINT(*-pro-type-member-init)
+    explicit DummyStatement(const ScopePoint sp) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<DummyStatement>)
     {
     }
@@ -703,7 +703,7 @@ class GotoStatement final : public Statement
     const LabelStatement* m_label;
 
 public:
-    explicit GotoStatement(ScopePoint sp, const LabelStatement* label) // NOLINT(*-pro-type-member-init)
+    explicit GotoStatement(const ScopePoint sp, const LabelStatement* label) // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<GotoStatement>), m_label(label)
     {
     }
@@ -826,7 +826,7 @@ class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, Proc
 
 protected:
     template <class T>
-    Usable(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
+    explicit Usable(std::in_place_type_t<T>) : AbstractIntrusiveVariant(std::in_place_type<T>)
     {
     }
 
@@ -848,7 +848,7 @@ class Declaration : public Usable
 
 protected:
     template <class T>
-    Declaration(std::in_place_type_t<T>, lexer::CTokenIterator nameToken)
+    Declaration(std::in_place_type_t<T>, const lexer::CTokenIterator nameToken)
         : Usable(std::in_place_type<T>), m_nameToken(nameToken)
     {
     }
@@ -916,7 +916,7 @@ public:
 class LabelDeclaration final : public Declaration
 {
 public:
-    LabelDeclaration(const lexer::CTokenIterator nameToken) : Declaration(std::in_place_type<LabelDeclaration>, nameToken) {}
+    explicit LabelDeclaration(const lexer::CTokenIterator nameToken) : Declaration(std::in_place_type<LabelDeclaration>, nameToken) {}
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelDeclaration)
 };
 

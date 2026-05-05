@@ -77,7 +77,7 @@ const Usable* SymbolTable::lookupInCurrentScope(const std::string_view name) con
         return nullptr;
 
     const auto& currentScope = m_scopes.back();
-    if (auto found = currentScope.find(name); found != currentScope.end())
+    if (const auto found = currentScope.find(name); found != currentScope.end())
     {
         return found->second;
     }

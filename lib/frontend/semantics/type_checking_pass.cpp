@@ -138,47 +138,47 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
         }
     }
 
-    for (const auto& element : node.getElements())
+    for (const auto& [expression, step, until, whileCondition] : node.getElements())
     {
-        visit(*element.expression);
-        if (element.step)
+        visit(*expression);
+        if (step)
         {
-            visit(*element.step);
-            if (auto itStep = m_context.expressionTypes.find(element.step.get());
+            visit(*step);
+            if (auto itStep = m_context.expressionTypes.find(step.get());
                 itStep != m_context.expressionTypes.end() && !itStep->second->is<ErrorType>())
             {
                 if (!isNumericType(*itStep->second))
                 {
                     m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
-                        *element.step->begin(), m_context.source, *element.step->begin()));
+                        *step->begin(), m_context.source, *step->begin()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
                 }
             }
         }
-        if (element.until)
+        if (until)
         {
-            visit(*element.until);
-            if (auto itUntil = m_context.expressionTypes.find(element.until.get());
+            visit(*until);
+            if (auto itUntil = m_context.expressionTypes.find(until.get());
                 itUntil != m_context.expressionTypes.end() && !itUntil->second->is<ErrorType>())
             {
                 if (!isNumericType(*itUntil->second))
                 {
                     m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
-                        *element.until->begin(), m_context.source, *element.until->begin()));
+                        *until->begin(), m_context.source, *until->begin()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
                 }
             }
         }
-        if (element.whileCondition)
+        if (whileCondition)
         {
-            visit(*element.whileCondition);
-            if (auto it = m_context.expressionTypes.find(element.whileCondition.get());
+            visit(*whileCondition);
+            if (auto it = m_context.expressionTypes.find(whileCondition.get());
                 it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
             {
                 if (const auto prim = it->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(
-                        *element.whileCondition->begin(), m_context.source, *element.whileCondition->begin()));
+                        *whileCondition->begin(), m_context.source, *whileCondition->begin()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
                 }
             }
@@ -322,12 +322,12 @@ void TypeCheckingPass::visit(const syntax::VariableDeclaration& /*node*/) {}
 
 void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
 {
-    for (const auto& dim : node.getDimensions())
+    for (const auto& [fst, snd] : node.getDimensions())
     {
-        visit(*dim.first);
-        visit(*dim.second);
+        visit(*fst);
+        visit(*snd);
 
-        for (const auto* expr : {dim.first.get(), dim.second.get()})
+        for (const auto* expr : {fst.get(), snd.get()})
         {
             if (auto it = m_context.expressionTypes.find(expr); it != m_context.expressionTypes.end())
             {

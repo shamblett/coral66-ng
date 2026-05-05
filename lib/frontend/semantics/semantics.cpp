@@ -73,7 +73,7 @@ std::uint64_t FixedType::getAlignOfImpl(const ProgramInterface&) const
 std::uint64_t ArrayType::getSizeOfImpl(const ProgramInterface& program) const
 {
     std::uint64_t elements = 1;
-    for (auto d : m_dimensions)
+    for (const auto d : m_dimensions)
         elements *= d;
     return elements * m_elementType->getSizeOf(program);
 }

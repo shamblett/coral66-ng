@@ -30,8 +30,8 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
     }
     else if (auto* unary = dynamic_cast<const syntax::UnaryExpression*>(&expr))
     {
-        auto opType = unary->getOp()->getTokenType();
-        if (opType == lexer::TokenType::Plus || opType == lexer::TokenType::Minus)
+        if (const auto opType = unary->getOp()->getTokenType();
+            opType == lexer::TokenType::Plus || opType == lexer::TokenType::Minus)
         {
             if (auto val = evaluateConstantInteger(unary->getOperand()))
             {
@@ -43,11 +43,10 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
     }
     else if (auto* binary = dynamic_cast<const syntax::BinaryExpression*>(&expr))
     {
-        auto left = evaluateConstantInteger(binary->getLeft());
-        auto right = evaluateConstantInteger(binary->getRight());
-        if (left && right)
+        const auto left = evaluateConstantInteger(binary->getLeft());
+        if (const auto right = evaluateConstantInteger(binary->getRight()); left && right)
         {
-            auto opType = binary->getOp()->getTokenType();
+            const auto opType = binary->getOp()->getTokenType();
             if (opType == lexer::TokenType::Plus)
                 return (*left) + (*right);
             if (opType == lexer::TokenType::Minus)

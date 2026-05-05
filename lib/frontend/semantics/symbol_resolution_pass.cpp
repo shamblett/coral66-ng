@@ -144,15 +144,15 @@ void SymbolResolutionPass::visit(const syntax::IfStatement& node)
 void SymbolResolutionPass::visit(const syntax::ForStatement& node)
 {
     visit(node.getVariable());
-    for (const auto& element : node.getElements())
+    for (const auto& [expression, step, until, whileCondition] : node.getElements())
     {
-        visit(*element.expression);
-        if (element.step)
-            visit(*element.step);
-        if (element.until)
-            visit(*element.until);
-        if (element.whileCondition)
-            visit(*element.whileCondition);
+        visit(*expression);
+        if (step)
+            visit(*step);
+        if (until)
+            visit(*until);
+        if (whileCondition)
+            visit(*whileCondition);
     }
     visit(node.getBody());
 }
@@ -202,14 +202,14 @@ void SymbolResolutionPass::visit(const syntax::ProcedureCallStatement& node)
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT(*-convert-member-functions-to-static)
-    std::optional<lexer::CTokenIterator> typeToken,
+    const std::optional<lexer::CTokenIterator> typeToken,
     const syntax::Expression* fixedTotalBits,
     const syntax::Expression* fixedFractionBits)                    // NOLINT(*-convert-member-functions-to-static)
 {
     if (!typeToken)
         return {(UntypedType{})};
 
-    auto type = typeToken.value()->getTokenType();
+    const auto type = typeToken.value()->getTokenType();
     if (type == lexer::TokenType::FloatingKeyword)
         return {(PrimitiveType{PrimitiveType::Floating})};
     if (type == lexer::TokenType::FixedKeyword)
@@ -288,11 +288,10 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
     const Type* baseTypePtr = m_context.ownedTypes.back().data();
 
     std::vector<std::uint64_t> dims;
-    for (const auto& d : node.getDimensions())
+    for (const auto& [fst, snd] : node.getDimensions())
     {
-        auto lower = evaluateConstantInteger(*d.first);
-        auto upper = evaluateConstantInteger(*d.second);
-        if (lower && upper)
+        auto lower = evaluateConstantInteger(*fst);
+        if (auto upper = evaluateConstantInteger(*snd); lower && upper)
         {
             if (*lower <= *upper)
             {
@@ -330,12 +329,12 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
     }
 
     // Visit dimension expressions
-    for (const auto& dim : node.getDimensions())
+    for (const auto& [fst, snd] : node.getDimensions())
     {
-        if (dim.first)
-            visit(*dim.first);
-        if (dim.second)
-            visit(*dim.second);
+        if (fst)
+            visit(*fst);
+        if (snd)
+            visit(*snd);
     }
 }
 
@@ -352,11 +351,11 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     std::uint64_t lengthVal = 0;
     if (node.getWidth())
     {
-        if (auto w = evaluateConstantInteger(*node.getWidth())) widthVal = static_cast<std::uint64_t>(*w);
+        if (const auto w = evaluateConstantInteger(*node.getWidth())) widthVal = static_cast<std::uint64_t>(*w);
     }
     if (node.getLength())
     {
-        if (auto l = evaluateConstantInteger(*node.getLength())) lengthVal = static_cast<std::uint64_t>(*l);
+        if (const auto l = evaluateConstantInteger(*node.getLength())) lengthVal = static_cast<std::uint64_t>(*l);
     }
 
     m_context.ownedTableInfos.push_back(TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, widthVal, lengthVal}});
@@ -436,8 +435,7 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
     for (const auto& labelToken : node.getLabels())
     {
         const auto& labelName = std::get<std::string>(labelToken->getValue());
-        const Usable* usable = m_context.symbolTable.lookup(labelName);
-        if (!usable)
+        if (const Usable* usable = m_context.symbolTable.lookup(labelName); !usable)
         {
             m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*labelToken, m_context.source, *labelToken));
             DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
@@ -472,11 +470,10 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
 
 void SymbolResolutionPass::visit(const syntax::OverlayDeclaration& node)
 {
-    auto baseToken = node.getBase();
+    const auto baseToken = node.getBase();
     const auto& baseName = std::get<std::string>(baseToken->getValue());
-    const Usable* usable = m_context.symbolTable.lookup(baseName);
 
-    if (!usable)
+    if (const Usable* usable = m_context.symbolTable.lookup(baseName); !usable)
     {
         m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*baseToken, m_context.source, *baseToken));
         DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
@@ -546,7 +543,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
             m_context.ownedTypes.push_back(std::move(paramTypeVal));
             const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
 
-            for (auto paramId : paramNode->getIdentifiers())
+            for (const auto paramId : paramNode->getIdentifiers())
             {
                 parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), isValue});
             }
@@ -560,7 +557,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
             m_context.ownedTypes.emplace_back(ArrayType{baseTypePtr, {}});
             const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
 
-            for (auto paramId : arrayNode->getIdentifiers())
+            for (const auto paramId : arrayNode->getIdentifiers())
             {
                 parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), false});
             }
@@ -706,8 +703,7 @@ void SymbolResolutionPass::visit(const syntax::Expression& node)
 void SymbolResolutionPass::visit(const syntax::IdentifierExpression& node)
 {
     const auto& name = std::get<std::string>(node.getIdentifier()->getValue());
-    const Usable* usable = m_context.symbolTable.lookup(name);
-    if (!usable)
+    if (const Usable* usable = m_context.symbolTable.lookup(name); !usable)
     {
         m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getIdentifier(), m_context.source,
                                                                       *node.getIdentifier()));
@@ -747,8 +743,7 @@ void SymbolResolutionPass::visit(const syntax::ConditionalExpression& node)
 void SymbolResolutionPass::visit(const syntax::FunctionCallExpression& node)
 {
     const auto& name = std::get<std::string>(node.getFunction()->getValue());
-    const Usable* usable = m_context.symbolTable.lookup(name);
-    if (!usable)
+    if (const Usable* usable = m_context.symbolTable.lookup(name); !usable)
     {
         m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getFunction(), m_context.source,
                                                                       *node.getFunction()));
@@ -770,8 +765,7 @@ void SymbolResolutionPass::visit(const syntax::ArrayAccessExpression& node)
     if (node.getArray())
     {
         const auto& name = std::get<std::string>(node.getArray()->getValue());
-        const Usable* usable = m_context.symbolTable.lookup(name);
-        if (!usable)
+        if (const Usable* usable = m_context.symbolTable.lookup(name); !usable)
         {
             m_context.log(
                 errors::semantics::UNDECLARED_IDENTIFIER_N.args(*node.getArray(), m_context.source, *node.getArray()));
