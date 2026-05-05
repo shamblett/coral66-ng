@@ -38,7 +38,7 @@ std::uint8_t getNumBytesForUTF8(Iter begin, Iter end)
 {
     CORAL66_ASSERT(begin != end);
     std::uint8_t des;
-    std::int8_t temp = *begin;
+    const std::int8_t temp = *begin;
     std::memcpy(&des, &temp, 1);
     
     std::uint8_t step = 0;
@@ -76,7 +76,7 @@ void toSafeUTF8(std::string_view const inputLine, OutputIter1 outputIter, Output
             llvm::UTF32 utf32;
             llvm::UTF32* targetStart = &utf32;
             const auto* const prev = sourceStart;
-            auto convRes = llvm::ConvertUTF8toUTF32(
+            const auto convRes = llvm::ConvertUTF8toUTF32(
                 reinterpret_cast<const llvm::UTF8**>(&sourceStart),
                 reinterpret_cast<const llvm::UTF8*>(sourceEnd), &targetStart, targetStart + 1,
                 llvm::strictConversion);
@@ -85,7 +85,7 @@ void toSafeUTF8(std::string_view const inputLine, OutputIter1 outputIter, Output
                 break;
             }
             mappingIter = std::fill_n(mappingIter, std::distance(prev, sourceStart), delta);
-            if (coral66::isWhitespace(utf32) || llvm::sys::unicode::isPrintable(utf32))
+            if (isWhitespace(utf32) || llvm::sys::unicode::isPrintable(static_cast<int>(utf32)))
             {
                 outputIter = std::copy(prev, sourceStart, outputIter);
                 continue;
@@ -96,7 +96,7 @@ void toSafeUTF8(std::string_view const inputLine, OutputIter1 outputIter, Output
             {
                 char nullControlCharacter[] = {static_cast<char>(0xE2), static_cast<char>(0x90),
                                                static_cast<char>(0x80)};
-                nullControlCharacter[2] |= utf32;
+                nullControlCharacter[2] |= static_cast<char>(utf32); // NOLINT(*-narrowing-conversions)
                 outputIter = std::copy(std::begin(nullControlCharacter), std::end(nullControlCharacter), outputIter);
             }
             else

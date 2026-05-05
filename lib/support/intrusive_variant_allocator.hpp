@@ -111,10 +111,11 @@ class Deleter
 public:
     Deleter() = default;
 
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     Deleter(::coral66::IntrusiveVariantAllocator<typename T::base_type>* allocator) : m_allocator(allocator) {}
 
     template <class U>
-    requires std::is_same_v<typename T::base_type, typename U::base_type> Deleter(Deleter<U>&& rhs) noexcept
+    requires std::is_same_v<typename T::base_type, typename U::base_type> explicit Deleter(Deleter<U>&& rhs) noexcept
         : m_allocator(rhs.m_allocator)
     {
     }
@@ -157,7 +158,7 @@ class IntrusiveVariantAllocator<Base, AbstractIntrusiveVariant<Base, Subclasses.
 
     std::vector<std::byte*>::iterator getFreeHead()
     {
-        auto head = std::ranges::find_if_not(m_heads, &slabFull);
+        const auto head = std::ranges::find_if_not(m_heads, &slabFull);
         if (head == m_heads.end())
         {
             auto newSlab = std::make_unique<Slab>();
@@ -204,7 +205,7 @@ class IntrusiveVariantAllocator<Base, AbstractIntrusiveVariant<Base, Subclasses.
             return;
         }
         std::byte* current = head;
-        std::byte* last = std::end(slab.storage);
+        const std::byte* last = std::end(slab.storage);
         std::unordered_set<std::byte*> holes;
         while (current < std::end(slab.storage))
         {
@@ -304,8 +305,9 @@ public:
         [[nodiscard]] coral66::not_null<Base> alloc(const Base& value)
     {
         constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, const Base&), sizeof...(Subclasses)>
-            copyConstructors = {+[](IntrusiveVariantAllocator* self, const Base& value) -> Base*
-                                { return self->template alloc<Subclasses>(static_cast<const Subclasses&>(value)); }...};
+            copyConstructors = {
+                +[](IntrusiveVariantAllocator* self, const Base& value1) -> Base*
+                { return self->template alloc<Subclasses>(static_cast<const Subclasses&>(value1)); }...};
         return copyConstructors[value.index()](this, value);
     }
 
@@ -314,8 +316,8 @@ public:
         [[nodiscard]] coral66::not_null<Base> alloc(Base&& value)
     {
         constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, Base&&), sizeof...(Subclasses)> moveConstructors = {
-            +[](IntrusiveVariantAllocator* self, Base&& value) -> Base*
-            { return self->template alloc<Subclasses>(static_cast<Subclasses&&>(std::move(value))); }...};
+            +[](IntrusiveVariantAllocator* self, Base&& value1) -> Base*
+            { return self->template alloc<Subclasses>(static_cast<Subclasses&&>(std::move(value1))); }...};
         return moveConstructors[value.index()](this, std::move(value));
     }
 

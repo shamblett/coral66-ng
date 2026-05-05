@@ -454,19 +454,19 @@ public:
     // DEDUCTION ONLY
 
     template <class V>
-    IntrusiveVariantValue(const V&)
+    explicit IntrusiveVariantValue(const V&)
     {
         CORAL66_UNREACHABLE;
     }
 
     template <class V>
-    IntrusiveVariantValue(V&&) noexcept // NOLINT(*-forwarding-reference-overload)
+    explicit IntrusiveVariantValue(V&&) noexcept // NOLINT(*-forwarding-reference-overload)
     {
         CORAL66_UNREACHABLE;
     }
 
     template <class V, class... Args>
-    IntrusiveVariantValue(std::in_place_type_t<V>, Args&&...) noexcept
+    explicit IntrusiveVariantValue(std::in_place_type_t<V>, Args&&...) noexcept
     {
         CORAL66_UNREACHABLE;
     }
@@ -490,6 +490,7 @@ class IntrusiveVariantValue<Base, AbstractIntrusiveVariant<Base, SubClasses...>>
 
 public:
     template <class T, class... Args>
+    // ReSharper disable once CppNonExplicitConvertingConstructor
     requires(std::is_same_v<T, SubClasses> || ...) IntrusiveVariantValue(std::in_place_type_t<T>, Args&&... args)
     {
         new (this->m_storage) T(std::forward<Args>(args)...);
@@ -499,6 +500,7 @@ public:
 
     template <class T>
     requires(std::is_same_v<T, SubClasses> || ...)
+        // ReSharper disable once CppNonExplicitConvertingConstructor
         IntrusiveVariantValue(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>)
     {
         new (this->m_storage) T(std::forward<T>(value));
@@ -526,6 +528,7 @@ public:
 
     template <class T>
     requires(std::is_same_v<T, SubClasses> || ...)
+        // ReSharper disable once CppNonExplicitConvertingConstructor
         IntrusiveVariantValue(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>)
     {
         new (this->m_storage) T(value);
@@ -554,22 +557,27 @@ public:
 
     template <class U = Base>
     requires(std::is_same_v<U, Base> && (std::is_copy_constructible_v<SubClasses> && ...))
+        // ReSharper disable once CppNonExplicitConvertingConstructor
         IntrusiveVariantValue(const U& value) noexcept((std::is_nothrow_copy_constructible_v<SubClasses> && ...))
     {
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, const Base&), sizeof...(SubClasses)> copyConstructors = {
-            +[](std::byte* storage, const Base& value)
-            { new (storage) SubClasses(static_cast<const SubClasses&>(value)); }...};
+            +[](std::byte* storage, const Base& value1)
+            { new (storage) SubClasses(static_cast<const SubClasses&>(value1)); }...};
         copyConstructors[this->m_index](this->m_storage, value);
     }
 
     template <class U = Base>
-    requires(std::is_same_v<U, Base> && (std::is_move_constructible_v<SubClasses> && ...))
-        IntrusiveVariantValue(U&& value) noexcept((std::is_nothrow_move_constructible_v<SubClasses> && ...))
+    requires(
+        std::is_same_v<U, Base>
+        && (std::is_move_constructible_v<SubClasses>
+            && ...)) explicit IntrusiveVariantValue(U&& value) noexcept((std::
+                                                                             is_nothrow_move_constructible_v<SubClasses>
+                                                                         && ...))
     {
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, Base&&), sizeof...(SubClasses)> moveConstructors = {
-            +[](std::byte* storage, Base&& value) { new (storage) SubClasses(static_cast<SubClasses&&>(value)); }...};
+            +[](std::byte* storage, Base&& value1) { new (storage) SubClasses(static_cast<SubClasses&&>(value1)); }...};
         moveConstructors[this->m_index](this->m_storage, std::forward<U>(value));
     }
 
@@ -603,7 +611,7 @@ public:
         return &get();
     }
 
-    operator const Base&() const&
+    explicit operator const Base&() const&
     {
         return get();
     }

@@ -68,7 +68,7 @@ class AbstractIntrusiveVariant
 
 public:
     template <class T>
-    constexpr AbstractIntrusiveVariant(std::in_place_type_t<T>)
+    explicit constexpr AbstractIntrusiveVariant(std::in_place_type_t<T>)
         : m_index(std::integral_constant<index_type, indexOf<T>()>::value)
     {
         static_assert((std::is_same_v<T, Args> || ...), "T must be one of the subclasses specified in Args...");
@@ -165,8 +165,8 @@ public:
         }
         constexpr std::array<bool (*)(const AbstractIntrusiveVariant&, const AbstractIntrusiveVariant&),
                              sizeof...(Args)>
-            equality = {{+[](const AbstractIntrusiveVariant& lhs, const AbstractIntrusiveVariant& rhs) -> bool
-                         { return static_cast<const Args&>(lhs) == static_cast<const Args&>(rhs); }...}};
+            equality = {{+[](const AbstractIntrusiveVariant& lhs1, const AbstractIntrusiveVariant& rhs1) -> bool
+                         { return static_cast<const Args&>(lhs1) == static_cast<const Args&>(rhs1); }...}};
         return equality[lhs.index()](lhs, rhs);
     }
 

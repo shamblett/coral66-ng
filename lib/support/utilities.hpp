@@ -557,7 +557,7 @@ public:
         return m_ptr;
     }
 
-    constexpr operator T* CORAL66_NON_NULL() const
+    explicit constexpr operator T* CORAL66_NON_NULL() const
     {
         return get();
     }
