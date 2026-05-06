@@ -18,7 +18,7 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
 std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>> coral66::parser::parseFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
                                           Context& context)
 {
-    std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>> result;
+    std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> result;
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
         const auto openParenToken = begin;
@@ -57,7 +57,7 @@ std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66:
     else
     {
         context.log(errors::parser::INVALID_FIXED_FORMAT.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::INVALID_FIXED_FORMAT);
     }
     return result;
@@ -90,7 +90,7 @@ bool coral66::parser::expectIdentifier(lexer::CTokenIterator& begin, const lexer
 }
 
 bool coral66::parser::expect(lexer::TokenType expected, lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                             Context& context, const coral66::FunctionRef<Message()> additional)
+                             Context& context, const FunctionRef<Message()> additional)
 {
     if (begin == end || begin->getTokenType() != expected)
     {
@@ -238,7 +238,7 @@ bool coral66::parser::firstIsInUnaryExpression(const lexer::CToken& token, const
            || token.getTokenType() == lexer::TokenType::Plus || token.getTokenType() == lexer::TokenType::Minus;
 }
 
-bool coral66::parser::firstIsInPostFixExpression(const lexer::CToken& token, const coral66::parser::Context& context)
+bool coral66::parser::firstIsInPostFixExpression(const lexer::CToken& token, const Context& context)
 {
     return token.getTokenType() == lexer::TokenType::OpenParentheses || firstIsInPrimaryExpression(token, context);
 }

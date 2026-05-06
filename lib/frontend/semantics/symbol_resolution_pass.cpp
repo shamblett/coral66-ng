@@ -207,11 +207,11 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
     const syntax::Expression* fixedFractionBits)                    // NOLINT(*-convert-member-functions-to-static)
 {
     if (!typeToken)
-        return {(UntypedType{})};
+        return {UntypedType{}};
 
     const auto type = typeToken.value()->getTokenType();
     if (type == lexer::TokenType::FloatingKeyword)
-        return {(PrimitiveType{PrimitiveType::Floating})};
+        return {PrimitiveType{PrimitiveType::Floating}};
     if (type == lexer::TokenType::FixedKeyword)
     {
         uint32_t total = 16;
@@ -224,12 +224,12 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
         {
             if (const auto fVal = evaluateConstantInteger(*fixedFractionBits); fVal && *fVal >= 0) frac = static_cast<uint32_t>(*fVal);
         }
-        return {(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)})};
+        return {FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)}};
     }
     if (type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword)
-        return {(PrimitiveType{PrimitiveType::Bits})};
+        return {PrimitiveType{PrimitiveType::Bits}};
 
-    return {(PrimitiveType{PrimitiveType::Integer})};
+    return {PrimitiveType{PrimitiveType::Integer}};
 }
 
 void SymbolResolutionPass::visit(const syntax::Declaration& node)
@@ -259,10 +259,10 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
     {
         auto typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer});
         if (type->is<PrimitiveType>())
-            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind()});
+            typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
         else if (type->is<FixedType>())
-            typeCopy = IntrusiveVariantValue<Type>(
-                FixedType{static_cast<uint8_t>(type->as<FixedType>().getTotalBits()), static_cast<uint8_t>(type->as<FixedType>().getFractionalBits())});
+            typeCopy = IntrusiveVariantValue(
+                FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
 
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
         declaration->setAstNode(&node);
@@ -386,12 +386,12 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 {
     auto type = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
-    auto typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}); // Default for now
+    auto typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}); // Default for now
         if (type->is<PrimitiveType>())
-            typeCopy = IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind()});
+            typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
         else if (type->is<FixedType>())
-            typeCopy = IntrusiveVariantValue<Type>(
-                FixedType{static_cast<uint8_t>(type->as<FixedType>().getTotalBits()), static_cast<uint8_t>(type->as<FixedType>().getFractionalBits())});
+            typeCopy = IntrusiveVariantValue(
+                FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
 
     std::optional<std::uint32_t> wordPos;
     if (node.getWordPosition())
@@ -498,7 +498,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
         {
             auto baseTypeVal = createTypeFromToken(paramNode->getType(), paramNode->getFixedTotalBits(), paramNode->getFixedFractionBits());
 
-            IntrusiveVariantValue<Type> paramTypeVal{UntypedType{}};
+            IntrusiveVariantValue paramTypeVal{UntypedType{}};
 
             bool isValue = false;
             switch (paramNode->getMode())
@@ -512,13 +512,13 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Array:
                     m_context.ownedTypes.push_back(std::move(baseTypeVal));
-                    paramTypeVal = IntrusiveVariantValue<Type>(ArrayType{m_context.ownedTypes.back().data(), {}});
+                    paramTypeVal = IntrusiveVariantValue(ArrayType{m_context.ownedTypes.back().data(), {}});
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Label:
-                    paramTypeVal = IntrusiveVariantValue<Type>(LabelType{});
+                    paramTypeVal = IntrusiveVariantValue(LabelType{});
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Switch:
-                    paramTypeVal = IntrusiveVariantValue<Type>(SwitchType{});
+                    paramTypeVal = IntrusiveVariantValue(SwitchType{});
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Procedure:
                 {
@@ -528,15 +528,15 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
                         m_context.ownedTypes.push_back(std::move(baseTypeVal));
                         procReturnType = m_context.ownedTypes.back().data();
                     }
-                    paramTypeVal = IntrusiveVariantValue<Type>(ProcedureType{procReturnType, {}});
+                    paramTypeVal = IntrusiveVariantValue(ProcedureType{procReturnType, {}});
                     break;
                 }
                 case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
-                    paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
+                    paramTypeVal = IntrusiveVariantValue(UntypedType{Type::Value});
                     isValue = true;
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
-                    paramTypeVal = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
+                    paramTypeVal = IntrusiveVariantValue(UntypedType{Type::Location});
                     break;
             }
 
@@ -564,13 +564,13 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
         }
     }
 
-    auto typeCopy = IntrusiveVariantValue<Type>(ProcedureType{returnTypePtr, std::move(parameters)});
+    auto typeCopy = IntrusiveVariantValue(ProcedureType{returnTypePtr, std::move(parameters)});
 
     auto declaration = makeIntrusiveVariant<ProcedureDeclaration>(id, std::move(typeCopy));
     declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 
-    auto registerProcedure = [&]()
+    auto registerProcedure = [&]
     {
         if (m_context.symbolTable.lookupInCurrentScope(name))
         {
@@ -611,35 +611,35 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
 
     for (auto id : node.getIdentifiers())
     {
-        IntrusiveVariantValue<Type> typeCopy{PrimitiveType{PrimitiveType::Integer}};
+        IntrusiveVariantValue typeCopy{PrimitiveType{PrimitiveType::Integer}};
 
         switch (node.getMode())
         {
             case syntax::ParameterDeclaration::ParameterMode::Value:
                 if (type->is<PrimitiveType>())
                     typeCopy =
-                        IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
+                        IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
                 else if (type->is<FixedType>())
-                    typeCopy = IntrusiveVariantValue<Type>(FixedType{
+                    typeCopy = IntrusiveVariantValue(FixedType{
                         type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Value});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Location:
                 if (type->is<PrimitiveType>())
                     typeCopy =
-                        IntrusiveVariantValue<Type>(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
+                        IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
                 else if (type->is<FixedType>())
-                    typeCopy = IntrusiveVariantValue<Type>(FixedType{type->as<FixedType>().getTotalBits(),
+                    typeCopy = IntrusiveVariantValue(FixedType{type->as<FixedType>().getTotalBits(),
                                                                      type->as<FixedType>().getFractionalBits(),
                                                                      Type::Location});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Array:
-                typeCopy = IntrusiveVariantValue<Type>(ArrayType{baseTypePtr, {}});
+                typeCopy = IntrusiveVariantValue(ArrayType{baseTypePtr, {}});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Label:
-                typeCopy = IntrusiveVariantValue<Type>(LabelType{});
+                typeCopy = IntrusiveVariantValue(LabelType{});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Switch:
-                typeCopy = IntrusiveVariantValue<Type>(SwitchType{});
+                typeCopy = IntrusiveVariantValue(SwitchType{});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Procedure:
             {
@@ -649,14 +649,14 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
                     m_context.ownedTypes.push_back(createTypeFromToken(node.getType()));
                     procReturnType = m_context.ownedTypes.back().data();
                 }
-                typeCopy = IntrusiveVariantValue<Type>(ProcedureType{procReturnType, {}});
+                typeCopy = IntrusiveVariantValue(ProcedureType{procReturnType, {}});
                 break;
             }
             case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
-                typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Value});
+                typeCopy = IntrusiveVariantValue(UntypedType{Type::Value});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
-                typeCopy = IntrusiveVariantValue<Type>(UntypedType{Type::Location});
+                typeCopy = IntrusiveVariantValue(UntypedType{Type::Location});
                 break;
         }
 

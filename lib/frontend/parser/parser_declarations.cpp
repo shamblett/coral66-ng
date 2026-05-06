@@ -204,9 +204,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
 
                 if (ids.empty())
                 {
-                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                     break;
                 }
@@ -226,9 +226,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         }
                         else
                         {
-                            context.log(errors::parser::EXPECTED_COLON.args(*(begin == end ? (end - 1) : begin),
+                            context.log(errors::parser::EXPECTED_COLON.args(*(begin == end ? end - 1 : begin),
                                                                             context.getSourceInterface(),
-                                                                            *(begin == end ? (end - 1) : begin)));
+                                                                            *(begin == end ? end - 1 : begin)));
                             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COLON);
                             break;
                         }
@@ -245,8 +245,8 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                     else
                     {
                         context.log(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET.args(
-                            *(begin == end ? (end - 1) : begin), context.getSourceInterface(),
-                            *(begin == end ? (end - 1) : begin)));
+                            *(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                            *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET);
                     }
                 }
@@ -310,9 +310,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 auto groupStart = begin;
                 if (!parseGroup())
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
 
                     // Recover
@@ -340,9 +340,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
             }
             if (!parsedAny)
             {
-                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                      context.getSourceInterface(),
-                                                                     *(begin == end ? (end - 1) : begin)));
+                                                                     *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
             }
         }
@@ -403,8 +403,8 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                             if (!parseGroup())
                             {
                                 context.log(errors::parser::EXPECTED_EXPRESSION.args(
-                                    *(begin == end ? (end - 1) : begin), context.getSourceInterface(),
-                                    *(begin == end ? (end - 1) : begin)));
+                                    *(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                                    *(begin == end ? end - 1 : begin)));
                                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
 
                                 // Recover
@@ -428,9 +428,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         }
                         if (!parsedAny)
                         {
-                            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                                  context.getSourceInterface(),
-                                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                                 *(begin == end ? end - 1 : begin)));
                             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                         }
                         break; // PRESET is always the last part of the table body
@@ -484,9 +484,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         }
                         else if (!isPartWord)
                         {
-                            context.log(errors::parser::EXPECTED_TYPE.args(*(begin == end ? (end - 1) : begin),
+                            context.log(errors::parser::EXPECTED_TYPE.args(*(begin == end ? end - 1 : begin),
                                                                            context.getSourceInterface(),
-                                                                           *(begin == end ? (end - 1) : begin)));
+                                                                           *(begin == end ? end - 1 : begin)));
                             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TYPE);
                             break;
                         }
@@ -540,9 +540,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                     }
                     else
                     {
-                        context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                        context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
                                                                              context.getSourceInterface(),
-                                                                             *(begin == end ? (end - 1) : begin)));
+                                                                             *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                         break;
                     }
@@ -568,9 +568,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                     auto groupStart = begin;
                     if (!parseGroup())
                     {
-                        context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                        context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                              context.getSourceInterface(),
-                                                                             *(begin == end ? (end - 1) : begin)));
+                                                                             *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
 
                         // Recover
@@ -598,9 +598,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
                 if (!parsedAny)
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                 }
             }
@@ -674,9 +674,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
             }
             else
             {
-                context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? end - 1 : begin),
                                                                       context.getSourceInterface(),
-                                                                      *(begin == end ? (end - 1) : begin)));
+                                                                      *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
                 begin = start;
             }
@@ -720,17 +720,17 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                 }
             }
             else
             {
-                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? end - 1 : begin),
                                                                      context.getSourceInterface(),
-                                                                     *(begin == end ? (end - 1) : begin)));
+                                                                     *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
             }
         }

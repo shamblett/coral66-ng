@@ -36,7 +36,7 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
             if (auto val = evaluateConstantInteger(unary->getOperand()))
             {
                 if (opType == lexer::TokenType::Minus)
-                    return -(*val);
+                    return -*val;
                 return *val;
             }
         }
@@ -48,15 +48,15 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
         {
             const auto opType = binary->getOp()->getTokenType();
             if (opType == lexer::TokenType::Plus)
-                return (*left) + (*right);
+                return *left + *right;
             if (opType == lexer::TokenType::Minus)
-                return (*left) - (*right);
+                return *left - *right;
             if (opType == lexer::TokenType::Asterisk)
-                return (*left) * (*right);
+                return *left * *right;
             if (opType == lexer::TokenType::Division)
             {
                 if (*right != 0)
-                    return (*left) / (*right);
+                    return *left / *right;
             }
         }
     }

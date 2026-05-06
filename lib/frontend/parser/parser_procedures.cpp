@@ -35,7 +35,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
             {
                 auto startMode = begin;
                 begin++;
-                auto mode = (type == lexer::TokenType::ValueKeyword) ?
+                auto mode = type == lexer::TokenType::ValueKeyword ?
                                 syntax::ParameterDeclaration::ParameterMode::Value :
                                 syntax::ParameterDeclaration::ParameterMode::Location;
 
@@ -83,7 +83,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 }
                 else if (nextType == lexer::TokenType::Identifier)
                 {
-                    auto untypedMode = (type == lexer::TokenType::ValueKeyword) ?
+                    auto untypedMode = type == lexer::TokenType::ValueKeyword ?
                                            syntax::ParameterDeclaration::ParameterMode::UntypedValue :
                                            syntax::ParameterDeclaration::ParameterMode::UntypedLocation;
                     std::vector<lexer::CTokenIterator> ids;
@@ -121,7 +121,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
             {
                 auto startMode = begin;
                 begin++;
-                auto mode = (type == lexer::TokenType::LabelKeyword) ?
+                auto mode = type == lexer::TokenType::LabelKeyword ?
                                 syntax::ParameterDeclaration::ParameterMode::Label :
                                 syntax::ParameterDeclaration::ParameterMode::Switch;
                 std::vector<lexer::CTokenIterator> ids;
@@ -186,9 +186,9 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? end - 1 : begin),
                                                                           context.getSourceInterface(),
-                                                                          *(begin == end ? (end - 1) : begin)));
+                                                                          *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
                     return std::nullopt;
                 }
@@ -202,9 +202,9 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? end - 1 : begin),
                                                                           context.getSourceInterface(),
-                                                                          *(begin == end ? (end - 1) : begin)));
+                                                                          *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
                     return std::nullopt;
                 }
@@ -266,9 +266,9 @@ std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
 
     if (isRecursive || hasProcedureKeyword)
     {
-        auto start = typeToken.has_value() ? typeToken.value() : (isRecursive ? rollback : (begin - 1));
+        auto start = typeToken.has_value() ? typeToken.value() : isRecursive ? rollback : begin - 1;
 
-        auto name = begin == end ? (end - 1) : begin;
+        auto name = begin == end ? end - 1 : begin;
         if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
         {
             begin++;

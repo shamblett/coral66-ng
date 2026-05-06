@@ -368,10 +368,10 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     std::map<std::pair<std::uint32_t, std::uint64_t>, std::vector<ModifierOfLine>> fileAndLineToModifiers;
     for (auto& iter : modifiers)
     {
-        const auto index = coral66::match(
-            iter, [](const DiagnosticBase::Underline& underline) { return underline.index; },
-            [](const DiagnosticBase::InsertAfter& insertAfter) { return insertAfter.index; },
-            [](const DiagnosticBase::Annotate& annotate) { return annotate.index; });
+        const auto index = match(
+            iter, [](const Underline& underline) { return underline.index; },
+            [](const InsertAfter& insertAfter) { return insertAfter.index; },
+            [](const Annotate& annotate) { return annotate.index; });
         CORAL66_ASSERT(arguments[index].range);
         arguments[index].range = toMacroId0Range(*arguments[index].range, sourceInterface);
         auto startLine = getLineCol(arguments[index].range->first, sourceInterface).first;
@@ -405,9 +405,9 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                 {{std::max(arguments[index].range->first.offset, startOffset),
                   std::min(arguments[index].range->second.offset, endOffset)},
                  coral66::match(
-                     iter, [](const DiagnosticBase::Underline& underline) -> ModifierOfLine::variant
+                     iter, [](const Underline& underline) -> ModifierOfLine::variant
                      { return ModifierOfLine::Underline{underline.character, underline.continuous}; },
-                     [&arguments](const DiagnosticBase::InsertAfter& insertAfter) -> ModifierOfLine::variant
+                     [&arguments](const InsertAfter& insertAfter) -> ModifierOfLine::variant
                      {
                          if (insertAfter.text >= 0)
                          {
@@ -416,7 +416,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                          }
                          return ModifierOfLine::InsertAfter{};
                      },
-                     [&arguments, index](const DiagnosticBase::Annotate& annotate) -> ModifierOfLine::variant
+                     [&arguments, index](const Annotate& annotate) -> ModifierOfLine::variant
                      {
                          CORAL66_ASSERT(arguments[annotate.text].inArgText);
                          const auto begin = arguments[index].range->first.offset;
@@ -442,7 +442,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         std::vector<std::int64_t> mapping(view.size() + 1);
         std::string safeUTF8;
         safeUTF8.reserve(mapping.size());
-        coral66::toSafeUTF8(view, std::back_inserter(safeUTF8), mapping.begin());
+        toSafeUTF8(view, std::back_inserter(safeUTF8), mapping.begin());
         view = safeUTF8;
         for (auto i = minLine; i <= maxLine; i++)
         {

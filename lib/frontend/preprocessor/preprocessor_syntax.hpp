@@ -36,7 +36,7 @@ struct ControlLine final
 
 struct TextBlock final
 {
-    std::span<const coral66::lexer::PPToken> tokens;
+    std::span<const lexer::PPToken> tokens;
 };
 
 using GroupPart = std::variant<TextBlock, ControlLine>;

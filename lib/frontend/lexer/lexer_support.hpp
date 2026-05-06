@@ -235,7 +235,7 @@ public:
     template <class F>
     void withOffset(std::uint64_t const offset, F&& f)
     {
-        auto exit = coral66::ScopeExit([offset = m_offset, this]() { m_offset = offset; });
+        auto exit = coral66::ScopeExit([offset = m_offset, this] { m_offset = offset; });
         m_offset = offset;
         std::forward<F>(f)();
     }

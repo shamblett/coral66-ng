@@ -437,7 +437,6 @@ class CodeStatement final : public Statement
 public:
     CodeStatement(lexer::CTokenIterator begin, lexer::CTokenIterator end);
     [[nodiscard]] lexer::CTokenIterator getCode() const;
-    ;
 };
 
 // Expressions

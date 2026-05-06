@@ -537,20 +537,20 @@ void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
         }
         else if (usable->is<LabelDeclaration>())
         {
-            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(LabelType{}));
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(LabelType{}));
         }
         else if (usable->is<SwitchDeclaration>())
         {
-            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(SwitchType{}));
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(SwitchType{}));
         }
         else
         {
-            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
         }
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 
@@ -559,20 +559,20 @@ void TypeCheckingPass::visit(const syntax::LiteralExpression& node)
 {
     if (node.getLiteral()->getType() == lexer::CToken::Floating)
         m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
+                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating}));
     else if (node.begin()->getTokenType() == lexer::TokenType::OctalKeyword || node.begin()->getTokenType() == lexer::TokenType::LiteralKeyword)
         m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Bits}));
+                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
     else
         m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, const Type& t2) const
 {
     if (t1.is<ErrorType>() || t2.is<ErrorType>())
-        return {(ErrorType{})};
+        return {ErrorType{}};
 
     if (isNumericType(t1) && isNumericType(t2))
     {
@@ -581,22 +581,22 @@ IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, cons
         if (const auto p2 = t2.tryAs<PrimitiveType>();
             (p1 && p1->getKind() == PrimitiveType::Floating) || (p2 && p2->getKind() == PrimitiveType::Floating))
         {
-            return {(PrimitiveType{PrimitiveType::Floating})};
+            return {PrimitiveType{PrimitiveType::Floating}};
         }
         if (auto f1 = t1.tryAs<FixedType>())
             return {*f1};
         if (auto f2 = t2.tryAs<FixedType>())
             return {*f2};
 
-        return {(PrimitiveType{PrimitiveType::Integer})};
+        return {PrimitiveType{PrimitiveType::Integer}};
     }
     
     if (isBitsType(t1) && isBitsType(t2))
     {
-        return {(PrimitiveType{PrimitiveType::Bits})};
+        return {PrimitiveType{PrimitiveType::Bits}};
     }
     
-    return {(ErrorType{})};
+    return {ErrorType{}};
 }
 
 void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
@@ -613,7 +613,8 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         auto type2 = it2->second;
         const auto opType = node.getOp()->getTokenType();
 
-        const bool isBitwiseOp = (opType == lexer::TokenType::DifferKeyword || opType == lexer::TokenType::UnionKeyword || opType == lexer::TokenType::MaskKeyword);
+        const bool isBitwiseOp = opType == lexer::TokenType::DifferKeyword || opType == lexer::TokenType::UnionKeyword
+                                 || opType == lexer::TokenType::MaskKeyword;
         
         bool operandsValid = true;
         if (isBitwiseOp)
@@ -635,7 +636,7 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         auto common = getCommonType(*type1, *type2);
         if (isBitwiseOp)
         {
-            common = IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Bits});
+            common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits});
         }
         
         if ((common->is<ErrorType>() || !operandsValid) && !type1->is<ErrorType>() && !type2->is<ErrorType>())
@@ -649,12 +650,12 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
             || opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
         {
             m_context.expressionTypes.insert_or_assign(
-                &node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+                &node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         }
         else if (isBitwiseOp)
         {
             m_context.expressionTypes.insert_or_assign(
-                &node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Bits}));
+                &node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
         }
         else
         {
@@ -663,7 +664,7 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 
@@ -681,7 +682,7 @@ void TypeCheckingPass::visit(const syntax::UnaryExpression& node)
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 
@@ -706,7 +707,7 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
     }
 
     m_context.expressionTypes.insert_or_assign(&node,
-                                               IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+                                               IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
 }
 
 void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
@@ -735,7 +736,7 @@ void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 
@@ -825,31 +826,31 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                     if (const auto p = procType->getReturnType()->tryAs<PrimitiveType>())
                     {
                         m_context.expressionTypes.insert_or_assign(
-                            &node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
+                            &node, IntrusiveVariantValue(PrimitiveType{p->getKind()}));
                     }
                     else
                     {
-                        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(UntypedType{}));
+                        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
                     }
                 }
                 else
                 {
-                    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(UntypedType{}));
+                    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
                 }
             }
             else
             {
-                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(UntypedType{}));
+                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
             }
         }
         else
         {
-            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
         }
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 
@@ -872,7 +873,7 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
 
     if (node.getArray() == nullptr)
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         return;
     }
 
@@ -901,11 +902,11 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
             if (const auto p = arrType->getElementType().tryAs<PrimitiveType>())
             {
                 m_context.expressionTypes.insert_or_assign(
-                    &node, IntrusiveVariantValue<Type>(PrimitiveType{p->getKind()}));
+                    &node, IntrusiveVariantValue(PrimitiveType{p->getKind()}));
             }
             else
             {
-                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(UntypedType{}));
+                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
             }
         }
         else if (auto* tableElement = usable->tryAs<TableElementDeclaration>())
@@ -914,12 +915,12 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
         }
         else
         {
-            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
         }
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 
@@ -934,7 +935,7 @@ void TypeCheckingPass::visit(const syntax::LocationExpression& node)
         DiagnosticCollector::addDiagnostic(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
     }
     m_context.expressionTypes.insert_or_assign(&node,
-                                               IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+                                               IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
 }
 
 void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
@@ -983,20 +984,20 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
     if (const auto kind = node.getType()->getTokenType(); kind == lexer::TokenType::IntegerKeyword)
     {
         m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Integer}));
+                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
     }
     else if (kind == lexer::TokenType::FloatingKeyword)
     {
         m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue<Type>(PrimitiveType{PrimitiveType::Floating}));
+                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating}));
     }
     else if (kind == lexer::TokenType::FixedKeyword)
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(FixedType(24, 0)));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(FixedType(24, 0)));
     }
     else
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue<Type>(ErrorType{}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
     }
 }
 

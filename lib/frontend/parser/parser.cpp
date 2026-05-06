@@ -60,9 +60,9 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         }
         else
         {
-            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
                                                                  context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                 *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
             return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
@@ -77,9 +77,9 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         }
         else
         {
-            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
                                                                  context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                 *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
             return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
@@ -160,9 +160,9 @@ std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const le
             }
             else
             {
-                context.log(errors::parser::EXPECTED_SEMICOLON.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_SEMICOLON.args(*(begin == end ? end - 1 : begin),
                                                                     context.getSourceInterface(),
-                                                                    *(begin == end ? (end - 1) : begin)));
+                                                                    *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SEMICOLON);
                 while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
                        && begin->getTokenType() != lexer::TokenType::EndKeyword)
@@ -224,8 +224,8 @@ std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const le
     }
     else
     {
-        context.log(errors::parser::EXPECTED_END.args(*(begin == end ? (end - 1) : begin), context.getSourceInterface(),
-                                                      *(begin == end ? (end - 1) : begin)));
+        context.log(errors::parser::EXPECTED_END.args(*(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                                                      *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_END);
         return nullptr;
     }

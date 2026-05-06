@@ -79,7 +79,7 @@ class Preprocessor final : PPSourceInterface
 
         for (long unsigned idx = 0; idx < tokens.size();)
         {
-            if (tokens[idx].getTokenType() == coral66::lexer::TokenType::Newline)
+            if (tokens[idx].getTokenType() == lexer::TokenType::Newline)
             {
                 idx++;
                 if (idx == tokens.size())
@@ -90,7 +90,7 @@ class Preprocessor final : PPSourceInterface
                 output.clear();
                 continue;
             }
-            if (tokens[idx].getTokenType() != coral66::lexer::TokenType::Identifier)
+            if (tokens[idx].getTokenType() != lexer::TokenType::Identifier)
             {
                 output.push_back(std::move(tokens[idx]));
                 idx++;
@@ -180,11 +180,11 @@ class Preprocessor final : PPSourceInterface
                 auto param_count = params.size();
 
                 long unsigned arg_idx = idx + 1;
-                while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Newline)
+                while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == lexer::TokenType::Newline)
                     arg_idx++;
 
                 if (arg_idx == tokens.size()
-                    || tokens[arg_idx].getTokenType() != coral66::lexer::TokenType::OpenParentheses)
+                    || tokens[arg_idx].getTokenType() != lexer::TokenType::OpenParentheses)
                 {
                     output.push_back(std::move(tokens[idx]));
                     idx++;
@@ -199,19 +199,19 @@ class Preprocessor final : PPSourceInterface
 
                 while (arg_idx < tokens.size())
                 {
-                    if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenParentheses)
+                    if (tokens[arg_idx].getTokenType() == lexer::TokenType::OpenParentheses)
                         paren_depth++;
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                    else if (tokens[arg_idx].getTokenType() == lexer::TokenType::CloseParentheses)
                     {
                         if (paren_depth == 0)
                             break;
                         paren_depth--;
                     }
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::OpenSquareBracket)
+                    else if (tokens[arg_idx].getTokenType() == lexer::TokenType::OpenSquareBracket)
                         square_depth++;
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseSquareBracket)
+                    else if (tokens[arg_idx].getTokenType() == lexer::TokenType::CloseSquareBracket)
                         square_depth--;
-                    else if (tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::Comma && paren_depth == 0
+                    else if (tokens[arg_idx].getTokenType() == lexer::TokenType::Comma && paren_depth == 0
                              && square_depth == 0)
                     {
                         actual_args.push_back(current_arg);
@@ -455,7 +455,7 @@ std::string reconstruct(const T* begin, const T* end, const source_interface& so
                 1);
         }
         result.insert(result.size(), newLines, '\n');
-        if (newLines == 0 && (begin->hasLeadingWhitespace()))
+        if (newLines == 0 && begin->hasLeadingWhitespace())
         {
             result += " " + lexer::normalizeSpelling(begin->getRepresentation(sourceInterface));
         }

@@ -266,7 +266,7 @@ std::pair<StateMachine, bool> StringLiteral::advance(char const c, Context& cont
     }
 
     characters += c;
-    if ((c == '\n' || c == '\r'))
+    if (c == '\n' || c == '\r')
     {
         context.report(errors::lexer::UNTERMINATED_STRING_LITERAL, context.tokenStartOffset,
                        std::pair{context.tokenStartOffset, context.getOffset()});
@@ -285,7 +285,7 @@ std::pair<StateMachine, bool> Text::advance(std::uint32_t const c, Context& cont
         {
             return {CommentSentence{}, false};
         }
-        else if (characters == tokenName(TokenType::EndKeyword))
+        if (characters == tokenName(TokenType::EndKeyword))
         {
             context.push(getNumUTF8ForUTF32(c), TokenType::Identifier, characters);
             return {EndComment{}, false};
@@ -349,10 +349,7 @@ std::pair<StateMachine, bool> EndComment::advance(char const c, Context& context
         {
             return {std::move(*this), true};
         }
-        else
-        {
-            return {Start{}, false};
-        }
+        return {Start{}, false};
     }
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
     {

@@ -39,7 +39,7 @@ struct Substitution;
 struct Stringification;
 struct TokenConcatenation;
 using PPRecord =
-    std::variant<std::monostate, Source::Substitution, Source::Stringification, Source::TokenConcatenation>;
+    std::variant<std::monostate, Substitution, Stringification, TokenConcatenation>;
 } // namespace Source
 
 class source_interface

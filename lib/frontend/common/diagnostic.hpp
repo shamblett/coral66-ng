@@ -544,7 +544,7 @@ private:
 
     constexpr static MaxVector<std::string_view, N> customModifiersFor(const std::size_t i)
     {
-        coral66::MaxVector<std::string_view, N> result{};
+        MaxVector<std::string_view, N> result{};
         auto text = getFormat();
         while (auto arg = detail::Diagnostic::nextArg(text))
         {

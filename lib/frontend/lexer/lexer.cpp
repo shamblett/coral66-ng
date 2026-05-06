@@ -414,7 +414,7 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                     if (next != end
                         && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
                     {
-                        numberText += (next->getTokenType() == TokenType::Plus) ? "+" : "-";
+                        numberText += next->getTokenType() == TokenType::Plus ? "+" : "-";
                         iter = next;
                         next = iter + 1;
                     }
@@ -432,7 +432,7 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                 if (next != end
                     && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
                 {
-                    numberText += (next->getTokenType() == TokenType::Plus) ? "+" : "-";
+                    numberText += next->getTokenType() == TokenType::Plus ? "+" : "-";
                     iter = next;
                     next = iter + 1;
                 }
@@ -448,7 +448,7 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                                         startIter->getCharSpaceOffset(), context);
             if (number)
             {
-                std::uint64_t length = (iter->getOffset() + iter->getLength()) - startIter->getOffset();
+                std::uint64_t length = iter->getOffset() + iter->getLength() - startIter->getOffset();
                 result.emplace_back(TokenType::Literal, startIter->getOffset(), length, startIter->getFileId(),
                                     startIter->getMacroId(), std::move(number->first), number->second);
             }

@@ -33,7 +33,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
 
         if (type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
         {
-            mode = (type == lexer::TokenType::ValueKeyword) ? syntax::ParameterDeclaration::ParameterMode::Value :
+            mode = type == lexer::TokenType::ValueKeyword ? syntax::ParameterDeclaration::ParameterMode::Value :
                                                               syntax::ParameterDeclaration::ParameterMode::Location;
             begin++;
             paramTypeToken = begin;
@@ -52,7 +52,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
         }
         else if (type == lexer::TokenType::LabelKeyword || type == lexer::TokenType::SwitchKeyword)
         {
-            mode = (type == lexer::TokenType::LabelKeyword) ? syntax::ParameterDeclaration::ParameterMode::Label :
+            mode = type == lexer::TokenType::LabelKeyword ? syntax::ParameterDeclaration::ParameterMode::Label :
                                                               syntax::ParameterDeclaration::ParameterMode::Switch;
             begin++;
         }
@@ -143,7 +143,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
     else
     {
         context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
         return std::nullopt;
     }
@@ -168,9 +168,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
         begin++;
         if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
         {
-            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
                                                                        context.getSourceInterface(),
-                                                                       *(begin == end ? (end - 1) : begin)));
+                                                                       *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
             return nullptr;
         }
@@ -218,7 +218,7 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                     {
                         isProcedure = true;
                     }
-                    else if (procLookahead != end && (currentStart->getTokenType() == lexer::TokenType::FixedKeyword))
+                    else if (procLookahead != end && currentStart->getTokenType() == lexer::TokenType::FixedKeyword)
                     {
                         if (procLookahead->getTokenType() == lexer::TokenType::OpenParentheses)
                         {
@@ -269,9 +269,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                         }
                         else
                         {
-                            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? (end - 1) : begin),
+                            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
                                                                                  context.getSourceInterface(),
-                                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                                 *(begin == end ? end - 1 : begin)));
                             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                             return nullptr;
                         }
@@ -314,9 +314,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
             }
             else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
             {
-                context.log(errors::parser::EXPECTED_N.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_N.args(*(begin == end ? end - 1 : begin),
                                                             context.getSourceInterface(), lexer::TokenType::SemiColon,
-                                                            *(begin == end ? (end - 1) : begin)));
+                                                            *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_N);
                 return nullptr;
             }
@@ -324,9 +324,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
 
         if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
-            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
                                                                         context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
+                                                                        *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }

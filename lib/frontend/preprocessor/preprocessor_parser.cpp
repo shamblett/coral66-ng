@@ -38,7 +38,7 @@ coral66::lexer::PPTokenIterator findNewline(coral66::lexer::PPTokenIterator cons
                                             coral66::lexer::PPTokenIterator const end)
 {
     return std::find_if(begin, end,
-                        coral66::compose(coral66::bind_front(std::equal_to<>{}, coral66::lexer::TokenType::Newline),
+                        coral66::compose(coral66::bind_front(std::equal_to{}, coral66::lexer::TokenType::Newline),
                                          &coral66::lexer::PPToken::getTokenType));
 }
 
@@ -46,7 +46,7 @@ coral66::lexer::PPTokenIterator findSemicolon(coral66::lexer::PPTokenIterator co
                                               coral66::lexer::PPTokenIterator const end)
 {
     return std::find_if(begin, end,
-                        coral66::compose(coral66::bind_front(std::equal_to<>{}, coral66::lexer::TokenType::SemiColon),
+                        coral66::compose(coral66::bind_front(std::equal_to{}, coral66::lexer::TokenType::SemiColon),
                                          &coral66::lexer::PPToken::getTokenType));
 }
 
@@ -58,7 +58,7 @@ coral66::lexer::PPTokenIterator findSemicolon(coral66::lexer::PPTokenIterator co
 
 } // namespace
 
-coral66::pp::Context::Context(const coral66::source_interface& sourceInterface, llvm::raw_ostream* reporter)
+coral66::pp::Context::Context(const source_interface& sourceInterface, llvm::raw_ostream* reporter)
     : m_sourceInterface(sourceInterface), m_reporter(reporter)
 {
 }
@@ -103,7 +103,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
     std::vector<GroupPart> parts;
     auto startText = begin;
 
-    auto flushText = [&]()
+    auto flushText = [&]
     {
         if (startText != begin)
         {

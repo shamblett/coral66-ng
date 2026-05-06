@@ -170,10 +170,10 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         }
         auto string = curr->getValue();
         auto result = std::ranges::find_if(
-            argumentList, compose(coral66::bind_front(std::equal_to<>{}, string), &lexer::PPToken::getValue));
+            argumentList, compose(coral66::bind_front(std::equal_to{}, string), &lexer::PPToken::getValue));
         if (result == argumentList.end())
         {
-            argumentList.push_back(*(curr++));
+            argumentList.push_back(*curr++);
             continue;
         }
         log(errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N.args(*curr, *this, *curr));
@@ -273,7 +273,7 @@ void coral66::pp::Preprocessor::visit(const DefineDirective& define)
         }
 
         bool errors = false;
-        auto innerSource = coral66::lexer::tokenize(innerString, m_reporter, &errors, "Macro", false);
+        auto innerSource = lexer::tokenize(innerString, m_reporter, &errors, "Macro", false);
         if (errors)
         {
             m_errorsOccurred = true;

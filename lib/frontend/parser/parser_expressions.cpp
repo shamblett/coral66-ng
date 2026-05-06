@@ -84,16 +84,16 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     auto condition = parseCondition(begin, end, context);
     if (!condition)
     {
-        context.log(errors::parser::EXPECTED_CONDITION.args(*(begin == end ? (end - 1) : begin),
+        context.log(errors::parser::EXPECTED_CONDITION.args(*(begin == end ? end - 1 : begin),
                                                             context.getSourceInterface(), lexer::TokenType::IfKeyword,
-                                                            *(begin == end ? (end - 1) : begin)));
+                                                            *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CONDITION);
         return nullptr;
     }
     if (begin == end || begin->getTokenType() != lexer::TokenType::ThenKeyword)
     {
         context.log(errors::parser::EXPECTED_THEN.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_THEN);
         return nullptr; // Missing THEN
     }
@@ -102,7 +102,7 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     if (!thenExpr)
     {
         context.log(errors::parser::EXPECTED_STATEMENT.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
         return nullptr;
     }
@@ -110,7 +110,7 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     if (begin == end || begin->getTokenType() != lexer::TokenType::ElseKeyword)
     {
         context.log(errors::parser::EXPECTED_ELSE.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ELSE);
         return nullptr; // Missing ELSE
     }
@@ -119,7 +119,7 @@ std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& be
     if (!elseExpr)
     {
         context.log(errors::parser::EXPECTED_STATEMENT.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
         return nullptr;
     }
@@ -145,7 +145,7 @@ std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, const l
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_EXPRESSION.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
         return nullptr;
     }
@@ -155,9 +155,9 @@ std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, const l
         auto right = parseSubcondition(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                  context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                 *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
             return nullptr;
         }
@@ -172,7 +172,7 @@ std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, cons
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_COMPARATOR.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COMPARATOR);
         return nullptr;
     }
@@ -182,9 +182,9 @@ std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, cons
         auto right = parseComparison(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_COMPARATOR.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_COMPARATOR.args(*(begin == end ? end - 1 : begin),
                                                                  context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                 *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COMPARATOR);
             return nullptr;
         }
@@ -199,7 +199,7 @@ std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, const 
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_SIMPLE_EXPRESSION.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_EXPRESSION);
         return nullptr;
     }
@@ -209,9 +209,9 @@ std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, const 
         auto right = parseSimpleExpression(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_SIMPLE_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_SIMPLE_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                         context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
+                                                                        *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_EXPRESSION);
             return nullptr;
         }
@@ -221,7 +221,7 @@ std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, const 
     {
         // Coral 66 requires a comparator for a comparison
         context.log(errors::parser::EXPECTED_COMPARATOR.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_COMPARATOR);
         return nullptr;
     }
@@ -238,9 +238,9 @@ std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, 
         auto right = parseTerm(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_TERM.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_TERM.args(*(begin == end ? end - 1 : begin),
                                                            context.getSourceInterface(),
-                                                           *(begin == end ? (end - 1) : begin)));
+                                                           *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TERM);
             return nullptr;
         }
@@ -253,7 +253,7 @@ std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, 
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_TERM.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TERM);
         return nullptr;
     }
@@ -263,9 +263,9 @@ std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, 
         auto right = parseTerm(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_TERM.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_TERM.args(*(begin == end ? end - 1 : begin),
                                                            context.getSourceInterface(),
-                                                           *(begin == end ? (end - 1) : begin)));
+                                                           *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TERM);
             return nullptr;
         }
@@ -280,7 +280,7 @@ std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, const lexer:
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_FACTOR.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_FACTOR);
         return nullptr;
     }
@@ -290,9 +290,9 @@ std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, const lexer:
         auto right = parseFactor(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_FACTOR.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_FACTOR.args(*(begin == end ? end - 1 : begin),
                                                              context.getSourceInterface(),
-                                                             *(begin == end ? (end - 1) : begin)));
+                                                             *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_FACTOR);
             return nullptr;
         }
@@ -313,9 +313,9 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
         auto expr = parseExpression(begin, end, context);
         if (!expr)
         {
-            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                  context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                 *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
             return nullptr;
         }
@@ -325,9 +325,9 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
         }
         else
         {
-            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
                                                                         context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
+                                                                        *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr; // Missing )
         }
@@ -349,7 +349,7 @@ std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, con
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_UNION.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_UNION);
         return nullptr;
     }
@@ -359,9 +359,9 @@ std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, con
         auto right = parseBitwiseUnion(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_UNION.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_UNION.args(*(begin == end ? end - 1 : begin),
                                                             context.getSourceInterface(),
-                                                            *(begin == end ? (end - 1) : begin)));
+                                                            *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_UNION);
             return nullptr;
         }
@@ -376,7 +376,7 @@ std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, cons
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_MASK.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_MASK);
         return nullptr;
     }
@@ -386,9 +386,9 @@ std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, cons
         auto right = parseBitwiseMask(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_MASK.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_MASK.args(*(begin == end ? end - 1 : begin),
                                                            context.getSourceInterface(),
-                                                           *(begin == end ? (end - 1) : begin)));
+                                                           *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_MASK);
             return nullptr;
         }
@@ -403,7 +403,7 @@ std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, const
     if (!expr)
     {
         context.log(errors::parser::EXPECTED_TYPED_PRIMARY.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TYPED_PRIMARY);
         return nullptr;
     }
@@ -413,9 +413,9 @@ std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, const
         auto right = parseTypedPrimary(begin, end, context);
         if (!right)
         {
-            context.log(errors::parser::EXPECTED_TYPED_PRIMARY.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_TYPED_PRIMARY.args(*(begin == end ? end - 1 : begin),
                                                                     context.getSourceInterface(),
-                                                                    *(begin == end ? (end - 1) : begin)));
+                                                                    *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TYPED_PRIMARY);
             return nullptr;
         }
@@ -476,9 +476,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
             auto wordRef = parseWordReference(begin, end, context);
             if (!wordRef)
             {
-                context.log(errors::parser::EXPECTED_WORD_REFERENCE.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_WORD_REFERENCE.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_WORD_REFERENCE);
                 return nullptr;
             }
@@ -503,9 +503,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                 auto firstExpr = parseExpression(begin, end, context);
                 if (!firstExpr)
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                     return nullptr;
                 }
@@ -516,9 +516,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                     std::unique_ptr<Expression> fractionBits = parseExpression(begin, end, context);
                     if (!fractionBits)
                     {
-                        context.log(errors::parser::EXPECTED_FRACTION_BITS.args(*(begin == end ? (end - 1) : begin),
+                        context.log(errors::parser::EXPECTED_FRACTION_BITS.args(*(begin == end ? end - 1 : begin),
                                                                                 context.getSourceInterface(),
-                                                                                *(begin == end ? (end - 1) : begin)));
+                                                                                *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_FRACTION_BITS);
                         return nullptr;
                     }
@@ -534,8 +534,8 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                             if (!expr)
                             {
                                 context.log(errors::parser::EXPECTED_EXPRESSION.args(
-                                    *(begin == end ? (end - 1) : begin), context.getSourceInterface(),
-                                    *(begin == end ? (end - 1) : begin)));
+                                    *(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                                    *(begin == end ? end - 1 : begin)));
                                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                                 return nullptr;
                             }
@@ -548,22 +548,16 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                             }
                         }
                         context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(
-                            *(begin == end ? (end - 1) : begin), context.getSourceInterface(),
-                            *(begin == end ? (end - 1) : begin)));
+                            *(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                            *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
                         return nullptr;
                     }
-                    context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
                                                                                 context.getSourceInterface(),
-                                                                                *(begin == end ? (end - 1) : begin)));
+                                                                                *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
                     return nullptr;
-                }
-                else if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
-                {
-                    // It was FIXED ( Expression )
-                    auto endToken = begin++; // skip )
-                    return std::make_unique<TypeChangeExpression>(typeToken, endToken, typeToken, std::move(firstExpr));
                 }
                 return nullptr;
             }
@@ -576,9 +570,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                 auto expr = parseExpression(begin, end, context);
                 if (!expr)
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                     return nullptr;
                 }
@@ -601,9 +595,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
             auto totalBits = parseExpression(begin, end, context);
             if (!totalBits)
             {
-                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                      context.getSourceInterface(),
-                                                                     *(begin == end ? (end - 1) : begin)));
+                                                                     *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                 return nullptr;
             }
@@ -613,9 +607,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                 auto bitPos = parseExpression(begin, end, context);
                 if (!bitPos)
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                     return nullptr;
                 }
@@ -625,9 +619,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                     auto typedPrim = parseTypedPrimary(begin, end, context);
                     if (!typedPrim)
                     {
-                        context.log(errors::parser::EXPECTED_TYPED_PRIMARY.args(*(begin == end ? (end - 1) : begin),
+                        context.log(errors::parser::EXPECTED_TYPED_PRIMARY.args(*(begin == end ? end - 1 : begin),
                                                                                 context.getSourceInterface(),
-                                                                                *(begin == end ? (end - 1) : begin)));
+                                                                                *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TYPED_PRIMARY);
                         return nullptr;
                     }
@@ -641,7 +635,7 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
             return nullptr;
         }
         context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
         return nullptr;
     }
@@ -664,9 +658,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                 auto expr = parseExpression(begin, end, context);
                 if (!expr)
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                     return nullptr;
                 }
@@ -677,9 +671,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                     auto nextExpr = parseExpression(begin, end, context);
                     if (!nextExpr)
                     {
-                        context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                        context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                              context.getSourceInterface(),
-                                                                             *(begin == end ? (end - 1) : begin)));
+                                                                             *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                         return nullptr;
                     }
@@ -691,9 +685,9 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
                 auto endToken = begin++;
                 return std::make_unique<FunctionCallExpression>(idToken, endToken, idToken, std::move(args));
             }
-            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
                                                                         context.getSourceInterface(),
-                                                                        *(begin == end ? (end - 1) : begin)));
+                                                                        *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }
@@ -731,9 +725,9 @@ std::unique_ptr<Expression> parseVariable(lexer::CTokenIterator& begin, const le
                     auto wordRef = parseWordReference(begin, end, context);
                     if (!wordRef)
                     {
-                        context.log(errors::parser::EXPECTED_WORD_REFERENCE.args(*(begin == end ? (end - 1) : begin),
+                        context.log(errors::parser::EXPECTED_WORD_REFERENCE.args(*(begin == end ? end - 1 : begin),
                                                                                  context.getSourceInterface(),
-                                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                                 *(begin == end ? end - 1 : begin)));
                         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_WORD_REFERENCE);
                         return nullptr;
                     }
@@ -747,7 +741,7 @@ std::unique_ptr<Expression> parseVariable(lexer::CTokenIterator& begin, const le
             return nullptr;
         }
         context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
         return nullptr;
     }
@@ -767,9 +761,9 @@ std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, con
         auto index = parseExpression(begin, end, context);
         if (!index)
         {
-            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                  context.getSourceInterface(),
-                                                                 *(begin == end ? (end - 1) : begin)));
+                                                                 *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
             return nullptr;
         }
@@ -781,7 +775,7 @@ std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, con
             return std::make_unique<ArrayAccessExpression>(startToken, endToken, nullptr, std::move(indices));
         }
         context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(
-            *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
         return nullptr;
     }
@@ -796,9 +790,9 @@ std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, con
             auto index1 = parseExpression(begin, end, context);
             if (!index1)
             {
-                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                      context.getSourceInterface(),
-                                                                     *(begin == end ? (end - 1) : begin)));
+                                                                     *(begin == end ? end - 1 : begin)));
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                 return nullptr;
             }
@@ -810,9 +804,9 @@ std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, con
                 auto index2 = parseExpression(begin, end, context);
                 if (!index2)
                 {
-                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? (end - 1) : begin),
+                    context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
                                                                          context.getSourceInterface(),
-                                                                         *(begin == end ? (end - 1) : begin)));
+                                                                         *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
                     return nullptr;
                 }
@@ -824,16 +818,16 @@ std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, con
                 auto endToken = begin++;
                 return std::make_unique<ArrayAccessExpression>(idToken, endToken, idToken, std::move(indices));
             }
-            context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(*(begin == end ? (end - 1) : begin),
+            context.log(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET.args(*(begin == end ? end - 1 : begin),
                                                                           context.getSourceInterface(),
-                                                                          *(begin == end ? (end - 1) : begin)));
+                                                                          *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_SQUARE_BRACKET);
             return nullptr;
         }
         return std::make_unique<IdentifierExpression>(idToken, begin, idToken);
     }
     context.log(errors::parser::EXPECTED_IDENTIFIER.args(
-        *(begin == end ? (end - 1) : begin), context.getSourceInterface(), *(begin == end ? (end - 1) : begin)));
+        *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
     return nullptr;
 }

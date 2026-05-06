@@ -20,7 +20,7 @@ namespace coral66::detail
 class ColorStringOstream : public llvm::raw_string_ostream
 {
 public:
-    explicit ColorStringOstream(std::string& O) : llvm::raw_string_ostream(O)
+    explicit ColorStringOstream(std::string& O) : raw_string_ostream(O)
     {
         // Only actually emit color codes if enable_colors(true) was called AND has_colors() allows it.
         // Or in tests we might want to suppress it entirely or strip ANSI codes.
@@ -31,7 +31,7 @@ public:
         return true;
     } // To let WithColor use color
 
-    llvm::raw_ostream& changeColor(const enum Colors Color, const bool Bold = false, const bool BG = false) override
+    raw_ostream& changeColor(const Colors Color, const bool Bold = false, const bool BG = false) override
     { // NOLINT(*-default-arguments)
         if (!colors_enabled())
             return *this;
@@ -75,14 +75,14 @@ public:
         return *this;
     }
 
-    llvm::raw_ostream& resetColor() override
+    raw_ostream& resetColor() override
     {
         if (colors_enabled())
             *this << "\033[0m";
         return *this;
     }
 
-    llvm::raw_ostream& reverseColor() override
+    raw_ostream& reverseColor() override
     {
         if (colors_enabled())
             *this << "\033[7m";
