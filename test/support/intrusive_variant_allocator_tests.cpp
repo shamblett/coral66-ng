@@ -33,7 +33,7 @@ public:
     std::size_t size;
     float thing;
 
-    Derived1(std::size_t size, float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
+    Derived1(const std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
 };
 
 class DestrSideEffect : public Base
@@ -310,9 +310,9 @@ TEST_CASE("IntrusiveVariantAllocator non trivial", "[IVA]")
         coral66::IntrusiveVariantAllocator<Base> allocator;
         for (std::size_t i = 0; i < 100; i++)
         {
-            for (auto& iter : operations)
+            for (auto& [alloc, size, thing] : operations)
             {
-                if (!iter.alloc)
+                if (!alloc)
                 {
                     if (!bases.empty())
                     {
@@ -321,10 +321,10 @@ TEST_CASE("IntrusiveVariantAllocator non trivial", "[IVA]")
                     }
                     continue;
                 }
-                bases.push(allocator.alloc<Derived1>(iter.size, iter.thing).get());
+                bases.push(allocator.alloc<Derived1>(size, thing).get());
                 CHECK(bases.back()->is<Derived1>());
-                CHECK(bases.back()->as<Derived1>().size == iter.size);
-                CHECK(bases.back()->as<Derived1>().thing == iter.thing);
+                CHECK(bases.back()->as<Derived1>().size == size);
+                CHECK(bases.back()->as<Derived1>().thing == thing);
             }
         }
     }
@@ -378,7 +378,7 @@ public:
     std::size_t size;
     float thing;
 
-    Derived2(std::size_t size, float thing) : Base2(std::in_place_type<Derived2>), size(size), thing(thing) {}
+    Derived2(const std::size_t size, const float thing) : Base2(std::in_place_type<Derived2>), size(size), thing(thing) {}
 };
 
 } // namespace
@@ -608,9 +608,9 @@ TEST_CASE("IntrusiveVariantAllocator trivial", "[IVA]")
         coral66::IntrusiveVariantAllocator<Base2> allocator;
         for (std::size_t i = 0; i < 100; i++)
         {
-            for (auto& iter : operations)
+            for (auto& [alloc, size, thing] : operations)
             {
-                if (!iter.alloc)
+                if (!alloc)
                 {
                     if (!bases.empty())
                     {
@@ -619,10 +619,10 @@ TEST_CASE("IntrusiveVariantAllocator trivial", "[IVA]")
                     }
                     continue;
                 }
-                bases.push(allocator.alloc<Derived2>(iter.size, iter.thing).get());
+                bases.push(allocator.alloc<Derived2>(size, thing).get());
                 CHECK(bases.back()->is<Derived2>());
-                CHECK(bases.back()->as<Derived2>().size == iter.size);
-                CHECK(bases.back()->as<Derived2>().thing == iter.thing);
+                CHECK(bases.back()->as<Derived2>().size == size);
+                CHECK(bases.back()->as<Derived2>().thing == thing);
             }
         }
     }

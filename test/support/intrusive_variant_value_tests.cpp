@@ -26,7 +26,7 @@ public:
     std::size_t size;
     float thing;
 
-    TrivDerived1(std::size_t size, float thing) : TrivBase(std::in_place_type<TrivDerived1>), size(size), thing(thing)
+    TrivDerived1(const std::size_t size, const float thing) : TrivBase(std::in_place_type<TrivDerived1>), size(size), thing(thing)
     {
     }
 };
@@ -58,7 +58,7 @@ public:
     float thing;
 
     // ReSharper disable once CppDFAConstantParameter
-    Derived1(std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
+    Derived1(const std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
 };
 
 class DestrSideEffect : public Base

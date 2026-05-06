@@ -27,7 +27,7 @@ struct TypeCheckingResult
     SymbolResolutionPass symPass;
     TypeCheckingPass typePass;
 
-    explicit TypeCheckingResult(const ParsedProgram& parsed, bool runTypePass = true)
+    explicit TypeCheckingResult(const ParsedProgram& parsed, const bool runTypePass = true)
         : ss(outStr), context(parsed.cTokens, &ss, &errors), symPass(context), typePass(context)
     {
         DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::clearDiagnostics();

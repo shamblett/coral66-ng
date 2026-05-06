@@ -7,7 +7,7 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
     auto enable = enableParallelization();
 
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     // Set the run order as declaration order
     session.configData().runOrder = Catch::TestRunOrder::Declared;
 
-    if (int returnCode = session.applyCommandLine(argc, argv); returnCode != 0) // Indicates a command line error
+    if (const int returnCode = session.applyCommandLine(argc, argv); returnCode != 0) // Indicates a command line error
         return returnCode;
 
     // writing to session.configData() or session.Config() here

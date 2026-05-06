@@ -35,7 +35,7 @@ std::string args(const Diagnostic&, Args&&... args)
         auto view = iter->view;
         result += std::string_view(last, view.data() - last);
         last = view.data() + view.size();
-        auto mod = iter->modifier;
+        const auto mod = iter->modifier;
         auto index = iter->index;
         if (mod != "s")
         {
@@ -56,13 +56,13 @@ std::string args(const Diagnostic&, Args&&... args)
 
 struct ProducesError : Catch::Matchers::StringMatcherBase
 {
-    ProducesError(const std::string& comparator)
+    explicit ProducesError(const std::string& comparator)
         : StringMatcherBase("contains", Catch::Matchers::CasedString("error: " + comparator, Catch::CaseSensitive::Yes))
     {
     }
 
     template <class Diagnostic, class... Args>
-    ProducesError(const Diagnostic& diagnostic, Args&&... args)
+    explicit ProducesError(const Diagnostic& diagnostic, Args&&... args)
         : ProducesError(detail::args(diagnostic, std::forward<Args>(args)...))
     {
     }
@@ -93,13 +93,13 @@ struct ProducesNoErrors : Catch::Matchers::StringMatcherBase
 
 struct ProducesNote : Catch::Matchers::StringMatcherBase
 {
-    ProducesNote(const std::string& comparator)
+    explicit ProducesNote(const std::string& comparator)
         : StringMatcherBase("contains", Catch::Matchers::CasedString("note: " + comparator, Catch::CaseSensitive::Yes))
     {
     }
 
     template <class Diagnostic, class... Args>
-    ProducesNote(const Diagnostic& diagnostic, Args&&... args)
+    explicit ProducesNote(const Diagnostic& diagnostic, Args&&... args)
         : ProducesNote(detail::args(diagnostic, std::forward<Args>(args)...))
     {
     }
@@ -129,14 +129,14 @@ struct ProducesNoNotes : Catch::Matchers::StringMatcherBase
 
 struct ProducesWarning : Catch::Matchers::StringMatcherBase
 {
-    ProducesWarning(const std::string& comparator)
+    explicit ProducesWarning(const std::string& comparator)
         : StringMatcherBase("contains",
                             Catch::Matchers::CasedString("warning: " + comparator, Catch::CaseSensitive::Yes))
     {
     }
 
     template <class Diagnostic, class... Args>
-    ProducesWarning(const Diagnostic& diagnostic, Args&&... args)
+    explicit ProducesWarning(const Diagnostic& diagnostic, Args&&... args)
         : ProducesWarning(detail::args(diagnostic, std::forward<Args>(args)...))
     {
     }
@@ -168,12 +168,12 @@ struct ProducesNoWarnings : Catch::Matchers::StringMatcherBase
 // Matcher that works almost like == of two strings except it doesn't care of any leading whitespaces per line
 struct ProducesLines : Catch::Matchers::MatcherBase<std::string_view>
 {
-    explicit ProducesLines(std::string_view text)
+    explicit ProducesLines(const std::string_view text)
     {
         std::size_t result = 0;
         while (true)
         {
-            auto newline = text.find('\n', result);
+            const auto newline = text.find('\n', result);
             if (newline == std::string_view::npos)
             {
                 m_linesTrimmed.emplace_back(trimEnd(text.substr(result)));
@@ -209,7 +209,7 @@ public:
         std::size_t result = 0;
         while (i < m_linesTrimmed.size())
         {
-            auto newline = source.find('\n', result);
+            const auto newline = source.find('\n', result);
             if (newline == std::string_view::npos)
             {
                 return trimEnd(source.substr(result)) == m_linesTrimmed[i] && i + 1 == m_linesTrimmed.size();
@@ -222,14 +222,14 @@ public:
             i++;
         }
         auto leftOver = source.substr(result);
-        return std::ranges::all_of(leftOver, [](unsigned char c) { return std::isspace(c & 0x7F); });
+        return std::ranges::all_of(leftOver, [](const unsigned char c) { return std::isspace(c & 0x7F); });
     }
 
 private:
-    static std::string_view trimEnd(std::string_view text)
+    static std::string_view trimEnd(const std::string_view text)
     {
         const auto end = std::find_if(std::make_reverse_iterator(text.end()), std::make_reverse_iterator(text.begin()),
-                                      [](char c) { return c != ' ' && c != '\t'; })
+                                      [](const char c) { return c != ' ' && c != '\t'; })
                              .base();
         return text.substr(0, end - text.begin());
     }
@@ -263,7 +263,7 @@ std::tuple<int, char**> createArgs(const std::string& commandLine);
 
 std::string getTestDataPath(const std::string& relativePath, const std::string& suite);
 
-std::string readFile(std::string& path);
+std::string readFile(const std::string& path);
 
 } // namespace coral66::Tests
 

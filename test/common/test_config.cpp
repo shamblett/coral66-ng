@@ -34,7 +34,7 @@ EndTest::~EndTest()
 
 std::tuple<int, char**> coral66::Tests::createArgs(const std::string& commandLine)
 {
-    std::string cl = "coral66 " + commandLine;
+    const std::string cl = "coral66 " + commandLine;
     wordexp_t p;
     wordexp(cl.c_str(), &p, 0);
     return std::make_tuple(p.we_wordc, p.we_wordv);
@@ -55,7 +55,7 @@ std::string coral66::Tests::getTestDataPath(const std::string& relativePath, con
     return relativePath;
 }
 
-std::string coral66::Tests::readFile(std::string& path)
+std::string coral66::Tests::readFile(const std::string& path)
 {
     fs::ifstream file(path, std::ios_base::in | std::ios_base::ate);
     if (!file.is_open())

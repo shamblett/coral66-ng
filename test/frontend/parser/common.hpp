@@ -59,7 +59,7 @@ struct ParsedStatement
     std::unique_ptr<parser::Context> context;
     std::unique_ptr<Statement> statement;
 
-    explicit ParsedStatement(std::string src, bool isTypedProc = false, bool isUntypedProc = false)
+    explicit ParsedStatement(std::string src, const bool isTypedProc = false, const bool isUntypedProc = false)
         : source(std::move(src)), ss(outStr)
     {
         ppTokens = lexer::tokenize(source, &ss);

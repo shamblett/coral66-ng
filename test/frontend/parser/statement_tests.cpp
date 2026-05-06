@@ -479,11 +479,11 @@ TEST_CASE("Coral Parse Statements - For", "[Parser][Statement]")
         CHECK(forStatement != nullptr);
         CHECK(std::get<std::string>(forStatement->getVariable().begin()->getValue()) == "A");
         CHECK(forStatement->getElements().size() == 1);
-        auto& el = forStatement->getElements()[0];
-        CHECK(std::get<llvm::APSInt>(el.expression->begin()->getValue()) == 1);
-        CHECK(el.step == nullptr);
-        CHECK(el.until == nullptr);
-        CHECK(el.whileCondition == nullptr);
+        const auto& [expression, step, until, whileCondition] = forStatement->getElements()[0];
+        CHECK(std::get<llvm::APSInt>(expression->begin()->getValue()) == 1);
+        CHECK(step == nullptr);
+        CHECK(until == nullptr);
+        CHECK(whileCondition == nullptr);
     }
 
     SECTION("FOR Multiple Expressions DO")

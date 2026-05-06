@@ -155,13 +155,13 @@ TEST_CASE("Coral Parse Expression - Function Calls", "[Parser][Expression]")
 {
     SECTION("No Args Function Call Equivalent (Identifier)")
     {
-        ParsedExpression p("func");
+        const ParsedExpression p("func");
         auto id = dynamic_cast<IdentifierExpression*>(p.expression.get());
         CHECK(id != nullptr);
     }
     SECTION("Function Call with arguments")
     {
-        ParsedExpression p("func(a, b + 1)");
+        const ParsedExpression p("func(a, b + 1)");
         auto fc = dynamic_cast<FunctionCallExpression*>(p.expression.get());
         CHECK(fc != nullptr);
         CHECK(fc->getArguments().size() == 2);

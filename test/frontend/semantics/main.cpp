@@ -7,7 +7,7 @@
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-int main(int argc, char* argv[])
+int main(const int argc, char* argv[])
 {
     auto enable = coral66::Tests::enableParallelization();
 
