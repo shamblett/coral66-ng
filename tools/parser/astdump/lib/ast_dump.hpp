@@ -55,15 +55,6 @@ private:
     // Expressions
     rapidjson::Value dump(const syntax::Expression* expression);
 
-    // Procedure call statement
-    rapidjson::Value dump(const syntax::ProcedureCallStatement* callStatement);
-
-    // Procedure declarations
-    rapidjson::Value dump(const syntax::ProcedureDeclaration* declaration);
-
-    // Procedure Specifications
-    rapidjson::Value dump(const syntax::ProcedureSpecification* specification);
-
     // Helper function to extract text from a Lexer CTokenIterator
     rapidjson::Value getTokenString(const lexer::CTokenIterator& token);
 };
