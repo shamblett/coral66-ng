@@ -90,8 +90,8 @@ struct Slab<allocSize, align, count, true>
     alignas(align) std::byte storage[size]{};
     struct
     {
-        coral66::suitableUInt<count> index : log2n(count) + 1;
-        coral66::suitableUInt<count> destroyed : 1;
+        suitableUInt<count> index : log2n(count) + 1;
+        suitableUInt<count> destroyed : 1;
     } metadata[size / allocSize]{};
 
     Slab()
@@ -103,7 +103,7 @@ struct Slab<allocSize, align, count, true>
 template <class T>
 class Deleter
 {
-    ::coral66::IntrusiveVariantAllocator<typename T::base_type>* m_allocator;
+    IntrusiveVariantAllocator<typename T::base_type>* m_allocator;
 
     template <class U>
     friend class Deleter;
@@ -112,10 +112,11 @@ public:
     Deleter() = default;
 
     // ReSharper disable once CppNonExplicitConvertingConstructor
-    Deleter(::coral66::IntrusiveVariantAllocator<typename T::base_type>* allocator) : m_allocator(allocator) {}
+    Deleter(IntrusiveVariantAllocator<typename T::base_type>* allocator) : m_allocator(allocator) {}
 
     template <class U>
-    requires std::is_same_v<typename T::base_type, typename U::base_type> explicit Deleter(Deleter<U>&& rhs) noexcept
+    // ReSharper disable once CppNonExplicitConvertingConstructor
+    requires std::is_same_v<typename T::base_type, typename U::base_type> Deleter(Deleter<U>&& rhs) noexcept
         : m_allocator(rhs.m_allocator)
     {
     }
@@ -266,7 +267,7 @@ public:
         return *this;
     }
 
-    void destroy(coral66::not_null<const Base> object)
+    void destroy(not_null<const Base> object)
     {
         Base* casted = const_cast<Base*>(object.get());
         auto* pointerIntoObject = reinterpret_cast<std::byte*>(casted);
@@ -351,7 +352,7 @@ public:
     template <class U, class... Args>
     [[nodiscard]] IVAUniquePtr<U> allocUnique(Args&&... args)
     {
-        return IVAUniquePtr<U>{alloc<U>(std::forward<Args>(args)...), this};
+        return IVAUniquePtr<U>{alloc<U>(std::forward<Args>(args)...).get(), this};
     }
 };
 

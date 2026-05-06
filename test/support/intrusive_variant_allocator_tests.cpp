@@ -92,7 +92,7 @@ TEST_CASE("IntrusiveVariantAllocator non trivial", "[IVA]")
         auto derived1 = allocator.alloc<DestrSideEffect>();
         CHECK(derived1->is<DestrSideEffect>());
         CHECK(DestrSideEffect::i == 1);
-        allocator.destroy(derived1);
+        allocator.destroy(derived1.get());
         CHECK(DestrSideEffect::i == -1);
     }
     SECTION("Random alloc and dealloc")
@@ -321,7 +321,7 @@ TEST_CASE("IntrusiveVariantAllocator non trivial", "[IVA]")
                     }
                     continue;
                 }
-                bases.push(allocator.alloc<Derived1>(iter.size, iter.thing));
+                bases.push(allocator.alloc<Derived1>(iter.size, iter.thing).get());
                 CHECK(bases.back()->is<Derived1>());
                 CHECK(bases.back()->as<Derived1>().size == iter.size);
                 CHECK(bases.back()->as<Derived1>().thing == iter.thing);
@@ -619,7 +619,7 @@ TEST_CASE("IntrusiveVariantAllocator trivial", "[IVA]")
                     }
                     continue;
                 }
-                bases.push(allocator.alloc<Derived2>(iter.size, iter.thing));
+                bases.push(allocator.alloc<Derived2>(iter.size, iter.thing).get());
                 CHECK(bases.back()->is<Derived2>());
                 CHECK(bases.back()->as<Derived2>().size == iter.size);
                 CHECK(bases.back()->as<Derived2>().thing == iter.thing);
