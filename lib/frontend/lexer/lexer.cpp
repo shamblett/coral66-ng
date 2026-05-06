@@ -519,8 +519,8 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
 }
 
 std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
-                                                         const PPSourceInterface& sourceInterface,
-                                                         llvm::raw_ostream* reporter)
+                                                         [[maybe_unused]] const PPSourceInterface& sourceInterface,
+                                                         [[maybe_unused]] llvm::raw_ostream* reporter)
 {
     CORAL66_ASSERT(PPToken.getTokenType() == coral66::lexer::TokenType::StringLiteral);
     auto value = std::string(PPToken.getValue());

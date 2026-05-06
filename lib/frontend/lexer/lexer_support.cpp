@@ -315,7 +315,7 @@ std::pair<StateMachine, bool> PreprocessingNumber::advance(std::uint32_t const c
     return {std::move(*this), true};
 }
 
-std::pair<StateMachine, bool> CommentSentence::advance(char const c, Context& context)
+std::pair<StateMachine, bool> CommentSentence::advance(char const c, [[maybe_unused]] Context& context)
 {
     if (c == ';')
     {
@@ -324,7 +324,7 @@ std::pair<StateMachine, bool> CommentSentence::advance(char const c, Context& co
     return {*this, true};
 }
 
-std::pair<StateMachine, bool> BracketedComment::advance(char const c, Context& context)
+std::pair<StateMachine, bool> BracketedComment::advance(char const c, [[maybe_unused]] Context& context)
 {
     if (c == '(')
     {
