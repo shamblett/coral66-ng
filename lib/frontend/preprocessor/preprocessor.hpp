@@ -225,7 +225,7 @@ class Preprocessor final : PPSourceInterface
                 }
                 actual_args.push_back(current_arg);
                 if (arg_idx < tokens.size()
-                    && tokens[arg_idx].getTokenType() == coral66::lexer::TokenType::CloseParentheses)
+                    && tokens[arg_idx].getTokenType() == lexer::TokenType::CloseParentheses)
                     arg_idx++;
 
                 if (actual_args.size() != param_count
@@ -272,7 +272,7 @@ class Preprocessor final : PPSourceInterface
                 std::vector<lexer::PPToken> new_replacement;
                 for (auto& tok : replacement)
                 {
-                    if (tok.getTokenType() == coral66::lexer::TokenType::Identifier)
+                    if (tok.getTokenType() == lexer::TokenType::Identifier)
                     {
                         auto tok_val = tok.getValue();
                         bool substituted = false;

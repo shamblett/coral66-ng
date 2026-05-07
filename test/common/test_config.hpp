@@ -30,7 +30,7 @@ std::string args(const Diagnostic&, Args&&... args)
     std::string result;
     std::string_view stringView = Diagnostic::getFormat();
     const char* last = stringView.data();
-    while (const auto iter = ::coral66::detail::Diagnostic::nextArg(stringView))
+    while (const auto iter = coral66::detail::Diagnostic::nextArg(stringView))
     {
         auto view = iter->view;
         result += std::string_view(last, view.data() - last);

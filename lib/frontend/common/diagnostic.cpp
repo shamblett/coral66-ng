@@ -404,7 +404,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
             vector.push_back(
                 {{std::max(arguments[index].range->first.offset, startOffset),
                   std::min(arguments[index].range->second.offset, endOffset)},
-                 coral66::match(
+                 match(
                      iter, [](const Underline& underline) -> ModifierOfLine::variant
                      { return ModifierOfLine::Underline{underline.character, underline.continuous}; },
                      [&arguments](const InsertAfter& insertAfter) -> ModifierOfLine::variant
@@ -554,7 +554,7 @@ std::unordered_set<std::string_view>& coral66::detail::Diagnostic::DiagnosticBas
 
 const std::unordered_set<std::string_view>& coral66::diag::getAllWarnings()
 {
-    return ::coral66::detail::Diagnostic::DiagnosticBase::allWarnings();
+    return coral66::detail::Diagnostic::DiagnosticBase::allWarnings();
 }
 
 coral66::detail::Diagnostic::WarningRegistrar::WarningRegistrar(std::string_view name)
