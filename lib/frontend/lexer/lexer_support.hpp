@@ -189,9 +189,9 @@ public:
     }
 
     template <class Diag, class Location, class... Args>
-    void report(const Diag& diag, Location&& location, Args&&... args)
+    void report(const Diag& diagnostics, Location&& location, Args&&... args)
     {
-        if (diag.getSeverity() == Severity::Error)
+        if (diagnostics.getSeverity() == Severity::Error)
         {
             m_errorsOccurred = true;
         }
@@ -202,7 +202,7 @@ public:
                 {
                     if constexpr (std::is_integral_v<std::decay_t<Location>>)
                     {
-                        *m_reporter << diag.args(map(m_characterToSourceSpace, location).first, *this,
+                        *m_reporter << diagnostics.args(map(m_characterToSourceSpace, location).first, *this,
                                                  std::forward<T0>(args1)...);
                         return;
                     }
@@ -214,15 +214,15 @@ public:
                             using T2 = std::decay_t<std::tuple_element_t<1, std::decay_t<Location>>>;
                             if constexpr (std::is_integral_v<T1> && std::is_integral_v<T2>)
                             {
-                                *m_reporter << diag.args(map(std::get<0>(location), map(std::get<1>(location))), *this,
+                                *m_reporter << diagnostics.args(map(std::get<0>(location), map(std::get<1>(location))), *this,
                                                          std::forward<T0>(args1)...);
                             }
                         }
                     }
-                    *m_reporter << diag.args(mapArgument(m_characterToSourceSpace, location), *this,
+                    *m_reporter << diagnostics.args(mapArgument(m_characterToSourceSpace, location), *this,
                                              std::forward<T0>(args1)...);
                 },
-                mapArguments(diag, m_characterToSourceSpace, std::forward_as_tuple(std::forward<Args>(args)...),
+                mapArguments(diagnostics, m_characterToSourceSpace, std::forward_as_tuple(std::forward<Args>(args)...),
                              std::index_sequence_for<Args...>{}));
         }
     }

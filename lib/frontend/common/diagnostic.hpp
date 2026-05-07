@@ -236,13 +236,13 @@ protected:
 
     struct Argument
     {
-        std::optional<std::pair<diag::PointLocation, diag::PointLocation>> range;
+        std::optional<std::pair<diagnostics::PointLocation, diagnostics::PointLocation>> range;
         std::optional<std::string> inFormatText;
         std::optional<std::string> inArgText;
         std::unordered_map<std::string_view, std::string> customModifiers;
     };
 
-    [[nodiscard]] Message print(std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
+    [[nodiscard]] Message print(std::pair<diagnostics::PointLocation, diagnostics::PointLocation> location, std::string_view message,
                                 std::span<Argument> arguments, std::span<const Modifiers> modifiers,
                                 const source_interface& sourceInterface) const;
 
@@ -402,13 +402,13 @@ concept IsIterable = requires(T t)
 template <class T>
 concept HasStringConverters = requires(T t, const source_interface& src)
 {
-    {diag::StringConverter<T>::inFormat(t, src)};
-    {diag::StringConverter<T>::inArg(t, src)};
+    {diagnostics::StringConverter<T>::inFormat(t, src)};
+    {diagnostics::StringConverter<T>::inArg(t, src)};
 }
 || requires(T t)
 {
-    {diag::StringConverter<T>::inFormat(t)};
-    {diag::StringConverter<T>::inArg(t)};
+    {diagnostics::StringConverter<T>::inFormat(t)};
+    {diagnostics::StringConverter<T>::inArg(t)};
 };
 
 template <class T>
@@ -441,7 +441,7 @@ private:
     constexpr static bool locationConstraintCheck()
     {
         using U = std::decay_t<T>;
-        if constexpr (std::is_same_v<diag::PointRange, U>)
+        if constexpr (std::is_same_v<diagnostics::PointRange, U>)
         {
             return true;
         }
@@ -575,13 +575,13 @@ private:
             [&args]<typename... T0>([[maybe_unused]] T0... chars) -> std::string
             {
                 static_assert(
-                    CompleteType<diag::CustomFormat<T0::value...>>,
-                    "No template specialization of coral66::diag::CustomModifier exists for a given format modifier");
+                    CompleteType<diagnostics::CustomFormat<T0::value...>>,
+                    "No template specialization of coral66::diagnostics::CustomModifier exists for a given format modifier");
                 static_assert(
-                    std::is_invocable_r_v<std::string, diag::CustomFormat<T0::value...>,
+                    std::is_invocable_r_v<std::string, diagnostics::CustomFormat<T0::value...>,
                                           std::tuple_element_t<i1, Tuple>>,
-                    "No operator() found in coral66::diag::CustomModifier for the given arg that returns a type convertible to std::string");
-                return diag::CustomFormat<T0::value...>{}(std::get<i1>(args));
+                    "No operator() found in coral66::diagnostics::CustomModifier for the given arg that returns a type convertible to std::string");
+                return diagnostics::CustomFormat<T0::value...>{}(std::get<i1>(args));
             },
             tuple);
     }
@@ -630,12 +630,12 @@ private:
     constexpr static auto allFormatModifiers = getAllFormatModifiers();
 };
 
-namespace diag
+namespace diagnostics
 {
 std::tuple<const lexer::TokenBase&, std::uint64_t> after(const lexer::TokenBase& token);
 
 const std::unordered_set<std::string_view>& getAllWarnings();
-} // namespace diag
+} // namespace diagnostics
 
 /**
  *  Creates a Diagnostic object with compile-time validation.
@@ -669,7 +669,7 @@ Message diagnostic<N, format, Mods...>::args(const T& location, const source_int
     static_assert(locationConstraintCheck<T>(), "First argument must denote a location");
     auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
                                      std::index_sequence_for<Args...>{}, sourceInterface);
-    return print(diag::getPointRange(location), getFormat(), array, modifiers, sourceInterface);
+    return print(diagnostics::getPointRange(location), getFormat(), array, modifiers, sourceInterface);
 }
 
 template <std::size_t N, auto& format, class... Mods>
@@ -750,19 +750,19 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args, std::inde
                           "If you are mean and want to circumvent this error, convert to std::string_view");
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::LocationConstraint))
             {
-                result[IntegerTy::value].range = diag::getPointRange(std::get<IntegerTy::value>(args));
+                result[IntegerTy::value].range = diagnostics::getPointRange(std::get<IntegerTy::value>(args));
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::StringConstraint))
             {
                 result[IntegerTy::value].inFormatText =
-                    diag::StringConverter<ArgTy>::inFormat(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
+                    diagnostics::StringConverter<ArgTy>::inFormat(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
                 result[IntegerTy::value].inArgText =
-                    diag::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
+                    diagnostics::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::TypeConstraint))
             {
                 using Type = std::decay_t<decltype(std::declval<ArgTy>().getType())>;
-                result[IntegerTy::value].inArgText = diag::StringConverter<Type>::inArg(
+                result[IntegerTy::value].inArgText = diagnostics::StringConverter<Type>::inArg(
                     std::get<IntegerTy::value>(args).getType(), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::CustomConstraint))

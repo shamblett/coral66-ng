@@ -158,8 +158,8 @@
 #endif
 
 #if defined(__NVCOMPILER)
-#    define CATCH_INTERNAL_START_WARNINGS_SUPPRESSION _Pragma( "diag push" )
-#    define CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION  _Pragma( "diag pop" )
+#    define CATCH_INTERNAL_START_WARNINGS_SUPPRESSION _Pragma( "diagnostics push" )
+#    define CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION  _Pragma( "diagnostics pop" )
 #    define CATCH_INTERNAL_SUPPRESS_UNUSED_VARIABLE_WARNINGS _Pragma( "diag_suppress declared_but_not_referenced" )
 #endif
 

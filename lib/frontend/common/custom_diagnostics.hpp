@@ -15,7 +15,7 @@ namespace coral66
 {
 class source_interface;
 
-namespace diag
+namespace diagnostics
 {
 /**
  * Trait to convert a type T into a string for diagnostics.
@@ -82,5 +82,5 @@ struct CustomFormat<U's'>
         return "";
     }
 };
-} // namespace diag
+} // namespace diagnostics
 } // namespace coral66

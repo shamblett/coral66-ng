@@ -18,7 +18,7 @@
 
 namespace
 {
-using PointLocation = coral66::diag::PointLocation;
+using PointLocation = coral66::diagnostics::PointLocation;
 
 std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation, PointLocation> location,
                                                         const coral66::source_interface& sourceInterface)
@@ -275,13 +275,13 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
 
 } // namespace
 
-auto coral66::diag::after(const lexer::TokenBase& token) -> std::tuple<const lexer::TokenBase&, std::uint64_t>
+auto coral66::diagnostics::after(const lexer::TokenBase& token) -> std::tuple<const lexer::TokenBase&, std::uint64_t>
 {
     return std::make_tuple(std::cref(token), token.getOffset() + token.getLength());
 }
 
 coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
-    std::pair<diag::PointLocation, diag::PointLocation> location, std::string_view message,
+    std::pair<diagnostics::PointLocation, diagnostics::PointLocation> location, std::string_view message,
     std::span<Argument> arguments, std::span<const Modifiers> modifiers, const source_interface& sourceInterface) const
 {
     if (m_severity == Severity::Warning)
@@ -552,7 +552,7 @@ std::unordered_set<std::string_view>& coral66::detail::Diagnostic::DiagnosticBas
     return set;
 }
 
-const std::unordered_set<std::string_view>& coral66::diag::getAllWarnings()
+const std::unordered_set<std::string_view>& coral66::diagnostics::getAllWarnings()
 {
     return coral66::detail::Diagnostic::DiagnosticBase::allWarnings();
 }

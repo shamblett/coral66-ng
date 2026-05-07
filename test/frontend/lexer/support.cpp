@@ -106,7 +106,7 @@ TEST_CASE("toCTokens with PPTokenIterator", "[lexer]")
 
 TEST_CASE("CustomFormat for TokenType", "[lexer]")
 {
-    constexpr diag::CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'> formatter;
+    constexpr diagnostics::CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'> formatter;
     const PPToken token(TokenType::Identifier, 0, 5, 0, 5, 0, 0, "dummy");
     const std::string formatted = formatter(token);
     CHECK(!formatted.empty());
@@ -115,9 +115,9 @@ TEST_CASE("CustomFormat for TokenType", "[lexer]")
 TEST_CASE("StringConverter for TokenType", "[lexer]")
 {
     const std::string inFormatStr =
-        diag::StringConverter<coral66::lexer::TokenType>::inFormat(TokenType::Identifier, nullptr);
+        diagnostics::StringConverter<coral66::lexer::TokenType>::inFormat(TokenType::Identifier, nullptr);
     CHECK(!inFormatStr.empty());
 
-    const std::string inArgStr = diag::StringConverter<coral66::lexer::TokenType>::inArg(TokenType::Identifier, nullptr);
+    const std::string inArgStr = diagnostics::StringConverter<coral66::lexer::TokenType>::inArg(TokenType::Identifier, nullptr);
     CHECK(!inArgStr.empty());
 }

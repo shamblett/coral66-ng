@@ -15,7 +15,7 @@
 #include "lib/support/abstract_intrusive_variant.hpp"
 #include "lib/support/utilities.hpp"
 
-namespace coral66::diag
+namespace coral66::diagnostics
 {
 namespace detail
 {
@@ -159,4 +159,4 @@ PointRange getPointRange(const T& arg)
     }
 }
 
-} // namespace coral66::diag
+} // namespace coral66::diagnostics

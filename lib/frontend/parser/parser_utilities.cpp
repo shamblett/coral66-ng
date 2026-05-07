@@ -96,7 +96,7 @@ bool coral66::parser::expect(lexer::TokenType expected, lexer::CTokenIterator& b
     {
         if (begin == end)
         {
-            context.log(errors::parser::EXPECTED_N.args(diag::after(*(end - 1)), context.getSourceInterface(), expected,
+            context.log(errors::parser::EXPECTED_N.args(diagnostics::after(*(end - 1)), context.getSourceInterface(), expected,
                                                         *(end - 1)));
         }
         else

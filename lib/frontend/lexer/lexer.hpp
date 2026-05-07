@@ -104,7 +104,7 @@ bool needsWhitespaceInBetween(TokenType left, TokenType right) noexcept;
 
 } // namespace lexer
 
-namespace diag
+namespace diagnostics
 {
 template <>
 struct CustomFormat<U't', U'o', U'k', U'e', U'n', U'T', U'y', U'p', U'e'>
@@ -176,6 +176,6 @@ struct StringConverter<lexer::PPToken> : StringConverter<lexer::TokenBase>
 {
 };
 
-} // namespace diag
+} // namespace diagnostics
 
 } // namespace coral66

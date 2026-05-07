@@ -291,9 +291,9 @@ struct ConversionContext
     bool* errorsOccurred;
 
     template <class Diag, class Location, class... Args>
-    void report(const Diag& diag, Location&& location, Args&&... args) const
+    void report(const Diag& diagnostics, Location&& location, Args&&... args) const
     {
-        if (diag.getSeverity() == coral66::Severity::Error && errorsOccurred)
+        if (diagnostics.getSeverity() == coral66::Severity::Error && errorsOccurred)
         {
             *errorsOccurred = true;
         }
@@ -304,7 +304,7 @@ struct ConversionContext
                 {
                     if constexpr (std::is_integral_v<std::decay_t<Location>>)
                     {
-                        *reporter << diag.args(
+                        *reporter << diagnostics.args(
                             std::forward_as_tuple(
                                 token, map(sourceInterface.getIntervalMaps()[token.getFileId()], location).first),
                             sourceInterface, std::forward<T0>(args1)...);
@@ -318,16 +318,16 @@ struct ConversionContext
                             using T2 = std::decay_t<std::tuple_element_t<1, std::decay_t<Location>>>;
                             if constexpr (std::is_integral_v<T1> && std::is_integral_v<T2>)
                             {
-                                *reporter << diag.args(std::forward_as_tuple(token, map(std::get<0>(location)),
+                                *reporter << diagnostics.args(std::forward_as_tuple(token, map(std::get<0>(location)),
                                                                              map(std::get<1>(location))),
                                                        sourceInterface, std::forward<T0>(args1)...);
                             }
                         }
                     }
-                    *reporter << diag.args(mapArgument(sourceInterface.getIntervalMaps()[token.getFileId()], location),
+                    *reporter << diagnostics.args(mapArgument(sourceInterface.getIntervalMaps()[token.getFileId()], location),
                                            sourceInterface, std::forward<T0>(args1)...);
                 },
-                mapArguments(diag, sourceInterface.getIntervalMaps()[token.getFileId()],
+                mapArguments(diagnostics, sourceInterface.getIntervalMaps()[token.getFileId()],
                              std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{}));
         }
     }
