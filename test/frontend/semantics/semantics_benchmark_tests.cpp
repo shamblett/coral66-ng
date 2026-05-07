@@ -34,8 +34,13 @@ TEST_CASE("Benchmark", "[Semantics][Benchmark]")
         ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
-        semantics::DiagnosticCollector::clearDiagnostics();
         auto parsed = parser::parseProgram(cTokens, &ss);
+
+        bool errors = false;
+        semantics::DiagnosticCollector::clearDiagnostics();
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        auto diagnostics = program.getSource().getDiagnostics();
+        CHECK(diagnostics.empty());
 
     }
 
@@ -51,8 +56,13 @@ TEST_CASE("Benchmark", "[Semantics][Benchmark]")
         ppTokens = pp::preprocess(std::move(ppTokens), &ss);
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
-        semantics::DiagnosticCollector::clearDiagnostics();
         auto parsed = parser::parseProgram(cTokens, &ss);
+
+        bool errors = false;
+        semantics::DiagnosticCollector::clearDiagnostics();
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        auto diagnostics = program.getSource().getDiagnostics();
+        CHECK(diagnostics.empty());
 
     }
 }

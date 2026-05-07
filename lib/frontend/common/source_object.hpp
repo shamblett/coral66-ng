@@ -197,6 +197,11 @@ public:
         return m_files;
     }
 
+    [[nodiscard]] std::vector<detail::Diagnostic::DiagnosticBase> getDiagnostics() const
+    {
+        return m_diagnostics;
+    }
+
     template <typename DiagnosticType>
     void addDiagnostic(const DiagnosticType& diagnostic)
     {
