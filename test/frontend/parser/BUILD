@@ -6,12 +6,8 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 filegroup(
-    name = "testdata",
-    srcs = glob([
-        "data/golden/ackermann/*",
-        "data/golden/sieve/*",
-        "data/golden/generated/*",
-    ]),
+    name = "golden_dir",
+    srcs = ["data/golden"],
 )
 
 cc_library(
@@ -25,9 +21,6 @@ cc_library(
         "procedure_tests.cpp",
         "program_tests.cpp",
         "statement_tests.cpp",
-    ],
-    data = [
-        "//test/frontend/parser:testdata",
     ],
     visibility = ["//test:__subpackages__"],
     deps = [
@@ -46,6 +39,12 @@ cc_test(
     srcs = [
         "main.cpp",
     ],
+    data = [
+        ":golden_dir",
+    ],
+    env = {
+        "GOLDEN_DIR": "$(rootpath :golden_dir)",
+    },
     visibility = ["//test:__subpackages__"],
     deps = [
         "parsertest",

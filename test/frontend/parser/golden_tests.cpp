@@ -24,7 +24,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
 {
     SECTION("Ackermann")
     {
-        auto sourcePath = getTestDataPath("golden/ackermann/ackerman.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("ackermann/ackerman.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -38,7 +38,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/ackermann/ackerman_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("ackermann/ackerman_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
@@ -47,7 +47,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
 
     SECTION("Sieve")
     {
-        auto sourcePath = getTestDataPath("golden/sieve/sieve.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("sieve/sieve.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -61,7 +61,7 @@ TEST_CASE("Examples", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/sieve/sieve_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("sieve/sieve_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
@@ -73,7 +73,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
 {
     SECTION("G1")
     {
-        auto sourcePath = getTestDataPath("golden/generated/g1.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("generated/g1.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -87,7 +87,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/generated/g1_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("generated/g1_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
@@ -96,7 +96,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
 
     SECTION("G2")
     {
-        auto sourcePath = getTestDataPath("golden/generated/g2.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("generated/g2.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -110,7 +110,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/generated/g2_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("generated/g2_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
@@ -119,7 +119,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
 
     SECTION("G3")
     {
-        auto sourcePath = getTestDataPath("golden/generated/g3.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("generated/g3.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -133,7 +133,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/generated/g3_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("generated/g3_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
@@ -142,7 +142,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
 
     SECTION("G4")
     {
-        auto sourcePath = getTestDataPath("golden/generated/g4.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("generated/g4.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -156,7 +156,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/generated/g4_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("generated/g4_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
@@ -165,7 +165,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
 
     SECTION("G5")
     {
-        auto sourcePath = getTestDataPath("golden/generated/g5.cor", "frontend/parser");
+        auto sourcePath = getTestDataPath("generated/g5.cor", "GOLDEN_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -179,7 +179,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("golden/generated/g5_ast.json", "frontend/parser");
+        auto astPath = getTestDataPath("generated/g5_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
