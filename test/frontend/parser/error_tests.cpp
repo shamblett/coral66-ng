@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "common.hpp"
+#include "test/frontend/common/common.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser_support.hpp"

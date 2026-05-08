@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "common.hpp"
+#include "test/frontend/common/common.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

@@ -26,9 +26,6 @@ cc_library(
         "program_tests.cpp",
         "statement_tests.cpp",
     ],
-    hdrs = [
-        "common.hpp",
-    ],
     data = [
         "//test/frontend/parser:testdata",
     ],
@@ -38,6 +35,7 @@ cc_library(
         "//lib/frontend/parser",
         "//lib/support",
         "//test/common",
+        "//test/frontend/common",
         "//test/vendor/catch2v3",
         "//tools/parser/astdump/lib:astdump",
     ],

@@ -12,7 +12,7 @@
 #include "lib/frontend/semantics/symbol_resolution_pass.hpp"
 #include "lib/frontend/semantics/type_checking_pass.hpp"
 #include "test/common/test_config.hpp"
-#include "test/frontend/parser/common.hpp"
+#include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;

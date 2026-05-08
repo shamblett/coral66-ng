@@ -26,7 +26,7 @@ cc_library(
         "//lib/frontend/semantics",
         "//lib/support",
         "//test/common",
-        "//test/frontend/parser:parsertest",
+        "//test/frontend/common",
         "//test/vendor/catch2v3",
     ],
 )

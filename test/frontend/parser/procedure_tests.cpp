@@ -4,7 +4,7 @@
  * Date   : 07/03/2026
  */
 
-#include "common.hpp"
+#include "test/frontend/common/common.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
