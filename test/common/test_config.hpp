@@ -261,7 +261,7 @@ struct EndTest
 
 std::tuple<int, char**> createArgs(const std::string& commandLine);
 
-std::string getTestDataPath(const std::string& relativePath, const std::string& suite);
+std::string getTestDataPath(const std::string& relativePath, const std::string& testPathEnvVar);
 
 std::string readFile(const std::string& path);
 

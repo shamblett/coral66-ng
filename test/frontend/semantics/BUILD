@@ -6,10 +6,8 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 filegroup(
-    name = "testdata",
-    srcs = glob([
-        "data/benchmark/*",
-    ]),
+    name = "benchmark_dir",
+    srcs = ["data/benchmark"],
 )
 
 cc_library(
@@ -20,9 +18,6 @@ cc_library(
         "semantics_symbol_resolution_tests.cpp",
         "semantics_type_check_tests.cpp",
         "symbol_table_tests.cpp",
-    ],
-    data = [
-        "//test/frontend/semantics:testdata",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
@@ -41,6 +36,12 @@ cc_test(
     srcs = [
         "main.cpp",
     ],
+    data = [
+        ":benchmark_dir",
+    ],
+    env = {
+        "BENCHMARK_DIR": "$(rootpath :benchmark_dir)",
+    },
     visibility = ["//test:__pkg__"],
     deps = [
         "semanticstest",
