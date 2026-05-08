@@ -207,11 +207,8 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
     cfPass.run(parseTree);
 
     std::vector<lexer::CToken> syntheticTokens;
-    std::vector<IntrVarPtr<Usable>> globals;
 
-    // TODO We can move ownership of usable's to the program if we want, but since backend generates code from globals,
-    // we return an empty globals list so the backend gracefully generates an empty module.
-    return {std::move(cTokens), std::move(syntheticTokens), std::move(globals)};
+    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables)};
 }
 
 } // namespace coral66::semantics
