@@ -72,7 +72,7 @@ TEST_CASE("Commandline actions", "[cli]")
 
     SECTION("Failed to open output file")
     {
-        auto [argc, argv] = createArgs("-c " + getTestDataPath("main.cor", "main") + " -o /nosuch/dir/billy");
+        auto [argc, argv] = createArgs("-c " + getTestDataPath("main.cor", "DATA_DIR") + " -o /nosuch/dir/billy");
         CHECK(coral66::main(argc, argv, &reporter) == EXIT_FAILURE);
         reporter.flush();
         auto errorMessage = FAILED_TO_OPEN_FILE_FOR_OUTPUT.argsCLI(std::string("/nosuch/dir/billy"));

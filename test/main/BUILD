@@ -6,10 +6,8 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 filegroup(
-    name = "testdata",
-    srcs = glob([
-        "data/*.cor",
-    ]),
+    name = "data_dir",
+    srcs = ["data"],
 )
 
 cc_library(
@@ -17,9 +15,6 @@ cc_library(
     srcs = [
         "command_line_tests.cpp",
         "main_tests.cpp",
-    ],
-    data = [
-        "//test/main:testdata",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
@@ -36,6 +31,12 @@ cc_test(
     srcs = [
         "main.cpp",
     ],
+    data = [
+        ":data_dir",
+    ],
+    env = {
+        "DATA_DIR": "$(rootpath :data_dir)",
+    },
     visibility = ["//test:__pkg__"],
     deps = [
         "maintest",
