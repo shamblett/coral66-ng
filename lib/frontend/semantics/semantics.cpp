@@ -9,6 +9,7 @@
 #include "control_flow_pass.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
 #include "semantic_context.hpp"
+#include "semantic_support.hpp"
 #include "symbol_resolution_pass.hpp"
 #include "type_checking_pass.hpp"
 
@@ -194,6 +195,7 @@ lexer::CTokenIterator UnaryOperator::end() const
 Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
 {
     CTRACK_NAME("Semantics");
+    DiagnosticCollector::clearDiagnostics();
     SemanticContext context(cTokens, reporter, errors);
     SymbolResolutionPass symPass(context);
     symPass.run(parseTree);
