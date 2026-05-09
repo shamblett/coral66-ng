@@ -63,7 +63,7 @@ TEST_CASE("Benchmark", "[Semantics][Benchmark]")
         semantics::DiagnosticCollector::clearDiagnostics();
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = program.getSource().getDiagnostics();
-        // CHECK(ss.str().empty());
+        CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 }
