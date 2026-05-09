@@ -12,16 +12,27 @@
 namespace coral66::semantics
 {
 
+static const Type& resolveExprType(const Type& t)
+{
+    if (const auto p = t.tryAs<ProcedureType>())
+    {
+        if (p->getReturnType()) return *p->getReturnType();
+    }
+    return t;
+}
+
 static bool isNumericType(const Type& t)
 {
-    if (const auto p = t.tryAs<PrimitiveType>())
+    const Type& rt = resolveExprType(t);
+    if (const auto p = rt.tryAs<PrimitiveType>())
         return p->getKind() == PrimitiveType::Integer || p->getKind() == PrimitiveType::Floating;
-    return t.is<FixedType>();
+    return rt.is<FixedType>();
 }
 
 static bool isBitsType(const Type& t)
 {
-    if (const auto p = t.tryAs<PrimitiveType>())
+    const Type& rt = resolveExprType(t);
+    if (const auto p = rt.tryAs<PrimitiveType>())
         return p->getKind() == PrimitiveType::Bits;
     return false;
 }
@@ -110,7 +121,7 @@ void TypeCheckingPass::visit(const syntax::IfStatement& node)
     if (const auto it = m_context.expressionTypes.find(&node.getCondition());
         it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
     {
-        if (const auto prim = it->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+        if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
         {
             m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
                                                                         *node.getCondition().begin()));
@@ -175,7 +186,7 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
             if (auto it = m_context.expressionTypes.find(whileCondition.get());
                 it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
             {
-                if (const auto prim = it->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(
                         *whileCondition->begin(), m_context.source, *whileCondition->begin()));
@@ -225,11 +236,11 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             }
             else if (isBitsType(*lType) && isNumericType(*rType))
             {
-                if (const auto p = rType->tryAs<PrimitiveType>(); !p || p->getKind() == PrimitiveType::Floating) mismatch = true;
+                if (const auto p = resolveExprType(*rType).tryAs<PrimitiveType>(); !p || p->getKind() == PrimitiveType::Floating) mismatch = true;
             }
             else if (isBitsType(*rType) && isNumericType(*lType))
             {
-                if (const auto p = lType->tryAs<PrimitiveType>(); !p || p->getKind() == PrimitiveType::Floating) mismatch = true;
+                if (const auto p = resolveExprType(*lType).tryAs<PrimitiveType>(); !p || p->getKind() == PrimitiveType::Floating) mismatch = true;
             }
             else if (isBitsType(*lType) || isBitsType(*rType))
             {
@@ -257,7 +268,7 @@ void TypeCheckingPass::visit(const syntax::GotoStatement& node)
         visit(*node.getIndex());
         if (const auto it = m_context.expressionTypes.find(node.getIndex()); it != m_context.expressionTypes.end())
         {
-            if (const auto prim = it->second->tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getIndex()->begin(), m_context.source,
                                                                             *node.getIndex()->begin()));
@@ -331,7 +342,7 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
         {
             if (auto it = m_context.expressionTypes.find(expr); it != m_context.expressionTypes.end())
             {
-                if (const auto prim = it->second->tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
                                                                                 *expr->begin()));
@@ -394,7 +405,7 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
             visit(*expr);
             if (auto it = m_context.expressionTypes.find(expr); it != m_context.expressionTypes.end())
             {
-                if (const auto prim = it->second->tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
                                                                                 *expr->begin()));
@@ -571,21 +582,23 @@ void TypeCheckingPass::visit(const syntax::LiteralExpression& node)
 // ReSharper disable once CppMemberFunctionMayBeStatic
 IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, const Type& t2) const
 {
-    if (t1.is<ErrorType>() || t2.is<ErrorType>())
+    const Type& rt1 = resolveExprType(t1);
+    const Type& rt2 = resolveExprType(t2);
+    if (rt1.is<ErrorType>() || rt2.is<ErrorType>())
         return {ErrorType{}};
 
-    if (isNumericType(t1) && isNumericType(t2))
+    if (isNumericType(rt1) && isNumericType(rt2))
     {
-        const auto p1 = t1.tryAs<PrimitiveType>();
+        const auto p1 = rt1.tryAs<PrimitiveType>();
 
-        if (const auto p2 = t2.tryAs<PrimitiveType>();
+        if (const auto p2 = rt2.tryAs<PrimitiveType>();
             (p1 && p1->getKind() == PrimitiveType::Floating) || (p2 && p2->getKind() == PrimitiveType::Floating))
         {
             return {PrimitiveType{PrimitiveType::Floating}};
         }
-        if (auto f1 = t1.tryAs<FixedType>())
+        if (auto f1 = rt1.tryAs<FixedType>())
             return {*f1};
-        if (auto f2 = t2.tryAs<FixedType>())
+        if (auto f2 = rt2.tryAs<FixedType>())
             return {*f2};
 
         return {PrimitiveType{PrimitiveType::Integer}};
@@ -697,7 +710,7 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
         if (auto it = m_context.expressionTypes.find(expr);
             it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
         {
-            if (const auto prim = it->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
                                                                             *expr->begin()));
@@ -716,7 +729,7 @@ void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
     if (const auto itCond = m_context.expressionTypes.find(&node.getCondition());
         itCond != m_context.expressionTypes.end() && !itCond->second->is<ErrorType>())
     {
-        if (const auto prim = itCond->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+        if (const auto prim = resolveExprType(*itCond->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
         {
             m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
                                                                         *node.getCondition().begin()));
@@ -862,7 +875,7 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
 
         if (auto it = m_context.expressionTypes.find(idx.get()); it != m_context.expressionTypes.end())
         {
-            if (const auto prim = it->second->tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(
                     errors::semantics::EXPECTED_INTEGER_TYPE.args(*idx->begin(), m_context.source, *idx->begin()));
@@ -946,7 +959,7 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
         if (const auto it = m_context.expressionTypes.find(node.getTotalBits());
             it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
         {
-            if (const auto prim = it->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getTotalBits()->begin(), m_context.source,
                                                                             *node.getTotalBits()->begin()));
@@ -960,7 +973,7 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
         if (const auto it = m_context.expressionTypes.find(node.getFractionBits());
             it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
         {
-            if (const auto prim = it->second->tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getFractionBits()->begin(), m_context.source,
                                                                             *node.getFractionBits()->begin()));

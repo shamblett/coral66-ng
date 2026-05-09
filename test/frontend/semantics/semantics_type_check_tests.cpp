@@ -313,6 +313,13 @@ TEST_CASE("Type Checking - ANSWER Statement", "[Semantics][TypeChecking]")
         CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
+    SECTION("Valid Answer in Typed Procedure With Assignment")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER a; INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; a := P; END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
     SECTION("Invalid Answer in Untyped Procedure")
     {
         ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN PROCEDURE P ; BEGIN ANSWER 1 END ; END");
