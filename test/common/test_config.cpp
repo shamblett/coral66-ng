@@ -45,6 +45,19 @@ std::string coral66::Tests::getTestDataPath(const std::string& relativePath, con
     if (const auto srcDir = llvm::sys::Process::GetEnv(testPathEnvVar))
     {
         fs::path path = *srcDir;
+        if (path.is_relative())
+        {
+            if (const auto testSrcDir = llvm::sys::Process::GetEnv("TEST_SRCDIR"))
+            {
+                if (const auto testWorkspace = llvm::sys::Process::GetEnv("TEST_WORKSPACE"))
+                {
+                    fs::path absolutePath = *testSrcDir;
+                    absolutePath /= *testWorkspace;
+                    absolutePath /= path;
+                    path = absolutePath;
+                }
+            }
+        }
         path /= relativePath;
         return path.string();
     }
