@@ -1,0 +1,17 @@
+'PROGRAM' goldenTwo
+
+'COMMON' (
+  'FLOATING' 'ARRAY' floatArray [ 0 : 5 ]
+)
+
+'BEGIN'
+  'INTEGER' counter;
+
+  'COMMENT' A loop example ;
+
+  'FOR' counter := 0 'STEP' 1 'UNTIL' 5 'DO'
+  'BEGIN'
+    floatArray [ counter ] := 0.0
+  'END'
+
+'END' end of program ;

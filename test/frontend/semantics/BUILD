@@ -10,6 +10,11 @@ filegroup(
     srcs = ["data/benchmark"],
 )
 
+filegroup(
+    name = "generated_dir",
+    srcs = ["data/generated"],
+)
+
 cc_library(
     name = "semanticstest",
     srcs = [
@@ -38,9 +43,11 @@ cc_test(
     ],
     data = [
         ":benchmark_dir",
+        ":generated_dir",
     ],
     env = {
         "BENCHMARK_DIR": "$(rootpath :benchmark_dir)",
+        "GENERATED_DIR": "$(rootpath :generated_dir)",
     },
     visibility = ["//test:__pkg__"],
     deps = [

@@ -1,0 +1,70 @@
+PROGRAM goldenFour
+
+COMMON (
+  INTEGER ARRAY statusFlags [ 0 : 5 ]
+)
+
+BEGIN
+  INTEGER status, flagMask, varA, varB;
+  FLOATING result;
+
+  COMMENT Table declaration using PRESET, UNSIGNED, BIT;
+  TABLE myTable [ 2 , 10 ]
+  [
+    entryType INTEGER 0;
+    entryValue (16) 1 BIT 0;
+    entryFlags UNSIGNED (8) 1 BIT 16
+  ]
+  PRESET 0, 0, 0;
+
+  COMMENT Overlay declaration using OVERLAY, WITH;
+  OVERLAY status WITH INTEGER myOverlaidInt;
+
+  COMMENT Recursive procedure using RECURSIVE, ANSWER, VALUE;
+  INTEGER RECURSIVE PROCEDURE factorial ( VALUE INTEGER n );
+  BEGIN
+    INTEGER ans;
+    IF n = 0 THEN
+      ans := 1
+    ELSE
+      ans := n * factorial ( n - 1 );
+    ANSWER ans
+  END;
+
+  COMMENT Procedure taking a LABEL;
+  PROCEDURE trapError ( LABEL errorLabel );
+  BEGIN
+    GOTO errorLabel
+  END;
+
+  status := 0;
+  flagMask := 255;
+  varA := 10;
+  varB := 20;
+
+  COMMENT Bitwise operations using MASK, UNION, DIFFER;
+  status := varA MASK flagMask UNION varB DIFFER 15;
+
+  COMMENT Logical operations using AND, OR in a condition;
+  IF varA = 10 AND varB = 20 OR status = 0 THEN
+    result := 1.0
+  ELSE
+    result := 0.0;
+
+  COMMENT While loop using FOR, WHILE, DO;
+  FOR status := 0 WHILE status < 5 DO
+  BEGIN
+    statusFlags [ status ] := status * 2;
+    status := status + 1
+  END;
+
+  COMMENT Part word assignment using BITS;
+  BITS [ 4, 0 ] status := 5;
+
+  COMMENT Literal usage;
+  varA := LITERAL ( A );
+
+  errorDest:
+    trapError ( errorDest )
+
+END end of program ;

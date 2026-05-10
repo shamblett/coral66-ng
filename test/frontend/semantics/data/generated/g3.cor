@@ -1,0 +1,27 @@
+SEGMENT goldenThree
+
+COMMON ( INTEGER statusVal )
+
+BEGIN
+  INTEGER myState;
+  SWITCH mySwitch := stateZero, stateOne, stateTwo;
+
+  COMMENT Jump table example ;
+  myState := 1;
+  GOTO mySwitch [ myState ];
+
+  stateZero:
+    statusVal := 0;
+    GOTO endLabel;
+
+  stateOne:
+    statusVal := 1;
+    GOTO endLabel;
+
+  stateTwo:
+    statusVal := 2;
+
+  endLabel:
+    statusVal := statusVal + 1
+
+END end of program ;
