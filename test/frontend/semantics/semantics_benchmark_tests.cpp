@@ -38,9 +38,8 @@ TEST_CASE("Benchmark", "[Semantics][Benchmark]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         bool errors = false;
-        semantics::DiagnosticCollector::clearDiagnostics();
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
-        auto diagnostics = program.getSource().getDiagnostics();
+        auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
         CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
@@ -60,9 +59,8 @@ TEST_CASE("Benchmark", "[Semantics][Benchmark]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         bool errors = false;
-        semantics::DiagnosticCollector::clearDiagnostics();
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
-        auto diagnostics = program.getSource().getDiagnostics();
+        auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
         CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }

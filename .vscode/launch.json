@@ -138,6 +138,10 @@
                 {
                     "name": "BENCHMARK_DIR",
                     "value": "${workspaceFolder}/test/frontend/semantics/data/benchmark"
+                },
+                {
+                    "name": "GENERATED_DIR",
+                    "value": "${workspaceFolder}/test/frontend/semantics/data/generated"
                 }
             ],
             "externalConsole": false,

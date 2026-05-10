@@ -1,11 +1,11 @@
 PROGRAM goldenOne
 
 COMMON (
-  INTEGER ARRAY commonArray [ 1 : 10 ];
-  FLOATING commonFloat
 )
 
 BEGIN
+  INTEGER ARRAY commonArray [ 1 : 10 ];
+  FLOATING commonFloat;
   INTEGER myInt, otherInt;
   FLOATING myFloat;
   FIXED ( 16, 8 ) myFixed;

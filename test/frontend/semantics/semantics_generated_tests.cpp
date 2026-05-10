@@ -18,14 +18,14 @@ using namespace coral66::syntax;
 using namespace coral66::Tests;
 
 /*
- * Benchmark tests
+ * Generated code tests
  */
 
-TEST_CASE("Benchmark", "[Semantics][Benchmark]")
+TEST_CASE("Generated", "[Semantics][Generated]")
 {
-    SECTION("Ackermann")
+    SECTION("G1")
     {
-        auto sourcePath = getTestDataPath("ackerman.cor", "BENCHMARK_DIR");
+        auto sourcePath = getTestDataPath("g1.cor", "GENERATED_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
@@ -38,31 +38,8 @@ TEST_CASE("Benchmark", "[Semantics][Benchmark]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         bool errors = false;
-        semantics::DiagnosticCollector::clearDiagnostics();
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
-        auto diagnostics = program.getSource().getDiagnostics();
-        CHECK(ss.str().empty());
-        CHECK(diagnostics.empty());
-    }
-
-    SECTION("Sieve")
-    {
-        auto sourcePath = getTestDataPath("sieve.cor", "BENCHMARK_DIR");
-        auto source = readFile(sourcePath);
-        CHECK(!source.empty());
-
-        std::string reporterString;
-        llvm::raw_string_ostream ss(reporterString);
-        auto ppTokens = lexer::tokenize(source, &ss);
-        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
-        auto cTokens = lexer::toCTokens(ppTokens, &ss);
-        auto context = std::make_unique<parser::Context>(cTokens, &ss);
-        auto parsed = parser::parseProgram(cTokens, &ss);
-
-        bool errors = false;
-        semantics::DiagnosticCollector::clearDiagnostics();
-        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
-        auto diagnostics = program.getSource().getDiagnostics();
+        auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
         CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
