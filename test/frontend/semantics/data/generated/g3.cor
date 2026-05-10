@@ -1,8 +1,9 @@
 SEGMENT goldenThree
 
-COMMON ( INTEGER statusVal )
+COMMON ()
 
 BEGIN
+  INTEGER statusVal;
   INTEGER myState;
   SWITCH mySwitch := stateZero, stateOne, stateTwo;
 

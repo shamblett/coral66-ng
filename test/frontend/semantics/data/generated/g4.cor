@@ -1,10 +1,9 @@
 PROGRAM goldenFour
 
-COMMON (
-  INTEGER ARRAY statusFlags [ 0 : 5 ]
-)
+COMMON ()
 
 BEGIN
+  INTEGER ARRAY statusFlags [ 0 : 5 ];
   INTEGER status, flagMask, varA, varB;
   FLOATING result;
 
