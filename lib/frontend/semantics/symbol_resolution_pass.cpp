@@ -170,7 +170,17 @@ void SymbolResolutionPass::visit(const syntax::GotoStatement& node)
 
     if (const Usable* usable = m_context.symbolTable.lookup(labelName))
     {
-        if (!usable->is<LabelDeclaration>() && !usable->is<SwitchDeclaration>())
+        bool isLabelOrSwitch = usable->is<LabelDeclaration>() || usable->is<SwitchDeclaration>();
+        if (!isLabelOrSwitch)
+        {
+            if (usable->is<VariableDeclaration>())
+            {
+                const auto& varDecl = usable->as<VariableDeclaration>();
+                isLabelOrSwitch = varDecl.getType().is<LabelType>() || varDecl.getType().is<SwitchType>();
+            }
+        }
+
+        if (!isLabelOrSwitch)
         {
             m_context.log(errors::semantics::LABEL_NOT_FOUND_N.args(*labelToken, m_context.source, *labelToken));
             DiagnosticCollector::addDiagnostic(errors::semantics::LABEL_NOT_FOUND_N);

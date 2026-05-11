@@ -449,7 +449,6 @@ TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]"
                                    "PROCEDURE P (LABEL L) ; GOTO L ; END;"
                                    "MYLABEL: P(MYLABEL) END");
         TypeCheckingResult res(parsed);
-        std::cout << res.ss.str() << std::endl;
         CHECK(!res.hasDiagnostic("LABEL_NOT_FOUND_N"));
     }
 
