@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <iostream>
 
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/parser/parser.hpp"
@@ -440,6 +441,16 @@ TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]"
                                    "MYLABEL: P(MYLABEL) END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+    }
+
+    SECTION("Passing a Label No Error")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
+                                   "PROCEDURE P (LABEL L) ; GOTO L ; END;"
+                                   "MYLABEL: P(MYLABEL) END");
+        TypeCheckingResult res(parsed);
+        std::cout << res.ss.str() << std::endl;
+        CHECK(!res.hasDiagnostic("LABEL_NOT_FOUND_N"));
     }
 
     SECTION("Passing a Switch")
