@@ -443,13 +443,23 @@ TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]"
         CHECK(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
     }
 
-    SECTION("Passing a Label No Error")
+    SECTION("Passing a Label No Label Not Found Error")
     {
         ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
                                    "PROCEDURE P (LABEL L) ; GOTO L ; END;"
                                    "MYLABEL: P(MYLABEL) END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("LABEL_NOT_FOUND_N"));
+    }
+
+    SECTION("Passing a Label No Location Parameter Requires Error")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
+                                   "INTEGER ARRAY statusFlags [ 0 : 5 ];"
+                                   "PROCEDURE P (LABEL L); GOTO L END;"
+                                   "MYLABEL: P(MYLABEL) END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("LOCATION_PARAMETER_REQUIRES_LVALUE"));
     }
 
     SECTION("Passing a Switch")
@@ -460,6 +470,7 @@ TEST_CASE("Type Checking - Control Flow Parameters", "[Semantics][TypeChecking]"
                                    "MYLABEL: P(S) END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("PROCEDURE_ARGUMENT_TYPE_MISMATCH"));
+        CHECK(!res.hasDiagnostic("LABEL_NOT_FOUND_N"));
     }
 }
 

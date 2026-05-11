@@ -790,7 +790,10 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                         auto& param = procType->getParameters()[i];
                         auto& arg = node.getArguments()[i];
                         
-                        if (!param.isValue)
+                        bool isPlaceOrProcedure = param.type->is<LabelType>() || 
+                                                  param.type->is<SwitchType>() || 
+                                                  param.type->is<ProcedureType>();
+                        if (!param.isValue && !isPlaceOrProcedure)
                         {
                             if (!isLValue(*arg, m_context))
                             {

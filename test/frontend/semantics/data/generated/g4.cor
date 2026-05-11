@@ -71,9 +71,9 @@ BEGIN
   BITS [ 4, 0 ] status := 5;
 
   COMMENT Literal usage;
-  errorDest:
-     varA := LITERAL ( A );
+  varA := LITERAL ( A );
 
- trapError ( errorDest );
+ errorDest:
+   trapError(errorDest);
 
 END end of program ;
