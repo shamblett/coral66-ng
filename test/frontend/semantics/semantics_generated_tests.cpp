@@ -65,9 +65,51 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         CHECK(diagnostics.empty());
     }
 
-    SECTION("G£")
+    SECTION("G3")
     {
         auto sourcePath = getTestDataPath("g3.cor", "GENERATED_DIR");
+        auto source = readFile(sourcePath);
+        CHECK(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        bool errors = false;
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
+        CHECK(ss.str().empty());
+        CHECK(diagnostics.empty());
+    }
+
+    SECTION("G4")
+    {
+        auto sourcePath = getTestDataPath("g4.cor", "GENERATED_DIR");
+        auto source = readFile(sourcePath);
+        CHECK(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        bool errors = false;
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
+        CHECK(ss.str().empty());
+        CHECK(diagnostics.empty());
+    }
+
+    SECTION("G5")
+    {
+        auto sourcePath = getTestDataPath("g5.cor", "GENERATED_DIR");
         auto source = readFile(sourcePath);
         CHECK(!source.empty());
 
