@@ -22,7 +22,7 @@ BEGIN
       INTEGER z;
       z := x * y;
       printString ( "Nested block scope" )
-    END
-  END
+    END;
+  END;
 
 END end of program ;

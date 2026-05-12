@@ -21,6 +21,6 @@ BEGIN
   FOR i := 1, i * 2 WHILE i < 10 DO
   BEGIN
     val := val + 1.0
-  END
+  END;
 
-END end of program ;
+END end of program;
