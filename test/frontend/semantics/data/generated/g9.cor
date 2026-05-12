@@ -1,0 +1,46 @@
+PROGRAM G9
+
+COMMON ()
+
+BEGIN
+  INTEGER ARRAY dataArr [ 1 : 10 ];
+  INTEGER sum;
+  SWITCH modeSwitch := mode1, mode2;
+
+  COMMENT Procedure taking advanced parameters ;
+  PROCEDURE process (
+    INTEGER ARRAY arr;
+    VALUE INTEGER size;
+    LABEL fallback;
+    SWITCH mode
+  );
+  BEGIN
+    INTEGER i;
+    i := size;
+    IF i > 10 THEN
+      GOTO fallback;
+    
+    GOTO mode [ 1 ]
+  END;
+
+  sum := 0;
+
+  process ( dataArr, 5, fallbackLabel, modeSwitch );
+
+  GOTO endProc;
+
+  mode1:
+    sum := 1;
+    GOTO endProc;
+
+  mode2:
+    sum := 2;
+    GOTO endProc;
+
+  fallbackLabel:
+    sum := -1;
+
+  endProc:
+    sum := sum + 1
+
+END end of program ;

@@ -1,0 +1,22 @@
+PROGRAM G7
+
+DEFINE macroWithArgs(A, B) " A + B " ;
+
+COMMON ()
+
+BEGIN
+  INTEGER val1, val2, result;
+  FLOATING fval;
+  INTEGER ARRAY myArr [ 0 : 5 ];
+
+  COMMENT Numbertype casting ;
+  val1 := INTEGER ( 3.14 );
+  fval := FLOATING ( 42 );
+
+  COMMENT LOCATION operator ;
+  val2 := LOCATION ( myArr [ 1 ] );
+
+  COMMENT Macro with arguments ;
+  result := macroWithArgs ( val1, val2 )
+
+END end of program ;

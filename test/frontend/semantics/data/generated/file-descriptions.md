@@ -41,3 +41,38 @@
    - DEFINE (Preprocessor keyword to define a macro string).
    - DELETE (Preprocessor keyword to erase a macro from memory).
    - CODE (To verify the CODE BEGIN "..." END inline code assembly/escape).
+
+
+6. g6.cor
+  This file focuses on multidimensional arrays, scientific notation literals, and advanced loops:
+   - Evaluates multi-dimensional arrays (e.g., `INTEGER ARRAY grid [1:5, 1:5]`).
+   - Uses floating-point scientific notation constants (e.g., `1.5 10 3`).
+   - Validates `FOR` loops with multiple sequence elements and mixed forms (`FOR i := 1, 2, 4, 8 DO` and `FOR i := 1, i * 2 WHILE i < 10 DO`).
+
+
+7. g7.cor
+  This file targets type coercion, macro arguments, and memory access operators:
+   - Tests parametrized macros (`DEFINE macroWithArgs(A, B) " A + B ";`).
+   - Verifies typed casting functions (`INTEGER (3.14)`, `FLOATING (42)`).
+   - Tests explicit `LOCATION ( Wordreference )` semantics.
+
+
+8. g8.cor
+  This file exercises the `COMMON` communicator with complex items:
+   - Demonstrates declaring and accessing a `LABEL` within a `COMMON` block.
+   - Demonstrates declaring a `PROCEDURE` interface inside a `COMMON` block.
+   - Tests an `ARRAY` shared across scopes via a `COMMON` communicator.
+
+
+9. g9.cor
+  This file validates procedures accepting complex parameters:
+   - Tests procedures that receive `INTEGER ARRAY` references.
+   - Tests passing `LABEL` and `SWITCH` parameters to influence the calling context's control flow.
+   - Exercises local jump destinations passed as arguments and invoked dynamically.
+
+
+10. g10.cor
+  This file checks string literal handling and complex block scoping:
+   - Passes `STRING` literals into procedures (e.g., `"Hello Coral 66"`).
+   - Contains deeply nested `BEGIN ... END` block structures to test proper lexical scoping and variable shadowing.
+
