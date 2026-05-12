@@ -1,6 +1,6 @@
-DEFINE myMacro " 10 " ;
+PROGRAM G5
 
-PROGRAM goldenFive
+DEFINE myMacro " 10 " ;
 
 COMMON (
   INTEGER ARRAY statusFlags [ 0 : 5 ]
