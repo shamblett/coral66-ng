@@ -209,7 +209,7 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
     // TODO maybe remove
     std::vector<lexer::CToken> syntheticTokens;
 
-    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables)};
+    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables). context};
 }
 
 } // namespace coral66::semantics

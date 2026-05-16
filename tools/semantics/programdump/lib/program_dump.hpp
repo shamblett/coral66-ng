@@ -8,55 +8,53 @@
 
 #include <rapidjson/document.h>
 
-#include "lib/frontend/syntax/syntax.hpp"
+#include "lib/frontend/semantics/semantic_context.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
 
+namespace llvm
+{
+class Type;
+}
 namespace coral66::tools
 {
 
 /*
- * Dumper for the parser AST.
+ * Dumper for the semantics program.
  *
  * Outputs the dump in JSON format.
  */
-class AstDump
+class ProgramDump
 {
     rapidjson::Document::AllocatorType& m_alloc;
 
 public:
-    explicit AstDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
+    explicit ProgramDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
 
     // Main dump method
-    rapidjson::Value dump(const syntax::Program& program);
+    rapidjson::Value dump(const semantics::Program& program);
 
     // Dump to a string
-    static std::string dumpToString(const syntax::Program& program);
+    static std::string dumpToString(const semantics::Program& program);
 
 private:
-    // Node Dispatcher
-    rapidjson::Value dump(const syntax::Node* node);
+    // Symbol table
+    rapidjson::Value dump(const semantics::SymbolTable& symbolTable);
 
-    // Block dump
-    rapidjson::Value dump(const syntax::Block& block);
+    // Resolved Identifiers
+    rapidjson::Value dump(const std::unordered_map<const syntax::Node*, const semantics::Usable*>& resolvedIdentifiers);
 
-    // Communicator
-    rapidjson::Value dump(const syntax::Communicator* communicator);
+    // Expression types
+    rapidjson::Value
+        dump(std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<semantics::Type>>& expressionTypes);
 
-    // Place references
+    // Usables
+    rapidjson::Value dump(const std::vector<IntrVarPtr<semantics::Usable>>& ownedUsables);
 
-    // Declarations
-    rapidjson::Value dump(const syntax::Declaration* declaration);
+    // Auxiliary types
+    rapidjson::Value dump(const std::deque<IntrusiveVariantValue<semantics::Type>> ownedTypes);
 
-    // Statements
-    rapidjson::Value dump(const syntax::Statement* statement);
-
-    // For element
-    rapidjson::Value dump(const syntax::ForElement& element);
-
-    // Expressions
-    rapidjson::Value dump(const syntax::Expression* expression);
-
-    // Helper function to extract text from a Lexer CTokenIterator
-    rapidjson::Value getTokenString(const lexer::CTokenIterator& token);
+    // Table Information
+    rapidjson::Value dump(const std::deque<semantics::TableInfo> ownedTableInfos);
 };
 
 } // namespace coral66::tools

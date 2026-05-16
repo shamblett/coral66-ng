@@ -18,6 +18,7 @@
 #include "lib/support/abstract_intrusive_variant.hpp"
 #include "lib/support/intrusive_variant_value.hpp"
 #include "lib/support/vendor/tsl/ordered_map.h"
+#include "lib/frontend/semantics/semantic_context.hpp"
 
 /**
  * Defines the classes and structures for the Semantic Abstract Syntax Tree (AST) for Coral 66.
@@ -619,7 +620,7 @@ class AssignmentStatement final : public Statement
 
 public:
     AssignmentStatement(const ScopePoint sp, IntrVarPtr<ExpressionBase>&& target, // NOLINT(*-pro-type-member-init)
-                        IntrVarPtr<ExpressionBase>&& value)                 // NOLINT(*-pro-type-member-init)
+                        IntrVarPtr<ExpressionBase>&& value)                       // NOLINT(*-pro-type-member-init)
         : Statement(sp, std::in_place_type<AssignmentStatement>), m_target(std::move(target)), m_value(std::move(value))
     {
     }
@@ -916,7 +917,10 @@ public:
 class LabelDeclaration final : public Declaration
 {
 public:
-    explicit LabelDeclaration(const lexer::CTokenIterator nameToken) : Declaration(std::in_place_type<LabelDeclaration>, nameToken) {}
+    explicit LabelDeclaration(const lexer::CTokenIterator nameToken)
+        : Declaration(std::in_place_type<LabelDeclaration>, nameToken)
+    {
+    }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(LabelDeclaration)
 };
 
@@ -1080,10 +1084,15 @@ class Program
     CSourceObject m_source;
     std::vector<lexer::CToken> m_syntheticTokens;
     std::vector<IntrVarPtr<Usable>> m_globals;
+    SemanticContext& m_context;
 
 public:
-    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, std::vector<IntrVarPtr<Usable>> globals)
-        : m_source(std::move(source)), m_syntheticTokens(std::move(synthetic)), m_globals(std::move(globals))
+    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, std::vector<IntrVarPtr<Usable>> globals,
+            SemanticContext& context)
+        : m_source(std::move(source)),
+          m_syntheticTokens(std::move(synthetic)),
+          m_globals(std::move(globals)),
+          m_context(context)
     {
     }
 
@@ -1094,6 +1103,10 @@ public:
     [[nodiscard]] const CSourceObject& getSource() const
     {
         return m_source;
+    }
+    [[nodiscard]] const SemanticContext& getContext() const
+    {
+        return m_context;
     }
 };
 
