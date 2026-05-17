@@ -15,7 +15,7 @@
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"
 #include "sysexits.h"
-#include "tools/parser/astdump/lib/ast_dump.hpp"
+#include "tools/semantics/programdump/lib/program_dump.hpp"
 
 std::string readInputFile(const std::string& inputFile)
 {
