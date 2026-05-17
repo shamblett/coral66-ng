@@ -13,6 +13,7 @@
 #include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/function_ref.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

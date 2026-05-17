@@ -12,6 +12,7 @@
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"
 #include "sysexits.h"
@@ -104,10 +105,10 @@ int main(const int argc, char** argv)
     doc.SetObject();
 
     // TODO Instantiate our dumper, providing the document's allocator
-    coral66::tools::AstDump dump(doc.GetAllocator());
+    coral66::tools::ProgramDump dump(doc.GetAllocator());
 
     // Dump the AST into the RapidJSON document root
-    rapidjson::Value root = dump.dump(tree);
+    rapidjson::Value root = dump.dump(program);
     doc.Swap(root);
 
     // Serialize to string for printing

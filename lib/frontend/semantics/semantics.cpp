@@ -5,6 +5,7 @@
  */
 
 #include "semantics.hpp"
+#include "program.hpp"
 
 #include "control_flow_pass.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
@@ -209,7 +210,7 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
     // TODO maybe remove
     std::vector<lexer::CToken> syntheticTokens;
 
-    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables). context};
+    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables), std::move(context)};
 }
 
 } // namespace coral66::semantics

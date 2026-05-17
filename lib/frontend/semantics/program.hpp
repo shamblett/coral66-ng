@@ -6,11 +6,45 @@
 
 #pragma once
 
-#include "program_interface.hpp"
-#include "semantics.hpp"
+#include "lib/frontend/semantics/semantic_context.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
+#include <llvm/Support/raw_ostream.h>
 
 namespace coral66::semantics
 {
-// Program class is defined in Semantics.hpp
-// This header ensures compatibility for inclusions expecting Program.hpp
-}
+
+class Program
+{
+    CSourceObject m_source;
+    std::vector<lexer::CToken> m_syntheticTokens;
+    std::vector<IntrVarPtr<Usable>> m_globals;
+    SemanticContext m_context;
+
+public:
+    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, std::vector<IntrVarPtr<Usable>> globals,
+            SemanticContext&& context)
+        : m_source(std::move(source)),
+          m_syntheticTokens(std::move(synthetic)),
+          m_globals(std::move(globals)),
+          m_context(std::move(context))
+    {
+    }
+
+    [[nodiscard]] const std::vector<IntrVarPtr<Usable>>& getGlobals() const
+    {
+        return m_globals;
+    }
+    [[nodiscard]] const CSourceObject& getSource() const
+    {
+        return m_source;
+    }
+    [[nodiscard]] const SemanticContext& getContext() const
+    {
+        return m_context;
+    }
+};
+
+Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter = &llvm::errs(),
+                bool* errors = nullptr);
+
+} // namespace coral66::semantics

@@ -9,6 +9,7 @@
 #include <rapidjson/document.h>
 
 #include "lib/frontend/semantics/semantic_context.hpp"
+#include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 
 namespace llvm

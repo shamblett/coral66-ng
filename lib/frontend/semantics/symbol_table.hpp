@@ -10,8 +10,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "semantics.hpp"
-
 /*
  * Provides a SymbolTable class that manages stacked/nested scopes to correctly resolve
  * variables and procedures within their respective blocks.
@@ -19,6 +17,8 @@
 
 namespace coral66::semantics
 {
+
+class Usable;
 
 class SymbolTable
 {

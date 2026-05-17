@@ -5,6 +5,7 @@
  */
 
 #include "code_generator.hpp"
+#include "lib/frontend/semantics/program.hpp"
 
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/InlineAsm.h>

@@ -15,7 +15,6 @@
 #include "lib/frontend/common/semantics_common.hpp"
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
-#include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/support/abstract_intrusive_variant.hpp"
 #include "lib/support/intrusive_variant_value.hpp"
 #include "lib/support/vendor/tsl/ordered_map.h"
@@ -1078,39 +1077,5 @@ public:
         return m_statements;
     }
 };
-
-class Program
-{
-    CSourceObject m_source;
-    std::vector<lexer::CToken> m_syntheticTokens;
-    std::vector<IntrVarPtr<Usable>> m_globals;
-    SemanticContext m_context;
-
-public:
-    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, std::vector<IntrVarPtr<Usable>> globals,
-            SemanticContext& context)
-        : m_source(std::move(source)),
-          m_syntheticTokens(std::move(synthetic)),
-          m_globals(std::move(globals)),
-          m_context(context)
-    {
-    }
-
-    [[nodiscard]] const std::vector<IntrVarPtr<Usable>>& getGlobals() const
-    {
-        return m_globals;
-    }
-    [[nodiscard]] const CSourceObject& getSource() const
-    {
-        return m_source;
-    }
-    [[nodiscard]] const SemanticContext& getContext() const
-    {
-        return m_context;
-    }
-};
-
-Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter = &llvm::errs(),
-                bool* errors = nullptr);
 
 } // namespace coral66::semantics

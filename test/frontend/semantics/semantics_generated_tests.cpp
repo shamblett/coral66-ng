@@ -4,6 +4,7 @@
  * Date   : 07/05/2026
  */
 
+#include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 
 #include <iostream>

@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "lib/frontend/syntax/syntax.hpp"
+#include "lib/frontend/semantics/semantics.hpp"
 #include "symbol_table.hpp"
 
 namespace llvm
