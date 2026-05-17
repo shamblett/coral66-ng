@@ -9,10 +9,6 @@
 
 #include "control_flow_pass.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
-#include "semantic_context.hpp"
-#include "semantic_support.hpp"
-#include "symbol_resolution_pass.hpp"
-#include "type_checking_pass.hpp"
 
 namespace coral66::semantics
 {
