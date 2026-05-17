@@ -193,24 +193,4 @@ lexer::CTokenIterator UnaryOperator::end() const
     return m_operand->end();
 }
 
-Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
-{
-    CTRACK_NAME("Semantics");
-    DiagnosticCollector::clearDiagnostics();
-    SemanticContext context(cTokens, reporter, errors);
-    SymbolResolutionPass symPass(context);
-    symPass.run(parseTree);
-
-    TypeCheckingPass typePass(context);
-    typePass.run(parseTree);
-
-    ControlFlowPass cfPass(context);
-    cfPass.run(parseTree);
-
-    // TODO maybe remove
-    std::vector<lexer::CToken> syntheticTokens;
-
-    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables), std::move(context)};
-}
-
 } // namespace coral66::semantics

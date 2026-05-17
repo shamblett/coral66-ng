@@ -5,3 +5,32 @@
  */
 
 #include "program.hpp"
+
+#include "control_flow_pass.hpp"
+#include "lib/support/vendor/ctrack/include/ctrack.hpp"
+#include "semantic_support.hpp"
+#include "symbol_resolution_pass.hpp"
+#include "type_checking_pass.hpp"
+
+namespace coral66::semantics
+{
+Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors)
+{
+    CTRACK_NAME("Semantics");
+    DiagnosticCollector::clearDiagnostics();
+    SemanticContext context(cTokens, reporter, errors);
+    SymbolResolutionPass symPass(context);
+    symPass.run(parseTree);
+
+    TypeCheckingPass typePass(context);
+    typePass.run(parseTree);
+
+    ControlFlowPass cfPass(context);
+    cfPass.run(parseTree);
+
+    // TODO maybe remove
+    std::vector<lexer::CToken> syntheticTokens;
+
+    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables), std::move(context)};
+}
+} // namespace coral66::semantics
