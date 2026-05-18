@@ -4,6 +4,8 @@
  * Date   : 16/05/2026
  */
 
+#include "lib/frontend/semantics/program.hpp"
+
 #include <iostream>
 
 #include <rapidjson/prettywriter.h>
@@ -12,7 +14,6 @@
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
-#include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"
 #include "sysexits.h"
@@ -39,7 +40,7 @@ std::string readInputFile(const std::string& inputFile)
 void generateOutputFile(const std::string& inputFile, const rapidjson::StringBuffer& buffer)
 {
     coral66::fs::path input_path = inputFile;
-    coral66::fs::path output_path = input_path.parent_path() / (input_path.stem().string() + "_ast");
+    coral66::fs::path output_path = input_path.parent_path() / (input_path.stem().string() + "_program");
     output_path.replace_extension(".json");
 
     coral66::fs::ofstream outputFile(output_path, std::ios_base::out);

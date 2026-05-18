@@ -8,8 +8,8 @@
 
 #include <rapidjson/document.h>
 
-#include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/program.hpp"
+#include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 
 namespace llvm
@@ -52,10 +52,10 @@ private:
     rapidjson::Value dump(const std::vector<IntrVarPtr<semantics::Usable>>& ownedUsables);
 
     // Auxiliary types
-    rapidjson::Value dump(const std::deque<IntrusiveVariantValue<semantics::Type>> ownedTypes);
+    rapidjson::Value dump(const std::deque<IntrusiveVariantValue<semantics::Type>>& ownedTypes);
 
     // Table Information
-    rapidjson::Value dump(const std::deque<semantics::TableInfo> ownedTableInfos);
+    rapidjson::Value dump(const std::deque<semantics::TableInfo>& ownedTableInfos);
 };
 
 } // namespace coral66::tools
