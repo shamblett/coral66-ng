@@ -821,12 +821,14 @@ class TableElementDeclaration;
 /*
  * This is a fundamental semantics tye, the purpose of which is to -
  *
- * Categorize Declarations: It uses AbstractIntrusiveVariant to encompass various types of declarations that can be targeted by a reference, including variables,
- * procedures, arrays, tables, overlays, switches, labels, and table elements.
+ * Categorize Declarations: It uses AbstractIntrusiveVariant to encompass various types of declarations that can be
+ * targeted by a reference, including variables, procedures, arrays, tables, overlays, switches, labels, and table
+ * elements.
  *
- * Track Dependencies: It maintains a list of other Usable entities that this entity depends on via the m_uses vector (getUses() / setUses()). This allows the
- * semantic analyzer to build a dependency graph to track use-def relationships, which is typically useful for tasks like liveness analysis, identifying unused
- * variables, or detecting circular dependencies.
+ * Track Dependencies: It maintains a list of other Usable entities that this entity depends on via the m_uses vector
+ * (getUses() / setUses()). This allows the semantic analyzer to build a dependency graph to track use-def
+ * relationships, which is typically useful for tasks like liveness analysis, identifying unused variables, or detecting
+ * circular dependencies.
  *
  */
 class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration,
@@ -856,6 +858,7 @@ class Declaration : public Usable
 {
     lexer::CTokenIterator m_nameToken;
     const syntax::Declaration* m_astNode = nullptr;
+    int m_scopeDepth = 0;
 
 protected:
     template <class T>
@@ -880,6 +883,15 @@ public:
     [[nodiscard]] const syntax::Declaration* getAstNode() const
     {
         return m_astNode;
+    }
+
+    void setScopeDepth(const int depth)
+    {
+        m_scopeDepth = depth;
+    }
+    [[nodiscard]] int getScopeDepth() const
+    {
+        return m_scopeDepth;
     }
 };
 

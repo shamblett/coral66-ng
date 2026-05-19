@@ -36,10 +36,6 @@ public:
     [[nodiscard]] const Usable* lookupInCurrentScope(std::string_view name) const;
     [[nodiscard]] int lookupScopeDepth(std::string_view name) const;
     [[nodiscard]] int scopeCount() const;
-    [[nodiscard]] const STEntries& getEntries() const
-    {
-        return m_scopes;
-    }
 };
 
 } // namespace coral66::semantics

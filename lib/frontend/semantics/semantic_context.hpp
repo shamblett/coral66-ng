@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "lib/frontend/syntax/syntax.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
+#include "lib/frontend/syntax/syntax.hpp"
 #include "symbol_table.hpp"
 
 namespace llvm
@@ -22,12 +22,17 @@ class raw_ostream;
 namespace coral66::semantics
 {
 
+typedef std::vector<IntrVarPtr<Usable>> OwnedUsables;
+typedef std::unordered_map<const syntax::Node*, const Usable*> ResolvedIdentifiers;
+typedef std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<Type>> ExpressionTypes;
+typedef std::deque<IntrusiveVariantValue<Type>> OwnedTypes;
+typedef std::deque<TableInfo> TableInfos;
+
 /*
  * Acts as the central context payload passed to each semantic pass. It currently wraps the
  * source_interface, diagnostics reporter, error flags, and an instance
  * of the SymbolTable.
  */
-
 class SemanticContext
 {
 public:
@@ -39,19 +44,19 @@ public:
     SymbolTable symbolTable;
 
     // Stores resolved symbols for identifiers in expressions
-    std::unordered_map<const syntax::Node*, const Usable*> resolvedIdentifiers;
+    ResolvedIdentifiers resolvedIdentifiers;
 
     // Stores inferred types for expressions
-    std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<Type>> expressionTypes;
+    ExpressionTypes expressionTypes;
 
     // Owns the semantic usable objects (declarations)
-    std::vector<IntrVarPtr<Usable>> ownedUsables;
+    OwnedUsables ownedUsables;
 
     // Owns auxiliary types allocated during resolution (e.g. return types, parameter types)
-    std::deque<IntrusiveVariantValue<Type>> ownedTypes;
+    OwnedTypes ownedTypes;
 
     // Owns TableInfo structures
-    std::deque<TableInfo> ownedTableInfos;
+    TableInfos ownedTableInfos;
 
     SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag)
         : source(sourceInterface), m_reporter(reporterStream), m_errors(errorFlag)

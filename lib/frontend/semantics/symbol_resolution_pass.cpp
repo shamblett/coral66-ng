@@ -5,16 +5,16 @@
  * Date   : 02/05/2026
  */
 
+#include "symbol_resolution_pass.hpp"
+
 #include <functional>
 #include <string>
 
+#include "control_flow_pass.hpp"
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
-#include "symbol_resolution_pass.hpp"
 #include "semantic_utilities.hpp"
-
-#include "control_flow_pass.hpp"
 
 namespace coral66::semantics
 {
@@ -60,6 +60,7 @@ void SymbolResolutionPass::visit(const syntax::Block& node)
             }
             else
             {
+                declaration->setScopeDepth(m_context.symbolTable.scopeCount());
                 m_context.symbolTable.insert(name, declaration.get());
             }
             m_context.ownedUsables.push_back(std::move(declaration));
@@ -212,9 +213,8 @@ void SymbolResolutionPass::visit(const syntax::ProcedureCallStatement& node)
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
 IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT(*-convert-member-functions-to-static)
-    const std::optional<lexer::CTokenIterator> typeToken,
-    const syntax::Expression* fixedTotalBits,
-    const syntax::Expression* fixedFractionBits)                    // NOLINT(*-convert-member-functions-to-static)
+    const std::optional<lexer::CTokenIterator> typeToken, const syntax::Expression* fixedTotalBits,
+    const syntax::Expression* fixedFractionBits) // NOLINT(*-convert-member-functions-to-static)
 {
     if (!typeToken)
         return {UntypedType{}};
@@ -228,11 +228,13 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
         uint32_t frac = 8;
         if (fixedTotalBits)
         {
-            if (const auto tVal = evaluateConstantInteger(*fixedTotalBits); tVal && *tVal > 0) total = static_cast<uint32_t>(*tVal);
+            if (const auto tVal = evaluateConstantInteger(*fixedTotalBits); tVal && *tVal > 0)
+                total = static_cast<uint32_t>(*tVal);
         }
         if (fixedFractionBits)
         {
-            if (const auto fVal = evaluateConstantInteger(*fixedFractionBits); fVal && *fVal >= 0) frac = static_cast<uint32_t>(*fVal);
+            if (const auto fVal = evaluateConstantInteger(*fixedFractionBits); fVal && *fVal >= 0)
+                frac = static_cast<uint32_t>(*fVal);
         }
         return {FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)}};
     }
@@ -285,6 +287,7 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
         }
         else
         {
+            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
         m_context.ownedUsables.push_back(std::move(declaration));
@@ -333,6 +336,7 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
         }
         else
         {
+            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
         m_context.ownedUsables.push_back(std::move(declaration));
@@ -361,14 +365,17 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     std::uint64_t lengthVal = 0;
     if (node.getWidth())
     {
-        if (const auto w = evaluateConstantInteger(*node.getWidth())) widthVal = static_cast<std::uint64_t>(*w);
+        if (const auto w = evaluateConstantInteger(*node.getWidth()))
+            widthVal = static_cast<std::uint64_t>(*w);
     }
     if (node.getLength())
     {
-        if (const auto l = evaluateConstantInteger(*node.getLength())) lengthVal = static_cast<std::uint64_t>(*l);
+        if (const auto l = evaluateConstantInteger(*node.getLength()))
+            lengthVal = static_cast<std::uint64_t>(*l);
     }
 
-    m_context.ownedTableInfos.push_back(TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, widthVal, lengthVal}});
+    m_context.ownedTableInfos.push_back(
+        TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, widthVal, lengthVal}});
 
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
@@ -383,6 +390,7 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     }
     else
     {
+        declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
     m_context.ownedUsables.push_back(std::move(declaration));
@@ -397,11 +405,11 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 {
     auto type = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
     auto typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}); // Default for now
-        if (type->is<PrimitiveType>())
-            typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
-        else if (type->is<FixedType>())
-            typeCopy = IntrusiveVariantValue(
-                FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
+    if (type->is<PrimitiveType>())
+        typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind()});
+    else if (type->is<FixedType>())
+        typeCopy = IntrusiveVariantValue(
+            FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
 
     std::optional<std::uint32_t> wordPos;
     if (node.getWordPosition())
@@ -430,6 +438,7 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     }
     else
     {
+        declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
     m_context.ownedUsables.push_back(std::move(declaration));
@@ -439,7 +448,7 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
 {
     auto id = node.getIdentifier();
-    
+
     std::vector<const LabelStatement*> switchLabels;
 
     for (const auto& labelToken : node.getLabels())
@@ -457,8 +466,9 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
         }
         else
         {
-             // We cast the usable directly; true node links are handled if we needed them, but we only strictly need size later
-             switchLabels.push_back(nullptr); 
+            // We cast the usable directly; true node links are handled if we needed them, but we only strictly need
+            // size later
+            switchLabels.push_back(nullptr);
         }
     }
 
@@ -473,6 +483,7 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
     }
     else
     {
+        declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
     m_context.ownedUsables.push_back(std::move(declaration));
@@ -506,7 +517,8 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     {
         if (auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclarationNode.get()))
         {
-            auto baseTypeVal = createTypeFromToken(paramNode->getType(), paramNode->getFixedTotalBits(), paramNode->getFixedFractionBits());
+            auto baseTypeVal = createTypeFromToken(paramNode->getType(), paramNode->getFixedTotalBits(),
+                                                   paramNode->getFixedFractionBits());
 
             IntrusiveVariantValue paramTypeVal{UntypedType{}};
 
@@ -589,6 +601,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
         }
         else
         {
+            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
     };
@@ -615,7 +628,8 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
     const Type* baseTypePtr = nullptr;
     if (node.getMode() == syntax::ParameterDeclaration::ParameterMode::Array)
     {
-        m_context.ownedTypes.push_back(createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits()));
+        m_context.ownedTypes.push_back(
+            createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits()));
         baseTypePtr = m_context.ownedTypes.back().data();
     }
 
@@ -627,20 +641,19 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
         {
             case syntax::ParameterDeclaration::ParameterMode::Value:
                 if (type->is<PrimitiveType>())
-                    typeCopy =
-                        IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
+                    typeCopy = IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Value});
                 else if (type->is<FixedType>())
-                    typeCopy = IntrusiveVariantValue(FixedType{
-                        type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits(), Type::Value});
+                    typeCopy = IntrusiveVariantValue(FixedType{type->as<FixedType>().getTotalBits(),
+                                                               type->as<FixedType>().getFractionalBits(), Type::Value});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Location:
                 if (type->is<PrimitiveType>())
                     typeCopy =
                         IntrusiveVariantValue(PrimitiveType{type->as<PrimitiveType>().getKind(), Type::Location});
                 else if (type->is<FixedType>())
-                    typeCopy = IntrusiveVariantValue(FixedType{type->as<FixedType>().getTotalBits(),
-                                                                     type->as<FixedType>().getFractionalBits(),
-                                                                     Type::Location});
+                    typeCopy =
+                        IntrusiveVariantValue(FixedType{type->as<FixedType>().getTotalBits(),
+                                                        type->as<FixedType>().getFractionalBits(), Type::Location});
                 break;
             case syntax::ParameterDeclaration::ParameterMode::Array:
                 typeCopy = IntrusiveVariantValue(ArrayType{baseTypePtr, {}});
@@ -681,6 +694,7 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
         }
         else
         {
+            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
         m_context.ownedUsables.push_back(std::move(declaration));
