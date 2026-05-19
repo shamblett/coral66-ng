@@ -20,7 +20,7 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program) const
     rapidjson::Value obj(rapidjson::kObjectType);
 
     // Symbol table
-    obj.AddMember("Symbol Table", dump(program.getContext().ownedUsables), m_alloc);
+    obj.AddMember("Symbol Table", dump(program.getGlobals()), m_alloc);
 
     return obj;
 }
