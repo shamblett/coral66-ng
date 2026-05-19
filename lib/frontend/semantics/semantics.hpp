@@ -818,6 +818,17 @@ class SwitchDeclaration;
 class LabelDeclaration;
 class TableElementDeclaration;
 
+/*
+ * This is a fundamental semantics tye, the purpose of which is to -
+ *
+ * Categorize Declarations: It uses AbstractIntrusiveVariant to encompass various types of declarations that can be targeted by a reference, including variables,
+ * procedures, arrays, tables, overlays, switches, labels, and table elements.
+ *
+ * Track Dependencies: It maintains a list of other Usable entities that this entity depends on via the m_uses vector (getUses() / setUses()). This allows the
+ * semantic analyzer to build a dependency graph to track use-def relationships, which is typically useful for tasks like liveness analysis, identifying unused
+ * variables, or detecting circular dependencies.
+ *
+ */
 class Usable : public AbstractIntrusiveVariant<Usable, VariableDeclaration, ProcedureDeclaration, ArrayDeclaration,
                                                TableDeclaration, OverlayDeclaration, SwitchDeclaration,
                                                LabelDeclaration, TableElementDeclaration>

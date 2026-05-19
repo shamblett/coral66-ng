@@ -8,17 +8,10 @@
 
 #include "program_dump.hpp"
 
+#include <ranges>
+
 namespace coral66::tools
 {
-
-// Helpers
-
-rapidjson::Value dumpSTEntries(const semantics::STEntries& entries)
-{
-    rapidjson::Value obj(rapidjson::kObjectType);
-
-    return obj;
-}
 
 // Entry point
 
@@ -42,7 +35,7 @@ rapidjson::Value ProgramDump::dump(const semantics::SymbolTable& symbolTable)
     rapidjson::Value obj(rapidjson::kObjectType);
 
     obj.AddMember("Scope Count", symbolTable.scopeCount(), m_alloc);
-    auto entries = dumpSTEntries(symbolTable.getEntries());
+    auto entries = dump(symbolTable.getEntries());
     obj.AddMember("Entries", entries, m_alloc);
     return obj;
 }
@@ -72,6 +65,64 @@ rapidjson::Value ProgramDump::dump(const std::deque<IntrusiveVariantValue<semant
 rapidjson::Value ProgramDump::dump(const std::deque<semantics::TableInfo>& ownedTableInfos)
 {
     return rapidjson::Value(rapidjson::kObjectType);
+}
+
+// Helpers
+rapidjson::Value ProgramDump::dump(const semantics::STEntries& entries) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    int scopeCount = 0;
+    for ( const auto& entry : entries)
+    {
+        obj.AddMember("Scope", scopeCount, m_alloc);
+        for (const auto& [name, usable] : entry)
+        {
+            obj.AddMember("Name", rapidjson::StringRef(name.data()), m_alloc);
+            obj.AddMember("Name", dump(usable), m_alloc);
+        }
+        scopeCount++;
+    }
+
+
+    return obj;
+}
+
+rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
+{
+
+    if (!usable)
+    {
+        return rapidjson::Value(rapidjson::kNullType);
+    }
+
+    return usable->match(
+        [&](const semantics::VariableDeclaration& variableDeclaration) {
+           rapidjson::Value obj(rapidjson::kObjectType);
+           obj.AddMember("Kind", "VariableDeclaration", m_alloc);
+           obj.AddMember("Name", rapidjson::StringRef(variableDeclaration.getName().data()), m_alloc);
+           // Optionally, you can dump type or uses here:
+           // obj.AddMember("Type", dump(varDecl.getType()), m_alloc);
+           return obj;
+       },
+       [&](const semantics::ProcedureDeclaration& procedureDeclaration) {
+           rapidjson::Value obj(rapidjson::kObjectType);
+           obj.AddMember("Kind", "ProcedureDeclaration", m_alloc);
+           obj.AddMember("Name", rapidjson::StringRef(procedureDeclaration.getName().data()), m_alloc);
+           return obj;
+       },
+       // A generic catch-all for other declarations (ArrayDeclaration, TableDeclaration, etc.)
+       [&]<typename T0>(const T0& otherDeclaration) {
+           rapidjson::Value obj(rapidjson::kObjectType);
+           obj.AddMember("Kind", "OtherDeclaration", m_alloc);
+
+           // All Usables currently derive from Declaration, so we can safely extract their name.
+           if constexpr (std::is_base_of_v<semantics::Declaration, std::decay_t<T0>>)
+           {
+               obj.AddMember("Name", rapidjson::StringRef(otherDeclaration.getName().data()), m_alloc);
+           }
+           return obj;
+       });
 }
 
 } // namespace coral66::tools

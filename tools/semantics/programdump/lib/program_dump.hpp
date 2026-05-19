@@ -56,6 +56,11 @@ private:
 
     // Table Information
     rapidjson::Value dump(const std::deque<semantics::TableInfo>& ownedTableInfos);
+
+    // Helpers
+    rapidjson::Value dump(const semantics::STEntries& entries) const;
+
+    rapidjson::Value dump(const semantics::Usable* usable) const;
 };
 
 } // namespace coral66::tools
