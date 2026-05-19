@@ -15,7 +15,7 @@ namespace coral66::tools
 
 // Entry point
 
-rapidjson::Value ProgramDump::dump(const semantics::Program& program)
+rapidjson::Value ProgramDump::dump(const semantics::Program& program) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
@@ -30,7 +30,7 @@ std::string ProgramDump::dumpToString(const semantics::Program& program)
     return "{}";
 }
 
-rapidjson::Value ProgramDump::dump(const semantics::SymbolTable& symbolTable)
+rapidjson::Value ProgramDump::dump(const semantics::SymbolTable& symbolTable) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
@@ -79,11 +79,10 @@ rapidjson::Value ProgramDump::dump(const semantics::STEntries& entries) const
         for (const auto& [name, usable] : entry)
         {
             obj.AddMember("Name", rapidjson::StringRef(name.data()), m_alloc);
-            obj.AddMember("Name", dump(usable), m_alloc);
+            obj.AddMember("Usables", dump(usable), m_alloc);
         }
         scopeCount++;
     }
-
 
     return obj;
 }

@@ -105,7 +105,6 @@ int main(const int argc, char** argv)
     rapidjson::Document doc;
     doc.SetObject();
 
-    // TODO Instantiate our dumper, providing the document's allocator
     coral66::tools::ProgramDump dump(doc.GetAllocator());
 
     // Dump the AST into the RapidJSON document root

@@ -32,14 +32,14 @@ public:
     explicit ProgramDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
 
     // Main dump method
-    rapidjson::Value dump(const semantics::Program& program);
+    rapidjson::Value dump(const semantics::Program& program) const;
 
     // Dump to a string
     static std::string dumpToString(const semantics::Program& program);
 
 private:
     // Symbol table
-    rapidjson::Value dump(const semantics::SymbolTable& symbolTable);
+    rapidjson::Value dump(const semantics::SymbolTable& symbolTable) const;
 
     // Resolved Identifiers
     rapidjson::Value dump(const std::unordered_map<const syntax::Node*, const semantics::Usable*>& resolvedIdentifiers);
