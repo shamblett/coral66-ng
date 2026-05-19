@@ -20,11 +20,11 @@ namespace coral66::semantics
 
 class Usable;
 
-typedef std::vector<std::unordered_map<std::string_view, const Usable*>> Entries;
+typedef std::vector<std::unordered_map<std::string_view, const Usable*>> STEntries;
 
 class SymbolTable
 {
-    Entries m_scopes;
+    STEntries m_scopes;
 
 public:
     SymbolTable();
@@ -36,7 +36,7 @@ public:
     [[nodiscard]] const Usable* lookupInCurrentScope(std::string_view name) const;
     [[nodiscard]] int lookupScopeDepth(std::string_view name) const;
     [[nodiscard]] int scopeCount() const;
-    [[nodiscard]] const Entries& getEntries() const
+    [[nodiscard]] const STEntries& getEntries() const
     {
         return m_scopes;
     }

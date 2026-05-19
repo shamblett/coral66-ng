@@ -13,7 +13,7 @@ namespace coral66::tools
 
 // Helpers
 
-rapidjson::Value dumpEntries(const semantics::Entries& entries)
+rapidjson::Value dumpSTEntries(const semantics::STEntries& entries)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
@@ -42,7 +42,7 @@ rapidjson::Value ProgramDump::dump(const semantics::SymbolTable& symbolTable)
     rapidjson::Value obj(rapidjson::kObjectType);
 
     obj.AddMember("Scope Count", symbolTable.scopeCount(), m_alloc);
-    auto entries = dumpEntries(symbolTable.getEntries());
+    auto entries = dumpSTEntries(symbolTable.getEntries());
     obj.AddMember("Entries", entries, m_alloc);
     return obj;
 }
