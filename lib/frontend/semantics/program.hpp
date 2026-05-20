@@ -17,11 +17,11 @@ class Program
 {
     CSourceObject m_source;
     std::vector<lexer::CToken> m_syntheticTokens;
-    std::vector<IntrVarPtr<Usable>> m_globals;
+    OwnedUsables m_globals;
     SemanticContext m_context;
 
 public:
-    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, std::vector<IntrVarPtr<Usable>> globals,
+    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, OwnedUsables globals,
             SemanticContext&& context)
         : m_source(std::move(source)),
           m_syntheticTokens(std::move(synthetic)),
