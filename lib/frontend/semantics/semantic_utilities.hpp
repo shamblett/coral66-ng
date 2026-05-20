@@ -49,5 +49,16 @@ inline bool isScalar(const Type& type)
     return isArithmetic(type); // Pointers? Coral uses Location?
 }
 
-} // namespace coral66::semantics
+inline const char* primitiveTypeKindToString(const PrimitiveType::Kind kind)
+{
+    using Kind = PrimitiveType::Kind;
+    switch (kind)
+    {
+        case Kind::Integer: return "Integer";
+        case Kind::Floating: return "Floating";
+        case Kind::Bits: return "Bits";
+        default: return "Unknown";
+    }
+}
 
+} // namespace coral66::semantics

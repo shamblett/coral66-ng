@@ -38,7 +38,6 @@ public:
     static std::string dumpToString(const semantics::Program& program);
 
 private:
-
     // Resolved Identifiers
     rapidjson::Value dump(const std::unordered_map<const syntax::Node*, const semantics::Usable*>& resolvedIdentifiers);
 
@@ -61,6 +60,8 @@ private:
     rapidjson::Value dump(const semantics::Usable* usable) const;
 
     rapidjson::Value dump(const semantics::ResolvedIdentifiers& identifiers) const;
+
+    rapidjson::Value dump(const semantics::Type& varType) const;
 };
 
 } // namespace coral66::tools

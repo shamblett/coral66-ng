@@ -10,6 +10,8 @@
 
 #include <ranges>
 
+#include "lib/frontend/semantics/semantic_utilities.hpp"
+
 namespace coral66::tools
 {
 
@@ -99,8 +101,7 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             rapidjson::Value obj(rapidjson::kObjectType);
             obj.AddMember("Kind", "VariableDeclaration", m_alloc);
             obj.AddMember("Name", rapidjson::StringRef(variableDeclaration.getName().data()), m_alloc);
-            // Optionally, you can dump type or uses here:
-            // obj.AddMember("Type", dump(varDecl.getType()), m_alloc);
+            obj.AddMember("Type", dump(variableDeclaration.getType()), m_alloc);
             return obj;
         },
         [&](const semantics::ProcedureDeclaration& procedureDeclaration)
@@ -110,17 +111,46 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Name", rapidjson::StringRef(procedureDeclaration.getName().data()), m_alloc);
             return obj;
         },
-        // A generic catch-all for other declarations (ArrayDeclaration, TableDeclaration, etc.)
-        [&]<typename T0>(const T0& otherDeclaration)
+        [&](const semantics::LabelDeclaration& labelDeclaration)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
-            obj.AddMember("Kind", "OtherDeclaration", m_alloc);
-
-            // All Usables currently derive from Declaration, so we can safely extract their name.
-            if constexpr (std::is_base_of_v<semantics::Declaration, std::decay_t<T0>>)
-            {
-                obj.AddMember("Name", rapidjson::StringRef(otherDeclaration.getName().data()), m_alloc);
-            }
+            obj.AddMember("Kind", "LabelDeclaration", m_alloc);
+            obj.AddMember("Name", rapidjson::StringRef(labelDeclaration.getName().data()), m_alloc);
+            return obj;
+        },
+        [&](const semantics::TableElementDeclaration& tableElementDeclaration)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Kind", "TableElementDeclaration", m_alloc);
+            obj.AddMember("Name", rapidjson::StringRef(tableElementDeclaration.getName().data()), m_alloc);
+            return obj;
+        },
+        [&](const semantics::ArrayDeclaration& arrayDeclaration)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Kind", "ArrayDeclaration", m_alloc);
+            obj.AddMember("Name", rapidjson::StringRef(arrayDeclaration.getName().data()), m_alloc);
+            return obj;
+        },
+        [&](const semantics::TableDeclaration& tableDeclaration)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Kind", "TableDeclaration", m_alloc);
+            obj.AddMember("Name", rapidjson::StringRef(tableDeclaration.getName().data()), m_alloc);
+            return obj;
+        },
+        [&](const semantics::OverlayDeclaration& overlayDeclaration)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Kind", "OverlayDeclaration", m_alloc);
+            obj.AddMember("Name", rapidjson::StringRef(overlayDeclaration.getName().data()), m_alloc);
+            return obj;
+        },
+        [&](const semantics::SwitchDeclaration& switchDeclaration)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Kind", "SwitchDeclaration", m_alloc);
+            obj.AddMember("Name", rapidjson::StringRef(switchDeclaration.getName().data()), m_alloc);
             return obj;
         });
 }
@@ -130,5 +160,27 @@ rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& identif
     rapidjson::Value obj(rapidjson::kObjectType);
 
     return obj;
+}
+
+rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
+{
+    return varType.match(
+        [&](const semantics::PrimitiveType& primitiveType)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "PrimitiveType", m_alloc);
+            obj.AddMember("Kind", rapidjson::StringRef(semantics::primitiveTypeKindToString(primitiveType.getKind())),
+                          m_alloc);
+            obj.AddMember("IsLocation", primitiveType.isLocation(), m_alloc);
+            obj.AddMember("IsUndefined", primitiveType.isUndefined(), m_alloc);
+            obj.AddMember("IsValue", primitiveType.isValue(), m_alloc);
+            return obj;
+        },
+        [&](const auto& /*otherType*/)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "UnknownType", m_alloc);
+            return obj;
+        });
 }
 } // namespace coral66::tools
