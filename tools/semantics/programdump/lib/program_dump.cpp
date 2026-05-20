@@ -22,6 +22,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program) const
     // Symbol table
     obj.AddMember("Symbol Table", dump(program.getGlobals()), m_alloc);
 
+    // Resolved identifiers
+    obj.AddMember("Resolved Identifiers", dump(program.getContext().resolvedIdentifiers), m_alloc);
+
     return obj;
 }
 
@@ -122,4 +125,10 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
         });
 }
 
+rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& identifiers) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    return obj;
+}
 } // namespace coral66::tools

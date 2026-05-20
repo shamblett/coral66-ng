@@ -18,7 +18,7 @@ The output is a JSON formatted file comprising the following sections :-
 * The symbol table.
 * Resolved identifiers
 * Expression types
-* Usables(Resolve symbols)
+* Usables(Resolved symbols)
 * Auxiliary types
 * Table information
 * Errors and Diagnostics
