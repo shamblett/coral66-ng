@@ -62,6 +62,12 @@ private:
     rapidjson::Value dump(const semantics::ResolvedIdentifiers& identifiers) const;
 
     rapidjson::Value dump(const semantics::Type& varType) const;
+
+    rapidjson::Value dump(const semantics::TableInfo& info) const;
+
+    rapidjson::Value dump(const semantics::TableDefinition& definition) const;
+
+    rapidjson::Value dump(const semantics::Field& field) const;
 };
 
 } // namespace coral66::tools
