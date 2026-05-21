@@ -176,6 +176,22 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("IsValue", primitiveType.isValue(), m_alloc);
             return obj;
         },
+        [&](const semantics::ArrayType& arrayType)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "ArrayType", m_alloc);
+            obj.AddMember("ElementType", dump(arrayType.getElementType()), m_alloc);
+            rapidjson::Value dimensions(rapidjson::kArrayType);
+            for (const auto& num : arrayType.getDimensions())
+            {
+                dimensions.PushBack(num, m_alloc);
+            }
+            obj.AddMember("Dimensions", dimensions, m_alloc);
+            obj.AddMember("IsLocation", arrayType.isLocation(), m_alloc);
+            obj.AddMember("IsUndefined", arrayType.isUndefined(), m_alloc);
+            obj.AddMember("IsValue", arrayType.isValue(), m_alloc);
+            return obj;
+        },
         [&](const auto& /*otherType*/)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
