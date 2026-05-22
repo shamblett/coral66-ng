@@ -185,6 +185,15 @@ rapidjson::Value ProgramDump::dump(const semantics::TableDefinition& definition)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
+    rapidjson::Value fields(rapidjson::kArrayType);
+    for (const auto& field : definition.getFields() )
+    {
+        fields.PushBack(dump(field), m_alloc);
+    }
+    obj.AddMember("Fields", fields, m_alloc);
+    obj.AddMember("Width", definition.getWidth(), m_alloc);
+    obj.AddMember("Length", definition.getLength(), m_alloc);
+
     return obj;
 }
 rapidjson::Value ProgramDump::dump(const semantics::Field& field) const
