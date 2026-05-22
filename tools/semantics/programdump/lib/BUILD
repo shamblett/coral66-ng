@@ -8,6 +8,7 @@ cc_library(
     name = "programdump",
     srcs = [
         "program_dump.cpp",
+        "program_dump_support.cpp",
     ],
     hdrs = [
         "program_dump.hpp",
