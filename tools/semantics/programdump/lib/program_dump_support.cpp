@@ -152,6 +152,12 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("IsValue", arrayType.isValue(), m_alloc);
             return obj;
         },
+        [&](const semantics::ProcedureType& procedureType)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+
+            return obj;
+        },
         [&](const semantics::TableType& tableType)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
