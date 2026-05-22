@@ -191,6 +191,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Field& field) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
+    obj.AddMember("Name", rapidjson::StringRef(field.name.c_str()), m_alloc);
+    obj.AddMember("Type", dump(*field.type), m_alloc);
+
     return obj;
 }
 
