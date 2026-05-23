@@ -29,31 +29,62 @@ std::string ProgramDump::dumpToString(const semantics::Program& program)
     return "{}";
 }
 
-rapidjson::Value
-    ProgramDump::dump(const std::unordered_map<const syntax::Node*, const semantics::Usable*>& resolvedIdentifiers)
+rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolvedIdentifiers) const
 {
-    return rapidjson::Value(rapidjson::kObjectType);
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    return obj;
 }
 
-rapidjson::Value ProgramDump::dump(
-    std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<semantics::Type>>& expressionTypes)
+rapidjson::Value ProgramDump::dump(const semantics::ExpressionTypes& expressionTypes) const
 {
-    return rapidjson::Value(rapidjson::kObjectType);
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    return obj;
 }
 
-rapidjson::Value ProgramDump::dump(const std::vector<IntrVarPtr<semantics::Usable>>& ownedUsables)
+rapidjson::Value ProgramDump::dump(const semantics::OwnedUsables& usables) const
 {
-    return rapidjson::Value(rapidjson::kObjectType);
+    rapidjson::Value obj(rapidjson::kObjectType);
+    rapidjson::Value symbols(rapidjson::kArrayType);
+
+    for (const auto& usablePtr : usables)
+    {
+        usablePtr->match(
+            [&]<typename T0>(const T0& declaration)
+            {
+                // Ensure we are dealing with a Declaration to safely call getScopeDepth and getName
+                if constexpr (std::is_base_of_v<semantics::Declaration, std::decay_t<T0>>)
+                {
+                    rapidjson::Value symbolObj(rapidjson::kObjectType);
+                    const auto name = declaration.getName();
+                    symbolObj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+                    symbolObj.AddMember("Scope Depth", declaration.getScopeDepth(), m_alloc);
+                    symbols.PushBack(symbolObj, m_alloc);
+                }
+            });
+    }
+
+    obj.AddMember("Symbols", symbols, m_alloc);
+    return obj;
 }
 
-rapidjson::Value ProgramDump::dump(const std::deque<IntrusiveVariantValue<semantics::Type>>& ownedTypes)
+rapidjson::Value ProgramDump::dump(const semantics::OwnedTypes& ownedTypes) const
 {
-    return rapidjson::Value(rapidjson::kObjectType);
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    return obj;
 }
 
-rapidjson::Value ProgramDump::dump(const std::deque<semantics::TableInfo>& ownedTableInfos)
+rapidjson::Value ProgramDump::dump(const semantics::TableInfo& info) const
 {
-    return rapidjson::Value(rapidjson::kObjectType);
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    obj.AddMember("Name", rapidjson::StringRef(info.name.c_str()), m_alloc);
+    obj.AddMember("Size", info.id, m_alloc);
+    obj.AddMember("Definition", dump(std::get<semantics::TableDefinition>(info.type)), m_alloc);
+
+    return obj;
 }
 
 } // namespace coral66::tools

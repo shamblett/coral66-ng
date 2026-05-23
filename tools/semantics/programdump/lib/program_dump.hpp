@@ -39,31 +39,24 @@ public:
 
 private:
     // Resolved Identifiers
-    rapidjson::Value dump(const std::unordered_map<const syntax::Node*, const semantics::Usable*>& resolvedIdentifiers);
+    rapidjson::Value dump(const semantics::ResolvedIdentifiers& resolvedIdentifiers) const;
 
     // Expression types
-    rapidjson::Value
-        dump(std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<semantics::Type>>& expressionTypes);
+    rapidjson::Value dump(const semantics::ExpressionTypes& expressionTypes) const;
 
     // Usables
-    rapidjson::Value dump(const std::vector<IntrVarPtr<semantics::Usable>>& ownedUsables);
+    rapidjson::Value dump(const semantics::OwnedUsables& ownedUsables) const;
 
     // Auxiliary types
-    rapidjson::Value dump(const std::deque<IntrusiveVariantValue<semantics::Type>>& ownedTypes);
+    rapidjson::Value dump(const semantics::OwnedTypes& ownedTypes) const;
 
     // Table Information
-    rapidjson::Value dump(const std::deque<semantics::TableInfo>& ownedTableInfos);
+    rapidjson::Value dump(const semantics::TableInfo& info) const;
 
     // Helpers
-    rapidjson::Value dump(const semantics::OwnedUsables& usables) const;
-
     rapidjson::Value dump(const semantics::Usable* usable) const;
 
-    rapidjson::Value dump(const semantics::ResolvedIdentifiers& identifiers) const;
-
     rapidjson::Value dump(const semantics::Type& varType) const;
-
-    rapidjson::Value dump(const semantics::TableInfo& info) const;
 
     rapidjson::Value dump(const semantics::TableDefinition& definition) const;
 
