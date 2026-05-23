@@ -155,7 +155,13 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
         [&](const semantics::ProcedureType& procedureType)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
-
+            obj.AddMember("ReturnType", dump(*procedureType.getReturnType()), m_alloc);
+            rapidjson::Value parameters(rapidjson::kArrayType);
+            for (const auto& parameter : procedureType.getParameters())
+            {
+                parameters.PushBack(dump(parameter), m_alloc);
+            }
+            obj.AddMember("Parameters", parameters, m_alloc);
             return obj;
         },
         [&](const semantics::TableType& tableType)
@@ -212,4 +218,16 @@ rapidjson::Value ProgramDump::dump(const semantics::Field& field) const
     return obj;
 }
 
+rapidjson::Value ProgramDump::dump(const semantics::ProcedureType::Parameter& parameter) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    obj.AddMember("Type", dump(*parameter.type), m_alloc);
+    const auto name = parameter.name;
+    obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+    obj.AddMember("IsValue", parameter.isValue, m_alloc);
+
+    return obj;
+
+}
 } // namespace coral66::tools
