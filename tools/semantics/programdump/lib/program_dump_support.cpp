@@ -164,6 +164,14 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("Parameters", parameters, m_alloc);
             return obj;
         },
+        [&](const semantics::FixedType& fixedType)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "FixedType", m_alloc);
+            obj.AddMember("TotalBits", fixedType.getTotalBits(), m_alloc);
+            obj.AddMember("FractionalBits", fixedType.getFractionalBits(), m_alloc);
+            return obj;
+        },
         [&](const semantics::TableType& tableType)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
@@ -172,6 +180,13 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("IsLocation", tableType.isLocation(), m_alloc);
             obj.AddMember("IsUndefined", tableType.isUndefined(), m_alloc);
             obj.AddMember("IsValue", tableType.isValue(), m_alloc);
+            return obj;
+        },
+        [&](const semantics::OverlayType& overlayType)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "OverlayType", m_alloc);
+            obj.AddMember("Info", dump(overlayType.getInfo()), m_alloc);
             return obj;
         },
         [&](const auto& /*otherType*/)
@@ -229,5 +244,30 @@ rapidjson::Value ProgramDump::dump(const semantics::ProcedureType::Parameter& pa
 
     return obj;
 
+}
+
+rapidjson::Value ProgramDump::dump(const semantics::OverlayInfo& info) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    obj.AddMember("Name", rapidjson::StringRef(info.name.data(), info.name.size()), m_alloc);
+    obj.AddMember("Size", info.id, m_alloc);
+    obj.AddMember("Type", dump(std::get<semantics::OverlayDefinition>(info.type)), m_alloc);
+
+    return obj;
+}
+
+rapidjson::Value ProgramDump::dump(const semantics::OverlayDefinition& definition) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    rapidjson::Value fields(rapidjson::kArrayType);
+    for (const auto& field : definition.getFields() )
+    {
+        fields.PushBack(dump(field), m_alloc);
+    }
+    obj.AddMember("Fields", fields, m_alloc);
+
+    return obj;
 }
 } // namespace coral66::tools

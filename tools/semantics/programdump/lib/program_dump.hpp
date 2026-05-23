@@ -70,6 +70,10 @@ private:
     rapidjson::Value dump(const semantics::Field& field) const;
 
     rapidjson::Value dump(const semantics::ProcedureType::Parameter& parameter) const;
+
+    rapidjson::Value dump(const semantics::OverlayInfo& info) const;
+
+    rapidjson::Value dump(const semantics::OverlayDefinition& definition) const;
 };
 
 } // namespace coral66::tools

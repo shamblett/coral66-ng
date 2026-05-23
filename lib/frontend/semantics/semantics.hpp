@@ -124,6 +124,8 @@ class OverlayDefinition
 
 public:
     explicit OverlayDefinition(std::vector<Field> fields) : m_fields(std::move(fields)) {}
+
+    [[nodiscard]] std::vector<Field> getFields() const { return m_fields;}
 };
 
 struct OverlayInfo
