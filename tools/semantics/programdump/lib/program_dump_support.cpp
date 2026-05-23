@@ -189,10 +189,28 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("Info", dump(overlayType.getInfo()), m_alloc);
             return obj;
         },
-        [&](const auto& /*otherType*/)
+        [&](const semantics::UntypedType&)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
-            obj.AddMember("Name", "UnknownType", m_alloc);
+            obj.AddMember("Name", "UntypedType", m_alloc);
+            return obj;
+        },
+        [&](const semantics::ErrorType&)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "ErrorType", m_alloc);
+            return obj;
+        },
+        [&](const semantics::LabelType&)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "LabelType", m_alloc);
+            return obj;
+        },
+        [&](const semantics::SwitchType&)
+        {
+            rapidjson::Value obj(rapidjson::kObjectType);
+            obj.AddMember("Name", "SwitchType", m_alloc);
             return obj;
         });
 }
@@ -213,7 +231,7 @@ rapidjson::Value ProgramDump::dump(const semantics::TableDefinition& definition)
     rapidjson::Value obj(rapidjson::kObjectType);
 
     rapidjson::Value fields(rapidjson::kArrayType);
-    for (const auto& field : definition.getFields() )
+    for (const auto& field : definition.getFields())
     {
         fields.PushBack(dump(field), m_alloc);
     }
@@ -243,7 +261,6 @@ rapidjson::Value ProgramDump::dump(const semantics::ProcedureType::Parameter& pa
     obj.AddMember("IsValue", parameter.isValue, m_alloc);
 
     return obj;
-
 }
 
 rapidjson::Value ProgramDump::dump(const semantics::OverlayInfo& info) const
@@ -262,7 +279,7 @@ rapidjson::Value ProgramDump::dump(const semantics::OverlayDefinition& definitio
     rapidjson::Value obj(rapidjson::kObjectType);
 
     rapidjson::Value fields(rapidjson::kArrayType);
-    for (const auto& field : definition.getFields() )
+    for (const auto& field : definition.getFields())
     {
         fields.PushBack(dump(field), m_alloc);
     }
