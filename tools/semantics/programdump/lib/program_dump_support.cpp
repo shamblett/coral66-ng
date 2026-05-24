@@ -38,6 +38,7 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "ProcedureDeclaration", m_alloc);
             const auto name = procedureDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            obj.AddMember("Type", dump(procedureDeclaration.getType()), m_alloc);
             return obj;
         },
         [&](const semantics::LabelDeclaration& labelDeclaration)
@@ -54,6 +55,16 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "TableElementDeclaration", m_alloc);
             const auto name = tableElementDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            obj.AddMember("Type", dump(tableElementDeclaration.getType()), m_alloc);
+            if (const auto bitPos = tableElementDeclaration.getBitPosition())
+            {
+                obj.AddMember("BitPosition", *bitPos, m_alloc);
+            }
+            if (const auto wordPos = tableElementDeclaration.getWordPosition())
+            {
+                obj.AddMember("WordPosition", *wordPos, m_alloc);
+            }
+            obj.AddMember("IsUnsigned", tableElementDeclaration.isUnsigned(), m_alloc);
             return obj;
         },
         [&](const semantics::ArrayDeclaration& arrayDeclaration)
@@ -62,6 +73,7 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "ArrayDeclaration", m_alloc);
             const auto name = arrayDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            obj.AddMember("Type", dump(arrayDeclaration.getType()), m_alloc);
             return obj;
         },
         [&](const semantics::TableDeclaration& tableDeclaration)
@@ -70,6 +82,7 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "TableDeclaration", m_alloc);
             const auto name = tableDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            obj.AddMember("Type", dump(tableDeclaration.getType()), m_alloc);
             return obj;
         },
         [&](const semantics::OverlayDeclaration& overlayDeclaration)
@@ -78,6 +91,7 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "OverlayDeclaration", m_alloc);
             const auto name = overlayDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            obj.AddMember("Type", dump(overlayDeclaration.getType()), m_alloc);
             return obj;
         },
         [&](const semantics::SwitchDeclaration& switchDeclaration)
@@ -86,6 +100,14 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "SwitchDeclaration", m_alloc);
             const auto name = switchDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            obj.AddMember("Type", dump(switchDeclaration.getType()), m_alloc);
+            for (const auto label : switchDeclaration.getLabels())
+            {
+                const auto labelName = label->getName()->getText();
+                obj.AddMember("Name", rapidjson::StringRef(labelName.data(), labelName.size()), m_alloc);
+                obj.AddMember("ScopePoint", label->getScopePoint().getScopeId(), m_alloc);
+                obj.AddMember("TargetScopePoint", label->getTarget()->getScopePoint().getScopeId(), m_alloc);
+            }
             return obj;
         });
 }

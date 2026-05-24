@@ -33,6 +33,14 @@ rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolve
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
+    for (const auto& [node, usable] : resolvedIdentifiers)
+
+    {
+        const auto text = node->begin()->getText();
+        obj.AddMember("NodeText", rapidjson::StringRef(text.data(), text.size()), m_alloc);
+        obj.AddMember("Usable", dump(usable), m_alloc);
+    }
+
     return obj;
 }
 
