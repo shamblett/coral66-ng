@@ -5,14 +5,55 @@
  */
 
 #include "program_dump.hpp"
+#include "lib/support/text.hpp"
 
 namespace coral66::tools
 {
 
+static std::string getTokenString(const lexer::CTokenIterator& token)
+{
+    if (!token)
+    {
+        return "";
+    }
+
+    std::string tokenValueStr;
+    std::visit(
+        [&]<typename T0>(const T0& arg)
+        {
+            using T = std::decay_t<T0>;
+
+            if constexpr (std::is_same_v<T, std::string>)
+            {
+                tokenValueStr = arg;
+            }
+            else if constexpr (std::is_same_v<T, coral66::lexer::NonCharString>)
+            {
+                tokenValueStr = "<NonCharString>";
+            }
+            else if constexpr (std::is_same_v<T, llvm::APSInt>)
+            {
+                tokenValueStr = coral66::to_string(arg);
+            }
+            else if constexpr (std::is_same_v<T, llvm::APFloat>)
+            {
+                tokenValueStr = coral66::to_string(arg);
+            }
+            else if constexpr (std::is_same_v<T, std::monostate>)
+            {
+                tokenValueStr = "";
+            }
+        },
+        token->getValue());
+
+    return tokenValueStr;
+}
+
 // Entry point
 
-rapidjson::Value ProgramDump::dump(const semantics::Program& program) const
+rapidjson::Value ProgramDump::dump(const semantics::Program& program)
 {
+    m_sourceInterface = &program.getSource();
     rapidjson::Value obj(rapidjson::kObjectType);
 
     // Symbol table
@@ -20,6 +61,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program) const
 
     // Resolved identifiers
     obj.AddMember("Resolved Identifiers", dump(program.getContext().resolvedIdentifiers), m_alloc);
+
+    // Expression Types
+    obj.AddMember("Expression Types", dump(program.getContext().expressionTypes), m_alloc);
 
     return obj;
 }
@@ -31,24 +75,68 @@ std::string ProgramDump::dumpToString(const semantics::Program& program)
 
 rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolvedIdentifiers) const
 {
-    rapidjson::Value obj(rapidjson::kObjectType);
+    rapidjson::Value arr(rapidjson::kArrayType);
 
     for (const auto& [node, usable] : resolvedIdentifiers)
-
     {
-        const auto text = node->begin()->getText();
-        obj.AddMember("NodeText", rapidjson::StringRef(text.data(), text.size()), m_alloc);
-        obj.AddMember("Usable", dump(usable), m_alloc);
+        rapidjson::Value item(rapidjson::kObjectType);
+        std::string text = getTokenString(node->begin());
+        item.AddMember("NodeText", rapidjson::Value(text.c_str(), text.size(), m_alloc), m_alloc);
+        
+        if (node->begin() && m_sourceInterface) {
+            rapidjson::Value location(rapidjson::kObjectType);
+            const auto fileId = node->begin()->getFileId();
+            const auto offset = node->begin()->getOffset();
+            if (fileId < m_sourceInterface->getFiles().size()) {
+                const auto line = m_sourceInterface->getLineNumber(fileId, offset);
+                const auto col = offset - m_sourceInterface->getLineStartOffset(fileId, line) + 1;
+                location.AddMember("FileId", fileId, m_alloc);
+                location.AddMember("Line", line, m_alloc);
+                location.AddMember("Column", col, m_alloc);
+            } else {
+                location.AddMember("Offset", offset, m_alloc);
+            }
+            item.AddMember("Location", location, m_alloc);
+        }
+        
+        item.AddMember("Usable", dump(usable), m_alloc);
+        arr.PushBack(item, m_alloc);
     }
 
-    return obj;
+    return arr;
 }
 
 rapidjson::Value ProgramDump::dump(const semantics::ExpressionTypes& expressionTypes) const
 {
-    rapidjson::Value obj(rapidjson::kObjectType);
+    rapidjson::Value arr(rapidjson::kArrayType);
 
-    return obj;
+    for (const auto& [expression, type] : expressionTypes)
+    {
+        rapidjson::Value item(rapidjson::kObjectType);
+        std::string text = getTokenString(expression->begin());
+        item.AddMember("ExpressionText", rapidjson::Value(text.c_str(), text.size(), m_alloc), m_alloc);
+        
+        if (expression->begin() && m_sourceInterface) {
+            rapidjson::Value location(rapidjson::kObjectType);
+            const auto fileId = expression->begin()->getFileId();
+            const auto offset = expression->begin()->getOffset();
+            if (fileId < m_sourceInterface->getFiles().size()) {
+                const auto line = m_sourceInterface->getLineNumber(fileId, offset);
+                const auto col = offset - m_sourceInterface->getLineStartOffset(fileId, line) + 1;
+                location.AddMember("FileId", fileId, m_alloc);
+                location.AddMember("Line", line, m_alloc);
+                location.AddMember("Column", col, m_alloc);
+            } else {
+                location.AddMember("Offset", offset, m_alloc);
+            }
+            item.AddMember("Location", location, m_alloc);
+        }
+        
+        item.AddMember("Type", dump(*type), m_alloc);
+        arr.PushBack(item, m_alloc);
+    }
+
+    return arr;
 }
 
 rapidjson::Value ProgramDump::dump(const semantics::OwnedUsables& usables) const

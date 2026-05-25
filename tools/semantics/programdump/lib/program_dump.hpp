@@ -27,12 +27,13 @@ namespace coral66::tools
 class ProgramDump
 {
     rapidjson::Document::AllocatorType& m_alloc;
+    const source_interface* m_sourceInterface = nullptr;
 
 public:
     explicit ProgramDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
 
     // Main dump method
-    rapidjson::Value dump(const semantics::Program& program) const;
+    rapidjson::Value dump(const semantics::Program& program);
 
     // Dump to a string
     static std::string dumpToString(const semantics::Program& program);
