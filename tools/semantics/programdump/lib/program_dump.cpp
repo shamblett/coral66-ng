@@ -5,6 +5,7 @@
  */
 
 #include "program_dump.hpp"
+
 #include "lib/support/text.hpp"
 
 namespace coral66::tools
@@ -82,23 +83,27 @@ rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolve
         rapidjson::Value item(rapidjson::kObjectType);
         std::string text = getTokenString(node->begin());
         item.AddMember("NodeText", rapidjson::Value(text.c_str(), text.size(), m_alloc), m_alloc);
-        
-        if (node->begin() && m_sourceInterface) {
+
+        if (node->begin() && m_sourceInterface)
+        {
             rapidjson::Value location(rapidjson::kObjectType);
             const auto fileId = node->begin()->getFileId();
             const auto offset = node->begin()->getOffset();
-            if (fileId < m_sourceInterface->getFiles().size()) {
+            if (fileId < m_sourceInterface->getFiles().size())
+            {
                 const auto line = m_sourceInterface->getLineNumber(fileId, offset);
                 const auto col = offset - m_sourceInterface->getLineStartOffset(fileId, line) + 1;
                 location.AddMember("FileId", fileId, m_alloc);
                 location.AddMember("Line", line, m_alloc);
                 location.AddMember("Column", col, m_alloc);
-            } else {
+            }
+            else
+            {
                 location.AddMember("Offset", offset, m_alloc);
             }
             item.AddMember("Location", location, m_alloc);
         }
-        
+
         item.AddMember("Usable", dump(usable), m_alloc);
         arr.PushBack(item, m_alloc);
     }
@@ -115,23 +120,27 @@ rapidjson::Value ProgramDump::dump(const semantics::ExpressionTypes& expressionT
         rapidjson::Value item(rapidjson::kObjectType);
         std::string text = getTokenString(expression->begin());
         item.AddMember("ExpressionText", rapidjson::Value(text.c_str(), text.size(), m_alloc), m_alloc);
-        
-        if (expression->begin() && m_sourceInterface) {
+
+        if (expression->begin() && m_sourceInterface)
+        {
             rapidjson::Value location(rapidjson::kObjectType);
             const auto fileId = expression->begin()->getFileId();
             const auto offset = expression->begin()->getOffset();
-            if (fileId < m_sourceInterface->getFiles().size()) {
+            if (fileId < m_sourceInterface->getFiles().size())
+            {
                 const auto line = m_sourceInterface->getLineNumber(fileId, offset);
                 const auto col = offset - m_sourceInterface->getLineStartOffset(fileId, line) + 1;
                 location.AddMember("FileId", fileId, m_alloc);
                 location.AddMember("Line", line, m_alloc);
                 location.AddMember("Column", col, m_alloc);
-            } else {
+            }
+            else
+            {
                 location.AddMember("Offset", offset, m_alloc);
             }
             item.AddMember("Location", location, m_alloc);
         }
-        
+
         item.AddMember("Type", dump(*type), m_alloc);
         arr.PushBack(item, m_alloc);
     }
