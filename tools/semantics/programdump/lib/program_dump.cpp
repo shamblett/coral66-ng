@@ -66,6 +66,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program)
     // Expression Types
     obj.AddMember("Expression Types", dump(program.getContext().expressionTypes), m_alloc);
 
+    // Auxiliary types
+    obj.AddMember("Auxiliary Types", dump(program.getContext().ownedTypes), m_alloc);
+
     return obj;
 }
 
@@ -177,6 +180,13 @@ rapidjson::Value ProgramDump::dump(const semantics::OwnedUsables& usables) const
 rapidjson::Value ProgramDump::dump(const semantics::OwnedTypes& ownedTypes) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
+
+    rapidjson::Value types(rapidjson::kArrayType);
+    for ( const auto& type : ownedTypes)
+    {
+        types.PushBack(dump(*type), m_alloc);
+    }
+    obj.AddMember("Types", types, m_alloc);
 
     return obj;
 }
