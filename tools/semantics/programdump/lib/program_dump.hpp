@@ -52,7 +52,7 @@ private:
     rapidjson::Value dump(const semantics::OwnedTypes& ownedTypes) const;
 
     // Table Information
-    rapidjson::Value dump(const semantics::TableInfo& info) const;
+    rapidjson::Value dump(const semantics::TableInfos& info) const;
 
     // Helpers
     rapidjson::Value dump(const semantics::Usable* usable) const;
@@ -68,6 +68,8 @@ private:
     rapidjson::Value dump(const semantics::OverlayInfo& info) const;
 
     rapidjson::Value dump(const semantics::OverlayDefinition& definition) const;
+
+    rapidjson::Value dump(const semantics::TableInfo& info) const;
 };
 
 } // namespace coral66::tools

@@ -276,4 +276,16 @@ rapidjson::Value ProgramDump::dump(const semantics::OverlayDefinition& definitio
 
     return obj;
 }
+
+rapidjson::Value ProgramDump::dump(const semantics::TableInfo& info) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    obj.AddMember("Name", rapidjson::StringRef(info.name.c_str()), m_alloc);
+    obj.AddMember("Size", info.id, m_alloc);
+    obj.AddMember("Definition", dump(std::get<semantics::TableDefinition>(info.type)), m_alloc);
+
+    return obj;
+}
+
 } // namespace coral66::tools

@@ -69,6 +69,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program)
     // Auxiliary types
     obj.AddMember("Auxiliary Types", dump(program.getContext().ownedTypes), m_alloc);
 
+    // Table Information
+    obj.AddMember("Table Info", dump(program.getContext().ownedTableInfos), m_alloc);
+
     return obj;
 }
 
@@ -151,12 +154,12 @@ rapidjson::Value ProgramDump::dump(const semantics::ExpressionTypes& expressionT
     return arr;
 }
 
-rapidjson::Value ProgramDump::dump(const semantics::OwnedUsables& usables) const
+rapidjson::Value ProgramDump::dump(const semantics::OwnedUsables& ownedUsables) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
     rapidjson::Value symbols(rapidjson::kArrayType);
 
-    for (const auto& usablePtr : usables)
+    for (const auto& usablePtr : ownedUsables)
     {
         usablePtr->match(
             [&]<typename T0>(const T0& declaration)
@@ -182,7 +185,7 @@ rapidjson::Value ProgramDump::dump(const semantics::OwnedTypes& ownedTypes) cons
     rapidjson::Value obj(rapidjson::kObjectType);
 
     rapidjson::Value types(rapidjson::kArrayType);
-    for ( const auto& type : ownedTypes)
+    for (const auto& type : ownedTypes)
     {
         types.PushBack(dump(*type), m_alloc);
     }
@@ -191,13 +194,16 @@ rapidjson::Value ProgramDump::dump(const semantics::OwnedTypes& ownedTypes) cons
     return obj;
 }
 
-rapidjson::Value ProgramDump::dump(const semantics::TableInfo& info) const
+rapidjson::Value ProgramDump::dump(const semantics::TableInfos& info) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
-    obj.AddMember("Name", rapidjson::StringRef(info.name.c_str()), m_alloc);
-    obj.AddMember("Size", info.id, m_alloc);
-    obj.AddMember("Definition", dump(std::get<semantics::TableDefinition>(info.type)), m_alloc);
+    rapidjson::Value infos(rapidjson::kArrayType);
+    for (const auto& tableInfo : info)
+    {
+        infos.PushBack(dump(tableInfo), m_alloc);
+    }
+    obj.AddMember("Infos", infos, m_alloc);
 
     return obj;
 }
