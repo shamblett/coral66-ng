@@ -72,6 +72,10 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program)
     // Table Information
     obj.AddMember("Table Info", dump(program.getContext().ownedTableInfos), m_alloc);
 
+    // Diagnostics
+    obj.AddMember("Diagnostics", dump(program.getSource().getDiagnostics(), program.getContext().m_errorCount),
+                  m_alloc);
+
     return obj;
 }
 
@@ -204,6 +208,32 @@ rapidjson::Value ProgramDump::dump(const semantics::TableInfos& info) const
         infos.PushBack(dump(tableInfo), m_alloc);
     }
     obj.AddMember("Infos", infos, m_alloc);
+
+    return obj;
+}
+
+rapidjson::Value ProgramDump::dump(const Diagnostics& diagnostics, const int errorCount) const
+{
+    rapidjson::Value obj(rapidjson::kObjectType);
+
+    obj.AddMember("ErrorCount", errorCount, m_alloc);
+    if (!diagnostics.empty())
+    {
+        for (const auto& diagnostic : diagnostics)
+        {
+            const auto name = diagnostic.getName();
+            obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            auto severity = "";
+            switch (diagnostic.getSeverity())
+            {
+                case Severity::Error: severity = "Error"; break;
+                case Severity::Warning: severity = "Warning"; break;
+                case Severity::Note: severity = "Note"; break;
+                case Severity::None: severity = "None"; break;
+            }
+            obj.AddMember("severity", rapidjson::StringRef(severity), m_alloc);
+        }
+    }
 
     return obj;
 }

@@ -99,6 +99,8 @@ public:
 };
 } // namespace detail
 
+typedef std::vector<detail::Diagnostic::DiagnosticBase> Diagnostics;
+
 template <class T>
 class SourceObject final : public detail::SourceObjectStorage<T>
 {
@@ -197,7 +199,7 @@ public:
         return m_files;
     }
 
-    [[nodiscard]] std::vector<detail::Diagnostic::DiagnosticBase> getDiagnostics() const
+    [[nodiscard]] Diagnostics getDiagnostics() const
     {
         return m_diagnostics;
     }

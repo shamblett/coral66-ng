@@ -8,14 +8,11 @@
 
 #include <rapidjson/document.h>
 
+#include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 
-namespace llvm
-{
-class Type;
-}
 namespace coral66::tools
 {
 
@@ -53,6 +50,9 @@ private:
 
     // Table Information
     rapidjson::Value dump(const semantics::TableInfos& info) const;
+
+    // Diagnostics
+    rapidjson::Value dump(const Diagnostics& diagnostics, int errorCount) const;
 
     // Helpers
     rapidjson::Value dump(const semantics::Usable* usable) const;
