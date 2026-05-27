@@ -21,7 +21,7 @@ The output is a JSON formatted file comprising the following sections :-
 * Usables(Resolved symbols)
 * Auxiliary types
 * Table information
-* Errors and Diagnostics
+* Errors and Diagnostics - Only diagnostics collected in semantics are included.
 
 
 The tool uses the [RapidJSON](https://rapidjson.org/) library to generate the JSON output.

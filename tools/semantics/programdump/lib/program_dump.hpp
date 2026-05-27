@@ -30,10 +30,10 @@ public:
     explicit ProgramDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
 
     // Main dump method
-    rapidjson::Value dump(const semantics::Program& program);
+    rapidjson::Value dump(const semantics::Program& program, const std::string& reports);
 
     // Dump to a string
-    static std::string dumpToString(const semantics::Program& program);
+    static std::string dumpToString(const semantics::Program& program, const std::string& reports);
 
 private:
     // Resolved Identifiers
@@ -52,7 +52,7 @@ private:
     rapidjson::Value dump(const semantics::TableInfos& info) const;
 
     // Diagnostics
-    rapidjson::Value dump(const Diagnostics& diagnostics, int errorCount) const;
+    rapidjson::Value dump(const semantics::SemanticContext& context, const std::string& reports) const;
 
     // Helpers
     rapidjson::Value dump(const semantics::Usable* usable) const;

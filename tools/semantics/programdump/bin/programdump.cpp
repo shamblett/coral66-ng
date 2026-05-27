@@ -14,7 +14,6 @@
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
-#include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"
 #include "sysexits.h"
 #include "tools/semantics/programdump/lib/program_dump.hpp"
@@ -75,30 +74,19 @@ int main(const int argc, char** argv)
     coral66::PPSourceObject tokens;
     bool errors = false;
 
+    // Let diagnostics percolate downwards, we output them in the program dump.
     // Lex
     tokens = coral66::lexer::tokenize(source, &ss, &errors);
-    if (errors)
-    {
-        std::cout << "SemanticsProgramDump::Error tokenizing source file " << ss.str() << std::endl;
-        return EX_DATAERR;
-    }
+
     // Preprocess
     auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errors);
 
     // Parse
     auto cTokens = coral66::lexer::toCTokens(std::move(result), &ss, &errors);
-    if (errors)
-    {
-        std::cout << "SemanticsProgramDump::Error tokenizing(C tokens) source file " << ss.str() << std::endl;
-        return EX_DATAERR;
-    }
-    auto tree = coral66::parser::parseProgram(cTokens, &ss, &errors);
-    if (errors)
-    {
-        std::cout << "SemanticsProgramDump::Error parsing source file " << ss.str() << std::endl;
-        return EX_DATAERR;
-    }
 
+    auto tree = coral66::parser::parseProgram(cTokens, &ss, &errors);
+
+    // Analyze
     auto program = coral66::semantics::analyse(tree, std::move(cTokens), &ss, &errors);
 
     // Create the RapidJSON Document
@@ -108,14 +96,14 @@ int main(const int argc, char** argv)
     coral66::tools::ProgramDump dump(doc.GetAllocator());
 
     // Dump the AST into the RapidJSON document root
-    rapidjson::Value root = dump.dump(program);
+    rapidjson::Value root = dump.dump(program, ss.str());
     doc.Swap(root);
 
     // Serialize to string for printing
     rapidjson::StringBuffer buffer;
 
     // Use PrettyWriter instead of Writer for human-readable output
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::PrettyWriter writer(buffer);
     doc.Accept(writer);
 
     // Generate the output file

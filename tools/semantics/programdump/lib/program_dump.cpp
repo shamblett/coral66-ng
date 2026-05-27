@@ -6,6 +6,7 @@
 
 #include "program_dump.hpp"
 
+#include "lib/frontend/semantics/semantic_support.hpp"
 #include "lib/support/text.hpp"
 
 namespace coral66::tools
@@ -52,7 +53,7 @@ static std::string getTokenString(const lexer::CTokenIterator& token)
 
 // Entry point
 
-rapidjson::Value ProgramDump::dump(const semantics::Program& program)
+rapidjson::Value ProgramDump::dump(const semantics::Program& program, const std::string& reports)
 {
     m_sourceInterface = &program.getSource();
     rapidjson::Value obj(rapidjson::kObjectType);
@@ -73,13 +74,12 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program)
     obj.AddMember("Table Info", dump(program.getContext().ownedTableInfos), m_alloc);
 
     // Diagnostics
-    obj.AddMember("Diagnostics", dump(program.getSource().getDiagnostics(), program.getContext().m_errorCount),
-                  m_alloc);
+    obj.AddMember("Diagnostics", dump(program.getContext(), reports), m_alloc);
 
     return obj;
 }
 
-std::string ProgramDump::dumpToString(const semantics::Program& program)
+std::string ProgramDump::dumpToString(const semantics::Program& program, const std::string& reports)
 {
     return "{}";
 }
@@ -212,12 +212,11 @@ rapidjson::Value ProgramDump::dump(const semantics::TableInfos& info) const
     return obj;
 }
 
-rapidjson::Value ProgramDump::dump(const Diagnostics& diagnostics, const int errorCount) const
+rapidjson::Value ProgramDump::dump(const semantics::SemanticContext& context, const std::string& reports) const
 {
     rapidjson::Value obj(rapidjson::kObjectType);
-
-    obj.AddMember("ErrorCount", errorCount, m_alloc);
-    if (!diagnostics.empty())
+    obj.AddMember("ErrorCount", context.m_errorCount, m_alloc);
+    if (const auto diagnostics = semantics::DiagnosticCollector::getDiagnostics(); !diagnostics.empty())
     {
         for (const auto& diagnostic : diagnostics)
         {
@@ -233,6 +232,7 @@ rapidjson::Value ProgramDump::dump(const Diagnostics& diagnostics, const int err
             }
             obj.AddMember("severity", rapidjson::StringRef(severity), m_alloc);
         }
+        obj.AddMember("Reports", rapidjson::StringRef(reports.c_str()), m_alloc);
     }
 
     return obj;
