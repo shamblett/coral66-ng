@@ -103,10 +103,13 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Type", dump(switchDeclaration.getType()), m_alloc);
             for (const auto label : switchDeclaration.getLabels())
             {
-                const auto labelName = label->getName()->getText();
-                obj.AddMember("Name", rapidjson::StringRef(labelName.data(), labelName.size()), m_alloc);
-                obj.AddMember("ScopePoint", label->getScopePoint().getScopeId(), m_alloc);
-                obj.AddMember("TargetScopePoint", label->getTarget()->getScopePoint().getScopeId(), m_alloc);
+                if (label != nullptr)
+                {
+                    const auto labelName = label->getName()->getText();
+                    obj.AddMember("Name", rapidjson::StringRef(labelName.data(), labelName.size()), m_alloc);
+                    obj.AddMember("ScopePoint", label->getScopePoint().getScopeId(), m_alloc);
+                    obj.AddMember("TargetScopePoint", label->getTarget()->getScopePoint().getScopeId(), m_alloc);
+                }
             }
             return obj;
         });
