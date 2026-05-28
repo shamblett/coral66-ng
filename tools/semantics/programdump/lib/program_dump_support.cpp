@@ -124,7 +124,6 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("IsLocation", primitiveType.isLocation(), m_alloc);
             obj.AddMember("IsUndefined", primitiveType.isUndefined(), m_alloc);
             obj.AddMember("IsValue", primitiveType.isValue(), m_alloc);
-            obj.AddMember("Index", primitiveType.index(), m_alloc);
             return obj;
         },
         [&](const semantics::ArrayType& arrayType)
@@ -141,14 +140,15 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("IsLocation", arrayType.isLocation(), m_alloc);
             obj.AddMember("IsUndefined", arrayType.isUndefined(), m_alloc);
             obj.AddMember("IsValue", arrayType.isValue(), m_alloc);
-            obj.AddMember("Index", arrayType.index(), m_alloc);
             return obj;
         },
         [&](const semantics::ProcedureType& procedureType)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
-            obj.AddMember("ReturnType", dump(*procedureType.getReturnType()), m_alloc);
-            obj.AddMember("Index", procedureType.index(), m_alloc);
+            if (procedureType.getReturnType() != nullptr)
+            {
+                obj.AddMember("ReturnType", dump(*procedureType.getReturnType()), m_alloc);
+            }
             rapidjson::Value parameters(rapidjson::kArrayType);
             for (const auto& parameter : procedureType.getParameters())
             {
@@ -163,7 +163,6 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("Name", "FixedType", m_alloc);
             obj.AddMember("TotalBits", fixedType.getTotalBits(), m_alloc);
             obj.AddMember("FractionalBits", fixedType.getFractionalBits(), m_alloc);
-            obj.AddMember("Index", fixedType.index(), m_alloc);
             return obj;
         },
         [&](const semantics::TableType& tableType)
@@ -174,7 +173,6 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             obj.AddMember("IsLocation", tableType.isLocation(), m_alloc);
             obj.AddMember("IsUndefined", tableType.isUndefined(), m_alloc);
             obj.AddMember("IsValue", tableType.isValue(), m_alloc);
-            obj.AddMember("Index", tableType.index(), m_alloc);
             return obj;
         },
         [&](const semantics::OverlayType& overlayType)
@@ -182,35 +180,30 @@ rapidjson::Value ProgramDump::dump(const semantics::Type& varType) const
             rapidjson::Value obj(rapidjson::kObjectType);
             obj.AddMember("Name", "OverlayType", m_alloc);
             obj.AddMember("Info", dump(overlayType.getInfo()), m_alloc);
-            obj.AddMember("Index", overlayType.index(), m_alloc);
             return obj;
         },
-        [&](const semantics::UntypedType& untypedType)
+        [&](const semantics::UntypedType&)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
             obj.AddMember("Name", "UntypedType", m_alloc);
-            obj.AddMember("Index", untypedType.index(), m_alloc);
             return obj;
         },
-        [&](const semantics::ErrorType& errorType)
+        [&](const semantics::ErrorType&)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
             obj.AddMember("Name", "ErrorType", m_alloc);
-            obj.AddMember("Index", errorType.index(), m_alloc);
             return obj;
         },
-        [&](const semantics::LabelType& labelType)
+        [&](const semantics::LabelType&)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
             obj.AddMember("Name", "LabelType", m_alloc);
-            obj.AddMember("Index", labelType.index(), m_alloc);
             return obj;
         },
-        [&](const semantics::SwitchType& switchType)
+        [&](const semantics::SwitchType&)
         {
             rapidjson::Value obj(rapidjson::kObjectType);
             obj.AddMember("Name", "SwitchType", m_alloc);
-            obj.AddMember("Index", switchType.index(), m_alloc);
             return obj;
         });
 }
