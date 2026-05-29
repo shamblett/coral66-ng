@@ -119,7 +119,10 @@ CREATE_ERROR(PROCEDURE_ARGUMENT_COUNT_MISMATCH, "Incorrect number of arguments f
 CREATE_ERROR(PROCEDURE_ARGUMENT_TYPE_MISMATCH, "Argument type mismatch", Underline<0>);
 CREATE_ERROR(LOCATION_PARAMETER_REQUIRES_LVALUE, "LOCATION parameter requires a variable (L-value)", Underline<0>);
 CREATE_ERROR(INVALID_SCALE_FOR_FIXED, "Invalid scale for FIXED point operation", Underline<0>);
-CREATE_ERROR(RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE, "Procedure calls itself but is not declared RECURSIVE", Underline<0>);
+CREATE_ERROR(RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE, "Procedure calls itself but is not declared RECURSIVE",
+             Underline<0>);
+CREATE_ERROR(PRESET_TYPE_MISMATCH, "Preset value type does not match declaration type", Underline<0>);
+CREATE_ERROR(PRESET_FIXED_POINT_OVERFLOW, "Preset value exceeds fixed point scale bounds", Underline<0>);
 } // namespace semantics
 
 namespace CLI

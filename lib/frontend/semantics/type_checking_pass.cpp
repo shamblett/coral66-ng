@@ -1,13 +1,16 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
 
+#include "type_checking_pass.hpp"
+
+#include <cmath>
+
+#include "control_flow_pass.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
-
-#include "type_checking_pass.hpp"
 
 namespace coral66::semantics
 {
@@ -16,7 +19,8 @@ static const Type& resolveExprType(const Type& t)
 {
     if (const auto p = t.tryAs<ProcedureType>())
     {
-        if (p->getReturnType()) return *p->getReturnType();
+        if (p->getReturnType())
+            return *p->getReturnType();
     }
     return t;
 }
@@ -44,8 +48,8 @@ static bool isLValue(const syntax::Expression& expr, const SemanticContext& ctx)
         if (const auto it = ctx.resolvedIdentifiers.find(id); it != ctx.resolvedIdentifiers.end())
         {
             const Usable* usable = it->second;
-            return usable->is<VariableDeclaration>() || usable->is<ArrayDeclaration>() ||
-                   usable->is<TableDeclaration>() || usable->is<TableElementDeclaration>();
+            return usable->is<VariableDeclaration>() || usable->is<ArrayDeclaration>() || usable->is<TableDeclaration>()
+                   || usable->is<TableElementDeclaration>();
         }
         return false;
     }
@@ -121,7 +125,8 @@ void TypeCheckingPass::visit(const syntax::IfStatement& node)
     if (const auto it = m_context.expressionTypes.find(&node.getCondition());
         it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
     {
-        if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+        if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+            !prim || prim->getKind() != PrimitiveType::Integer)
         {
             m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
                                                                         *node.getCondition().begin()));
@@ -143,8 +148,8 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
     {
         if (!isNumericType(*varIt->second))
         {
-            m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
-                *node.getVariable().begin(), m_context.source, *node.getVariable().begin()));
+            m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(*node.getVariable().begin(), m_context.source,
+                                                                        *node.getVariable().begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
         }
     }
@@ -160,8 +165,8 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
             {
                 if (!isNumericType(*itStep->second))
                 {
-                    m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
-                        *step->begin(), m_context.source, *step->begin()));
+                    m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(*step->begin(), m_context.source,
+                                                                                *step->begin()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
                 }
             }
@@ -174,8 +179,8 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
             {
                 if (!isNumericType(*itUntil->second))
                 {
-                    m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(
-                        *until->begin(), m_context.source, *until->begin()));
+                    m_context.log(errors::semantics::EXPECTED_NUMERIC_TYPE.args(*until->begin(), m_context.source,
+                                                                                *until->begin()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_NUMERIC_TYPE);
                 }
             }
@@ -186,7 +191,8 @@ void TypeCheckingPass::visit(const syntax::ForStatement& node)
             if (auto it = m_context.expressionTypes.find(whileCondition.get());
                 it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
             {
-                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                    !prim || prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(
                         *whileCondition->begin(), m_context.source, *whileCondition->begin()));
@@ -229,18 +235,22 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
         if (!lType->is<ErrorType>() && !rType->is<ErrorType>())
         {
             bool mismatch = false;
-            
+
             if (isBitsType(*lType) && isBitsType(*rType))
             {
                 // Match
             }
             else if (isBitsType(*lType) && isNumericType(*rType))
             {
-                if (const auto p = resolveExprType(*rType).tryAs<PrimitiveType>(); !p || p->getKind() == PrimitiveType::Floating) mismatch = true;
+                if (const auto p = resolveExprType(*rType).tryAs<PrimitiveType>();
+                    !p || p->getKind() == PrimitiveType::Floating)
+                    mismatch = true;
             }
             else if (isBitsType(*rType) && isNumericType(*lType))
             {
-                if (const auto p = resolveExprType(*lType).tryAs<PrimitiveType>(); !p || p->getKind() == PrimitiveType::Floating) mismatch = true;
+                if (const auto p = resolveExprType(*lType).tryAs<PrimitiveType>();
+                    !p || p->getKind() == PrimitiveType::Floating)
+                    mismatch = true;
             }
             else if (isBitsType(*lType) || isBitsType(*rType))
             {
@@ -268,7 +278,8 @@ void TypeCheckingPass::visit(const syntax::GotoStatement& node)
         visit(*node.getIndex());
         if (const auto it = m_context.expressionTypes.find(node.getIndex()); it != m_context.expressionTypes.end())
         {
-            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                prim && prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getIndex()->begin(), m_context.source,
                                                                             *node.getIndex()->begin()));
@@ -327,9 +338,19 @@ void TypeCheckingPass::visit(const syntax::Declaration& node)
         visit(*parameterDeclaration);
 }
 
-// ReSharper disable once CppMemberFunctionMayBeConst
-// ReSharper disable once CppMemberFunctionMayBeStatic
-void TypeCheckingPass::visit(const syntax::VariableDeclaration& /*node*/) {}
+void TypeCheckingPass::visit(const syntax::VariableDeclaration& node)
+{
+    if (node.hasPreset())
+    {
+        IntrusiveVariantValue<Type> type{PrimitiveType{PrimitiveType::Integer}};
+        if (node.getType()->getTokenType() == lexer::TokenType::FloatingKeyword)
+            type = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating});
+        else if (node.getType()->getTokenType() == lexer::TokenType::FixedKeyword)
+            type = IntrusiveVariantValue(FixedType(24, 0));
+
+        validatePresets(node.getPresetTokens(), *type, node.getFixedTotalBits(), node.getFixedFractionBits());
+    }
+}
 
 void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
 {
@@ -342,7 +363,8 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
         {
             if (auto it = m_context.expressionTypes.find(expr); it != m_context.expressionTypes.end())
             {
-                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                    prim && prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
                                                                                 *expr->begin()));
@@ -370,29 +392,40 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
                 }
             }
         }
-        
+
         // Count comma separated preset items
         std::uint64_t presetCount = 0;
         bool inPreset = false;
         for (const auto token : node.getPresetTokens())
         {
-             if (token->getTokenType() == lexer::TokenType::Comma)
-             {
-                 if (inPreset) presetCount++;
-                 inPreset = false;
-             }
-             else
-             {
-                 inPreset = true;
-             }
+            if (token->getTokenType() == lexer::TokenType::Comma)
+            {
+                if (inPreset)
+                    presetCount++;
+                inPreset = false;
+            }
+            else
+            {
+                inPreset = true;
+            }
         }
-        if (inPreset) presetCount++;
+        if (inPreset)
+            presetCount++;
 
         if (presetCount > totalElements)
         {
-            m_context.log(errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
+            m_context.log(
+                errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_PRESET_COUNT);
         }
+
+        IntrusiveVariantValue<Type> type{PrimitiveType{PrimitiveType::Integer}};
+        if (node.getType()->getTokenType() == lexer::TokenType::FloatingKeyword)
+            type = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating});
+        else if (node.getType()->getTokenType() == lexer::TokenType::FixedKeyword)
+            type = IntrusiveVariantValue(FixedType(24, 0));
+
+        validatePresets(node.getPresetTokens(), *type, node.getFixedTotalBits(), node.getFixedFractionBits());
     }
 }
 
@@ -405,7 +438,8 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
             visit(*expr);
             if (auto it = m_context.expressionTypes.find(expr); it != m_context.expressionTypes.end())
             {
-                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+                if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                    prim && prim->getKind() != PrimitiveType::Integer)
                 {
                     m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
                                                                                 *expr->begin()));
@@ -435,33 +469,39 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
                     {
                         totalElements = def->getLength();
                         // A table preset list provides one preset per word, so it's length * width
-                        totalElements *= def->getWidth(); 
+                        totalElements *= def->getWidth();
                     }
                 }
             }
         }
-        
+
         std::uint64_t presetCount = 0;
         bool inPreset = false;
         for (const auto token : node.getPresetTokens())
         {
-             if (token->getTokenType() == lexer::TokenType::Comma)
-             {
-                 if (inPreset) presetCount++;
-                 inPreset = false;
-             }
-             else
-             {
-                 inPreset = true;
-             }
+            if (token->getTokenType() == lexer::TokenType::Comma)
+            {
+                if (inPreset)
+                    presetCount++;
+                inPreset = false;
+            }
+            else
+            {
+                inPreset = true;
+            }
         }
-        if (inPreset) presetCount++;
+        if (inPreset)
+            presetCount++;
 
         if (presetCount > totalElements)
         {
-            m_context.log(errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
+            m_context.log(
+                errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_PRESET_COUNT);
         }
+
+        IntrusiveVariantValue<Type> type{PrimitiveType{PrimitiveType::Integer}};
+        validatePresets(node.getPresetTokens(), *type, nullptr, nullptr);
     }
 }
 
@@ -532,7 +572,8 @@ void TypeCheckingPass::visit(const syntax::IdentifierExpression& node)
             {
                 if (!m_currentProcedure->isRecursive())
                 {
-                    m_context.log(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE.args(*node.getIdentifier(), m_context.source, *node.getIdentifier()));
+                    m_context.log(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE.args(
+                        *node.getIdentifier(), m_context.source, *node.getIdentifier()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE);
                 }
             }
@@ -571,12 +612,11 @@ void TypeCheckingPass::visit(const syntax::LiteralExpression& node)
     if (node.getLiteral()->getType() == lexer::CToken::Floating)
         m_context.expressionTypes.insert_or_assign(&node,
                                                    IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating}));
-    else if (node.begin()->getTokenType() == lexer::TokenType::OctalKeyword || node.begin()->getTokenType() == lexer::TokenType::LiteralKeyword)
-        m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
+    else if (node.begin()->getTokenType() == lexer::TokenType::OctalKeyword
+             || node.begin()->getTokenType() == lexer::TokenType::LiteralKeyword)
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
     else
-        m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
@@ -603,12 +643,12 @@ IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, cons
 
         return {PrimitiveType{PrimitiveType::Integer}};
     }
-    
+
     if (isBitsType(t1) && isBitsType(t2))
     {
         return {PrimitiveType{PrimitiveType::Bits}};
     }
-    
+
     return {ErrorType{}};
 }
 
@@ -628,13 +668,16 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
 
         const bool isBitwiseOp = opType == lexer::TokenType::DifferKeyword || opType == lexer::TokenType::UnionKeyword
                                  || opType == lexer::TokenType::MaskKeyword;
-        
+
         bool operandsValid = true;
         if (isBitwiseOp)
         {
-            auto isBitsOrInt = [](const Type& t) {
-                if (isBitsType(t)) return true;
-                if (const auto p = t.tryAs<PrimitiveType>()) return p->getKind() != PrimitiveType::Floating;
+            auto isBitsOrInt = [](const Type& t)
+            {
+                if (isBitsType(t))
+                    return true;
+                if (const auto p = t.tryAs<PrimitiveType>())
+                    return p->getKind() != PrimitiveType::Floating;
                 return true; // Consider FIXED as numeric integer
             };
             if (!isBitsOrInt(*type1) || !isBitsOrInt(*type2))
@@ -651,7 +694,7 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         {
             common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits});
         }
-        
+
         if ((common->is<ErrorType>() || !operandsValid) && !type1->is<ErrorType>() && !type2->is<ErrorType>())
         {
             m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getOp(), m_context.source, *node.getOp()));
@@ -662,13 +705,13 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
             || opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual
             || opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
         {
-            m_context.expressionTypes.insert_or_assign(
-                &node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+            m_context.expressionTypes.insert_or_assign(&node,
+                                                       IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         }
         else if (isBitwiseOp)
         {
-            m_context.expressionTypes.insert_or_assign(
-                &node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
+            m_context.expressionTypes.insert_or_assign(&node,
+                                                       IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
         }
         else
         {
@@ -710,17 +753,17 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
         if (auto it = m_context.expressionTypes.find(expr);
             it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
         {
-            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                !prim || prim->getKind() != PrimitiveType::Integer)
             {
-                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source,
-                                                                            *expr->begin()));
+                m_context.log(
+                    errors::semantics::EXPECTED_INTEGER_TYPE.args(*expr->begin(), m_context.source, *expr->begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
             }
         }
     }
 
-    m_context.expressionTypes.insert_or_assign(&node,
-                                               IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
 }
 
 void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
@@ -729,7 +772,8 @@ void TypeCheckingPass::visit(const syntax::ConditionalExpression& node)
     if (const auto itCond = m_context.expressionTypes.find(&node.getCondition());
         itCond != m_context.expressionTypes.end() && !itCond->second->is<ErrorType>())
     {
-        if (const auto prim = resolveExprType(*itCond->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+        if (const auto prim = resolveExprType(*itCond->second).tryAs<PrimitiveType>();
+            !prim || prim->getKind() != PrimitiveType::Integer)
         {
             m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getCondition().begin(), m_context.source,
                                                                         *node.getCondition().begin()));
@@ -769,7 +813,8 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
             {
                 if (!m_currentProcedure->isRecursive())
                 {
-                    m_context.log(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE.args(*node.getFunction(), m_context.source, *node.getFunction()));
+                    m_context.log(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE.args(
+                        *node.getFunction(), m_context.source, *node.getFunction()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE);
                 }
             }
@@ -790,16 +835,16 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                         auto& param = procType->getParameters()[i];
                         auto& arg = node.getArguments()[i];
 
-                        const bool isPlaceOrProcedure = param.type->is<LabelType>() ||
-                                                  param.type->is<SwitchType>() || 
-                                                  param.type->is<ProcedureType>();
+                        const bool isPlaceOrProcedure = param.type->is<LabelType>() || param.type->is<SwitchType>()
+                                                        || param.type->is<ProcedureType>();
                         if (!param.isValue && !isPlaceOrProcedure)
                         {
                             if (!isLValue(*arg, m_context))
                             {
                                 m_context.log(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE.args(
                                     *arg->begin(), m_context.source, *arg->begin()));
-                                DiagnosticCollector::addDiagnostic(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
+                                DiagnosticCollector::addDiagnostic(
+                                    errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
                             }
                         }
 
@@ -814,7 +859,7 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                             }
                             if (!isCompatible && *param.type == *itArg->second)
                                 isCompatible = true;
-                            
+
                             if (!isCompatible)
                             {
                                 if (auto* paramArr = param.type->tryAs<ArrayType>())
@@ -841,8 +886,8 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                 {
                     if (const auto p = procType->getReturnType()->tryAs<PrimitiveType>())
                     {
-                        m_context.expressionTypes.insert_or_assign(
-                            &node, IntrusiveVariantValue(PrimitiveType{p->getKind()}));
+                        m_context.expressionTypes.insert_or_assign(&node,
+                                                                   IntrusiveVariantValue(PrimitiveType{p->getKind()}));
                     }
                     else
                     {
@@ -878,7 +923,8 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
 
         if (auto it = m_context.expressionTypes.find(idx.get()); it != m_context.expressionTypes.end())
         {
-            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); prim && prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                prim && prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(
                     errors::semantics::EXPECTED_INTEGER_TYPE.args(*idx->begin(), m_context.source, *idx->begin()));
@@ -910,15 +956,14 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
         {
             if (!arrType->getDimensions().empty() && node.getIndices().size() != arrType->getDimensions().size())
             {
-                m_context.log(
-                    errors::semantics::INCORRECT_NUMBER_OF_INDICES.args(*node.begin(), m_context.source, *node.begin()));
+                m_context.log(errors::semantics::INCORRECT_NUMBER_OF_INDICES.args(*node.begin(), m_context.source,
+                                                                                  *node.begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_NUMBER_OF_INDICES);
             }
 
             if (const auto p = arrType->getElementType().tryAs<PrimitiveType>())
             {
-                m_context.expressionTypes.insert_or_assign(
-                    &node, IntrusiveVariantValue(PrimitiveType{p->getKind()}));
+                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{p->getKind()}));
             }
             else
             {
@@ -945,13 +990,11 @@ void TypeCheckingPass::visit(const syntax::LocationExpression& node)
     visit(node.getWordReference());
     if (!isLValue(node.getWordReference(), m_context))
     {
-        m_context.log(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE.args(*node.getWordReference().begin(),
-                                                                                 m_context.source,
-                                                                                 *node.getWordReference().begin()));
+        m_context.log(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE.args(
+            *node.getWordReference().begin(), m_context.source, *node.getWordReference().begin()));
         DiagnosticCollector::addDiagnostic(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
     }
-    m_context.expressionTypes.insert_or_assign(&node,
-                                               IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
 }
 
 void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
@@ -962,10 +1005,11 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
         if (const auto it = m_context.expressionTypes.find(node.getTotalBits());
             it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
         {
-            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                !prim || prim->getKind() != PrimitiveType::Integer)
             {
-                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getTotalBits()->begin(), m_context.source,
-                                                                            *node.getTotalBits()->begin()));
+                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(
+                    *node.getTotalBits()->begin(), m_context.source, *node.getTotalBits()->begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
             }
         }
@@ -976,10 +1020,11 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
         if (const auto it = m_context.expressionTypes.find(node.getFractionBits());
             it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
         {
-            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>(); !prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                !prim || prim->getKind() != PrimitiveType::Integer)
             {
-                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(*node.getFractionBits()->begin(), m_context.source,
-                                                                            *node.getFractionBits()->begin()));
+                m_context.log(errors::semantics::EXPECTED_INTEGER_TYPE.args(
+                    *node.getFractionBits()->begin(), m_context.source, *node.getFractionBits()->begin()));
                 DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_INTEGER_TYPE);
             }
         }
@@ -999,8 +1044,7 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
 
     if (const auto kind = node.getType()->getTokenType(); kind == lexer::TokenType::IntegerKeyword)
     {
-        m_context.expressionTypes.insert_or_assign(&node,
-                                                   IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
     }
     else if (kind == lexer::TokenType::FloatingKeyword)
     {
@@ -1014,6 +1058,98 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
     else
     {
         m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));
+    }
+}
+
+void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>& tokens, const Type& baseType,
+                                       const syntax::Expression* fixedTotal, const syntax::Expression* fixedFraction)
+{
+    bool isFixed = baseType.is<FixedType>();
+    bool isInteger = false;
+    bool isFloating = false;
+
+    if (const auto* pType = baseType.tryAs<PrimitiveType>())
+    {
+        isInteger = (pType->getKind() == PrimitiveType::Integer);
+        isFloating = (pType->getKind() == PrimitiveType::Floating);
+    }
+
+    if (!isFixed && !isInteger && !isFloating)
+        return;
+
+    std::optional<std::int64_t> totalBits;
+    std::optional<std::int64_t> fractionBits;
+    if (fixedTotal)
+        totalBits = evaluateConstantInteger(*fixedTotal);
+    if (fixedFraction)
+        fractionBits = evaluateConstantInteger(*fixedFraction);
+
+    bool isNegative = false;
+    for (const auto& token : tokens)
+    {
+        if (token->getTokenType() == lexer::TokenType::Minus)
+        {
+            isNegative = !isNegative;
+            continue;
+        }
+        if (token->getTokenType() == lexer::TokenType::Plus || token->getTokenType() == lexer::TokenType::Comma
+            || token->getTokenType() == lexer::TokenType::OpenParentheses
+            || token->getTokenType() == lexer::TokenType::CloseParentheses)
+        {
+            isNegative = false;
+            continue;
+        }
+
+        if (token->getTokenType() == lexer::TokenType::StringLiteral)
+        {
+            if (isInteger || isFixed || isFloating)
+            {
+                m_context.log(errors::semantics::PRESET_TYPE_MISMATCH.args(*token, m_context.source, *token));
+                DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_TYPE_MISMATCH);
+            }
+            isNegative = false;
+            continue;
+        }
+
+        if (token->getTokenType() == lexer::TokenType::Literal
+            || token->getTokenType() == lexer::TokenType::OctalKeyword)
+        {
+            auto tokenType = token->getType();
+            if (isInteger)
+            {
+                if (tokenType == lexer::CToken::Floating)
+                {
+                    m_context.log(errors::semantics::PRESET_TYPE_MISMATCH.args(*token, m_context.source, *token));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_TYPE_MISMATCH);
+                }
+            }
+            else if (isFixed)
+            {
+                if (totalBits && fractionBits)
+                {
+                    double val = 0.0;
+                    if (auto* intVal = std::get_if<llvm::APSInt>(&token->getValue()))
+                        val = static_cast<double>(intVal->getExtValue());
+                    else if (auto* floatVal = std::get_if<llvm::APFloat>(&token->getValue()))
+                        val = floatVal->convertToDouble();
+
+                    if (isNegative)
+                        val = -val;
+
+                    double maxVal = std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1))
+                                    - std::pow(2.0, static_cast<double>(-*fractionBits));
+                    double minVal = -std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1));
+
+                    if (val > maxVal || val < minVal)
+                    {
+                        m_context.log(
+                            errors::semantics::PRESET_FIXED_POINT_OVERFLOW.args(*token, m_context.source, *token));
+                        DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_FIXED_POINT_OVERFLOW);
+                    }
+                }
+            }
+            isNegative = false;
+        }
     }
 }
 

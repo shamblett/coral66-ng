@@ -316,7 +316,8 @@ TEST_CASE("Type Checking - ANSWER Statement", "[Semantics][TypeChecking]")
 
     SECTION("Valid Answer in Typed Procedure With Assignment")
     {
-        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER a; INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; a := P; END");
+        ParsedProgram const parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER a; INTEGER PROCEDURE P ; BEGIN ANSWER 1 END ; a := P; END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -569,5 +570,28 @@ TEST_CASE("Type Checking - Recursive Validations", "[Semantics][TypeCheck]")
         ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN RECURSIVE PROCEDURE P ; BEGIN P ; END ; END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE"));
+    }
+
+    SECTION("Preset Type Constraints - Integer")
+    {
+        const std::string source = R"(
+        INTEGER i := 1.5;
+        INTEGER ARRAY arr[1:2] := 1, "test";
+        )";
+
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN " + source + " END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("PRESET_TYPE_MISMATCH"));
+    }
+
+    SECTION("Preset Type Constraints - Fixed point overflow")
+    {
+        const std::string source = R"(
+        FIXED(10, 5) f := 100.0; 
+        )";
+
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN " + source + " END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("PRESET_FIXED_POINT_OVERFLOW"));
     }
 }
