@@ -94,16 +94,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N);
         return {{}, nullptr};
     }
-    if (defineDirective.tokens[0].getTokenType() == lexer::TokenType::Identifier)
-    {
-        if (lexer::isKeyword(defineDirective.tokens[0].getValue()))
-        {
-            log(errors::pp::KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER.args(
-                defineDirective.tokens[0], *this, lexer::TokenType::Identifier, defineDirective.tokens[0]));
-            preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER);
-            return {{}, nullptr};
-        }
-    }
+    
     const auto* identifierPos = &defineDirective.tokens[0];
     const auto* curr = identifierPos + 1;
     const auto* end = defineDirective.tokens.data() + defineDirective.tokens.size();

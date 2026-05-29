@@ -52,14 +52,6 @@ TEST_CASE("Preprocess - Errors", "[PP]")
         CHECK(result.findDiagnostic(PP_EXPECTED_N_INSTEAD_OF_N));
     }
 
-    SECTION("Keyword Cannot Be A Macro Identifier")
-    {
-        bool errors = false;
-        auto result = preprocess("DEFINE BEGIN \"1\";", errors);
-        CHECK(errors);
-        CHECK(result.findDiagnostic(KEYWORD_CANNOT_BE_A_MACRO_IDENTIFIER));
-    }
-
     SECTION("Whitespace Required After Object Macro Definition")
     {
         bool errors = false;
