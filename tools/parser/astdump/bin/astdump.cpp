@@ -111,7 +111,7 @@ int main(const int argc, char** argv)
     rapidjson::StringBuffer buffer;
 
     // Use PrettyWriter instead of Writer for human-readable output
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::PrettyWriter writer(buffer);
     doc.Accept(writer);
 
     // Generate the output file

@@ -29,7 +29,7 @@ static std::string getTokenString(const lexer::CTokenIterator& token)
             {
                 tokenValueStr = arg;
             }
-            else if constexpr (std::is_same_v<T, coral66::lexer::NonCharString>)
+            else if constexpr (std::is_same_v<T, lexer::NonCharString>)
             {
                 tokenValueStr = "<NonCharString>";
             }

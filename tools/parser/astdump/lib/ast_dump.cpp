@@ -70,7 +70,7 @@ std::string AstDump::dumpToString(const syntax::Program& program)
     rapidjson::StringBuffer buffer;
 
     // Use PrettyWriter instead of Writer for human-readable output
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::PrettyWriter writer(buffer);
     doc.Accept(writer);
 
     return buffer.GetString();
@@ -181,7 +181,7 @@ rapidjson::Value AstDump::getTokenString(const lexer::CTokenIterator& token)
                 // Usually identifiers or string literals
                 tokenValueStr = arg;
             }
-            else if constexpr (std::is_same_v<T, coral66::lexer::NonCharString>)
+            else if constexpr (std::is_same_v<T, lexer::NonCharString>)
             {
                 // Specialized internal string representation
                 tokenValueStr = "<NonCharString>";

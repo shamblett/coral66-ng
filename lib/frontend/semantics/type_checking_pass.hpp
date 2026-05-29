@@ -68,7 +68,7 @@ private:
     // Helper functions
     IntrusiveVariantValue<Type> getCommonType(const Type& t1, const Type& t2) const;
     void validatePresets(const std::vector<lexer::CTokenIterator>& tokens, const Type& baseType,
-                         const syntax::Expression* fixedTotal, const syntax::Expression* fixedFraction);
+                         const syntax::Expression* fixedTotal, const syntax::Expression* fixedFraction) const;
 };
 
 } // namespace coral66::semantics

@@ -342,7 +342,7 @@ void TypeCheckingPass::visit(const syntax::VariableDeclaration& node)
 {
     if (node.hasPreset())
     {
-        IntrusiveVariantValue<Type> type{PrimitiveType{PrimitiveType::Integer}};
+        IntrusiveVariantValue type{PrimitiveType{PrimitiveType::Integer}};
         if (node.getType()->getTokenType() == lexer::TokenType::FloatingKeyword)
             type = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating});
         else if (node.getType()->getTokenType() == lexer::TokenType::FixedKeyword)
@@ -419,7 +419,7 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
             DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_PRESET_COUNT);
         }
 
-        IntrusiveVariantValue<Type> type{PrimitiveType{PrimitiveType::Integer}};
+        IntrusiveVariantValue type{PrimitiveType{PrimitiveType::Integer}};
         if (node.getType()->getTokenType() == lexer::TokenType::FloatingKeyword)
             type = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating});
         else if (node.getType()->getTokenType() == lexer::TokenType::FixedKeyword)
@@ -500,7 +500,7 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
             DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_PRESET_COUNT);
         }
 
-        IntrusiveVariantValue<Type> type{PrimitiveType{PrimitiveType::Integer}};
+        IntrusiveVariantValue type{PrimitiveType{PrimitiveType::Integer}};
         validatePresets(node.getPresetTokens(), *type, nullptr, nullptr);
     }
 }
@@ -1062,16 +1062,16 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
 }
 
 void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>& tokens, const Type& baseType,
-                                       const syntax::Expression* fixedTotal, const syntax::Expression* fixedFraction)
+                                       const syntax::Expression* fixedTotal, const syntax::Expression* fixedFraction) const
 {
-    bool isFixed = baseType.is<FixedType>();
+    const bool isFixed = baseType.is<FixedType>();
     bool isInteger = false;
     bool isFloating = false;
 
     if (const auto* pType = baseType.tryAs<PrimitiveType>())
     {
-        isInteger = (pType->getKind() == PrimitiveType::Integer);
-        isFloating = (pType->getKind() == PrimitiveType::Floating);
+        isInteger = pType->getKind() == PrimitiveType::Integer;
+        isFloating = pType->getKind() == PrimitiveType::Floating;
     }
 
     if (!isFixed && !isInteger && !isFloating)
@@ -1114,7 +1114,7 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
         if (token->getTokenType() == lexer::TokenType::Literal
             || token->getTokenType() == lexer::TokenType::OctalKeyword)
         {
-            auto tokenType = token->getType();
+            const auto tokenType = token->getType();
             if (isInteger)
             {
                 if (tokenType == lexer::CToken::Floating)
@@ -1136,11 +1136,11 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
                     if (isNegative)
                         val = -val;
 
-                    double maxVal = std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1))
+                    const double maxVal = std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1))
                                     - std::pow(2.0, static_cast<double>(-*fractionBits));
-                    double minVal = -std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1));
 
-                    if (val > maxVal || val < minVal)
+                    if (double minVal = -std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1));
+                        val > maxVal || val < minVal)
                     {
                         m_context.log(
                             errors::semantics::PRESET_FIXED_POINT_OVERFLOW.args(*token, m_context.source, *token));
