@@ -6,6 +6,9 @@
 
 #include "program_dump.hpp"
 
+#include <rapidjson/prettywriter.h>
+#include <rapidjson/stringbuffer.h>
+
 #include "lib/frontend/semantics/semantic_support.hpp"
 #include "lib/support/text.hpp"
 
@@ -81,7 +84,24 @@ rapidjson::Value ProgramDump::dump(const semantics::Program& program, const std:
 
 std::string ProgramDump::dumpToString(const semantics::Program& program, const std::string& reports)
 {
-    return "{}";
+    // Create the RapidJSON Document
+    rapidjson::Document doc;
+    doc.SetObject();
+
+    // Instantiate our dumper, providing the document's allocator
+    ProgramDump dump(doc.GetAllocator());
+
+    // Dump the program into the RapidJSON document root
+    rapidjson::Value root = dump.dump(program, reports);
+    doc.Swap(root);
+
+    rapidjson::StringBuffer buffer;
+
+    // Use PrettyWriter instead of Writer for human-readable output
+    rapidjson::PrettyWriter writer(buffer);
+    doc.Accept(writer);
+
+    return buffer.GetString();
 }
 
 rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolvedIdentifiers) const
