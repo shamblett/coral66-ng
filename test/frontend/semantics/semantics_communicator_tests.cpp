@@ -4,11 +4,11 @@
  * Date   : 02/05/2026
  */
 
-#include "test/frontend/common/common.hpp"
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/symbol_resolution_pass.hpp"
 #include "test/common/test_config.hpp"
+#include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
@@ -41,7 +41,7 @@ inline const Usable* findDeclaration(const SemanticContext& ctx, const std::stri
             return u.get();
         if (u->is<semantics::ArrayDeclaration>() && u->as<semantics::ArrayDeclaration>().getName() == name)
             return u.get();
-        if (u->is<semantics::LabelDeclaration>() && u->as<semantics::LabelDeclaration>().getName() == name)
+        if (u->is<LabelDeclaration>() && u->as<LabelDeclaration>().getName() == name)
             return u.get();
     }
     return nullptr;
@@ -62,7 +62,8 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
 
     SECTION("Procedure Specification in Common")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON(INTEGER PROCEDURE P(VALUE INTEGER)) BEGIN INTEGER I ; I := P(10) END");
+        ParsedProgram parsed(
+            "PROGRAM TEST COMMON(INTEGER PROCEDURE P(VALUE INTEGER)) BEGIN INTEGER I ; I := P(10) END");
         SymbolResolutionResult res(parsed);
 
         auto pDecl = findDeclaration(res.context, "P");
@@ -107,4 +108,3 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         CHECK(foundRedef);
     }
 }
-

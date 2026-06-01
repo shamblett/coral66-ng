@@ -349,6 +349,7 @@ void TypeCheckingPass::visit(const syntax::Declaration& node)
         visit(*parameterDeclaration);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void TypeCheckingPass::visit(const syntax::VariableDeclaration& node)
 {
     if (node.hasPreset())
@@ -1150,7 +1151,7 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
                     const double maxVal = std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1))
                                     - std::pow(2.0, static_cast<double>(-*fractionBits));
 
-                    if (double minVal = -std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1));
+                    if (const double minVal = -std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1));
                         val > maxVal || val < minVal)
                     {
                         m_context.log(

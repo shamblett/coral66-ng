@@ -690,7 +690,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
         }
     }
 
-    auto type = ProcedureType{returnTypePtr, std::move(parameters)};
+    const auto type = ProcedureType{returnTypePtr, std::move(parameters)};
     auto typeCopy = IntrusiveVariantValue(type);
 
     auto declaration = makeIntrusiveVariant<ProcedureDeclaration>(id, std::move(typeCopy));
@@ -711,6 +711,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
     m_context.ownedUsables.push_back(std::move(declaration));
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void SymbolResolutionPass::visit(const syntax::PlaceSpecification& node)
 {
     for (auto id : node.getIdentifiers())

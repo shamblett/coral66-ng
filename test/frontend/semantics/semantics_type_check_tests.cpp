@@ -155,10 +155,10 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
         std::vector<ProcedureType::Parameter> params;
         params.push_back({&intType, "X", false});
 
-        auto procType = IntrusiveVariantValue<Type>(ProcedureType{nullptr, std::move(params)});
+        auto procType = IntrusiveVariantValue(ProcedureType{nullptr, std::move(params)});
 
         auto it = parsed.cTokens.data().begin();
-        auto nameToken = &(*it);
+        auto nameToken = &*it;
 
         auto pDeclaration = IntrVarPtr<Usable>(new semantics::ProcedureDeclaration(nameToken, std::move(procType)));
 
@@ -170,7 +170,7 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
             {
                 if (auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get()))
                 {
-                    if (auto callExpr = dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression()))
+                    if (auto callExpr = dynamic_cast<const FunctionCallExpression*>(&callStmt->getExpression()))
                     {
                         res.context.resolvedIdentifiers[callExpr] = pDeclaration.get();
                     }
@@ -262,10 +262,10 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
         std::vector<ProcedureType::Parameter> params;
         params.push_back({&intType, "X", true}); // isValue = true
 
-        auto procType = IntrusiveVariantValue<Type>(ProcedureType{nullptr, std::move(params)});
+        auto procType = IntrusiveVariantValue(ProcedureType{nullptr, std::move(params)});
 
         const auto it = parsed.cTokens.data().begin();
-        const auto nameToken = &(*it);
+        const auto nameToken = &*it;
 
         auto pDeclaration = IntrVarPtr<Usable>(new semantics::ProcedureDeclaration(nameToken, std::move(procType)));
 
@@ -277,8 +277,7 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
             {
                 if (const auto callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(stmt.get()))
                 {
-                    if (const auto callExpr =
-                            dynamic_cast<const syntax::FunctionCallExpression*>(&callStmt->getExpression()))
+                    if (const auto callExpr = dynamic_cast<const FunctionCallExpression*>(&callStmt->getExpression()))
                     {
                         res.context.resolvedIdentifiers[callExpr] = pDeclaration.get();
                     }

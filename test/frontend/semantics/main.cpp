@@ -9,7 +9,7 @@
 
 int main(const int argc, char* argv[])
 {
-    auto enable = coral66::Tests::enableParallelization();
+    auto enable = enableParallelization();
 
     Catch::Session session; // There must be exactly one instance
     // writing to session.configData() here sets defaults
