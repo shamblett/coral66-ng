@@ -35,6 +35,18 @@ void SymbolResolutionPass::run(const syntax::Program& program)
 void SymbolResolutionPass::visit(const syntax::Program& node)
 {
     m_context.symbolTable.enterScope();
+
+    if (const auto* communicator = node.getCommunicator())
+    {
+        if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(communicator))
+        {
+            for (const auto& item : commonCommunicator->getItems())
+            {
+                visit(*item);
+            }
+        }
+    }
+
     if (node.hasBlock())
     {
         visit(node.getBlock());
@@ -250,6 +262,10 @@ void SymbolResolutionPass::visit(const syntax::Declaration& node)
         visit(*variableDeclaration);
     else if (auto* procedureDeclaration = dynamic_cast<const syntax::ProcedureDeclaration*>(&node))
         visit(*procedureDeclaration);
+    else if (auto* procedureSpecification = dynamic_cast<const syntax::ProcedureSpecification*>(&node))
+        visit(*procedureSpecification);
+    else if (auto* placeSpecification = dynamic_cast<const syntax::PlaceSpecification*>(&node))
+        visit(*placeSpecification);
     else if (auto* arrayDeclaration = dynamic_cast<const syntax::ArrayDeclaration*>(&node))
         visit(*arrayDeclaration);
     else if (auto* tableDeclaration = dynamic_cast<const syntax::TableDeclaration*>(&node))
@@ -618,6 +634,103 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
     m_context.symbolTable.exitScope();
 
     m_context.ownedUsables.push_back(std::move(declaration));
+}
+
+void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
+{
+    auto id = node.getName();
+
+    auto returnTypeVal = createTypeFromToken(node.getType());
+    m_context.ownedTypes.push_back(std::move(returnTypeVal));
+    const Type* returnTypePtr = node.getType() ? m_context.ownedTypes.back().data() : nullptr;
+
+    std::vector<ProcedureType::Parameter> parameters;
+    for (const auto& paramDeclarationNode : node.getParameters())
+    {
+        if (auto* paramNode = dynamic_cast<const syntax::ParameterDeclaration*>(paramDeclarationNode.get()))
+        {
+            auto baseTypeVal = createTypeFromToken(paramNode->getType(), paramNode->getFixedTotalBits(),
+                                                   paramNode->getFixedFractionBits());
+
+            IntrusiveVariantValue paramTypeVal{UntypedType{}};
+
+            bool isValue = false;
+            switch (paramNode->getMode())
+            {
+                case syntax::ParameterDeclaration::ParameterMode::Value:
+                    paramTypeVal = std::move(baseTypeVal);
+                    isValue = true;
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Location:
+                    paramTypeVal = std::move(baseTypeVal);
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Array:
+                    m_context.ownedTypes.push_back(std::move(baseTypeVal));
+                    paramTypeVal = IntrusiveVariantValue(ArrayType{m_context.ownedTypes.back().data(), {}});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::UntypedValue:
+                    paramTypeVal = std::move(baseTypeVal);
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::UntypedLocation:
+                    paramTypeVal = IntrusiveVariantValue(UntypedType{});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Label:
+                    paramTypeVal = IntrusiveVariantValue(LabelType{});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Switch:
+                    paramTypeVal = IntrusiveVariantValue(SwitchType{});
+                    break;
+                case syntax::ParameterDeclaration::ParameterMode::Procedure:
+                    paramTypeVal = IntrusiveVariantValue(ProcedureType{nullptr, {}});
+                    break;
+            }
+
+            m_context.ownedTypes.push_back(std::move(paramTypeVal));
+            parameters.push_back({m_context.ownedTypes.back().data(), "", isValue});
+        }
+    }
+
+    auto type = ProcedureType{returnTypePtr, std::move(parameters)};
+    auto typeCopy = IntrusiveVariantValue(type);
+
+    auto declaration = makeIntrusiveVariant<ProcedureDeclaration>(id, std::move(typeCopy));
+    declaration->setAstNode(&node);
+    const auto& name = std::get<std::string>(id->getValue());
+
+    if (m_context.symbolTable.lookupInCurrentScope(name))
+    {
+        m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
+        DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+    }
+    else
+    {
+        declaration->setScopeDepth(m_context.symbolTable.scopeCount());
+        m_context.symbolTable.insert(name, declaration.get());
+    }
+
+    m_context.ownedUsables.push_back(std::move(declaration));
+}
+
+void SymbolResolutionPass::visit(const syntax::PlaceSpecification& node)
+{
+    for (auto id : node.getIdentifiers())
+    {
+        auto declaration = makeIntrusiveVariant<LabelDeclaration>(id);
+        declaration->setAstNode(&node);
+        const auto& name = std::get<std::string>(id->getValue());
+
+        if (m_context.symbolTable.lookupInCurrentScope(name))
+        {
+            m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*id, m_context.source, *id));
+            DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+        }
+        else
+        {
+            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
+            m_context.symbolTable.insert(name, declaration.get());
+        }
+        m_context.ownedUsables.push_back(std::move(declaration));
+    }
 }
 
 void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)

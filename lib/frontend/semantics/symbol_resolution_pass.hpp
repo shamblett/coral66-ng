@@ -46,6 +46,8 @@ private:
     void visit(const syntax::Declaration& node);
     void visit(const syntax::VariableDeclaration& node);
     void visit(const syntax::ProcedureDeclaration& node);
+    void visit(const syntax::ProcedureSpecification& node);
+    void visit(const syntax::PlaceSpecification& node);
     void visit(const syntax::ArrayDeclaration& node);
     void visit(const syntax::TableDeclaration& node);
     void visit(const syntax::TableElementDeclaration& node);

@@ -41,7 +41,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -62,7 +62,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -83,7 +83,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -104,7 +104,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -125,7 +125,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -146,7 +146,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -167,7 +167,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -188,8 +188,8 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        //TODO awaiting common communicator CHECK(ss.str().empty());
-        //TODO awaiting common communicator CHECK(diagnostics.empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
+        CHECK(diagnostics.empty());
     }
 
     SECTION("G9")
@@ -209,7 +209,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 
@@ -230,7 +230,7 @@ TEST_CASE("Generated", "[Semantics][Generated]")
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
-        CHECK(ss.str().empty());
+        if (!ss.str().empty()) { std::cout << ss.str() << std::endl; } CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
     }
 }
