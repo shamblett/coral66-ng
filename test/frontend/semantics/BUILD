@@ -27,9 +27,10 @@ cc_library(
         "semantics_communicator_tests.cpp",
         "semantics_control_flow_tests.cpp",
         "semantics_generated_tests.cpp",
+        "semantics_golden_tests.cpp",
         "semantics_symbol_resolution_tests.cpp",
+        "semantics_symbol_table_tests.cpp",
         "semantics_type_check_tests.cpp",
-        "symbol_table_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
@@ -40,6 +41,7 @@ cc_library(
         "//test/common",
         "//test/frontend/common",
         "//test/vendor/catch2v3",
+        "//tools/semantics/programdump/lib:programdump",
     ],
 )
 

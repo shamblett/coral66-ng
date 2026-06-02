@@ -46,17 +46,10 @@ TEST_CASE("Examples", "[Semantics][Golden]")
         CHECK(sourceProgram == prog);
     }
 
-    SECTION("Sieve")
-    {
-
-    }
+    SECTION("Sieve") {}
 }
 
 TEST_CASE("Generated", "[Parser][Golden]")
 {
-    SECTION("G1")
-    {
-
-    }
-
+    SECTION("G1") {}
 }
