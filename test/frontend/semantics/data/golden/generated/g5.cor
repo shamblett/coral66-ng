@@ -1,0 +1,20 @@
+PROGRAM G5
+
+DEFINE myMacro " 10 " ;
+
+COMMON (
+  INTEGER ARRAY statusFlags [ 0 : 5 ]
+)
+
+BEGIN
+  INTEGER status;
+
+  COMMENT Code block usage ;
+  CODE BEGIN " This is arbitrary code logic " END;
+  
+  status := myMacro;
+
+  COMMENT Preprocessor DELETE ;
+  DELETE myMacro ;
+
+END end of program ;

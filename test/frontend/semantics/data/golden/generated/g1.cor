@@ -1,0 +1,42 @@
+PROGRAM G1
+
+COMMON (
+)
+
+BEGIN
+  INTEGER ARRAY commonArray [ 1 : 10 ];
+  FLOATING commonFloat;
+  INTEGER myInt, otherInt;
+  FLOATING myFloat;
+  FIXED ( 16, 8 ) myFixed;
+  INTEGER myBits;
+
+  COMMENT This is a single line comment;
+  
+  PROCEDURE myProc ( VALUE INTEGER a ; LOCATION FLOATING b );
+  BEGIN
+    INTEGER procLocal;
+    procLocal := a + 10;
+    b := b + 1.5
+  END;
+
+  myInt := 5;
+  otherInt := 10;
+  
+  myFloat := 3.14159;
+  myFixed := 2.71;
+  myBits := OCTAL ( 1234 );
+
+  myProc ( myInt, myFloat );
+
+  myInt := IF myInt = otherInt THEN 0 ELSE otherInt / 2;
+  
+  COMMENT This is a
+          multi-line
+          comment;
+  
+  errorLabel:
+    commonArray [ 1 ] := myInt;
+    commonFloat := myFloat
+
+END end of program ;

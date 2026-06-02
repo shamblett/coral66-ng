@@ -15,13 +15,18 @@ filegroup(
     srcs = ["data/generated"],
 )
 
+filegroup(
+    name = "golden_dir",
+    srcs = ["data/golden"],
+)
+
 cc_library(
     name = "semanticstest",
     srcs = [
         "semantics_benchmark_tests.cpp",
+        "semantics_communicator_tests.cpp",
         "semantics_control_flow_tests.cpp",
         "semantics_generated_tests.cpp",
-        "semantics_communicator_tests.cpp",
         "semantics_symbol_resolution_tests.cpp",
         "semantics_type_check_tests.cpp",
         "symbol_table_tests.cpp",
@@ -46,10 +51,12 @@ cc_test(
     data = [
         ":benchmark_dir",
         ":generated_dir",
+        ":golden_dir",
     ],
     env = {
         "BENCHMARK_DIR": "$(rootpath :benchmark_dir)",
         "GENERATED_DIR": "$(rootpath :generated_dir)",
+        "GOLDEN_DIR": "$(rootpath :golden_dir)",
     },
     visibility = ["//test:__pkg__"],
     deps = [

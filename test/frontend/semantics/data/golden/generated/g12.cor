@@ -1,0 +1,10 @@
+PROGRAM G12
+
+COMMON (
+  LABEL l1
+)
+
+BEGIN
+  INTEGER l1;
+  l1:
+END;

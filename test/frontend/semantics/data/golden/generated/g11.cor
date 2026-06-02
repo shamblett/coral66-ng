@@ -1,0 +1,12 @@
+PROGRAM G11
+
+COMMON (
+  LABEL conflictingLabel, conflictingLabel;
+  INTEGER conflictingVar;
+  INTEGER conflictingVar
+)
+
+BEGIN
+  INTEGER x;
+  x := 1
+END;

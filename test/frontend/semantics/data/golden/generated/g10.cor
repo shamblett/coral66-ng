@@ -1,0 +1,28 @@
+PROGRAM G10
+
+COMMON ()
+
+BEGIN
+  COMMENT STRING literals and block scope tests ;
+
+  PROCEDURE printString ( VALUE INTEGER ptr );
+  BEGIN
+    COMMENT Dummy proc to accept string pointer ;
+  END;
+
+  printString ( "Hello Coral 66" );
+
+  BEGIN
+    INTEGER x, y, z;
+    x := 1;
+    y := 2;
+    z := x + y;
+    
+    BEGIN
+      INTEGER z;
+      z := x * y;
+      printString ( "Nested block scope" )
+    END;
+  END;
+
+END end of program ;
