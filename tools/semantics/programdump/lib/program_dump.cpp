@@ -6,6 +6,8 @@
 
 #include "program_dump.hpp"
 
+#include <ranges>
+
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
 
@@ -106,9 +108,21 @@ std::string ProgramDump::dumpToString(const semantics::Program& program, const s
 
 rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolvedIdentifiers) const
 {
+    // Sort the unordered map
+    std::vector<std::pair<const syntax::Node*, const semantics::Usable*>> sorted_pairs(resolvedIdentifiers.begin(),
+                                                                                       resolvedIdentifiers.end());
+    std::ranges::sort(sorted_pairs, {},
+                      [](const auto& p)
+                      {
+                          if (p.first->begin() == nullptr)
+                              return std::make_tuple(0u, 0ul, reinterpret_cast<std::uintptr_t>(p.first));
+                          return std::make_tuple(p.first->begin()->getFileId(), p.first->begin()->getOffset(),
+                                                 reinterpret_cast<std::uintptr_t>(p.first));
+                      });
+
     rapidjson::Value arr(rapidjson::kArrayType);
 
-    for (const auto& [node, usable] : resolvedIdentifiers)
+    for (const auto& [node, usable] : sorted_pairs)
     {
         rapidjson::Value item(rapidjson::kObjectType);
         std::string text = getTokenString(node->begin());
@@ -143,9 +157,25 @@ rapidjson::Value ProgramDump::dump(const semantics::ResolvedIdentifiers& resolve
 
 rapidjson::Value ProgramDump::dump(const semantics::ExpressionTypes& expressionTypes) const
 {
+    // Sort the unordered map
+    std::vector<std::pair<const syntax::Expression*, const semantics::Type*>> sorted_pairs;
+    sorted_pairs.reserve(expressionTypes.size());
+    for (const auto& [expression, type] : expressionTypes)
+    {
+        sorted_pairs.emplace_back(expression, &static_cast<const semantics::Type&>(type));
+    }
+    std::ranges::sort(sorted_pairs, {},
+                      [](const auto& p)
+                      {
+                          if (p.first->begin() == nullptr)
+                              return std::make_tuple(0u, 0ul, reinterpret_cast<std::uintptr_t>(p.first));
+                          return std::make_tuple(p.first->begin()->getFileId(), p.first->begin()->getOffset(),
+                                                 reinterpret_cast<std::uintptr_t>(p.first));
+                      });
+
     rapidjson::Value arr(rapidjson::kArrayType);
 
-    for (const auto& [expression, type] : expressionTypes)
+    for (const auto& [expression, type] : sorted_pairs)
     {
         rapidjson::Value item(rapidjson::kObjectType);
         std::string text = getTokenString(expression->begin());
