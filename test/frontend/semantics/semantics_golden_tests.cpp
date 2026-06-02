@@ -40,10 +40,10 @@ TEST_CASE("Examples", "[Semantics][Golden]")
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         auto sourceProgram = tools::ProgramDump::dumpToString(program, reporterString);
         auto programPath = getTestDataPath("ackermann/ackerman_program.json", "GOLDEN_DIR");
-        auto prog = readFile(programPath);
-        CHECK(!prog.empty());
+        auto generatedProgram = readFile(programPath);
+        CHECK(!generatedProgram.empty());
 
-        CHECK(sourceProgram == prog);
+        CHECK(sourceProgram == generatedProgram);
     }
 
     SECTION("Sieve") {}
