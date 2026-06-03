@@ -24,11 +24,22 @@ cc_library(
     ],
 )
 
+filegroup(
+    name = "data_dir",
+    srcs = glob(["data/**"]),
+)
+
 cc_test(
     name = "backend",
     srcs = [
         "main.cpp",
     ],
+    data = [
+        ":data_dir",
+    ],
+    env = {
+        "BACKEND_DIR": "test/backend/data",
+    },
     visibility = ["//test:__pkg__"],
     deps = [
         "backendtest",
