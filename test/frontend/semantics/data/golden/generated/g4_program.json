@@ -1,0 +1,1866 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "errorDest",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "statusFlags",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "status",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "flagMask",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "varA",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "varB",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "result",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myTable1",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "entryType",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "entryValue",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "entryFlags",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myTable",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "teeth1",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "teeth2",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "ratio",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "arc",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myOverlaidInt",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "n",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "ans",
+                "Scope Depth": 5
+            },
+            {
+                "Name": "factorial",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "errorLabel",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "trapError",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 36,
+                "Column": 8
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "n",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 37,
+                "Column": 7
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "ans",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 7
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "ans",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 14
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "n",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "factorial",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 18
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "factorial",
+                "Type": {
+                    "ReturnType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "n",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 30
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "n",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 40,
+                "Column": 12
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "ans",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 46,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "errorLabel",
+                "Type": {
+                    "Name": "LabelType"
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "flagMask",
+            "Location": {
+                "FileId": 0,
+                "Line": 50,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "flagMask",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varA",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 52,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varB",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 13
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varA",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "flagMask",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 23
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "flagMask",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 38
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varB",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 6
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varA",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 20
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varB",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 33
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "result",
+            "Location": {
+                "FileId": 0,
+                "Line": 59,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "result",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "result",
+            "Location": {
+                "FileId": 0,
+                "Line": 61,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "result",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 7
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 25
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "statusFlags",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "ArrayDeclaration",
+                "Name": "statusFlags",
+                "Type": {
+                    "Name": "ArrayType",
+                    "ElementType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Dimensions": [
+                        6
+                    ],
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 19
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 31
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 67,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 67,
+                "Column": 15
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 71,
+                "Column": 17
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "status",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 74,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "varA",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "trapError",
+            "Location": {
+                "FileId": 0,
+                "Line": 77,
+                "Column": 4
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "trapError",
+                "Type": {
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "LabelType"
+                            },
+                            "Name": "errorLabel",
+                            "IsValue": false
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "errorDest",
+            "Location": {
+                "FileId": 0,
+                "Line": 77,
+                "Column": 14
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "errorDest"
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 6,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 6,
+                "Column": 35
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "2",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 20
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 24
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "3",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 20
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 36,
+                "Column": 8
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 36,
+                "Column": 8
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 36,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 37,
+                "Column": 7
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 37,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 7
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "factorial",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 34
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 40,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "flagMask",
+            "Location": {
+                "FileId": 0,
+                "Line": 50,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "255",
+            "Location": {
+                "FileId": 0,
+                "Line": 50,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 11
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 52,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "20",
+            "Location": {
+                "FileId": 0,
+                "Line": 52,
+                "Column": 11
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Bits",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Bits",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Bits",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "flagMask",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 23
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 38
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "15",
+            "Location": {
+                "FileId": 0,
+                "Line": 55,
+                "Column": 50
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 6
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 6
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 6
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 6
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 20
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varB",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 20
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "20",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 27
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 33
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 33
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 58,
+                "Column": 42
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "result",
+            "Location": {
+                "FileId": 0,
+                "Line": 59,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 59,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "result",
+            "Location": {
+                "FileId": 0,
+                "Line": 61,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 61,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 7
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 17
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 25
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 25
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 64,
+                "Column": 34
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusFlags",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "2",
+            "Location": {
+                "FileId": 0,
+                "Line": 66,
+                "Column": 40
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 67,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 67,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 67,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 67,
+                "Column": 24
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 71,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "4",
+            "Location": {
+                "FileId": 0,
+                "Line": 71,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 71,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "status",
+            "Location": {
+                "FileId": 0,
+                "Line": 71,
+                "Column": 17
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 71,
+                "Column": 27
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "varA",
+            "Location": {
+                "FileId": 0,
+                "Line": 74,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 74,
+                "Column": 11
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Bits",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "trapError",
+            "Location": {
+                "FileId": 0,
+                "Line": 77,
+                "Column": 4
+            },
+            "Type": {
+                "Name": "UntypedType"
+            }
+        },
+        {
+            "ExpressionText": "errorDest",
+            "Location": {
+                "FileId": 0,
+                "Line": 77,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "LabelType"
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "UntypedType"
+            },
+            {
+                "Name": "LabelType"
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": [
+            {
+                "Name": "myTable1",
+                "Size": 0,
+                "Definition": {
+                    "Fields": [],
+                    "Width": 2,
+                    "Length": 10
+                }
+            },
+            {
+                "Name": "myTable",
+                "Size": 0,
+                "Definition": {
+                    "Fields": [],
+                    "Width": 1,
+                    "Length": 3
+                }
+            }
+        ]
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}

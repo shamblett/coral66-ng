@@ -390,7 +390,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             }
         },
         {
@@ -405,7 +405,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": true
+                "IsValue": false
             }
         },
         {
@@ -480,7 +480,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             }
         },
         {
@@ -495,7 +495,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": true
+                "IsValue": false
             }
         },
         {
@@ -540,7 +540,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             }
         },
         {
@@ -555,7 +555,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": true
+                "IsValue": false
             }
         },
         {
@@ -690,7 +690,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             }
         },
         {
@@ -705,7 +705,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": true
+                "IsValue": false
             }
         },
         {

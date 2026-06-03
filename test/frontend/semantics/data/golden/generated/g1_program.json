@@ -1,0 +1,1047 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "errorLabel",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "commonArray",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "commonFloat",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myInt",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "otherInt",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myFloat",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myFixed",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myBits",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "a",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "b",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "procLocal",
+                "Scope Depth": 5
+            },
+            {
+                "Name": "myProc",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "procLocal",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "procLocal",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "a",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 18
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "a",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "b",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "b",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": true,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "b",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 10
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "b",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": true,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 24,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "otherInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myFloat",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myFixed",
+            "Location": {
+                "FileId": 0,
+                "Line": 27,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myFixed",
+                "Type": {
+                    "Name": "FixedType",
+                    "TotalBits": 16,
+                    "FractionalBits": 8
+                }
+            }
+        },
+        {
+            "NodeText": "myBits",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myBits",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myProc",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "myProc",
+                "Type": {
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "a",
+                            "IsValue": true
+                        },
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Floating",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "b",
+                            "IsValue": false
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 12
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 19
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myFloat",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 15
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 23
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "otherInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 44
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "otherInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "commonArray",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "ArrayDeclaration",
+                "Name": "commonArray",
+                "Type": {
+                    "Name": "ArrayType",
+                    "ElementType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Dimensions": [
+                        10
+                    ],
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 26
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myInt",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "commonFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 40,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "commonFloat",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "myFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 40,
+                "Column": 20
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myFloat",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Floating",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 7,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 7,
+                "Column": 35
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "procLocal",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "a",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "a",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 22
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "b",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": true,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "b",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": true,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "b",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1.5",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 24,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 24,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "3.1415899999999999",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myFixed",
+            "Location": {
+                "FileId": 0,
+                "Line": 27,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "FixedType",
+                "TotalBits": 16,
+                "FractionalBits": 8
+            }
+        },
+        {
+            "ExpressionText": "2.71",
+            "Location": {
+                "FileId": 0,
+                "Line": 27,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myBits",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Bits",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myProc",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "UntypedType"
+            }
+        },
+        {
+            "ExpressionText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 15
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 23
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 37
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 44
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "otherInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 44
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "2",
+            "Location": {
+                "FileId": 0,
+                "Line": 32,
+                "Column": 55
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "commonArray",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myInt",
+            "Location": {
+                "FileId": 0,
+                "Line": 39,
+                "Column": 26
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "commonFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 40,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myFloat",
+            "Location": {
+                "FileId": 0,
+                "Line": 40,
+                "Column": 20
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "UntypedType"
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}

@@ -21,7 +21,7 @@ using namespace coral66::Tests;
  * Golden tests
  *
  * Note that until the duplicate AST node problem outlined in the random-ordering.md document
- * is fixed we can only compare the source and genertaed on size, which of course should always be
+ * is fixed we can only compare the source and generated on size, which of course should always be
  * the same.
  */
 

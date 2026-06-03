@@ -1,0 +1,93 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "conflictingLabel",
+                "Scope Depth": 2
+            },
+            {
+                "Name": "conflictingLabel",
+                "Scope Depth": 0
+            },
+            {
+                "Name": "conflictingVar",
+                "Scope Depth": 2
+            },
+            {
+                "Name": "conflictingVar",
+                "Scope Depth": 0
+            },
+            {
+                "Name": "x",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "x",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 8
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": []
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 2,
+        "Name": "REDEFINITION_OF_SYMBOL_N",
+        "severity": "Error",
+        "Name": "REDEFINITION_OF_SYMBOL_N",
+        "severity": "Error",
+        "Reports": "<stdin>:4:27: error: Redefinition of symbol 'conflictingLabel'\n   4 |   LABEL conflictingLabel, conflictingLabel;\n     |                           ~~~~~~~~~~~~~~~~ \n<stdin>:6:11: error: Redefinition of symbol 'conflictingVar'\n   6 |   INTEGER conflictingVar\n     |           ~~~~~~~~~~~~~~\n"
+    }
+}

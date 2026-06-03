@@ -1,0 +1,414 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "stateZero",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "stateOne",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "stateTwo",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "endLabel",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "statusVal",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "myState",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "mySwitch",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "myState",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myState",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "SwitchDeclaration",
+                "Name": "mySwitch",
+                "Type": {
+                    "Name": "SwitchType"
+                }
+            }
+        },
+        {
+            "NodeText": "myState",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 19
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "myState",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 15,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "statusVal",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 16,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "endLabel"
+            }
+        },
+        {
+            "NodeText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "statusVal",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "endLabel"
+            }
+        },
+        {
+            "NodeText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "statusVal",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "statusVal",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 18
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "statusVal",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "myState",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 11,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "myState",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 15,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 15,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "2",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "statusVal",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": []
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}

@@ -1,0 +1,861 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "mode1",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "mode2",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "fallbackLabel",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "endProc",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "dataArr",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "sum",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "modeSwitch",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "arr",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "size",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "fallback",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "mode",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "i",
+                "Scope Depth": 5
+            },
+            {
+                "Name": "process",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "i",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "i",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "size",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 10
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "size",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "i",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 8
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "i",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 21,
+                "Column": 7
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "fallback",
+                "Type": {
+                    "Name": "LabelType"
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "mode",
+                "Type": {
+                    "Name": "SwitchType"
+                }
+            }
+        },
+        {
+            "NodeText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "sum",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "process",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "process",
+                "Type": {
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "ArrayType",
+                                "ElementType": {
+                                    "Name": "PrimitiveType",
+                                    "Kind": "Integer",
+                                    "IsLocation": false,
+                                    "IsUndefined": false,
+                                    "IsValue": false
+                                },
+                                "Dimensions": [],
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "arr",
+                            "IsValue": false
+                        },
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "size",
+                            "IsValue": true
+                        },
+                        {
+                            "Type": {
+                                "Name": "LabelType"
+                            },
+                            "Name": "fallback",
+                            "IsValue": false
+                        },
+                        {
+                            "Type": {
+                                "Name": "SwitchType"
+                            },
+                            "Name": "mode",
+                            "IsValue": false
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "dataArr",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 13
+            },
+            "Usable": {
+                "Kind": "ArrayDeclaration",
+                "Name": "dataArr",
+                "Type": {
+                    "Name": "ArrayType",
+                    "ElementType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Dimensions": [
+                        10
+                    ],
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "fallbackLabel",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 25
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "fallbackLabel"
+            }
+        },
+        {
+            "NodeText": "modeSwitch",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 40
+            },
+            "Usable": {
+                "Kind": "SwitchDeclaration",
+                "Name": "modeSwitch",
+                "Type": {
+                    "Name": "SwitchType"
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 30,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "endProc"
+            }
+        },
+        {
+            "NodeText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 33,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "sum",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 34,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "endProc"
+            }
+        },
+        {
+            "NodeText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 37,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "sum",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 38,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "LabelDeclaration",
+                "Name": "endProc"
+            }
+        },
+        {
+            "NodeText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 41,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "sum",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 44,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "sum",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 44,
+                "Column": 12
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "sum",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 6,
+                "Column": 27
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 6,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "i",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "size",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "i",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 8
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "i",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 8
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 20,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 17
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 26,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "process",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "UntypedType"
+            }
+        },
+        {
+            "ExpressionText": "dataArr",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "ArrayType",
+                "ElementType": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                },
+                "Dimensions": [
+                    10
+                ],
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 22
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "fallbackLabel",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 25
+            },
+            "Type": {
+                "Name": "LabelType"
+            }
+        },
+        {
+            "ExpressionText": "modeSwitch",
+            "Location": {
+                "FileId": 0,
+                "Line": 28,
+                "Column": 40
+            },
+            "Type": {
+                "Name": "SwitchType"
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 33,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 33,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 37,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "2",
+            "Location": {
+                "FileId": 0,
+                "Line": 37,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 41,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "",
+            "Location": {
+                "FileId": 0,
+                "Line": 41,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 41,
+                "Column": 13
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 44,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 44,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "sum",
+            "Location": {
+                "FileId": 0,
+                "Line": 44,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 44,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "UntypedType"
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "ArrayType",
+                "ElementType": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                },
+                "Dimensions": [],
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "LabelType"
+            },
+            {
+                "Name": "SwitchType"
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}

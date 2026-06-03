@@ -1,0 +1,492 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "ptr",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "printString",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "x",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "y",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "z",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "z",
+                "Scope Depth": 5
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "printString",
+            "Location": {
+                "FileId": 0,
+                "Line": 13,
+                "Column": 3
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "printString",
+                "Type": {
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "ptr",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 17,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "x",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "y",
+            "Location": {
+                "FileId": 0,
+                "Line": 18,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "y",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "z",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "z",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 10
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "x",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "y",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 14
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "y",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "z",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 7
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "z",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 12
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "x",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "y",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 16
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "y",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "printString",
+            "Location": {
+                "FileId": 0,
+                "Line": 24,
+                "Column": 7
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "printString",
+                "Type": {
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "ptr",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "printString",
+            "Location": {
+                "FileId": 0,
+                "Line": 13,
+                "Column": 3
+            },
+            "Type": {
+                "Name": "UntypedType"
+            }
+        },
+        {
+            "ExpressionText": "Hello Coral 66",
+            "Location": {
+                "FileId": 0,
+                "Line": 13,
+                "Column": 17
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 17,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 17,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "y",
+            "Location": {
+                "FileId": 0,
+                "Line": 18,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "2",
+            "Location": {
+                "FileId": 0,
+                "Line": 18,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "z",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 10
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "y",
+            "Location": {
+                "FileId": 0,
+                "Line": 19,
+                "Column": 14
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "z",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 7
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "x",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "y",
+            "Location": {
+                "FileId": 0,
+                "Line": 23,
+                "Column": 16
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "printString",
+            "Location": {
+                "FileId": 0,
+                "Line": 24,
+                "Column": 7
+            },
+            "Type": {
+                "Name": "UntypedType"
+            }
+        },
+        {
+            "ExpressionText": "Nested block scope",
+            "Location": {
+                "FileId": 0,
+                "Line": 24,
+                "Column": 21
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "UntypedType"
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}

@@ -1,0 +1,236 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "floatArray",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "counter",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "counter",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 9
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "counter",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "floatArray",
+            "Location": {
+                "FileId": 0,
+                "Line": 14,
+                "Column": 5
+            },
+            "Usable": {
+                "Kind": "ArrayDeclaration",
+                "Name": "floatArray",
+                "Type": {
+                    "Name": "ArrayType",
+                    "ElementType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Floating",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Dimensions": [
+                        6
+                    ],
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "counter",
+            "Location": {
+                "FileId": 0,
+                "Line": 14,
+                "Column": 18
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "counter",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 7,
+                "Column": 35
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 7,
+                "Column": 39
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "counter",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 9
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 20
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 29
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "5",
+            "Location": {
+                "FileId": 0,
+                "Line": 12,
+                "Column": 39
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "floatArray",
+            "Location": {
+                "FileId": 0,
+                "Line": 14,
+                "Column": 5
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "counter",
+            "Location": {
+                "FileId": 0,
+                "Line": 14,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 14,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Floating",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}

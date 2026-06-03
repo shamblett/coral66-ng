@@ -1,0 +1,32 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "l1",
+                "Scope Depth": 2
+            },
+            {
+                "Name": "l1",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "l1",
+                "Scope Depth": 0
+            }
+        ]
+    },
+    "Resolved Identifiers": [],
+    "Expression Types": [],
+    "Auxiliary Types": {
+        "Types": []
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 1,
+        "Name": "REDEFINITION_OF_SYMBOL_N",
+        "severity": "Error",
+        "Reports": "<stdin>:8:11: error: Redefinition of symbol 'l1'\n   8 |   INTEGER l1;\n     |           ~~ \n"
+    }
+}
