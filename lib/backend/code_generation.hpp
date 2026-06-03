@@ -11,15 +11,7 @@
 #include <llvm/Target/TargetMachine.h>
 
 #include "lib/support/filesystem.hpp"
-
-/**
- *  CodeGeneration.hpp
- *  Defines the entry point and options for LLVM code generation.
- *
- * This file declares the `generateLLVM` function, which orchestrates the translation
- * of the semantic AST (Program) into LLVM IR. It also defines the `Options` struct
- * to configure the code generation process, including optimization levels and debug info.
- */
+#include "lib/frontend/syntax/syntax.hpp"
 
 namespace coral66
 {
@@ -45,7 +37,7 @@ struct Options
     llvm::CodeGenOptLevel ol = llvm::CodeGenOpt::parseLevel('0').value();
 };
 
-std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const semantics::Program& program,
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
                                                   const Options& options = {});
 } // namespace CGLLVM
 } // namespace coral66

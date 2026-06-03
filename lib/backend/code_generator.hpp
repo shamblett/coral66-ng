@@ -10,6 +10,7 @@
 
 #include "code_generation.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
+#include "lib/frontend/syntax/syntax.hpp"
 
 namespace coral66::CGLLVM
 {
@@ -17,7 +18,6 @@ namespace coral66::CGLLVM
 struct Value
 {
     llvm::Value* value;
-    // Simple alignment handling for now
     llvm::MaybeAlign alignment;
 
     Value(llvm::Value* v, llvm::MaybeAlign a = {}) : value(v), alignment(a) {}
@@ -27,60 +27,61 @@ struct Value
 class code_generator final
 {
     llvm::Module& m_module;
+    const syntax::Program& m_tree;
     const semantics::Program& m_program;
     const source_interface& m_sourceInterface;
     const CGLLVM::Options& m_options;
 
     llvm::IRBuilder<> m_builder{m_module.getContext()};
     llvm::Function* m_currentFunction = nullptr;
-    const semantics::ProcedureDeclaration* m_currentProcedure = nullptr;
+    const syntax::ProcedureDeclaration* m_currentProcedure = nullptr;
 
     std::unordered_map<const semantics::Usable*, llvm::Value*> m_globals;
     std::unordered_map<const semantics::Usable*, llvm::AllocaInst*> m_locals;
-    std::unordered_map<const semantics::LabelStatement*, llvm::BasicBlock*> m_labels;
+    std::unordered_map<const syntax::Statement*, llvm::BasicBlock*> m_labels;
 
 public:
-    explicit code_generator(llvm::Module& module, const semantics::Program& program,
+    explicit code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
                             const source_interface& sourceInterface, const CGLLVM::Options& options);
 
     void generate();
 
-    // Type Lowering
     llvm::Type* convertType(const semantics::Type& type);
+    llvm::Value* emitAddress(const syntax::Expression& expr);
+    llvm::BasicBlock* getOrCreateLabel(const syntax::Statement* stmt);
 
-    // Helpers
-    llvm::Value* emitAddress(const semantics::ExpressionBase& expr);
-    llvm::BasicBlock* getOrCreateLabel(const semantics::LabelStatement* label);
-
-    // Visitors (Top Level)
     void visit(const semantics::Declaration& decl);
+    
+    void visit(const syntax::Program& program);
+    void visit(const syntax::Block& block);
+    void visit(const syntax::Declaration& decl);
+    void visit(const syntax::ProcedureDeclaration& decl);
+    void visit(const syntax::VariableDeclaration& decl);
+    void visit(const syntax::ArrayDeclaration& decl);
 
-    // Visitors (Statements)
-    void visit(const semantics::Statement& stmt);
-    void visit(const semantics::AssignmentStatement& stmt);
-    void visit(const semantics::IfStatement& stmt);
-    void visit(const semantics::GotoStatement& stmt);
-    void visit(const semantics::ForStatement& stmt);
-    void visit(const semantics::AnswerStatement& stmt);
-    void visit(const semantics::CodeStatement& stmt);
-    void visit(const semantics::ProcedureCallStatement& stmt);
-    void visit(const semantics::LabelStatement& stmt); // Add visitor for LabelStatement
-    void visit(const semantics::DummyStatement& stmt);
-    void visit(const semantics::BlockStatement& stmt);
-    void visit(const semantics::CompoundStatement& stmt);
+    void visit(const syntax::Statement& stmt);
+    void visit(const syntax::AssignmentStatement& stmt);
+    void visit(const syntax::IfStatement& stmt);
+    void visit(const syntax::GotoStatement& stmt);
+    void visit(const syntax::ForStatement& stmt);
+    void visit(const syntax::AnswerStatement& stmt);
+    void visit(const syntax::CodeStatement& stmt);
+    void visit(const syntax::ProcedureCallStatement& stmt);
+    void visit(const syntax::DummyStatement& stmt);
+    void visit(const syntax::BlockStatement& stmt);
+    void visit(const syntax::CompoundStatement& stmt);
 
-    // Visitors (Expressions)
-    llvm::Value* visit(const semantics::ExpressionBase& expr);
-    llvm::Value* visit(const semantics::Constant& expr);
-    llvm::Value* visit(const semantics::DeclarationRead& expr);
-    llvm::Value* visit(const semantics::BinaryOperator& expr);
-    llvm::Value* visit(const semantics::UnaryOperator& expr);
-    llvm::Value* visit(const semantics::CallExpression& expr);
-    llvm::Value* visit(const semantics::PartWordAccess& expr);
-    static llvm::Value* visit(const semantics::ErrorExpression& expr);
-
+    llvm::Value* visit(const syntax::Expression& expr);
+    llvm::Value* visit(const syntax::LiteralExpression& expr);
+    llvm::Value* visit(const syntax::IdentifierExpression& expr);
+    llvm::Value* visit(const syntax::BinaryExpression& expr);
+    llvm::Value* visit(const syntax::UnaryExpression& expr);
+    llvm::Value* visit(const syntax::FunctionCallExpression& expr);
+    llvm::Value* visit(const syntax::PartWordExpression& expr);
+    llvm::Value* visit(const syntax::ArrayAccessExpression& expr);
+    
 private:
-    void generateProcedure(const semantics::ProcedureDeclaration& procDecl);
+    void generateProcedure(const semantics::ProcedureDeclaration& procDecl, const syntax::ProcedureDeclaration& astNode);
 };
 
 } // namespace coral66::CGLLVM

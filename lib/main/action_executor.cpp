@@ -159,7 +159,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
             ;
     }
 
-    auto targetMachine = coral66::CGLLVM::generateLLVM(module, program, codegenOptions);
+    auto targetMachine = coral66::CGLLVM::generateLLVM(module, tree, program, codegenOptions);
 
     if (llvm::verifyModule(module, &llvm::errs()))
     {

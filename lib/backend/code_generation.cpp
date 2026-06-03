@@ -14,7 +14,7 @@
 namespace coral66::CGLLVM
 {
 
-std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const semantics::Program& program,
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
                                                   const Options& options)
 {
     CTRACK_NAME("Generate LLVM");
@@ -52,7 +52,7 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const se
         }
     } stubSource;
 
-    code_generator generator(module, program, stubSource, options);
+    code_generator generator(module, tree, program, stubSource, options);
     generator.generate();
 
     // Return target machine (stub)
