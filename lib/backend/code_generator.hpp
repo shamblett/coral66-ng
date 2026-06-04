@@ -63,7 +63,7 @@ public:
     void visit(const syntax::AssignmentStatement& stmt);
     void visit(const syntax::IfStatement& stmt);
     void visit(const syntax::GotoStatement& statement);
-    void visit(const syntax::ForStatement& stmt);
+    void visit(const syntax::ForStatement& statement);
     void visit(const syntax::AnswerStatement& stmt);
     void visit(const syntax::CodeStatement& statement);
     void visit(const syntax::ProcedureCallStatement& stmt);
