@@ -10,8 +10,8 @@
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 
-#include "lib/support/filesystem.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
+#include "lib/support/filesystem.hpp"
 
 namespace coral66
 {
@@ -37,7 +37,7 @@ struct Options
     llvm::CodeGenOptLevel ol = llvm::CodeGenOpt::parseLevel('0').value();
 };
 
-std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
-                                                  const Options& options = {});
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree,
+                                                  const semantics::Program& program, const Options& options = {});
 } // namespace cgllvm
 } // namespace coral66

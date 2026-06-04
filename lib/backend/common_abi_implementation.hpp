@@ -6,7 +6,6 @@
 
 #pragma once
 
-
 #include <unordered_map>
 
 #include "abi_implementation.hpp"
@@ -42,7 +41,6 @@ class common_abi_implementation : public abi_implementation
         m_adjustments;
 
 protected:
-
     common_abi_implementation(const llvm::DataLayout& dataLayout) : abi_implementation(dataLayout) {}
 
     const T* m_currentFunctionABI = nullptr;

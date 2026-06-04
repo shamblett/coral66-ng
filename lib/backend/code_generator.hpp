@@ -51,7 +51,7 @@ public:
     llvm::BasicBlock* getOrCreateLabel(const syntax::Statement* statement);
 
     void visit(const semantics::Declaration& declaration);
-    
+
     void visit(const syntax::Program& program);
     void visit(const syntax::Block& block);
     void visit(const syntax::Declaration& declaration);
@@ -79,9 +79,10 @@ public:
     llvm::Value* visit(const syntax::FunctionCallExpression& expression);
     llvm::Value* visit(const syntax::PartWordExpression& expression);
     llvm::Value* visit(const syntax::ArrayAccessExpression& expression);
-    
+
 private:
-    void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration, const syntax::ProcedureDeclaration& astNode);
+    void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
+                           const syntax::ProcedureDeclaration& astNode);
 };
 
 } // namespace coral66::cgllvm

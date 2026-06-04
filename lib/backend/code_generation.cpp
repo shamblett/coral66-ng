@@ -14,8 +14,8 @@
 namespace coral66::cgllvm
 {
 
-std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
-                                                  const Options& options)
+std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree,
+                                                  const semantics::Program& program, const Options& options)
 {
     CTRACK_NAME("Generate LLVM");
     // Minimal SourceInterface stub or pass nullptr if not needed by basic codegen yet
