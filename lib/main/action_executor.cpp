@@ -6,6 +6,7 @@
 
 #include "action_executor.hpp"
 
+#include <cstdlib>
 #include <llvm/Bitcode/BitcodeWriterPass.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/PassManager.h>
@@ -42,9 +43,13 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
     {
         return EXIT_FAILURE;
     }
-    if (action == Action::Compile && !cl::SyntaxOnly)
+    if ((action == Action::Compile || action == Action::Link) && !cl::SyntaxOnly)
     {
         m_linkableFiles.emplace_back(*objectFile);
+    }
+    if (action == Action::Link && !cl::SyntaxOnly && !cl::ParseOnly)
+    {
+        return linkExecutable();
     }
     return EXIT_SUCCESS;
 }
@@ -176,7 +181,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         std::terminate();
     }
     std::string outputFile;
-    if (!cl::OutputFilename.empty())
+    if (!cl::OutputFilename.empty() && action != Action::Link)
     {
         outputFile = cl::OutputFilename.getValue();
     }
@@ -281,4 +286,46 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         *m_reporter << "\n" << result << "\n";
     }
     return fs::path(outputFile);
+}
+
+int coral66::ActionExecutor::linkExecutable() const
+{
+    if (m_linkableFiles.empty())
+    {
+        return EXIT_FAILURE;
+    }
+
+    std::string outName;
+    if (!cl::OutputFilename.empty())
+    {
+        outName = cl::OutputFilename.getValue();
+    }
+    else
+    {
+        auto p = m_linkableFiles.front();
+        p.replace_extension("");
+        outName = p.string();
+    }
+
+    std::string command = "gcc";
+    for (const auto& file : m_linkableFiles)
+    {
+        command += " " + file.string();
+    }
+    command += " -o " + outName;
+
+    int result = std::system(command.c_str());
+    if (result != 0)
+    {
+        *m_reporter << errors::CLI::FAILED_TO_LINK_EXECUTABLE.argsCLI();
+        return EXIT_FAILURE;
+    }
+
+    // Clean up temporary object files if linking succeeded
+    for (const auto& file : m_linkableFiles)
+    {
+        fs::remove(file);
+    }
+
+    return EXIT_SUCCESS;
 }

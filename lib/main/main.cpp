@@ -82,5 +82,5 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     {
         return executor.execute(Action::Preprocess, cl::SourceFilename.data());
     }
-    return executor.execute(Action::Compile, cl::SourceFilename.data());
+    return executor.execute(Action::Link, cl::SourceFilename.data());
 }

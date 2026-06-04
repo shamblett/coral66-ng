@@ -41,5 +41,6 @@ public:
     int execute(Action action, const std::string& file);
 
     std::optional<std::string> compileCoral66File(Action action, fs::path& sourceFile) const;
+    int linkExecutable() const;
 };
 } // namespace coral66
