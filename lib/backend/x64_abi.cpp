@@ -6,11 +6,6 @@
 
 #include "x64_abi.hpp"
 
-#include <algorithm>
-#include <numeric>
-#include <tuple>
-#include <variant>
-
 #include "lib/frontend/semantics/semantics.hpp"
 
 namespace coral66::CGLLVM

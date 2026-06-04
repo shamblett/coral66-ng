@@ -39,7 +39,7 @@ namespace coral66::Tests
 namespace detail
 {
 void computeAndGet(std::unique_ptr<llvm::Module>&& module, std::string_view functionName,
-                   coral66::FunctionRef<void(std::uintptr_t)> symbolCallback);
+                   FunctionRef<void(std::uintptr_t)> symbolCallback);
 
 template <class F>
 struct return_type;
@@ -89,13 +89,13 @@ class ContainsIR : public Catch::Matchers::MatcherBase<llvm::Module>
     std::string m_pattern;
 
 public:
-    explicit ContainsIR(std::string pattern) : m_pattern("(.*)" + pattern + "(.*|\n|$)") {}
+    explicit ContainsIR(const std::string& pattern) : m_pattern("(.*)" + pattern + "(.*|\n|$)") {}
 
     bool match(const llvm::Module& module) const override
     {
-        auto string = printModule(module);
-        std::regex pattern(m_pattern);
-        auto result = std::regex_search(string, pattern);
+        const auto string = printModule(module);
+        const std::regex pattern(m_pattern);
+        const auto result = std::regex_search(string, pattern);
         return result;
     }
 
@@ -110,10 +110,8 @@ protected:
 
 using namespace coral66::Tests;
 
-namespace Catch
-{
 template <>
-struct StringMaker<llvm::Module>
+struct Catch::StringMaker<llvm::Module>
 {
     static std::string convert(const llvm::Module& module)
     {
@@ -124,6 +122,4 @@ struct StringMaker<llvm::Module>
         }
         return "'" + s + "'";
     }
-};
-
-} // namespace Catch
+}; // namespace Catch

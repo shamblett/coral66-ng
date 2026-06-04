@@ -20,8 +20,8 @@ struct Value
     llvm::Value* value;
     llvm::MaybeAlign alignment;
 
-    Value(llvm::Value* v, llvm::MaybeAlign a = {}) : value(v), alignment(a) {}
-    Value(std::nullptr_t) : value(nullptr) {}
+    explicit Value(llvm::Value* v, const llvm::MaybeAlign a = {}) : value(v), alignment(a) {}
+    explicit Value(std::nullptr_t) : value(nullptr) {}
 };
 
 class code_generator final
@@ -30,7 +30,7 @@ class code_generator final
     const syntax::Program& m_tree;
     const semantics::Program& m_program;
     const source_interface& m_sourceInterface;
-    const CGLLVM::Options& m_options;
+    const Options& m_options;
 
     llvm::IRBuilder<> m_builder{m_module.getContext()};
     llvm::Function* m_currentFunction = nullptr;
@@ -42,7 +42,7 @@ class code_generator final
 
 public:
     explicit code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
-                            const source_interface& sourceInterface, const CGLLVM::Options& options);
+                            const source_interface& sourceInterface, const Options& options);
 
     void generate();
 
@@ -55,19 +55,19 @@ public:
     void visit(const syntax::Program& program);
     void visit(const syntax::Block& block);
     void visit(const syntax::Declaration& decl);
-    void visit(const syntax::ProcedureDeclaration& decl);
-    void visit(const syntax::VariableDeclaration& decl);
-    void visit(const syntax::ArrayDeclaration& decl);
+    void visit(const syntax::ProcedureDeclaration& declaration);
+    void visit(const syntax::VariableDeclaration& declaration);
+    void visit(const syntax::ArrayDeclaration& declaration);
 
     void visit(const syntax::Statement& stmt);
     void visit(const syntax::AssignmentStatement& stmt);
     void visit(const syntax::IfStatement& stmt);
-    void visit(const syntax::GotoStatement& stmt);
+    void visit(const syntax::GotoStatement& statement);
     void visit(const syntax::ForStatement& stmt);
     void visit(const syntax::AnswerStatement& stmt);
-    void visit(const syntax::CodeStatement& stmt);
+    void visit(const syntax::CodeStatement& statement);
     void visit(const syntax::ProcedureCallStatement& stmt);
-    void visit(const syntax::DummyStatement& stmt);
+    void visit(const syntax::DummyStatement& statement);
     void visit(const syntax::BlockStatement& stmt);
     void visit(const syntax::CompoundStatement& stmt);
 
@@ -77,7 +77,7 @@ public:
     llvm::Value* visit(const syntax::BinaryExpression& expr);
     llvm::Value* visit(const syntax::UnaryExpression& expr);
     llvm::Value* visit(const syntax::FunctionCallExpression& expr);
-    llvm::Value* visit(const syntax::PartWordExpression& expr);
+    llvm::Value* visit(const syntax::PartWordExpression& expression);
     llvm::Value* visit(const syntax::ArrayAccessExpression& expr);
     
 private:

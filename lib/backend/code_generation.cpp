@@ -27,7 +27,7 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const sy
     // This is an issue. I should update Codegen.hpp or remove dependency.
 
     // Stub SourceInterface
-    class StubSourceInterface : public source_interface
+    const class StubSourceInterface : public source_interface
     {
     public:
         [[nodiscard]] std::uint64_t getLineNumber(std::uint32_t, std::uint64_t) const noexcept override
@@ -57,7 +57,7 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const sy
 
     // Return target machine (stub)
     std::string error;
-    auto target = llvm::TargetRegistry::lookupTarget(module.getTargetTriple(), error);
+    const auto target = llvm::TargetRegistry::lookupTarget(module.getTargetTriple(), error);
     if (!target)
         return nullptr;
     return std::unique_ptr<llvm::TargetMachine>(

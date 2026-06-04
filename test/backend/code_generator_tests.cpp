@@ -4,10 +4,10 @@
  * Date   : 31/01/2026
  */
 
-#include <llvm/IR/Instructions.h>
-#include <llvm/IR/Verifier.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/GenericValue.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
 
 #include "common.hpp"
@@ -16,12 +16,12 @@
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 #include "test/common/test_config.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace Catch::Matchers;
 
-TEST_CASE("Sieve End-to-End Execution", "[Backend][Execution]")
+TEST_CASE("Phase 1 - Sieve End-to-End Execution", "[Backend][Execution]")
 {
     // Initialize LLVM Native Target for JIT Execution
     llvm::InitializeNativeTarget();
@@ -38,38 +38,36 @@ TEST_CASE("Sieve End-to-End Execution", "[Backend][Execution]")
     bool errors = false;
     auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
     REQUIRE_FALSE(errors);
-    
+
     ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
     REQUIRE_FALSE(errors);
-    
+
     auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
     REQUIRE_FALSE(errors);
-    
+
     auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
     REQUIRE_FALSE(errors);
-    
+
     auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
     REQUIRE_FALSE(errors);
 
     // Code Generation
     llvm::LLVMContext context;
     auto module = std::make_unique<llvm::Module>("sieve", context);
-    
+
     coral66::CGLLVM::Options codegenOptions;
     auto targetMachine = coral66::CGLLVM::generateLLVM(*module, parsed, program, codegenOptions);
-    
+
     REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
 
     // JIT Execution
     std::string errStr;
-    llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
-                                    .setErrorStr(&errStr)
-                                    .setEngineKind(llvm::EngineKind::JIT)
-                                    .create();
+    llvm::ExecutionEngine* ee =
+        llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
     REQUIRE(ee != nullptr);
 
-// Run the `main` or `sieve` function
-    
+    // Run the `main` or `sieve` function
+
     // Ensure all globals are allocated and JIT compilation is done before running
     ee->finalizeObject();
 
@@ -80,12 +78,12 @@ TEST_CASE("Sieve End-to-End Execution", "[Backend][Execution]")
     ee->runFunction(mainFunc, noArgs);
 
     // The ExecutionEngine took ownership of the module, but we can access globals by name
-    void* ansAddr = (void*)ee->getGlobalValueAddress("ans");
+    auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
 
     REQUIRE(ansAddr != nullptr);
-    
+
     // Dereference to get the actual value
-    int32_t finalAns = *reinterpret_cast<int32_t*>(ansAddr);
+    int32_t finalAns = *static_cast<int32_t*>(ansAddr);
 
     // The sieve algorithm in sieve.cor produces exactly 1899 prime numbers under 8191.
     REQUIRE(finalAns == 1899);
