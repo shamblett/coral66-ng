@@ -131,6 +131,7 @@ CREATE_ERROR(FAILED_TO_OPEN_SOURCE_FILE, "Failed to open source file '%0'");
 CREATE_ERROR(NO_SOURCE_FILES_SPECIFIED, "No source files specified");
 CREATE_ERROR(SOURCE_FILE_EXTENSION_NOT_COR, "The source file extension is not .cor '%0'");
 CREATE_ERROR(FAILED_TO_OPEN_FILE_FOR_OUTPUT, "Failed to open file '%0' for output");
+CREATE_ERROR(FAILED_TO_GENERATE_TARGET_MACHINE, "Failed to generate LLVM target machine");
 } // namespace CLI
 
 namespace lexer

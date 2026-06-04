@@ -13,6 +13,8 @@
 #include <llvm/IRPrinter/IRPrintingPasses.h>
 #include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/FileSystem.h>
+#include <llvm/TargetParser/Host.h>
+#include <llvm/TargetParser/Triple.h>
 
 #include "command_line_arguments.hpp"
 #include "lib/backend/code_generation.hpp"
@@ -128,6 +130,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     cgllvm::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
+    module.setTargetTriple(llvm::Triple(llvm::sys::getDefaultTargetTriple()));
     if (cl::Pie || cl::Pic)
     {
         codegenOptions.reloc = llvm::Reloc::Model::PIC_;
@@ -160,6 +163,11 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     }
 
     auto targetMachine = coral66::cgllvm::generateLLVM(module, tree, program, codegenOptions);
+    if (!targetMachine)
+    {
+        *m_reporter << errors::CLI::FAILED_TO_GENERATE_TARGET_MACHINE.argsCLI();
+        return {};
+    }
 
     if (llvm::verifyModule(module, &llvm::errs()))
     {
