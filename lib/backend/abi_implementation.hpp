@@ -10,7 +10,7 @@
 
 #include "lib/frontend/semantics/semantics.hpp"
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 
 class abi_implementation
@@ -25,4 +25,4 @@ public:
                                   std::vector<llvm::Type*>& parameterTypes) = 0;
 };
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

@@ -19,7 +19,7 @@ namespace semantics
 {
 class Program;
 } // namespace semantics
-namespace CGLLVM
+namespace cgllvm
 {
 enum class DebugEmission
 {
@@ -39,5 +39,5 @@ struct Options
 
 std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
                                                   const Options& options = {});
-} // namespace CGLLVM
+} // namespace cgllvm
 } // namespace coral66

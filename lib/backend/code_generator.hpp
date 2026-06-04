@@ -12,7 +12,7 @@
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 
 struct Value
@@ -84,4 +84,4 @@ private:
     void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration, const syntax::ProcedureDeclaration& astNode);
 };
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

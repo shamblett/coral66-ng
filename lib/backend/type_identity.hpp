@@ -23,7 +23,7 @@
  * (e.g., int) for the purpose of LLVM type generation and caching.
  */
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 // Default std::hash and operator== of semantics::Type and subclasses make use of equality the way C defines it. This
 // does not equal the type system a backend may care about, however. The LLVM backend eg, does not care about any
@@ -325,4 +325,4 @@ struct TypeEqual<semantics::ErrorType>
     }
 };
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

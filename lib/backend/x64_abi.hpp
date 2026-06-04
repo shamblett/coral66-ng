@@ -8,7 +8,7 @@
 
 #include "abi_implementation.hpp"
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 
 class x64_abi final : public abi_implementation
@@ -18,4 +18,4 @@ public:
                           std::vector<llvm::Type*>& parameterTypes) override;
 };
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

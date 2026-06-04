@@ -11,7 +11,7 @@
 #include <llvm/IR/InlineAsm.h>
 #include <llvm/IR/Module.h>
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 
 code_generator::code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
@@ -683,4 +683,4 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
     return m_builder.CreateLoad(type, addr, "arrayload");
 }
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

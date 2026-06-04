@@ -125,7 +125,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         return std::optional<fs::path>{std::in_place};
     }
 
-    CGLLVM::Options codegenOptions;
+    cgllvm::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
     if (cl::Pie || cl::Pic)
@@ -149,17 +149,17 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     // Debug level
     switch (cl::DebugLevel)
     {
-        case cl::DebugLevel::NoDebug: codegenOptions.debugEmission = CGLLVM::DebugEmission::None; break;
-        case cl::DebugLevel::g1: codegenOptions.debugEmission = CGLLVM::DebugEmission::Line; break;
-        case cl::DebugLevel::g2: codegenOptions.debugEmission = CGLLVM::DebugEmission::Default; break;
-        case cl::DebugLevel::g3: codegenOptions.debugEmission = CGLLVM::DebugEmission::Extended; break;
+        case cl::DebugLevel::NoDebug: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
+        case cl::DebugLevel::g1: codegenOptions.debugEmission = cgllvm::DebugEmission::Line; break;
+        case cl::DebugLevel::g2: codegenOptions.debugEmission = cgllvm::DebugEmission::Default; break;
+        case cl::DebugLevel::g3: codegenOptions.debugEmission = cgllvm::DebugEmission::Extended; break;
         default:
-            codegenOptions.debugEmission = CGLLVM::DebugEmission::None;
+            codegenOptions.debugEmission = cgllvm::DebugEmission::None;
             break;
             ;
     }
 
-    auto targetMachine = coral66::CGLLVM::generateLLVM(module, tree, program, codegenOptions);
+    auto targetMachine = coral66::cgllvm::generateLLVM(module, tree, program, codegenOptions);
 
     if (llvm::verifyModule(module, &llvm::errs()))
     {

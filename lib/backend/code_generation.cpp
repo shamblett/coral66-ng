@@ -11,7 +11,7 @@
 #include "code_generator.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 
 std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
@@ -64,4 +64,4 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const sy
         target->createTargetMachine(module.getTargetTriple(), "generic", "", {}, {}));
 }
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

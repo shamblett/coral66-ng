@@ -6,7 +6,7 @@
 
 #include "abi_implementation.hpp"
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 // ABI logic stub
 }

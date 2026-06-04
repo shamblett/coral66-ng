@@ -8,7 +8,7 @@
 
 #include "lib/frontend/semantics/semantics.hpp"
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 
 void x64_abi::applyPlatformABI(const semantics::ProcedureType&, llvm::Type*&, std::vector<llvm::Type*>&)
@@ -16,4 +16,4 @@ void x64_abi::applyPlatformABI(const semantics::ProcedureType&, llvm::Type*&, st
     // Stub implementation
 }
 
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

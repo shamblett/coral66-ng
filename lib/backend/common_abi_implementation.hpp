@@ -26,7 +26,7 @@ namespace llvm
 class AllocaInst;
 } // namespace llvm
 
-namespace coral66::CGLLVM
+namespace coral66::cgllvm
 {
 template <class T>
 class common_abi_implementation : public abi_implementation
@@ -72,4 +72,4 @@ public:
         arguments = result->second.second.arguments;
     }
 };
-} // namespace coral66::CGLLVM
+} // namespace coral66::cgllvm

@@ -55,8 +55,8 @@ TEST_CASE("Phase 1 - Sieve End-to-End Execution", "[Backend][Execution]")
     llvm::LLVMContext context;
     auto module = std::make_unique<llvm::Module>("sieve", context);
 
-    coral66::CGLLVM::Options codegenOptions;
-    auto targetMachine = coral66::CGLLVM::generateLLVM(*module, parsed, program, codegenOptions);
+    coral66::cgllvm::Options codegenOptions;
+    auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
     REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
 
