@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "lib/support/vendor/magic_enum/magic_enum.hpp"
+
 #include "semantics.hpp"
 
 namespace coral66::semantics
@@ -51,14 +53,7 @@ inline bool isScalar(const Type& type)
 
 inline const char* primitiveTypeKindToString(const PrimitiveType::Kind kind)
 {
-    using Kind = PrimitiveType::Kind;
-    switch (kind)
-    {
-        case Kind::Integer: return "Integer";
-        case Kind::Floating: return "Floating";
-        case Kind::Bits: return "Bits";
-        default: return "Unknown";
-    }
+    return magic_enum::enum_name(kind).data();
 }
 
 } // namespace coral66::semantics

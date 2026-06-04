@@ -13,6 +13,7 @@
 
 #include <string_view>
 
+#include "lib/support/vendor/magic_enum/magic_enum.hpp"
 #include "lib/support/function_ref.hpp"
 #include "parser.hpp"
 
@@ -89,19 +90,7 @@ bool firstIsInPrimaryExpression(const lexer::CToken& token, const Context& conte
 
 inline const char* parameterModeToString(const syntax::ParameterDeclaration::ParameterMode mode)
 {
-    using Mode = syntax::ParameterDeclaration::ParameterMode;
-    switch (mode)
-    {
-        case Mode::Value: return "Value";
-        case Mode::Location: return "Location";
-        case Mode::Array: return "Array";
-        case Mode::Label: return "Label";
-        case Mode::Switch: return "Switch";
-        case Mode::Procedure: return "Procedure";
-        case Mode::UntypedValue: return "UntypedValue";
-        case Mode::UntypedLocation: return "UntypedLocation";
-        default: return "Unknown";
-    }
+    return magic_enum::enum_name(mode).data();
 }
 
 } // namespace coral66::parser
