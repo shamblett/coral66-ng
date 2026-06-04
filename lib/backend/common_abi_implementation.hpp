@@ -6,11 +6,6 @@
 
 #pragma once
 
-/*
- * Project: coral66
- * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
- * Date   : 31/01/2026
- */
 
 #include <unordered_map>
 
@@ -47,6 +42,7 @@ class common_abi_implementation : public abi_implementation
         m_adjustments;
 
 protected:
+
     common_abi_implementation(const llvm::DataLayout& dataLayout) : abi_implementation(dataLayout) {}
 
     const T* m_currentFunctionABI = nullptr;

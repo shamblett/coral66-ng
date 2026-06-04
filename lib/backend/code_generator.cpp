@@ -75,18 +75,18 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     return llvm::Type::getVoidTy(ctx);
 }
 
-llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* stmt)
+llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* statement)
 {
-    if (!m_labels.contains(stmt))
+    if (!m_labels.contains(statement))
     {
-        m_labels[stmt] = llvm::BasicBlock::Create(m_module.getContext(), "label", m_currentFunction);
+        m_labels[statement] = llvm::BasicBlock::Create(m_module.getContext(), "label", m_currentFunction);
     }
-    return m_labels[stmt];
+    return m_labels[statement];
 }
 
-llvm::Value* code_generator::emitAddress(const syntax::Expression& expr)
+llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
 {
-    if (auto* idExpr = dynamic_cast<const syntax::IdentifierExpression*>(&expr))
+    if (auto* idExpr = dynamic_cast<const syntax::IdentifierExpression*>(&expression))
     {
         if (const auto it = m_program.getContext().resolvedIdentifiers.find(idExpr);
             it != m_program.getContext().resolvedIdentifiers.end()) {
@@ -97,21 +97,21 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expr)
                 return m_globals[declaration];
         }
     }
-    else if (auto* part = dynamic_cast<const syntax::PartWordExpression*>(&expr))
+    else if (auto* part = dynamic_cast<const syntax::PartWordExpression*>(&expression))
     {
         return emitAddress(part->getBase());
     }
-    else if (auto* arrAccess = dynamic_cast<const syntax::ArrayAccessExpression*>(&expr))
+    else if (auto* arrAccess = dynamic_cast<const syntax::ArrayAccessExpression*>(&expression))
     {
         const auto it = m_program.getContext().resolvedIdentifiers.find(arrAccess);
         if (it == m_program.getContext().resolvedIdentifiers.end()) return nullptr;
         
-        const auto* decl = it->second;
+        const auto* declaration = it->second;
         llvm::Value* baseAddr = nullptr;
-        if (m_locals.contains(decl))
-            baseAddr = m_locals[decl];
-        else if (m_globals.contains(decl))
-            baseAddr = m_globals[decl];
+        if (m_locals.contains(declaration))
+            baseAddr = m_locals[declaration];
+        else if (m_globals.contains(declaration))
+            baseAddr = m_globals[declaration];
 
         if (!baseAddr) return nullptr;
 
@@ -124,7 +124,7 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expr)
         }
 
         llvm::Type* baseType = nullptr;
-        decl->match(
+        declaration->match(
             [&](const semantics::ArrayDeclaration& arrayDeclaration) { baseType = convertType(arrayDeclaration.getType()); },
             [&](const auto&) {}
         );
@@ -135,26 +135,26 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expr)
     return nullptr;
 }
 
-void code_generator::visit(const semantics::Declaration& decl)
+void code_generator::visit(const semantics::Declaration& declaration)
 {
     // Only process global declarations here.
-    // if (decl.getScopeDepth() != 1) return;
+    // if (declaration.getScopeDepth() != 1) return;
 
-    if (auto* var = dynamic_cast<const semantics::VariableDeclaration*>(&decl))
+    if (auto* var = dynamic_cast<const semantics::VariableDeclaration*>(&declaration))
     {
         auto* llvmType = convertType(var->getType());
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    llvm::Constant::getNullValue(llvmType), var->getName());
         m_globals[var] = globalVar;
     }
-    else if (auto* arr = dynamic_cast<const semantics::ArrayDeclaration*>(&decl))
+    else if (auto* arr = dynamic_cast<const semantics::ArrayDeclaration*>(&declaration))
     {
         auto* llvmType = convertType(arr->getType());
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    llvm::Constant::getNullValue(llvmType), arr->getName());
         m_globals[arr] = globalVar;
     }
-    else if (auto* proc = dynamic_cast<const semantics::ProcedureDeclaration*>(&decl))
+    else if (auto* proc = dynamic_cast<const semantics::ProcedureDeclaration*>(&declaration))
     {
         const auto* procType = proc->getType().tryAs<semantics::ProcedureType>();
         llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
@@ -178,13 +178,13 @@ void code_generator::visit(const semantics::Declaration& decl)
     }
 }
 
-void code_generator::generateProcedure(const semantics::ProcedureDeclaration& procDecl, const syntax::ProcedureDeclaration& astNode)
+void code_generator::generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration, const syntax::ProcedureDeclaration& astNode)
 {
     m_currentProcedure = &astNode;
     m_labels.clear();
     m_locals.clear();
 
-    llvm::Function* f = llvm::cast<llvm::Function>(m_globals[&procDecl]);
+    llvm::Function* f = llvm::cast<llvm::Function>(m_globals[&procedureDeclaration]);
     m_currentFunction = f;
 
     llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "entry", f);
@@ -212,7 +212,7 @@ void code_generator::visit(const syntax::Program& program)
     {
         if (const auto* procedureDeclaration = global->tryAs<semantics::ProcedureDeclaration>())
         {
-            if (procedureDeclaration->getAstNode() /* && procDecl->getScopeDepth() == 1 */)
+            if (procedureDeclaration->getAstNode())
             {
                 if (auto* syntaxProc = dynamic_cast<const syntax::ProcedureDeclaration*>(procedureDeclaration->getAstNode()))
                 {
@@ -246,9 +246,9 @@ void code_generator::visit(const syntax::Program& program)
 
 void code_generator::visit(const syntax::Block& block)
 {
-    for (const auto& decl : block.getDeclarations())
+    for (const auto& declaration : block.getDeclarations())
     {
-        visit(*decl);
+        visit(*declaration);
     }
     for (const auto& stmt : block.getStatements())
     {
@@ -256,13 +256,13 @@ void code_generator::visit(const syntax::Block& block)
     }
 }
 
-void code_generator::visit(const syntax::Declaration& decl)
+void code_generator::visit(const syntax::Declaration& declaration)
 {
-    if (auto* var = dynamic_cast<const syntax::VariableDeclaration*>(&decl))
+    if (auto* var = dynamic_cast<const syntax::VariableDeclaration*>(&declaration))
         visit(*var);
-    else if (auto* arr = dynamic_cast<const syntax::ArrayDeclaration*>(&decl))
+    else if (auto* arr = dynamic_cast<const syntax::ArrayDeclaration*>(&declaration))
         visit(*arr);
-    else if (auto* proc = dynamic_cast<const syntax::ProcedureDeclaration*>(&decl))
+    else if (auto* proc = dynamic_cast<const syntax::ProcedureDeclaration*>(&declaration))
         visit(*proc);
 }
 
@@ -300,47 +300,47 @@ void code_generator::visit(const syntax::ProcedureDeclaration& declaration)
     // For Phase 1, we only need top-level procedures.
 }
 
-void code_generator::visit(const syntax::Statement& stmt)
+void code_generator::visit(const syntax::Statement& statement)
 {
-    if (auto* s = dynamic_cast<const syntax::AssignmentStatement*>(&stmt)) visit(*s);
-    else if (auto* s1 = dynamic_cast<const syntax::IfStatement*>(&stmt)) visit(*s1);
-    else if (auto* s2 = dynamic_cast<const syntax::GotoStatement*>(&stmt)) visit(*s2);
-    else if (auto* s3 = dynamic_cast<const syntax::ForStatement*>(&stmt)) visit(*s3);
-    else if (auto* s4 = dynamic_cast<const syntax::AnswerStatement*>(&stmt)) visit(*s4);
-    else if (auto* s5 = dynamic_cast<const syntax::CodeStatement*>(&stmt)) visit(*s5);
-    else if (auto* s6 = dynamic_cast<const syntax::ProcedureCallStatement*>(&stmt)) visit(*s6);
-    else if (auto* s7 = dynamic_cast<const syntax::DummyStatement*>(&stmt)) visit(*s7);
-    else if (auto* s8 = dynamic_cast<const syntax::BlockStatement*>(&stmt)) visit(*s8);
-    else if (auto* s9 = dynamic_cast<const syntax::CompoundStatement*>(&stmt)) visit(*s9);
+    if (auto* s = dynamic_cast<const syntax::AssignmentStatement*>(&statement)) visit(*s);
+    else if (auto* s1 = dynamic_cast<const syntax::IfStatement*>(&statement)) visit(*s1);
+    else if (auto* s2 = dynamic_cast<const syntax::GotoStatement*>(&statement)) visit(*s2);
+    else if (auto* s3 = dynamic_cast<const syntax::ForStatement*>(&statement)) visit(*s3);
+    else if (auto* s4 = dynamic_cast<const syntax::AnswerStatement*>(&statement)) visit(*s4);
+    else if (auto* s5 = dynamic_cast<const syntax::CodeStatement*>(&statement)) visit(*s5);
+    else if (auto* s6 = dynamic_cast<const syntax::ProcedureCallStatement*>(&statement)) visit(*s6);
+    else if (auto* s7 = dynamic_cast<const syntax::DummyStatement*>(&statement)) visit(*s7);
+    else if (auto* s8 = dynamic_cast<const syntax::BlockStatement*>(&statement)) visit(*s8);
+    else if (auto* s9 = dynamic_cast<const syntax::CompoundStatement*>(&statement)) visit(*s9);
 }
 
 void code_generator::visit(const syntax::DummyStatement& statement) {}
 
-void code_generator::visit(const syntax::BlockStatement& stmt)
+void code_generator::visit(const syntax::BlockStatement& statement)
 {
-    if (stmt.hasBlock())
-        visit(stmt.getBlock());
+    if (statement.hasBlock())
+        visit(statement.getBlock());
 }
 
-void code_generator::visit(const syntax::CompoundStatement& stmt)
+void code_generator::visit(const syntax::CompoundStatement& statement)
 {
-    for (const auto& s : stmt.getStatements())
+    for (const auto& s : statement.getStatements())
         visit(*s);
 }
 
-void code_generator::visit(const syntax::AssignmentStatement& stmt)
+void code_generator::visit(const syntax::AssignmentStatement& statement)
 {
-    llvm::Value* targetAddr = emitAddress(stmt.getVariable());
-    llvm::Value* rhs = visit(stmt.getExpression());
+    llvm::Value* targetAddr = emitAddress(statement.getVariable());
+    llvm::Value* rhs = visit(statement.getExpression());
     if (!targetAddr || !rhs) return;
 
-    const auto it = m_program.getContext().expressionTypes.find(&stmt.getVariable());
+    const auto it = m_program.getContext().expressionTypes.find(&statement.getVariable());
     llvm::Type* targetType = nullptr;
     if (it != m_program.getContext().expressionTypes.end()) {
         targetType = convertType(*it->second);
     } else {
         // Fallback for arrays
-        if (auto* arrAccess = dynamic_cast<const syntax::ArrayAccessExpression*>(&stmt.getVariable())) {
+        if (auto* arrAccess = dynamic_cast<const syntax::ArrayAccessExpression*>(&statement.getVariable())) {
             if (const auto rit = m_program.getContext().resolvedIdentifiers.find(arrAccess);
                 rit != m_program.getContext().resolvedIdentifiers.end()) {
                 if (auto* arrDeclaration = rit->second->tryAs<semantics::ArrayDeclaration>()) {
@@ -361,9 +361,9 @@ void code_generator::visit(const syntax::AssignmentStatement& stmt)
     m_builder.CreateStore(rhs, targetAddr);
 }
 
-void code_generator::visit(const syntax::IfStatement& stmt)
+void code_generator::visit(const syntax::IfStatement& statement)
 {
-    llvm::Value* cond = visit(stmt.getCondition());
+    llvm::Value* cond = visit(statement.getCondition());
     if (!cond) return;
 
     if (cond->getType()->isIntegerTy() && cond->getType()->getIntegerBitWidth() > 1)
@@ -373,11 +373,11 @@ void code_generator::visit(const syntax::IfStatement& stmt)
     llvm::BasicBlock* elseBB = llvm::BasicBlock::Create(m_module.getContext(), "else");
     llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(m_module.getContext(), "ifcont");
 
-    const bool hasElse = stmt.getElseBranch() != nullptr;
+    const bool hasElse = statement.getElseBranch() != nullptr;
     m_builder.CreateCondBr(cond, thenBB, hasElse ? elseBB : mergeBB);
 
     m_builder.SetInsertPoint(thenBB);
-    visit(stmt.getThenBranch());
+    visit(statement.getThenBranch());
     if (!m_builder.GetInsertBlock()->getTerminator())
         m_builder.CreateBr(mergeBB);
 
@@ -385,7 +385,7 @@ void code_generator::visit(const syntax::IfStatement& stmt)
     {
         m_currentFunction->insert(m_currentFunction->end(), elseBB);
         m_builder.SetInsertPoint(elseBB);
-        visit(*stmt.getElseBranch());
+        visit(*statement.getElseBranch());
         if (!m_builder.GetInsertBlock()->getTerminator())
             m_builder.CreateBr(mergeBB);
     }
@@ -503,9 +503,9 @@ void code_generator::visit(const syntax::ForStatement& statement)
     m_builder.SetInsertPoint(endBB);
 }
 
-void code_generator::visit(const syntax::AnswerStatement& stmt)
+void code_generator::visit(const syntax::AnswerStatement& statement)
 {
-    llvm::Value* val = visit(stmt.getExpression());
+    llvm::Value* val = visit(statement.getExpression());
     if (val && m_currentFunction->getReturnType()->isIntegerTy())
     {
         val = m_builder.CreateIntCast(val, m_currentFunction->getReturnType(), true);
@@ -515,27 +515,27 @@ void code_generator::visit(const syntax::AnswerStatement& stmt)
 
 void code_generator::visit(const syntax::CodeStatement& statement) {}
 
-void code_generator::visit(const syntax::ProcedureCallStatement& stmt)
+void code_generator::visit(const syntax::ProcedureCallStatement& statement)
 {
-    visit(stmt.getExpression());
+    visit(statement.getExpression());
 }
 
-llvm::Value* code_generator::visit(const syntax::Expression& expr)
+llvm::Value* code_generator::visit(const syntax::Expression& expression)
 {
-    if (auto* e = dynamic_cast<const syntax::LiteralExpression*>(&expr)) return visit(*e);
-    if (auto* e = dynamic_cast<const syntax::IdentifierExpression*>(&expr)) return visit(*e);
-    if (auto* e = dynamic_cast<const syntax::BinaryExpression*>(&expr)) return visit(*e);
-    if (auto* e = dynamic_cast<const syntax::UnaryExpression*>(&expr)) return visit(*e);
-    if (auto* e = dynamic_cast<const syntax::FunctionCallExpression*>(&expr)) return visit(*e);
-    if (auto* e = dynamic_cast<const syntax::PartWordExpression*>(&expr)) return visit(*e);
-    if (auto* e = dynamic_cast<const syntax::ArrayAccessExpression*>(&expr)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::LiteralExpression*>(&expression)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::IdentifierExpression*>(&expression)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::BinaryExpression*>(&expression)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::UnaryExpression*>(&expression)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::FunctionCallExpression*>(&expression)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::PartWordExpression*>(&expression)) return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::ArrayAccessExpression*>(&expression)) return visit(*e);
     return nullptr;
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-llvm::Value* code_generator::visit(const syntax::LiteralExpression& expr)
+llvm::Value* code_generator::visit(const syntax::LiteralExpression& expression)
 {
-    auto& val = expr.getLiteral()->getValue();
+    auto& val = expression.getLiteral()->getValue();
     if (std::holds_alternative<llvm::APSInt>(val))
     {
         return llvm::ConstantInt::get(m_module.getContext(), std::get<llvm::APSInt>(val));
@@ -554,9 +554,9 @@ llvm::Value* code_generator::visit(const syntax::LiteralExpression& expr)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expr)
+llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expression)
 {
-    if (const auto it = m_program.getContext().resolvedIdentifiers.find(&expr);
+    if (const auto it = m_program.getContext().resolvedIdentifiers.find(&expression);
         it != m_program.getContext().resolvedIdentifiers.end()) {
         const auto* declaration = it->second;
         if (auto* procedureDeclaration = declaration->tryAs<semantics::ProcedureDeclaration>()) {
@@ -568,7 +568,7 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expr)
             if (const auto* procType = procedureDeclaration->getType().tryAs<semantics::ProcedureType>()) {
                 llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
                 if (procType->getReturnType()) retType = convertType(*procType->getReturnType());
-                const std::vector<llvm::Type*> params;
+                constexpr std::vector<llvm::Type*> params;
                 ft = llvm::FunctionType::get(retType, params, false);
             }
             if (ft) return m_builder.CreateCall(ft, funcVal, {});
@@ -576,12 +576,12 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expr)
         }
     }
 
-    llvm::Value* addr = emitAddress(expr);
+    llvm::Value* addr = emitAddress(expression);
     if (!addr) return nullptr;
     if (llvm::isa<llvm::Function>(addr)) return addr;
     
     llvm::Type* type = nullptr;
-    if (const auto typeIt = m_program.getContext().expressionTypes.find(&expr);
+    if (const auto typeIt = m_program.getContext().expressionTypes.find(&expression);
         typeIt != m_program.getContext().expressionTypes.end()) {
         type = convertType(*typeIt->second);
     } else {
@@ -590,10 +590,10 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expr)
     return m_builder.CreateLoad(type, addr);
 }
 
-llvm::Value* code_generator::visit(const syntax::BinaryExpression& expr)
+llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
 {
-    llvm::Value* L = visit(expr.getLeft());
-    llvm::Value* R = visit(expr.getRight());
+    llvm::Value* L = visit(expression.getLeft());
+    llvm::Value* R = visit(expression.getRight());
     if (!L || !R) return nullptr;
 
     if (L->getType() != R->getType())
@@ -611,7 +611,7 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expr)
         }
     }
 
-    const auto kind = expr.getOp()->getTokenType();
+    const auto kind = expression.getOp()->getTokenType();
     if (kind == lexer::TokenType::Plus) return L->getType()->isFloatingPointTy() ? m_builder.CreateFAdd(L, R) : m_builder.CreateAdd(L, R);
     if (kind == lexer::TokenType::Minus) return L->getType()->isFloatingPointTy() ? m_builder.CreateFSub(L, R) : m_builder.CreateSub(L, R);
     if (kind == lexer::TokenType::Asterisk) return L->getType()->isFloatingPointTy() ? m_builder.CreateFMul(L, R) : m_builder.CreateMul(L, R);
@@ -625,20 +625,20 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expr)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::UnaryExpression& expr)
+llvm::Value* code_generator::visit(const syntax::UnaryExpression& expression)
 {
-    llvm::Value* operand = visit(expr.getOperand());
+    llvm::Value* operand = visit(expression.getOperand());
     if (!operand) return nullptr;
 
-    const auto kind = expr.getOp()->getTokenType();
+    const auto kind = expression.getOp()->getTokenType();
     if (kind == lexer::TokenType::Minus) return m_builder.CreateNeg(operand);
     if (kind == lexer::TokenType::Plus) return operand;
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& expr)
+llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& expression)
 {
-    auto it = m_program.getContext().resolvedIdentifiers.find(&expr);
+    const auto it = m_program.getContext().resolvedIdentifiers.find(&expression);
     if (it == m_program.getContext().resolvedIdentifiers.end()) return nullptr;
 
     const auto* declaration = it->second;
@@ -646,7 +646,7 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& expr)
     if (!funcVal) return nullptr;
 
     std::vector<llvm::Value*> args;
-    for (const auto& arg : expr.getArguments())
+    for (const auto& arg : expression.getArguments())
     {
         args.push_back(visit(*arg));
     }
@@ -668,16 +668,16 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& expr)
 
 llvm::Value* code_generator::visit(const syntax::PartWordExpression& expression) { return nullptr; }
 
-llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expr)
+llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expression)
 {
-    llvm::Value* addr = emitAddress(expr);
+    llvm::Value* addr = emitAddress(expression);
     if (!addr) return nullptr;
 
-    const auto rit = m_program.getContext().resolvedIdentifiers.find(&expr);
+    const auto rit = m_program.getContext().resolvedIdentifiers.find(&expression);
     llvm::Type* type = llvm::Type::getInt32Ty(m_module.getContext());
     if (rit != m_program.getContext().resolvedIdentifiers.end()) {
-        if (auto* arrDecl = rit->second->tryAs<semantics::ArrayDeclaration>()) {
-            type = convertType(arrDecl->getType().tryAs<semantics::ArrayType>()->getElementType());
+        if (auto* arrayDeclaration = rit->second->tryAs<semantics::ArrayDeclaration>()) {
+            type = convertType(arrayDeclaration->getType().tryAs<semantics::ArrayType>()->getElementType());
         }
     }
     return m_builder.CreateLoad(type, addr, "arrayload");

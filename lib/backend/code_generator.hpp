@@ -47,41 +47,41 @@ public:
     void generate();
 
     llvm::Type* convertType(const semantics::Type& type);
-    llvm::Value* emitAddress(const syntax::Expression& expr);
-    llvm::BasicBlock* getOrCreateLabel(const syntax::Statement* stmt);
+    llvm::Value* emitAddress(const syntax::Expression& expression);
+    llvm::BasicBlock* getOrCreateLabel(const syntax::Statement* statement);
 
-    void visit(const semantics::Declaration& decl);
+    void visit(const semantics::Declaration& declaration);
     
     void visit(const syntax::Program& program);
     void visit(const syntax::Block& block);
-    void visit(const syntax::Declaration& decl);
+    void visit(const syntax::Declaration& declaration);
     void visit(const syntax::ProcedureDeclaration& declaration);
     void visit(const syntax::VariableDeclaration& declaration);
     void visit(const syntax::ArrayDeclaration& declaration);
 
-    void visit(const syntax::Statement& stmt);
-    void visit(const syntax::AssignmentStatement& stmt);
-    void visit(const syntax::IfStatement& stmt);
+    void visit(const syntax::Statement& statement);
+    void visit(const syntax::AssignmentStatement& statement);
+    void visit(const syntax::IfStatement& statement);
     void visit(const syntax::GotoStatement& statement);
     void visit(const syntax::ForStatement& statement);
-    void visit(const syntax::AnswerStatement& stmt);
+    void visit(const syntax::AnswerStatement& statement);
     void visit(const syntax::CodeStatement& statement);
-    void visit(const syntax::ProcedureCallStatement& stmt);
+    void visit(const syntax::ProcedureCallStatement& statement);
     void visit(const syntax::DummyStatement& statement);
-    void visit(const syntax::BlockStatement& stmt);
-    void visit(const syntax::CompoundStatement& stmt);
+    void visit(const syntax::BlockStatement& statement);
+    void visit(const syntax::CompoundStatement& statement);
 
-    llvm::Value* visit(const syntax::Expression& expr);
-    llvm::Value* visit(const syntax::LiteralExpression& expr);
-    llvm::Value* visit(const syntax::IdentifierExpression& expr);
-    llvm::Value* visit(const syntax::BinaryExpression& expr);
-    llvm::Value* visit(const syntax::UnaryExpression& expr);
-    llvm::Value* visit(const syntax::FunctionCallExpression& expr);
+    llvm::Value* visit(const syntax::Expression& expression);
+    llvm::Value* visit(const syntax::LiteralExpression& expression);
+    llvm::Value* visit(const syntax::IdentifierExpression& expression);
+    llvm::Value* visit(const syntax::BinaryExpression& expression);
+    llvm::Value* visit(const syntax::UnaryExpression& expression);
+    llvm::Value* visit(const syntax::FunctionCallExpression& expression);
     llvm::Value* visit(const syntax::PartWordExpression& expression);
-    llvm::Value* visit(const syntax::ArrayAccessExpression& expr);
+    llvm::Value* visit(const syntax::ArrayAccessExpression& expression);
     
 private:
-    void generateProcedure(const semantics::ProcedureDeclaration& procDecl, const syntax::ProcedureDeclaration& astNode);
+    void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration, const syntax::ProcedureDeclaration& astNode);
 };
 
 } // namespace coral66::CGLLVM
