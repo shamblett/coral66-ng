@@ -17,7 +17,7 @@ void CommandLineProcessor::PrintVersion(llvm::raw_ostream& OS)
     OS << version << "\n";
 }
 
-void CommandLineProcessor::ParseCommandLine(int argc, char** argv)
+void CommandLineProcessor::ParseCommandLine(const int argc, char** argv)
 {
     // Reset all options to their default values before parsing
     // As all these variables are global any users that run this multiple times in

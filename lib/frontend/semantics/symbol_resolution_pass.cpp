@@ -45,6 +45,13 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 visit(*item);
             }
         }
+        else if (auto* extCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(communicator))
+        {
+            for (const auto& item : extCommunicator->getItems())
+            {
+                visit(*item);
+            }
+        }
     }
 
     if (node.hasBlock())

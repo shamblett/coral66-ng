@@ -752,13 +752,13 @@ std::vector<lexer::CTokenIterator> LibraryCommunicator::getItems() const
 
 // ExternalCommunicator
 ExternalCommunicator::ExternalCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                                           const std::vector<lexer::CTokenIterator>& items)
+                                           std::vector<std::unique_ptr<Declaration>>&& items)
 
-    : Communicator(begin, end), m_items(items)
+    : Communicator(begin, end), m_items(std::move(items))
 {
 }
 
-std::vector<lexer::CTokenIterator> ExternalCommunicator::getItems() const
+const std::vector<std::unique_ptr<Declaration>>& ExternalCommunicator::getItems() const
 {
     return m_items;
 }

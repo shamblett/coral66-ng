@@ -162,7 +162,10 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
 
     auto start = begin;
 
-    if (begin->getTokenType() == lexer::TokenType::CommonKeyword)
+    bool isCommon = begin->getTokenType() == lexer::TokenType::CommonKeyword;
+    bool isExternal = begin->getTokenType() == lexer::TokenType::ExternalKeyword;
+
+    if (isCommon || isExternal)
     {
         std::vector<std::unique_ptr<syntax::Declaration>> result;
         begin++;
@@ -334,7 +337,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
         auto endToken = begin;
         begin++;
 
-        return std::make_unique<syntax::CommonCommunicator>(start, endToken, std::move(result));
+        if (isCommon)
+            return std::make_unique<syntax::CommonCommunicator>(start, endToken, std::move(result));
+        return std::make_unique<syntax::ExternalCommunicator>(start, endToken, std::move(result));
     }
 
     return nullptr;

@@ -151,7 +151,6 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         default:
             llvm::CodeGenOpt::parseLevel('0').value();
             break;
-            ;
     }
 
     // Debug level
@@ -164,7 +163,6 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         default:
             codegenOptions.debugEmission = cgllvm::DebugEmission::None;
             break;
-            ;
     }
 
     auto targetMachine = coral66::cgllvm::generateLLVM(module, tree, program, codegenOptions);
@@ -314,8 +312,7 @@ int coral66::ActionExecutor::linkExecutable() const
     }
     command += " -o " + outName;
 
-    int result = std::system(command.c_str());
-    if (result != 0)
+    if (int result = std::system(command.c_str()); result != 0)
     {
         *m_reporter << errors::CLI::FAILED_TO_LINK_EXECUTABLE.argsCLI();
         return EXIT_FAILURE;

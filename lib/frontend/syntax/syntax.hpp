@@ -599,12 +599,12 @@ public:
 
 class ExternalCommunicator final : public Communicator
 {
-    std::vector<lexer::CTokenIterator> m_items;
+    std::vector<std::unique_ptr<Declaration>> m_items;
 
 public:
     ExternalCommunicator(lexer::CTokenIterator begin, lexer::CTokenIterator end,
-                         const std::vector<lexer::CTokenIterator>& items);
-    [[nodiscard]] std::vector<lexer::CTokenIterator> getItems() const;
+                         std::vector<std::unique_ptr<Declaration>>&& items);
+    [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getItems() const;
 };
 
 } // namespace coral66::syntax
