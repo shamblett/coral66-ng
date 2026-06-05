@@ -312,7 +312,7 @@ int coral66::ActionExecutor::linkExecutable() const
     }
     command += " -o " + outName;
 
-    if (int result = std::system(command.c_str()); result != 0)
+    if (const int result = std::system(command.c_str()); result != 0)
     {
         *m_reporter << errors::CLI::FAILED_TO_LINK_EXECUTABLE.argsCLI();
         return EXIT_FAILURE;
