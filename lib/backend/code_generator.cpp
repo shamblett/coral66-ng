@@ -589,15 +589,10 @@ llvm::Value* code_generator::visit(const syntax::LiteralExpression& expression)
     }
     if (std::holds_alternative<std::string>(val))
     {
-        // Try parsing string if fallback
-        try
-        {
-            return llvm::ConstantInt::get(m_module.getContext(),
-                                          llvm::APInt(32, std::stoi(std::get<std::string>(val)), true));
-        }
-        catch (...)
-        {
-        }
+        const std::string& strValue = std::get<std::string>(val);
+        // Standard Coral string literals should be emitted as global string constants
+        // returning an i8* (pointer to characters) which allows passing to EXTERNAL C functions.
+        return m_builder.CreateGlobalStringPtr(strValue);
     }
     return nullptr;
 }
@@ -742,7 +737,21 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
     }
 
     if (ft)
+    {
+        for (size_t i = 0; i < args.size() && i < ft->getNumParams(); ++i)
+        {
+            if (args[i]->getType() != ft->getParamType(i))
+            {
+                if (args[i]->getType()->isPointerTy() && ft->getParamType(i)->isIntegerTy())
+                    args[i] = m_builder.CreatePtrToInt(args[i], ft->getParamType(i));
+                else if (args[i]->getType()->isIntegerTy() && ft->getParamType(i)->isPointerTy())
+                    args[i] = m_builder.CreateIntToPtr(args[i], ft->getParamType(i));
+                else
+                    args[i] = m_builder.CreateIntCast(args[i], ft->getParamType(i), true);
+            }
+        }
         return m_builder.CreateCall(ft, funcVal, args);
+    }
     return nullptr;
 }
 
