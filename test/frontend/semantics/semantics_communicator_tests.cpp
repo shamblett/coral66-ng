@@ -66,9 +66,9 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
             "PROGRAM TEST COMMON(INTEGER PROCEDURE P(VALUE INTEGER)) BEGIN INTEGER I ; I := P(10) END");
         SymbolResolutionResult res(parsed);
 
-        auto pDecl = findDeclaration(res.context, "P");
-        CHECK(pDecl != nullptr);
-        CHECK(pDecl->is<semantics::ProcedureDeclaration>());
+        auto procedureDeclaration = findDeclaration(res.context, "P");
+        CHECK(procedureDeclaration != nullptr);
+        CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(res.errors == false);
     }
 
@@ -97,6 +97,35 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
     SECTION("Error on mismatching common label and inner variable")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON(LABEL L1) BEGIN INTEGER L1; L1: END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundRedef = false;
+        for (auto& d : diagnostics)
+            if (d.getName() == "REDEFINITION_OF_SYMBOL_N")
+                foundRedef = true;
+        CHECK(foundRedef);
+    }
+}
+
+TEST_CASE("Symbol Resolution - External Communicators", "[Semantics][SymbolResolution][Communicator]")
+{
+    SECTION("Procedure Specification in External")
+    {
+        const ParsedProgram parsed("PROGRAM TEST EXTERNAL(INTEGER PROCEDURE P(VALUE INTEGER))");
+        const SymbolResolutionResult res(parsed);
+
+        auto procedureDeclaration = findDeclaration(res.context, "P");
+        CHECK(procedureDeclaration != nullptr);
+        CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
+        CHECK(res.errors == false);
+    }
+
+    SECTION("Error on duplicate symbol in EXTERNAL communicator")
+    {
+        ParsedProgram parsed(
+            "PROGRAM TEST EXTERNAL(INTEGER PROCEDURE P(VALUE INTEGER); INTEGER PROCEDURE P(VALUE INTEGER))");
         SymbolResolutionResult res(parsed);
 
         CHECK(res.errors == true);
