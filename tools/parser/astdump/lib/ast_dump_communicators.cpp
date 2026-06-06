@@ -24,6 +24,17 @@ rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
         }
         obj.AddMember("Common", commons, m_alloc);
     }
+
+    if (auto* externalCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(communicator))
+    {
+        rapidjson::Value externals(rapidjson::kArrayType);
+        for (const auto& external : externalCommunicator->getItems())
+        {
+            externals.PushBack(dump(external.get()), m_alloc);
+        }
+        obj.AddMember("External", externals, m_alloc);
+    }
+
     return obj;
 }
 

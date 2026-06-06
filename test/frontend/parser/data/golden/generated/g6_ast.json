@@ -1,0 +1,200 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "G6"
+    },
+    "Communicator": {
+        "External": [
+            {
+                "NodeType": "ProcedureSpecification",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Name": {
+                    "Class": "identifier",
+                    "Value": "computeStatus"
+                },
+                "Parameters": [
+                    {
+                        "NodeType": "ParameterDeclaration",
+                        "Mode": "Value",
+                        "Type": {
+                            "Class": "INTEGER",
+                            "Value": "INTEGER"
+                        },
+                        "Identifiers": []
+                    }
+                ]
+            }
+        ]
+    },
+    "Block": {
+        "NodeType": "Block",
+        "Declarations": [
+            {
+                "NodeType": "VariableDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "val"
+                    }
+                ],
+                "Preset": false,
+                "Preset Tokens": []
+            },
+            {
+                "NodeType": "ArrayDeclaration",
+                "Type": {
+                    "Class": "INTEGER",
+                    "Value": "INTEGER"
+                },
+                "Identifiers": [
+                    {
+                        "Class": "identifier",
+                        "Value": "sharedArr"
+                    }
+                ],
+                "Dimensions": [
+                    [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        },
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "5"
+                            }
+                        }
+                    ]
+                ],
+                "Has Preset": false,
+                "Preset Tokens": []
+            }
+        ],
+        "Statements": [
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "val"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "FunctionCallExpression",
+                    "Function": {
+                        "Class": "identifier",
+                        "Value": "computeStatus"
+                    },
+                    "Arguments": [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "10"
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "NodeType": "IfStatement",
+                "Then": {
+                    "NodeType": "GotoStatement",
+                    "Label": {
+                        "Class": "identifier",
+                        "Value": "errorPoint"
+                    },
+                    "Index": {}
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "ArrayAccessExpression",
+                    "Array": {
+                        "Class": "identifier",
+                        "Value": "sharedArr"
+                    },
+                    "Indices": [
+                        {
+                            "NodeType": "LiteralExpression",
+                            "Literal": {
+                                "Class": "literal",
+                                "Value": "0"
+                            }
+                        }
+                    ]
+                },
+                "RHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "val"
+                    }
+                }
+            },
+            {
+                "NodeType": "GotoStatement",
+                "Label": {
+                    "Class": "identifier",
+                    "Value": "skipError"
+                },
+                "Index": {}
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "val"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "UnaryExpression",
+                    "Op": {
+                        "Class": "-",
+                        "Value": "-"
+                    },
+                    "Operand": {
+                        "NodeType": "LiteralExpression",
+                        "Literal": {
+                            "Class": "literal",
+                            "Value": "1"
+                        }
+                    }
+                }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "val"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "0"
+                    }
+                }
+            }
+        ]
+    }
+}

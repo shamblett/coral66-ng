@@ -38,6 +38,9 @@
 
 5. g5.cor
   This file specifically targets edge features like inline system code and the Coral 66 macro preprocessor:
-- DEFINE (Preprocessor keyword to define a macro string).
-- DELETE (Preprocessor keyword to erase a macro from memory).
-- CODE (To verify the CODE BEGIN "..." END inline code assembly/escape).
+     - DEFINE (Preprocessor keyword to define a macro string).
+     - DELETE (Preprocessor keyword to erase a macro from memory).
+     - CODE (To verify the CODE BEGIN "..." END inline code assembly/escape).
+
+5. g6.cor
+   This file specifically targets the external communicator

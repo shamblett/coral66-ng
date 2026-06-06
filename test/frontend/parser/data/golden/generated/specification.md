@@ -1,6 +1,5 @@
 This directory contains machine generated Coral 66 source files to support golden testing of the lexer, preprocessor and
-parser
-processing chain. Each generated file must conform to the following specification :-
+parser processing chains. Each generated file must conform to the following specification :-
 
 - The source files must have an extension of .cor
 - Stropped or unstropped keywords can be used but not in the same source file, i.e. all keywords in the same source file
