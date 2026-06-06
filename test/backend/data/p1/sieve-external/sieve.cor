@@ -21,7 +21,8 @@
 'DEFINE' SIZE "8190";
 
 EXTERNAL ( PROCEDURE PrintString(VALUE INTEGER);
-           PROCEDURE PrintValue(LOCATION INTEGER))
+           PROCEDURE PrintInteger(VALUE INTEGER);
+           PROCEDURE NewLines(INTEGER))
 
 'BEGIN'
    'INTEGER' ans;
@@ -68,11 +69,14 @@ EXTERNAL ( PROCEDURE PrintString(VALUE INTEGER);
    'END' sieve;
 
    PrintString("The Sieve of Eratosthenes");
+   NewLines(1);
 
    ans := sieve;
 
     PrintString("The answer is :- ");
-    PrintValue(ans);
-
+    PrintInteger(ans);
+    NewLines(2);
+    PrintString("End of Program ");
+    NewLines(1);
 'END'
 

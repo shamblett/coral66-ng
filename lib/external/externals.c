@@ -1,9 +1,8 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
-
 
 #include <stdint.h>
 #include <stdio.h>
@@ -15,40 +14,37 @@
 // The procedure signature must match the name and parameters used in your Coral EXTERNAL
 // communicator declaration,
 
-// LOCATION INTEGER
-// EXTERNAL ( PROCEDURE PrintValue(LOCATION INTEGER) );
-void PrintValue(const int val)
-{
-    printf("%d\n", val);
-}
-
 // EXTERNAL ( PROCEDURE Exit(INTEGER) );
+// Exits the program with the specified exit code.
 void Exit(const int code)
 {
     exit(code);
 }
 
-// The signature must match the name used in your Coral EXTERNAL declaration
-//
-// // We use intptr_t to safely hold the memory address regardless of whether
-// the platform is 32-bit or 64-bit.
-// VALUE INTEGER
-// EXTERNAL ( PROCEDURE PrintString(VALUE INTEGER) );
+// EXTERNAL ( PROCEDURE NewLines(INTEGER) );
+// Prints the specified number of newlines
+void NewLines(const int number)
+{
+    for (int i = 0; i <= number; i++)
+    {
+        putchar('\n');
+    }
+}
 
+// EXTERNAL ( PROCEDURE PrintString(VALUE INTEGER) );
+// Prints the supplied string, no newline.
 void PrintString(const intptr_t stringAddress)
 {
     // Cast the raw integer back to a standard C character pointer
     const auto str = (const char*)stringAddress;
 
     // Call the standard library function
-    printf("%s\n", str);
+    printf("%s", str);
 }
 
-// Optional: For printing integers as you requested earlier
-// VALUE INTEGER
 // EXTERNAL ( PROCEDURE PrintInteger(VALUE INTEGER) );
-
+// Prints the supplied integer, no newline
 void PrintInteger(const intptr_t val)
 {
-    printf("%d\n", (int)val);
+    printf("%d", (int)val);
 }
