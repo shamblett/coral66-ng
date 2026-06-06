@@ -20,6 +20,9 @@
 
 'DEFINE' SIZE "8190";
 
+EXTERNAL ( PROCEDURE PrintString(VALUE INTEGER);
+           PROCEDURE PrintValue(LOCATION INTEGER))
+
 'BEGIN'
    'INTEGER' ans;
    'INTEGER' startTime, stopTime;
@@ -64,7 +67,12 @@
       'ANSWER' count
    'END' sieve;
 
+   PrintString("The Sieve of Eratosthenes");
+
    ans := sieve;
+
+    PrintString("The answer is :- ");
+    PrintValue(ans);
 
 'END'
 

@@ -37,7 +37,7 @@ coral66::PPSourceObject preprocess(std::string source)
 
 namespace coral66::Tests
 {
-struct ProducesPP : Catch::Matchers::MatcherBase<coral66::PPSourceObject>
+struct ProducesPP : Catch::Matchers::MatcherBase<PPSourceObject>
 {
 private:
     std::string m_source;
