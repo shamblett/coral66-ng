@@ -1,0 +1,26 @@
+PROGRAM G13
+
+EXTERNAL (
+  INTEGER PROCEDURE computeStatus ( VALUE INTEGER );
+)
+
+BEGIN
+  INTEGER val;
+  INTEGER ARRAY sharedArr [ 0 : 5 ];
+
+  COMMENT Usage of EXTERNAL procedure ;
+  val := computeStatus ( 10 );
+
+  IF val <> 0 THEN
+    GOTO errorPoint;
+
+  sharedArr [ 0 ] := val;
+  GOTO skipError;
+
+  errorPoint:
+    val := -1;
+
+  skipError:
+    val := 0
+
+END end of program ;

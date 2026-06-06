@@ -76,3 +76,8 @@
    - Passes `STRING` literals into procedures (e.g., `"Hello Coral 66"`).
    - Contains deeply nested `BEGIN ... END` block structures to test proper lexical scoping and variable shadowing.
 
+11. g10.cor and g11.cor
+    These file check duplicate and missing label handling:
+
+12. g12.cor
+    This file checks EXTERNAL communicator processing.
