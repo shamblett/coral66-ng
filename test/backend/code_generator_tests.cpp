@@ -27,7 +27,7 @@ TEST_CASE("Phase 1 - Sieve End-to-End Execution", "[Backend][Execution]")
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    auto sourcePath = getTestDataPath("p1/sieve.cor", "BACKEND_DIR");
+    auto sourcePath = getTestDataPath("p1/sieve/sieve.cor", "BACKEND_DIR");
     auto source = readFile(sourcePath);
     REQUIRE_FALSE(source.empty());
 

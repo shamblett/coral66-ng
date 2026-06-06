@@ -11,7 +11,7 @@ Compile and link your Coral 66 source (sieve.cor) with the C wrapper (externals.
    Pass both the C wrapper and the Coral object file gcc. The C compiler will automatically invoke the system linker, resolve the EXTERNAL symbol, and
    link in the standard C library (libc).
 
-   gcc wrapper.c sieve.o -o sieve
+   gcc externals.c sieve.o -o sieve
 
 3. Run your program:
    ./sieve

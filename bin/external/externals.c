@@ -1,16 +1,29 @@
+/*
+* Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 31/01/2026
+ */
+
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+//
+// Externals wrapper to allow communication between the EXTERNAL communicator declarations and
+// the platform library facilities.
+// The procedure signature must match the name and parameters used in your Coral EXTERNAL
+// communicator declaration,
+
 // LOCATION INTEGER
-// EXTERNAL ( PROCEDURE CoralPutsValue(LOCATION INTEGER) );
-void CoralPutsValue(int val)
+// EXTERNAL ( PROCEDURE PrintValue(LOCATION INTEGER) );
+void PrintValue(const int val)
 {
     printf("%d\n", val);
 }
 
-// EXTERNAL ( PROCEDURE CoralExit(INTEGER) );
-void CoralExit(int code)
+// EXTERNAL ( PROCEDURE Exit(INTEGER) );
+void Exit(const int code)
 {
     exit(code);
 }
@@ -20,12 +33,12 @@ void CoralExit(int code)
 // // We use intptr_t to safely hold the memory address regardless of whether
 // the platform is 32-bit or 64-bit.
 // VALUE INTEGER
-// EXTERNAL ( 'PROCEDURE' CoralPutsString('VALUE' 'INTEGER') );
+// EXTERNAL ( PROCEDURE PrintString(VALUE INTEGER) );
 
-void CoralPutsString(intptr_t stringAddress)
+void PrintString(const intptr_t stringAddress)
 {
     // Cast the raw integer back to a standard C character pointer
-    const char* str = (const char*)stringAddress;
+    const auto str = (const char*)stringAddress;
 
     // Call the standard library function
     printf("%s\n", str);
@@ -33,9 +46,9 @@ void CoralPutsString(intptr_t stringAddress)
 
 // Optional: For printing integers as you requested earlier
 // VALUE INTEGER
-// 'EXTERNAL' ( 'PROCEDURE' CoralPrintInteger('VALUE' 'INTEGER') );
+// EXTERNAL ( PROCEDURE PrintInteger(VALUE INTEGER) );
 
-void CoralPrintInteger(intptr_t val)
+void PrintInteger(const intptr_t val)
 {
     printf("%d\n", (int)val);
 }
