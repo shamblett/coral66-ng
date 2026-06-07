@@ -1,0 +1,787 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "ans",
+                "Scope Depth": 3
+            },
+            {
+                "Name": "m",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "n",
+                "Scope Depth": 4
+            },
+            {
+                "Name": "Ackermann",
+                "Scope Depth": 3
+            }
+        ]
+    },
+    "Resolved Identifiers": [
+        {
+            "NodeText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 46,
+                "Column": 12
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "m",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 47,
+                "Column": 19
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "n",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 48,
+                "Column": 18
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "n",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 19
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "Ackermann",
+                "Type": {
+                    "ReturnType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "m",
+                            "IsValue": true
+                        },
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "n",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 30
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "m",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 19
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "Ackermann",
+                "Type": {
+                    "ReturnType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "m",
+                            "IsValue": true
+                        },
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "n",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 30
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "m",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 37
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "Ackermann",
+                "Type": {
+                    "ReturnType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "m",
+                            "IsValue": true
+                        },
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "n",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "NodeText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 48
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "m",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 51
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "n",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": true
+                }
+            }
+        },
+        {
+            "NodeText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 54,
+                "Column": 4
+            },
+            "Usable": {
+                "Kind": "VariableDeclaration",
+                "Name": "ans",
+                "Type": {
+                    "Name": "PrimitiveType",
+                    "Kind": "Integer",
+                    "IsLocation": false,
+                    "IsUndefined": false,
+                    "IsValue": false
+                }
+            }
+        },
+        {
+            "NodeText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 54,
+                "Column": 11
+            },
+            "Usable": {
+                "Kind": "ProcedureDeclaration",
+                "Name": "Ackermann",
+                "Type": {
+                    "ReturnType": {
+                        "Name": "PrimitiveType",
+                        "Kind": "Integer",
+                        "IsLocation": false,
+                        "IsUndefined": false,
+                        "IsValue": false
+                    },
+                    "Parameters": [
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "m",
+                            "IsValue": true
+                        },
+                        {
+                            "Type": {
+                                "Name": "PrimitiveType",
+                                "Kind": "Integer",
+                                "IsLocation": false,
+                                "IsUndefined": false,
+                                "IsValue": false
+                            },
+                            "Name": "n",
+                            "IsValue": true
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "Expression Types": [
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 46,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 46,
+                "Column": 12
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 46,
+                "Column": 16
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 47,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 47,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 47,
+                "Column": 23
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 48,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 48,
+                "Column": 18
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "0",
+            "Location": {
+                "FileId": 0,
+                "Line": 48,
+                "Column": 22
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 34
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 49,
+                "Column": 37
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 19
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 30
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 34
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 37
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "m",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 48
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 51
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        },
+        {
+            "ExpressionText": "n",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 51
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 51,
+                "Column": 55
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "ans",
+            "Location": {
+                "FileId": 0,
+                "Line": 54,
+                "Column": 4
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "Ackermann",
+            "Location": {
+                "FileId": 0,
+                "Line": 54,
+                "Column": 11
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "3",
+            "Location": {
+                "FileId": 0,
+                "Line": 54,
+                "Column": 22
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "6",
+            "Location": {
+                "FileId": 0,
+                "Line": 54,
+                "Column": 24
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 0
+    }
+}
