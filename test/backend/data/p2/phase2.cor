@@ -17,7 +17,7 @@
 
       'IF' (g 'MASK' 1) <> 0 'THEN' 'COMMENT' MASK is Bitwise AND. 5 MASK 1 = 1 ;
       'BEGIN'
-         ans := 42
+         ans := 42; 'COMMENT' This is the correct answer;
       'END'
       'ELSE'
       'BEGIN'
