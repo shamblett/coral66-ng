@@ -33,7 +33,7 @@ struct ParsedExpression
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
-        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
 
         const auto& tokens = cTokens.data();
         const lexer::CToken* begin = tokens.data();
@@ -64,7 +64,7 @@ struct ParsedStatement
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
-        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
 
         if (isTypedProc)
             context->enterProcedure(true);
@@ -99,7 +99,7 @@ struct ParsedProcedure
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
-        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
 
         const auto& tokens = cTokens.data();
         const lexer::CToken* begin = tokens.data();
@@ -129,7 +129,7 @@ struct ParsedCommunicator
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
-        context = std::make_unique<coral66::parser::Context>(cTokens, &ss);
+        context = std::make_unique<parser::Context>(cTokens, &ss);
 
         const auto& tokens = cTokens.data();
         const lexer::CToken* begin = tokens.data();
