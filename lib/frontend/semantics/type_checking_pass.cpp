@@ -695,6 +695,23 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
             if (!isBitsOrInt(*type1) || !isBitsOrInt(*type2))
                 operandsValid = false;
         }
+        else if (opType == lexer::TokenType::LessThan || opType == lexer::TokenType::LessThanOrEqual
+                 || opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual
+                 || opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
+        {
+            if (isBitsType(*type1) && isBitsType(*type2))
+            {
+                // Fine
+            }
+            else if ((isBitsType(*type1) && isNumericType(*type2)) || (isNumericType(*type1) && isBitsType(*type2)))
+            {
+                // Coral 66 allows mixing bits and integers in some contexts, but let's just let it pass here
+            }
+            else if (isBitsType(*type1) || isBitsType(*type2))
+            {
+                operandsValid = false;
+            }
+        }
         else
         {
             if (isBitsType(*type1) || isBitsType(*type2))
@@ -705,6 +722,14 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         if (isBitwiseOp)
         {
             common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits});
+        }
+        else if (opType == lexer::TokenType::LessThan || opType == lexer::TokenType::LessThanOrEqual
+                 || opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual
+                 || opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
+        {
+            if (isBitsType(*type1) || isBitsType(*type2)) {
+                common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits});
+            }
         }
 
         if ((common->is<ErrorType>() || !operandsValid) && !type1->is<ErrorType>() && !type2->is<ErrorType>())

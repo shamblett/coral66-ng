@@ -1,0 +1,31 @@
+'PROGRAM' Phase2Test
+'BEGIN'
+   'INTEGER' ans;
+   'INTEGER' a, b, c, d, e;
+
+   a := 10;
+   b := 5;
+   c := a - b;      'COMMENT' 5 ;
+   d := a * b;      'COMMENT' 50 ;
+   e := a / b;      'COMMENT' 2 ;
+
+   'IF' c = 5 'AND' d = 50 'AND' e = 2 'THEN'
+   'BEGIN'
+      'INTEGER' f, g;
+      f := a 'UNION' b;  'COMMENT' Bitwise OR: 10 (1010) UNION 5 (0101) = 15 (1111) ;
+      g := f 'DIFFER' a; 'COMMENT' Bitwise XOR: 15 (1111) DIFFER 10 (1010) = 5 (0101) ;
+
+      'IF' (g 'MASK' 1) <> 0 'THEN' 'COMMENT' MASK is Bitwise AND. 5 MASK 1 = 1 ;
+      'BEGIN'
+         ans := 42
+      'END'
+      'ELSE'
+      'BEGIN'
+         ans := 0
+      'END'
+   'END'
+   'ELSE'
+   'BEGIN'
+      ans := 99
+   'END'
+'END'

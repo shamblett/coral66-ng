@@ -687,6 +687,12 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         return m_builder.CreateICmpSGT(L, R);
     if (kind == lexer::TokenType::GreaterThanOrEqual)
         return m_builder.CreateICmpSGE(L, R);
+    if (kind == lexer::TokenType::AndKeyword || kind == lexer::TokenType::MaskKeyword)
+        return m_builder.CreateAnd(L, R);
+    if (kind == lexer::TokenType::OrKeyword || kind == lexer::TokenType::UnionKeyword)
+        return m_builder.CreateOr(L, R);
+    if (kind == lexer::TokenType::DifferKeyword)
+        return m_builder.CreateXor(L, R);
     return nullptr;
 }
 

@@ -645,6 +645,30 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
         return parseWordReference(begin, end, context);
     }
 
+    if (tType == lexer::TokenType::OpenParentheses)
+    {
+        begin++; // skip (
+        auto expr = parseExpression(begin, end, context);
+        if (!expr)
+        {
+            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
+                                                                 context.getSourceInterface(),
+                                                                 *(begin == end ? end - 1 : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+            return nullptr;
+        }
+        if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+        {
+            begin++; // skip )
+            return expr;
+        }
+        context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
+                                                                    context.getSourceInterface(),
+                                                                    *(begin == end ? end - 1 : begin)));
+        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
+        return nullptr;
+    }
+
     if (tType == lexer::TokenType::Identifier)
     {
         if (const auto lookahead = begin + 1;
