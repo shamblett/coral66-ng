@@ -485,7 +485,7 @@ void code_generator::visit(const syntax::GotoStatement& statement)
         const auto* declaration = it->second;
 
         // If it's a simple label:
-        if (auto* labelDecl = declaration->tryAs<semantics::LabelDeclaration>())
+        if (declaration->tryAs<semantics::LabelDeclaration>())
         {
             if (m_namedLabels.contains(labelName))
             {
