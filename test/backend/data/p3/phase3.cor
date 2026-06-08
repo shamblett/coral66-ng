@@ -1,0 +1,29 @@
+'PROGRAM' Phase3Test
+'BEGIN'
+   'INTEGER' ans;
+   'FLOATING' f1, f2;
+   'BITS' b1;
+   'FIXED' (13, 5) x1;
+
+   f1 := 10.5;
+   f2 := 2.0;
+
+   'COMMENT' Floating point arithmetic ;
+   f1 := f1 * f2; 'COMMENT' 21.0 ;
+
+   'COMMENT' Bits assignment ;
+   b1 := 10;
+
+   'COMMENT' Fixed point assignment ;
+   x1 := 11;
+
+   'COMMENT' Type Casting and Coercion ;
+   'IF' 'INTEGER'(f1) = 21 'THEN'
+   'BEGIN'
+      ans := 'INTEGER'(f1) + 'INTEGER'(b1) + 'INTEGER'(x1); 'COMMENT' 21 + 10 + 11 = 42 ;
+   'END'
+   'ELSE'
+   'BEGIN'
+      ans := 0
+   'END'
+'END'

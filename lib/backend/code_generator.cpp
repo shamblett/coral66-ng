@@ -371,8 +371,12 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
 
     if (rhs->getType() != targetType && targetType)
     {
-        if (rhs->getType()->isDoubleTy() && targetType->isIntegerTy())
+        if (rhs->getType()->isFloatingPointTy() && targetType->isIntegerTy())
             rhs = m_builder.CreateFPToSI(rhs, targetType);
+        else if (rhs->getType()->isIntegerTy() && targetType->isFloatingPointTy())
+            rhs = m_builder.CreateSIToFP(rhs, targetType);
+        else if (rhs->getType()->isFloatingPointTy() && targetType->isFloatingPointTy())
+            rhs = m_builder.CreateFPCast(rhs, targetType);
         else if (rhs->getType()->isIntegerTy() && targetType->isIntegerTy())
             rhs = m_builder.CreateIntCast(rhs, targetType, true);
     }
@@ -572,6 +576,8 @@ llvm::Value* code_generator::visit(const syntax::Expression& expression)
         return visit(*e);
     if (auto* e = dynamic_cast<const syntax::ArrayAccessExpression*>(&expression))
         return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::TypeChangeExpression*>(&expression))
+        return visit(*e);
     return nullptr;
 }
 
@@ -653,9 +659,9 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
 
     if (L->getType() != R->getType())
     {
-        if (L->getType()->isIntegerTy() && R->getType()->isDoubleTy())
+        if (L->getType()->isIntegerTy() && R->getType()->isFloatingPointTy())
             L = m_builder.CreateSIToFP(L, R->getType());
-        else if (L->getType()->isDoubleTy() && R->getType()->isIntegerTy())
+        else if (L->getType()->isFloatingPointTy() && R->getType()->isIntegerTy())
             R = m_builder.CreateSIToFP(R, L->getType());
         else if (L->getType()->isIntegerTy() && R->getType()->isIntegerTy())
         {
@@ -663,6 +669,14 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
                 R = m_builder.CreateIntCast(R, L->getType(), true);
             else
                 L = m_builder.CreateIntCast(L, R->getType(), true);
+        }
+        else if (L->getType()->isFloatingPointTy() && R->getType()->isFloatingPointTy())
+        {
+            // If they are both floats but different precision, cast the smaller to the larger
+            if (L->getType()->getFPMantissaWidth() > R->getType()->getFPMantissaWidth())
+                R = m_builder.CreateFPCast(R, L->getType());
+            else
+                L = m_builder.CreateFPCast(L, R->getType());
         }
     }
 
@@ -784,4 +798,27 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
     return m_builder.CreateLoad(type, addr, "arrayload");
 }
 
+
+llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expression)
+{
+    llvm::Value* val = visit(expression.getExpression());
+    if (!val) return nullptr;
+
+    auto it = m_program.getContext().expressionTypes.find(&expression);
+    if (it == m_program.getContext().expressionTypes.end()) return val;
+
+    llvm::Type* targetType = convertType(*it->second);
+    if (val->getType() == targetType) return val;
+
+    if (targetType->isFloatingPointTy() && val->getType()->isIntegerTy())
+        return m_builder.CreateSIToFP(val, targetType);
+    if (targetType->isIntegerTy() && val->getType()->isFloatingPointTy())
+        return m_builder.CreateFPToSI(val, targetType);
+    if (targetType->isFloatingPointTy() && val->getType()->isFloatingPointTy())
+        return m_builder.CreateFPCast(val, targetType);
+    if (targetType->isIntegerTy() && val->getType()->isIntegerTy())
+        return m_builder.CreateIntCast(val, targetType, true);
+
+    return val;
+}
 } // namespace coral66::cgllvm
