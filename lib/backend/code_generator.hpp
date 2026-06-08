@@ -39,6 +39,7 @@ class code_generator final
     std::unordered_map<const semantics::Usable*, llvm::Value*> m_globals;
     std::unordered_map<const semantics::Usable*, llvm::AllocaInst*> m_locals;
     std::unordered_map<const syntax::Statement*, llvm::BasicBlock*> m_labels;
+    std::unordered_map<std::string, llvm::BasicBlock*> m_namedLabels;
 
 public:
     explicit code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
@@ -70,6 +71,8 @@ public:
     void visit(const syntax::DummyStatement& statement);
     void visit(const syntax::BlockStatement& statement);
     void visit(const syntax::CompoundStatement& statement);
+
+    void preScanLabels(const syntax::Statement& statement);
 
     llvm::Value* visit(const syntax::Expression& expression);
     llvm::Value* visit(const syntax::LiteralExpression& expression);

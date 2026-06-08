@@ -78,9 +78,45 @@ llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* stat
 {
     if (!m_labels.contains(statement))
     {
-        m_labels[statement] = llvm::BasicBlock::Create(m_module.getContext(), "label", m_currentFunction);
+        llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "label");
+        m_labels[statement] = bb;
+        for (const auto& labelToken : statement->getLabels())
+        {
+            const auto& labelName = std::get<std::string>(labelToken->getValue());
+            m_namedLabels[labelName] = bb;
+        }
     }
     return m_labels[statement];
+}
+
+void code_generator::preScanLabels(const syntax::Statement& statement)
+{
+    if (!statement.getLabels().empty())
+        getOrCreateLabel(&statement);
+
+    if (auto* compStmt = dynamic_cast<const syntax::CompoundStatement*>(&statement))
+    {
+        for (const auto& innerStmt : compStmt->getStatements())
+            preScanLabels(*innerStmt);
+    }
+    else if (auto* ifStmt = dynamic_cast<const syntax::IfStatement*>(&statement))
+    {
+        preScanLabels(ifStmt->getThenBranch());
+        if (ifStmt->getElseBranch())
+            preScanLabels(*ifStmt->getElseBranch());
+    }
+    else if (auto* forStmt = dynamic_cast<const syntax::ForStatement*>(&statement))
+    {
+        preScanLabels(forStmt->getBody());
+    }
+    else if (auto* blockStmt = dynamic_cast<const syntax::BlockStatement*>(&statement))
+    {
+        if (blockStmt->hasBlock())
+        {
+            for (const auto& innerStmt : blockStmt->getBlock().getStatements())
+                preScanLabels(*innerStmt);
+        }
+    }
 }
 
 llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
@@ -183,6 +219,7 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
 {
     m_currentProcedure = &astNode;
     m_labels.clear();
+    m_namedLabels.clear();
     m_locals.clear();
 
     llvm::Function* f = llvm::cast<llvm::Function>(m_globals[&procedureDeclaration]);
@@ -194,6 +231,7 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
     // Generate body
     if constexpr (true) // astNode.getBody() always returns a reference
     {
+        preScanLabels(astNode.getBody());
         visit(astNode.getBody());
     }
 
@@ -228,6 +266,7 @@ void code_generator::visit(const syntax::Program& program)
     if (program.hasBlock())
     {
         m_labels.clear();
+        m_namedLabels.clear();
         m_locals.clear();
 
         llvm::FunctionType* ft = llvm::FunctionType::get(llvm::Type::getInt32Ty(m_module.getContext()), false);
@@ -236,6 +275,9 @@ void code_generator::visit(const syntax::Program& program)
 
         llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "entry", f);
         m_builder.SetInsertPoint(bb);
+
+        for (const auto& stmt : program.getBlock().getStatements())
+            preScanLabels(*stmt);
 
         visit(program.getBlock());
 
@@ -304,6 +346,17 @@ void code_generator::visit(const syntax::ProcedureDeclaration& declaration)
 
 void code_generator::visit(const syntax::Statement& statement)
 {
+    if (!statement.getLabels().empty())
+    {
+        llvm::BasicBlock* stmtBB = getOrCreateLabel(&statement);
+        if (!m_builder.GetInsertBlock()->getTerminator())
+        {
+            m_builder.CreateBr(stmtBB);
+        }
+        m_currentFunction->insert(m_currentFunction->end(), stmtBB);
+        m_builder.SetInsertPoint(stmtBB);
+    }
+
     if (auto* s = dynamic_cast<const syntax::AssignmentStatement*>(&statement))
         visit(*s);
     else if (auto* s1 = dynamic_cast<const syntax::IfStatement*>(&statement))
@@ -394,10 +447,13 @@ void code_generator::visit(const syntax::IfStatement& statement)
         cond = m_builder.CreateICmpNE(cond, llvm::ConstantInt::get(cond->getType(), 0));
 
     llvm::BasicBlock* thenBB = llvm::BasicBlock::Create(m_module.getContext(), "then", m_currentFunction);
-    llvm::BasicBlock* elseBB = llvm::BasicBlock::Create(m_module.getContext(), "else");
+    llvm::BasicBlock* elseBB = nullptr;
     llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(m_module.getContext(), "ifcont");
 
     const bool hasElse = statement.getElseBranch() != nullptr;
+    if (hasElse)
+        elseBB = llvm::BasicBlock::Create(m_module.getContext(), "else");
+
     m_builder.CreateCondBr(cond, thenBB, hasElse ? elseBB : mergeBB);
 
     m_builder.SetInsertPoint(thenBB);
@@ -413,16 +469,77 @@ void code_generator::visit(const syntax::IfStatement& statement)
         if (!m_builder.GetInsertBlock()->getTerminator())
             m_builder.CreateBr(mergeBB);
     }
-    else
-    {
-        delete elseBB;
-    }
 
     m_currentFunction->insert(m_currentFunction->end(), mergeBB);
     m_builder.SetInsertPoint(mergeBB);
 }
 
-void code_generator::visit(const syntax::GotoStatement& statement) {} // Skip for Phase 1
+void code_generator::visit(const syntax::GotoStatement& statement)
+{
+    const auto& labelToken = statement.getLabel();
+    const auto& labelName = std::get<std::string>(labelToken->getValue());
+
+    if (const auto it = m_program.getContext().resolvedIdentifiers.find(&statement);
+        it != m_program.getContext().resolvedIdentifiers.end())
+    {
+        const auto* declaration = it->second;
+
+        // If it's a simple label:
+        if (auto* labelDecl = declaration->tryAs<semantics::LabelDeclaration>())
+        {
+            if (m_namedLabels.contains(labelName))
+            {
+                llvm::BasicBlock* targetBB = m_namedLabels[labelName];
+                m_builder.CreateBr(targetBB);
+                
+                // Set insertion point to a new unreachable block to handle dead code after GOTO
+                llvm::BasicBlock* deadBB = llvm::BasicBlock::Create(m_module.getContext(), "dead", m_currentFunction);
+                m_builder.SetInsertPoint(deadBB);
+            }
+        }
+        else if (auto* switchDecl = declaration->tryAs<semantics::SwitchDeclaration>())
+        {
+            if (auto* indexExpr = statement.getIndex())
+            {
+                llvm::Value* indexVal = visit(*indexExpr);
+                if (!indexVal) return;
+                
+                // Ensure index is an integer type (i32)
+                if (!indexVal->getType()->isIntegerTy(32))
+                {
+                    indexVal = m_builder.CreateIntCast(indexVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
+                }
+
+                // Coral 66 switch indices are 1-based by default
+                indexVal = m_builder.CreateSub(indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
+
+                // Create default block (fallthrough or unreachable)
+                llvm::BasicBlock* defaultBB = llvm::BasicBlock::Create(m_module.getContext(), "switch.default", m_currentFunction);
+                
+                auto& switchLabels = switchDecl->getLabels();
+                llvm::SwitchInst* switchInst = m_builder.CreateSwitch(indexVal, defaultBB, switchLabels.size());
+
+                for (size_t i = 0; i < switchLabels.size(); ++i)
+                {
+                    if (switchLabels[i]) 
+                    {
+                        const auto& targetLabelNameToken = switchLabels[i]->getName();
+                        const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
+                        
+                        if (m_namedLabels.contains(targetLabelName))
+                        {
+                            llvm::BasicBlock* targetBB = m_namedLabels[targetLabelName];
+                            switchInst->addCase(llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), i), targetBB);
+                        }
+                    }
+                }
+
+                m_builder.SetInsertPoint(defaultBB);
+                // What to do if index is out of bounds? We'll just continue execution.
+            }
+        }
+    }
+}
 
 void code_generator::visit(const syntax::ForStatement& statement)
 {

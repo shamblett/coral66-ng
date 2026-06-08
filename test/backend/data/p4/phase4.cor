@@ -1,0 +1,20 @@
+'PROGRAM' Phase4Test
+'BEGIN'
+   'INTEGER' ans;
+   'INTEGER' x;
+   'SWITCH' S := Label1, Label2, LabelEnd;
+
+   x := 0;
+   
+   'GOTO' S[1]; 'COMMENT' goes to Label1 ;
+   
+Label2:
+   x := 5;
+   'GOTO' S[3]; 'COMMENT' goes to LabelEnd ;
+   
+Label1:
+   'GOTO' S[2]; 'COMMENT' goes to Label2 ;
+
+LabelEnd:
+   ans := x;
+'END'
