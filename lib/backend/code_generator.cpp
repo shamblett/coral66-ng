@@ -10,6 +10,8 @@
 #include <llvm/IR/InlineAsm.h>
 #include <llvm/IR/Module.h>
 
+#include <ranges>
+
 #include "lib/frontend/semantics/program.hpp"
 
 namespace coral66::cgllvm
@@ -51,17 +53,13 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
             case semantics::PrimitiveType::Bits: baseType = llvm::Type::getInt32Ty(ctx); break;
         }
     }
-    else if (type.is<semantics::UntypedType>())
-    {
-        baseType = llvm::Type::getVoidTy(ctx);
-    }
     else if (auto* arr = type.tryAs<semantics::ArrayType>())
     {
         llvm::Type* elemType = convertType(arr->getElementType());
         llvm::Type* arrType = elemType;
-        for (auto it = arr->getDimensions().rbegin(); it != arr->getDimensions().rend(); ++it)
+        for (const unsigned long it : std::views::reverse(arr->getDimensions()))
         {
-            arrType = llvm::ArrayType::get(arrType, *it);
+            arrType = llvm::ArrayType::get(arrType, it);
         }
         baseType = arrType;
     }
@@ -79,7 +77,7 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
         baseType = llvm::Type::getVoidTy(ctx);
     }
 
-    if (type.isLocation() && !baseType->isVoidTy())
+    if (type.isLocation() && !(baseType != nullptr && baseType->isVoidTy()))
     {
         return llvm::PointerType::getUnqual(ctx);
     }
@@ -235,17 +233,16 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
     m_namedLabels.clear();
     m_locals.clear();
 
-    llvm::Function* f = llvm::cast<llvm::Function>(m_globals[&procedureDeclaration]);
+    auto* f = llvm::cast<llvm::Function>(m_globals[&procedureDeclaration]);
     m_currentFunction = f;
 
     llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "entry", f);
     m_builder.SetInsertPoint(bb);
 
-    const auto* procType = procedureDeclaration.getType().tryAs<semantics::ProcedureType>();
-    if (procType)
+    if (const auto* procedureType = procedureDeclaration.getType().tryAs<semantics::ProcedureType>())
     {
         size_t argIdx = 0;
-        for (const auto& param : procType->getParameters())
+        for (const auto& param : procedureType->getParameters())
         {
             llvm::Argument* arg = f->getArg(argIdx);
             arg->setName(std::string(param.name) + "_arg");
@@ -253,14 +250,14 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
             const semantics::Usable* paramDecl = nullptr;
             for (const auto& usable : m_program.getGlobals())
             {
-                if (auto* varDecl = usable->tryAs<semantics::VariableDeclaration>())
+                if (const auto* variableDeclaration = usable->tryAs<semantics::VariableDeclaration>())
                 {
-                    if (varDecl->getName() == param.name)
+                    if (variableDeclaration->getName() == param.name)
                     {
                         bool found = false;
                         for (const auto& p : astNode.getParameters())
                         {
-                            if (varDecl->getAstNode() == p.get())
+                            if (variableDeclaration->getAstNode() == p.get())
                             {
                                 found = true;
                                 break;
@@ -277,8 +274,8 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
 
             if (paramDecl)
             {
-                llvm::Type* llvmType = convertType(*param.type);
-                if (param.type->isLocation() || llvmType->isPointerTy())
+                if (llvm::Type* llvmType = convertType(*param.type);
+                    param.type->isLocation() || llvmType->isPointerTy())
                 {
                     m_locals[paramDecl] = arg;
                 }
@@ -551,10 +548,8 @@ void code_generator::visit(const syntax::GotoStatement& statement)
     if (const auto it = m_program.getContext().resolvedIdentifiers.find(&statement);
         it != m_program.getContext().resolvedIdentifiers.end())
     {
-        const auto* declaration = it->second;
-
         // If it's a simple label:
-        if (declaration->tryAs<semantics::LabelDeclaration>())
+        if (const auto* declaration = it->second; declaration->tryAs<semantics::LabelDeclaration>())
         {
             if (m_namedLabels.contains(labelName))
             {
@@ -593,9 +588,9 @@ void code_generator::visit(const syntax::GotoStatement& statement)
                     if (switchLabels[i]) 
                     {
                         const auto& targetLabelNameToken = switchLabels[i]->getName();
-                        const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
-                        
-                        if (m_namedLabels.contains(targetLabelName))
+
+                        if (const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
+                            m_namedLabels.contains(targetLabelName))
                         {
                             llvm::BasicBlock* targetBB = m_namedLabels[targetLabelName];
                             switchInst->addCase(llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), i), targetBB);
@@ -741,10 +736,10 @@ void code_generator::visit(const syntax::AnswerStatement& statement)
 
 void code_generator::visit(const syntax::CodeStatement& statement)
 {
-    auto it = m_program.getContext().parsedCodes.find(&statement);
+    const auto it = m_program.getContext().parsedCodes.find(&statement);
     if (it == m_program.getContext().parsedCodes.end()) return;
 
-    const semantics::ParsedCode& parsed = it->second;
+    const auto& [llvmCode, inputs, outputs] = it->second;
 
     std::vector<llvm::Value*> inputArgs;
     std::string constraints;
@@ -752,7 +747,7 @@ void code_generator::visit(const syntax::CodeStatement& statement)
     std::vector<llvm::Value*> outputAddrs;
 
     // For outputs
-    for (const auto* output : parsed.outputs)
+    for (const auto* output : outputs)
     {
         llvm::Value* addr = nullptr;
         if (m_locals.contains(output))
@@ -776,7 +771,7 @@ void code_generator::visit(const syntax::CodeStatement& statement)
     }
 
     // For inputs
-    for (const auto* input : parsed.inputs)
+    for (const auto* input : inputs)
     {
         llvm::Value* addr = nullptr;
         if (m_locals.contains(input))
@@ -804,7 +799,7 @@ void code_generator::visit(const syntax::CodeStatement& statement)
     constraints += "~{memory},~{dirflag},~{fpsr},~{flags},~{eax},~{ebx},~{ecx},~{edx},~{r10}";
 
     std::vector<llvm::Type*> argTypes;
-    for (auto* arg : inputArgs) argTypes.push_back(arg->getType());
+    for (const auto* argument : inputArgs) argTypes.push_back(argument->getType());
 
     llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
     if (outputTypes.size() == 1) {
@@ -814,7 +809,7 @@ void code_generator::visit(const syntax::CodeStatement& statement)
     }
 
     llvm::FunctionType* asmt = llvm::FunctionType::get(retType, argTypes, false);
-    llvm::InlineAsm* ia = llvm::InlineAsm::get(asmt, parsed.llvmCode, constraints, true);
+    llvm::InlineAsm* ia = llvm::InlineAsm::get(asmt, llvmCode, constraints, true);
 
     llvm::CallInst* call = m_builder.CreateCall(ia, inputArgs);
     
@@ -869,7 +864,7 @@ llvm::Value* code_generator::visit(const syntax::LiteralExpression& expression)
     }
     if (std::holds_alternative<std::string>(val))
     {
-        const std::string& strValue = std::get<std::string>(val);
+        const auto& strValue = std::get<std::string>(val);
         // Standard Coral string literals should be emitted as global string constants
         // returning an i8* (pointer to characters) which allows passing to EXTERNAL C functions.
         return m_builder.CreateGlobalString(strValue);
@@ -1056,16 +1051,16 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
 
     if (ft)
     {
-        for (size_t i = 0; i < args.size() && i < ft->getNumParams(); ++i)
+        for (size_t i1 = 0; i1 < args.size() && i1 < ft->getNumParams(); ++i1)
         {
-            if (args[i]->getType() != ft->getParamType(i))
+            if (args[i1]->getType() != ft->getParamType(i1))
             {
-                if (args[i]->getType()->isPointerTy() && ft->getParamType(i)->isIntegerTy())
-                    args[i] = m_builder.CreatePtrToInt(args[i], ft->getParamType(i));
-                else if (args[i]->getType()->isIntegerTy() && ft->getParamType(i)->isPointerTy())
-                    args[i] = m_builder.CreateIntToPtr(args[i], ft->getParamType(i));
+                if (args[i1]->getType()->isPointerTy() && ft->getParamType(i1)->isIntegerTy())
+                    args[i1] = m_builder.CreatePtrToInt(args[i1], ft->getParamType(i1));
+                else if (args[i1]->getType()->isIntegerTy() && ft->getParamType(i1)->isPointerTy())
+                    args[i1] = m_builder.CreateIntToPtr(args[i1], ft->getParamType(i1));
                 else
-                    args[i] = m_builder.CreateIntCast(args[i], ft->getParamType(i), true);
+                    args[i1] = m_builder.CreateIntCast(args[i1], ft->getParamType(i1), true);
             }
         }
         return m_builder.CreateCall(ft, funcVal, args);
@@ -1102,7 +1097,7 @@ llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expressio
     llvm::Value* val = visit(expression.getExpression());
     if (!val) return nullptr;
 
-    auto it = m_program.getContext().expressionTypes.find(&expression);
+    const auto it = m_program.getContext().expressionTypes.find(&expression);
     if (it == m_program.getContext().expressionTypes.end()) return val;
 
     llvm::Type* targetType = convertType(*it->second);
