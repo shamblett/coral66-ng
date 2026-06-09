@@ -1,0 +1,28 @@
+'PROGRAM' SwapTest
+'BEGIN'
+   'INTEGER' ans;
+   'INTEGER' x, y;
+
+   'PROCEDURE' Swap ('LOCATION' 'INTEGER' a, b);
+   'BEGIN'
+      'INTEGER' temp;
+      temp := a;
+      a := b;
+      b := temp;
+   'END' Swap;
+
+   x := 10;
+   y := 20;
+   Swap(x, y);
+
+   'IF' x = 20 'THEN'
+   'BEGIN'
+      'IF' y = 10 'THEN'
+         ans := 1
+      'ELSE'
+         ans := 0;
+   'END'
+   'ELSE'
+      ans := 0;
+
+'END' main

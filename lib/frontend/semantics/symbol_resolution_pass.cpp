@@ -137,6 +137,8 @@ void SymbolResolutionPass::visit(const syntax::Statement& node)
         visit(*gotoStmt);
     else if (auto* answerStmt = dynamic_cast<const syntax::AnswerStatement*>(&node))
         visit(*answerStmt);
+    else if (auto* codeStmt = dynamic_cast<const syntax::CodeStatement*>(&node))
+        visit(*codeStmt);
     else if (auto* callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(&node))
         visit(*callStmt);
 }
@@ -549,11 +551,21 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
             switch (paramNode->getMode())
             {
                 case syntax::ParameterDeclaration::ParameterMode::Value:
-                    paramTypeVal = std::move(baseTypeVal);
+                    if (baseTypeVal->is<PrimitiveType>())
+                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Value});
+                    else if (baseTypeVal->is<FixedType>())
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Value});
+                    else
+                        paramTypeVal = std::move(baseTypeVal);
                     isValue = true;
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Location:
-                    paramTypeVal = std::move(baseTypeVal);
+                    if (baseTypeVal->is<PrimitiveType>())
+                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+                    else if (baseTypeVal->is<FixedType>())
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Location});
+                    else
+                        paramTypeVal = std::move(baseTypeVal);
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Array:
                     m_context.ownedTypes.push_back(std::move(baseTypeVal));
@@ -665,11 +677,21 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
             switch (paramNode->getMode())
             {
                 case syntax::ParameterDeclaration::ParameterMode::Value:
-                    paramTypeVal = std::move(baseTypeVal);
+                    if (baseTypeVal->is<PrimitiveType>())
+                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Value});
+                    else if (baseTypeVal->is<FixedType>())
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Value});
+                    else
+                        paramTypeVal = std::move(baseTypeVal);
                     isValue = true;
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Location:
-                    paramTypeVal = std::move(baseTypeVal);
+                    if (baseTypeVal->is<PrimitiveType>())
+                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+                    else if (baseTypeVal->is<FixedType>())
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Location});
+                    else
+                        paramTypeVal = std::move(baseTypeVal);
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Array:
                     m_context.ownedTypes.push_back(std::move(baseTypeVal));
@@ -941,4 +963,83 @@ void SymbolResolutionPass::visit(const syntax::TypeChangeExpression& node)
     visit(node.getExpression());
 }
 
+
+void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
+{
+    const auto& codeToken = node.getCode();
+    const auto& codeStrVariant = codeToken->getValue();
+    if (!std::holds_alternative<std::string>(codeStrVariant)) return;
+
+    std::string rawCode = std::get<std::string>(codeStrVariant);
+    ParsedCode parsed;
+    
+    struct TokenInfo {
+        bool isOutput;
+        std::string name;
+        size_t pos;
+    };
+    std::vector<TokenInfo> tokens;
+    
+    size_t i = 0;
+    while (i < rawCode.length())
+    {
+        if (rawCode[i] == '@' || rawCode[i] == '!')
+        {
+            bool isOutput = (rawCode[i] == '!');
+            size_t pos = i;
+            i++;
+            std::string idStr;
+            while (i < rawCode.length() && (std::isalnum(rawCode[i]) || rawCode[i] == '_'))
+            {
+                idStr += rawCode[i];
+                i++;
+            }
+            if (!idStr.empty())
+            {
+                tokens.push_back({isOutput, idStr, pos});
+            }
+        }
+        else
+        {
+            i++;
+        }
+    }
+    
+    std::string llvmCode;
+    size_t lastPos = 0;
+    size_t numOutputs = 0;
+    for (auto& t : tokens) if (t.isOutput) numOutputs++;
+    
+    size_t outIdx = 0;
+    size_t inIdx = numOutputs;
+    
+    for (const auto& t : tokens)
+    {
+        llvmCode += rawCode.substr(lastPos, t.pos - lastPos);
+        const Usable* symbol = m_context.symbolTable.lookup(t.name);
+        if (!symbol)
+        {
+            m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*codeToken, m_context.source, *codeToken));
+            DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
+        }
+        else
+        {
+            if (t.isOutput)
+            {
+                parsed.outputs.push_back(symbol);
+                llvmCode += "$" + std::to_string(outIdx++);
+            }
+            else
+            {
+                parsed.inputs.push_back(symbol);
+                llvmCode += "$" + std::to_string(inIdx++);
+            }
+        }
+        lastPos = t.pos + 1 + t.name.length(); // 1 for @ or !
+    }
+    llvmCode += rawCode.substr(lastPos);
+    
+    parsed.llvmCode = llvmCode;
+    m_context.parsedCodes[&node] = parsed;
+}
 } // namespace coral66::semantics

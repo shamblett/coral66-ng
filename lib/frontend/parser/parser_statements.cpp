@@ -213,7 +213,9 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_END);
                     return nullptr;
                 }
-                return std::make_unique<syntax::CodeStatement>(start, begin);
+                auto stmt = std::make_unique<syntax::CodeStatement>(start, begin);
+                if (begin != end) begin++; // consume END keyword
+                return stmt;
             }
             if (begin != end && begin->getTokenType() != lexer::TokenType::StringLiteral)
             {

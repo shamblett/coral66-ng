@@ -22,9 +22,17 @@ class raw_ostream;
 namespace coral66::semantics
 {
 
+struct ParsedCode
+{
+    std::string llvmCode;
+    std::vector<const Usable*> inputs;
+    std::vector<const Usable*> outputs;
+};
+
 typedef std::vector<IntrVarPtr<Usable>> OwnedUsables;
 typedef std::unordered_map<const syntax::Node*, const Usable*> ResolvedIdentifiers;
 typedef std::unordered_map<const syntax::Expression*, IntrusiveVariantValue<Type>> ExpressionTypes;
+typedef std::unordered_map<const syntax::CodeStatement*, ParsedCode> ParsedCodes;
 typedef std::deque<IntrusiveVariantValue<Type>> OwnedTypes;
 typedef std::deque<TableInfo> TableInfos;
 
@@ -48,6 +56,9 @@ public:
 
     // Stores inferred types for expressions
     ExpressionTypes expressionTypes;
+
+    // Stores parsed inline assembly for code statements
+    ParsedCodes parsedCodes;
 
     // Owns the semantic usable objects (declarations)
     OwnedUsables ownedUsables;

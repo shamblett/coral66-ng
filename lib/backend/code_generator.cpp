@@ -40,18 +40,20 @@ void code_generator::generate()
 llvm::Type* code_generator::convertType(const semantics::Type& type)
 {
     auto& ctx = m_module.getContext();
+    llvm::Type* baseType = nullptr;
+
     if (auto* prim = type.tryAs<semantics::PrimitiveType>())
     {
         switch (prim->getKind())
         {
-            case semantics::PrimitiveType::Integer: return llvm::Type::getInt32Ty(ctx);
-            case semantics::PrimitiveType::Floating: return llvm::Type::getFloatTy(ctx);
-            case semantics::PrimitiveType::Bits: return llvm::Type::getInt32Ty(ctx);
+            case semantics::PrimitiveType::Integer: baseType = llvm::Type::getInt32Ty(ctx); break;
+            case semantics::PrimitiveType::Floating: baseType = llvm::Type::getFloatTy(ctx); break;
+            case semantics::PrimitiveType::Bits: baseType = llvm::Type::getInt32Ty(ctx); break;
         }
     }
     else if (type.is<semantics::UntypedType>())
     {
-        return llvm::Type::getVoidTy(ctx);
+        baseType = llvm::Type::getVoidTy(ctx);
     }
     else if (auto* arr = type.tryAs<semantics::ArrayType>())
     {
@@ -61,17 +63,28 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
         {
             arrType = llvm::ArrayType::get(arrType, *it);
         }
-        return arrType;
+        baseType = arrType;
     }
     else if (auto* fixed = type.tryAs<semantics::FixedType>())
     {
         if (fixed->getTotalBits() <= 16)
-            return llvm::Type::getInt16Ty(ctx);
-        if (fixed->getTotalBits() <= 32)
-            return llvm::Type::getInt32Ty(ctx);
-        return llvm::Type::getInt64Ty(ctx);
+            baseType = llvm::Type::getInt16Ty(ctx);
+        else if (fixed->getTotalBits() <= 32)
+            baseType = llvm::Type::getInt32Ty(ctx);
+        else
+            baseType = llvm::Type::getInt64Ty(ctx);
     }
-    return llvm::Type::getVoidTy(ctx);
+    else
+    {
+        baseType = llvm::Type::getVoidTy(ctx);
+    }
+
+    if (type.isLocation() && !baseType->isVoidTy())
+    {
+        return llvm::PointerType::getUnqual(ctx);
+    }
+
+    return baseType;
 }
 
 llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* statement)
@@ -227,6 +240,58 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
 
     llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "entry", f);
     m_builder.SetInsertPoint(bb);
+
+    const auto* procType = procedureDeclaration.getType().tryAs<semantics::ProcedureType>();
+    if (procType)
+    {
+        size_t argIdx = 0;
+        for (const auto& param : procType->getParameters())
+        {
+            llvm::Argument* arg = f->getArg(argIdx);
+            arg->setName(std::string(param.name) + "_arg");
+
+            const semantics::Usable* paramDecl = nullptr;
+            for (const auto& usable : m_program.getGlobals())
+            {
+                if (auto* varDecl = usable->tryAs<semantics::VariableDeclaration>())
+                {
+                    if (varDecl->getName() == param.name)
+                    {
+                        bool found = false;
+                        for (const auto& p : astNode.getParameters())
+                        {
+                            if (varDecl->getAstNode() == p.get())
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (found)
+                        {
+                            paramDecl = usable.get();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (paramDecl)
+            {
+                llvm::Type* llvmType = convertType(*param.type);
+                if (param.type->isLocation() || llvmType->isPointerTy())
+                {
+                    m_locals[paramDecl] = arg;
+                }
+                else
+                {
+                    llvm::AllocaInst* alloca = m_builder.CreateAlloca(llvmType, nullptr, param.name);
+                    m_locals[paramDecl] = alloca;
+                    m_builder.CreateStore(arg, alloca);
+                }
+            }
+            argIdx++;
+        }
+    }
 
     // Generate body
     if constexpr (true) // astNode.getBody() always returns a reference
@@ -405,6 +470,10 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
     if (it != m_program.getContext().expressionTypes.end())
     {
         targetType = convertType(*it->second);
+        if (targetType->isPointerTy() && it->second->isLocation()) {
+             if (auto* prim = it->second->tryAs<semantics::PrimitiveType>())
+                 targetType = convertType(semantics::PrimitiveType(prim->getKind()));
+        }
     }
     else
     {
@@ -670,7 +739,95 @@ void code_generator::visit(const syntax::AnswerStatement& statement)
     m_builder.CreateRet(val);
 }
 
-void code_generator::visit(const syntax::CodeStatement& statement) {}
+void code_generator::visit(const syntax::CodeStatement& statement)
+{
+    auto it = m_program.getContext().parsedCodes.find(&statement);
+    if (it == m_program.getContext().parsedCodes.end()) return;
+
+    const semantics::ParsedCode& parsed = it->second;
+
+    std::vector<llvm::Value*> inputArgs;
+    std::string constraints;
+    std::vector<llvm::Type*> outputTypes;
+    std::vector<llvm::Value*> outputAddrs;
+
+    // For outputs
+    for (const auto* output : parsed.outputs)
+    {
+        llvm::Value* addr = nullptr;
+        if (m_locals.contains(output))
+            addr = m_locals[output];
+        else if (m_globals.contains(output))
+            addr = m_globals[output];
+
+        if (addr)
+        {
+            outputAddrs.push_back(addr);
+            llvm::Type* outType = nullptr;
+            if (auto* var = output->tryAs<semantics::VariableDeclaration>())
+                outType = convertType(var->getType());
+            else
+                outType = llvm::Type::getInt32Ty(m_module.getContext());
+            outputTypes.push_back(outType);
+
+            if (!constraints.empty()) constraints += ",";
+            constraints += "=r"; // Output constraint
+        }
+    }
+
+    // For inputs
+    for (const auto* input : parsed.inputs)
+    {
+        llvm::Value* addr = nullptr;
+        if (m_locals.contains(input))
+            addr = m_locals[input];
+        else if (m_globals.contains(input))
+            addr = m_globals[input];
+
+        if (addr)
+        {
+            llvm::Type* type = nullptr;
+            if (auto* var = input->tryAs<semantics::VariableDeclaration>())
+                type = convertType(var->getType());
+            else
+                type = llvm::Type::getInt32Ty(m_module.getContext()); // default
+            
+            llvm::Value* val = m_builder.CreateLoad(type, addr);
+            inputArgs.push_back(val);
+            if (!constraints.empty()) constraints += ",";
+            constraints += "r"; // Input constraint
+        }
+    }
+
+    // Include clobbers for safety as per specification recommendation
+    if (!constraints.empty()) constraints += ",";
+    constraints += "~{memory},~{dirflag},~{fpsr},~{flags},~{eax},~{ebx},~{ecx},~{edx},~{r10}";
+
+    std::vector<llvm::Type*> argTypes;
+    for (auto* arg : inputArgs) argTypes.push_back(arg->getType());
+
+    llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
+    if (outputTypes.size() == 1) {
+        retType = outputTypes[0];
+    } else if (outputTypes.size() > 1) {
+        retType = llvm::StructType::get(m_module.getContext(), outputTypes);
+    }
+
+    llvm::FunctionType* asmt = llvm::FunctionType::get(retType, argTypes, false);
+    llvm::InlineAsm* ia = llvm::InlineAsm::get(asmt, parsed.llvmCode, constraints, true);
+
+    llvm::CallInst* call = m_builder.CreateCall(ia, inputArgs);
+    
+    // Store outputs
+    if (outputTypes.size() == 1) {
+        m_builder.CreateStore(call, outputAddrs[0]);
+    } else if (outputTypes.size() > 1) {
+        for (size_t i = 0; i < outputTypes.size(); ++i) {
+            llvm::Value* ext = m_builder.CreateExtractValue(call, i);
+            m_builder.CreateStore(ext, outputAddrs[i]);
+        }
+    }
+}
 
 void code_generator::visit(const syntax::ProcedureCallStatement& statement)
 {
@@ -759,6 +916,15 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expressio
         typeIt != m_program.getContext().expressionTypes.end())
     {
         type = convertType(*typeIt->second);
+        // If the variable is a LOCATION parameter, the address holds a pointer to the actual value.
+        // Wait, emitAddress returns the pointer. So if type is ptr, we want to load the underlying primitive type.
+        // Actually, expressionTypes gives the type of the expression. A LOCATION variable used in an expression
+        // has the underlying PrimitiveType, NOT Location!
+        // Let's ensure the type is not a pointer if it's evaluated. 
+        if (type->isPointerTy() && typeIt->second->isLocation()) {
+             // Location variables evaluate to their underlying type!
+             type = convertType(semantics::PrimitiveType(typeIt->second->tryAs<semantics::PrimitiveType>()->getKind()));
+        }
     }
     else
     {
@@ -853,15 +1019,14 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
         return nullptr;
 
     std::vector<llvm::Value*> args;
-    for (const auto& arg : expression.getArguments())
-    {
-        args.push_back(visit(*arg));
-    }
 
     llvm::FunctionType* ft = nullptr;
+    const semantics::ProcedureType* procType = nullptr;
+
     if (auto* procedureDeclaration = declaration->tryAs<semantics::ProcedureDeclaration>())
     {
-        if (const auto* procType = procedureDeclaration->getType().tryAs<semantics::ProcedureType>())
+        procType = procedureDeclaration->getType().tryAs<semantics::ProcedureType>();
+        if (procType)
         {
             llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
             if (procType->getReturnType())
@@ -871,6 +1036,22 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
                 params.push_back(convertType(*p.type));
             ft = llvm::FunctionType::get(retType, params, false);
         }
+    }
+
+    size_t i = 0;
+    for (const auto& arg : expression.getArguments())
+    {
+        if (procType && i < procType->getParameters().size() && procType->getParameters()[i].type->isLocation())
+        {
+            llvm::Value* addr = emitAddress(*arg);
+            if (!addr) addr = visit(*arg); // Fallback
+            args.push_back(addr);
+        }
+        else
+        {
+            args.push_back(visit(*arg));
+        }
+        i++;
     }
 
     if (ft)

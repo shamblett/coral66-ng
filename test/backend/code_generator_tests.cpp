@@ -67,6 +67,7 @@ TEST_CASE("Phase 1", "[Backend][Execution]")
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -146,6 +147,7 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -226,6 +228,7 @@ TEST_CASE("Phase 3", "[Backend][Execution]")
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -306,6 +309,7 @@ TEST_CASE("Phase 4", "[Backend][Execution]")
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -343,7 +347,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
 {
     SECTION("Ackermann End-to-End Execution")
     {
-        SKIP(); // For now
+        
         // Initialize LLVM Native Target for JIT Execution
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
@@ -386,6 +390,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -414,6 +419,132 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
 
         // The answer for the Ackermann function (3,6) is 509
         REQUIRE(finalAns == 509);
+
+        delete ee;
+    }
+
+    SECTION("Swap End-to-End Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("p5/swap/swap.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors) llvm::errs() << ss.str() << "\n";
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors) llvm::errs() << ss.str() << "\n";
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("swap", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
+
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr);
+
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        if (!mainFunc)
+            mainFunc = ee->FindFunctionNamed("SwapTest");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
+
+    SECTION("Inline Asm End-to-End Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("p5/inlineasm/inlineasm.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors) llvm::errs() << ss.str() << "\n";
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors) llvm::errs() << ss.str() << "\n";
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("inlineasm", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+module->print(llvm::errs(), nullptr);
+
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr);
+
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        if (!mainFunc)
+            mainFunc = ee->FindFunctionNamed("InlineAsmTest");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 40);
 
         delete ee;
     }

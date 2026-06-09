@@ -1,0 +1,11 @@
+'PROGRAM' InlineAsmTest
+'BEGIN'
+   'INTEGER' ans;
+   'INTEGER' x, y;
+
+   x := 15;
+   y := 25;
+
+   'CODE' 'BEGIN' "movl @x, %r10d ; addl @y, %r10d ; movl %r10d, !ans" 'END';
+
+'END' main

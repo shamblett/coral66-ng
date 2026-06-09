@@ -37,7 +37,7 @@ class code_generator final
     const syntax::ProcedureDeclaration* m_currentProcedure = nullptr;
 
     std::unordered_map<const semantics::Usable*, llvm::Value*> m_globals;
-    std::unordered_map<const semantics::Usable*, llvm::AllocaInst*> m_locals;
+    std::unordered_map<const semantics::Usable*, llvm::Value*> m_locals;
     std::unordered_map<const syntax::Statement*, llvm::BasicBlock*> m_labels;
     std::unordered_map<std::string, llvm::BasicBlock*> m_namedLabels;
 
