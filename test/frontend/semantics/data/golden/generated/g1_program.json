@@ -239,7 +239,7 @@
                                 "Kind": "Integer",
                                 "IsLocation": false,
                                 "IsUndefined": false,
-                                "IsValue": false
+                                "IsValue": true
                             },
                             "Name": "a",
                             "IsValue": true
@@ -248,7 +248,7 @@
                             "Type": {
                                 "Name": "PrimitiveType",
                                 "Kind": "Floating",
-                                "IsLocation": false,
+                                "IsLocation": true,
                                 "IsUndefined": false,
                                 "IsValue": false
                             },
@@ -1027,12 +1027,12 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             },
             {
                 "Name": "PrimitiveType",
                 "Kind": "Floating",
-                "IsLocation": false,
+                "IsLocation": true,
                 "IsUndefined": false,
                 "IsValue": false
             }

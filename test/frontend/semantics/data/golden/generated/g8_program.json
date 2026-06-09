@@ -72,7 +72,7 @@
                                 "Kind": "Integer",
                                 "IsLocation": false,
                                 "IsUndefined": false,
-                                "IsValue": false
+                                "IsValue": true
                             },
                             "Name": "",
                             "IsValue": true
@@ -466,7 +466,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             },
             {
                 "Name": "PrimitiveType",

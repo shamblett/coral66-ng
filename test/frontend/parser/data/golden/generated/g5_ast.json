@@ -67,6 +67,23 @@
                     "Class": "string literal",
                     "Value": " This is arbitrary code logic "
                 }
+            },
+            {
+                "NodeType": "AssignmentStatement",
+                "LHS": {
+                    "NodeType": "IdentifierExpression",
+                    "Identifier": {
+                        "Class": "identifier",
+                        "Value": "status"
+                    }
+                },
+                "RHS": {
+                    "NodeType": "LiteralExpression",
+                    "Literal": {
+                        "Class": "literal",
+                        "Value": "10"
+                    }
+                }
             }
         ]
     }

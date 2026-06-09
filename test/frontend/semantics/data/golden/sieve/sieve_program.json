@@ -1403,7 +1403,14 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
             },
             {
                 "Name": "PrimitiveType",
@@ -1417,7 +1424,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             },
             {
                 "Name": "PrimitiveType",
@@ -1431,14 +1438,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
-            },
-            {
-                "Name": "PrimitiveType",
-                "Kind": "Integer",
-                "IsLocation": false,
-                "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             },
             {
                 "Name": "PrimitiveType",

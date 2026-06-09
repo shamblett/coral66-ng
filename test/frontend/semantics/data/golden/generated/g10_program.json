@@ -46,7 +46,7 @@
                                 "Kind": "Integer",
                                 "IsLocation": false,
                                 "IsUndefined": false,
-                                "IsValue": false
+                                "IsValue": true
                             },
                             "Name": "ptr",
                             "IsValue": true
@@ -225,7 +225,7 @@
                                 "Kind": "Integer",
                                 "IsLocation": false,
                                 "IsUndefined": false,
-                                "IsValue": false
+                                "IsValue": true
                             },
                             "Name": "ptr",
                             "IsValue": true
@@ -479,7 +479,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             }
         ]
     },

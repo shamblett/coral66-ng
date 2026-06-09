@@ -193,7 +193,7 @@
                                 "Kind": "Integer",
                                 "IsLocation": false,
                                 "IsUndefined": false,
-                                "IsValue": false
+                                "IsValue": true
                             },
                             "Name": "n",
                             "IsValue": true
@@ -1828,7 +1828,7 @@
                 "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
-                "IsValue": false
+                "IsValue": true
             },
             {
                 "Name": "UntypedType"
