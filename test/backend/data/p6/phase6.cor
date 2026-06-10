@@ -1,0 +1,32 @@
+'PROGRAM' Phase6Test
+'BEGIN'
+   'INTEGER' ans;
+
+   'TABLE' MyTab [ 2, 10 ]
+   [
+     x 'INTEGER' 0;
+     y 'INTEGER' 1
+   ];
+
+   'INTEGER' 'ARRAY' arr [1:2, 1:2] 'PRESET' 10, 20, 30, 40;
+
+   'OVERLAY' arr 'WITH' 'INTEGER' overlaidArr;
+
+   'INTEGER' pVal;
+
+   'PROCEDURE' SetPVal ('LOCATION' 'INTEGER' p);
+   'BEGIN'
+      p := 42;
+   'END' SetPVal;
+
+   SetPVal(pVal);
+
+   overlaidArr := 10;
+   arr[1, 1] := 20;
+
+   'IF' overlaidArr = 10 'AND' pVal = 42 'AND' arr[1, 1] = 20 'THEN'
+      ans := 42
+   'ELSE'
+      ans := 0;
+
+'END' Phase6Test

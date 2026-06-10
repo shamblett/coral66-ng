@@ -59,6 +59,8 @@ public:
     void visit(const syntax::ProcedureDeclaration& declaration);
     void visit(const syntax::VariableDeclaration& declaration);
     void visit(const syntax::ArrayDeclaration& declaration);
+    void visit(const syntax::TableDeclaration& declaration);
+    void visit(const syntax::OverlayDeclaration& declaration);
 
     void visit(const syntax::Statement& statement);
     void visit(const syntax::AssignmentStatement& statement);

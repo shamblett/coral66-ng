@@ -345,7 +345,6 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
             dims.push_back(0);
         }
     }
-
     for (auto id : node.getIdentifiers())
     {
         auto typeCopy = IntrusiveVariantValue(ArrayType{baseTypePtr, dims});

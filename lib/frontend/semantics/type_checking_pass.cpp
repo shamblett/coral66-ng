@@ -391,20 +391,12 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
     if (node.hasPreset())
     {
         std::uint64_t totalElements = 1;
-        const auto id = node.getIdentifiers().front();
-        const auto& name = std::get<std::string>(id->getValue());
-        if (const auto usable = m_context.symbolTable.lookupInCurrentScope(name))
+        for (const auto& [fst, snd] : node.getDimensions())
         {
-            if (auto* declaration = usable->tryAs<ArrayDeclaration>())
-            {
-                if (auto* arrType = declaration->getType().tryAs<ArrayType>())
-                {
-                    for (const auto dimSize : arrType->getDimensions())
-                    {
-                        totalElements *= dimSize;
-                    }
-                }
-            }
+             auto lower = evaluateConstantInteger(*fst);
+             auto upper = evaluateConstantInteger(*snd);
+             if (lower && upper && *lower <= *upper)
+                 totalElements *= static_cast<std::uint64_t>(*upper - *lower + 1);
         }
 
         // Count comma separated preset items
@@ -425,6 +417,8 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
         }
         if (inPreset)
             presetCount++;
+
+        
 
         if (presetCount > totalElements)
         {
@@ -471,23 +465,10 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
     if (node.hasPreset())
     {
         std::uint64_t totalElements = 1;
-        const auto id = node.getIdentifier();
-        const auto& name = std::get<std::string>(id->getValue());
-        if (const auto usable = m_context.symbolTable.lookupInCurrentScope(name))
-        {
-            if (auto* declaration = usable->tryAs<TableDeclaration>())
-            {
-                if (auto* tableType = declaration->getType().tryAs<TableType>())
-                {
-                    if (auto* def = std::get_if<TableDefinition>(&tableType->getInfo().type))
-                    {
-                        totalElements = def->getLength();
-                        // A table preset list provides one preset per word, so it's length * width
-                        totalElements *= def->getWidth();
-                    }
-                }
-            }
-        }
+        if (auto w = evaluateConstantInteger(*node.getWidth()))
+            totalElements *= static_cast<std::uint64_t>(*w);
+        if (auto l = evaluateConstantInteger(*node.getLength()))
+            totalElements *= static_cast<std::uint64_t>(*l);
 
         std::uint64_t presetCount = 0;
         bool inPreset = false;

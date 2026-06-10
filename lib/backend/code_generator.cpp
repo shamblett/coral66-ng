@@ -72,6 +72,30 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
         else
             baseType = llvm::Type::getInt64Ty(ctx);
     }
+    else if (auto* tab = type.tryAs<semantics::TableType>())
+    {
+        if (auto* def = std::get_if<semantics::TableDefinition>(&tab->getInfo().type))
+        {
+            std::vector<llvm::Type*> fieldTypes;
+            for (const auto& field : def->getFields())
+            {
+                fieldTypes.push_back(convertType(*field.type));
+            }
+            llvm::Type* structType = llvm::StructType::get(ctx, fieldTypes);
+            if (def->getLength() > 0)
+                baseType = llvm::ArrayType::get(structType, def->getLength());
+            else
+                baseType = structType;
+        }
+        else
+        {
+            baseType = llvm::Type::getVoidTy(ctx);
+        }
+    }
+    else if (type.is<semantics::OverlayType>())
+    {
+        baseType = llvm::Type::getInt32Ty(ctx);
+    }
     else
     {
         baseType = llvm::Type::getVoidTy(ctx);
@@ -200,6 +224,20 @@ void code_generator::visit(const semantics::Declaration& declaration)
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    llvm::Constant::getNullValue(llvmType), arr->getName());
         m_globals[arr] = globalVar;
+    }
+    else if (auto* tab = dynamic_cast<const semantics::TableDeclaration*>(&declaration))
+    {
+        auto* llvmType = convertType(tab->getType());
+        auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+                                                   llvm::Constant::getNullValue(llvmType), tab->getName());
+        m_globals[tab] = globalVar;
+    }
+    else if (auto* over = dynamic_cast<const semantics::OverlayDeclaration*>(&declaration))
+    {
+        auto* llvmType = convertType(over->getType());
+        auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+                                                   llvm::Constant::getNullValue(llvmType), over->getName());
+        m_globals[over] = globalVar;
     }
     else if (auto* proc = dynamic_cast<const semantics::ProcedureDeclaration*>(&declaration))
     {
@@ -370,6 +408,10 @@ void code_generator::visit(const syntax::Declaration& declaration)
         visit(*arr);
     else if (auto* proc = dynamic_cast<const syntax::ProcedureDeclaration*>(&declaration))
         visit(*proc);
+    else if (auto* tab = dynamic_cast<const syntax::TableDeclaration*>(&declaration))
+        visit(*tab);
+    else if (auto* over = dynamic_cast<const syntax::OverlayDeclaration*>(&declaration))
+        visit(*over);
 }
 
 void code_generator::visit(const syntax::VariableDeclaration& declaration)
@@ -395,6 +437,35 @@ void code_generator::visit(const syntax::ArrayDeclaration& declaration)
         {
             auto* llvmType = convertType(semArr->getType());
             auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semArr->getName());
+            m_locals[it->second] = alloca;
+        }
+    }
+}
+
+
+void code_generator::visit(const syntax::TableDeclaration& declaration)
+{
+    if (const auto it = m_program.getContext().resolvedIdentifiers.find(&declaration);
+        it != m_program.getContext().resolvedIdentifiers.end())
+    {
+        if (auto* semTab = it->second->tryAs<semantics::TableDeclaration>())
+        {
+            auto* llvmType = convertType(semTab->getType());
+            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semTab->getName());
+            m_locals[it->second] = alloca;
+        }
+    }
+}
+
+void code_generator::visit(const syntax::OverlayDeclaration& declaration)
+{
+    if (const auto it = m_program.getContext().resolvedIdentifiers.find(&declaration);
+        it != m_program.getContext().resolvedIdentifiers.end())
+    {
+        if (auto* semOver = it->second->tryAs<semantics::OverlayDeclaration>())
+        {
+            auto* llvmType = convertType(semOver->getType());
+            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semOver->getName());
             m_locals[it->second] = alloca;
         }
     }
