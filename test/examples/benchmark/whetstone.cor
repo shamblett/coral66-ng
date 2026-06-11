@@ -1,3 +1,4 @@
+'PROGRAM' Whetstone
 'COMMENT'-----------------------------------------------------------------
  -
  -   Filename:
@@ -47,9 +48,6 @@
    'PROCEDURE' comment ('VALUE''INTEGER');
    'PROCEDURE' failed  ('VALUE''INTEGER');
    'PROCEDURE' result;
-)
-
-'COMMON' (
    'PROCEDURE' outchar ('VALUE''INTEGER','VALUE''INTEGER');
    'PROCEDURE' outstring ('VALUE''INTEGER','VALUE''INTEGER');
    'PROCEDURE' outinteger ('VALUE''INTEGER','VALUE''INTEGER');
@@ -83,7 +81,7 @@
      ----------------------------------------------------------------------;
 
    'DEFINE' pi 3.14159265358978;
-   'DEFINE' quarterturn "pi/2.0";
+   'DEFINE' quarterturn pi / 2.0;
   
    'FLOATING''RECURSIVE' sin ('VALUE''FLOATING' x);
    'BEGIN'
