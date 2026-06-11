@@ -120,9 +120,9 @@ class Preprocessor final : PPSourceInterface
                     break;
                 }
 
-                if (current_macro_id - 1 < m_substitutions.size())
+                if (current_macro_id < m_substitutions.size())
                 {
-                    if (const auto& record = m_substitutions[current_macro_id - 1];
+                    if (const auto& record = m_substitutions[current_macro_id];
                         std::holds_alternative<Source::Substitution>(record))
                     {
                         const auto& sub = std::get<Source::Substitution>(record);
