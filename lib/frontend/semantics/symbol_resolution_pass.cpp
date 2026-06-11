@@ -969,7 +969,7 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
     const auto& codeStrVariant = codeToken->getValue();
     if (!std::holds_alternative<std::string>(codeStrVariant)) return;
 
-    std::string rawCode = std::get<std::string>(codeStrVariant);
+    const auto rawCode = std::get<std::string>(codeStrVariant);
     ParsedCode parsed;
     
     struct TokenInfo {
@@ -984,8 +984,8 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
     {
         if (rawCode[i] == '@' || rawCode[i] == '!')
         {
-            bool isOutput = (rawCode[i] == '!');
-            size_t pos = i;
+            const bool isOutput = rawCode[i] == '!';
+            const size_t pos = i;
             i++;
             std::string idStr;
             while (i < rawCode.length() && (std::isalnum(rawCode[i]) || rawCode[i] == '_'))
@@ -1007,23 +1007,22 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
     std::string llvmCode;
     size_t lastPos = 0;
     size_t numOutputs = 0;
-    for (auto& t : tokens) if (t.isOutput) numOutputs++;
+    for (const auto& t : tokens) if (t.isOutput) numOutputs++;
     
     size_t outIdx = 0;
     size_t inIdx = numOutputs;
     
-    for (const auto& t : tokens)
+    for (const auto& [isOutput, name, pos] : tokens)
     {
-        llvmCode += rawCode.substr(lastPos, t.pos - lastPos);
-        const Usable* symbol = m_context.symbolTable.lookup(t.name);
-        if (!symbol)
+        llvmCode += rawCode.substr(lastPos, pos - lastPos);
+        if (const Usable* symbol = m_context.symbolTable.lookup(name); !symbol)
         {
             m_context.log(errors::semantics::UNDECLARED_IDENTIFIER_N.args(*codeToken, m_context.source, *codeToken));
             DiagnosticCollector::addDiagnostic(errors::semantics::UNDECLARED_IDENTIFIER_N);
         }
         else
         {
-            if (t.isOutput)
+            if (isOutput)
             {
                 parsed.outputs.push_back(symbol);
                 llvmCode += "$" + std::to_string(outIdx++);
@@ -1034,7 +1033,7 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
                 llvmCode += "$" + std::to_string(inIdx++);
             }
         }
-        lastPos = t.pos + 1 + t.name.length(); // 1 for @ or !
+        lastPos = pos + 1 + name.length(); // 1 for @ or !
     }
     llvmCode += rawCode.substr(lastPos);
     

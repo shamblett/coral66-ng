@@ -77,9 +77,9 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
         if (auto* def = std::get_if<semantics::TableDefinition>(&tab->getInfo().type))
         {
             std::vector<llvm::Type*> fieldTypes;
-            for (const auto& field : def->getFields())
+            for (const auto& [type, name] : def->getFields())
             {
-                fieldTypes.push_back(convertType(*field.type));
+                fieldTypes.push_back(convertType(*type));
             }
             llvm::Type* structType = llvm::StructType::get(ctx, fieldTypes);
             if (def->getLength() > 0)

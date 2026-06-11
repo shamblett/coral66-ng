@@ -394,8 +394,7 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
         for (const auto& [fst, snd] : node.getDimensions())
         {
              auto lower = evaluateConstantInteger(*fst);
-             auto upper = evaluateConstantInteger(*snd);
-             if (lower && upper && *lower <= *upper)
+            if (auto upper = evaluateConstantInteger(*snd); lower && upper && *lower <= *upper)
                  totalElements *= static_cast<std::uint64_t>(*upper - *lower + 1);
         }
 
@@ -465,9 +464,9 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
     if (node.hasPreset())
     {
         std::uint64_t totalElements = 1;
-        if (auto w = evaluateConstantInteger(*node.getWidth()))
+        if (const auto w = evaluateConstantInteger(*node.getWidth()))
             totalElements *= static_cast<std::uint64_t>(*w);
-        if (auto l = evaluateConstantInteger(*node.getLength()))
+        if (const auto l = evaluateConstantInteger(*node.getLength()))
             totalElements *= static_cast<std::uint64_t>(*l);
 
         std::uint64_t presetCount = 0;
