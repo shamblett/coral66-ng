@@ -81,7 +81,7 @@
      ----------------------------------------------------------------------;
 
    'DEFINE' pi 3.14159265358978;
-   'DEFINE' quarterturn pi / 2.0;
+   'DEFINE' halfpi (pi / 2.0);
   
    'FLOATING''RECURSIVE' sin ('VALUE''FLOATING' x);
    'BEGIN'
@@ -93,7 +93,7 @@
    
       'FLOATING' xnorm, xint, x2, y;
     
-      xnorm := x / quarterturn;
+      xnorm := x / halfpi;
 
       'IF' fabsf (xnorm) > 4.0 'THEN'
          'BEGIN'
@@ -119,7 +119,7 @@
    
    'FLOATING''RECURSIVE' cos ('VALUE''FLOATING' x);
    'BEGIN'
-     'ANSWER' sin (x + quarterturn);
+     'ANSWER' sin (x + halfpi);
    'END' cos;
    
    'FLOATING''RECURSIVE' arctan ('VALUE''FLOATING' x);
@@ -147,9 +147,9 @@
       'IF' fabsf (x) >= 1.0 'THEN'
          'BEGIN'
             'IF' x < 0.0 'THEN'
-               y := - ( quarterturn + y )
+               y := - ( halfpi + y )
             'ELSE'
-               y := quarterturn - y
+               y := halfpi - y
          'END';
    
       'ANSWER' y;
