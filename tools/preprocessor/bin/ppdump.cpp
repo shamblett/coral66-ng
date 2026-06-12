@@ -6,15 +6,11 @@
 
 #include <iostream>
 
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
-
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/support/filesystem.hpp"
 #include "sysexits.h"
-#include "tools/parser/astdump/lib/ast_dump.hpp"
 
 std::string readInputFile(const std::string& inputFile)
 {
@@ -81,7 +77,12 @@ int main(const int argc, char** argv)
     // Preprocess
     auto result = coral66::pp::preprocess(std::move(tokens), &ss, &errors);
 
+    // Reconstruct
+    const auto output =
+        coral66::pp::reconstruct(result.data().data(), result.data().data() + result.data().size(), result);
+
     // Dump the preprocessed text into the output file
+    generateOutputFile(inputFile, output);
 
     return EX_OK;
 }
