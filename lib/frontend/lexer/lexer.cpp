@@ -406,22 +406,36 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
             if (iter->getTokenType() == TokenType::PPNumber)
             {
                 numberText += std::string(iter->getValue());
-                if (auto next = iter + 1; next != end && next->getTokenType() == TokenType::Apostrophe)
+                if (auto next = iter + 1; next != end && (next->getTokenType() == TokenType::Apostrophe || (next->getTokenType() == TokenType::Identifier && (next->getValue().starts_with("e") || next->getValue().starts_with("E")))))
                 {
-                    numberText += "e";
-                    iter = next;
-                    next = iter + 1;
-                    if (next != end
-                        && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
-                    {
-                        numberText += next->getTokenType() == TokenType::Plus ? "+" : "-";
+                    if (next->getTokenType() == TokenType::Identifier && next->getValue().size() > 1) {
+                        bool all_digits = true;
+                        for (size_t i = 1; i < next->getValue().size(); ++i) {
+                            if (!std::isdigit(next->getValue()[i])) {
+                                all_digits = false;
+                                break;
+                            }
+                        }
+                        if (all_digits) {
+                            numberText += std::string(next->getValue());
+                            iter = next;
+                        }
+                    } else {
+                        numberText += "e";
                         iter = next;
                         next = iter + 1;
-                    }
-                    if (next != end && next->getTokenType() == TokenType::PPNumber)
-                    {
-                        numberText += std::string(next->getValue());
-                        iter = next;
+                        if (next != end
+                            && (next->getTokenType() == TokenType::Plus || next->getTokenType() == TokenType::Minus))
+                        {
+                            numberText += next->getTokenType() == TokenType::Plus ? "+" : "-";
+                            iter = next;
+                            next = iter + 1;
+                        }
+                        if (next != end && next->getTokenType() == TokenType::PPNumber)
+                        {
+                            numberText += std::string(next->getValue());
+                            iter = next;
+                        }
                     }
                 }
             }

@@ -91,21 +91,21 @@ TEST_CASE("Coral Parse Expression - Bitwise", "[Parser][Expression]")
     {
         ParsedExpression p("a MASK b");
         auto binOp = dynamic_cast<BinaryExpression*>(p.expression.get());
-        CHECK(binOp != nullptr);
+        REQUIRE(binOp != nullptr);
         CHECK(binOp->getOp()->getTokenType() == lexer::TokenType::MaskKeyword);
     }
     SECTION("UNION")
     {
         ParsedExpression p("a UNION b");
         auto binOp = dynamic_cast<BinaryExpression*>(p.expression.get());
-        CHECK(binOp != nullptr);
+        REQUIRE(binOp != nullptr);
         CHECK(binOp->getOp()->getTokenType() == lexer::TokenType::UnionKeyword);
     }
     SECTION("DIFFER")
     {
         ParsedExpression p("a DIFFER b");
         auto binOp = dynamic_cast<BinaryExpression*>(p.expression.get());
-        CHECK(binOp != nullptr);
+        REQUIRE(binOp != nullptr);
         CHECK(binOp->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
     }
     SECTION("Bitwise Precedence")
@@ -177,7 +177,7 @@ TEST_CASE("Coral Parse Expression - Arithmetic", "[Parser][Expression]")
     {
         ParsedExpression p("a + b");
         auto binOp = dynamic_cast<BinaryExpression*>(p.expression.get());
-        CHECK(binOp != nullptr);
+        REQUIRE(binOp != nullptr);
         CHECK(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
     }
     SECTION("Unary Minus")
@@ -187,11 +187,22 @@ TEST_CASE("Coral Parse Expression - Arithmetic", "[Parser][Expression]")
         CHECK(unOp != nullptr);
         CHECK(unOp->getOp()->getTokenType() == lexer::TokenType::Minus);
     }
+    SECTION("Implicit Unary Operators")
+    {
+        ParsedExpression p("a + -b");
+        auto binOp = dynamic_cast<BinaryExpression*>(p.expression.get());
+        REQUIRE(binOp != nullptr);
+        CHECK(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
+
+        auto right = dynamic_cast<const UnaryExpression*>(&binOp->getRight());
+        CHECK(right != nullptr);
+        CHECK(right->getOp()->getTokenType() == lexer::TokenType::Minus);
+    }
     SECTION("Precedence")
     {
         ParsedExpression p("a + b * c");
         auto binOp = dynamic_cast<BinaryExpression*>(p.expression.get());
-        CHECK(binOp != nullptr);
+        REQUIRE(binOp != nullptr);
         CHECK(binOp->getOp()->getTokenType() == lexer::TokenType::Plus);
 
         auto right = dynamic_cast<const BinaryExpression*>(&binOp->getRight());

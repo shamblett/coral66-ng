@@ -306,6 +306,21 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
     if (begin == end)
         return nullptr;
 
+    if (isAddOperator(begin->getTokenType()))
+    {
+        auto op = begin++;
+        auto right = parseFactor(begin, end, context);
+        if (!right)
+        {
+            context.log(errors::parser::EXPECTED_FACTOR.args(*(begin == end ? end - 1 : begin),
+                                                             context.getSourceInterface(),
+                                                             *(begin == end ? end - 1 : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_FACTOR);
+            return nullptr;
+        }
+        return std::make_unique<UnaryExpression>(op, right->end(), op, std::move(right));
+    }
+
     // Untyped Primary
     if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {

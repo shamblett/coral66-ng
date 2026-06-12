@@ -25,7 +25,7 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
     {
         const ParsedStatement s("A := 2;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
-        CHECK(assignmentStatement != nullptr);
+        REQUIRE(assignmentStatement != nullptr);
         CHECK(std::get<llvm::APSInt>(assignmentStatement->getExpression().begin()->getValue()) == 2);
     }
 
@@ -33,7 +33,7 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
     {
         const ParsedStatement s("A := IF 2 > 1 THEN 3 ELSE 4;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
-        CHECK(assignmentStatement != nullptr);
+        REQUIRE(assignmentStatement != nullptr);
         auto condExpr = dynamic_cast<const ConditionalExpression*>(&assignmentStatement->getExpression());
         CHECK(condExpr != nullptr);
 
@@ -50,21 +50,21 @@ TEST_CASE("Coral Parse Statements - Assignment", "[Parser][Statement]")
     {
         const ParsedStatement s("[LOCATION(i) + 1] := 3.8;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
-        CHECK(assignmentStatement != nullptr);
+        REQUIRE(assignmentStatement != nullptr);
     }
 
     SECTION("Bits")
     {
         const ParsedStatement s("BITS[2,6]x := 3;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
-        CHECK(assignmentStatement != nullptr);
+        REQUIRE(assignmentStatement != nullptr);
     }
 
     SECTION("Location And Bits")
     {
         const ParsedStatement s("BITS[1,23] [LOCATION(i) + 1] := 1;");
         auto assignmentStatement = dynamic_cast<AssignmentStatement*>(s.statement.get());
-        CHECK(assignmentStatement != nullptr);
+        REQUIRE(assignmentStatement != nullptr);
     }
 }
 

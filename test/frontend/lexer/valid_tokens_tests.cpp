@@ -158,6 +158,28 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         CHECK(std::get<llvm::APFloat>(result.data()[2].getValue()) == llvm::APFloat(0.1));
     }
 
+    SECTION("Standard Exponents")
+    {
+        auto result = lex("2.5e3 1e3 10e-2 1.5E2");
+        CHECK(result.data().size() == 4);
+
+        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[0].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[0].getValue()) == llvm::APFloat(2500.0));
+
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[1].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[1].getValue()) == llvm::APFloat(1000.0));
+
+        CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[2].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[2].getValue()) == llvm::APFloat(0.1));
+
+        CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[3].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[3].getValue()) == llvm::APFloat(150.0));
+    }
+
     SECTION("Strings")
     {
         auto result = lex(R"("Hello World" "It's me" "")");
