@@ -34,7 +34,7 @@ void generateOutputFile(const std::string& inputFile, const std::string& buffer)
 {
     coral66::fs::path input_path = inputFile;
     coral66::fs::path output_path = input_path.parent_path() / (input_path.stem().string() + "_pp");
-    output_path.replace_extension(".txt");
+    output_path.replace_extension(".cor");
 
     coral66::fs::ofstream outputFile(output_path, std::ios_base::out);
     if (!outputFile.is_open())
