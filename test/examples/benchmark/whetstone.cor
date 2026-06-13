@@ -80,6 +80,7 @@
      Baltimore, MD 21203.
      ----------------------------------------------------------------------;
 
+   'DEFINE' CLOCKSPERSEC (1.99 * 1000 * 1000);
    'DEFINE' pi 3.14159265358978;
    'DEFINE' halfpi (pi / 2.0);
   
@@ -478,7 +479,6 @@
     
    'COMMENT' Get stop time after ntimes ;
 
-   stoptime := clock;
 
    'COMMENT'  Now compute number of K Whetstones per sec;
 
