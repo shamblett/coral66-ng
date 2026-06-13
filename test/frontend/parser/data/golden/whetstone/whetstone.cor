@@ -1,0 +1,492 @@
+'PROGRAM' Whetstone
+'COMMENT'-----------------------------------------------------------------
+ -
+ -   Filename:
+ -
+ -      whetstone.cor
+ -  
+ -   Description:
+ -  
+ -      Performs one million Whetstone instructions, a number of times, 
+ -      then prints the execution speed in K Whetstone Instructions per 
+ -      Second (KWIPS). For example, if ntimes = 1, and the execution time
+ -      is 1 second, then the result is 1000 KWIPS.
+ -    
+ -      The KWIPS rating is the number of Kilo Whetstone Instructions Per 
+ -      Second. The following code is worth 1 million whetstones for each 
+ -      iteration, so to compute the rating, run the code ntimes, then:
+ -
+ -          rating := 1000 / time taken in secs / ntimes
+ -
+ -      ntimes should be set so the benchmark takes about ten seconds to run 
+ -      so you can get an approximate verification of the printed rating.
+ -   
+ -      A Motorola 68020 with 68881 scores about 2000 KWIPS, so by setting
+ -      ntimes to 20, the execution time is 10 secs, which is a good time
+ -      from the point of view of timing the clock function, and from
+ -      checking using a stop watch. ntimes = 100 is good on a Pentium.
+ -
+ -   Credits:
+ -  
+ -      A Synthetic Benchmark, H.J. Curnow and B.A. Whichmann,
+ -      The Computing Journal, Volume 19  Number 1,  Feb 1976, P. 43-49
+ -
+ -      This source text was translated from Algol to Coral 66 by Chris
+ -      Nettleton, November 1999.
+ -
+ -      The elementary functions in the copyrighted section were copied
+ -      from the Ada compiler PIWG test program A000093.
+ - 
+ -   Revision:
+ -  
+ -      $Id: whetstone.c,v $
+ -
+ --------------------------------------------------------------------------;
+
+'COMMON'(
+   'PROCEDURE' test    ('VALUE''INTEGER', 'VALUE''INTEGER');
+   'PROCEDURE' comment ('VALUE''INTEGER');
+   'PROCEDURE' failed  ('VALUE''INTEGER');
+   'PROCEDURE' result;
+   'PROCEDURE' outchar ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' outstring ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' outinteger ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' outnewline ('VALUE''INTEGER');
+)
+
+'BEGIN'
+
+   'INTEGER' ntimes := 1; (number of times to run the benchmark)
+    
+   'COMMENT' Benchmark timing stuff ;
+   'FLOATING' rating;
+   'INTEGER' starttime;
+   'INTEGER' stoptime;
+  
+   
+   'FLOATING''PROCEDURE' fabsf ('VALUE''FLOATING' x);
+   'ANSWER' 'IF' x < 0.0 'THEN' -x 'ELSE' x;
+
+   
+   'COMMENT'
+     ----------------------------------------------------------------------
+     These routines are provided for use by ACM SIGAda PIWG for making
+     measurements. These routines are copyrighted and may only be used for
+     performance measurements. These math routines must not be distributed
+     without this notice. No permission is granted to any party to modify,
+     to redistribute, to sell, to give away, or to otherwise use or
+     transmit these math routines without express written permission from
+     Westinghouse Electric Corporation, c/o Jon Squire, P.O. Box 746 MS1615,
+     Baltimore, MD 21203.
+     ----------------------------------------------------------------------;
+
+   'DEFINE' CLOCKSPERSEC (1.99 * 1000 * 1000);
+   'DEFINE' pi 3.14159265358978;
+   'DEFINE' halfpi (pi / 2.0);
+  
+   'FLOATING''RECURSIVE' sin ('VALUE''FLOATING' x);
+   'BEGIN'
+      'DEFINE' c1 1.57079631847;
+      'DEFINE' c3 -0.64596371106;
+      'DEFINE' c5 0.07968967928;
+      'DEFINE' c7 -0.00467376557;
+      'DEFINE' c9 0.00015148419;
+   
+      'FLOATING' xnorm, xint, x2, y;
+    
+      xnorm := x / halfpi;
+
+      'IF' fabsf (xnorm) > 4.0 'THEN'
+         'BEGIN'
+            xint := 'FLOATING' ('INTEGER' ('FLOATING'(xnorm / 4.0)));
+            xnorm := xnorm - 4.0 * xint;
+         'END';
+   
+      'IF' xnorm > 2.0 'THEN'
+         xnorm := 2.0 - xnorm
+      'ELSE' 'IF' xnorm < -2.0 'THEN'
+         xnorm := -2.0 - xnorm;
+   
+      'IF' xnorm > 1.0 'THEN'
+         xnorm := 2.0 - xnorm
+      'ELSE' 'IF' xnorm < -1.0 'THEN'
+         xnorm := -2.0 - xnorm;
+   
+      x2 := xnorm * xnorm;
+      y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * x2 ) * x2) * x2) * x2) * xnorm;
+   
+      'ANSWER' y;
+   'END' sin;
+   
+   'FLOATING''RECURSIVE' cos ('VALUE''FLOATING' x);
+   'BEGIN'
+     'ANSWER' sin (x + halfpi);
+   'END' cos;
+   
+   'FLOATING''RECURSIVE' arctan ('VALUE''FLOATING' x);
+   'BEGIN'
+      'DEFINE' c1 0.9999993329;
+      'DEFINE' c3 -0.3332985605;
+      'DEFINE' c5 0.1994653599;
+      'DEFINE' c7 -0.1390853351;
+      'DEFINE' c9 0.0964200441;
+      'DEFINE' c11 -0.0559098861;
+      'DEFINE' c13 0.0218612288;
+      'DEFINE' c15 -0.0040540580;
+   
+      'FLOATING' a2, y, a;
+  
+      a := x;
+
+      'IF' fabsf (a) > 1.0 'THEN'
+         a := 1.0 / a;
+   
+      a2 := a * a;
+      y := ( c1 + ( c3 + ( c5 + ( c7 + ( c9 + ( c11 + ( c13 + c15 * a2 ) * a2) * a2
+            ) * a2) * a2) * a2) * a2) * a;
+   
+      'IF' fabsf (x) >= 1.0 'THEN'
+         'BEGIN'
+            'IF' x < 0.0 'THEN'
+               y := - ( halfpi + y )
+            'ELSE'
+               y := halfpi - y
+         'END';
+   
+      'ANSWER' y;
+   'END';
+   
+   'FLOATING''RECURSIVE' sqrt ('VALUE''FLOATING' x);
+   'BEGIN'
+      'DEFINE' a 2.1902;
+      'DEFINE' b 3.0339;
+      'DEFINE' c 1.5451;
+   
+      'FLOATING' y, rootpwr, xnorm;
+
+      rootpwr := 1.0;
+   
+      'IF' x <= 0.0 'THEN'
+         'ANSWER' 0.0;
+   
+      'IF' x > 1.0 'THEN' 
+         'BEGIN'
+            'FOR' xnorm := x 'WHILE' xnorm > 1.0 'DO'
+               'BEGIN'
+                  rootpwr := rootpwr * 2.0;
+                  xnorm := xnorm * 0.25
+               'END'
+         'END'
+      'ELSE'
+         'BEGIN'
+            'FOR' xnorm := x 'WHILE' xnorm < 0.25 'DO' 
+               'BEGIN'
+                  rootpwr := rootpwr * 0.5;
+                  xnorm := xnorm * 4.0
+               'END'
+         'END';
+   
+     y := a + b / ( c + xnorm );
+     y := 0.5 * ( y + xnorm / y );
+     y := 0.5 * ( y + xnorm / y );
+     y := y * rootpwr;
+   
+     'ANSWER' y
+   'END';
+   
+   'FLOATING''RECURSIVE' exp ('VALUE''FLOATING' x);
+   'BEGIN'
+      'DEFINE' c1 9.99999900943303e-01;
+      'DEFINE' c2 5.00006347344554e-01;
+      'DEFINE' c3 1.66667985598315e-01;
+      'DEFINE' c4 4.16350120350139e-02;
+      'DEFINE' c5 8.32859610677671e-03;
+      'DEFINE' c6 1.43927433449119e-03;
+      'DEFINE' c7 2.04699933614437e-04;
+    
+      'FLOATING' x1, y, epwr, e;
+
+      epwr := 1.0;
+      e := 2.71828182845905;
+   
+      'IF' fabsf (x) > 88.0 'THEN'
+         'ANSWER' 0.0;
+   
+      'FOR' x1 := fabsf (x) 'WHILE' x1 >= 1.0 'DO'
+         'BEGIN'
+            epwr := epwr * e * e;
+            x1 := x1 - 2.0
+         'END';
+   
+      y := 1.0 + ( c1 + ( c2 + ( c3 + ( c4 + ( c5 + ( c6 + c7 * x1 ) * x1) * x1) * x1
+           ) * x1) * x1) * x1;
+      y := y * epwr;
+      'IF' x < 0.0 'THEN'
+         y := 1.0 / y;
+   
+      'ANSWER' y
+   'END';
+   
+   'FLOATING''RECURSIVE' log10 ('VALUE''FLOATING' x);
+   'BEGIN'
+     'DEFINE' c1 0.868591718;
+     'DEFINE' c3 0.289335524;
+     'DEFINE' c5 0.177522071;
+     'DEFINE' c7 0.094376476;
+     'DEFINE' c9 0.191337714;
+     'DEFINE' cr10 3.1622777;
+   
+     'FLOATING' y, xnorm, xlog, frac, frac2;
+   
+     xlog := 0.5;
+     'IF' x <= 0.0 'THEN'
+       'ANSWER' 0.0;
+   
+     'IF' x >= 10.0 'THEN'
+       'BEGIN'
+          'COMMENT' reduce to 1.0 .. 10.0 ;
+         'FOR' xnorm := x 'WHILE' xnorm >= 10.0 'DO' 
+           'BEGIN'
+             xlog := xlog + 1.0;
+             xnorm := xnorm * 0.1
+           'END'
+       'END'
+     'ELSE'
+       'BEGIN'
+          'COMMENT' reduce to 1.0 .. 10.0 ;
+         'FOR' xnorm := x 'WHILE' xnorm < 1.0 'DO'
+           'BEGIN'
+             xlog := xlog - 1.0;
+             xnorm := xnorm * 10.0
+           'END'
+       'END';
+   
+       frac := ( xnorm - cr10 ) / ( xnorm + cr10 );
+       frac2 := frac * frac;
+       y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * frac2 ) * frac2) * frac2) * frac2)
+           * frac;
+
+       'ANSWER' y + xlog
+   'END';
+   
+   
+   'FLOATING''RECURSIVE' ln ('VALUE''FLOATING' x);
+   'BEGIN'
+     'ANSWER' 2.302585093 * log10 ( x );
+   'END';
+   
+   'COMMENT'
+     ----------------------------------------------------------------------
+     End of copyrighted section
+     ----------------------------------------------------------------------;
+
+
+   'COMMENT' Major loop counter ; 
+   'INTEGER' cycleno; 
+
+   'FLOATING' x1, x2, x3, x4, x, y, z, t, t1, t2;
+   'FLOATING''ARRAY' e1[1:4];
+   'INTEGER' i, j, k, l, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11;
+   
+  
+   'PROCEDURE' pa ('FLOATING''ARRAY' e);
+   'BEGIN'
+      'INTEGER' j;
+
+      j := 0;
+   lab:
+      e[1] := (e[1] + e[2] + e[3] - e[4]) * t;
+      e[2] := (e[1] + e[2] - e[3] + e[4]) * t;
+      e[3] := (e[1] - e[2] + e[3] + e[4]) * t;
+      e[4] := (- e[1] + e[2] + e[3] + e[4]) / t2;
+      j := j + 1;
+      'IF' j < 6 'THEN'
+         'GOTO' lab;
+   'END';
+
+   'PROCEDURE' p0;
+   'BEGIN'
+      e1[j] := e1[k];
+      e1[k] := e1[l];
+      e1[l] := e1[j];
+   'END';
+
+   'PROCEDURE' p3 ('LOCATION''FLOATING' x, y, z);
+   'BEGIN'
+      x := t * (x + y);
+      y := t * (x + y);
+      z := (x + y) / t2;
+   'END';
+
+ 
+ 
+ 
+   'COMMENT' initialize constants ;
+
+   t := 0.499975;
+   t1 := 0.50025;
+   t2 := 2.0;
+
+   'COMMENT' read the value of i, controlling total weight: if i = 10 the
+      total weight is one million Whetstone instructions ;
+
+   'COMMENT' inreal (2, i) ;
+
+   i := 10;
+
+   n1 := 0;        n2 := 12 * i;   n3 := 14 * i;
+   n4 := 345 * i;  n5 := 0;        n6 := 210 * i;
+   n7 := 32 * i;   n8 := 899 * i;  n9 := 616 * i;
+   n10 := 0;       n11 := 93 * i;
+
+   'FOR' cycleno := 1 'STEP' 1 'UNTIL' ntimes 'DO'
+      'BEGIN'
+
+         'COMMENT' module 1: simple identifiers ;
+   
+         x1 := 1.0;
+         x2 := -1.0;
+         x3 := -1.0;
+         x4 := -1.0;
+   
+         'FOR' i := 1 'STEP' 1 'UNTIL' n1 'DO'
+         'BEGIN'
+            x1 := (x1 + x2 + x3 - x4) * t;
+            x2 := (x1 + x2 - x3 + x4) * t;
+            x3 := (x1 - x2 + x3 + x4) * t;
+            x4 := (- x1 + x2 + x3 + x4) * t
+         'END';
+   
+         'COMMENT' module 2: array elements ;
+      
+         e1[1] := 1.0;
+         e1[2] := -1.0;
+         e1[3] := -1.0;
+         e1[4] := -1.0;
+      
+         'FOR' i := 1 'STEP' 1 'UNTIL' n2 'DO'
+         'BEGIN'
+            e1[1] := (e1[1] + e1[2] + e1[3] - e1[4]) * t;
+            e1[2] := (e1[1] + e1[2] - e1[3] + e1[4]) * t;
+            e1[3] := (e1[1] - e1[2] + e1[3] + e1[4]) * t;
+            e1[4] := (- e1[1] + e1[2] + e1[3] + e1[4]) * t
+         'END';
+      
+
+         'COMMENT' module 3: as array parameter ;
+      
+         'FOR' i:= 1 'STEP' 1 'UNTIL' n3 'DO'
+            pa (e1);
+      
+      
+         'COMMENT' module 4: conditional jumps ;
+      
+         j := 1;
+         'FOR' i := 1 'STEP' 1 'UNTIL' n4 'DO'
+         'BEGIN'
+            'IF' j = 1 'THEN'
+               j := 2
+            'ELSE'
+               j := 3;
+      
+            'IF' j > 2 'THEN'
+               j := 0
+            'ELSE'
+               j := 1;
+      
+            'IF' j < 1 'THEN'
+               j := 1
+            'ELSE'
+               j := 0;
+         'END';
+      
+      
+         'COMMENT' module 5: omitted ;
+    
+         'COMMENT' module 6: integer arithmetic ;
+      
+         j := 1;   k := 2;   l := 3;
+      
+         'FOR' i := 1 'STEP' 1 'UNTIL' n6 'DO'
+         'BEGIN'
+            j := j * (k - j) * (l - k);
+            k := l * k - (l - j) * k;
+            l := (l - k) * (k + j) ;    'COMMENT' typo in TCJ ;
+            e1[l-1] := j + k + l;
+            e1[k-1] := j * k * l;
+         'END';
+      
+      
+         'COMMENT' module 7: trig functions ;
+
+         x := 0.5;
+         y := 0.5;
+
+         'FOR' i := 1 'STEP' 1 'UNTIL' n7 'DO'
+         'BEGIN'
+            x := t * arctan (t2 * sin (x) * cos (x) /
+               (cos (x + y) + cos (x - y) - 1.0));
+            y := t * arctan (t2 * sin (y) * cos (y) /
+               (cos (x + y) + cos (x - y) - 1.0));
+         'END';
+
+
+         'COMMENT' module 8: procedure calls ;
+      
+         x := 1.0;
+         y := 1.0;
+         z := 1.0;
+      
+         'FOR' i := 1 'STEP' 1 'UNTIL' n8 'DO'
+            p3 (x, y, z);
+      
+      
+         'COMMENT' module 9: array references ;
+      
+         j := 1;  
+         k := 2;  
+         l := 3;
+         e1[1] := 1.0;  
+         e1[2] := 2.0;  
+         e1[3] := 3.0;
+      
+         'FOR' i := 1 'STEP' 1 'UNTIL' n9 'DO'
+            p0;
+      
+      
+         'COMMENT' module 10: integer arithmetik ;
+      
+         j := 2;  
+         k := 3;
+      
+         'FOR' i := 1 'STEP' 1 'UNTIL' n10 'DO'
+            'BEGIN'
+               j := j + k;
+               k := j + k;
+               j := k - j;
+               k := k -j -j
+            'END';
+      
+   
+         'COMMENT' module 11: standard functions ;
+      
+         x := 0.75;
+         'FOR' i := 1 'STEP' 1 'UNTIL' n11 'DO'
+            x := sqrt (exp (ln (x) / t1));
+      
+         
+      'END';
+    
+   'COMMENT' Get stop time after ntimes ;
+
+
+   'COMMENT'  Now compute number of K Whetstones per sec;
+
+   rating := 1000.0 * CLOCKSPERSEC * ntimes / 
+                'FLOATING'(stoptime - starttime);
+
+
+   result ;
+
+'END' main
+

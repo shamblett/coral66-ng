@@ -6,9 +6,9 @@
 
 #include <iostream>
 
-#include "test/frontend/common/common.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "test/common/test_config.hpp"
+#include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 #include "tools/parser/astdump/lib/ast_dump.hpp"
 
@@ -62,6 +62,29 @@ TEST_CASE("Examples", "[Parser][Golden]")
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
         auto astPath = getTestDataPath("sieve/sieve_ast.json", "GOLDEN_DIR");
+        auto ast = readFile(astPath);
+        CHECK(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
+
+    SECTION("Whetstone")
+    {
+        auto sourcePath = getTestDataPath("whetstone/whetstone.cor", "GOLDEN_DIR");
+        auto source = readFile(sourcePath);
+        CHECK(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("whetstone/whetstone_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 
