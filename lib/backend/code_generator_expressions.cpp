@@ -45,20 +45,30 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
         if (!baseAddr)
             return nullptr;
 
-        std::vector<llvm::Value*> indices;
-        indices.push_back(llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(32, 0)));
-        for (const auto& idxExpr : arrAccess->getIndices())
-        {
-            llvm::Value* idxVal = visit(*idxExpr);
-            indices.push_back(idxVal);
-        }
-
         llvm::Type* baseType = nullptr;
         declaration->match([&](const semantics::ArrayDeclaration& arrayDeclaration)
                            { baseType = convertType(arrayDeclaration.getType()); }, [&](const auto&) {});
 
-        if (baseType)
-            return m_builder.CreateGEP(baseType, baseAddr, indices, "arrayidx");
+        if (!baseType)
+            return nullptr;
+
+        std::vector<llvm::Value*> indices;
+        if (baseType->isArrayTy())
+            indices.push_back(llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(32, 0)));
+        
+        for (const auto& idxExpr : arrAccess->getIndices())
+        {
+            llvm::Value* idxVal = visit(*idxExpr);
+            if (!idxVal) return nullptr;
+            if (idxVal->getType()->isFloatingPointTy()) {
+                idxVal = m_builder.CreateFPToSI(idxVal, llvm::Type::getInt32Ty(m_module.getContext()));
+            } else if (!idxVal->getType()->isIntegerTy(32) && idxVal->getType()->isIntegerTy()) {
+                idxVal = m_builder.CreateIntCast(idxVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
+            }
+            indices.push_back(idxVal);
+        }
+
+        return m_builder.CreateGEP(baseType, baseAddr, indices, "arrayidx");
     }
     return nullptr;
 }
@@ -203,17 +213,17 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
     if (kind == lexer::TokenType::Division)
         return L->getType()->isFloatingPointTy() ? m_builder.CreateFDiv(L, R) : m_builder.CreateSDiv(L, R);
     if (kind == lexer::TokenType::Equal)
-        return m_builder.CreateICmpEQ(L, R);
+        return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpOEQ(L, R) : m_builder.CreateICmpEQ(L, R);
     if (kind == lexer::TokenType::NotEqual)
-        return m_builder.CreateICmpNE(L, R);
+        return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpONE(L, R) : m_builder.CreateICmpNE(L, R);
     if (kind == lexer::TokenType::LessThan)
-        return m_builder.CreateICmpSLT(L, R);
+        return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpOLT(L, R) : m_builder.CreateICmpSLT(L, R);
     if (kind == lexer::TokenType::LessThanOrEqual)
-        return m_builder.CreateICmpSLE(L, R);
+        return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpOLE(L, R) : m_builder.CreateICmpSLE(L, R);
     if (kind == lexer::TokenType::GreaterThan)
-        return m_builder.CreateICmpSGT(L, R);
+        return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpOGT(L, R) : m_builder.CreateICmpSGT(L, R);
     if (kind == lexer::TokenType::GreaterThanOrEqual)
-        return m_builder.CreateICmpSGE(L, R);
+        return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpOGE(L, R) : m_builder.CreateICmpSGE(L, R);
     if (kind == lexer::TokenType::AndKeyword || kind == lexer::TokenType::MaskKeyword)
         return m_builder.CreateAnd(L, R);
     if (kind == lexer::TokenType::OrKeyword || kind == lexer::TokenType::UnionKeyword)
@@ -231,7 +241,7 @@ llvm::Value* code_generator::visit(const syntax::UnaryExpression& expression)
 
     const auto kind = expression.getOp()->getTokenType();
     if (kind == lexer::TokenType::Minus)
-        return m_builder.CreateNeg(operand);
+        return operand->getType()->isFloatingPointTy() ? m_builder.CreateFNeg(operand) : m_builder.CreateNeg(operand);
     if (kind == lexer::TokenType::Plus)
         return operand;
     return nullptr;
@@ -271,7 +281,8 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
     size_t i = 0;
     for (const auto& arg : expression.getArguments())
     {
-        if (procType && i < procType->getParameters().size() && procType->getParameters()[i].type->isLocation())
+        if (procType && i < procType->getParameters().size() && 
+            (procType->getParameters()[i].type->isLocation() || procType->getParameters()[i].type->tryAs<semantics::ArrayType>()))
         {
             llvm::Value* addr = emitAddress(*arg);
             if (!addr)
@@ -291,12 +302,21 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
         {
             if (args[i1]->getType() != ft->getParamType(i1))
             {
-                if (args[i1]->getType()->isPointerTy() && ft->getParamType(i1)->isIntegerTy())
-                    args[i1] = m_builder.CreatePtrToInt(args[i1], ft->getParamType(i1));
-                else if (args[i1]->getType()->isIntegerTy() && ft->getParamType(i1)->isPointerTy())
-                    args[i1] = m_builder.CreateIntToPtr(args[i1], ft->getParamType(i1));
-                else
-                    args[i1] = m_builder.CreateIntCast(args[i1], ft->getParamType(i1), true);
+                llvm::Type* argType = args[i1]->getType();
+                llvm::Type* paramType = ft->getParamType(i1);
+                if (argType->isPointerTy() && paramType->isIntegerTy())
+                    args[i1] = m_builder.CreatePtrToInt(args[i1], paramType);
+                else if (argType->isIntegerTy() && paramType->isPointerTy())
+                    args[i1] = m_builder.CreateIntToPtr(args[i1], paramType);
+                else if (argType->isIntegerTy() && paramType->isFloatingPointTy())
+                    args[i1] = m_builder.CreateSIToFP(args[i1], paramType);
+                else if (argType->isFloatingPointTy() && paramType->isIntegerTy())
+                    args[i1] = m_builder.CreateFPToSI(args[i1], paramType);
+                else if (argType->isFloatingPointTy() && paramType->isFloatingPointTy())
+                    args[i1] = m_builder.CreateFPCast(args[i1], paramType);
+                else if (argType->isIntegerTy() && paramType->isIntegerTy())
+                    args[i1] = m_builder.CreateIntCast(args[i1], paramType, true);
+                // If it's something else (like an array value), we skip casting to avoid crashes.
             }
         }
         return m_builder.CreateCall(ft, funcVal, args);

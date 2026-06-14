@@ -56,12 +56,16 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     else if (auto* arr = type.tryAs<semantics::ArrayType>())
     {
         llvm::Type* elemType = convertType(arr->getElementType());
-        llvm::Type* arrType = elemType;
-        for (const unsigned long it : std::views::reverse(arr->getDimensions()))
-        {
-            arrType = llvm::ArrayType::get(arrType, it);
+        if (arr->getDimensions().empty()) {
+            baseType = llvm::PointerType::getUnqual(ctx);
+        } else {
+            llvm::Type* arrType = elemType;
+            for (const unsigned long it : std::views::reverse(arr->getDimensions()))
+            {
+                arrType = llvm::ArrayType::get(arrType, it);
+            }
+            baseType = arrType;
         }
-        baseType = arrType;
     }
     else if (auto* fixed = type.tryAs<semantics::FixedType>())
     {
