@@ -625,11 +625,11 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
-        REQUIRE(ansAddr != nullptr);
-
-        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
-        REQUIRE(finalAns == 2.0);
+        // Square root
+        auto sqrtAnsAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("sqrtans"));
+        REQUIRE(sqrtAnsAddr != nullptr);
+        int32_t sqrtAns = *static_cast<int32_t*>(sqrtAnsAddr);
+        REQUIRE(sqrtAns == 2.0);
 
         delete ee;
     }
