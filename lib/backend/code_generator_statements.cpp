@@ -289,11 +289,16 @@ void code_generator::visit(const syntax::ForStatement& statement)
             llvm::Value* v2 = visit(*step);
             llvm::Value* v3 = visit(*until);
 
-            auto castToLoopVar = [&](llvm::Value* val) -> llvm::Value* {
-                if (val->getType() == loopVarType) return val;
-                if (val->getType()->isIntegerTy() && loopVarType->isFloatingPointTy()) return m_builder.CreateSIToFP(val, loopVarType);
-                if (val->getType()->isFloatingPointTy() && loopVarType->isIntegerTy()) return m_builder.CreateFPToSI(val, loopVarType);
-                if (val->getType()->isFloatingPointTy() && loopVarType->isFloatingPointTy()) return m_builder.CreateFPCast(val, loopVarType);
+            auto castToLoopVar = [&](llvm::Value* val) -> llvm::Value*
+            {
+                if (val->getType() == loopVarType)
+                    return val;
+                if (val->getType()->isIntegerTy() && loopVarType->isFloatingPointTy())
+                    return m_builder.CreateSIToFP(val, loopVarType);
+                if (val->getType()->isFloatingPointTy() && loopVarType->isIntegerTy())
+                    return m_builder.CreateFPToSI(val, loopVarType);
+                if (val->getType()->isFloatingPointTy() && loopVarType->isFloatingPointTy())
+                    return m_builder.CreateFPCast(val, loopVarType);
                 return m_builder.CreateIntCast(val, loopVarType, true);
             };
 
@@ -301,7 +306,7 @@ void code_generator::visit(const syntax::ForStatement& statement)
             v2 = castToLoopVar(v2);
             v3 = castToLoopVar(v3);
 
-            llvm::IRBuilder<> tmpBuilder(&m_currentFunction->getEntryBlock(), m_currentFunction->getEntryBlock().begin());
+            llvm::IRBuilder tmpBuilder(&m_currentFunction->getEntryBlock(), m_currentFunction->getEntryBlock().begin());
 
             llvm::AllocaInst* v1Addr = tmpBuilder.CreateAlloca(loopVarType, nullptr, "v1");
             llvm::AllocaInst* v2Addr = tmpBuilder.CreateAlloca(loopVarType, nullptr, "v2");
@@ -329,11 +334,14 @@ void code_generator::visit(const syntax::ForStatement& statement)
             llvm::Value* currV3 = m_builder.CreateLoad(loopVarType, v3Addr);
 
             llvm::Value* isExhausted = nullptr;
-            if (loopVarType->isFloatingPointTy()) {
+            if (loopVarType->isFloatingPointTy())
+            {
                 llvm::Value* diff = m_builder.CreateFSub(currV1, currV3);
                 llvm::Value* prod = m_builder.CreateFMul(diff, currV2);
                 isExhausted = m_builder.CreateFCmpOGT(prod, llvm::ConstantFP::get(loopVarType, 0.0));
-            } else {
+            }
+            else
+            {
                 llvm::Value* diff = m_builder.CreateSub(currV1, currV3);
                 llvm::Value* prod = m_builder.CreateMul(diff, currV2);
                 isExhausted = m_builder.CreateICmpSGT(prod, llvm::ConstantInt::get(loopVarType, 0));
@@ -346,7 +354,8 @@ void code_generator::visit(const syntax::ForStatement& statement)
 
             m_builder.SetInsertPoint(incBB);
             llvm::Value* cv = m_builder.CreateLoad(loopVarType, loopVarAddr);
-            llvm::Value* nextV1 = loopVarType->isFloatingPointTy() ? m_builder.CreateFAdd(cv, currV2) : m_builder.CreateAdd(cv, currV2);
+            llvm::Value* nextV1 =
+                loopVarType->isFloatingPointTy() ? m_builder.CreateFAdd(cv, currV2) : m_builder.CreateAdd(cv, currV2);
             m_builder.CreateStore(nextV1, v1Addr);
             m_builder.CreateBr(condBB);
         }
@@ -363,11 +372,16 @@ void code_generator::visit(const syntax::ForStatement& statement)
             m_builder.SetInsertPoint(evalBB);
 
             llvm::Value* exprVal = visit(*expression);
-            if (exprVal->getType() != loopVarType) {
-                if (exprVal->getType()->isIntegerTy() && loopVarType->isFloatingPointTy()) exprVal = m_builder.CreateSIToFP(exprVal, loopVarType);
-                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isIntegerTy()) exprVal = m_builder.CreateFPToSI(exprVal, loopVarType);
-                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isFloatingPointTy()) exprVal = m_builder.CreateFPCast(exprVal, loopVarType);
-                else exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
+            if (exprVal->getType() != loopVarType)
+            {
+                if (exprVal->getType()->isIntegerTy() && loopVarType->isFloatingPointTy())
+                    exprVal = m_builder.CreateSIToFP(exprVal, loopVarType);
+                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isIntegerTy())
+                    exprVal = m_builder.CreateFPToSI(exprVal, loopVarType);
+                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isFloatingPointTy())
+                    exprVal = m_builder.CreateFPCast(exprVal, loopVarType);
+                else
+                    exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
             }
             if (loopVarAddr)
                 m_builder.CreateStore(exprVal, loopVarAddr);
@@ -388,11 +402,16 @@ void code_generator::visit(const syntax::ForStatement& statement)
         else
         {
             llvm::Value* exprVal = visit(*expression);
-            if (exprVal->getType() != loopVarType) {
-                if (exprVal->getType()->isIntegerTy() && loopVarType->isFloatingPointTy()) exprVal = m_builder.CreateSIToFP(exprVal, loopVarType);
-                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isIntegerTy()) exprVal = m_builder.CreateFPToSI(exprVal, loopVarType);
-                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isFloatingPointTy()) exprVal = m_builder.CreateFPCast(exprVal, loopVarType);
-                else exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
+            if (exprVal->getType() != loopVarType)
+            {
+                if (exprVal->getType()->isIntegerTy() && loopVarType->isFloatingPointTy())
+                    exprVal = m_builder.CreateSIToFP(exprVal, loopVarType);
+                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isIntegerTy())
+                    exprVal = m_builder.CreateFPToSI(exprVal, loopVarType);
+                else if (exprVal->getType()->isFloatingPointTy() && loopVarType->isFloatingPointTy())
+                    exprVal = m_builder.CreateFPCast(exprVal, loopVarType);
+                else
+                    exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
             }
             if (loopVarAddr)
                 m_builder.CreateStore(exprVal, loopVarAddr);
@@ -411,17 +430,18 @@ void code_generator::visit(const syntax::ForStatement& statement)
 void code_generator::visit(const syntax::AnswerStatement& statement)
 {
     llvm::Value* val = visit(statement.getExpression());
-    if (!val) return;
-    llvm::Type* retType = m_currentFunction->getReturnType();
-    if (val->getType() != retType) {
-        if (val->getType()->isIntegerTy() && retType->isFloatingPointTy())
-            val = m_builder.CreateSIToFP(val, retType);
-        else if (val->getType()->isFloatingPointTy() && retType->isIntegerTy())
-            val = m_builder.CreateFPToSI(val, retType);
-        else if (val->getType()->isFloatingPointTy() && retType->isFloatingPointTy())
-            val = m_builder.CreateFPCast(val, retType);
-        else if (val->getType()->isIntegerTy() && retType->isIntegerTy())
-            val = m_builder.CreateIntCast(val, retType, true);
+    if (!val)
+        return;
+    if (llvm::Type* returnType = m_currentFunction->getReturnType(); val->getType() != returnType)
+    {
+        if (val->getType()->isIntegerTy() && returnType->isFloatingPointTy())
+            val = m_builder.CreateSIToFP(val, returnType);
+        else if (val->getType()->isFloatingPointTy() && returnType->isIntegerTy())
+            val = m_builder.CreateFPToSI(val, returnType);
+        else if (val->getType()->isFloatingPointTy() && returnType->isFloatingPointTy())
+            val = m_builder.CreateFPCast(val, returnType);
+        else if (val->getType()->isIntegerTy() && returnType->isIntegerTy())
+            val = m_builder.CreateIntCast(val, returnType, true);
     }
     m_builder.CreateRet(val);
 }

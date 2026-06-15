@@ -56,9 +56,12 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     else if (auto* arr = type.tryAs<semantics::ArrayType>())
     {
         llvm::Type* elemType = convertType(arr->getElementType());
-        if (arr->getDimensions().empty()) {
+        if (arr->getDimensions().empty())
+        {
             baseType = llvm::PointerType::getUnqual(ctx);
-        } else {
+        }
+        else
+        {
             llvm::Type* arrType = elemType;
             for (const unsigned long it : std::views::reverse(arr->getDimensions()))
             {
@@ -81,9 +84,9 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
         if (auto* def = std::get_if<semantics::TableDefinition>(&tab->getInfo().type))
         {
             std::vector<llvm::Type*> fieldTypes;
-            for (const auto& [type, name] : def->getFields())
+            for (const auto& [type1, name] : def->getFields())
             {
-                fieldTypes.push_back(convertType(*type));
+                fieldTypes.push_back(convertType(*type1));
             }
             llvm::Type* structType = llvm::StructType::get(ctx, fieldTypes);
             if (def->getLength() > 0)

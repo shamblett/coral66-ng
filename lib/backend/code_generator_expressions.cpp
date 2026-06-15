@@ -55,14 +55,18 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
         std::vector<llvm::Value*> indices;
         if (baseType->isArrayTy())
             indices.push_back(llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(32, 0)));
-        
+
         for (const auto& idxExpr : arrAccess->getIndices())
         {
             llvm::Value* idxVal = visit(*idxExpr);
-            if (!idxVal) return nullptr;
-            if (idxVal->getType()->isFloatingPointTy()) {
+            if (!idxVal)
+                return nullptr;
+            if (idxVal->getType()->isFloatingPointTy())
+            {
                 idxVal = m_builder.CreateFPToSI(idxVal, llvm::Type::getInt32Ty(m_module.getContext()));
-            } else if (!idxVal->getType()->isIntegerTy(32) && idxVal->getType()->isIntegerTy()) {
+            }
+            else if (!idxVal->getType()->isIntegerTy(32) && idxVal->getType()->isIntegerTy())
+            {
                 idxVal = m_builder.CreateIntCast(idxVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
             }
             indices.push_back(idxVal);
@@ -281,8 +285,9 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
     size_t i = 0;
     for (const auto& arg : expression.getArguments())
     {
-        if (procType && i < procType->getParameters().size() && 
-            (procType->getParameters()[i].type->isLocation() || procType->getParameters()[i].type->tryAs<semantics::ArrayType>()))
+        if (procType && i < procType->getParameters().size()
+            && (procType->getParameters()[i].type->isLocation()
+                || procType->getParameters()[i].type->tryAs<semantics::ArrayType>()))
         {
             llvm::Value* addr = emitAddress(*arg);
             if (!addr)
@@ -302,20 +307,20 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
         {
             if (args[i1]->getType() != ft->getParamType(i1))
             {
-                llvm::Type* argType = args[i1]->getType();
-                llvm::Type* paramType = ft->getParamType(i1);
-                if (argType->isPointerTy() && paramType->isIntegerTy())
-                    args[i1] = m_builder.CreatePtrToInt(args[i1], paramType);
-                else if (argType->isIntegerTy() && paramType->isPointerTy())
-                    args[i1] = m_builder.CreateIntToPtr(args[i1], paramType);
-                else if (argType->isIntegerTy() && paramType->isFloatingPointTy())
-                    args[i1] = m_builder.CreateSIToFP(args[i1], paramType);
-                else if (argType->isFloatingPointTy() && paramType->isIntegerTy())
-                    args[i1] = m_builder.CreateFPToSI(args[i1], paramType);
-                else if (argType->isFloatingPointTy() && paramType->isFloatingPointTy())
-                    args[i1] = m_builder.CreateFPCast(args[i1], paramType);
-                else if (argType->isIntegerTy() && paramType->isIntegerTy())
-                    args[i1] = m_builder.CreateIntCast(args[i1], paramType, true);
+                const llvm::Type* argumentType = args[i1]->getType();
+                if (llvm::Type* parameterType = ft->getParamType(i1);
+                    argumentType->isPointerTy() && parameterType->isIntegerTy())
+                    args[i1] = m_builder.CreatePtrToInt(args[i1], parameterType);
+                else if (argumentType->isIntegerTy() && parameterType->isPointerTy())
+                    args[i1] = m_builder.CreateIntToPtr(args[i1], parameterType);
+                else if (argumentType->isIntegerTy() && parameterType->isFloatingPointTy())
+                    args[i1] = m_builder.CreateSIToFP(args[i1], parameterType);
+                else if (argumentType->isFloatingPointTy() && parameterType->isIntegerTy())
+                    args[i1] = m_builder.CreateFPToSI(args[i1], parameterType);
+                else if (argumentType->isFloatingPointTy() && parameterType->isFloatingPointTy())
+                    args[i1] = m_builder.CreateFPCast(args[i1], parameterType);
+                else if (argumentType->isIntegerTy() && parameterType->isIntegerTy())
+                    args[i1] = m_builder.CreateIntCast(args[i1], parameterType, true);
                 // If it's something else (like an array value), we skip casting to avoid crashes.
             }
         }
