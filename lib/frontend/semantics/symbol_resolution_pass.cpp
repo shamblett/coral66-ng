@@ -962,7 +962,7 @@ void SymbolResolutionPass::visit(const syntax::TypeChangeExpression& node)
     visit(node.getExpression());
 }
 
-
+// ReSharper disable once CppMemberFunctionMayBeConst
 void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
 {
     const auto& codeToken = node.getCode();
