@@ -22,9 +22,9 @@
    SetPVal(pVal);
 
    overlaidArr := 10;
-   arr[1, 1] := 20;
+   arr[2, 2] := 20;
 
-   'IF' overlaidArr = 10 'AND' pVal = 42 'AND' arr[1, 1] = 20 'THEN'
+   'IF' overlaidArr = 10 'AND' pVal = 42 'AND' arr[2, 2] = 20 'THEN'
       ans := 42
    'ELSE'
       ans := 0;

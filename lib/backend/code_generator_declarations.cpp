@@ -38,10 +38,30 @@ void code_generator::visit(const semantics::Declaration& declaration)
     }
     else if (auto* over = dynamic_cast<const semantics::OverlayDeclaration*>(&declaration))
     {
-        auto* llvmType = convertType(over->getType());
-        auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
-                                                   llvm::Constant::getNullValue(llvmType), over->getName());
-        m_globals[over] = globalVar;
+        if (auto* astNode = dynamic_cast<const syntax::OverlayDeclaration*>(over->getAstNode()))
+        {
+            const auto baseName = std::get<std::string>(astNode->getBase()->getValue());
+            const semantics::Usable* baseUsable = m_program.getContext().symbolTable.lookup(baseName);
+            if (baseUsable && m_globals.contains(baseUsable))
+            {
+                llvm::Constant* baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
+                std::int64_t offsetVal = 0;
+                if (astNode->getOffset()->getType() == lexer::CToken::Integer)
+                {
+                    if (auto* intVal = std::get_if<llvm::APSInt>(&astNode->getOffset()->getValue()))
+                        offsetVal = intVal->getExtValue();
+                }
+
+                llvm::Constant* finalAddr = baseAddr;
+                if (offsetVal != 0)
+                {
+                    llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
+                    llvm::Constant* idx = llvm::ConstantInt::get(i32Ty, offsetVal, true);
+                    finalAddr = llvm::ConstantExpr::getGetElementPtr(i32Ty, baseAddr, idx);
+                }
+                m_globals[over] = finalAddr;
+            }
+        }
     }
     else if (auto* proc = dynamic_cast<const semantics::ProcedureDeclaration*>(&declaration))
     {
@@ -218,14 +238,56 @@ void code_generator::visit(const syntax::TableDeclaration& declaration)
 
 void code_generator::visit(const syntax::OverlayDeclaration& declaration)
 {
-    if (const auto it = m_program.getContext().resolvedIdentifiers.find(&declaration);
-        it != m_program.getContext().resolvedIdentifiers.end())
+    const auto baseName = std::get<std::string>(declaration.getBase()->getValue());
+    const semantics::Usable* baseUsable = m_program.getContext().symbolTable.lookup(baseName);
+    if (!baseUsable)
+        return;
+
+    llvm::Value* baseAddr = nullptr;
+    if (m_locals.contains(baseUsable))
+        baseAddr = m_locals[baseUsable];
+    else if (m_globals.contains(baseUsable))
+        baseAddr = m_globals[baseUsable];
+
+    if (!baseAddr)
+        return;
+
+    std::int64_t offsetVal = 0;
+    if (declaration.getOffset()->getType() == lexer::CToken::Integer)
     {
-        if (auto* semOver = it->second->tryAs<semantics::OverlayDeclaration>())
+        if (auto* intVal = std::get_if<llvm::APSInt>(&declaration.getOffset()->getValue()))
+            offsetVal = intVal->getExtValue();
+    }
+
+    // Coral 66 OVERLAY array base offsets are usually 1 word (4 bytes) each, but depend on type.
+    // Actually we just get the base address, GEP if offset != 0, and bitcast.
+    llvm::Value* finalAddr = baseAddr;
+    if (offsetVal != 0)
+    {
+        llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
+        llvm::Value* idx = llvm::ConstantInt::get(i32Ty, offsetVal, true);
+        finalAddr = m_builder.CreateGEP(i32Ty, baseAddr, idx, "overlay_offset");
+    }
+
+    const syntax::Declaration& innerDecl = declaration.getOverlayDeclaration();
+    std::string targetName;
+    if (auto* varDecl = dynamic_cast<const syntax::VariableDeclaration*>(&innerDecl))
+    {
+        if (!varDecl->getIdentifiers().empty())
+            targetName = std::get<std::string>(varDecl->getIdentifiers()[0]->getValue());
+    }
+    else if (auto* arrDecl = dynamic_cast<const syntax::ArrayDeclaration*>(&innerDecl))
+    {
+        if (!arrDecl->getIdentifiers().empty())
+            targetName = std::get<std::string>(arrDecl->getIdentifiers()[0]->getValue());
+    }
+    
+    if (!targetName.empty())
+    {
+        const semantics::Usable* targetUsable = m_program.getContext().symbolTable.lookup(targetName);
+        if (targetUsable)
         {
-            auto* llvmType = convertType(semOver->getType());
-            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semOver->getName());
-            m_locals[it->second] = alloca;
+            m_locals[targetUsable] = finalAddr;
         }
     }
 }

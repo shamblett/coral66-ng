@@ -8,6 +8,11 @@
 
 #include "lib/frontend/semantics/program.hpp"
 
+namespace coral66::semantics
+{
+std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& expr);
+}
+
 namespace coral66::cgllvm
 {
 
@@ -46,8 +51,20 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
             return nullptr;
 
         llvm::Type* baseType = nullptr;
-        declaration->match([&](const semantics::ArrayDeclaration& arrayDeclaration)
-                           { baseType = convertType(arrayDeclaration.getType()); }, [&](const auto&) {});
+        const syntax::ArrayDeclaration* arrDeclNode = nullptr;
+        declaration->match(
+            [&](const semantics::ArrayDeclaration& arrayDeclaration)
+            {
+                baseType = convertType(arrayDeclaration.getType());
+                arrDeclNode = dynamic_cast<const syntax::ArrayDeclaration*>(arrayDeclaration.getAstNode());
+            },
+            [&](const semantics::VariableDeclaration& varDecl)
+            {
+                baseType = convertType(varDecl.getType());
+            },
+            [&](const auto&)
+            {
+            });
 
         if (!baseType)
             return nullptr;
@@ -56,8 +73,9 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
         if (baseType->isArrayTy())
             indices.push_back(llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(32, 0)));
 
-        for (const auto& idxExpr : arrAccess->getIndices())
+        for (std::size_t i = 0; i < arrAccess->getIndices().size(); ++i)
         {
+            const auto& idxExpr = arrAccess->getIndices()[i];
             llvm::Value* idxVal = visit(*idxExpr);
             if (!idxVal)
                 return nullptr;
@@ -69,6 +87,17 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
             {
                 idxVal = m_builder.CreateIntCast(idxVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
             }
+
+            if (arrDeclNode && i < arrDeclNode->getDimensions().size())
+            {
+                auto lower = semantics::evaluateConstantInteger(*arrDeclNode->getDimensions()[i].first);
+                if (lower && *lower != 0)
+                {
+                    llvm::Value* lowerVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), *lower, true);
+                    idxVal = m_builder.CreateSub(idxVal, lowerVal, "idx_offset");
+                }
+            }
+
             indices.push_back(idxVal);
         }
 

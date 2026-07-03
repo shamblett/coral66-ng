@@ -9,6 +9,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
+#include <iostream>
 
 #include "common.hpp"
 #include "lib/backend/code_generation.hpp"
@@ -21,6 +22,218 @@
 
 using namespace Catch::Matchers;
 
+TEST_CASE("Review 1", "[Backend][Execution]")
+{
+    SECTION("Array Bounds Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/array_bounds.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("review1_test", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        module->print(llvm::errs(), nullptr);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 17); // 5 + 12
+
+        delete ee;
+    }
+
+    SECTION("Overlay Aliasing Read Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/overlay_aliasing.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("review1_test", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        module->print(llvm::errs(), nullptr);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
+
+    SECTION("Overlay Aliasing Write Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/overlay_aliasing_mod.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("review1_test", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        module->print(llvm::errs(), nullptr);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
+}
 TEST_CASE("Phase 1", "[Backend][Execution]")
 {
     SECTION("Sieve End-to-End Execution")
@@ -50,14 +263,14 @@ TEST_CASE("Phase 1", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -68,6 +281,7 @@ TEST_CASE("Phase 1", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 
@@ -132,14 +346,14 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -150,6 +364,7 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 
@@ -215,14 +430,14 @@ TEST_CASE("Phase 3", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -233,6 +448,7 @@ TEST_CASE("Phase 3", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 
@@ -298,14 +514,14 @@ TEST_CASE("Phase 4", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -316,6 +532,7 @@ TEST_CASE("Phase 4", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 
@@ -380,14 +597,14 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -398,6 +615,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 
@@ -590,14 +808,14 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -607,6 +825,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 
@@ -659,14 +878,14 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during parsing:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         if (errors)
         {
-            llvm::errs() << "Errors during semantics:\n" << ss.str() << "\n";
+            WARN(ss.str());
         }
         REQUIRE_FALSE(errors);
 
@@ -676,6 +895,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
 

@@ -25,14 +25,151 @@ code_generator::code_generator(llvm::Module& module, const syntax::Program& tree
 
 void code_generator::generate()
 {
+    // First pass: Find global overlays to prevent double-allocation
+    if (m_tree.hasBlock())
+    {
+        for (const auto& decl : m_tree.getBlock().getDeclarations())
+        {
+            if (auto* overDecl = dynamic_cast<const syntax::OverlayDeclaration*>(decl.get()))
+            {
+                m_globalOverlays.push_back(overDecl);
+            }
+        }
+    }
+
     // First pass: Global Declarations
-    // We iterate over semantic usables because the semantic pass already flattened and lifted
-    // them. We only declare the ones that are at scope depth 1 (global).
     for (const auto& global : m_program.getGlobals())
     {
+        bool isOverlayInner = false;
+        
+        for (const auto* overDecl : m_globalOverlays)
+        {
+            const auto& innerDecl = overDecl->getOverlayDeclaration();
+            // Try to extract the name from the inner declaration to match
+            std::string innerName;
+            if (auto* varDecl = dynamic_cast<const syntax::VariableDeclaration*>(&innerDecl))
+            {
+                if (!varDecl->getIdentifiers().empty())
+                    innerName = std::get<std::string>(varDecl->getIdentifiers()[0]->getValue());
+            }
+            else if (auto* arrDecl = dynamic_cast<const syntax::ArrayDeclaration*>(&innerDecl))
+            {
+                if (!arrDecl->getIdentifiers().empty())
+                    innerName = std::get<std::string>(arrDecl->getIdentifiers()[0]->getValue());
+            }
+            
+            if (!innerName.empty())
+            {
+                std::string globalName;
+                global->match(
+                    [&](const semantics::VariableDeclaration& var) { globalName = var.getName(); },
+                    [&](const semantics::ArrayDeclaration& arr) { globalName = arr.getName(); },
+                    [&](const semantics::TableDeclaration& tab) { globalName = tab.getName(); },
+                    [&](const semantics::OverlayDeclaration& over) { globalName = over.getName(); },
+                    [&](const semantics::ProcedureDeclaration& proc) { globalName = proc.getName(); },
+                    [](const auto&) {}
+                );
+                
+                if (globalName == innerName)
+                {
+                    isOverlayInner = true;
+                    break;
+                }
+            }
+        }
+        
+        if (isOverlayInner)
+            continue;
+
         global->match([&](const semantics::VariableDeclaration& var) { visit(var); },
                       [&](const semantics::ArrayDeclaration& arr) { visit(arr); },
+                      [&](const semantics::TableDeclaration& tab) { visit(tab); },
+                      [&](const semantics::OverlayDeclaration& over) { visit(over); },
                       [&](const semantics::ProcedureDeclaration& proc) { visit(proc); }, [](const auto&) {});
+    }
+
+    // After all normal globals are set up, resolve global overlays
+    for (const auto* overDecl : m_globalOverlays)
+    {
+        const auto baseName = std::get<std::string>(overDecl->getBase()->getValue());
+        
+        const semantics::Usable* baseUsable = nullptr;
+        for (const auto& g : m_program.getGlobals())
+        {
+            std::string gName;
+            g->match(
+                [&](const semantics::VariableDeclaration& var) { gName = var.getName(); },
+                [&](const semantics::ArrayDeclaration& arr) { gName = arr.getName(); },
+                [&](const semantics::TableDeclaration& tab) { gName = tab.getName(); },
+                [&](const semantics::OverlayDeclaration& over) { gName = over.getName(); },
+                [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getName(); },
+                [](const auto&) {}
+            );
+            if (gName == baseName)
+            {
+                baseUsable = g.get();
+                break;
+            }
+        }
+
+        if (baseUsable && m_globals.contains(baseUsable))
+        {
+            llvm::Constant* baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
+            std::int64_t offsetVal = 0;
+            if (overDecl->getOffset()->getType() == lexer::CToken::Integer)
+            {
+                if (auto* intVal = std::get_if<llvm::APSInt>(&overDecl->getOffset()->getValue()))
+                    offsetVal = intVal->getExtValue();
+            }
+
+            llvm::Constant* finalAddr = baseAddr;
+            if (offsetVal != 0)
+            {
+                llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
+                llvm::Constant* idx = llvm::ConstantInt::get(i32Ty, offsetVal, true);
+                finalAddr = llvm::ConstantExpr::getGetElementPtr(i32Ty, baseAddr, idx);
+            }
+            
+            const syntax::Declaration& innerDecl = overDecl->getOverlayDeclaration();
+            std::string targetName;
+            if (auto* varDecl = dynamic_cast<const syntax::VariableDeclaration*>(&innerDecl))
+            {
+                if (!varDecl->getIdentifiers().empty())
+                    targetName = std::get<std::string>(varDecl->getIdentifiers()[0]->getValue());
+            }
+            else if (auto* arrDecl = dynamic_cast<const syntax::ArrayDeclaration*>(&innerDecl))
+            {
+                if (!arrDecl->getIdentifiers().empty())
+                    targetName = std::get<std::string>(arrDecl->getIdentifiers()[0]->getValue());
+            }
+            
+            if (!targetName.empty())
+            {
+                const semantics::Usable* targetUsable = nullptr;
+                for (const auto& g : m_program.getGlobals())
+                {
+                    std::string gName;
+                    g->match(
+                [&](const semantics::VariableDeclaration& var) { gName = var.getName(); },
+                [&](const semantics::ArrayDeclaration& arr) { gName = arr.getName(); },
+                [&](const semantics::TableDeclaration& tab) { gName = tab.getName(); },
+                [&](const semantics::OverlayDeclaration& over) { gName = over.getName(); },
+                [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getName(); },
+                [](const auto&) {}
+            );
+                    if (gName == targetName)
+                    {
+                        targetUsable = g.get();
+                        break;
+                    }
+                }
+                
+                if (targetUsable)
+                {
+                    m_globals[targetUsable] = finalAddr;
+                }
+            }
+        }
     }
 
     // Second pass: Generate body for the main program and all procedures

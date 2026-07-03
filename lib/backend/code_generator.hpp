@@ -40,6 +40,7 @@ class code_generator final
     std::unordered_map<const semantics::Usable*, llvm::Value*> m_locals;
     std::unordered_map<const syntax::Statement*, llvm::BasicBlock*> m_labels;
     std::unordered_map<std::string, llvm::BasicBlock*> m_namedLabels;
+    std::vector<const syntax::OverlayDeclaration*> m_globalOverlays;
 
 public:
     explicit code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
