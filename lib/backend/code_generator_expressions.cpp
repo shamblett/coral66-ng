@@ -500,17 +500,79 @@ llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expressio
         return val;
 
     llvm::Type* targetType = convertType(*it->second);
-    if (val->getType() == targetType)
-        return val;
+    
+    std::uint32_t targetFraction = 0;
+    bool isTargetFixed = false;
+    if (auto* fixedT = it->second->tryAs<semantics::FixedType>())
+    {
+        targetFraction = fixedT->getFractionalBits();
+        isTargetFixed = true;
+    }
 
+    std::uint32_t valFraction = 0;
+    bool isValFixed = false;
+    const auto exprIt = m_program.getContext().expressionTypes.find(&expression.getExpression());
+    if (exprIt != m_program.getContext().expressionTypes.end())
+    {
+        if (auto* fixedV = exprIt->second->tryAs<semantics::FixedType>())
+        {
+            valFraction = fixedV->getFractionalBits();
+            isValFixed = true;
+        }
+    }
+
+    // Convert from FIXED to FLOATING
     if (targetType->isFloatingPointTy() && val->getType()->isIntegerTy())
-        return m_builder.CreateSIToFP(val, targetType);
+    {
+        val = m_builder.CreateSIToFP(val, targetType);
+        if (isValFixed && valFraction > 0)
+        {
+            llvm::Value* divisor = llvm::ConstantFP::get(targetType, static_cast<double>(1ULL << valFraction));
+            val = m_builder.CreateFDiv(val, divisor, "fixed_to_float_scale");
+        }
+        return val;
+    }
+
+    // Convert from FLOATING to FIXED or INTEGER
     if (targetType->isIntegerTy() && val->getType()->isFloatingPointTy())
+    {
+        if (isTargetFixed && targetFraction > 0)
+        {
+            llvm::Value* multiplier = llvm::ConstantFP::get(val->getType(), static_cast<double>(1ULL << targetFraction));
+            val = m_builder.CreateFMul(val, multiplier, "float_to_fixed_scale");
+        }
         return m_builder.CreateFPToSI(val, targetType);
+    }
+
+    // Convert between floating points
     if (targetType->isFloatingPointTy() && val->getType()->isFloatingPointTy())
         return m_builder.CreateFPCast(val, targetType);
+
+    // Convert between INTEGER and FIXED (or FIXED and FIXED)
     if (targetType->isIntegerTy() && val->getType()->isIntegerTy())
-        return m_builder.CreateIntCast(val, targetType, true);
+    {
+        if (val->getType()->getIntegerBitWidth() < targetType->getIntegerBitWidth())
+            val = m_builder.CreateIntCast(val, targetType, true);
+
+        if (isTargetFixed || isValFixed)
+        {
+            if (targetFraction > valFraction)
+            {
+                llvm::Value* shiftVal = llvm::ConstantInt::get(val->getType(), targetFraction - valFraction);
+                val = m_builder.CreateShl(val, shiftVal, "scale_up");
+            }
+            else if (valFraction > targetFraction)
+            {
+                llvm::Value* shiftVal = llvm::ConstantInt::get(val->getType(), valFraction - targetFraction);
+                val = m_builder.CreateAShr(val, shiftVal, "scale_down");
+            }
+        }
+
+        if (val->getType() != targetType)
+            val = m_builder.CreateIntCast(val, targetType, true);
+
+        return val;
+    }
 
     return val;
 }
