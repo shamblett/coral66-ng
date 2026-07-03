@@ -1,0 +1,19 @@
+'PROGRAM' ProcLabel
+'BEGIN'
+  'INTEGER' ans;
+
+  'PROCEDURE' JumpToLabel ('VALUE' 'INTEGER' val; 'LABEL' lab);
+  'BEGIN'
+     'IF' val = 42 'THEN'
+        'GOTO' lab;
+     ans := 1;
+  'END' JumpToLabel;
+
+  JumpToLabel(0, success);
+  'GOTO' finish;
+  
+success:
+  ans := 0;
+
+finish:
+'END'

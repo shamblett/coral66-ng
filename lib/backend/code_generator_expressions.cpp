@@ -175,6 +175,49 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expressio
                 return m_builder.CreateCall(ft, funcVal, {});
             return nullptr;
         }
+        else if (declaration->is<semantics::LabelDeclaration>())
+        {
+            const auto& labelName = std::get<std::string>(expression.getIdentifier()->getValue());
+            if (m_namedLabels.contains(labelName))
+            {
+                return llvm::BlockAddress::get(m_currentFunction, m_namedLabels[labelName]);
+            }
+        }
+        else if (auto* switchDeclaration = declaration->tryAs<semantics::SwitchDeclaration>())
+        {
+            auto& switchLabels = switchDeclaration->getLabels();
+            llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+            llvm::ArrayType* arrType = llvm::ArrayType::get(ptrType, switchLabels.size());
+            
+            llvm::AllocaInst* switchArray = m_builder.CreateAlloca(arrType, nullptr, "switch_array");
+            
+            for (size_t i = 0; i < switchLabels.size(); ++i)
+            {
+                if (switchLabels[i])
+                {
+                    const auto& targetLabelNameToken = switchLabels[i]->getName();
+                    if (const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
+                        m_namedLabels.contains(targetLabelName))
+                    {
+                        llvm::BlockAddress* blockAddr = llvm::BlockAddress::get(m_currentFunction, m_namedLabels[targetLabelName]);
+                        
+                        llvm::Value* indices[] = {
+                            llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
+                            llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), i)
+                        };
+                        
+                        llvm::Value* gep = m_builder.CreateGEP(arrType, switchArray, indices);
+                        m_builder.CreateStore(blockAddr, gep);
+                    }
+                }
+            }
+            
+            llvm::Value* indices[] = {
+                llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
+                llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0)
+            };
+            return m_builder.CreateGEP(arrType, switchArray, indices);
+        }
     }
 
     llvm::Value* addr = emitAddress(expression);

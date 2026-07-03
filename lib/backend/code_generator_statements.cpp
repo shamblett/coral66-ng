@@ -17,7 +17,7 @@ llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* stat
 {
     if (!m_labels.contains(statement))
     {
-        llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "label");
+        llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "label", m_currentFunction);
         m_labels[statement] = bb;
         for (const auto& labelToken : statement->getLabels())
         {
@@ -69,6 +69,11 @@ void code_generator::visit(const syntax::Statement& statement)
         }
         m_currentFunction->insert(m_currentFunction->end(), stmtBB);
         m_builder.SetInsertPoint(stmtBB);
+    }
+    else if (m_builder.GetInsertBlock() && m_builder.GetInsertBlock()->getTerminator())
+    {
+        // Dead code: current block is terminated and this statement has no label to branch to.
+        return;
     }
 
     if (auto* s = dynamic_cast<const syntax::AssignmentStatement*>(&statement))
@@ -277,10 +282,6 @@ void code_generator::visit(const syntax::GotoStatement& statement)
             {
                 llvm::BasicBlock* targetBB = m_namedLabels[labelName];
                 m_builder.CreateBr(targetBB);
-
-                // Set insertion point to a new unreachable block to handle dead code after GOTO
-                llvm::BasicBlock* deadBB = llvm::BasicBlock::Create(m_module.getContext(), "dead", m_currentFunction);
-                m_builder.SetInsertPoint(deadBB);
             }
         }
         else if (auto* switchDeclaration = declaration->tryAs<semantics::SwitchDeclaration>())
@@ -326,6 +327,90 @@ void code_generator::visit(const syntax::GotoStatement& statement)
 
                 m_builder.SetInsertPoint(defaultBB);
                 // What to do if index is out of bounds? We'll just continue execution.
+            }
+        }
+        else if (auto* varDeclaration = declaration->tryAs<semantics::VariableDeclaration>())
+        {
+            if (varDeclaration->getType().is<semantics::LabelType>())
+            {
+                llvm::Value* ptrAddr = m_locals.contains(varDeclaration) ? m_locals[varDeclaration] : nullptr;
+                if (!ptrAddr && m_globals.contains(varDeclaration))
+                    ptrAddr = m_globals[varDeclaration];
+
+                if (ptrAddr)
+                {
+                    llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+                    llvm::Value* blockAddr = m_builder.CreateLoad(ptrType, ptrAddr, "label_param_load");
+                    
+                    llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(blockAddr, std::max((size_t)1, m_namedLabels.size()));
+                    if (m_namedLabels.empty())
+                    {
+                        llvm::BasicBlock* dummyBB = llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
+                        indirectBr->addDestination(dummyBB);
+                        
+                        // We also need to add a terminator to the dummy block to keep LLVM IR valid
+                        llvm::BasicBlock* currentInsertBlock = m_builder.GetInsertBlock();
+                        m_builder.SetInsertPoint(dummyBB);
+                        m_builder.CreateUnreachable();
+                        m_builder.SetInsertPoint(currentInsertBlock);
+                    }
+                    else
+                    {
+                        for (const auto& [name, bb] : m_namedLabels)
+                        {
+                            indirectBr->addDestination(bb);
+                        }
+                    }
+                }
+            }
+            else if (varDeclaration->getType().is<semantics::SwitchType>())
+            {
+                llvm::Value* ptrAddr = m_locals.contains(varDeclaration) ? m_locals[varDeclaration] : nullptr;
+                if (!ptrAddr && m_globals.contains(varDeclaration))
+                    ptrAddr = m_globals[varDeclaration];
+
+                if (ptrAddr)
+                {
+                    if (auto* indexExpr = statement.getIndex())
+                    {
+                        llvm::Value* indexVal = visit(*indexExpr);
+                        if (indexVal)
+                        {
+                            if (!indexVal->getType()->isIntegerTy(32))
+                            {
+                                indexVal = m_builder.CreateIntCast(indexVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
+                            }
+
+                            indexVal = m_builder.CreateSub(
+                                indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
+
+                            llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+                            llvm::Value* switchArrayPtr = m_builder.CreateLoad(ptrType, ptrAddr, "switch_array_load");
+                            
+                            llvm::Value* targetBlockPtrAddr = m_builder.CreateGEP(ptrType, switchArrayPtr, indexVal, "switch_target_gep");
+                            llvm::Value* blockAddr = m_builder.CreateLoad(ptrType, targetBlockPtrAddr, "switch_target_load");
+                            
+                            llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(blockAddr, std::max((size_t)1, m_namedLabels.size()));
+                            if (m_namedLabels.empty())
+                            {
+                                llvm::BasicBlock* dummyBB = llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
+                                indirectBr->addDestination(dummyBB);
+                                
+                                llvm::BasicBlock* currentInsertBlock = m_builder.GetInsertBlock();
+                                m_builder.SetInsertPoint(dummyBB);
+                                m_builder.CreateUnreachable();
+                                m_builder.SetInsertPoint(currentInsertBlock);
+                            }
+                            else
+                            {
+                                for (const auto& [name, bb] : m_namedLabels)
+                                {
+                                    indirectBr->addDestination(bb);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

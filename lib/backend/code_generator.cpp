@@ -240,6 +240,10 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     {
         baseType = llvm::Type::getInt32Ty(ctx);
     }
+    else if (type.is<semantics::LabelType>() || type.is<semantics::SwitchType>())
+    {
+        baseType = llvm::PointerType::getUnqual(ctx);
+    }
     else
     {
         baseType = llvm::Type::getVoidTy(ctx);

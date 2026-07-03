@@ -66,7 +66,9 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
 
         std::string engineError;
         llvm::ExecutionEngine* ee =
@@ -134,7 +136,9 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         coral66::cgllvm::Options codegenOptions;
         auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
+        module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
 
         std::string engineError;
         llvm::ExecutionEngine* ee =
@@ -158,6 +162,102 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         REQUIRE(finalAns == 1);
 
         delete ee;
+    }
+
+    SECTION("Procedure Label Parameter Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/proc_label.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto* context = new llvm::LLVMContext();
+        auto module = std::make_unique<llvm::Module>("review1_proc_label", *context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        module->print(llvm::errs(), nullptr);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        module.release();
+    }
+
+    SECTION("Procedure Switch Parameter Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/proc_switch.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto* context = new llvm::LLVMContext();
+        auto module = std::make_unique<llvm::Module>("review1_proc_switch", *context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        module->print(llvm::errs(), nullptr);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        module.release();
     }
 
     SECTION("Array Bounds Execution")
@@ -205,6 +305,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
 
         std::string engineError;
         llvm::ExecutionEngine* ee =
@@ -275,6 +376,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
 
         std::string engineError;
         llvm::ExecutionEngine* ee =
@@ -345,6 +447,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
 
         std::string engineError;
         llvm::ExecutionEngine* ee =
@@ -419,6 +522,7 @@ TEST_CASE("Phase 1", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
         module->print(llvm::errs(), nullptr);
 
         // JIT Execution
@@ -502,6 +606,7 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
         module->print(llvm::errs(), nullptr);
 
         // JIT Execution
@@ -587,6 +692,7 @@ TEST_CASE("Phase 3", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
+        module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -671,6 +777,7 @@ TEST_CASE("Phase 4", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
+        module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -754,6 +861,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
+        module->print(llvm::errs(), nullptr);
 
         // JIT Execution
         std::string errStr;
@@ -826,6 +934,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
+        module->print(llvm::errs(), nullptr);
 
         std::string errStr;
         llvm::ExecutionEngine* ee =
@@ -890,6 +999,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
         coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
         module->print(llvm::errs(), nullptr);
 
         std::string errStr;
@@ -964,6 +1074,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
         module->print(llvm::errs(), nullptr);
+        module->print(llvm::errs(), nullptr);
 
         std::string errStr;
         llvm::ExecutionEngine* ee =
@@ -1033,6 +1144,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
         module->print(llvm::errs(), nullptr);
 
         std::string errStr;

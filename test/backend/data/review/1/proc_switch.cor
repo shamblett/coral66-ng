@@ -1,0 +1,26 @@
+'PROGRAM' ProcSwitch
+'BEGIN'
+  'INTEGER' ans;
+  'SWITCH' sw := L1, L2, L3;
+
+  'PROCEDURE' JumpToSwitch ('VALUE' 'INTEGER' val; 'SWITCH' s);
+  'BEGIN'
+     'IF' val = 42 'THEN'
+        'GOTO' s[1];
+     ans := 42;
+  'END' JumpToSwitch;
+
+  JumpToSwitch(0, sw);
+  'GOTO' finish;
+  
+L1:
+  ans := 10;
+  'GOTO' finish;
+L2:
+  ans := 0;
+  'GOTO' finish;
+L3:
+  ans := 99;
+
+finish:
+'END'
