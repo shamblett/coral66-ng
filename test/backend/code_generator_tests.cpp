@@ -24,6 +24,142 @@ using namespace Catch::Matchers;
 
 TEST_CASE("Review 1", "[Backend][Execution]")
 {
+    SECTION("Bits Part-Word Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/bits_partword.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("review1_bits", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
+
+    SECTION("Fixed Point Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/fixed_point.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("review1_fixed", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
+
     SECTION("Array Bounds Execution")
     {
         llvm::InitializeNativeTarget();

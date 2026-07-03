@@ -1,0 +1,13 @@
+'PROGRAM' OverlayAliasMod
+'BEGIN'
+  'INTEGER' 'ARRAY' basearr[0:5];
+  'OVERLAY' basearr[2] 'WITH' 'INTEGER' overlayvar;
+  'INTEGER' ans;
+
+  overlayvar := 99;
+  
+  'IF' basearr[2] = 99 'THEN'
+    ans := 1
+  'ELSE'
+    ans := 0;
+'END'

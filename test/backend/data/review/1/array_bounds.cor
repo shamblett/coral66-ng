@@ -1,0 +1,10 @@
+'PROGRAM' ArrayBounds
+'BEGIN'
+  'INTEGER' 'ARRAY' arr[10:15];
+  'INTEGER' ans;
+
+  arr[10] := 5;
+  arr[15] := 12;
+
+  ans := arr[10] + arr[15];
+'END'

@@ -153,6 +153,75 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
             rhs = m_builder.CreateIntCast(rhs, targetType, true);
     }
 
+    if (rhs->getType()->isIntegerTy() && targetType && targetType->isIntegerTy())
+    {
+        const auto exprIt = m_program.getContext().expressionTypes.find(&statement.getExpression());
+        std::uint32_t targetFraction = 0;
+        std::uint32_t rhsFraction = 0;
+        bool isTargetFixed = false;
+        bool isRhsFixed = false;
+
+        if (it != m_program.getContext().expressionTypes.end())
+        {
+            if (auto* fixedT = it->second->tryAs<semantics::FixedType>())
+            {
+                targetFraction = fixedT->getFractionalBits();
+                isTargetFixed = true;
+            }
+        }
+        if (exprIt != m_program.getContext().expressionTypes.end())
+        {
+            if (auto* fixedR = exprIt->second->tryAs<semantics::FixedType>())
+            {
+                rhsFraction = fixedR->getFractionalBits();
+                isRhsFixed = true;
+            }
+        }
+
+        if (isTargetFixed || isRhsFixed)
+        {
+            if (targetFraction > rhsFraction)
+            {
+                llvm::Value* shiftVal = llvm::ConstantInt::get(targetType, targetFraction - rhsFraction);
+                rhs = m_builder.CreateShl(rhs, shiftVal, "align_assign");
+            }
+            else if (rhsFraction > targetFraction)
+            {
+                llvm::Value* shiftVal = llvm::ConstantInt::get(targetType, rhsFraction - targetFraction);
+                rhs = m_builder.CreateAShr(rhs, shiftVal, "align_assign");
+            }
+        }
+    }
+
+    if (auto* partWord = dynamic_cast<const syntax::PartWordExpression*>(&statement.getVariable()))
+    {
+        llvm::Value* startBitVal = visit(partWord->getStartBit());
+        llvm::Value* widthVal = visit(partWord->getWidth());
+
+        if (startBitVal && widthVal && targetType)
+        {
+            if (startBitVal->getType() != targetType)
+                startBitVal = m_builder.CreateIntCast(startBitVal, targetType, false);
+            if (widthVal->getType() != targetType)
+                widthVal = m_builder.CreateIntCast(widthVal, targetType, false);
+
+            llvm::Value* currentValue = m_builder.CreateLoad(targetType, targetAddr, "partword_load");
+            
+            llvm::Value* one = llvm::ConstantInt::get(targetType, 1);
+            llvm::Value* shiftedOne = m_builder.CreateShl(one, widthVal);
+            llvm::Value* widthMask = m_builder.CreateSub(shiftedOne, one);
+            llvm::Value* mask = m_builder.CreateShl(widthMask, startBitVal);
+            llvm::Value* invMask = m_builder.CreateNot(mask);
+            
+            llvm::Value* clearedBase = m_builder.CreateAnd(currentValue, invMask, "partword_cleared");
+            
+            llvm::Value* maskedRhs = m_builder.CreateAnd(rhs, widthMask);
+            llvm::Value* shiftedRhs = m_builder.CreateShl(maskedRhs, startBitVal, "partword_shifted_rhs");
+            
+            rhs = m_builder.CreateOr(clearedBase, shiftedRhs, "partword_newval");
+        }
+    }
+
     m_builder.CreateStore(rhs, targetAddr);
 }
 

@@ -1,0 +1,16 @@
+'PROGRAM' FixedTest
+'BEGIN'
+  'FIXED'(16, 4) f1;
+  'FIXED'(16, 6) f2;
+  'FIXED'(16, 4) f3;
+  'INTEGER' ans;
+  
+  f1 := 2;
+  f2 := f1 * f1; 'COMMENT' f1 * f1 = 4.0. Fraction: f1(4) + f1(4) = 8. Target f2 has fraction 6. Shift right by 2. Result is 4.0 in fraction 6 (256);
+  f3 := f2 / f1; 'COMMENT' f2 / f1 = 2.0. Fraction: target f3 has 4. shiftAmt = target(4) + right(4) - left(6) = 2. Shift f2 left by 2 before divide. (256<<2) / 32 = 1024 / 32 = 32. Result is 2.0 in fraction 4 (32);
+  
+  'IF' f3 = 2 'THEN'
+    ans := 1
+  'ELSE'
+    ans := 0;
+'END'

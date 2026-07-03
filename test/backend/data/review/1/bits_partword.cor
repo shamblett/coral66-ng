@@ -1,0 +1,20 @@
+'PROGRAM' BitsTest
+'BEGIN'
+  'INTEGER' word;
+  'INTEGER' ans;
+  
+  word := 0;
+  
+  'COMMENT' write to bits 4 to 7 (width 4);
+  'BITS'[4, 4] word := 15;
+  
+  'IF' word = 240 'THEN'
+  'BEGIN'
+     'IF' 'BITS'[4, 4] word = 15 'THEN'
+        ans := 1
+     'ELSE'
+        ans := 0
+  'END'
+  'ELSE'
+     ans := 0;
+'END'
