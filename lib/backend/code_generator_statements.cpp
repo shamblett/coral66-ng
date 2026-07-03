@@ -67,7 +67,8 @@ void code_generator::visit(const syntax::Statement& statement)
         {
             m_builder.CreateBr(stmtBB);
         }
-        m_currentFunction->insert(m_currentFunction->end(), stmtBB);
+        // DO NOT manually insert into m_currentFunction here, as getOrCreateLabel 
+        // already attached it to the function. Doing so corrupts the LLVM ilist!
         m_builder.SetInsertPoint(stmtBB);
     }
     else if (m_builder.GetInsertBlock() && m_builder.GetInsertBlock()->getTerminator())
