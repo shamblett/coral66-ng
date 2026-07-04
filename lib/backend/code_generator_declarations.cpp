@@ -11,17 +11,18 @@
 namespace coral66::cgllvm
 {
 
-llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType, std::size_t numElements)
+llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens,
+                                                llvm::Type* targetType, const std::size_t numElements)
 {
     std::vector<llvm::Constant*> elements;
     llvm::Type* elemType = nullptr;
-    if (auto* arrType = llvm::dyn_cast<llvm::ArrayType>(targetType))
-        elemType = arrType->getElementType();
+    if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(targetType))
+        elemType = arrayType->getElementType();
     else
         elemType = targetType; // Not really expected for arrays/tables, but safe fallback
 
     std::size_t currentElement = 0;
-    
+
     for (std::size_t i = 0; i < tokens.size() && currentElement < numElements; ++i)
     {
         auto tType = tokens[i]->getTokenType();
@@ -35,24 +36,27 @@ llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenI
             }
             continue;
         }
-        
+
         bool isNegative = false;
         if (tType == lexer::TokenType::Minus || tType == lexer::TokenType::Plus)
         {
             isNegative = (tType == lexer::TokenType::Minus);
             i++;
-            if (i >= tokens.size()) break;
+            if (i >= tokens.size())
+                break;
             tType = tokens[i]->getTokenType();
         }
 
-        if (tType == lexer::TokenType::Literal && 
-            (tokens[i]->getType() == lexer::CToken::Type::Integer || tokens[i]->getType() == lexer::CToken::Type::Floating))
+        if (tType == lexer::TokenType::Literal
+            && (tokens[i]->getType() == lexer::CToken::Type::Integer
+                || tokens[i]->getType() == lexer::CToken::Type::Floating))
         {
             llvm::Constant* val = nullptr;
             if (auto* intVal = std::get_if<llvm::APSInt>(&tokens[i]->getValue()))
             {
                 std::int64_t v = intVal->getExtValue();
-                if (isNegative) v = -v;
+                if (isNegative)
+                    v = -v;
                 if (elemType->isFloatingPointTy())
                     val = llvm::ConstantFP::get(elemType, static_cast<double>(v));
                 else
@@ -61,13 +65,14 @@ llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenI
             else if (auto* floatVal = std::get_if<llvm::APFloat>(&tokens[i]->getValue()))
             {
                 double v = floatVal->convertToDouble();
-                if (isNegative) v = -v;
+                if (isNegative)
+                    v = -v;
                 if (elemType->isFloatingPointTy())
                     val = llvm::ConstantFP::get(elemType, v);
                 else
                     val = llvm::ConstantInt::get(elemType, static_cast<std::int64_t>(v), true);
             }
-            
+
             if (val)
             {
                 elements.push_back(val);
@@ -87,7 +92,7 @@ llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenI
     {
         return llvm::ConstantArray::get(arrType, elements);
     }
-    
+
     return elements.empty() ? llvm::Constant::getNullValue(targetType) : elements[0];
 }
 
@@ -99,7 +104,7 @@ void code_generator::visit(const semantics::Declaration& declaration)
     {
         auto* llvmType = convertType(var->getType());
         llvm::Constant* initializer = llvm::Constant::getNullValue(llvmType);
-        
+
         if (auto* astNode = dynamic_cast<const syntax::VariableDeclaration*>(var->getAstNode()))
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
@@ -107,7 +112,7 @@ void code_generator::visit(const semantics::Declaration& declaration)
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1);
             }
         }
-        
+
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    initializer, var->getName());
         m_globals[var] = globalVar;
@@ -116,18 +121,18 @@ void code_generator::visit(const semantics::Declaration& declaration)
     {
         auto* llvmType = convertType(arr->getType());
         llvm::Constant* initializer = llvm::Constant::getNullValue(llvmType);
-        
+
         if (auto* astNode = dynamic_cast<const syntax::ArrayDeclaration*>(arr->getAstNode()))
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
                 std::size_t numElements = 1;
-                if (auto* arrTy = llvm::dyn_cast<llvm::ArrayType>(llvmType))
-                    numElements = arrTy->getNumElements();
+                if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
+                    numElements = arrayType->getNumElements();
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements);
             }
         }
-        
+
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    initializer, arr->getName());
         m_globals[arr] = globalVar;
@@ -136,18 +141,18 @@ void code_generator::visit(const semantics::Declaration& declaration)
     {
         auto* llvmType = convertType(tab->getType());
         llvm::Constant* initializer = llvm::Constant::getNullValue(llvmType);
-        
+
         if (auto* astNode = dynamic_cast<const syntax::TableDeclaration*>(tab->getAstNode()))
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
                 std::size_t numElements = 1;
-                if (auto* arrTy = llvm::dyn_cast<llvm::ArrayType>(llvmType))
-                    numElements = arrTy->getNumElements();
+                if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
+                    numElements = arrayType->getNumElements();
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements);
             }
         }
-        
+
         auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
                                                    initializer, tab->getName());
         m_globals[tab] = globalVar;
@@ -157,8 +162,8 @@ void code_generator::visit(const semantics::Declaration& declaration)
         if (auto* astNode = dynamic_cast<const syntax::OverlayDeclaration*>(over->getAstNode()))
         {
             const auto baseName = std::get<std::string>(astNode->getBase()->getValue());
-            const semantics::Usable* baseUsable = m_program.getContext().symbolTable.lookup(baseName);
-            if (baseUsable && m_globals.contains(baseUsable))
+            if (const semantics::Usable* baseUsable = m_program.getContext().symbolTable.lookup(baseName);
+                baseUsable && m_globals.contains(baseUsable))
             {
                 llvm::Constant* baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
                 std::int64_t offsetVal = 0;
@@ -397,11 +402,10 @@ void code_generator::visit(const syntax::OverlayDeclaration& declaration)
         if (!arrDecl->getIdentifiers().empty())
             targetName = std::get<std::string>(arrDecl->getIdentifiers()[0]->getValue());
     }
-    
+
     if (!targetName.empty())
     {
-        const semantics::Usable* targetUsable = m_program.getContext().symbolTable.lookup(targetName);
-        if (targetUsable)
+        if (const semantics::Usable* targetUsable = m_program.getContext().symbolTable.lookup(targetName))
         {
             m_locals[targetUsable] = finalAddr;
         }

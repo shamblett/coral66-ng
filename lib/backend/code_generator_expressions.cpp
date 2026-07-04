@@ -71,10 +71,7 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
                 baseType = convertType(arrayDeclaration.getType());
                 arrDeclNode = dynamic_cast<const syntax::ArrayDeclaration*>(arrayDeclaration.getAstNode());
             },
-            [&](const semantics::VariableDeclaration& varDecl)
-            {
-                baseType = convertType(varDecl.getType());
-            },
+            [&](const semantics::VariableDeclaration& varDecl) { baseType = convertType(varDecl.getType()); },
             [&](const semantics::TableElementDeclaration& tableElemDecl)
             {
                 tableElemNode = &tableElemDecl;
@@ -90,9 +87,7 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
                     }
                 }
             },
-            [&](const auto&)
-            {
-            });
+            [&](const auto&) {});
 
         if (!baseType)
             return nullptr;
@@ -118,10 +113,11 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
 
             if (arrDeclNode && i < arrDeclNode->getDimensions().size())
             {
-                auto lower = semantics::evaluateConstantInteger(*arrDeclNode->getDimensions()[i].first);
-                if (lower && *lower != 0)
+                if (auto lower = semantics::evaluateConstantInteger(*arrDeclNode->getDimensions()[i].first);
+                    lower && *lower != 0)
                 {
-                    llvm::Value* lowerVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), *lower, true);
+                    llvm::Value* lowerVal =
+                        llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), *lower, true);
                     idxVal = m_builder.CreateSub(idxVal, lowerVal, "idx_offset");
                 }
             }
@@ -130,13 +126,15 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
             {
                 if (tableWidth > 1)
                 {
-                    llvm::Value* widthVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), tableWidth, true);
+                    llvm::Value* widthVal =
+                        llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), tableWidth, true);
                     idxVal = m_builder.CreateMul(idxVal, widthVal, "table_row_offset");
                 }
-                
+
                 if (tableElemNode->getWordPosition().has_value() && tableElemNode->getWordPosition().value() > 0)
                 {
-                    llvm::Value* wordOffsetVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), tableElemNode->getWordPosition().value(), true);
+                    llvm::Value* wordOffsetVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()),
+                                                                        tableElemNode->getWordPosition().value(), true);
                     idxVal = m_builder.CreateAdd(idxVal, wordOffsetVal, "table_word_offset");
                 }
             }
@@ -218,10 +216,10 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expressio
                 return m_builder.CreateCall(ft, funcVal, {});
             return nullptr;
         }
-        else if (declaration->is<semantics::LabelDeclaration>())
+        if (declaration->is<semantics::LabelDeclaration>())
         {
-            const auto& labelName = std::get<std::string>(expression.getIdentifier()->getValue());
-            if (m_namedLabels.contains(labelName))
+            if (const auto& labelName = std::get<std::string>(expression.getIdentifier()->getValue());
+                m_namedLabels.contains(labelName))
             {
                 return llvm::BlockAddress::get(m_currentFunction, m_namedLabels[labelName]);
             }
@@ -231,9 +229,9 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expressio
             auto& switchLabels = switchDeclaration->getLabels();
             llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
             llvm::ArrayType* arrType = llvm::ArrayType::get(ptrType, switchLabels.size());
-            
+
             llvm::AllocaInst* switchArray = m_builder.CreateAlloca(arrType, nullptr, "switch_array");
-            
+
             for (size_t i = 0; i < switchLabels.size(); ++i)
             {
                 if (switchLabels[i])
@@ -242,23 +240,21 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expressio
                     if (const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
                         m_namedLabels.contains(targetLabelName))
                     {
-                        llvm::BlockAddress* blockAddr = llvm::BlockAddress::get(m_currentFunction, m_namedLabels[targetLabelName]);
-                        
+                        llvm::BlockAddress* blockAddr =
+                            llvm::BlockAddress::get(m_currentFunction, m_namedLabels[targetLabelName]);
+
                         llvm::Value* indices[] = {
                             llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
-                            llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), i)
-                        };
-                        
+                            llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), i)};
+
                         llvm::Value* gep = m_builder.CreateGEP(arrType, switchArray, indices);
                         m_builder.CreateStore(blockAddr, gep);
                     }
                 }
             }
-            
-            llvm::Value* indices[] = {
-                llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
-                llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0)
-            };
+
+            llvm::Value* indices[] = {llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
+                                      llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0)};
             return m_builder.CreateGEP(arrType, switchArray, indices);
         }
     }
@@ -307,15 +303,19 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
     bool isLeftFixed = false;
     bool isRightFixed = false;
 
-    if (itL != m_program.getContext().expressionTypes.end()) {
-        if (auto* fixedL = itL->second->tryAs<semantics::FixedType>()) {
+    if (itL != m_program.getContext().expressionTypes.end())
+    {
+        if (auto* fixedL = itL->second->tryAs<semantics::FixedType>())
+        {
             leftFraction = fixedL->getFractionalBits();
             isLeftFixed = true;
         }
     }
 
-    if (itR != m_program.getContext().expressionTypes.end()) {
-        if (auto* fixedR = itR->second->tryAs<semantics::FixedType>()) {
+    if (itR != m_program.getContext().expressionTypes.end())
+    {
+        if (auto* fixedR = itR->second->tryAs<semantics::FixedType>())
+        {
             rightFraction = fixedR->getFractionalBits();
             isRightFixed = true;
         }
@@ -347,10 +347,10 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
 
     if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
-        if (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus ||
-            kind == lexer::TokenType::LessThan || kind == lexer::TokenType::LessThanOrEqual ||
-            kind == lexer::TokenType::Equal || kind == lexer::TokenType::GreaterThanOrEqual ||
-            kind == lexer::TokenType::GreaterThan || kind == lexer::TokenType::NotEqual)
+        if (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::LessThan
+            || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::Equal
+            || kind == lexer::TokenType::GreaterThanOrEqual || kind == lexer::TokenType::GreaterThan
+            || kind == lexer::TokenType::NotEqual)
         {
             if (leftFraction > rightFraction)
             {
@@ -373,45 +373,37 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
     {
         if (L->getType()->isFloatingPointTy())
             return m_builder.CreateFMul(L, R);
-        else
+        llvm::Value* mul = m_builder.CreateMul(L, R);
+        if (isLeftFixed || isRightFixed)
         {
-            llvm::Value* mul = m_builder.CreateMul(L, R);
-            if (isLeftFixed || isRightFixed)
+            const std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
+            if (const std::uint32_t currentFraction = leftFraction + rightFraction; currentFraction > targetFraction)
             {
-                std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
-                std::uint32_t currentFraction = leftFraction + rightFraction;
-                if (currentFraction > targetFraction)
-                {
-                    llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), currentFraction - targetFraction);
-                    return m_builder.CreateAShr(mul, shiftVal, "scale_mul");
-                }
-                else if (currentFraction < targetFraction)
-                {
-                    llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), targetFraction - currentFraction);
-                    return m_builder.CreateShl(mul, shiftVal, "scale_mul");
-                }
+                llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), currentFraction - targetFraction);
+                return m_builder.CreateAShr(mul, shiftVal, "scale_mul");
             }
-            return mul;
+            else if (currentFraction < targetFraction)
+            {
+                llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), targetFraction - currentFraction);
+                return m_builder.CreateShl(mul, shiftVal, "scale_mul");
+            }
         }
+        return mul;
     }
     if (kind == lexer::TokenType::Division)
     {
         if (L->getType()->isFloatingPointTy())
             return m_builder.CreateFDiv(L, R);
-        else
+        if (isLeftFixed || isRightFixed)
         {
-            if (isLeftFixed || isRightFixed)
+            const std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
+            if (const std::uint32_t shiftAmount = targetFraction + rightFraction - leftFraction; shiftAmount > 0)
             {
-                std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
-                std::uint32_t shiftAmt = targetFraction + rightFraction - leftFraction;
-                if (shiftAmt > 0)
-                {
-                    llvm::Value* shiftVal = llvm::ConstantInt::get(L->getType(), shiftAmt);
-                    L = m_builder.CreateShl(L, shiftVal, "scale_div_num");
-                }
+                llvm::Value* shiftVal = llvm::ConstantInt::get(L->getType(), shiftAmount);
+                L = m_builder.CreateShl(L, shiftVal, "scale_div_num");
             }
-            return m_builder.CreateSDiv(L, R);
         }
+        return m_builder.CreateSDiv(L, R);
     }
     if (kind == lexer::TokenType::Equal)
         return L->getType()->isFloatingPointTy() ? m_builder.CreateFCmpOEQ(L, R) : m_builder.CreateICmpEQ(L, R);
@@ -544,16 +536,16 @@ llvm::Value* code_generator::visit(const syntax::PartWordExpression& expression)
 
     if (startBitVal->getType() != baseType)
         startBitVal = m_builder.CreateIntCast(startBitVal, baseType, false);
-    
+
     if (widthVal->getType() != baseType)
         widthVal = m_builder.CreateIntCast(widthVal, baseType, false);
 
     llvm::Value* shifted = m_builder.CreateLShr(baseVal, startBitVal, "partword_shift");
-    
+
     llvm::Value* one = llvm::ConstantInt::get(baseType, 1);
     llvm::Value* shiftedOne = m_builder.CreateShl(one, widthVal, "partword_mask_shl");
     llvm::Value* mask = m_builder.CreateSub(shiftedOne, one, "partword_mask");
-    
+
     return m_builder.CreateAnd(shifted, mask, "partword_val");
 }
 
@@ -579,22 +571,29 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
             tableElem = tabElem;
         }
     }
-    
+
     llvm::Value* loaded = m_builder.CreateLoad(type, addr, "arrayload");
 
     if (tableElem && tableElem->getBitPosition().has_value())
     {
-        std::uint32_t bitPos = tableElem->getBitPosition().value();
+        const std::uint32_t bitPos = tableElem->getBitPosition().value();
         std::uint32_t bitLength = 32;
-        
-        bool isFixed = tableElem->getType().is<semantics::FixedType>();
-        if (isFixed) {
+
+        if (tableElem->getType().is<semantics::FixedType>())
+        {
             bitLength = tableElem->getType().as<semantics::FixedType>().getTotalBits();
-        } else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>()) {
-            if (p->getKind() == semantics::PrimitiveType::Bits) {
-                // If it's a bit type but we have no width, what should it be? Let's assume a default or whatever the user supplied. Wait, BITS doesn't have an explicit size if not given? No, BITS without width means the whole word usually, but part-words specify the bit length as total bits. Wait! If there's no fixed total bits, let's just assume it extracts 1 bit or default. Actually, Coral 66 part words typically have a bit width defined in `total-bits`.
-                // Let's check `getFixedTotalBits` from AST? No, we just have the semantic type.
-                // If the type is PrimitiveType::Integer or Bits, we might just have bitLength=32, which is no masking.
+        }
+        else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>())
+        {
+            if (p->getKind() == semantics::PrimitiveType::Bits)
+            {
+                // If it's a bit type but we have no width, what should it be? Let's assume a default or whatever the
+                // user supplied. Wait, BITS doesn't have an explicit size if not given? No, BITS without width means
+                // the whole word usually, but part-words specify the bit length as total bits. Wait! If there's no
+                // fixed total bits, let's just assume it extracts 1 bit or default. Actually, Coral 66 part words
+                // typically have a bit width defined in `total-bits`. Let's check `getFixedTotalBits` from AST? No, we
+                // just have the semantic type. If the type is PrimitiveType::Integer or Bits, we might just have
+                // bitLength=32, which is no masking.
             }
         }
 
@@ -602,15 +601,16 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
         {
             llvm::Value* shiftVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), bitPos, true);
             llvm::Value* shifted = m_builder.CreateLShr(loaded, shiftVal, "partword_shift");
-            
-            std::uint32_t mask = (1U << bitLength) - 1;
+
+            const std::uint32_t mask = (1U << bitLength) - 1;
             llvm::Value* maskVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), mask, true);
             llvm::Value* masked = m_builder.CreateAnd(shifted, maskVal, "partword_mask");
-            
+
             // If it's signed (i.e. not unsigned), we should sign-extend it if the MSB is set.
-            if (!tableElem->isUnsigned() && isFixed)
+            if (!tableElem->isUnsigned())
             {
-                llvm::Value* shiftAmt = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 32 - bitLength, true);
+                llvm::Value* shiftAmt =
+                    llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 32 - bitLength, true);
                 llvm::Value* shl = m_builder.CreateShl(masked, shiftAmt);
                 masked = m_builder.CreateAShr(shl, shiftAmt, "partword_sext");
             }
@@ -638,7 +638,7 @@ llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expressio
         return val;
 
     llvm::Type* targetType = convertType(*it->second);
-    
+
     std::uint32_t targetFraction = 0;
     bool isTargetFixed = false;
     if (auto* fixedT = it->second->tryAs<semantics::FixedType>())
@@ -649,10 +649,10 @@ llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expressio
 
     std::uint32_t valFraction = 0;
     bool isValFixed = false;
-    const auto exprIt = m_program.getContext().expressionTypes.find(&expression.getExpression());
-    if (exprIt != m_program.getContext().expressionTypes.end())
+    if (const auto expressionIterator = m_program.getContext().expressionTypes.find(&expression.getExpression());
+        expressionIterator != m_program.getContext().expressionTypes.end())
     {
-        if (auto* fixedV = exprIt->second->tryAs<semantics::FixedType>())
+        if (auto* fixedV = expressionIterator->second->tryAs<semantics::FixedType>())
         {
             valFraction = fixedV->getFractionalBits();
             isValFixed = true;
@@ -676,7 +676,8 @@ llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expressio
     {
         if (isTargetFixed && targetFraction > 0)
         {
-            llvm::Value* multiplier = llvm::ConstantFP::get(val->getType(), static_cast<double>(1ULL << targetFraction));
+            llvm::Value* multiplier =
+                llvm::ConstantFP::get(val->getType(), static_cast<double>(1ULL << targetFraction));
             val = m_builder.CreateFMul(val, multiplier, "float_to_fixed_scale");
         }
         return m_builder.CreateFPToSI(val, targetType);

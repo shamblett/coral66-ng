@@ -88,7 +88,8 @@ public:
     llvm::Value* visit(const syntax::TypeChangeExpression& expression);
 
 private:
-    llvm::Constant* parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType, std::size_t numElements);
+    static llvm::Constant* parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
+                                           std::size_t numElements);
 
     void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
                            const syntax::ProcedureDeclaration& astNode);

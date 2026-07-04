@@ -8,6 +8,8 @@
 
 #include <llvm/IR/InlineAsm.h>
 
+#include <ranges>
+
 #include "lib/frontend/semantics/program.hpp"
 
 namespace coral66::cgllvm
@@ -67,7 +69,7 @@ void code_generator::visit(const syntax::Statement& statement)
         {
             m_builder.CreateBr(stmtBB);
         }
-        // DO NOT manually insert into m_currentFunction here, as getOrCreateLabel 
+        // DO NOT manually insert into m_currentFunction here, as getOrCreateLabel
         // already attached it to the function. Doing so corrupts the LLVM ilist!
         m_builder.SetInsertPoint(stmtBB);
     }
@@ -99,6 +101,7 @@ void code_generator::visit(const syntax::Statement& statement)
         visit(*s9);
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 void code_generator::visit(const syntax::DummyStatement& statement) {}
 
 void code_generator::visit(const syntax::BlockStatement& statement)
@@ -202,9 +205,8 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
     if (auto* partWord = dynamic_cast<const syntax::PartWordExpression*>(&statement.getVariable()))
     {
         llvm::Value* startBitVal = visit(partWord->getStartBit());
-        llvm::Value* widthVal = visit(partWord->getWidth());
 
-        if (startBitVal && widthVal && targetType)
+        if (llvm::Value* widthVal = visit(partWord->getWidth()); startBitVal && widthVal && targetType)
         {
             if (startBitVal->getType() != targetType)
                 startBitVal = m_builder.CreateIntCast(startBitVal, targetType, false);
@@ -212,37 +214,40 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                 widthVal = m_builder.CreateIntCast(widthVal, targetType, false);
 
             llvm::Value* currentValue = m_builder.CreateLoad(targetType, targetAddr, "partword_load");
-            
+
             llvm::Value* one = llvm::ConstantInt::get(targetType, 1);
             llvm::Value* shiftedOne = m_builder.CreateShl(one, widthVal);
             llvm::Value* widthMask = m_builder.CreateSub(shiftedOne, one);
             llvm::Value* mask = m_builder.CreateShl(widthMask, startBitVal);
             llvm::Value* invMask = m_builder.CreateNot(mask);
-            
+
             llvm::Value* clearedBase = m_builder.CreateAnd(currentValue, invMask, "partword_cleared");
-            
+
             llvm::Value* maskedRhs = m_builder.CreateAnd(rhs, widthMask);
             llvm::Value* shiftedRhs = m_builder.CreateShl(maskedRhs, startBitVal, "partword_shifted_rhs");
-            
+
             rhs = m_builder.CreateOr(clearedBase, shiftedRhs, "partword_newval");
         }
     }
     else if (auto* arrAccess = dynamic_cast<const syntax::ArrayAccessExpression*>(&statement.getVariable()))
     {
-        const auto rit = m_program.getContext().resolvedIdentifiers.find(arrAccess);
-        if (rit != m_program.getContext().resolvedIdentifiers.end())
+        if (const auto rit = m_program.getContext().resolvedIdentifiers.find(arrAccess);
+            rit != m_program.getContext().resolvedIdentifiers.end())
         {
             if (auto* tableElem = rit->second->tryAs<semantics::TableElementDeclaration>())
             {
                 if (tableElem->getBitPosition().has_value())
                 {
-                    std::uint32_t bitPos = tableElem->getBitPosition().value();
+                    const std::uint32_t bitPos = tableElem->getBitPosition().value();
                     std::uint32_t bitLength = 32;
-                    bool isFixed = tableElem->getType().is<semantics::FixedType>();
-                    if (isFixed) {
+                    if (tableElem->getType().is<semantics::FixedType>())
+                    {
                         bitLength = tableElem->getType().as<semantics::FixedType>().getTotalBits();
-                    } else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>()) {
-                        if (p->getKind() == semantics::PrimitiveType::Integer) bitLength = 32;
+                    }
+                    else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>())
+                    {
+                        if (p->getKind() == semantics::PrimitiveType::Integer)
+                            bitLength = 32;
                     }
 
                     if (bitLength > 0 && bitLength < 32)
@@ -250,28 +255,28 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                         llvm::Type* wordType = llvm::Type::getInt32Ty(m_module.getContext());
                         llvm::Value* currentValue = m_builder.CreateLoad(wordType, targetAddr, "table_elem_load");
 
-                        std::uint32_t maskValInt = (1U << bitLength) - 1;
+                        const std::uint32_t maskValInt = (1U << bitLength) - 1;
                         llvm::Value* widthMask = llvm::ConstantInt::get(wordType, maskValInt, true);
-                        
+
                         llvm::Value* startBitVal = llvm::ConstantInt::get(wordType, bitPos, true);
                         llvm::Value* mask = m_builder.CreateShl(widthMask, startBitVal);
                         llvm::Value* invMask = m_builder.CreateNot(mask);
-                        
+
                         llvm::Value* clearedBase = m_builder.CreateAnd(currentValue, invMask, "table_elem_cleared");
-                        
+
                         if (rhs->getType() != wordType)
                         {
                             rhs = m_builder.CreateIntCast(rhs, wordType, true);
                         }
-                        
+
                         llvm::Value* maskedRhs = m_builder.CreateAnd(rhs, widthMask);
                         llvm::Value* shiftedRhs = m_builder.CreateShl(maskedRhs, startBitVal, "table_elem_shifted_rhs");
-                        
+
                         rhs = m_builder.CreateOr(clearedBase, shiftedRhs, "table_elem_newval");
                     }
                     else if (bitPos > 0)
                     {
-                        // If it's a 32-bit field, but offset > 0 (which is weird for 32-bit words), 
+                        // If it's a 32-bit field, but offset > 0 (which is weird for 32-bit words),
                         // we would just shift it, but if it takes the whole word, bitPos must be 0.
                         // Assuming 32-bit width and bitPos=0 is the only valid case for bitLength=32.
                     }
@@ -394,13 +399,15 @@ void code_generator::visit(const syntax::GotoStatement& statement)
                 {
                     llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
                     llvm::Value* blockAddr = m_builder.CreateLoad(ptrType, ptrAddr, "label_param_load");
-                    
-                    llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(blockAddr, std::max((size_t)1, m_namedLabels.size()));
+
+                    llvm::IndirectBrInst* indirectBr =
+                        m_builder.CreateIndirectBr(blockAddr, std::max(static_cast<size_t>(1), m_namedLabels.size()));
                     if (m_namedLabels.empty())
                     {
-                        llvm::BasicBlock* dummyBB = llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
+                        llvm::BasicBlock* dummyBB =
+                            llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
                         indirectBr->addDestination(dummyBB);
-                        
+
                         // We also need to add a terminator to the dummy block to keep LLVM IR valid
                         llvm::BasicBlock* currentInsertBlock = m_builder.GetInsertBlock();
                         m_builder.SetInsertPoint(dummyBB);
@@ -409,7 +416,7 @@ void code_generator::visit(const syntax::GotoStatement& statement)
                     }
                     else
                     {
-                        for (const auto& [name, bb] : m_namedLabels)
+                        for (const auto& bb : m_namedLabels | std::views::values)
                         {
                             indirectBr->addDestination(bb);
                         }
@@ -426,12 +433,12 @@ void code_generator::visit(const syntax::GotoStatement& statement)
                 {
                     if (auto* indexExpr = statement.getIndex())
                     {
-                        llvm::Value* indexVal = visit(*indexExpr);
-                        if (indexVal)
+                        if (llvm::Value* indexVal = visit(*indexExpr))
                         {
                             if (!indexVal->getType()->isIntegerTy(32))
                             {
-                                indexVal = m_builder.CreateIntCast(indexVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
+                                indexVal = m_builder.CreateIntCast(indexVal,
+                                                                   llvm::Type::getInt32Ty(m_module.getContext()), true);
                             }
 
                             indexVal = m_builder.CreateSub(
@@ -439,16 +446,20 @@ void code_generator::visit(const syntax::GotoStatement& statement)
 
                             llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
                             llvm::Value* switchArrayPtr = m_builder.CreateLoad(ptrType, ptrAddr, "switch_array_load");
-                            
-                            llvm::Value* targetBlockPtrAddr = m_builder.CreateGEP(ptrType, switchArrayPtr, indexVal, "switch_target_gep");
-                            llvm::Value* blockAddr = m_builder.CreateLoad(ptrType, targetBlockPtrAddr, "switch_target_load");
-                            
-                            llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(blockAddr, std::max((size_t)1, m_namedLabels.size()));
+
+                            llvm::Value* targetBlockPtrAddr =
+                                m_builder.CreateGEP(ptrType, switchArrayPtr, indexVal, "switch_target_gep");
+                            llvm::Value* blockAddr =
+                                m_builder.CreateLoad(ptrType, targetBlockPtrAddr, "switch_target_load");
+
+                            llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(
+                                blockAddr, std::max(static_cast<size_t>(1), m_namedLabels.size()));
                             if (m_namedLabels.empty())
                             {
-                                llvm::BasicBlock* dummyBB = llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
+                                llvm::BasicBlock* dummyBB =
+                                    llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
                                 indirectBr->addDestination(dummyBB);
-                                
+
                                 llvm::BasicBlock* currentInsertBlock = m_builder.GetInsertBlock();
                                 m_builder.SetInsertPoint(dummyBB);
                                 m_builder.CreateUnreachable();
@@ -456,7 +467,7 @@ void code_generator::visit(const syntax::GotoStatement& statement)
                             }
                             else
                             {
-                                for (const auto& [name, bb] : m_namedLabels)
+                                for (const auto& bb : m_namedLabels | std::views::values)
                                 {
                                     indirectBr->addDestination(bb);
                                 }
