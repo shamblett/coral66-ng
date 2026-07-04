@@ -46,12 +46,25 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
             baseAddr = m_locals[declaration];
         else if (m_globals.contains(declaration))
             baseAddr = m_globals[declaration];
+        else if (auto* tableElem = declaration->tryAs<semantics::TableElementDeclaration>())
+        {
+            if (auto* parentTable = tableElem->getParentTable())
+            {
+                if (m_locals.contains(parentTable))
+                    baseAddr = m_locals[parentTable];
+                else if (m_globals.contains(parentTable))
+                    baseAddr = m_globals[parentTable];
+            }
+        }
 
         if (!baseAddr)
             return nullptr;
 
         llvm::Type* baseType = nullptr;
         const syntax::ArrayDeclaration* arrDeclNode = nullptr;
+        const semantics::TableElementDeclaration* tableElemNode = nullptr;
+        std::uint32_t tableWidth = 0;
+
         declaration->match(
             [&](const semantics::ArrayDeclaration& arrayDeclaration)
             {
@@ -61,6 +74,21 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
             [&](const semantics::VariableDeclaration& varDecl)
             {
                 baseType = convertType(varDecl.getType());
+            },
+            [&](const semantics::TableElementDeclaration& tableElemDecl)
+            {
+                tableElemNode = &tableElemDecl;
+                if (auto* parentTable = tableElemDecl.getParentTable())
+                {
+                    baseType = convertType(parentTable->getType());
+                    if (auto* tabType = parentTable->getType().tryAs<semantics::TableType>())
+                    {
+                        if (auto* def = std::get_if<semantics::TableDefinition>(&tabType->getInfo().type))
+                        {
+                            tableWidth = def->getWidth();
+                        }
+                    }
+                }
             },
             [&](const auto&)
             {
@@ -95,6 +123,21 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
                 {
                     llvm::Value* lowerVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), *lower, true);
                     idxVal = m_builder.CreateSub(idxVal, lowerVal, "idx_offset");
+                }
+            }
+
+            if (tableElemNode)
+            {
+                if (tableWidth > 1)
+                {
+                    llvm::Value* widthVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), tableWidth, true);
+                    idxVal = m_builder.CreateMul(idxVal, widthVal, "table_row_offset");
+                }
+                
+                if (tableElemNode->getWordPosition().has_value() && tableElemNode->getWordPosition().value() > 0)
+                {
+                    llvm::Value* wordOffsetVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), tableElemNode->getWordPosition().value(), true);
+                    idxVal = m_builder.CreateAdd(idxVal, wordOffsetVal, "table_word_offset");
                 }
             }
 
@@ -522,14 +565,66 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
 
     const auto rit = m_program.getContext().resolvedIdentifiers.find(&expression);
     llvm::Type* type = llvm::Type::getInt32Ty(m_module.getContext());
+    const semantics::TableElementDeclaration* tableElem = nullptr;
+
     if (rit != m_program.getContext().resolvedIdentifiers.end())
     {
         if (auto* arrayDeclaration = rit->second->tryAs<semantics::ArrayDeclaration>())
         {
             type = convertType(arrayDeclaration->getType().tryAs<semantics::ArrayType>()->getElementType());
         }
+        else if (auto* tabElem = rit->second->tryAs<semantics::TableElementDeclaration>())
+        {
+            type = llvm::Type::getInt32Ty(m_module.getContext()); // The array element type is always i32 for tables
+            tableElem = tabElem;
+        }
     }
-    return m_builder.CreateLoad(type, addr, "arrayload");
+    
+    llvm::Value* loaded = m_builder.CreateLoad(type, addr, "arrayload");
+
+    if (tableElem && tableElem->getBitPosition().has_value())
+    {
+        std::uint32_t bitPos = tableElem->getBitPosition().value();
+        std::uint32_t bitLength = 32;
+        
+        bool isFixed = tableElem->getType().is<semantics::FixedType>();
+        if (isFixed) {
+            bitLength = tableElem->getType().as<semantics::FixedType>().getTotalBits();
+        } else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>()) {
+            if (p->getKind() == semantics::PrimitiveType::Bits) {
+                // If it's a bit type but we have no width, what should it be? Let's assume a default or whatever the user supplied. Wait, BITS doesn't have an explicit size if not given? No, BITS without width means the whole word usually, but part-words specify the bit length as total bits. Wait! If there's no fixed total bits, let's just assume it extracts 1 bit or default. Actually, Coral 66 part words typically have a bit width defined in `total-bits`.
+                // Let's check `getFixedTotalBits` from AST? No, we just have the semantic type.
+                // If the type is PrimitiveType::Integer or Bits, we might just have bitLength=32, which is no masking.
+            }
+        }
+
+        if (bitLength > 0 && bitLength < 32)
+        {
+            llvm::Value* shiftVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), bitPos, true);
+            llvm::Value* shifted = m_builder.CreateLShr(loaded, shiftVal, "partword_shift");
+            
+            std::uint32_t mask = (1U << bitLength) - 1;
+            llvm::Value* maskVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), mask, true);
+            llvm::Value* masked = m_builder.CreateAnd(shifted, maskVal, "partword_mask");
+            
+            // If it's signed (i.e. not unsigned), we should sign-extend it if the MSB is set.
+            if (!tableElem->isUnsigned() && isFixed)
+            {
+                llvm::Value* shiftAmt = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 32 - bitLength, true);
+                llvm::Value* shl = m_builder.CreateShl(masked, shiftAmt);
+                masked = m_builder.CreateAShr(shl, shiftAmt, "partword_sext");
+            }
+            loaded = masked;
+        }
+        else if (bitPos > 0)
+        {
+            // Just shift if length is 32 (though bitPos + 32 would overflow the word)
+            llvm::Value* shiftVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), bitPos, true);
+            loaded = m_builder.CreateLShr(loaded, shiftVal, "partword_shift");
+        }
+    }
+
+    return loaded;
 }
 
 llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expression)

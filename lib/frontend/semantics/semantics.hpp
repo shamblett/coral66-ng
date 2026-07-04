@@ -954,18 +954,25 @@ class TableElementDeclaration final : public Declaration
     bool m_unsigned;
     std::optional<std::uint32_t> m_wordPosition;
     std::optional<std::uint32_t> m_bitPosition;
+    const TableDeclaration* m_parentTable;
 
 public:
     TableElementDeclaration(const lexer::CTokenIterator nameToken, IntrusiveVariantValue<Type> type,
                             const bool isUnsigned = false,
                             const std::optional<std::uint32_t> wordPosition = std::nullopt,
-                            const std::optional<std::uint32_t> bitPosition = std::nullopt)
+                            const std::optional<std::uint32_t> bitPosition = std::nullopt,
+                            const TableDeclaration* parentTable = nullptr)
         : Declaration(std::in_place_type<TableElementDeclaration>, nameToken),
           m_type(std::move(type)),
           m_unsigned(isUnsigned),
           m_wordPosition(wordPosition),
-          m_bitPosition(bitPosition)
+          m_bitPosition(bitPosition),
+          m_parentTable(parentTable)
     {
+    }
+    [[nodiscard]] const TableDeclaration* getParentTable() const
+    {
+        return m_parentTable;
     }
     [[nodiscard]] const Type& getType() const
     {

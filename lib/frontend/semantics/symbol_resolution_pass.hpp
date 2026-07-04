@@ -21,6 +21,7 @@ namespace coral66::semantics
 class SymbolResolutionPass
 {
     SemanticContext& m_context;
+    TableDeclaration* m_currentTableDeclaration = nullptr;
 
 public:
     explicit SymbolResolutionPass(SemanticContext& context);

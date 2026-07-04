@@ -38,12 +38,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -108,12 +110,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -178,12 +182,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -226,12 +232,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -274,12 +282,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -345,12 +355,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -416,12 +428,14 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -472,6 +486,149 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         delete ee;
     }
+    SECTION("Table Bit Packing Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/table_bit_packing.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("test_module", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        auto mainFunc = ee->FindFunctionNamed("main");
+        if (!mainFunc)
+            mainFunc = ee->FindFunctionNamed("TEST");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
+
+    SECTION("Preset Data Execution")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/preset_data.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("test_module", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        auto mainFunc = ee->FindFunctionNamed("main");
+        if (!mainFunc)
+            mainFunc = ee->FindFunctionNamed("TEST");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(ansAddr != nullptr);
+
+        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
+        REQUIRE(finalAns == 1);
+
+        delete ee;
+    }
 }
 TEST_CASE("Phase 1", "[Backend][Execution]")
 {
@@ -491,12 +648,14 @@ TEST_CASE("Phase 1", "[Backend][Execution]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -575,12 +734,14 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -660,12 +821,14 @@ TEST_CASE("Phase 3", "[Backend][Execution]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -745,12 +908,14 @@ TEST_CASE("Phase 4", "[Backend][Execution]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -829,12 +994,14 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -908,6 +1075,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
@@ -974,6 +1142,7 @@ TEST_CASE("Phase 5", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
@@ -1043,12 +1212,14 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -1114,12 +1285,14 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors) WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);

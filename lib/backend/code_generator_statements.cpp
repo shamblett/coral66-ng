@@ -227,6 +227,58 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
             rhs = m_builder.CreateOr(clearedBase, shiftedRhs, "partword_newval");
         }
     }
+    else if (auto* arrAccess = dynamic_cast<const syntax::ArrayAccessExpression*>(&statement.getVariable()))
+    {
+        const auto rit = m_program.getContext().resolvedIdentifiers.find(arrAccess);
+        if (rit != m_program.getContext().resolvedIdentifiers.end())
+        {
+            if (auto* tableElem = rit->second->tryAs<semantics::TableElementDeclaration>())
+            {
+                if (tableElem->getBitPosition().has_value())
+                {
+                    std::uint32_t bitPos = tableElem->getBitPosition().value();
+                    std::uint32_t bitLength = 32;
+                    bool isFixed = tableElem->getType().is<semantics::FixedType>();
+                    if (isFixed) {
+                        bitLength = tableElem->getType().as<semantics::FixedType>().getTotalBits();
+                    } else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>()) {
+                        if (p->getKind() == semantics::PrimitiveType::Integer) bitLength = 32;
+                    }
+
+                    if (bitLength > 0 && bitLength < 32)
+                    {
+                        llvm::Type* wordType = llvm::Type::getInt32Ty(m_module.getContext());
+                        llvm::Value* currentValue = m_builder.CreateLoad(wordType, targetAddr, "table_elem_load");
+
+                        std::uint32_t maskValInt = (1U << bitLength) - 1;
+                        llvm::Value* widthMask = llvm::ConstantInt::get(wordType, maskValInt, true);
+                        
+                        llvm::Value* startBitVal = llvm::ConstantInt::get(wordType, bitPos, true);
+                        llvm::Value* mask = m_builder.CreateShl(widthMask, startBitVal);
+                        llvm::Value* invMask = m_builder.CreateNot(mask);
+                        
+                        llvm::Value* clearedBase = m_builder.CreateAnd(currentValue, invMask, "table_elem_cleared");
+                        
+                        if (rhs->getType() != wordType)
+                        {
+                            rhs = m_builder.CreateIntCast(rhs, wordType, true);
+                        }
+                        
+                        llvm::Value* maskedRhs = m_builder.CreateAnd(rhs, widthMask);
+                        llvm::Value* shiftedRhs = m_builder.CreateShl(maskedRhs, startBitVal, "table_elem_shifted_rhs");
+                        
+                        rhs = m_builder.CreateOr(clearedBase, shiftedRhs, "table_elem_newval");
+                    }
+                    else if (bitPos > 0)
+                    {
+                        // If it's a 32-bit field, but offset > 0 (which is weird for 32-bit words), 
+                        // we would just shift it, but if it takes the whole word, bitPos must be 0.
+                        // Assuming 32-bit width and bitPos=0 is the only valid case for bitLength=32.
+                    }
+                }
+            }
+        }
+    }
 
     m_builder.CreateStore(rhs, targetAddr);
 }

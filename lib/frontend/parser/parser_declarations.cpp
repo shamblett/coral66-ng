@@ -388,6 +388,9 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
             }
 
             std::vector<std::unique_ptr<syntax::Declaration>> elements;
+            std::vector<lexer::CTokenIterator> presetTokens;
+            bool hasPresetAssignment = false;
+
             if (begin != end && begin->getTokenType() == lexer::TokenType::OpenSquareBracket)
             {
                 begin++;
@@ -400,22 +403,37 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         bool parsedAny = false;
                         while (begin != end && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
                         {
+                            if (begin->getTokenType() == lexer::TokenType::Comma)
+                            {
+                                presetTokens.push_back(begin);
+                                begin++;
+                                parsedAny = true;
+                                continue;
+                            }
+                            
+                            auto groupStart = begin;
                             if (!parseGroup())
                             {
-                                context.log(errors::parser::EXPECTED_EXPRESSION.args(
-                                    *(begin == end ? end - 1 : begin), context.getSourceInterface(),
-                                    *(begin == end ? end - 1 : begin)));
-                                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
-
-                                // Recover
-                                while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
-                                       && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
+                                if (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
                                 {
-                                    begin++;
+                                    context.log(errors::parser::EXPECTED_EXPRESSION.args(
+                                        *(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                                        *(begin == end ? end - 1 : begin)));
+                                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+
+                                    // Recover
+                                    while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
+                                           && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
+                                    {
+                                        begin++;
+                                    }
+                                    parsedAny = true; // Error reported
                                 }
-                                parsedAny = true; // Error reported
                                 break;
                             }
+                            for (auto it = groupStart; it != begin; ++it)
+                                presetTokens.push_back(it);
+
                             parsedAny = true;
                             if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                             {
@@ -553,8 +571,6 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 }
             }
 
-            bool hasPresetAssignment = false;
-            std::vector<lexer::CTokenIterator> presetTokens;
             if (begin != end
                 && (begin->getTokenType() == lexer::TokenType::Assignment
                     || begin->getTokenType() == lexer::TokenType::PresetKeyword))
@@ -565,21 +581,35 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 bool parsedAny = false;
                 while (begin != end)
                 {
+                    if (begin->getTokenType() == lexer::TokenType::Comma)
+                    {
+                        // It's a void preset item, push a comma token as placeholder or empty
+                        presetTokens.push_back(begin);
+                        begin++;
+                        parsedAny = true;
+                        continue;
+                    }
+                    
                     auto groupStart = begin;
                     if (!parseGroup())
                     {
-                        context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
-                                                                             context.getSourceInterface(),
-                                                                             *(begin == end ? end - 1 : begin)));
-                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
-
-                        // Recover
-                        while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
-                               && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+                        // If it fails to parse a group, and it's not a valid end token, error
+                        if (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon && begin->getTokenType() != lexer::TokenType::CloseParentheses && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
                         {
-                            begin++;
+                            context.log(errors::parser::EXPECTED_EXPRESSION.args(*(begin == end ? end - 1 : begin),
+                                                                                 context.getSourceInterface(),
+                                                                                 *(begin == end ? end - 1 : begin)));
+                            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
+
+                            // Recover
+                            while (begin != end && begin->getTokenType() != lexer::TokenType::SemiColon
+                                   && begin->getTokenType() != lexer::TokenType::CloseParentheses
+                                   && begin->getTokenType() != lexer::TokenType::CloseSquareBracket)
+                            {
+                                begin++;
+                            }
+                            parsedAny = true; // Error reported
                         }
-                        parsedAny = true; // Error reported
                         break;
                     }
                     for (auto it = groupStart; it != begin; ++it)

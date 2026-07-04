@@ -404,6 +404,9 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
     declaration->setAstNode(&node);
+    
+    auto* prevTableDeclaration = m_currentTableDeclaration;
+    m_currentTableDeclaration = declaration.get();
 
     const auto& name = std::get<std::string>(id->getValue());
 
@@ -423,6 +426,8 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     {
         visit(*element);
     }
+    
+    m_currentTableDeclaration = prevTableDeclaration;
 }
 
 void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
@@ -434,6 +439,19 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     else if (type->is<FixedType>())
         typeCopy = IntrusiveVariantValue(
             FixedType{type->as<FixedType>().getTotalBits(), type->as<FixedType>().getFractionalBits()});
+    else if (node.getFixedTotalBits())
+    {
+        uint32_t total = 16;
+        uint32_t frac = 0;
+        if (const auto tVal = evaluateConstantInteger(*node.getFixedTotalBits()); tVal && *tVal > 0)
+            total = static_cast<uint32_t>(*tVal);
+        if (node.getFixedFractionBits())
+        {
+            if (const auto fVal = evaluateConstantInteger(*node.getFixedFractionBits()); fVal && *fVal >= 0)
+                frac = static_cast<uint32_t>(*fVal);
+        }
+        typeCopy = IntrusiveVariantValue(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)});
+    }
 
     std::optional<std::uint32_t> wordPos;
     if (node.getWordPosition())
@@ -451,7 +469,7 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
 
     auto id = node.getIdentifier();
     auto declaration =
-        makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos);
+        makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos, m_currentTableDeclaration);
     declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 

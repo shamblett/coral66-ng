@@ -220,16 +220,19 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     {
         if (auto* def = std::get_if<semantics::TableDefinition>(&tab->getInfo().type))
         {
-            std::vector<llvm::Type*> fieldTypes;
-            for (const auto& [type1, name] : def->getFields())
-            {
-                fieldTypes.push_back(convertType(*type1));
-            }
-            llvm::Type* structType = llvm::StructType::get(ctx, fieldTypes);
+            llvm::Type* wordType = llvm::Type::getInt32Ty(ctx);
             if (def->getLength() > 0)
-                baseType = llvm::ArrayType::get(structType, def->getLength());
+            {
+                baseType = llvm::ArrayType::get(wordType, def->getWidth() * def->getLength());
+            }
             else
-                baseType = structType;
+            {
+                // Just for references or dynamically sized
+                if (def->getWidth() > 0)
+                    baseType = llvm::ArrayType::get(wordType, def->getWidth());
+                else
+                    baseType = llvm::PointerType::getUnqual(ctx);
+            }
         }
         else
         {

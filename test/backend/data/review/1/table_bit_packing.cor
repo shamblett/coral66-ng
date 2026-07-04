@@ -1,0 +1,32 @@
+'PROGRAM' TEST
+'BEGIN'
+  'INTEGER' ans;
+  'TABLE' MYTAB [2, 5]
+    [
+      A 'INTEGER' 0;
+      B 'UNSIGNED' (16) 0, 16;
+      C 'UNSIGNED' (8) 1, 0;
+      D 'UNSIGNED' (8) 1, 8
+    ];
+    
+  ans := 0;
+  
+  A[2] := 10;
+  B[2] := 20;
+  C[2] := 30;
+  D[2] := 40;
+  
+  'IF' A[2] = 10 'THEN'
+  'BEGIN'
+    'IF' B[2] = 20 'THEN'
+    'BEGIN'
+      'IF' C[2] = 30 'THEN'
+      'BEGIN'
+        'IF' D[2] = 40 'THEN'
+        'BEGIN'
+          ans := 1;
+        'END'
+      'END'
+    'END'
+  'END'
+'END'
