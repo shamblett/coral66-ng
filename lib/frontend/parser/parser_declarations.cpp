@@ -477,16 +477,10 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                         if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
                         {
                             isPartWord = true;
-                            int depth = 1;
                             begin++;
-                            while (begin != end && depth > 0)
-                            {
-                                if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
-                                    depth++;
-                                else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
-                                    depth--;
+                            fixedScale.first = parseExpression(begin, end, context);
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
                                 begin++;
-                            }
                         }
                         else if (!isPartWord
                                  && (begin->getTokenType() == lexer::TokenType::FloatingKeyword

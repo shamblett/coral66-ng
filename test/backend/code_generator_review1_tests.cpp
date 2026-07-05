@@ -535,6 +535,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
 
+        module->print(llvm::errs(), nullptr);
         std::string engineError;
         llvm::ExecutionEngine* ee =
             llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
@@ -549,6 +550,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
             mainFunc = ee->FindFunctionNamed("TEST");
         REQUIRE(mainFunc != nullptr);
 
+        ee->finalizeObject();
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
@@ -607,6 +609,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
 
+        module->print(llvm::errs(), nullptr);
         std::string engineError;
         llvm::ExecutionEngine* ee =
             llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
@@ -621,6 +624,7 @@ TEST_CASE("Review 1", "[Backend][Execution]")
             mainFunc = ee->FindFunctionNamed("TEST");
         REQUIRE(mainFunc != nullptr);
 
+        ee->finalizeObject();
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 

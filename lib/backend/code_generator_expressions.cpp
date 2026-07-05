@@ -87,6 +87,17 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
                     }
                 }
             },
+            [&](const semantics::TableDeclaration& tableDeclaration)
+            {
+                baseType = convertType(tableDeclaration.getType());
+                if (auto* tabType = tableDeclaration.getType().tryAs<semantics::TableType>())
+                {
+                    if (auto* def = std::get_if<semantics::TableDefinition>(&tabType->getInfo().type))
+                    {
+                        tableWidth = def->getWidth();
+                    }
+                }
+            },
             [&](const auto&) {});
 
         if (!baseType)
@@ -569,6 +580,10 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
         {
             type = llvm::Type::getInt32Ty(m_module.getContext()); // The array element type is always i32 for tables
             tableElem = tabElem;
+        }
+        else if (rit->second->is<semantics::TableDeclaration>())
+        {
+            type = llvm::Type::getInt32Ty(m_module.getContext());
         }
     }
 

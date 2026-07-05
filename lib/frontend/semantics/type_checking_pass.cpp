@@ -993,6 +993,10 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
         {
             m_context.expressionTypes.insert_or_assign(&node, tableElement->getType());
         }
+        else if (usable->is<TableDeclaration>())
+        {
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+        }
         else
         {
             m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));

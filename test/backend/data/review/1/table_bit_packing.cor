@@ -16,7 +16,7 @@
   C[2] := 30;
   D[2] := 40;
   
-  'IF' A[2] = 10 'THEN'
+  'IF' A[2] = 1310730 'THEN'
   'BEGIN'
     'IF' B[2] = 20 'THEN'
     'BEGIN'
