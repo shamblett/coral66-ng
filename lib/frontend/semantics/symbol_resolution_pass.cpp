@@ -449,8 +449,13 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
         {
             if (const auto fVal = evaluateConstantInteger(*node.getFixedFractionBits()); fVal && *fVal >= 0)
                 frac = static_cast<uint32_t>(*fVal);
+            typeCopy = IntrusiveVariantValue(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)});
         }
-        typeCopy = IntrusiveVariantValue(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)});
+        else
+        {
+            // It's just (10) or UNSIGNED (10) which means part-word integer, not FIXED.
+            typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer});
+        }
     }
 
     std::optional<std::uint32_t> wordPos;
