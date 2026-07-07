@@ -30,7 +30,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
     SECTION("Whetstone End-to-End Execution")
     {
         // TODO
-        SKIP();
+        //SKIP();
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
@@ -82,7 +82,6 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         llvm::ExecutionEngine* ee =
             llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
         REQUIRE(ee != nullptr);
-
         ee->finalizeObject();
 
         llvm::Function* mainFunc = ee->FindFunctionNamed("main");
