@@ -11,6 +11,7 @@
 #include <ranges>
 
 #include "lib/frontend/semantics/program.hpp"
+#include "lib/frontend/semantics/control_flow_pass.hpp"
 
 namespace coral66::cgllvm
 {
@@ -246,8 +247,20 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                     }
                     else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>())
                     {
-                        if (p->getKind() == semantics::PrimitiveType::Integer)
+                        if (p->getKind() == semantics::PrimitiveType::Integer || p->getKind() == semantics::PrimitiveType::Bits)
+                        {
                             bitLength = 32;
+                            if (auto* astNode = dynamic_cast<const syntax::TableElementDeclaration*>(tableElem->getAstNode()))
+                            {
+                                if (astNode->getFixedTotalBits())
+                                {
+                                    if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits()); tVal && *tVal > 0)
+                                    {
+                                        bitLength = static_cast<std::uint32_t>(*tVal);
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     if (bitLength > 0 && bitLength < 32)

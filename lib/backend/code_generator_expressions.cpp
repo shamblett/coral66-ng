@@ -600,15 +600,19 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
         }
         else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>())
         {
-            if (p->getKind() == semantics::PrimitiveType::Bits)
+            if (p->getKind() == semantics::PrimitiveType::Integer || p->getKind() == semantics::PrimitiveType::Bits)
             {
-                // If it's a bit type but we have no width, what should it be? Let's assume a default or whatever the
-                // user supplied. Wait, BITS doesn't have an explicit size if not given? No, BITS without width means
-                // the whole word usually, but part-words specify the bit length as total bits. Wait! If there's no
-                // fixed total bits, let's just assume it extracts 1 bit or default. Actually, Coral 66 part words
-                // typically have a bit width defined in `total-bits`. Let's check `getFixedTotalBits` from AST? No, we
-                // just have the semantic type. If the type is PrimitiveType::Integer or Bits, we might just have
-                // bitLength=32, which is no masking.
+                bitLength = 32;
+                if (auto* astNode = dynamic_cast<const syntax::TableElementDeclaration*>(tableElem->getAstNode()))
+                {
+                    if (astNode->getFixedTotalBits())
+                    {
+                        if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits()); tVal && *tVal > 0)
+                        {
+                            bitLength = static_cast<std::uint32_t>(*tVal);
+                        }
+                    }
+                }
             }
         }
 
