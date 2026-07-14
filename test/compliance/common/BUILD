@@ -5,7 +5,7 @@
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 cc_library(
-    name = "compliancecommon",
+    name = "common",
     srcs = [
         "common.cpp",
     ],

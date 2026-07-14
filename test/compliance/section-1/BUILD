@@ -1,15 +1,14 @@
 #
-# Test suite backend library tests
+# Compliance tests section 1
 #
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_library(
-    name = "compliancesection1test",
+    name = "section1test",
     srcs = [
-    ],
-    hdrs = [
+        "section_1_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
@@ -17,6 +16,7 @@ cc_library(
         "//lib/frontend/common",
         "//lib/support",
         "//test/common",
+        "//test/compliance/common",
         "//test/vendor/catch2v3",
     ],
 )
@@ -39,6 +39,6 @@ cc_test(
     },
     visibility = ["//test:__pkg__"],
     deps = [
-        "compliancesection1test",
+        "section1test",
     ],
 )
