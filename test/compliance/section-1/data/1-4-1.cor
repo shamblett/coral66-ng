@@ -1,0 +1,5 @@
+PROGRAM ONEFOURONE
+COMMENT Undeclared identifiers produce an error;
+BEGIN
+   j := 0;
+END
