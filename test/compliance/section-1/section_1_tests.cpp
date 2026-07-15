@@ -38,7 +38,7 @@ TEST_CASE("Section 1-4-1", "[Compliance][Section-1-4]")
     {
         auto sourcePath = getTestDataPath("1-4-1.cor", "COMPLIANCE_SECTION_1_DIR");
         auto source = readFile(sourcePath);
-        REQUIRE_FALSE(source.empty());
+        CHECK_FALSE(source.empty());
 
         std::string reporterString;
         llvm::raw_string_ostream ss(reporterString);
@@ -46,21 +46,19 @@ TEST_CASE("Section 1-4-1", "[Compliance][Section-1-4]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        REQUIRE_FALSE(errors);
+        CHECK_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
-        REQUIRE_FALSE(errors);
+        CHECK_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors)
-            WARN(ss.str());
-        REQUIRE_FALSE(errors);
+        CHECK_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
-        REQUIRE_FALSE(errors);
+        CHECK_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
-        REQUIRE(errors);
+        CHECK(errors);
         CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 2);
         CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(UNDECLARED_IDENTIFIER_N));
         CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(CANNOT_ASSIGN_TO_CONST));
