@@ -1,0 +1,23 @@
+PROGRAM ONEFOURTHREE
+COMMENT Out of bounds array access triggers UB;
+BEGIN
+
+   INTEGER ARRAY flags, indices[0 : 1];
+   INTEGER result;
+   INTEGER flags0, flags1;
+   INTEGER index0, index1;
+
+   flags[0] := 10;
+   flags[1] := 20;
+   indices[0] := 0;
+   COMMENT Use an out of bounds value that is inside the allocated address space to trigger the UB;
+   indices[1] := 100;
+
+   result := -1;
+   flags0 := flags[0];
+   flags1 := flags[1];
+   index0 := indices[0];
+   index1 := indices[1];
+
+   result := flags[index1];
+END
