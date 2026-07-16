@@ -2,25 +2,22 @@ PROGRAM ONEFOURTWO
 COMMENT Out of bounds array access causes sigsev;
 BEGIN
 
-   INTEGER ARRAY flags [0 : 4];
-   INTEGER ARRAY indices [0 : 4];
-   INTEGER iter;
-   INTEGER value;
-
-   value := 0;
+   INTEGER ARRAY flags, indices[0 : 1];
+   INTEGER result;
+   INTEGER flags0, flags1;
+   INTEGER index0, index1;
 
    flags[0] := 10;
    flags[1] := 20;
-   flags[2] := 30;
-   flags[3] := 40;
+   indices[0] := 0;
+   COMMENT Use an out of bounds value that is outside the allocated address space to cause the sigsev;
+   indices[1] := 10000000;
 
-   indices[0] := 1;
-   indices[1] := 2;
-   indices[2] := 11;
-   indices[3] := 23;
+   result := -1;
+   flags0 := flags[0];
+   flags1 := flags[1];
+   index0 := indices[0];
+   index1 := indices[1];
 
-   FOR iter := 0 STEP 1 UNTIL 4 DO
-   BEGIN
-      value := flags[indices[iter]];
-   END;
+   result := flags[index1];
 END

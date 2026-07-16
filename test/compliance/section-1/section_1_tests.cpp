@@ -124,7 +124,7 @@ TEST_CASE("Section 1-4-1", "[Compliance][Section-1-4]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-
+        // Clean up
         delete ee;
     }
 }
