@@ -73,14 +73,6 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         CHECK(result.findDiagnostic(UNEXPECTED_CHARACTER));
     }
 
-    SECTION("Non-Printable Character")
-    {
-        bool errors = false;
-        std::string source = "\u200B";
-        auto result = lexToCTokens(source, errors);
-        CHECK(result.findDiagnostic(NON_PRINTABLE_CHARACTER_N));
-    }
-
     SECTION("Unterminated Stropped Keyword")
     {
         bool errors = false;

@@ -224,21 +224,12 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
             }
             if (!llvm::sys::unicode::isPrintable(c)) // NOLINT(*-narrowing-conversions)
             {
-                std::string buffer = "\\U";
-                buffer.reserve(10);
-                llvm::raw_string_ostream ss(buffer);
-                ss << llvm::format_hex_no_prefix(c, 8);
-                ss.flush();
-                const auto size = getNumUTF8ForUTF32(c);
-                context.report(errors::lexer::NON_PRINTABLE_CHARACTER_N, context.getOffset() - size, buffer,
-                               std::pair{context.getOffset() - size, context.getOffset()});
-                DiagnosticCollector::addDiagnostic(errors::lexer::NON_PRINTABLE_CHARACTER_N);
+                // Ignore non printing characters, they should not stop compilation.
+                return *this;
             }
-            else
-            {
-                context.push(context.getOffset() - getNumUTF8ForUTF32(c), context.getOffset(),
-                             TokenType::Miscellaneous);
-            }
+
+            context.push(context.getOffset() - getNumUTF8ForUTF32(c), context.getOffset(), TokenType::Miscellaneous);
+
             return *this;
         }
     }

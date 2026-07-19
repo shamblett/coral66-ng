@@ -372,4 +372,11 @@ TEST_CASE("Comments", "[lexer]")
             CHECK(result.data()[i].getTokenType() == correct[i]);
         }
     }
+
+    SECTION("Non-Printable Character")
+    {
+        std::string source = "\u200B";
+        auto result = lex(source);
+        CHECK(result.data().size() == 0);
+    }
 }

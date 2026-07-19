@@ -2,9 +2,9 @@ PROGRAM TWOONE
 COMMENT Layout characters do not fail compilation;
 BEGIN
    COMMENT Layout characters are embedded freely throughout the source text;
-   COMMENT Special characters are allowed in comments\n\b;
+   COMMENT Special characters and layout are allowed  in comments\n\b;
 
-   INTEGER ans;
+	 INTEGER ans;
    FLOATING f1, f2;
    BITS b1;
    FIXED (13, 5) x1;
@@ -13,7 +13,7 @@ BEGIN
    f2 := 2.0;
 
    COMMENT Floating point arithmetic ;
-   f1 := f1 * f2; COMMENT 21.0 ;
+f1 := f1 * f2; COMMENT 21.0 ;
 
    COMMENT Bits assignment ;
    b1 := 10;
@@ -24,7 +24,8 @@ BEGIN
    COMMENT Type Casting and Coercion ;
    IF INTEGER(f1) = 21 THEN
    BEGIN
-      ans := INTEGER(f1) + INTEGER(b1) + INTEGER(x1); COMMENT 21 + 10 + 11 = 42
+      ans := INTEGER(f1) + INTEGER(b1) + INTEGER(x1); COMMENT 21 + 10
+11 = 42
    END
    ELSE
    BEGIN
