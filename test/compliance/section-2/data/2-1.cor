@@ -2,6 +2,7 @@ PROGRAM TWOONE
 COMMENT Layout characters do not fail compilation;
 BEGIN
    COMMENT Layout characters are embedded freely throughout the source text;
+   COMMENT Special characters are allowed in comments\n\b;
 
    INTEGER ans;
    FLOATING f1, f2;
