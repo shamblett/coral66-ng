@@ -15,6 +15,8 @@ Each test case/section is annotated with the particular part of the specificatio
 present in a section is also tested in its own test file named 'examples'. Coral 66 source code files are commented to
 describe expected behaviour as appropriate.
 
-Coral 66 source code test files are named after the relevant specification section and the test number, for instance 1-4-1.cor refers to
-section 1.4 test 1, 1-4-2.cor to section 1.4 test 2 and so on.
+Coral 66 source code test files are named after the relevant specification section and the test number, for instance 1-4-1.cor refers to section 1.4 test 1, 1-4-2.cor to section 1.4 test 2 and so on.
+
+Note that there is no intention of duplicating functionality in compliance tests that is fully tested elsewhere in the
+test suite. Where a section is fully covered by other tests its complaince value can be set to N/A
 
