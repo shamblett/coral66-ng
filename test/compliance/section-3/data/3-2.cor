@@ -1,0 +1,21 @@
+PROGRAM THREETWO
+COMMENT Inner names hide outer names for name clash resolution;
+BEGIN
+
+   INTEGER outerAnswer;
+   INTEGER innerAnswerValue;
+
+   outerAnswer := 10;
+   innerAnswerValue := 0;
+
+   BEGIN
+
+     INTEGER innerAnswer;
+
+     innerAnswer := 20;
+     innerAnswer := innerAnswer + 1;
+     innerAnswerValue := innerAnswer
+
+   END;
+
+END

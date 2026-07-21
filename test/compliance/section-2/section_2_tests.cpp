@@ -12,16 +12,12 @@
 
 #include <iostream>
 
-#include <sys/wait.h>
-#include <unistd.h>
-
 #include "lib/backend/code_generation.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
-#include "lib/frontend/semantics/semantic_support.hpp"
 #include "test/common/test_config.hpp"
 #include "test/compliance/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
