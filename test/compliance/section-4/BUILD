@@ -1,0 +1,44 @@
+#
+# Compliance tests section 1
+#
+
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+load("@rules_cc//cc:cc_test.bzl", "cc_test")
+
+cc_library(
+    name = "section4test",
+    srcs = [
+        "section_4_tests.cpp",
+    ],
+    visibility = ["//test:__pkg__"],
+    deps = [
+        "//lib/backend",
+        "//lib/frontend/common",
+        "//lib/support",
+        "//test/common",
+        "//test/compliance/common",
+        "//test/vendor/catch2v3",
+    ],
+)
+
+filegroup(
+    name = "data_dir",
+    srcs = glob(["data/**"]),
+)
+
+cc_test(
+    name = "section4",
+    srcs = [
+        "main.cpp",
+    ],
+    data = [
+        ":data_dir",
+    ],
+    env = {
+        "COMPLIANCE_SECTION_4_DIR": "test/compliance/section-4/data",
+    },
+    visibility = ["//test:__pkg__"],
+    deps = [
+        "section4test",
+    ],
+)

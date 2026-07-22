@@ -203,11 +203,10 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     else if (auto* fixed = type.tryAs<semantics::FixedType>())
     {
         if (fixed->getTotalBits() <= 16)
+        {
             baseType = llvm::Type::getInt16Ty(ctx);
-        else if (fixed->getTotalBits() <= 32)
-            baseType = llvm::Type::getInt32Ty(ctx);
-        else
-            baseType = llvm::Type::getInt64Ty(ctx);
+        }
+        baseType = llvm::Type::getInt32Ty(ctx);
     }
     else if (auto* tab = type.tryAs<semantics::TableType>())
     {
