@@ -1,0 +1,13 @@
+PROGRAM Numerics
+COMMENT Various numeric processing tests;
+BEGIN
+
+   INTEGER theInteger;
+   FLOATING theFloat;
+   FIXED(13,5) theFixed;
+
+   theInteger := 10;
+   theFloat := 20.0;
+   theFixed := 8.75;
+
+END

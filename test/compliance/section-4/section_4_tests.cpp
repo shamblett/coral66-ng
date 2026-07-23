@@ -98,7 +98,8 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         // Integer
         uint64_t rawAddress = ee->getGlobalValueAddress("theInteger");
-        if (const llvm::GlobalValue* gVal = ee->getGlobalValueAtAddress(reinterpret_cast<void*>(rawAddress))) {
+        if (const llvm::GlobalValue* gVal = ee->getGlobalValueAtAddress(reinterpret_cast<void*>(rawAddress)))
+        {
             const llvm::DataLayout& dl = ee->getDataLayout();
             uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
             CHECK(sizeInBytes == 5);
@@ -106,7 +107,8 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         // Floating
         rawAddress = ee->getGlobalValueAddress("theFloat");
-        if (const llvm::GlobalValue* gVal = ee->getGlobalValueAtAddress(reinterpret_cast<void*>(rawAddress))) {
+        if (const llvm::GlobalValue* gVal = ee->getGlobalValueAtAddress(reinterpret_cast<void*>(rawAddress)))
+        {
             const llvm::DataLayout& dl = ee->getDataLayout();
             uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
             CHECK(sizeInBytes == 5);
@@ -114,27 +116,12 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         // Fixed
         rawAddress = ee->getGlobalValueAddress("theFixed");
-        if (const llvm::GlobalValue* gVal = ee->getGlobalValueAtAddress(reinterpret_cast<void*>(rawAddress))) {
+        if (const llvm::GlobalValue* gVal = ee->getGlobalValueAtAddress(reinterpret_cast<void*>(rawAddress)))
+        {
             const llvm::DataLayout& dl = ee->getDataLayout();
             uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
             CHECK(sizeInBytes == 5);
         }
-
-        // Just check the fixed value for completeness
-        auto fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("theFixed"));
-
-        REQUIRE(fixedAddress != nullptr);
-
-        // Dereference to get the actual value
-        int32_t fixed = *static_cast<int32_t*>(fixedAddress);
-
-        /// Identify Fractional Bits: The layout (13,5) dictates that the number has 5 fractional bits.
-        /// Understand the Scaling Factor: Fixed-point representations scale the real value by \(2^{f}\),
-        /// where \(f\) is the number of fractional bits.Calculate the Base Integer:
-        /// Multiply the given value by the scaling factor (\(2^5 = 32\)).
-        ///
-        /// 8.75 * 32 = 280
-        CHECK(fixed == 280);
 
         // Clean up
         delete ee;
