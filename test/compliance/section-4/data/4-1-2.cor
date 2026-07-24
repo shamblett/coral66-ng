@@ -1,0 +1,9 @@
+PROGRAM FOURONETWO
+COMMENT FIXED numerics tests;
+BEGIN
+
+   FIXED(13,5) theFixed;
+
+   theFixed := 8.75;
+
+END

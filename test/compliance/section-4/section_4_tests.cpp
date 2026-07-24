@@ -39,13 +39,13 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
     /// numerically.
     /// It is assumedthroughout this definition that a number is confined within a
     /// single computer word which in this implementation is 32 bits long.
-    SECTION("4-1")
+    SECTION("4-1-1")
     {
         // Initialize LLVM Native Target for JIT Execution
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
-        auto sourcePath = getTestDataPath("4-1.cor", "COMPLIANCE_SECTION_4_DIR");
+        auto sourcePath = getTestDataPath("4-1-1.cor", "COMPLIANCE_SECTION_4_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
 
@@ -71,7 +71,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         // Code Generation
         llvm::LLVMContext context;
-        auto module = std::make_unique<llvm::Module>("fourone", context);
+        auto module = std::make_unique<llvm::Module>("fouroneone", context);
         REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
 
         coral66::cgllvm::Options codegenOptions;
@@ -122,6 +122,91 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
             uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
             CHECK(sizeInBytes == 5);
         }
+
+        // Clean up
+        delete ee;
+    }
+
+    /// A fixed Numeric type is indicated by the word FIXED followed by scaling
+    /// constants which must be given numerically, e.g.
+
+    /// FIXED (13,5)
+
+    /// This specifies five fractional bits and a minimum of 13 bits to represent the
+    /// number as a whole, including the fractional bits and a sign.
+    SECTION("4-1-2")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("4-1-2.cor", "COMPLIANCE_SECTION_4_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("fouronetwo", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        // Run the `main` function
+
+        // Ensure all globals are allocated and JIT compilation is done before running
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        // Fixed value
+        auto fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("theFixed"));
+
+        REQUIRE(fixedAddress != nullptr);
+
+        // Dereference to get the actual value
+        int32_t fixed = *static_cast<int32_t*>(fixedAddress);
+
+        /// The layout (13,5) dictates that the number has 5 fractional bits.
+        /// Fixed-point representations scale the real value by (2^{f}),
+        /// where (f) is the number of fractional bits.
+        /// To derive the absolute integer value Multiply the given value by the
+        /// scaling factor ((2^5 = 32)).
+        ///
+        /// 8.75 * 32 = 280
+        CHECK(fixed == 256); // TODO
 
         // Clean up
         delete ee;

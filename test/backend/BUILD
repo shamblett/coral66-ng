@@ -15,7 +15,6 @@ cc_library(
         "code_generator_phase5_tests.cpp",
         "code_generator_phase6_tests.cpp",
         "code_generator_review1_tests.cpp",
-        "numeric_tests.cpp",
         "common.cpp",
     ],
     hdrs = [
