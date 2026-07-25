@@ -200,12 +200,9 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
             baseType = arrType;
         }
     }
-    else if (auto* fixed = type.tryAs<semantics::FixedType>())
+    else if (type.tryAs<semantics::FixedType>())
     {
-        if (fixed->getTotalBits() <= 16)
-        {
-            baseType = llvm::Type::getInt16Ty(ctx);
-        }
+
         baseType = llvm::Type::getInt32Ty(ctx);
     }
     else if (auto* tab = type.tryAs<semantics::TableType>())

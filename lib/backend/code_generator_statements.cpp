@@ -154,6 +154,7 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
     if (rhs->getType() != targetType && targetType)
     {
         if (rhs->getType()->isFloatingPointTy() && targetType->isIntegerTy())
+            // TODO check for FIXED here
             rhs = m_builder.CreateFPToSI(rhs, targetType);
         else if (rhs->getType()->isIntegerTy() && targetType->isFloatingPointTy())
             rhs = m_builder.CreateSIToFP(rhs, targetType);
