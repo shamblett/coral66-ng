@@ -15,8 +15,6 @@ int main(const int argc, char* argv[])
     llvm::InitializeNativeTargetAsmParser();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    auto enable = enableParallelization();
-
     Catch::Session session; // There must be exactly one instance
     // writing to session.configData() here sets defaults
     // this is the preferred way to set them
