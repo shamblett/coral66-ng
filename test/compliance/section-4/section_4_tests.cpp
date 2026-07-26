@@ -206,7 +206,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         /// scaling factor ((2^5 = 32)).
         ///
         /// 8.75 * 32 = 280
-        CHECK(fixed == 256); // TODO
+        CHECK(fixed == 280); // TODO
 
         // Clean up
         delete ee;

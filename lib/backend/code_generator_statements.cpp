@@ -185,16 +185,21 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                 if (const auto* constFP = llvm::dyn_cast<llvm::ConstantFP>(rhs))
                 {
                     auto value = constFP->getValue();
-                    llvm::APFloat tempFloat(static_cast<float>(targetFraction ^ 2));
+                    uint64_t factorInt = static_cast<uint64_t>(pow(2, targetFraction));
+                    llvm::APFloat tempFloat(value.getSemantics(), factorInt);
                     auto storeValue = value * tempFloat;
-                    llvm::APSInt integerResult(32, /*isUnsigned=*/false);
+                    llvm::APSInt integerResult(32, false);
                     bool isExact = false;
                     llvm::APFloat::opStatus status =
                         storeValue.convertToInteger(integerResult, llvm::APFloat::rmTowardZero, &isExact);
-                    if (status & llvm::APFloat::opInvalidOp) {
+                    if (status & llvm::APFloat::opInvalidOp)
+                    {
+                        // TODO fail here
                         return;
                     }
-                    int32_t nativeInt = integerResult.getSExtValue();
+                    auto storeRhs = llvm::ConstantInt::get(m_module.getContext(), integerResult);
+                    m_builder.CreateStore(storeRhs, targetAddr);
+                    return;
                 }
             }
             else if (rhsFraction > targetFraction)
