@@ -6,12 +6,13 @@
 
 #include "code_generator.hpp"
 
+#include <llvm/IR/Constants.h>
 #include <llvm/IR/InlineAsm.h>
 
 #include <ranges>
 
-#include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/control_flow_pass.hpp"
+#include "lib/frontend/semantics/program.hpp"
 
 namespace coral66::cgllvm
 {
@@ -151,20 +152,8 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
         }
     }
 
-    if (rhs->getType() != targetType && targetType)
-    {
-        if (rhs->getType()->isFloatingPointTy() && targetType->isIntegerTy())
-            // TODO check for FIXED here
-            rhs = m_builder.CreateFPToSI(rhs, targetType);
-        else if (rhs->getType()->isIntegerTy() && targetType->isFloatingPointTy())
-            rhs = m_builder.CreateSIToFP(rhs, targetType);
-        else if (rhs->getType()->isFloatingPointTy() && targetType->isFloatingPointTy())
-            rhs = m_builder.CreateFPCast(rhs, targetType);
-        else if (rhs->getType()->isIntegerTy() && targetType->isIntegerTy())
-            rhs = m_builder.CreateIntCast(rhs, targetType, true);
-    }
-
-    if (rhs->getType()->isIntegerTy() && targetType && targetType->isIntegerTy())
+    // Do fixed processing while rhs is still a float
+    if (rhs->getType()->isFloatingPointTy() && targetType && targetType->isIntegerTy())
     {
         const auto exprIt = m_program.getContext().expressionTypes.find(&statement.getExpression());
         std::uint32_t targetFraction = 0;
@@ -193,8 +182,20 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
         {
             if (targetFraction > rhsFraction)
             {
-                llvm::Value* shiftVal = llvm::ConstantInt::get(targetType, targetFraction - rhsFraction);
-                rhs = m_builder.CreateShl(rhs, shiftVal, "align_assign");
+                if (const auto* constFP = llvm::dyn_cast<llvm::ConstantFP>(rhs))
+                {
+                    auto value = constFP->getValue();
+                    llvm::APFloat tempFloat(static_cast<float>(targetFraction ^ 2));
+                    auto storeValue = value * tempFloat;
+                    llvm::APSInt integerResult(32, /*isUnsigned=*/false);
+                    bool isExact = false;
+                    llvm::APFloat::opStatus status =
+                        storeValue.convertToInteger(integerResult, llvm::APFloat::rmTowardZero, &isExact);
+                    if (status & llvm::APFloat::opInvalidOp) {
+                        return;
+                    }
+                    int32_t nativeInt = integerResult.getSExtValue();
+                }
             }
             else if (rhsFraction > targetFraction)
             {
@@ -202,6 +203,18 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                 rhs = m_builder.CreateAShr(rhs, shiftVal, "align_assign");
             }
         }
+    }
+
+    if (rhs->getType() != targetType && targetType)
+    {
+        if (rhs->getType()->isFloatingPointTy() && targetType->isIntegerTy())
+            rhs = m_builder.CreateFPToSI(rhs, targetType);
+        else if (rhs->getType()->isIntegerTy() && targetType->isFloatingPointTy())
+            rhs = m_builder.CreateSIToFP(rhs, targetType);
+        else if (rhs->getType()->isFloatingPointTy() && targetType->isFloatingPointTy())
+            rhs = m_builder.CreateFPCast(rhs, targetType);
+        else if (rhs->getType()->isIntegerTy() && targetType->isIntegerTy())
+            rhs = m_builder.CreateIntCast(rhs, targetType, true);
     }
 
     if (auto* partWord = dynamic_cast<const syntax::PartWordExpression*>(&statement.getVariable()))
@@ -248,14 +261,17 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                     }
                     else if (auto* p = tableElem->getType().tryAs<semantics::PrimitiveType>())
                     {
-                        if (p->getKind() == semantics::PrimitiveType::Integer || p->getKind() == semantics::PrimitiveType::Bits)
+                        if (p->getKind() == semantics::PrimitiveType::Integer
+                            || p->getKind() == semantics::PrimitiveType::Bits)
                         {
                             bitLength = 32;
-                            if (auto* astNode = dynamic_cast<const syntax::TableElementDeclaration*>(tableElem->getAstNode()))
+                            if (auto* astNode =
+                                    dynamic_cast<const syntax::TableElementDeclaration*>(tableElem->getAstNode()))
                             {
                                 if (astNode->getFixedTotalBits())
                                 {
-                                    if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits()); tVal && *tVal > 0)
+                                    if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
+                                        tVal && *tVal > 0)
                                     {
                                         bitLength = static_cast<std::uint32_t>(*tVal);
                                     }
