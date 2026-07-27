@@ -2,8 +2,14 @@ PROGRAM FOURONETWO
 COMMENT FIXED numerics tests;
 BEGIN
 
-   FIXED(13,5) theFixed;
+   FIXED(13,5) f1351;
+   FIXED(13,5) f1352;
+   FIXED(13,5) f1353;
+   FIXED(13,5) f1354;
 
-   theFixed := 8.75;
+   f1351 := 8.75; COMMENT Integer value 280;
+   f1352 := 87.5; COMMENT Integer value 2800;
+   f1353 := 875.0;  COMMENT Invalid (Overflows maximum capacity);
+   f1354 := 875;  COMMENT Also works with integer;
 
 END

@@ -191,23 +191,37 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-        // Fixed value
-        auto fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("theFixed"));
-
+        // f1351
+        auto fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("f1351"));
         REQUIRE(fixedAddress != nullptr);
-
         // Dereference to get the actual value
         int32_t fixed = *static_cast<int32_t*>(fixedAddress);
-
-        /// The layout (13,5) dictates that the number has 5 fractional bits.
-        /// Fixed-point representations scale the real value by (2^{f}),
-        /// where (f) is the number of fractional bits.
-        /// To derive the absolute integer value Multiply the given value by the
-        /// scaling factor ((2^5 = 32)).
-        ///
         /// 8.75 * 32 = 280
-        CHECK(fixed == 280); // TODO
+        CHECK(fixed == 280);
 
+        // f1352
+        fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("f1352"));
+        REQUIRE(fixedAddress != nullptr);
+        // Dereference to get the actual value
+        fixed = *static_cast<int32_t*>(fixedAddress);
+        /// 87.5 * 32 = 2800
+        CHECK(fixed == 2800);
+
+        // f1353
+        fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("f1353"));
+        REQUIRE(fixedAddress != nullptr);
+        // Dereference to get the actual value
+        fixed = *static_cast<int32_t*>(fixedAddress);
+        /// 875 * 32 = 28000
+        CHECK(fixed == 28000);
+
+        // f1354 - same as f1353 but RHS is an integer not a float
+        fixedAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("f1354"));
+        REQUIRE(fixedAddress != nullptr);
+        // Dereference to get the actual value
+        fixed = *static_cast<int32_t*>(fixedAddress);
+        /// 875 * 32 = 28000
+        CHECK(fixed == 28000);
         // Clean up
         delete ee;
     }

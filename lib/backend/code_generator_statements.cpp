@@ -182,10 +182,10 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
         {
             if (targetFraction > rhsFraction)
             {
+                const double factor = pow(2, targetFraction);
                 if (rhs->getType()->isFloatingPointTy())
                 {
-                    // Calculate the integer scaling factor and generate an LLVM float constant
-                    const double factor = pow(2, targetFraction);
+                    // Generate an LLVM float constant
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
 
                     // Emit a runtime Float Multiplication instruction
@@ -198,13 +198,24 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                     m_builder.CreateStore(storeRhs, targetAddr);
                     return;
                 }
+
+                // Must be integer type
+                // Generate an LLVM Integer constant
+                llvm::Value* tempInt = llvm::ConstantInt::get(rhs->getType(), factor);
+
+                // Emit a runtime Integer Multiplication instruction
+                llvm::Value* multiplied = m_builder.CreateMul(rhs, tempInt, "scaled_val");
+
+                // Store the final runtime result into memory
+                m_builder.CreateStore(multiplied, targetAddr);
+                return;
             }
             if (rhsFraction > targetFraction)
             {
+                const double factor = pow(2, rhsFraction);
                 if (rhs->getType()->isFloatingPointTy())
                 {
-                    // Calculate the integer scaling factor and generate an LLVM float constant
-                    const double factor = pow(2, rhsFraction);
+                    // Generate an LLVM float constant
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
 
                     // Emit a runtime Float Multiplication instruction
@@ -217,6 +228,17 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                     m_builder.CreateStore(storeRhs, targetAddr);
                     return;
                 }
+
+                // Must be integer type
+                // Generate an LLVM Integer constant
+                llvm::Value* tempInt = llvm::ConstantInt::get(rhs->getType(), factor);
+
+                // Emit a runtime Integer Multiplication instruction
+                llvm::Value* multiplied = m_builder.CreateMul(rhs, tempInt, "scaled_val");
+
+                // Store the final runtime result into memory
+                m_builder.CreateStore(multiplied, targetAddr);
+                return;
             }
         }
     }
@@ -286,7 +308,7 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                             {
                                 if (astNode->getFixedTotalBits())
                                 {
-                                    if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
+                                    if (const auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
                                         tVal && *tVal > 0)
                                     {
                                         bitLength = static_cast<std::uint32_t>(*tVal);
