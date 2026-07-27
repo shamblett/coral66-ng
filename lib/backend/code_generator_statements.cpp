@@ -152,8 +152,8 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
         }
     }
 
-    // Do fixed processing while rhs is still a float
-    if (rhs->getType()->isFloatingPointTy() && targetType && targetType->isIntegerTy())
+    // If we are assigning to an integer it could be fixed. check this first
+    if (targetType && targetType->isIntegerTy())
     {
         const auto exprIt = m_program.getContext().expressionTypes.find(&statement.getExpression());
         std::uint32_t targetFraction = 0;
@@ -182,7 +182,7 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
         {
             if (targetFraction > rhsFraction)
             {
-                if (llvm::isa<llvm::ConstantFP>(rhs)) // Works for variables too if you remove this if-statement!
+                if (rhs->getType()->isFloatingPointTy())
                 {
                     // Calculate the integer scaling factor and generate an LLVM float constant
                     const double factor = pow(2, targetFraction);
@@ -199,10 +199,24 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                     return;
                 }
             }
-            else if (rhsFraction > targetFraction)
+            if (rhsFraction > targetFraction)
             {
-                llvm::Value* shiftVal = llvm::ConstantInt::get(targetType, rhsFraction - targetFraction);
-                rhs = m_builder.CreateAShr(rhs, shiftVal, "align_assign");
+                if (rhs->getType()->isFloatingPointTy())
+                {
+                    // Calculate the integer scaling factor and generate an LLVM float constant
+                    const double factor = pow(2, rhsFraction);
+                    llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
+
+                    // Emit a runtime Float Multiplication instruction
+                    llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
+
+                    // Emit a runtime Float-to-Unsigned-Integer cast instruction (truncates toward zero)
+                    llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
+
+                    // Store the final runtime result into memory
+                    m_builder.CreateStore(storeRhs, targetAddr);
+                    return;
+                }
             }
         }
     }
