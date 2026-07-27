@@ -9,6 +9,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
+
 #include <iostream>
 
 #include "common.hpp"
@@ -41,14 +42,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -76,8 +81,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
 
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -113,14 +120,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -148,8 +159,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
 
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -162,11 +175,25 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-        auto ansAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
-        REQUIRE(ansAddr != nullptr);
+        // f1 4 fractional bits
+        auto varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("f1"));
+        REQUIRE(varAddr != nullptr);
+        int32_t final = *static_cast<int32_t*>(varAddr);
+        /// 2 * 16 = 32
+        CHECK(final == 32);
 
-        int32_t finalAns = *static_cast<int32_t*>(ansAddr);
-        REQUIRE(finalAns == 1);
+        // f2 6 fractional bits
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("f2"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        /// 4 * 64 = 256
+        CHECK(final == 256);
+
+        // Ans
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
 
         delete ee;
     }
@@ -185,14 +212,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -235,14 +266,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -285,14 +320,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -321,8 +360,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
 
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -358,14 +399,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -394,8 +439,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
 
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -431,14 +478,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -467,8 +518,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         module->print(llvm::errs(), nullptr);
 
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -503,14 +556,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -537,8 +594,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -577,14 +636,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -611,8 +674,10 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         module->print(llvm::errs(), nullptr);
         std::string engineError;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&engineError).setEngineKind(llvm::EngineKind::JIT).create();
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
         if (!ee)
         {
             llvm::errs() << "JIT Error: " << engineError << "\n";
@@ -637,4 +702,3 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         delete ee;
     }
 }
-

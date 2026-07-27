@@ -390,6 +390,7 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
             const std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
             if (const std::uint32_t currentFraction = leftFraction + rightFraction; currentFraction > targetFraction)
             {
+                // TODO fix this
                 llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), currentFraction - targetFraction);
                 return m_builder.CreateAShr(mul, shiftVal, "scale_mul");
             }
@@ -607,7 +608,8 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
                 {
                     if (astNode->getFixedTotalBits())
                     {
-                        if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits()); tVal && *tVal > 0)
+                        if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
+                            tVal && *tVal > 0)
                         {
                             bitLength = static_cast<std::uint32_t>(*tVal);
                         }
