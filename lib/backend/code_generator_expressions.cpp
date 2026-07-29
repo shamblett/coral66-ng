@@ -332,28 +332,6 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         }
     }
 
-    if (L->getType() != R->getType())
-    {
-        if (L->getType()->isIntegerTy() && R->getType()->isFloatingPointTy())
-            L = m_builder.CreateSIToFP(L, R->getType());
-        else if (L->getType()->isFloatingPointTy() && R->getType()->isIntegerTy())
-            R = m_builder.CreateSIToFP(R, L->getType());
-        else if (L->getType()->isIntegerTy() && R->getType()->isIntegerTy())
-        {
-            if (L->getType()->getIntegerBitWidth() > R->getType()->getIntegerBitWidth())
-                R = m_builder.CreateIntCast(R, L->getType(), true);
-            else
-                L = m_builder.CreateIntCast(L, R->getType(), true);
-        }
-        else if (L->getType()->isFloatingPointTy() && R->getType()->isFloatingPointTy())
-        {
-            if (L->getType()->getFPMantissaWidth() > R->getType()->getFPMantissaWidth())
-                R = m_builder.CreateFPCast(R, L->getType());
-            else
-                L = m_builder.CreateFPCast(L, R->getType());
-        }
-    }
-
     const auto kind = expression.getOp()->getTokenType();
 
     if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
@@ -376,6 +354,28 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         }
     }
 
+    if (L->getType() != R->getType())
+    {
+        if (L->getType()->isIntegerTy() && R->getType()->isFloatingPointTy())
+            L = m_builder.CreateSIToFP(L, R->getType());
+        else if (L->getType()->isFloatingPointTy() && R->getType()->isIntegerTy())
+            R = m_builder.CreateSIToFP(R, L->getType());
+        else if (L->getType()->isIntegerTy() && R->getType()->isIntegerTy())
+        {
+            if (L->getType()->getIntegerBitWidth() > R->getType()->getIntegerBitWidth())
+                R = m_builder.CreateIntCast(R, L->getType(), true);
+            else
+                L = m_builder.CreateIntCast(L, R->getType(), true);
+        }
+        else if (L->getType()->isFloatingPointTy() && R->getType()->isFloatingPointTy())
+        {
+            if (L->getType()->getFPMantissaWidth() > R->getType()->getFPMantissaWidth())
+                R = m_builder.CreateFPCast(R, L->getType());
+            else
+                L = m_builder.CreateFPCast(L, R->getType());
+        }
+    }
+
     if (kind == lexer::TokenType::Plus)
         return L->getType()->isFloatingPointTy() ? m_builder.CreateFAdd(L, R) : m_builder.CreateAdd(L, R);
     if (kind == lexer::TokenType::Minus)
@@ -385,36 +385,12 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         if (L->getType()->isFloatingPointTy())
             return m_builder.CreateFMul(L, R);
         llvm::Value* mul = m_builder.CreateMul(L, R);
-        if (isLeftFixed || isRightFixed)
-        {
-            const std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
-            if (const std::uint32_t currentFraction = leftFraction + rightFraction; currentFraction > targetFraction)
-            {
-                // TODO fix this
-                llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), currentFraction - targetFraction);
-                return m_builder.CreateAShr(mul, shiftVal, "scale_mul");
-            }
-            else if (currentFraction < targetFraction)
-            {
-                llvm::Value* shiftVal = llvm::ConstantInt::get(mul->getType(), targetFraction - currentFraction);
-                return m_builder.CreateShl(mul, shiftVal, "scale_mul");
-            }
-        }
         return mul;
     }
     if (kind == lexer::TokenType::Division)
     {
         if (L->getType()->isFloatingPointTy())
             return m_builder.CreateFDiv(L, R);
-        if (isLeftFixed || isRightFixed)
-        {
-            const std::uint32_t targetFraction = std::max(leftFraction, rightFraction);
-            if (const std::uint32_t shiftAmount = targetFraction + rightFraction - leftFraction; shiftAmount > 0)
-            {
-                llvm::Value* shiftVal = llvm::ConstantInt::get(L->getType(), shiftAmount);
-                L = m_builder.CreateShl(L, shiftVal, "scale_div_num");
-            }
-        }
         return m_builder.CreateSDiv(L, R);
     }
     if (kind == lexer::TokenType::Equal)
