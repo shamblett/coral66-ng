@@ -334,8 +334,26 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
 
     const auto kind = expression.getOp()->getTokenType();
 
+    // Check for fixed processing, do all this here as one operation
     if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
+        // Both fixed
+        if ( isLeftFixed && isRightFixed )
+        {
+            // Same fixed point
+            if ( rightFraction == leftFraction)
+            {
+
+            }
+        }
+
+        // Left fixed
+        if ( isLeftFixed) {}
+
+        // Right fixed
+        if ( isRightFixed) {}
+
+
         if (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::LessThan
             || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::Equal
             || kind == lexer::TokenType::GreaterThanOrEqual || kind == lexer::TokenType::GreaterThan
