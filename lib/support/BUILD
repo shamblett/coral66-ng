@@ -27,6 +27,7 @@ cc_library(
         "utilities.hpp",
         "value_reset.hpp",
         "vendor/ctrack/include/ctrack.hpp",
+        "vendor/fixed/dynamic_fixed.hpp",
         "vendor/magic_enum/magic_enum.hpp",
         "vendor/tsl/ordered_hash.h",
         "vendor/tsl/ordered_map.h",
