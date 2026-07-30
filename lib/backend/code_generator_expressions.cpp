@@ -339,7 +339,7 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         }
     }
 
-    if ( rightFraction == leftFraction && rightTotal == leftTotal)
+    if (rightFraction == leftFraction && rightTotal == leftTotal)
     {
         sameFormat = true;
     }
@@ -353,30 +353,29 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         const auto lhs = numeric::fixed::DynamicFixed(itL->second->Value, leftTotal, leftFraction);
 
         // Both fixed
-        if ( isLeftFixed && isRightFixed )
+        if (isLeftFixed && isRightFixed)
         {
-
-            if (kind == lexer::TokenType::Plus )
+            if (kind == lexer::TokenType::Plus)
             {
                 const auto val = (rhs + lhs).raw_value;
-                llvm::LLVMContext &context = L->getContext();
-                llvm::Type *int32Type = llvm::Type::getInt32Ty(context);
+                llvm::LLVMContext& context = L->getContext();
+                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
                 return llvm::ConstantInt::get(int32Type, val, true);
             }
 
-            if (kind == lexer::TokenType::Minus )
+            if (kind == lexer::TokenType::Minus)
             {
                 const auto val = (rhs - lhs).raw_value;
-                llvm::LLVMContext &context = L->getContext();
-                llvm::Type *int32Type = llvm::Type::getInt32Ty(context);
+                llvm::LLVMContext& context = L->getContext();
+                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
                 return llvm::ConstantInt::get(int32Type, val, true);
             }
 
-            if ( kind ==lexer::TokenType::Equal)
+            if (kind == lexer::TokenType::Equal)
             {
-                if ( sameFormat )
+                if (sameFormat)
                 {
-                    if ( rhs.raw_value == lhs.raw_value)
+                    if (rhs.raw_value == lhs.raw_value)
                     {
                         return llvm::ConstantInt::getTrue(L->getContext());
                     }
@@ -385,11 +384,14 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         }
 
         // Left fixed
-        if ( isLeftFixed) {}
+        if (isLeftFixed)
+        {
+        }
 
         // Right fixed
-        if ( isRightFixed) {}
-
+        if (isRightFixed)
+        {
+        }
     }
 
     if (L->getType() != R->getType())
