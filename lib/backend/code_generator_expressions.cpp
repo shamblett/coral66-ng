@@ -7,6 +7,7 @@
 #include "code_generator.hpp"
 
 #include "lib/frontend/semantics/program.hpp"
+#include "lib/support/vendor/fixed/dynamic_fixed.hpp"
 
 namespace coral66::semantics
 {
@@ -311,14 +312,19 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
 
     std::uint32_t leftFraction = 0;
     std::uint32_t rightFraction = 0;
+    std::uint32_t leftTotal = 0;
+    std::uint32_t rightTotal = 0;
+
     bool isLeftFixed = false;
     bool isRightFixed = false;
+    bool sameFormat = false;
 
     if (itL != m_program.getContext().expressionTypes.end())
     {
         if (auto* fixedL = itL->second->tryAs<semantics::FixedType>())
         {
             leftFraction = fixedL->getFractionalBits();
+            leftTotal = fixedL->getTotalBits();
             isLeftFixed = true;
         }
     }
@@ -328,8 +334,14 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         if (auto* fixedR = itR->second->tryAs<semantics::FixedType>())
         {
             rightFraction = fixedR->getFractionalBits();
+            rightTotal = fixedR->getTotalBits();
             isRightFixed = true;
         }
+    }
+
+    if ( rightFraction == leftFraction && rightTotal == leftTotal)
+    {
+        sameFormat = true;
     }
 
     const auto kind = expression.getOp()->getTokenType();
@@ -337,13 +349,38 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
     // Check for fixed processing, do all this here as one operation
     if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
+        const auto rhs = numeric::fixed::DynamicFixed(itR->second->Value, rightTotal, rightFraction);
+        const auto lhs = numeric::fixed::DynamicFixed(itL->second->Value, leftTotal, leftFraction);
+
         // Both fixed
         if ( isLeftFixed && isRightFixed )
         {
-            // Same fixed point
-            if ( rightFraction == leftFraction)
-            {
 
+            if (kind == lexer::TokenType::Plus )
+            {
+                const auto val = (rhs + lhs).raw_value;
+                llvm::LLVMContext &context = L->getContext();
+                llvm::Type *int32Type = llvm::Type::getInt32Ty(context);
+                return llvm::ConstantInt::get(int32Type, val, true);
+            }
+
+            if (kind == lexer::TokenType::Minus )
+            {
+                const auto val = (rhs - lhs).raw_value;
+                llvm::LLVMContext &context = L->getContext();
+                llvm::Type *int32Type = llvm::Type::getInt32Ty(context);
+                return llvm::ConstantInt::get(int32Type, val, true);
+            }
+
+            if ( kind ==lexer::TokenType::Equal)
+            {
+                if ( sameFormat )
+                {
+                    if ( rhs.raw_value == lhs.raw_value)
+                    {
+                        return llvm::ConstantInt::getTrue(L->getContext());
+                    }
+                }
             }
         }
 
@@ -353,23 +390,6 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
         // Right fixed
         if ( isRightFixed) {}
 
-
-        if (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::LessThan
-            || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::Equal
-            || kind == lexer::TokenType::GreaterThanOrEqual || kind == lexer::TokenType::GreaterThan
-            || kind == lexer::TokenType::NotEqual)
-        {
-            if (leftFraction > rightFraction)
-            {
-                llvm::Value* shiftVal = llvm::ConstantInt::get(R->getType(), leftFraction - rightFraction);
-                R = m_builder.CreateShl(R, shiftVal, "align_fraction");
-            }
-            else if (rightFraction > leftFraction)
-            {
-                llvm::Value* shiftVal = llvm::ConstantInt::get(L->getType(), rightFraction - leftFraction);
-                L = m_builder.CreateShl(L, shiftVal, "align_fraction");
-            }
-        }
     }
 
     if (L->getType() != R->getType())
@@ -602,7 +622,7 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
                 {
                     if (astNode->getFixedTotalBits())
                     {
-                        if (auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
+                        if (const auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
                             tVal && *tVal > 0)
                         {
                             bitLength = static_cast<std::uint32_t>(*tVal);
