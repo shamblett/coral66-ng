@@ -58,8 +58,8 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
 
     if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
-        const auto rhs = numeric::fixed::DynamicFixed(itR->second->Value, rightTotal, rightFraction);
-        const auto lhs = numeric::fixed::DynamicFixed(itL->second->Value, leftTotal, leftFraction);
+        const auto rhs = numeric::fixed::DynamicFixed(2.0, rightTotal, rightFraction);
+        const auto lhs = numeric::fixed::DynamicFixed(2.0, leftTotal, leftFraction);
 
         // Both fixed
         if (isLeftFixed && isRightFixed)
