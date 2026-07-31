@@ -13,6 +13,7 @@ cc_library(
         "code_generator_declarations.cpp",
         "code_generator_expressions.cpp",
         "code_generator_statements.cpp",
+        "numeric_support.cpp",
         "x64_abi.cpp",
     ],
     hdrs = [

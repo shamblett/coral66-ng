@@ -93,6 +93,8 @@ private:
 
     void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
                            const syntax::ProcedureDeclaration& astNode);
+
+    llvm::Value* processFixedBinaryExpression(llvm::Value* L, llvm::Value* R, lexer::TokenType kind);
 };
 
 } // namespace coral66::cgllvm
