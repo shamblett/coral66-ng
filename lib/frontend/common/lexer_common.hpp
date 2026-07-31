@@ -15,6 +15,7 @@
 #include <variant>
 
 #include "lib/support/utilities.hpp"
+#include "source_interface.hpp"
 
 namespace coral66::lexer
 {

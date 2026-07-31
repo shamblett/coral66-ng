@@ -4,11 +4,11 @@
  * Date   : 31/07/2026
  */
 
-#include "../frontend/common/lexer_common.hpp"
-#include "../frontend/common/semantics_common.hpp"
-#include "../frontend/semantics/program.hpp"
-#include "../frontend/syntax/syntax.hpp"
-#include "../support/vendor/fixed/dynamic_fixed.hpp"
+#include "lib/frontend/common/lexer_common.hpp"
+#include "lib/frontend/common/semantics_common.hpp"
+#include "lib/frontend/semantics/program.hpp"
+#include "lib/frontend/syntax/syntax.hpp"
+#include "lib/support/vendor/fixed/dynamic_fixed.hpp"
 
 #include "code_generator.hpp"
 
@@ -30,7 +30,7 @@ llvm::Value* code_generator::processFixedBinaryExpression(const syntax::BinaryEx
     bool sameFormat = false;
 
     const auto kind = expression.getOp()->getTokenType();
-    llvm::Value* L = visit(expression.getLeft());
+    const llvm::Value* L = visit(expression.getLeft());
 
     if (itL != m_program.getContext().expressionTypes.end())
     {
