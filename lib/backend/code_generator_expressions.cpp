@@ -310,9 +310,10 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
     const auto kind = expression.getOp()->getTokenType();
 
     // Check for and process fixed values in the expression
-    if ( auto value = processFixedBinaryExpression(L, R, kind) != nullptr )
+    if ( auto value = processFixedBinaryExpression(expression))
     {
-        return value;
+        if ( value != nullptr ) {
+            return value;
     }
 
     if (L->getType() != R->getType())

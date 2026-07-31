@@ -4,16 +4,18 @@
  * Date   : 31/07/2026
  */
 
-#include "code_generator.hpp"
+#include "../frontend/common/lexer_common.hpp"
+#include "../frontend/common/semantics_common.hpp"
+#include "../frontend/semantics/program.hpp"
+#include "../frontend/syntax/syntax.hpp"
+#include "../support/vendor/fixed/dynamic_fixed.hpp"
 
-#include "lib/frontend/common/lexer_common.hpp"
-#include "lib/frontend/semantics/program.hpp"
-#include "lib/support/vendor/ctrack/include/ctrack.hpp"
+#include "code_generator.hpp"
 
 namespace coral66::cgllvm
 {
 // Process binary expressions where either or both sides are fixed
-llvm::Value* code_generator::processFixedBinaryExpression(llvm::Value* L, llvm::Value* R, lexer::TokenType kind)
+llvm::Value* code_generator::processFixedBinaryExpression(const syntax::BinaryExpression& expression)
 {
     const auto itL = m_program.getContext().expressionTypes.find(&expression.getLeft());
     const auto itR = m_program.getContext().expressionTypes.find(&expression.getRight());
@@ -26,6 +28,9 @@ llvm::Value* code_generator::processFixedBinaryExpression(llvm::Value* L, llvm::
     bool isLeftFixed = false;
     bool isRightFixed = false;
     bool sameFormat = false;
+
+    const auto kind = expression.getOp()->getTokenType();
+    llvm::Value* L = visit(expression.getLeft());
 
     if (itL != m_program.getContext().expressionTypes.end())
     {
