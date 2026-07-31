@@ -189,6 +189,13 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         /// 4 * 64 = 256
         CHECK(final == 256);
 
+        // f3 4 fractional bits
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("f3"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        /// (256<<2) / 32 = 1024 / 32 = 32
+        CHECK(final == 32);
+
         // Ans
         varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
         REQUIRE(varAddr != nullptr);

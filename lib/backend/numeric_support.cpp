@@ -56,7 +56,6 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         sameFormat = true;
     }
 
-    // Check for fixed processing, do all this here as one operation
     if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
         const auto rhs = numeric::fixed::DynamicFixed(itR->second->Value, rightTotal, rightFraction);
@@ -81,6 +80,22 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
                 return llvm::ConstantInt::get(int32Type, val, true);
             }
 
+            if (kind == lexer::TokenType::Asterisk)
+            {
+                const auto val = (rhs * lhs);
+                llvm::LLVMContext& context = L->getContext();
+                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
+                return llvm::ConstantInt::get(int32Type, val.raw_value, true);
+            }
+
+            if (kind == lexer::TokenType::Division)
+            {
+                const auto val = (rhs / lhs).raw_value;
+                llvm::LLVMContext& context = L->getContext();
+                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
+                return llvm::ConstantInt::get(int32Type, val, true);
+            }
+
             if (kind == lexer::TokenType::Equal)
             {
                 if (sameFormat)
@@ -89,7 +104,11 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
                     {
                         return llvm::ConstantInt::getTrue(L->getContext());
                     }
+                } else
+                {
+
                 }
+                return llvm::ConstantInt::getFalse(L->getContext());
             }
         }
 
