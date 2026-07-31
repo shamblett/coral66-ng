@@ -66,34 +66,38 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         {
             if (kind == lexer::TokenType::Plus)
             {
-                const auto val = (rhs + lhs).raw_value;
+                const auto val = (rhs + lhs).to_double();
                 llvm::LLVMContext& context = L->getContext();
-                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
-                return llvm::ConstantInt::get(int32Type, val, true);
+                llvm::Type* fpType = llvm::Type::getFloatTy(context);
+                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
+                return fpConstant;
             }
 
             if (kind == lexer::TokenType::Minus)
             {
-                const auto val = (rhs - lhs).raw_value;
+                const auto val = (rhs - lhs).to_double();
                 llvm::LLVMContext& context = L->getContext();
-                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
-                return llvm::ConstantInt::get(int32Type, val, true);
+                llvm::Type* fpType = llvm::Type::getFloatTy(context);
+                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
+                return fpConstant;
             }
 
             if (kind == lexer::TokenType::Asterisk)
             {
-                const auto val = (rhs * lhs);
+                const auto val = (rhs * lhs).to_double();
                 llvm::LLVMContext& context = L->getContext();
-                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
-                return llvm::ConstantInt::get(int32Type, val.raw_value, true);
+                llvm::Type* fpType = llvm::Type::getFloatTy(context);
+                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
+                return fpConstant;
             }
 
             if (kind == lexer::TokenType::Division)
             {
-                const auto val = (rhs / lhs).raw_value;
+                const auto val = (rhs / lhs).to_double();
                 llvm::LLVMContext& context = L->getContext();
-                llvm::Type* int32Type = llvm::Type::getInt32Ty(context);
-                return llvm::ConstantInt::get(int32Type, val, true);
+                llvm::Type* fpType = llvm::Type::getFloatTy(context);
+                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
+                return fpConstant;
             }
 
             if (kind == lexer::TokenType::Equal)
@@ -104,9 +108,9 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
                     {
                         return llvm::ConstantInt::getTrue(L->getContext());
                     }
-                } else
+                }
+                else
                 {
-
                 }
                 return llvm::ConstantInt::getFalse(L->getContext());
             }

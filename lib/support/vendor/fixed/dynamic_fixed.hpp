@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <stdexcept>
 
 ///
@@ -82,7 +81,7 @@ public:
     }
 
     // Rescale this variable to a new dynamic format
-    DynamicFixed cast_to(const int new_total, const int new_frac) const
+    [[nodiscard]] DynamicFixed cast_to(const int new_total, const int new_frac) const
     {
         const int shift = new_frac - frac_bits;
         int64_t new_raw = raw_value;
@@ -90,11 +89,11 @@ public:
             new_raw <<= shift;
         else if (shift < 0)
             new_raw >>= (-shift);
-        return DynamicFixed(static_cast<int32_t>(new_raw), new_total, new_frac);
+        return {static_cast<int32_t>(new_raw), new_total, new_frac};
     }
 
     // Convert back to double for verification
-    double to_double() const
+    [[nodiscard]] double to_double() const
     {
         if (frac_bits >= 0)
         {
@@ -109,7 +108,7 @@ public:
     {
         const DynamicFixed aligned_other = other.cast_to(this->total_bits, this->frac_bits);
         const int64_t res = static_cast<int64_t>(this->raw_value) + aligned_other.raw_value;
-        return DynamicFixed(static_cast<int32_t>(res), total_bits, frac_bits);
+        return {static_cast<int32_t>(res), total_bits, frac_bits};
     }
 
     // Subtraction (Result adopts LHS format)
@@ -117,7 +116,7 @@ public:
     {
         const DynamicFixed aligned_other = other.cast_to(this->total_bits, this->frac_bits);
         const int64_t res = static_cast<int64_t>(this->raw_value) - aligned_other.raw_value;
-        return DynamicFixed(static_cast<int32_t>(res), total_bits, frac_bits);
+        return {static_cast<int32_t>(res), total_bits, frac_bits};
     }
 
     // Multiplication (Result adopts LHS format)
@@ -133,7 +132,7 @@ public:
         else if (shift_right < 0)
             temp_mult <<= (-shift_right);
 
-        return DynamicFixed(static_cast<int32_t>(temp_mult), this->total_bits, this->frac_bits);
+        return {static_cast<int32_t>(temp_mult), this->total_bits, this->frac_bits};
     }
 
     // Division (Result adopts LHS format)
@@ -145,7 +144,7 @@ public:
         }
 
         // Use 64-bit to safely shift the numerator left before dividing
-        int64_t numerator = static_cast<int64_t>(this->raw_value);
+        auto numerator = static_cast<int64_t>(this->raw_value);
 
         if (const int shift_left = other.frac_bits; shift_left > 0)
             numerator <<= shift_left;
@@ -154,7 +153,7 @@ public:
 
         const int64_t temp_div = numerator / other.raw_value;
 
-        return DynamicFixed(static_cast<int32_t>(temp_div), this->total_bits, this->frac_bits);
+        return {static_cast<int32_t>(temp_div), this->total_bits, this->frac_bits};
     }
 };
 
