@@ -11,7 +11,7 @@
 namespace coral66::cgllvm
 {
 
-class x64_abi final : public abi_implementation
+class x64_abi final : public AbiImplementation
 {
 public:
     void applyPlatformABI(const semantics::ProcedureType& procedureType, llvm::Type*& returnType,

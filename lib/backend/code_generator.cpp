@@ -17,13 +17,13 @@
 namespace coral66::cgllvm
 {
 
-code_generator::code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
-                               const source_interface& sourceInterface, const Options& options)
+CodeGenerator::CodeGenerator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
+                             const source_interface& sourceInterface, const Options& options)
     : m_module(module), m_tree(tree), m_program(program), m_sourceInterface(sourceInterface), m_options(options)
 {
 }
 
-void code_generator::generate()
+void CodeGenerator::generate()
 {
     // First pass: Find global overlays to prevent double-allocation
     if (m_tree.hasBlock())
@@ -169,7 +169,7 @@ void code_generator::generate()
     visit(m_tree);
 }
 
-llvm::Type* code_generator::convertType(const semantics::Type& type)
+llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
 {
     auto& ctx = m_module.getContext();
     llvm::Type* baseType = nullptr;
@@ -202,7 +202,6 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     }
     else if (type.tryAs<semantics::FixedType>())
     {
-
         baseType = llvm::Type::getInt32Ty(ctx);
     }
     else if (auto* tab = type.tryAs<semantics::TableType>())
@@ -249,7 +248,7 @@ llvm::Type* code_generator::convertType(const semantics::Type& type)
     return baseType;
 }
 
-void code_generator::visit(const syntax::Program& program)
+void CodeGenerator::visit(const syntax::Program& program)
 {
     // Generate code for all top-level procedures
     for (const auto& global : m_program.getGlobals())

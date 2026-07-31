@@ -24,7 +24,7 @@ struct Value
     explicit Value(std::nullptr_t) : value(nullptr) {}
 };
 
-class code_generator final
+class CodeGenerator final
 {
     llvm::Module& m_module;
     const syntax::Program& m_tree;
@@ -43,8 +43,8 @@ class code_generator final
     std::vector<const syntax::OverlayDeclaration*> m_globalOverlays;
 
 public:
-    explicit code_generator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
-                            const source_interface& sourceInterface, const Options& options);
+    explicit CodeGenerator(llvm::Module& module, const syntax::Program& tree, const semantics::Program& program,
+                           const source_interface& sourceInterface, const Options& options);
 
     void generate();
 

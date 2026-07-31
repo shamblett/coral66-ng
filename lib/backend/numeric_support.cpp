@@ -4,18 +4,17 @@
  * Date   : 31/07/2026
  */
 
+#include "code_generator.hpp"
 #include "lib/frontend/common/lexer_common.hpp"
 #include "lib/frontend/common/semantics_common.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 #include "lib/support/vendor/fixed/dynamic_fixed.hpp"
 
-#include "code_generator.hpp"
-
 namespace coral66::cgllvm
 {
 // Process binary expressions where either or both sides are fixed
-llvm::Value* code_generator::processFixedBinaryExpression(const syntax::BinaryExpression& expression)
+llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExpression& expression)
 {
     const auto itL = m_program.getContext().expressionTypes.find(&expression.getLeft());
     const auto itR = m_program.getContext().expressionTypes.find(&expression.getRight());
@@ -103,12 +102,9 @@ llvm::Value* code_generator::processFixedBinaryExpression(const syntax::BinaryEx
         if (isRightFixed)
         {
         }
-
-
     }
 
     return nullptr;
 }
 
-
-} // coral66::cgllvm
+} // namespace coral66::cgllvm

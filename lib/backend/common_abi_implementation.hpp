@@ -15,7 +15,7 @@
  *  CommonABIImplementation.hpp
  *  Defines a common base class for ABI implementations with caching.
  *
- * This file provides the common_abi_implementation template class, which extends abi_implementation.
+ * This file provides the CommonAbiImplementation template class, which extends AbiImplementation.
  * It implements a caching mechanism for platform-specific ABI adjustments to function
  * signatures, avoiding redundant calculations for repeatedly encountered function types.
  */
@@ -28,7 +28,7 @@ class AllocaInst;
 namespace coral66::cgllvm
 {
 template <class T>
-class common_abi_implementation : public abi_implementation
+class CommonAbiImplementation : public AbiImplementation
 {
     struct Cache
     {
@@ -41,7 +41,7 @@ class common_abi_implementation : public abi_implementation
         m_adjustments;
 
 protected:
-    common_abi_implementation(const llvm::DataLayout& dataLayout) : abi_implementation(dataLayout) {}
+    CommonAbiImplementation(const llvm::DataLayout& dataLayout) : AbiImplementation(dataLayout) {}
 
     const T* m_currentFunctionABI = nullptr;
     llvm::AllocaInst* m_returnSlot = nullptr;

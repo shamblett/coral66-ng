@@ -17,7 +17,7 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
 namespace coral66::cgllvm
 {
 
-llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
+llvm::Value* CodeGenerator::emitAddress(const syntax::Expression& expression)
 {
     if (auto* idExpr = dynamic_cast<const syntax::IdentifierExpression*>(&expression))
     {
@@ -159,7 +159,7 @@ llvm::Value* code_generator::emitAddress(const syntax::Expression& expression)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::Expression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::Expression& expression)
 {
     if (auto* e = dynamic_cast<const syntax::LiteralExpression*>(&expression))
         return visit(*e);
@@ -181,7 +181,7 @@ llvm::Value* code_generator::visit(const syntax::Expression& expression)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeConst
-llvm::Value* code_generator::visit(const syntax::LiteralExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::LiteralExpression& expression)
 {
     auto& val = expression.getLiteral()->getValue();
     if (std::holds_alternative<llvm::APSInt>(val))
@@ -202,7 +202,7 @@ llvm::Value* code_generator::visit(const syntax::LiteralExpression& expression)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression)
 {
     if (const auto it = m_program.getContext().resolvedIdentifiers.find(&expression);
         it != m_program.getContext().resolvedIdentifiers.end())
@@ -300,7 +300,7 @@ llvm::Value* code_generator::visit(const syntax::IdentifierExpression& expressio
     return m_builder.CreateLoad(type, addr);
 }
 
-llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::BinaryExpression& expression)
 {
     llvm::Value* L = visit(expression.getLeft());
     llvm::Value* R = visit(expression.getRight());
@@ -378,7 +378,7 @@ llvm::Value* code_generator::visit(const syntax::BinaryExpression& expression)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::UnaryExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::UnaryExpression& expression)
 {
     llvm::Value* operand = visit(expression.getOperand());
     if (!operand)
@@ -392,7 +392,7 @@ llvm::Value* code_generator::visit(const syntax::UnaryExpression& expression)
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::FunctionCallExpression& expression)
 {
     const auto it = m_program.getContext().resolvedIdentifiers.find(&expression);
     if (it == m_program.getContext().resolvedIdentifiers.end())
@@ -470,7 +470,7 @@ llvm::Value* code_generator::visit(const syntax::FunctionCallExpression& express
     return nullptr;
 }
 
-llvm::Value* code_generator::visit(const syntax::PartWordExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::PartWordExpression& expression)
 {
     llvm::Value* baseVal = visit(expression.getBase());
     llvm::Value* startBitVal = visit(expression.getStartBit());
@@ -501,7 +501,7 @@ llvm::Value* code_generator::visit(const syntax::PartWordExpression& expression)
     return m_builder.CreateAnd(shifted, mask, "partword_val");
 }
 
-llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expression)
 {
     llvm::Value* addr = emitAddress(expression);
     if (!addr)
@@ -588,7 +588,7 @@ llvm::Value* code_generator::visit(const syntax::ArrayAccessExpression& expressi
     return loaded;
 }
 
-llvm::Value* code_generator::visit(const syntax::TypeChangeExpression& expression)
+llvm::Value* CodeGenerator::visit(const syntax::TypeChangeExpression& expression)
 {
     llvm::Value* val = visit(expression.getExpression());
     if (!val)

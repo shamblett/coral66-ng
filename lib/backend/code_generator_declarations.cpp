@@ -11,8 +11,8 @@
 namespace coral66::cgllvm
 {
 
-llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens,
-                                                llvm::Type* targetType, const std::size_t numElements)
+llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
+                                               const std::size_t numElements)
 {
     std::vector<llvm::Constant*> elements;
     llvm::Type* elemType = nullptr;
@@ -96,7 +96,7 @@ llvm::Constant* code_generator::parsePresetList(const std::vector<lexer::CTokenI
     return elements.empty() ? llvm::Constant::getNullValue(targetType) : elements[0];
 }
 
-void code_generator::visit(const semantics::Declaration& declaration)
+void CodeGenerator::visit(const semantics::Declaration& declaration)
 {
     // Only process global declarations here.
 
@@ -208,8 +208,8 @@ void code_generator::visit(const semantics::Declaration& declaration)
     }
 }
 
-void code_generator::generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
-                                       const syntax::ProcedureDeclaration& astNode)
+void CodeGenerator::generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
+                                      const syntax::ProcedureDeclaration& astNode)
 {
     m_currentProcedure = &astNode;
     m_labels.clear();
@@ -289,7 +289,7 @@ void code_generator::generateProcedure(const semantics::ProcedureDeclaration& pr
     }
 }
 
-void code_generator::visit(const syntax::Block& block)
+void CodeGenerator::visit(const syntax::Block& block)
 {
     for (const auto& declaration : block.getDeclarations())
     {
@@ -301,7 +301,7 @@ void code_generator::visit(const syntax::Block& block)
     }
 }
 
-void code_generator::visit(const syntax::Declaration& declaration)
+void CodeGenerator::visit(const syntax::Declaration& declaration)
 {
     if (auto* var = dynamic_cast<const syntax::VariableDeclaration*>(&declaration))
         visit(*var);
@@ -315,7 +315,7 @@ void code_generator::visit(const syntax::Declaration& declaration)
         visit(*over);
 }
 
-void code_generator::visit(const syntax::VariableDeclaration& declaration)
+void CodeGenerator::visit(const syntax::VariableDeclaration& declaration)
 {
     if (const auto it = m_program.getContext().resolvedIdentifiers.find(&declaration);
         it != m_program.getContext().resolvedIdentifiers.end())
@@ -329,7 +329,7 @@ void code_generator::visit(const syntax::VariableDeclaration& declaration)
     }
 }
 
-void code_generator::visit(const syntax::ArrayDeclaration& declaration)
+void CodeGenerator::visit(const syntax::ArrayDeclaration& declaration)
 {
     if (const auto it = m_program.getContext().resolvedIdentifiers.find(&declaration);
         it != m_program.getContext().resolvedIdentifiers.end())
@@ -343,7 +343,7 @@ void code_generator::visit(const syntax::ArrayDeclaration& declaration)
     }
 }
 
-void code_generator::visit(const syntax::TableDeclaration& declaration)
+void CodeGenerator::visit(const syntax::TableDeclaration& declaration)
 {
     if (const auto it = m_program.getContext().resolvedIdentifiers.find(&declaration);
         it != m_program.getContext().resolvedIdentifiers.end())
@@ -357,7 +357,7 @@ void code_generator::visit(const syntax::TableDeclaration& declaration)
     }
 }
 
-void code_generator::visit(const syntax::OverlayDeclaration& declaration)
+void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
 {
     const auto baseName = std::get<std::string>(declaration.getBase()->getValue());
     const semantics::Usable* baseUsable = m_program.getContext().symbolTable.lookup(baseName);
@@ -412,7 +412,7 @@ void code_generator::visit(const syntax::OverlayDeclaration& declaration)
     }
 }
 
-void code_generator::visit(const syntax::ProcedureDeclaration& declaration)
+void CodeGenerator::visit(const syntax::ProcedureDeclaration& declaration)
 {
     // Nested procedures can be handled here if needed.
     // For Phase 1, we only need top-level procedures.

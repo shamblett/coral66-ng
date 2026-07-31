@@ -17,7 +17,7 @@
 namespace coral66::cgllvm
 {
 
-llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* statement)
+llvm::BasicBlock* CodeGenerator::getOrCreateLabel(const syntax::Statement* statement)
 {
     if (!m_labels.contains(statement))
     {
@@ -32,7 +32,7 @@ llvm::BasicBlock* code_generator::getOrCreateLabel(const syntax::Statement* stat
     return m_labels[statement];
 }
 
-void code_generator::preScanLabels(const syntax::Statement& statement)
+void CodeGenerator::preScanLabels(const syntax::Statement& statement)
 {
     if (!statement.getLabels().empty())
         getOrCreateLabel(&statement);
@@ -62,7 +62,7 @@ void code_generator::preScanLabels(const syntax::Statement& statement)
     }
 }
 
-void code_generator::visit(const syntax::Statement& statement)
+void CodeGenerator::visit(const syntax::Statement& statement)
 {
     if (!statement.getLabels().empty())
     {
@@ -104,21 +104,21 @@ void code_generator::visit(const syntax::Statement& statement)
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic
-void code_generator::visit(const syntax::DummyStatement& statement) {}
+void CodeGenerator::visit(const syntax::DummyStatement& statement) {}
 
-void code_generator::visit(const syntax::BlockStatement& statement)
+void CodeGenerator::visit(const syntax::BlockStatement& statement)
 {
     if (statement.hasBlock())
         visit(statement.getBlock());
 }
 
-void code_generator::visit(const syntax::CompoundStatement& statement)
+void CodeGenerator::visit(const syntax::CompoundStatement& statement)
 {
     for (const auto& s : statement.getStatements())
         visit(*s);
 }
 
-void code_generator::visit(const syntax::AssignmentStatement& statement)
+void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
 {
     llvm::Value* targetAddr = emitAddress(statement.getVariable());
     llvm::Value* rhs = visit(statement.getExpression());
@@ -308,7 +308,8 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
                             {
                                 if (astNode->getFixedTotalBits())
                                 {
-                                    if (const auto tVal = semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
+                                    if (const auto tVal =
+                                            semantics::evaluateConstantInteger(*astNode->getFixedTotalBits());
                                         tVal && *tVal > 0)
                                     {
                                         bitLength = static_cast<std::uint32_t>(*tVal);
@@ -356,7 +357,7 @@ void code_generator::visit(const syntax::AssignmentStatement& statement)
     m_builder.CreateStore(rhs, targetAddr);
 }
 
-void code_generator::visit(const syntax::IfStatement& statement)
+void CodeGenerator::visit(const syntax::IfStatement& statement)
 {
     llvm::Value* cond = visit(statement.getCondition());
     if (!cond)
@@ -393,7 +394,7 @@ void code_generator::visit(const syntax::IfStatement& statement)
     m_builder.SetInsertPoint(mergeBB);
 }
 
-void code_generator::visit(const syntax::GotoStatement& statement)
+void CodeGenerator::visit(const syntax::GotoStatement& statement)
 {
     const auto& labelToken = statement.getLabel();
     const auto& labelName = std::get<std::string>(labelToken->getValue());
@@ -548,7 +549,7 @@ void code_generator::visit(const syntax::GotoStatement& statement)
     }
 }
 
-void code_generator::visit(const syntax::ForStatement& statement)
+void CodeGenerator::visit(const syntax::ForStatement& statement)
 {
     llvm::Value* loopVarAddr = emitAddress(statement.getVariable());
     llvm::Type* loopVarType = nullptr;
@@ -713,7 +714,7 @@ void code_generator::visit(const syntax::ForStatement& statement)
     m_builder.SetInsertPoint(endBB);
 }
 
-void code_generator::visit(const syntax::AnswerStatement& statement)
+void CodeGenerator::visit(const syntax::AnswerStatement& statement)
 {
     llvm::Value* val = visit(statement.getExpression());
     if (!val)
@@ -732,7 +733,7 @@ void code_generator::visit(const syntax::AnswerStatement& statement)
     m_builder.CreateRet(val);
 }
 
-void code_generator::visit(const syntax::CodeStatement& statement)
+void CodeGenerator::visit(const syntax::CodeStatement& statement)
 {
     const auto it = m_program.getContext().parsedCodes.find(&statement);
     if (it == m_program.getContext().parsedCodes.end())
@@ -834,7 +835,7 @@ void code_generator::visit(const syntax::CodeStatement& statement)
     }
 }
 
-void code_generator::visit(const syntax::ProcedureCallStatement& statement)
+void CodeGenerator::visit(const syntax::ProcedureCallStatement& statement)
 {
     visit(statement.getExpression());
 }

@@ -19,9 +19,9 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const sy
 {
     CTRACK_NAME("Generate LLVM");
     // Minimal SourceInterface stub or pass nullptr if not needed by basic codegen yet
-    // The previous code_generator constructor took SourceInterface.
+    // The previous CodeGenerator constructor took SourceInterface.
     // We can pass a dummy one or update Codegen.hpp to take SourceInterface?
-    // code_generator.hpp needs SourceInterface.
+    // CodeGenerator.hpp needs SourceInterface.
     // For now, let's assume caller provides it, or we stub it.
     // But generateLLVM signature in Codegen.hpp does NOT take SourceInterface.
     // This is an issue. I should update Codegen.hpp or remove dependency.
@@ -52,7 +52,7 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const sy
         }
     } stubSource;
 
-    code_generator generator(module, tree, program, stubSource, options);
+    CodeGenerator generator(module, tree, program, stubSource, options);
     generator.generate();
 
     // Return target machine (stub)
