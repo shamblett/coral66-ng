@@ -1,0 +1,35 @@
+'PROGRAM' FixedTest
+'COMMENT' Operator tests with variables and constants;
+'BEGIN'
+  'FIXED'(16, 4) f1;
+  'FIXED'(16, 6) f2;
+
+  'INTEGER' gtv;
+  'INTEGER' gtc;
+  'INTEGER' ltv;
+  'INTEGER' ltc;
+  'INTEGER' gtev;
+  'INTEGER' gtec;
+  'INTEGER' ltev;
+  'INTEGER' ltec;
+  'INTEGER' eqv;
+  'INTEGER' eqc;
+  'INTEGER' neqv;
+  'INTEGER' neqc;
+  'INTEGER' plusv;
+  'INTEGER' plusc;
+  'INTEGER' minusv;
+  'INTEGER' minusc;
+
+
+
+  f1 := 2;
+  f2 := 4.0;
+
+  gtv := 0;
+  'IF' f2 > f1 'THEN' gtv := 1;
+
+  gtc := 0;
+  'IF' f2 > 3 'THEN' gtc := 1;
+
+'END'
