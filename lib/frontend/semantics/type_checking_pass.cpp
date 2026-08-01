@@ -393,9 +393,9 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
         std::uint64_t totalElements = 1;
         for (const auto& [fst, snd] : node.getDimensions())
         {
-             auto lower = evaluateConstantInteger(*fst);
+            auto lower = evaluateConstantInteger(*fst);
             if (auto upper = evaluateConstantInteger(*snd); lower && upper && *lower <= *upper)
-                 totalElements *= static_cast<std::uint64_t>(*upper - *lower + 1);
+                totalElements *= static_cast<std::uint64_t>(*upper - *lower + 1);
         }
 
         // Count comma separated preset items
@@ -416,8 +416,6 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
         }
         if (inPreset)
             presetCount++;
-
-        
 
         if (presetCount > totalElements)
         {
@@ -630,9 +628,16 @@ IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, cons
         {
             return {PrimitiveType{PrimitiveType::Floating}};
         }
-        if (auto f1 = rt1.tryAs<FixedType>())
+        auto f1 = rt1.tryAs<FixedType>();
+        auto f2 = rt2.tryAs<FixedType>();
+        if (f1 && f2)
+        {
+            return f1->getFractionalBits() >= f2->getFractionalBits() ? IntrusiveVariantValue<Type>{*f1} :
+                                                                        IntrusiveVariantValue<Type>{*f2};
+        }
+        if (f1)
             return {*f1};
-        if (auto f2 = rt2.tryAs<FixedType>())
+        if (f2)
             return {*f2};
 
         return {PrimitiveType{PrimitiveType::Integer}};
@@ -709,7 +714,8 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
                  || opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual
                  || opType == lexer::TokenType::GreaterThan || opType == lexer::TokenType::NotEqual)
         {
-            if (isBitsType(*type1) || isBitsType(*type2)) {
+            if (isBitsType(*type1) || isBitsType(*type2))
+            {
                 common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits});
             }
         }
@@ -995,7 +1001,8 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
         }
         else if (usable->is<TableDeclaration>())
         {
-            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+            m_context.expressionTypes.insert_or_assign(&node,
+                                                       IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         }
         else
         {
@@ -1085,7 +1092,8 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
 }
 
 void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>& tokens, const Type& baseType,
-                                       const syntax::Expression* fixedTotal, const syntax::Expression* fixedFraction) const
+                                       const syntax::Expression* fixedTotal,
+                                       const syntax::Expression* fixedFraction) const
 {
     const bool isFixed = baseType.is<FixedType>();
     bool isInteger = false;
@@ -1160,7 +1168,7 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
                         val = -val;
 
                     const double maxVal = std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1))
-                                    - std::pow(2.0, static_cast<double>(-*fractionBits));
+                                          - std::pow(2.0, static_cast<double>(-*fractionBits));
 
                     if (const double minVal = -std::pow(2.0, static_cast<double>(*totalBits - *fractionBits - 1));
                         val > maxVal || val < minVal)
@@ -1178,5 +1186,3 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
 
 void TypeCheckingPass::visit(const syntax::CodeStatement& node) {}
 } // namespace coral66::semantics
-
-

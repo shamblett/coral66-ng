@@ -57,6 +57,16 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         auto scaledL = const_cast<llvm::Value*>(L);
         auto scaledR = const_cast<llvm::Value*>(R);
 
+        std::uint32_t resultFraction = std::max(leftFraction, rightFraction);
+        if (const auto exprIt = m_program.getContext().expressionTypes.find(&expression);
+            exprIt != m_program.getContext().expressionTypes.end())
+        {
+            if (auto* fixedRes = exprIt->second->tryAs<semantics::FixedType>())
+            {
+                resultFraction = fixedRes->getFractionalBits();
+            }
+        }
+
         // Align integer bit widths before operations
         if (scaledL->getType()->getIntegerBitWidth() > scaledR->getType()->getIntegerBitWidth())
         {
@@ -103,18 +113,43 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
 
         if (kind == lexer::TokenType::Asterisk)
         {
-            // Multiply raw bits, then shift right by rightFraction to retain leftFraction format.
             llvm::Value* mult = m_builder.CreateMul(scaledL, scaledR, "fixed_mul_raw");
-            llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
-            return m_builder.CreateAShr(mult, shiftVal, "fixed_mul_scale");
+            std::uint32_t currentFraction = leftFraction + rightFraction;
+            if (currentFraction > resultFraction)
+            {
+                llvm::Value* shiftVal =
+                    llvm::ConstantInt::get(scaledL->getType(), currentFraction - resultFraction, true);
+                return m_builder.CreateAShr(mult, shiftVal, "fixed_mul_scale");
+            }
+            else if (resultFraction > currentFraction)
+            {
+                llvm::Value* shiftVal =
+                    llvm::ConstantInt::get(scaledL->getType(), resultFraction - currentFraction, true);
+                return m_builder.CreateShl(mult, shiftVal, "fixed_mul_scale_up");
+            }
+            return mult;
         }
 
         if (kind == lexer::TokenType::Division)
         {
-            // Shift LHS left by rightFraction before dividing by raw RHS to retain leftFraction format.
-            llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
-            llvm::Value* shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
-            return m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div");
+            llvm::Value* shiftedL = scaledL;
+            if (resultFraction + rightFraction >= leftFraction)
+            {
+                std::uint32_t shiftAmount = resultFraction + rightFraction - leftFraction;
+                if (shiftAmount > 0)
+                {
+                    llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
+                    shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
+                }
+                return m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div");
+            }
+            else
+            {
+                llvm::Value* div = m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div_raw");
+                std::uint32_t shiftAmount = leftFraction - rightFraction - resultFraction;
+                llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
+                return m_builder.CreateAShr(div, shiftVal, "fixed_div_scale_down");
+            }
         }
 
         if (kind == lexer::TokenType::Equal)
