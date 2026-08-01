@@ -21,12 +21,9 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
 
     std::uint32_t leftFraction = 0;
     std::uint32_t rightFraction = 0;
-    std::uint32_t leftTotal = 0;
-    std::uint32_t rightTotal = 0;
 
     bool isLeftFixed = false;
     bool isRightFixed = false;
-    bool sameFormat = false;
 
     const auto kind = expression.getOp()->getTokenType();
     const llvm::Value* L = visit(expression.getLeft());
@@ -40,7 +37,6 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         if (auto* fixedL = itL->second->tryAs<semantics::FixedType>())
         {
             leftFraction = fixedL->getFractionalBits();
-            leftTotal = fixedL->getTotalBits();
             isLeftFixed = true;
         }
     }
@@ -50,178 +46,106 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         if (auto* fixedR = itR->second->tryAs<semantics::FixedType>())
         {
             rightFraction = fixedR->getFractionalBits();
-            rightTotal = fixedR->getTotalBits();
             isRightFixed = true;
         }
     }
 
-    if (rightFraction == leftFraction && rightTotal == leftTotal)
-    {
-        sameFormat = true;
-    }
-
     if (L->getType()->isIntegerTy() && R->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
-        const auto* constL = llvm::dyn_cast<llvm::ConstantInt>(L);
+        // Emit instructions using IRBuilder.
+        // Note: If L and R are constants, IRBuilder will automatically constant-fold these operations
+        // and return an llvm::ConstantInt* without emitting instructions.
+        llvm::Value* scaledL = const_cast<llvm::Value*>(L);
+        llvm::Value* scaledR = const_cast<llvm::Value*>(R);
 
-        if (const auto* constR = llvm::dyn_cast<llvm::ConstantInt>(R); constL && constR)
+        // Align integer bit widths before operations
+        if (scaledL->getType()->getIntegerBitWidth() > scaledR->getType()->getIntegerBitWidth())
         {
-            const auto lhs_raw = static_cast<int32_t>(constL->getSExtValue());
-            const auto rhs_raw = static_cast<int32_t>(constR->getSExtValue());
+            scaledR = m_builder.CreateIntCast(scaledR, scaledL->getType(), true);
+        }
+        else if (scaledL->getType()->getIntegerBitWidth() < scaledR->getType()->getIntegerBitWidth())
+        {
+            scaledL = m_builder.CreateIntCast(scaledL, scaledR->getType(), true);
+        }
 
-            const auto lhs = numeric::fixed::DynamicFixed(lhs_raw, leftTotal, leftFraction);
-            const auto rhs = numeric::fixed::DynamicFixed(rhs_raw, rightTotal, rightFraction);
+        const bool isAddSubCmp =
+            (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::Equal
+             || kind == lexer::TokenType::NotEqual || kind == lexer::TokenType::LessThan
+             || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::GreaterThan
+             || kind == lexer::TokenType::GreaterThanOrEqual);
 
-            // Both fixed
-            if (isLeftFixed && isRightFixed)
+        llvm::Value* alignedL = scaledL;
+        llvm::Value* alignedR = scaledR;
+
+        // Align fractions only for Add, Sub, and Comparisons
+        if (isAddSubCmp)
+        {
+            if (leftFraction > rightFraction)
             {
-                if (kind == lexer::TokenType::Plus)
-                {
-                    const auto val = lhs + rhs;
-                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
-                }
-
-                if (kind == lexer::TokenType::Minus)
-                {
-                    const auto val = lhs - rhs;
-                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
-                }
-
-                if (kind == lexer::TokenType::Asterisk)
-                {
-                    const auto val = lhs * rhs;
-                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
-                }
-
-                if (kind == lexer::TokenType::Division)
-                {
-                    const auto val = lhs / rhs;
-                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
-                }
-
-                if (kind == lexer::TokenType::Equal)
-                {
-                    if (sameFormat)
-                    {
-                        if (lhs.raw_value == rhs.raw_value)
-                        {
-                            return llvm::ConstantInt::getTrue(L->getContext());
-                        }
-                    }
-                    else
-                    {
-                    }
-                    return llvm::ConstantInt::getFalse(L->getContext());
-                }
+                llvm::Value* shiftVal = llvm::ConstantInt::get(alignedL->getType(), leftFraction - rightFraction, true);
+                alignedR = m_builder.CreateShl(alignedR, shiftVal, "align_right_fraction");
             }
-
-            // Left fixed
-            if (isLeftFixed)
+            else if (rightFraction > leftFraction)
             {
-            }
-
-            // Right fixed
-            if (isRightFixed)
-            {
+                llvm::Value* shiftVal = llvm::ConstantInt::get(alignedR->getType(), rightFraction - leftFraction, true);
+                alignedL = m_builder.CreateShl(alignedL, shiftVal, "align_left_fraction");
             }
         }
-        else
+
+        if (kind == lexer::TokenType::Plus)
         {
-            // Run-time variables: Emit instructions using IRBuilder
-            auto scaledL = const_cast<llvm::Value*>(L);
-            auto scaledR = const_cast<llvm::Value*>(R);
+            return m_builder.CreateAdd(alignedL, alignedR, "fixed_add");
+        }
 
-            // Align integer bit widths before operations
-            if (scaledL->getType()->getIntegerBitWidth() > scaledR->getType()->getIntegerBitWidth())
-            {
-                scaledR = m_builder.CreateIntCast(scaledR, scaledL->getType(), true);
-            }
-            else if (scaledL->getType()->getIntegerBitWidth() < scaledR->getType()->getIntegerBitWidth())
-            {
-                scaledL = m_builder.CreateIntCast(scaledL, scaledR->getType(), true);
-            }
+        if (kind == lexer::TokenType::Minus)
+        {
+            return m_builder.CreateSub(alignedL, alignedR, "fixed_sub");
+        }
 
-            const bool isAddSubCmp =
-                (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::Equal
-                 || kind == lexer::TokenType::NotEqual || kind == lexer::TokenType::LessThan
-                 || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::GreaterThan
-                 || kind == lexer::TokenType::GreaterThanOrEqual);
+        if (kind == lexer::TokenType::Asterisk)
+        {
+            // Multiply raw bits, then shift right by rightFraction to retain leftFraction format.
+            llvm::Value* mult = m_builder.CreateMul(scaledL, scaledR, "fixed_mul_raw");
+            llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
+            return m_builder.CreateAShr(mult, shiftVal, "fixed_mul_scale");
+        }
 
-            llvm::Value* alignedL = scaledL;
-            llvm::Value* alignedR = scaledR;
+        if (kind == lexer::TokenType::Division)
+        {
+            // Shift LHS left by rightFraction before dividing by raw RHS to retain leftFraction format.
+            llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
+            llvm::Value* shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
+            return m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div");
+        }
 
-            // Align fractions only for Add, Sub, and Comparisons
-            if (isAddSubCmp)
-            {
-                if (leftFraction > rightFraction)
-                {
-                    llvm::Value* shiftVal =
-                        llvm::ConstantInt::get(alignedL->getType(), leftFraction - rightFraction, true);
-                    alignedR = m_builder.CreateShl(alignedR, shiftVal, "align_right_fraction");
-                }
-                else if (rightFraction > leftFraction)
-                {
-                    llvm::Value* shiftVal =
-                        llvm::ConstantInt::get(alignedR->getType(), rightFraction - leftFraction, true);
-                    alignedL = m_builder.CreateShl(alignedL, shiftVal, "align_left_fraction");
-                }
-            }
+        if (kind == lexer::TokenType::Equal)
+        {
+            return m_builder.CreateICmpEQ(alignedL, alignedR, "fixed_eq");
+        }
 
-            if (kind == lexer::TokenType::Plus)
-            {
-                return m_builder.CreateAdd(alignedL, alignedR, "fixed_add");
-            }
+        if (kind == lexer::TokenType::NotEqual)
+        {
+            return m_builder.CreateICmpNE(alignedL, alignedR, "fixed_ne");
+        }
 
-            if (kind == lexer::TokenType::Minus)
-            {
-                return m_builder.CreateSub(alignedL, alignedR, "fixed_sub");
-            }
+        if (kind == lexer::TokenType::LessThan)
+        {
+            return m_builder.CreateICmpSLT(alignedL, alignedR, "fixed_lt");
+        }
 
-            if (kind == lexer::TokenType::Asterisk)
-            {
-                // Multiply raw bits, then shift right by rightFraction to retain leftFraction format.
-                llvm::Value* mult = m_builder.CreateMul(scaledL, scaledR, "fixed_mul_raw");
-                llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
-                return m_builder.CreateAShr(mult, shiftVal, "fixed_mul_scale");
-            }
+        if (kind == lexer::TokenType::LessThanOrEqual)
+        {
+            return m_builder.CreateICmpSLE(alignedL, alignedR, "fixed_le");
+        }
 
-            if (kind == lexer::TokenType::Division)
-            {
-                // Shift LHS left by rightFraction before dividing by raw RHS to retain leftFraction format.
-                llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
-                llvm::Value* shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
-                return m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div");
-            }
+        if (kind == lexer::TokenType::GreaterThan)
+        {
+            return m_builder.CreateICmpSGT(alignedL, alignedR, "fixed_gt");
+        }
 
-            if (kind == lexer::TokenType::Equal)
-            {
-                return m_builder.CreateICmpEQ(alignedL, alignedR, "fixed_eq");
-            }
-
-            if (kind == lexer::TokenType::NotEqual)
-            {
-                return m_builder.CreateICmpNE(alignedL, alignedR, "fixed_ne");
-            }
-
-            if (kind == lexer::TokenType::LessThan)
-            {
-                return m_builder.CreateICmpSLT(alignedL, alignedR, "fixed_lt");
-            }
-
-            if (kind == lexer::TokenType::LessThanOrEqual)
-            {
-                return m_builder.CreateICmpSLE(alignedL, alignedR, "fixed_le");
-            }
-
-            if (kind == lexer::TokenType::GreaterThan)
-            {
-                return m_builder.CreateICmpSGT(alignedL, alignedR, "fixed_gt");
-            }
-
-            if (kind == lexer::TokenType::GreaterThanOrEqual)
-            {
-                return m_builder.CreateICmpSGE(alignedL, alignedR, "fixed_ge");
-            }
+        if (kind == lexer::TokenType::GreaterThanOrEqual)
+        {
+            return m_builder.CreateICmpSGE(alignedL, alignedR, "fixed_ge");
         }
     }
 
