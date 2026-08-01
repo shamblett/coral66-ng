@@ -9,7 +9,6 @@
 #include "lib/frontend/common/semantics_common.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
-#include "lib/support/vendor/fixed/dynamic_fixed.hpp"
 
 namespace coral66::cgllvm
 {
@@ -55,8 +54,8 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         // Emit instructions using IRBuilder.
         // Note: If L and R are constants, IRBuilder will automatically constant-fold these operations
         // and return an llvm::ConstantInt* without emitting instructions.
-        llvm::Value* scaledL = const_cast<llvm::Value*>(L);
-        llvm::Value* scaledR = const_cast<llvm::Value*>(R);
+        auto scaledL = const_cast<llvm::Value*>(L);
+        auto scaledR = const_cast<llvm::Value*>(R);
 
         // Align integer bit widths before operations
         if (scaledL->getType()->getIntegerBitWidth() > scaledR->getType()->getIntegerBitWidth())
