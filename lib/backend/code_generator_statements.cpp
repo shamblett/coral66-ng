@@ -224,13 +224,33 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
     if (rhs->getType() != targetType && targetType)
     {
         if (rhs->getType()->isFloatingPointTy() && targetType->isIntegerTy())
+        {
             rhs = m_builder.CreateFPToSI(rhs, targetType);
+        }
         else if (rhs->getType()->isIntegerTy() && targetType->isFloatingPointTy())
+        {
             rhs = m_builder.CreateSIToFP(rhs, targetType);
+            const auto exprIt = m_program.getContext().expressionTypes.find(&statement.getExpression());
+            if (exprIt != m_program.getContext().expressionTypes.end())
+            {
+                if (auto* fixedR = exprIt->second->tryAs<semantics::FixedType>())
+                {
+                    if (fixedR->getFractionalBits() > 0)
+                    {
+                        llvm::Value* divisor = llvm::ConstantFP::get(targetType, static_cast<double>(1ULL << fixedR->getFractionalBits()));
+                        rhs = m_builder.CreateFDiv(rhs, divisor, "fixed_to_float_scale");
+                    }
+                }
+            }
+        }
         else if (rhs->getType()->isFloatingPointTy() && targetType->isFloatingPointTy())
+        {
             rhs = m_builder.CreateFPCast(rhs, targetType);
+        }
         else if (rhs->getType()->isIntegerTy() && targetType->isIntegerTy())
+        {
             rhs = m_builder.CreateIntCast(rhs, targetType, true);
+        }
     }
 
     if (auto* partWord = dynamic_cast<const syntax::PartWordExpression*>(&statement.getVariable()))

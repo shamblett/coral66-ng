@@ -321,9 +321,37 @@ llvm::Value* CodeGenerator::visit(const syntax::BinaryExpression& expression)
     if (L->getType() != R->getType())
     {
         if (L->getType()->isIntegerTy() && R->getType()->isFloatingPointTy())
+        {
             L = m_builder.CreateSIToFP(L, R->getType());
+            if (const auto it = m_program.getContext().expressionTypes.find(&expression.getLeft());
+                it != m_program.getContext().expressionTypes.end())
+            {
+                if (auto* fixed = it->second->tryAs<semantics::FixedType>())
+                {
+                    if (fixed->getFractionalBits() > 0)
+                    {
+                        llvm::Value* divisor = llvm::ConstantFP::get(R->getType(), static_cast<double>(1ULL << fixed->getFractionalBits()));
+                        L = m_builder.CreateFDiv(L, divisor, "fixed_to_float_scale");
+                    }
+                }
+            }
+        }
         else if (L->getType()->isFloatingPointTy() && R->getType()->isIntegerTy())
+        {
             R = m_builder.CreateSIToFP(R, L->getType());
+            if (const auto it = m_program.getContext().expressionTypes.find(&expression.getRight());
+                it != m_program.getContext().expressionTypes.end())
+            {
+                if (auto* fixed = it->second->tryAs<semantics::FixedType>())
+                {
+                    if (fixed->getFractionalBits() > 0)
+                    {
+                        llvm::Value* divisor = llvm::ConstantFP::get(L->getType(), static_cast<double>(1ULL << fixed->getFractionalBits()));
+                        R = m_builder.CreateFDiv(R, divisor, "fixed_to_float_scale");
+                    }
+                }
+            }
+        }
         else if (L->getType()->isIntegerTy() && R->getType()->isIntegerTy())
         {
             if (L->getType()->getIntegerBitWidth() > R->getType()->getIntegerBitWidth())
