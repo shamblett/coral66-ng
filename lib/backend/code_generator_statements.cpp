@@ -182,62 +182,40 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
         {
             if (targetFraction > rhsFraction)
             {
-                const double factor = pow(2, targetFraction);
                 if (rhs->getType()->isFloatingPointTy())
                 {
-                    // Generate an LLVM float constant
+                    // Float represents the unscaled value. Scale by targetFraction.
+                    const double factor = pow(2, targetFraction);
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
-
-                    // Emit a runtime Float Multiplication instruction
                     llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
-
-                    // Emit a runtime Float-to-Unsigned-Integer cast instruction (truncates toward zero)
                     llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
-
-                    // Store the final runtime result into memory
                     m_builder.CreateStore(storeRhs, targetAddr);
                     return;
                 }
 
-                // Must be integer type
-                // Generate an LLVM Integer constant
-                llvm::Value* tempInt = llvm::ConstantInt::get(rhs->getType(), factor);
-
-                // Emit a runtime Integer Multiplication instruction
-                llvm::Value* multiplied = m_builder.CreateMul(rhs, tempInt, "scaled_val");
-
-                // Store the final runtime result into memory
-                m_builder.CreateStore(multiplied, targetAddr);
+                // Integer type: already scaled by rhsFraction. Scale up by the difference.
+                llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), targetFraction - rhsFraction);
+                llvm::Value* scaledRhs = m_builder.CreateShl(rhs, shiftVal, "scaled_val_up");
+                m_builder.CreateStore(scaledRhs, targetAddr);
                 return;
             }
             if (rhsFraction > targetFraction)
             {
-                const double factor = pow(2, rhsFraction);
                 if (rhs->getType()->isFloatingPointTy())
                 {
-                    // Generate an LLVM float constant
+                    // Float represents the unscaled value. Scale by targetFraction.
+                    const double factor = pow(2, targetFraction);
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
-
-                    // Emit a runtime Float Multiplication instruction
                     llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
-
-                    // Emit a runtime Float-to-Unsigned-Integer cast instruction (truncates toward zero)
                     llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
-
-                    // Store the final runtime result into memory
                     m_builder.CreateStore(storeRhs, targetAddr);
                     return;
                 }
 
-                // Must be integer type
-                // Generate an LLVM Integer constant
-                llvm::Value* tempInt = llvm::ConstantInt::get(rhs->getType(), factor);
-
-                // Emit a runtime Integer Multiplication instruction
-                llvm::Value* multiplied = m_builder.CreateMul(rhs, tempInt, "scaled_val");
-
-                // Store the final runtime result into memory
-                m_builder.CreateStore(multiplied, targetAddr);
+                // Integer type: already scaled by rhsFraction. Scale down by the difference.
+                llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), rhsFraction - targetFraction);
+                llvm::Value* scaledRhs = m_builder.CreateAShr(rhs, shiftVal, "scaled_val_down");
+                m_builder.CreateStore(scaledRhs, targetAddr);
                 return;
             }
         }

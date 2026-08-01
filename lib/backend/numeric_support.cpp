@@ -30,6 +30,10 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
 
     const auto kind = expression.getOp()->getTokenType();
     const llvm::Value* L = visit(expression.getLeft());
+    const llvm::Value* R = visit(expression.getRight());
+
+    if (!L || !R)
+        return nullptr;
 
     if (itL != m_program.getContext().expressionTypes.end())
     {
@@ -56,74 +60,168 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         sameFormat = true;
     }
 
-    if (L->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
+    if (L->getType()->isIntegerTy() && R->getType()->isIntegerTy() && (isLeftFixed || isRightFixed))
     {
-        const auto rhs = numeric::fixed::DynamicFixed(2.0, rightTotal, rightFraction);
-        const auto lhs = numeric::fixed::DynamicFixed(2.0, leftTotal, leftFraction);
+        const auto* constL = llvm::dyn_cast<llvm::ConstantInt>(L);
 
-        // Both fixed
-        if (isLeftFixed && isRightFixed)
+        if (const auto* constR = llvm::dyn_cast<llvm::ConstantInt>(R); constL && constR)
         {
+            const auto lhs_raw = static_cast<int32_t>(constL->getSExtValue());
+            const auto rhs_raw = static_cast<int32_t>(constR->getSExtValue());
+
+            const auto lhs = numeric::fixed::DynamicFixed(lhs_raw, leftTotal, leftFraction);
+            const auto rhs = numeric::fixed::DynamicFixed(rhs_raw, rightTotal, rightFraction);
+
+            // Both fixed
+            if (isLeftFixed && isRightFixed)
+            {
+                if (kind == lexer::TokenType::Plus)
+                {
+                    const auto val = lhs + rhs;
+                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
+                }
+
+                if (kind == lexer::TokenType::Minus)
+                {
+                    const auto val = lhs - rhs;
+                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
+                }
+
+                if (kind == lexer::TokenType::Asterisk)
+                {
+                    const auto val = lhs * rhs;
+                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
+                }
+
+                if (kind == lexer::TokenType::Division)
+                {
+                    const auto val = lhs / rhs;
+                    return llvm::ConstantInt::get(L->getType(), val.raw_value, true);
+                }
+
+                if (kind == lexer::TokenType::Equal)
+                {
+                    if (sameFormat)
+                    {
+                        if (lhs.raw_value == rhs.raw_value)
+                        {
+                            return llvm::ConstantInt::getTrue(L->getContext());
+                        }
+                    }
+                    else
+                    {
+                    }
+                    return llvm::ConstantInt::getFalse(L->getContext());
+                }
+            }
+
+            // Left fixed
+            if (isLeftFixed)
+            {
+            }
+
+            // Right fixed
+            if (isRightFixed)
+            {
+            }
+        }
+        else
+        {
+            // Run-time variables: Emit instructions using IRBuilder
+            auto scaledL = const_cast<llvm::Value*>(L);
+            auto scaledR = const_cast<llvm::Value*>(R);
+
+            // Align integer bit widths before operations
+            if (scaledL->getType()->getIntegerBitWidth() > scaledR->getType()->getIntegerBitWidth())
+            {
+                scaledR = m_builder.CreateIntCast(scaledR, scaledL->getType(), true);
+            }
+            else if (scaledL->getType()->getIntegerBitWidth() < scaledR->getType()->getIntegerBitWidth())
+            {
+                scaledL = m_builder.CreateIntCast(scaledL, scaledR->getType(), true);
+            }
+
+            const bool isAddSubCmp =
+                (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::Equal
+                 || kind == lexer::TokenType::NotEqual || kind == lexer::TokenType::LessThan
+                 || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::GreaterThan
+                 || kind == lexer::TokenType::GreaterThanOrEqual);
+
+            llvm::Value* alignedL = scaledL;
+            llvm::Value* alignedR = scaledR;
+
+            // Align fractions only for Add, Sub, and Comparisons
+            if (isAddSubCmp)
+            {
+                if (leftFraction > rightFraction)
+                {
+                    llvm::Value* shiftVal =
+                        llvm::ConstantInt::get(alignedL->getType(), leftFraction - rightFraction, true);
+                    alignedR = m_builder.CreateShl(alignedR, shiftVal, "align_right_fraction");
+                }
+                else if (rightFraction > leftFraction)
+                {
+                    llvm::Value* shiftVal =
+                        llvm::ConstantInt::get(alignedR->getType(), rightFraction - leftFraction, true);
+                    alignedL = m_builder.CreateShl(alignedL, shiftVal, "align_left_fraction");
+                }
+            }
+
             if (kind == lexer::TokenType::Plus)
             {
-                const auto val = (rhs + lhs).to_double();
-                llvm::LLVMContext& context = L->getContext();
-                llvm::Type* fpType = llvm::Type::getFloatTy(context);
-                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
-                return fpConstant;
+                return m_builder.CreateAdd(alignedL, alignedR, "fixed_add");
             }
 
             if (kind == lexer::TokenType::Minus)
             {
-                const auto val = (rhs - lhs).to_double();
-                llvm::LLVMContext& context = L->getContext();
-                llvm::Type* fpType = llvm::Type::getFloatTy(context);
-                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
-                return fpConstant;
+                return m_builder.CreateSub(alignedL, alignedR, "fixed_sub");
             }
 
             if (kind == lexer::TokenType::Asterisk)
             {
-                const auto val = (rhs * lhs).to_double();
-                llvm::LLVMContext& context = L->getContext();
-                llvm::Type* fpType = llvm::Type::getFloatTy(context);
-                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
-                return fpConstant;
+                // Multiply raw bits, then shift right by rightFraction to retain leftFraction format.
+                llvm::Value* mult = m_builder.CreateMul(scaledL, scaledR, "fixed_mul_raw");
+                llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
+                return m_builder.CreateAShr(mult, shiftVal, "fixed_mul_scale");
             }
 
             if (kind == lexer::TokenType::Division)
             {
-                const auto val = (rhs / lhs).to_double();
-                llvm::LLVMContext& context = L->getContext();
-                llvm::Type* fpType = llvm::Type::getFloatTy(context);
-                llvm::Constant* fpConstant = llvm::ConstantFP::get(fpType, val);
-                return fpConstant;
+                // Shift LHS left by rightFraction before dividing by raw RHS to retain leftFraction format.
+                llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), rightFraction, true);
+                llvm::Value* shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
+                return m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div");
             }
 
             if (kind == lexer::TokenType::Equal)
             {
-                if (sameFormat)
-                {
-                    if (rhs.raw_value == lhs.raw_value)
-                    {
-                        return llvm::ConstantInt::getTrue(L->getContext());
-                    }
-                }
-                else
-                {
-                }
-                return llvm::ConstantInt::getFalse(L->getContext());
+                return m_builder.CreateICmpEQ(alignedL, alignedR, "fixed_eq");
             }
-        }
 
-        // Left fixed
-        if (isLeftFixed)
-        {
-        }
+            if (kind == lexer::TokenType::NotEqual)
+            {
+                return m_builder.CreateICmpNE(alignedL, alignedR, "fixed_ne");
+            }
 
-        // Right fixed
-        if (isRightFixed)
-        {
+            if (kind == lexer::TokenType::LessThan)
+            {
+                return m_builder.CreateICmpSLT(alignedL, alignedR, "fixed_lt");
+            }
+
+            if (kind == lexer::TokenType::LessThanOrEqual)
+            {
+                return m_builder.CreateICmpSLE(alignedL, alignedR, "fixed_le");
+            }
+
+            if (kind == lexer::TokenType::GreaterThan)
+            {
+                return m_builder.CreateICmpSGT(alignedL, alignedR, "fixed_gt");
+            }
+
+            if (kind == lexer::TokenType::GreaterThanOrEqual)
+            {
+                return m_builder.CreateICmpSGE(alignedL, alignedR, "fixed_ge");
+            }
         }
     }
 
