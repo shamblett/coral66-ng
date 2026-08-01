@@ -106,12 +106,12 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         delete ee;
     }
 
-    SECTION("Fixed Point Execution")
+    SECTION("Fixed Point Execution - Variables")
     {
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
-        auto sourcePath = getTestDataPath("review/1/fixed_point.cor", "BACKEND_DIR");
+        auto sourcePath = getTestDataPath("review/1/fixed_point_variables.cor", "BACKEND_DIR");
         auto source = readFile(sourcePath);
         REQUIRE_FALSE(source.empty());
 
@@ -204,6 +204,106 @@ TEST_CASE("Review 1", "[Backend][Execution]")
 
         delete ee;
     }
+
+    SECTION("Fixed Point Execution - Constants")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("review/1/fixed_point_constants.cor", "BACKEND_DIR");
+        auto source = readFile(sourcePath);
+        REQUIRE_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+        {
+            WARN(ss.str());
+        }
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("review1_fixed", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        module->print(llvm::errs(), nullptr);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+        module->print(llvm::errs(), nullptr);
+
+        std::string engineError;
+        llvm::ExecutionEngine* ee = llvm::EngineBuilder(std::move(module))
+                                        .setErrorStr(&engineError)
+                                        .setEngineKind(llvm::EngineKind::JIT)
+                                        .create();
+        if (!ee)
+        {
+            llvm::errs() << "JIT Error: " << engineError << "\n";
+        }
+        REQUIRE(ee != nullptr);
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        // f1 4 fractional bits
+        auto varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("f1"));
+        REQUIRE(varAddr != nullptr);
+        int32_t final = *static_cast<int32_t*>(varAddr);
+        /// 2 * 16 = 32
+        CHECK(final == 32);
+
+        // f2 6 fractional bits
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("f2"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        /// 4 * 64 = 256
+        CHECK(final == 256);
+
+        // f3 4 fractional bits
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("f3"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        /// (256<<2) / 32 = 1024 / 32 = 32
+        CHECK(final == 32);
+
+        // Ans
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ans"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        delete ee;
+    }
+
 
     SECTION("Procedure Label Parameter Execution")
     {
