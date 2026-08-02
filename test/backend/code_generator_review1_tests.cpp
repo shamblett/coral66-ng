@@ -397,6 +397,41 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         final = *static_cast<int32_t*>(varAddr);
         CHECK(final == 1);
 
+        // gtev
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("gtev"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // gtec
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("gtec"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // ltev
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ltev"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // ltec
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ltec"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // eqv
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("eqv"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // eqc
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("eqc"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
         delete ee;
     }
 
