@@ -445,6 +445,30 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         final = *static_cast<int32_t*>(varAddr);
         CHECK(final == 1);
 
+        // plusv
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("plusv"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 6);
+
+        // plusc
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("plusc"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 8);
+
+        // minusv
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("minusv"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 2);
+
+        // minusc
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("minusc"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 3);
+
         delete ee;
     }
 

@@ -64,4 +64,10 @@
   neqc := 0;
   'IF' f2 <> 6 'THEN' neqc := 1;
 
+  plusv := f1 + f2; COMMENT giving 6;
+  plusc := f2 + 4; COMMENT giving 8;
+
+  minusv := f2 - f1; COMMENT giving 2;
+  minusc := f3 - 1; COMMENT giving 3;
+
 'END'
