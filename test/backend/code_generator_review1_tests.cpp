@@ -385,6 +385,18 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         final = *static_cast<int32_t*>(varAddr);
         CHECK(final == 1);
 
+        // ltv
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ltv"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // ltc
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ltc"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
         delete ee;
     }
 

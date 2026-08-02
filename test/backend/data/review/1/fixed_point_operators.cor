@@ -32,4 +32,10 @@
   gtc := 0;
   'IF' f2 > 3 'THEN' gtc := 1;
 
+  ltv := 0;
+  'IF' f1 < f2 'THEN' ltv := 1;
+
+  ltc := 0;
+  'IF' f1 < 3 'THEN' ltc := 1;
+
 'END'
