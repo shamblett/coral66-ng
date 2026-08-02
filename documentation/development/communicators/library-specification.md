@@ -61,3 +61,8 @@ but it doesn't clutter the current AST with the library's internal logic.
 1. It checks if myMaths.cor has already been compiled into myMaths.o (and if the object file is newer than the source).
 2. If not, it spawns a background compiler thread to compile myMaths.cor to myMaths.o.
 3. During the final linking stage, it automatically appends myMaths.o to the linker command line.
+
+The library code itself should leverage the COMMON communicator to export facilities to the invoking program, i.e definitions in a
+COMMON communicator in a library are exported to the invoking program implicitly, there should be no need to add a corresponding COMMON
+communicator in the invoking program to use these definitions. Conversely any definitions in the LIBRARY code that are not placed in the COMMON
+communicator are not visible to the invoking program and are local to the LIBRARY.
