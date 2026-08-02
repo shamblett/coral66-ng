@@ -432,6 +432,19 @@ TEST_CASE("Review 1", "[Backend][Execution]")
         REQUIRE(varAddr != nullptr);
         final = *static_cast<int32_t*>(varAddr);
         CHECK(final == 1);
+
+        // neqv
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("neqv"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
+        // neqc
+        varAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("neqc"));
+        REQUIRE(varAddr != nullptr);
+        final = *static_cast<int32_t*>(varAddr);
+        CHECK(final == 1);
+
         delete ee;
     }
 

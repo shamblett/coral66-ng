@@ -58,4 +58,10 @@
   eqc := 0;
   'IF' f2 = 4.0 'THEN' eqc := 1;
 
+  neqv := 0;
+  'IF' f3 <> f1 'THEN' neqv := 1;
+
+  neqc := 0;
+  'IF' f2 <> 6 'THEN' neqc := 1;
+
 'END'

@@ -577,7 +577,7 @@ std::string_view coral66::lexer::tokenName(TokenType const tokenType, bool const
         case TokenType::Asterisk: return quote ? "'*'" : "*";
         case TokenType::Division: return quote ? "'/'" : "/";
         case TokenType::Equal: return quote ? "'='" : "=";
-        case TokenType::NotEqual: return quote ? "'!='" : "!=";
+        case TokenType::NotEqual: return quote ? "'<>'" : "<>";
         case TokenType::LessThan: return quote ? "'<'" : "<";
         case TokenType::LessThanOrEqual: return quote ? "'<='" : "<=";
         case TokenType::GreaterThan: return quote ? "'>'" : ">";
