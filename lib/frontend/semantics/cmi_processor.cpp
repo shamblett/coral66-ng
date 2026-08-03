@@ -25,6 +25,10 @@ namespace coral66::semantics
 // throughout the semantic phase.
 static std::deque<lexer::CToken> g_syntheticTokens;
 
+// To satisfy the pointer requirements of TableType and OverlayType during CMI parse
+static std::deque<TableInfo> g_syntheticTableInfos;
+static std::deque<OverlayInfo> g_syntheticOverlayInfos;
+
 static lexer::CTokenIterator createSyntheticIdentifierToken(const std::string& name)
 {
     g_syntheticTokens.emplace_back(
@@ -158,7 +162,6 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
             
             std::string typeStr = typeToString(varDecl->getType());
             symbolObj.AddMember("data_type", rapidjson::Value(typeStr.c_str(), allocator), allocator);
-            symbolObj.AddMember("is_array", false, allocator);
         }
         else if (auto* procDecl = decl->getIf<ProcedureDeclaration>())
         {
@@ -185,7 +188,92 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
                 symbolObj.AddMember("parameters", paramsArray, allocator);
             }
         }
-        // Additional exported types (Arrays, Switches, Labels) can be implemented here.
+        else if (auto* arrayDecl = decl->getIf<ArrayDeclaration>())
+        {
+            symbolObj.AddMember("symbol_category", "array", allocator);
+            
+            auto* arrayType = arrayDecl->getType().getIf<ArrayType>();
+            if (arrayType)
+            {
+                std::string elemTypeStr = typeToString(arrayType->getElementType());
+                symbolObj.AddMember("data_type", rapidjson::Value(elemTypeStr.c_str(), allocator), allocator);
+                
+                rapidjson::Value dimsArray(rapidjson::kArrayType);
+                for (auto dim : arrayType->getDimensions())
+                {
+                    dimsArray.PushBack(dim, allocator);
+                }
+                symbolObj.AddMember("dimensions", dimsArray, allocator);
+            }
+        }
+        else if (auto* tableDecl = decl->getIf<TableDeclaration>())
+        {
+            symbolObj.AddMember("symbol_category", "table", allocator);
+            
+            auto* tableType = tableDecl->getType().getIf<TableType>();
+            if (tableType)
+            {
+                const TableInfo& info = tableType->getInfo();
+                symbolObj.AddMember("table_name", rapidjson::Value(info.name.c_str(), allocator), allocator);
+                symbolObj.AddMember("table_id", info.id, allocator);
+                
+                if (std::holds_alternative<TableDefinition>(info.type))
+                {
+                    const auto& def = std::get<TableDefinition>(info.type);
+                    symbolObj.AddMember("width", def.getWidth(), allocator);
+                    symbolObj.AddMember("length", def.getLength(), allocator);
+                    
+                    rapidjson::Value fieldsArray(rapidjson::kArrayType);
+                    for (const auto& field : def.getFields())
+                    {
+                        rapidjson::Value fieldObj(rapidjson::kObjectType);
+                        fieldObj.AddMember("name", rapidjson::Value(field.name.c_str(), allocator), allocator);
+                        
+                        std::string fieldTypeStr = typeToString(*field.type);
+                        fieldObj.AddMember("data_type", rapidjson::Value(fieldTypeStr.c_str(), allocator), allocator);
+                        
+                        fieldsArray.PushBack(fieldObj, allocator);
+                    }
+                    symbolObj.AddMember("fields", fieldsArray, allocator);
+                }
+            }
+        }
+        else if (auto* overlayDecl = decl->getIf<OverlayDeclaration>())
+        {
+            symbolObj.AddMember("symbol_category", "overlay", allocator);
+            
+            auto* overlayType = overlayDecl->getType().getIf<OverlayType>();
+            if (overlayType)
+            {
+                const OverlayInfo& info = overlayType->getInfo();
+                symbolObj.AddMember("overlay_name", rapidjson::Value(info.name.c_str(), allocator), allocator);
+                symbolObj.AddMember("overlay_id", info.id, allocator);
+                
+                if (std::holds_alternative<OverlayDefinition>(info.type))
+                {
+                    const auto& def = std::get<OverlayDefinition>(info.type);
+                    
+                    rapidjson::Value fieldsArray(rapidjson::kArrayType);
+                    for (const auto& field : def.getFields())
+                    {
+                        rapidjson::Value fieldObj(rapidjson::kObjectType);
+                        fieldObj.AddMember("name", rapidjson::Value(field.name.c_str(), allocator), allocator);
+                        
+                        std::string fieldTypeStr = typeToString(*field.type);
+                        fieldObj.AddMember("data_type", rapidjson::Value(fieldTypeStr.c_str(), allocator), allocator);
+                        
+                        fieldsArray.PushBack(fieldObj, allocator);
+                    }
+                    symbolObj.AddMember("fields", fieldsArray, allocator);
+                }
+            }
+        }
+        else
+        {
+            // E.g., SwitchDeclaration, LabelDeclaration - Ignored for CMI export as they don't map to
+            // cross-module library APIs in a meaningful way under our precompiled module model.
+            continue;
+        }
 
         symbols.PushBack(symbolObj, allocator);
     }
@@ -235,7 +323,6 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 IntrusiveVariantValue<Type> type = stringToType(typeStr);
                 
                 auto varDecl = std::make_unique<VariableDeclaration>(syntheticToken, std::move(type));
-                // Note: The caller must inject varDecl->get() into the SymbolTable with External linkage logic
                 importedSymbols.push_back(std::move(varDecl));
             }
         }
@@ -245,11 +332,10 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
             {
                 std::string returnTypeStr = sym["return_type"].GetString();
                 
-                // Currently dynamically leaking returnType allocation for the parameter list 
-                // in a real setup, we would use the compiler's semantic type allocator
                 Type* returnType = new UntypedType();
                 if (returnTypeStr == "INTEGER") returnType = new PrimitiveType(PrimitiveType::Integer);
                 else if (returnTypeStr == "REAL") returnType = new PrimitiveType(PrimitiveType::Floating);
+                else if (returnTypeStr == "BITS") returnType = new PrimitiveType(PrimitiveType::Bits);
                 
                 std::vector<ProcedureType::Parameter> parameters;
                 const rapidjson::Value& params = sym["parameters"];
@@ -264,10 +350,9 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     Type* pType = new UntypedType();
                     if (pTypeStr == "INTEGER") pType = new PrimitiveType(PrimitiveType::Integer);
                     else if (pTypeStr == "REAL") pType = new PrimitiveType(PrimitiveType::Floating);
+                    else if (pTypeStr == "BITS") pType = new PrimitiveType(PrimitiveType::Bits);
                     
-                    // We must ensure string_view outlives the parameter - syntheticToken's string does this
                     lexer::CTokenIterator paramToken = createSyntheticIdentifierToken(pName);
-                    
                     parameters.push_back({pType, paramToken->getText(), isValue});
                 }
                 
@@ -275,6 +360,94 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 auto procDecl = std::make_unique<ProcedureDeclaration>(syntheticToken, std::move(procType));
                 
                 importedSymbols.push_back(std::move(procDecl));
+            }
+        }
+        else if (category == "array")
+        {
+            if (sym.HasMember("data_type") && sym.HasMember("dimensions"))
+            {
+                std::string typeStr = sym["data_type"].GetString();
+                
+                Type* elemType = new UntypedType();
+                if (typeStr == "INTEGER") elemType = new PrimitiveType(PrimitiveType::Integer);
+                else if (typeStr == "REAL") elemType = new PrimitiveType(PrimitiveType::Floating);
+                else if (typeStr == "BITS") elemType = new PrimitiveType(PrimitiveType::Bits);
+                
+                std::vector<std::uint64_t> dimensions;
+                const rapidjson::Value& dims = sym["dimensions"];
+                for (rapidjson::SizeType j = 0; j < dims.Size(); j++)
+                {
+                    dimensions.push_back(dims[j].GetUint64());
+                }
+                
+                auto arrType = IntrusiveVariantValue<Type>(std::in_place_type<ArrayType>, elemType, std::move(dimensions));
+                auto arrDecl = std::make_unique<ArrayDeclaration>(syntheticToken, std::move(arrType));
+                
+                importedSymbols.push_back(std::move(arrDecl));
+            }
+        }
+        else if (category == "table")
+        {
+            if (sym.HasMember("table_name") && sym.HasMember("table_id") && sym.HasMember("width") && sym.HasMember("length") && sym.HasMember("fields"))
+            {
+                std::vector<Field> fields;
+                const rapidjson::Value& fieldsArr = sym["fields"];
+                
+                for (rapidjson::SizeType j = 0; j < fieldsArr.Size(); j++)
+                {
+                    const rapidjson::Value& f = fieldsArr[j];
+                    std::string fName = f["name"].GetString();
+                    std::string fTypeStr = f["data_type"].GetString();
+                    
+                    IntrusiveVariantValue<Type> fType = stringToType(fTypeStr);
+                    fields.push_back({std::move(fType), fName});
+                }
+                
+                TableDefinition def(std::move(fields), sym["width"].GetUint64(), sym["length"].GetUint64());
+                
+                TableInfo info;
+                info.name = sym["table_name"].GetString();
+                info.id = sym["table_id"].GetUint64();
+                info.type = std::move(def);
+                
+                g_syntheticTableInfos.push_back(std::move(info));
+                
+                auto tableType = IntrusiveVariantValue<Type>(std::in_place_type<TableType>, g_syntheticTableInfos.back());
+                auto tableDecl = std::make_unique<TableDeclaration>(syntheticToken, std::move(tableType));
+                
+                importedSymbols.push_back(std::move(tableDecl));
+            }
+        }
+        else if (category == "overlay")
+        {
+            if (sym.HasMember("overlay_name") && sym.HasMember("overlay_id") && sym.HasMember("fields"))
+            {
+                std::vector<Field> fields;
+                const rapidjson::Value& fieldsArr = sym["fields"];
+                
+                for (rapidjson::SizeType j = 0; j < fieldsArr.Size(); j++)
+                {
+                    const rapidjson::Value& f = fieldsArr[j];
+                    std::string fName = f["name"].GetString();
+                    std::string fTypeStr = f["data_type"].GetString();
+                    
+                    IntrusiveVariantValue<Type> fType = stringToType(fTypeStr);
+                    fields.push_back({std::move(fType), fName});
+                }
+                
+                OverlayDefinition def(std::move(fields));
+                
+                OverlayInfo info;
+                info.name = sym["overlay_name"].GetString();
+                info.id = sym["overlay_id"].GetUint64();
+                info.type = std::move(def);
+                
+                g_syntheticOverlayInfos.push_back(std::move(info));
+                
+                auto overlayType = IntrusiveVariantValue<Type>(std::in_place_type<OverlayType>, g_syntheticOverlayInfos.back());
+                auto overlayDecl = std::make_unique<OverlayDeclaration>(syntheticToken, std::move(overlayType));
+                
+                importedSymbols.push_back(std::move(overlayDecl));
             }
         }
     }

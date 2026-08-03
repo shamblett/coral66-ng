@@ -30,10 +30,16 @@ The header provides metadata necessary for the compiler to validate compatibilit
 The `symbols` array contains the serialized representations of exported symbols. Each object in this array contains:
 
 *   **`name`** (`String`): The identifier of the symbol.
-*   **`symbol_category`** (`String`): The category of the symbol (e.g., `"data"`, `"procedure"`, `"label"`, `"switch"`).
+*   **`symbol_category`** (`String`): The category of the symbol (`"data"`, `"procedure"`, `"array"`, `"table"`, `"overlay"`).
 *   *Category-specific fields*:
-    *   **Data**: Requires `data_type` (e.g., `"REAL"`, `"INTEGER"`), and array dimension bounds if applicable.
-    *   **Procedures**: Requires `return_type` (e.g., `"REAL"`, `"NONE"` for untyped procedures) and a `parameters` array detailing parameter names, data types, and passing conventions (`"VALUE"`, `"LOCATION"`).
+    *   **Data (`"data"`)**: Requires `data_type` (e.g., `"REAL"`, `"INTEGER"`).
+    *   **Procedures (`"procedure"`)**: Requires `return_type` (e.g., `"REAL"`, `"NONE"` for untyped procedures) and a `parameters` array detailing parameter names, data types, and passing conventions (`"VALUE"`, `"LOCATION"`).
+    *   **Arrays (`"array"`)**: Requires `data_type` defining the primitive elements and a `dimensions` integer array representing the size of each dimension.
+    *   **Tables (`"table"`)**: Requires `table_name`, `table_id`, `width`, `length`, and a `fields` array specifying each element's `name` and `data_type`.
+    *   **Overlays (`"overlay"`)**: Requires `overlay_name`, `overlay_id`, and a `fields` array specifying each element's `name` and `data_type`.
+
+**Ignored Entities:**
+While the `COMMON` communicator in monolithic, single-pass Coral 66 compilation supports specifying global `SWITCH` labels and `GOTO` labels (Places), these entities **are explicitly ignored** during CMI generation for libraries. Jumping to an arbitrary memory address or switch table across pre-compiled object-file boundaries heavily violates calling conventions, stack management, and modern linkers' execution models. Therefore, they cannot form a logical part of a precompiled library's public API.
 
 ## 3. Examples
 
