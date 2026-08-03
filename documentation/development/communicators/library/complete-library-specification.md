@@ -8,7 +8,7 @@ Rather than relying on textual inclusion or complex background compilation withi
 
 When a library is compiled, the compiler produces two artifacts:
 1. An object file (`.o` or `.a`).
-2. A Coral Module Interface (`.cmi`) file. This is a lightweight, serialized binary representation of the symbols explicitly exported by the library.
+2. A Coral Module Interface (`.cmi`) file. This is a lightweight, human-readable JSON representation of the symbols explicitly exported by the library.
 
 When an invoking program declares `LIBRARY myMaths`, the compiler does not re-parse the source of `myMaths.cor`. Instead, it locates and deserializes `myMaths.cmi`, injecting the defined symbols into the semantic analyzer's symbol table as `External`.
 
@@ -18,7 +18,7 @@ The library code leverages the `COMMON` communicator to explicitly define its pu
 Conversely, any definitions in the library source that are *not* placed in the `COMMON` communicator are local to the library and remain strictly hidden from the invoking program.
 
 ### 1.2 Macro Hygiene
-Because the importing program only reads the binary `.cmi` file, `DEFINE` macros used internally by the library are completely isolated. They cannot leak into or pollute the importing program's macro namespace, preventing naming collisions.
+Because the importing program only reads the structured JSON `.cmi` file, `DEFINE` macros used internally by the library are completely isolated. They cannot leak into or pollute the importing program's macro namespace, preventing naming collisions.
 
 ## 2. Workflows and Command Line Usage
 
@@ -30,6 +30,7 @@ Users can create libraries using a dedicated compiler flag (e.g., `--emit-librar
 
 **Source file (`myMaths.cor`):**
 ```coral66
+SEGMENT myMaths;
 COMMENT This is the library source ;
 COMMON (
     PROCEDURE myMaths_Sin(VALUE REAL);
@@ -87,6 +88,6 @@ coral66 main.cor -L /path/to/mylibs -o my_app
 
 1. **Standalone Capability:** Users do not need CMake, Make, or Bazel to create or share libraries. The `coral66-ng` executable handles both interface generation and linking integration.
 2. **Driver Simplicity:** The compiler driver (`action_executor.cpp`) remains clean. It does not need to orchestrate multi-threaded background compilation, check source timestamps, or manage cyclic dependencies.
-3. **Compilation Speed:** Reading a binary `.cmi` file is orders of magnitude faster than repeatedly re-preprocessing and parsing Coral 66 source text.
+3. **Compilation Speed & Introspection:** Reading a structured JSON `.cmi` file is orders of magnitude faster than repeatedly re-preprocessing and parsing Coral 66 source text. Furthermore, the JSON format allows for trivial introspection by developers and easy integration with external tooling.
 4. **Build System Compatibility:** If a user eventually transitions to a complex build system (like Bazel), the `.cmi` and `.o` artifacts map perfectly to standard DAG dependency tracking.
 5. **Memory Efficiency:** The semantic phase does not have to maintain multiple heavy ASTs in memory simultaneously; it only holds the required semantic symbols.
