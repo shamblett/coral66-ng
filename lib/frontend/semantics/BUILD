@@ -7,6 +7,7 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "semantics",
     srcs = [
+        "cmi_processor.cpp",
         "control_flow_pass.cpp",
         "evaluate_constant.cpp",
         "program.cpp",
@@ -18,6 +19,7 @@ cc_library(
         "type_checking_pass.cpp",
     ],
     hdrs = [
+        "cmi_processor.hpp",
         "control_flow_pass.hpp",
         "program.hpp",
         "program_interface.hpp",
