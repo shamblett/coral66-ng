@@ -21,10 +21,10 @@ class Declaration;
 
 /**
  * CMIProcessor
- * 
+ *
  * Handles the generation and parsing of Coral Module Interface (.cmi) files.
  * CMI files are JSON documents that serialize the public API of a library
- * (symbols defined in the COMMON communicator) for consumption by other 
+ * (symbols defined in the COMMON communicator) for consumption by other
  * compilation units.
  */
 class CMIProcessor
@@ -35,57 +35,56 @@ public:
 
     /**
      * Generates a CMI file for a given library.
-     * 
+     *
      * @param libraryName The name of the library (SEGMENT name).
      * @param exportedSymbols The list of semantic symbols exported via COMMON.
      * @param outputPath The file path where the .cmi file will be written.
      * @return true if successful, false otherwise.
      */
-    static bool generateCMIFile(const std::string& libraryName, 
-                                const std::vector<const Usable*>& exportedSymbols, 
+    static bool generateCMIFile(const std::string& libraryName, const std::vector<const Usable*>& exportedSymbols,
                                 const std::filesystem::path& outputPath);
 
     /**
      * Generates a CMI JSON string.
-     * 
+     *
      * @param libraryName The name of the library.
      * @param exportedSymbols The list of semantic symbols exported via COMMON.
      * @return The formatted JSON string.
      */
-    static std::string generateCMIString(const std::string& libraryName, 
+    static std::string generateCMIString(const std::string& libraryName,
                                          const std::vector<const Usable*>& exportedSymbols);
 
     /**
      * Parses a CMI file and instantiates semantic symbols.
-     * 
+     *
      * @param inputPath The file path of the .cmi file to read.
      * @param importedSymbols Output vector to be populated with the imported symbols.
      * @return true if parsing and validation were successful.
      */
-    static bool parseCMIFile(const std::filesystem::path& inputPath, 
+    static bool parseCMIFile(const std::filesystem::path& inputPath,
                              std::vector<std::unique_ptr<Declaration>>& importedSymbols);
 
     /**
      * Parses a CMI JSON string and instantiates semantic symbols.
-     * 
+     *
      * @param cmiContent The JSON content.
      * @param importedSymbols Output vector to be populated with the imported symbols.
      * @return true if parsing and validation were successful.
      */
-    static bool parseCMIString(const std::string& cmiContent, 
+    static bool parseCMIString(const std::string& cmiContent,
                                std::vector<std::unique_ptr<Declaration>>& importedSymbols);
 
 private:
     /**
      * Internal helper to build the rapidjson DOM from semantic symbols.
      */
-    static rapidjson::Document createDocument(const std::string& libraryName, 
+    static rapidjson::Document createDocument(const std::string& libraryName,
                                               const std::vector<const Usable*>& exportedSymbols);
 
     /**
      * Internal helper to parse the rapidjson DOM into semantic symbols.
      */
-    static bool parseDocument(const rapidjson::Document& doc, 
+    static bool parseDocument(const rapidjson::Document& doc,
                               std::vector<std::unique_ptr<Declaration>>& importedSymbols);
 };
 
