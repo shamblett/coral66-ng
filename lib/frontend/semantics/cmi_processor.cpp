@@ -7,12 +7,10 @@
 #include "lib/frontend/semantics/cmi_processor.hpp"
 
 #include <fstream>
-#include <iostream>
 #include <deque>
 
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
-#include <rapidjson/error/en.h>
 
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"
@@ -41,7 +39,7 @@ static lexer::CTokenIterator createSyntheticIdentifierToken(const std::string& n
 
 static std::string typeToString(const Type& type)
 {
-    if (auto* prim = type.getIf<PrimitiveType>())
+    if (auto* prim = type.tryAs<PrimitiveType>())
     {
         switch (prim->getKind())
         {
@@ -148,7 +146,7 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
 
     for (const Usable* usable : exportedSymbols)
     {
-        auto* decl = usable->getIf<Declaration>();
+        auto* decl = static_cast<const Declaration*>(usable);
         if (!decl) continue;
 
         std::string name(decl->getName());
@@ -156,18 +154,18 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
         rapidjson::Value symbolObj(rapidjson::kObjectType);
         symbolObj.AddMember("name", rapidjson::Value(name.c_str(), allocator), allocator);
 
-        if (auto* varDecl = decl->getIf<VariableDeclaration>())
+        if (auto* varDecl = decl->tryAs<VariableDeclaration>())
         {
             symbolObj.AddMember("symbol_category", "data", allocator);
             
             std::string typeStr = typeToString(varDecl->getType());
             symbolObj.AddMember("data_type", rapidjson::Value(typeStr.c_str(), allocator), allocator);
         }
-        else if (auto* procDecl = decl->getIf<ProcedureDeclaration>())
+        else if (auto* procDecl = decl->tryAs<ProcedureDeclaration>())
         {
             symbolObj.AddMember("symbol_category", "procedure", allocator);
             
-            auto* procType = procDecl->getType().getIf<ProcedureType>();
+            auto* procType = procDecl->getType().tryAs<ProcedureType>();
             if (procType)
             {
                 std::string returnTypeStr = typeToString(*procType->getReturnType());
@@ -178,7 +176,7 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
                 {
                     rapidjson::Value paramObj(rapidjson::kObjectType);
                     paramObj.AddMember("name", rapidjson::Value(param.name.data(), param.name.size(), allocator), allocator);
-                    paramObj.AddMember("pass_by", param.isValue ? "VALUE" : "LOCATION", allocator);
+                    paramObj.AddMember("pass_by", rapidjson::StringRef(param.isValue ? "VALUE" : "LOCATION"), allocator);
                     
                     std::string paramTypeStr = typeToString(*param.type);
                     paramObj.AddMember("data_type", rapidjson::Value(paramTypeStr.c_str(), allocator), allocator);
@@ -188,11 +186,11 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
                 symbolObj.AddMember("parameters", paramsArray, allocator);
             }
         }
-        else if (auto* arrayDecl = decl->getIf<ArrayDeclaration>())
+        else if (auto* arrayDecl = decl->tryAs<ArrayDeclaration>())
         {
             symbolObj.AddMember("symbol_category", "array", allocator);
             
-            auto* arrayType = arrayDecl->getType().getIf<ArrayType>();
+            auto* arrayType = arrayDecl->getType().tryAs<ArrayType>();
             if (arrayType)
             {
                 std::string elemTypeStr = typeToString(arrayType->getElementType());
@@ -206,11 +204,11 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
                 symbolObj.AddMember("dimensions", dimsArray, allocator);
             }
         }
-        else if (auto* tableDecl = decl->getIf<TableDeclaration>())
+        else if (auto* tableDecl = decl->tryAs<TableDeclaration>())
         {
             symbolObj.AddMember("symbol_category", "table", allocator);
             
-            auto* tableType = tableDecl->getType().getIf<TableType>();
+            auto* tableType = tableDecl->getType().tryAs<TableType>();
             if (tableType)
             {
                 const TableInfo& info = tableType->getInfo();
@@ -238,11 +236,11 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
                 }
             }
         }
-        else if (auto* overlayDecl = decl->getIf<OverlayDeclaration>())
+        else if (auto* overlayDecl = decl->tryAs<OverlayDeclaration>())
         {
             symbolObj.AddMember("symbol_category", "overlay", allocator);
             
-            auto* overlayType = overlayDecl->getType().getIf<OverlayType>();
+            auto* overlayType = overlayDecl->getType().tryAs<OverlayType>();
             if (overlayType)
             {
                 const OverlayInfo& info = overlayType->getInfo();
