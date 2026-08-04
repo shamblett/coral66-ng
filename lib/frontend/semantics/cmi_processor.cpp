@@ -142,7 +142,7 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
 
     for (const Usable* usable : exportedSymbols)
     {
-        auto* declaration = static_cast<const Declaration*>(usable);
+        auto* declaration = static_cast<const Declaration*>(usable); // NOLINT(*-pro-type-static-cast-downcast)
         if (!declaration)
             continue;
 
