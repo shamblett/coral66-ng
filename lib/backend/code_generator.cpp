@@ -200,7 +200,7 @@ llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
             baseType = arrType;
         }
     }
-    else if (type.tryAs<semantics::FixedType>())
+    else if (type.is<semantics::FixedType>() || type.is<semantics::OverlayType>())
     {
         baseType = llvm::Type::getInt32Ty(ctx);
     }
@@ -226,10 +226,6 @@ llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
         {
             baseType = llvm::Type::getVoidTy(ctx);
         }
-    }
-    else if (type.is<semantics::OverlayType>())
-    {
-        baseType = llvm::Type::getInt32Ty(ctx);
     }
     else if (type.is<semantics::LabelType>() || type.is<semantics::SwitchType>())
     {

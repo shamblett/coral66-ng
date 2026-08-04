@@ -77,8 +77,7 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
             scaledL = m_builder.CreateIntCast(scaledL, scaledR->getType(), true);
         }
 
-        const bool isAddSubCmp =
-            kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus
+        const bool isAddSubCmp = kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus
                                  || kind == lexer::TokenType::Equal || kind == lexer::TokenType::NotEqual
                                  || kind == lexer::TokenType::LessThan || kind == lexer::TokenType::LessThanOrEqual
                                  || kind == lexer::TokenType::GreaterThan
@@ -135,20 +134,18 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
             llvm::Value* shiftedL = scaledL;
             if (resultFraction + rightFraction >= leftFraction)
             {
-                if (std::uint32_t shiftAmount = resultFraction + rightFraction - leftFraction; shiftAmount > 0)
+                if (const std::uint32_t shiftAmount = resultFraction + rightFraction - leftFraction; shiftAmount > 0)
                 {
                     llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
                     shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
                 }
                 return m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div");
             }
-            else
-            {
-                llvm::Value* div = m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div_raw");
-                const std::uint32_t shiftAmount = leftFraction - rightFraction - resultFraction;
-                llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
-                return m_builder.CreateAShr(div, shiftVal, "fixed_div_scale_down");
-            }
+
+            llvm::Value* div = m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div_raw");
+            const std::uint32_t shiftAmount = leftFraction - rightFraction - resultFraction;
+            llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
+            return m_builder.CreateAShr(div, shiftVal, "fixed_div_scale_down");
         }
 
         if (kind == lexer::TokenType::Equal)
