@@ -114,8 +114,7 @@ TEST_CASE("CustomFormat for TokenType", "[lexer]")
 
 TEST_CASE("StringConverter for TokenType", "[lexer]")
 {
-    const std::string inFormatStr =
-        diagnostics::StringConverter<TokenType>::inFormat(TokenType::Identifier, nullptr);
+    const std::string inFormatStr = diagnostics::StringConverter<TokenType>::inFormat(TokenType::Identifier, nullptr);
     CHECK(!inFormatStr.empty());
 
     const std::string inArgStr = diagnostics::StringConverter<TokenType>::inArg(TokenType::Identifier, nullptr);

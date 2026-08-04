@@ -6,7 +6,6 @@
 
 #include "action_executor.hpp"
 
-#include <cstdlib>
 #include <llvm/Bitcode/BitcodeWriterPass.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/PassManager.h>
@@ -16,6 +15,8 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/TargetParser/Host.h>
 #include <llvm/TargetParser/Triple.h>
+
+#include <cstdlib>
 
 #include "command_line_arguments.hpp"
 #include "lib/backend/code_generation.hpp"
@@ -149,9 +150,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         case cl::OptLevel::O1: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('1').value(); break;
         case cl::OptLevel::O2: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('2').value(); break;
         case cl::OptLevel::O3: codegenOptions.ol = llvm::CodeGenOpt::parseLevel('3').value(); break;
-        default:
-            llvm::CodeGenOpt::parseLevel('0').value();
-            break;
+        default: llvm::CodeGenOpt::parseLevel('0').value(); break;
     }
 
     // Debug level
@@ -161,9 +160,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         case cl::DebugLevel::g1: codegenOptions.debugEmission = cgllvm::DebugEmission::Line; break;
         case cl::DebugLevel::g2: codegenOptions.debugEmission = cgllvm::DebugEmission::Default; break;
         case cl::DebugLevel::g3: codegenOptions.debugEmission = cgllvm::DebugEmission::Extended; break;
-        default:
-            codegenOptions.debugEmission = cgllvm::DebugEmission::None;
-            break;
+        default: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
     }
 
     auto targetMachine = coral66::cgllvm::generateLLVM(module, tree, program, codegenOptions);
@@ -289,9 +286,9 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     {
         fs::path cmiPath = outputFile;
         cmiPath.replace_extension("cmi");
-        
+
         std::string libName = std::get<std::string>(tree.getName()->getValue());
-        
+
         if (!semantics::CMIProcessor::generateCMIFile(libName, program.getContext().exportedSymbols, cmiPath))
         {
             *m_reporter << "Warning: Failed to generate CMI file for library '" << libName << "'\n";

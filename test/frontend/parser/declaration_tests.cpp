@@ -4,9 +4,9 @@
  * Date   : 23/03/2026
  */
 
-#include "test/frontend/common/common.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
+#include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;

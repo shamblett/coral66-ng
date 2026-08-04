@@ -99,17 +99,15 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     return nullptr;
                 }
             }
-            context.log(errors::parser::EXPECTED_VARIABLE.args(*(begin == end ? end - 1 : begin),
-                                                               context.getSourceInterface(),
-                                                               *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_VARIABLE.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_VARIABLE);
             return nullptr;
         }
         if (begin->getTokenType() != lexer::TokenType::Identifier)
         {
-            context.log(errors::parser::EXPECTED_ASSIGNMENT.args(*(begin == end ? end - 1 : begin),
-                                                                 context.getSourceInterface(),
-                                                                 *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_ASSIGNMENT.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_ASSIGNMENT);
             return nullptr;
         }
@@ -148,9 +146,9 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET.args(
-                        *(begin == end ? end - 1 : begin), context.getSourceInterface(),
-                        *(begin == end ? end - 1 : begin)));
+                    context.log(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET.args(*(begin == end ? end - 1 : begin),
+                                                                                   context.getSourceInterface(),
+                                                                                   *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_SQUARE_BRACKET);
                     return nullptr;
                 }
@@ -214,7 +212,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
                     return nullptr;
                 }
                 auto stmt = std::make_unique<syntax::CodeStatement>(start, begin);
-                if (begin != end) begin++; // consume END keyword
+                if (begin != end)
+                    begin++; // consume END keyword
                 return stmt;
             }
             if (begin != end && begin->getTokenType() != lexer::TokenType::StringLiteral)
@@ -241,9 +240,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     {
         if (isConsequence)
         {
-            context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(*(begin == end ? end - 1 : begin),
-                                                                       context.getSourceInterface(),
-                                                                       *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT);
             return nullptr;
         }
@@ -284,9 +282,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         }
         else
         {
-            context.log(errors::parser::EXPECTED_THEN.args(*(begin == end ? end - 1 : begin),
-                                                           context.getSourceInterface(),
-                                                           *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_THEN.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_THEN);
         }
         return nullptr;
@@ -296,9 +293,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
     {
         if (isConsequence)
         {
-            context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(*(begin == end ? end - 1 : begin),
-                                                                       context.getSourceInterface(),
-                                                                       *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_SIMPLE_STATEMENT.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_SIMPLE_STATEMENT);
             return nullptr;
         }
@@ -412,9 +408,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         }
         else
         {
-            context.log(errors::parser::EXPECTED_VARIABLE.args(*(begin == end ? end - 1 : begin),
-                                                               context.getSourceInterface(),
-                                                               *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_VARIABLE.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_VARIABLE);
         }
         return nullptr;
@@ -440,8 +435,8 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         return nullptr;
     }
 
-    context.log(errors::parser::EXPECTED_STATEMENT.args(
-        *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
+    context.log(errors::parser::EXPECTED_STATEMENT.args(*(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                                                        *(begin == end ? end - 1 : begin)));
     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_STATEMENT);
     return nullptr;
 }

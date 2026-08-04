@@ -19,7 +19,6 @@ namespace coral66::semantics
  * bounds checking for array access, part word accesses, fixed scaling, and procedure return paths.
  */
 
-
 std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& expr);
 
 class ControlFlowPass
@@ -27,7 +26,6 @@ class ControlFlowPass
     SemanticContext& m_context;
     const syntax::ProcedureDeclaration* m_currentProcedure = nullptr;
     bool m_hasAnswer = false;
-
 
 public:
     explicit ControlFlowPass(SemanticContext& context);

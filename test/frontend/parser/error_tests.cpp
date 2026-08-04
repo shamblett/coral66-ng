@@ -6,11 +6,11 @@
 
 #include <iostream>
 
-#include "test/frontend/common/common.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/parser/parser_support.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "test/common/test_config.hpp"
+#include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 /*

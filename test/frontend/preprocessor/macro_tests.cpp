@@ -114,7 +114,6 @@ TEST_CASE("Coral DELETE Macro Syntax", "[PP]")
  */
 TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
 {
-    
     SECTION("Keyword Shadowing")
     {
         // Tests that a macro can shadow a language keyword (like BEGIN)
@@ -122,7 +121,7 @@ TEST_CASE("Coral DEFINE Macro Substitution", "[PP]")
                               "BEGIN; ");
         CHECK_THAT(ret, ProducesPP("1; "));
     }
-SECTION("Simple Value Substitution")
+    SECTION("Simple Value Substitution")
     {
         auto ret = preprocess("DEFINE ID \"5\"; "
                               "INTEGER A; "

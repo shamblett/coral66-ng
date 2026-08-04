@@ -34,12 +34,14 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
         if (type == lexer::TokenType::ValueKeyword || type == lexer::TokenType::LocationKeyword)
         {
             mode = type == lexer::TokenType::ValueKeyword ? syntax::ParameterDeclaration::ParameterMode::Value :
-                                                              syntax::ParameterDeclaration::ParameterMode::Location;
+                                                            syntax::ParameterDeclaration::ParameterMode::Location;
             begin++;
             paramTypeToken = begin;
             if (begin != end
                 && (begin->getTokenType() == lexer::TokenType::IntegerKeyword
-                    || begin->getTokenType() == lexer::TokenType::FloatingKeyword || begin->getTokenType() == lexer::TokenType::BitsKeyword || begin->getTokenType() == lexer::TokenType::BitKeyword
+                    || begin->getTokenType() == lexer::TokenType::FloatingKeyword
+                    || begin->getTokenType() == lexer::TokenType::BitsKeyword
+                    || begin->getTokenType() == lexer::TokenType::BitKeyword
                     || begin->getTokenType() == lexer::TokenType::FixedKeyword))
             {
                 const auto currentType = begin->getTokenType();
@@ -53,10 +55,11 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
         else if (type == lexer::TokenType::LabelKeyword || type == lexer::TokenType::SwitchKeyword)
         {
             mode = type == lexer::TokenType::LabelKeyword ? syntax::ParameterDeclaration::ParameterMode::Label :
-                                                              syntax::ParameterDeclaration::ParameterMode::Switch;
+                                                            syntax::ParameterDeclaration::ParameterMode::Switch;
             begin++;
         }
-        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
+        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+                 || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
                  || type == lexer::TokenType::FixedKeyword)
         {
             paramTypeToken = begin;
@@ -167,14 +170,13 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
         begin++;
         if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
         {
-            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
-                                                                       context.getSourceInterface(),
-                                                                       *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
             return nullptr;
         }
         begin++;
-        
+
         std::vector<lexer::CTokenIterator> result;
         while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
@@ -191,7 +193,7 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
                 return nullptr;
             }
-            
+
             if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
             {
                 begin++;
@@ -201,12 +203,11 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 break;
             }
         }
-        
+
         if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
-            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
-                                                                        context.getSourceInterface(),
-                                                                        *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }
@@ -224,9 +225,8 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
         begin++;
         if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
         {
-            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
-                                                                       context.getSourceInterface(),
-                                                                       *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
             return nullptr;
         }
@@ -266,7 +266,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                     isProcedure = true;
                 }
                 else if (procLookahead->getTokenType() == lexer::TokenType::IntegerKeyword
-                         || procLookahead->getTokenType() == lexer::TokenType::FloatingKeyword || procLookahead->getTokenType() == lexer::TokenType::BitsKeyword || procLookahead->getTokenType() == lexer::TokenType::BitKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::FloatingKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::BitsKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::BitKeyword
                          || procLookahead->getTokenType() == lexer::TokenType::FixedKeyword)
                 {
                     procLookahead++;
@@ -300,7 +302,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 {
                     std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
                     if (begin->getTokenType() == lexer::TokenType::IntegerKeyword
-                        || begin->getTokenType() == lexer::TokenType::FloatingKeyword || begin->getTokenType() == lexer::TokenType::BitsKeyword || begin->getTokenType() == lexer::TokenType::BitKeyword
+                        || begin->getTokenType() == lexer::TokenType::FloatingKeyword
+                        || begin->getTokenType() == lexer::TokenType::BitsKeyword
+                        || begin->getTokenType() == lexer::TokenType::BitKeyword
                         || begin->getTokenType() == lexer::TokenType::FixedKeyword)
                     {
                         typeToken = begin;
@@ -380,9 +384,8 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
 
         if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
         {
-            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
-                                                                        context.getSourceInterface(),
-                                                                        *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr;
         }

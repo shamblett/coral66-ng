@@ -330,7 +330,8 @@ llvm::Value* CodeGenerator::visit(const syntax::BinaryExpression& expression)
                 {
                     if (fixed->getFractionalBits() > 0)
                     {
-                        llvm::Value* divisor = llvm::ConstantFP::get(R->getType(), static_cast<double>(1ULL << fixed->getFractionalBits()));
+                        llvm::Value* divisor = llvm::ConstantFP::get(
+                            R->getType(), static_cast<double>(1ULL << fixed->getFractionalBits()));
                         L = m_builder.CreateFDiv(L, divisor, "fixed_to_float_scale");
                     }
                 }
@@ -346,7 +347,8 @@ llvm::Value* CodeGenerator::visit(const syntax::BinaryExpression& expression)
                 {
                     if (fixed->getFractionalBits() > 0)
                     {
-                        llvm::Value* divisor = llvm::ConstantFP::get(L->getType(), static_cast<double>(1ULL << fixed->getFractionalBits()));
+                        llvm::Value* divisor = llvm::ConstantFP::get(
+                            L->getType(), static_cast<double>(1ULL << fixed->getFractionalBits()));
                         R = m_builder.CreateFDiv(R, divisor, "fixed_to_float_scale");
                     }
                 }

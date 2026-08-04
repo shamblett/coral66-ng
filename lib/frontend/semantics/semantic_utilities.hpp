@@ -7,7 +7,6 @@
 #pragma once
 
 #include "lib/support/vendor/magic_enum/magic_enum.hpp"
-
 #include "semantics.hpp"
 
 namespace coral66::semantics

@@ -60,9 +60,8 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         }
         else
         {
-            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
-                                                                 context.getSourceInterface(),
-                                                                 *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
             return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
@@ -77,9 +76,8 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         }
         else
         {
-            context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
-                                                                 context.getSourceInterface(),
-                                                                 *(begin == end ? end - 1 : begin)));
+            context.log(errors::parser::EXPECTED_IDENTIFIER.args(
+                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
             return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
@@ -131,7 +129,8 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     return {sourceObject.data().data(), end, std::move(block), std::move(communicator), name, isSegment};
 }
 
-std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
+std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
+                                          Context& context)
 {
     if (begin == end || begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {

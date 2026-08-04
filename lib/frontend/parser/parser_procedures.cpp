@@ -40,7 +40,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                                 syntax::ParameterDeclaration::ParameterMode::Location;
 
                 if (const auto nextType = begin->getTokenType();
-                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
+                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword
+                    || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
                     || nextType == lexer::TokenType::FixedKeyword)
                 {
                     auto paramTypeToken = begin;
@@ -78,8 +79,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                         }
                     }
                     parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(
-                        startMode, begin, mode, paramTypeToken, std::move(ids),
-                        std::move(fixedScale.first), std::move(fixedScale.second)));
+                        startMode, begin, mode, paramTypeToken, std::move(ids), std::move(fixedScale.first),
+                        std::move(fixedScale.second)));
                 }
                 else if (nextType == lexer::TokenType::Identifier)
                 {
@@ -176,7 +177,8 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                     startMode, begin, syntax::ParameterDeclaration::ParameterMode::Procedure, std::nullopt,
                     std::move(ids)));
             }
-            else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
+            else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+                     || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
                      || type == lexer::TokenType::FixedKeyword)
             {
                 if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
@@ -224,8 +226,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
 }
 
 std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterator& begin,
-                                                             const lexer::CTokenIterator end,
-                                                             Context& context)
+                                                             const lexer::CTokenIterator end, Context& context)
 {
     if (begin == end)
     {
@@ -238,7 +239,9 @@ std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
 
     if (begin != end
         && (begin->getTokenType() == lexer::TokenType::IntegerKeyword
-            || begin->getTokenType() == lexer::TokenType::FloatingKeyword || begin->getTokenType() == lexer::TokenType::BitsKeyword || begin->getTokenType() == lexer::TokenType::BitKeyword
+            || begin->getTokenType() == lexer::TokenType::FloatingKeyword
+            || begin->getTokenType() == lexer::TokenType::BitsKeyword
+            || begin->getTokenType() == lexer::TokenType::BitKeyword
             || begin->getTokenType() == lexer::TokenType::FixedKeyword))
     {
         typeToken = begin;

@@ -14,7 +14,8 @@
 
 namespace coral66::semantics
 {
-Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors, const std::string& libraryPath)
+Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter, bool* errors,
+                const std::string& libraryPath)
 {
     CTRACK_NAME("Semantics");
     DiagnosticCollector::clearDiagnostics();

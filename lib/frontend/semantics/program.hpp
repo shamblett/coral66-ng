@@ -6,9 +6,10 @@
 
 #pragma once
 
+#include <llvm/Support/raw_ostream.h>
+
 #include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
-#include <llvm/Support/raw_ostream.h>
 
 namespace coral66::semantics
 {

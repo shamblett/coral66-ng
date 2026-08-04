@@ -13,8 +13,8 @@
 
 #include <string_view>
 
-#include "lib/support/vendor/magic_enum/magic_enum.hpp"
 #include "lib/support/function_ref.hpp"
+#include "lib/support/vendor/magic_enum/magic_enum.hpp"
 #include "parser.hpp"
 
 namespace coral66::parser
@@ -22,7 +22,8 @@ namespace coral66::parser
 bool isAssignment(lexer::TokenType type);
 
 void validateFixedFormat(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
-std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> parseFixedFormat(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>>
+    parseFixedFormat(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
 
 bool expectIdentifier(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context,
                       std::string_view& value, FunctionRef<Message()> additional = {});

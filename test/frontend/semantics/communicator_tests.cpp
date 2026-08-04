@@ -4,13 +4,14 @@
  * Date   : 02/05/2026
  */
 
+#include <iostream>
+
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/symbol_resolution_pass.hpp"
 #include "test/common/test_config.hpp"
 #include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
-#include <iostream>
 
 using namespace coral66;
 using namespace coral66::semantics;

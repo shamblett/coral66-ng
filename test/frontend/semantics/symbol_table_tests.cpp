@@ -4,9 +4,9 @@
  * Date   : 02/05/2026
  */
 
-#include "lib/frontend/semantics/semantics.hpp"
-
 #include "lib/frontend/semantics/symbol_table.hpp"
+
+#include "lib/frontend/semantics/semantics.hpp"
 #include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 

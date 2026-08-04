@@ -237,7 +237,8 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
                 {
                     if (fixedR->getFractionalBits() > 0)
                     {
-                        llvm::Value* divisor = llvm::ConstantFP::get(targetType, static_cast<double>(1ULL << fixedR->getFractionalBits()));
+                        llvm::Value* divisor =
+                            llvm::ConstantFP::get(targetType, static_cast<double>(1ULL << fixedR->getFractionalBits()));
                         rhs = m_builder.CreateFDiv(rhs, divisor, "fixed_to_float_scale");
                     }
                 }

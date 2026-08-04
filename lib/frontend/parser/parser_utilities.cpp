@@ -15,8 +15,8 @@ void coral66::parser::validateFixedFormat(lexer::CTokenIterator& begin, const le
     parseFixedFormat(begin, end, context);
 }
 
-std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>> coral66::parser::parseFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
-                                          Context& context)
+std::pair<std::unique_ptr<coral66::syntax::Expression>, std::unique_ptr<coral66::syntax::Expression>>
+    coral66::parser::parseFixedFormat(lexer::CTokenIterator& begin, const lexer::CTokenIterator end, Context& context)
 {
     std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> result;
     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -96,8 +96,8 @@ bool coral66::parser::expect(lexer::TokenType expected, lexer::CTokenIterator& b
     {
         if (begin == end)
         {
-            context.log(errors::parser::EXPECTED_N.args(diagnostics::after(*(end - 1)), context.getSourceInterface(), expected,
-                                                        *(end - 1)));
+            context.log(errors::parser::EXPECTED_N.args(diagnostics::after(*(end - 1)), context.getSourceInterface(),
+                                                        expected, *(end - 1)));
         }
         else
         {

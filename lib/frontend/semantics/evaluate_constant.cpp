@@ -1,5 +1,5 @@
 /*
-* Project: coral66
+ * Project: coral66
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
@@ -63,4 +63,4 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
     return std::nullopt;
 }
 
-}
+} // namespace coral66::semantics

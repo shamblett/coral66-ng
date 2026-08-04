@@ -65,11 +65,12 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 const auto& libName = std::get<std::string>(itemToken->getValue());
                 std::filesystem::path cmiPath = m_context.libraryPath;
                 cmiPath /= (libName + ".cmi");
-                
+
                 std::vector<std::unique_ptr<Declaration>> importedSymbols;
                 if (!CMIProcessor::parseCMIFile(cmiPath, importedSymbols))
                 {
-                    m_context.log(errors::semantics::FAILED_TO_READ_CMI_FILE_N.args(*itemToken, m_context.source, *itemToken, cmiPath.string()));
+                    m_context.log(errors::semantics::FAILED_TO_READ_CMI_FILE_N.args(*itemToken, m_context.source,
+                                                                                    *itemToken, cmiPath.string()));
                     DiagnosticCollector::addDiagnostic(errors::semantics::FAILED_TO_READ_CMI_FILE_N);
                 }
                 else
@@ -78,13 +79,14 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                     {
                         const auto name = std::string(decl->getName());
                         decl->setScopeDepth(m_context.symbolTable.scopeCount());
-                        
+
                         // Convert to IntrusiveVariantValue
                         IntrVarPtr<Usable> usableDecl(decl.release());
-                        
+
                         if (m_context.symbolTable.lookupInCurrentScope(name))
                         {
-                            m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*itemToken, m_context.source, *itemToken));
+                            m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*itemToken, m_context.source,
+                                                                                           *itemToken));
                             DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
                         }
                         else
@@ -448,7 +450,7 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
     declaration->setAstNode(&node);
-    
+
     auto* prevTableDeclaration = m_currentTableDeclaration;
     m_currentTableDeclaration = declaration.get();
 
@@ -470,7 +472,7 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     {
         visit(*element);
     }
-    
+
     m_currentTableDeclaration = prevTableDeclaration;
 }
 
@@ -517,8 +519,8 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     }
 
     auto id = node.getIdentifier();
-    auto declaration =
-        makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(), wordPos, bitPos, m_currentTableDeclaration);
+    auto declaration = makeIntrusiveVariant<TableElementDeclaration>(id, std::move(typeCopy), node.isUnsigned(),
+                                                                     wordPos, bitPos, m_currentTableDeclaration);
     declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 
@@ -618,18 +620,24 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
             {
                 case syntax::ParameterDeclaration::ParameterMode::Value:
                     if (baseTypeVal->is<PrimitiveType>())
-                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Value});
+                        paramTypeVal = IntrusiveVariantValue(
+                            PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Value});
                     else if (baseTypeVal->is<FixedType>())
-                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Value});
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                                       baseTypeVal->as<FixedType>().getFractionalBits(),
+                                                                       Type::Value});
                     else
                         paramTypeVal = std::move(baseTypeVal);
                     isValue = true;
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Location:
                     if (baseTypeVal->is<PrimitiveType>())
-                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+                        paramTypeVal = IntrusiveVariantValue(
+                            PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
                     else if (baseTypeVal->is<FixedType>())
-                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Location});
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                                       baseTypeVal->as<FixedType>().getFractionalBits(),
+                                                                       Type::Location});
                     else
                         paramTypeVal = std::move(baseTypeVal);
                     break;
@@ -744,18 +752,24 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
             {
                 case syntax::ParameterDeclaration::ParameterMode::Value:
                     if (baseTypeVal->is<PrimitiveType>())
-                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Value});
+                        paramTypeVal = IntrusiveVariantValue(
+                            PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Value});
                     else if (baseTypeVal->is<FixedType>())
-                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Value});
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                                       baseTypeVal->as<FixedType>().getFractionalBits(),
+                                                                       Type::Value});
                     else
                         paramTypeVal = std::move(baseTypeVal);
                     isValue = true;
                     break;
                 case syntax::ParameterDeclaration::ParameterMode::Location:
                     if (baseTypeVal->is<PrimitiveType>())
-                        paramTypeVal = IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+                        paramTypeVal = IntrusiveVariantValue(
+                            PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
                     else if (baseTypeVal->is<FixedType>())
-                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(), baseTypeVal->as<FixedType>().getFractionalBits(), Type::Location});
+                        paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                                       baseTypeVal->as<FixedType>().getFractionalBits(),
+                                                                       Type::Location});
                     else
                         paramTypeVal = std::move(baseTypeVal);
                     break;
@@ -1034,18 +1048,20 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
 {
     const auto& codeToken = node.getCode();
     const auto& codeStrVariant = codeToken->getValue();
-    if (!std::holds_alternative<std::string>(codeStrVariant)) return;
+    if (!std::holds_alternative<std::string>(codeStrVariant))
+        return;
 
     const auto rawCode = std::get<std::string>(codeStrVariant);
     ParsedCode parsed;
-    
-    struct TokenInfo {
+
+    struct TokenInfo
+    {
         bool isOutput;
         std::string name;
         size_t pos;
     };
     std::vector<TokenInfo> tokens;
-    
+
     size_t i = 0;
     while (i < rawCode.length())
     {
@@ -1070,15 +1086,17 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
             i++;
         }
     }
-    
+
     std::string llvmCode;
     size_t lastPos = 0;
     size_t numOutputs = 0;
-    for (const auto& t : tokens) if (t.isOutput) numOutputs++;
-    
+    for (const auto& t : tokens)
+        if (t.isOutput)
+            numOutputs++;
+
     size_t outIdx = 0;
     size_t inIdx = numOutputs;
-    
+
     for (const auto& [isOutput, name, pos] : tokens)
     {
         llvmCode += rawCode.substr(lastPos, pos - lastPos);
@@ -1103,7 +1121,7 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
         lastPos = pos + 1 + name.length(); // 1 for @ or !
     }
     llvmCode += rawCode.substr(lastPos);
-    
+
     parsed.llvmCode = llvmCode;
     m_context.parsedCodes[&node] = parsed;
 }

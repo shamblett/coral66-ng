@@ -4,11 +4,10 @@
  * Date   : 02/05/2026
  */
 
+#include "control_flow_pass.hpp"
 
 #include "lib/frontend/common/messages/errors.hpp"
 #include "semantic_support.hpp"
-
-#include "control_flow_pass.hpp"
 
 namespace coral66::semantics
 {
@@ -19,7 +18,6 @@ void ControlFlowPass::run(const syntax::Program& program)
 {
     visit(program);
 }
-
 
 void ControlFlowPass::visit(const syntax::Program& node)
 {
@@ -206,8 +204,9 @@ void ControlFlowPass::visit(const syntax::GotoStatement& node)
                     // Coral 66 switch indices are 1-based
                     if (*constIdx < 1 || *constIdx > static_cast<std::int64_t>(sw->getLabels().size()))
                     {
-                         m_context.log(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS.args(*node.getIndex()->begin(), m_context.source, *node.getIndex()->begin()));
-                         DiagnosticCollector::addDiagnostic(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS);
+                        m_context.log(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS.args(
+                            *node.getIndex()->begin(), m_context.source, *node.getIndex()->begin()));
+                        DiagnosticCollector::addDiagnostic(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS);
                     }
                 }
             }
@@ -354,5 +353,3 @@ void ControlFlowPass::visit(const syntax::FunctionCallExpression& node)
 
 void ControlFlowPass::visit(const syntax::CodeStatement& node) {}
 } // namespace coral66::semantics
-
-
