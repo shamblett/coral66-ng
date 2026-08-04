@@ -40,7 +40,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
         bool isNegative = false;
         if (tType == lexer::TokenType::Minus || tType == lexer::TokenType::Plus)
         {
-            isNegative = (tType == lexer::TokenType::Minus);
+            isNegative = tType == lexer::TokenType::Minus;
             i++;
             if (i >= tokens.size())
                 break;
@@ -165,7 +165,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
             if (const semantics::Usable* baseUsable = m_program.getContext().symbolTable.lookup(baseName);
                 baseUsable && m_globals.contains(baseUsable))
             {
-                llvm::Constant* baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
+                auto* baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
                 std::int64_t offsetVal = 0;
                 if (astNode->getOffset()->getType() == lexer::CToken::Integer)
                 {

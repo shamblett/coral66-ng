@@ -78,10 +78,11 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         }
 
         const bool isAddSubCmp =
-            (kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus || kind == lexer::TokenType::Equal
-             || kind == lexer::TokenType::NotEqual || kind == lexer::TokenType::LessThan
-             || kind == lexer::TokenType::LessThanOrEqual || kind == lexer::TokenType::GreaterThan
-             || kind == lexer::TokenType::GreaterThanOrEqual);
+            kind == lexer::TokenType::Plus || kind == lexer::TokenType::Minus
+                                 || kind == lexer::TokenType::Equal || kind == lexer::TokenType::NotEqual
+                                 || kind == lexer::TokenType::LessThan || kind == lexer::TokenType::LessThanOrEqual
+                                 || kind == lexer::TokenType::GreaterThan
+                                 || kind == lexer::TokenType::GreaterThanOrEqual;
 
         llvm::Value* alignedL = scaledL;
         llvm::Value* alignedR = scaledR;
@@ -114,8 +115,7 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
         if (kind == lexer::TokenType::Asterisk)
         {
             llvm::Value* mult = m_builder.CreateMul(scaledL, scaledR, "fixed_mul_raw");
-            std::uint32_t currentFraction = leftFraction + rightFraction;
-            if (currentFraction > resultFraction)
+            if (const std::uint32_t currentFraction = leftFraction + rightFraction; currentFraction > resultFraction)
             {
                 llvm::Value* shiftVal =
                     llvm::ConstantInt::get(scaledL->getType(), currentFraction - resultFraction, true);
@@ -135,8 +135,7 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
             llvm::Value* shiftedL = scaledL;
             if (resultFraction + rightFraction >= leftFraction)
             {
-                std::uint32_t shiftAmount = resultFraction + rightFraction - leftFraction;
-                if (shiftAmount > 0)
+                if (std::uint32_t shiftAmount = resultFraction + rightFraction - leftFraction; shiftAmount > 0)
                 {
                     llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
                     shiftedL = m_builder.CreateShl(scaledL, shiftVal, "fixed_div_scale_up");
@@ -146,7 +145,7 @@ llvm::Value* CodeGenerator::processFixedBinaryExpression(const syntax::BinaryExp
             else
             {
                 llvm::Value* div = m_builder.CreateSDiv(shiftedL, scaledR, "fixed_div_raw");
-                std::uint32_t shiftAmount = leftFraction - rightFraction - resultFraction;
+                const std::uint32_t shiftAmount = leftFraction - rightFraction - resultFraction;
                 llvm::Value* shiftVal = llvm::ConstantInt::get(scaledL->getType(), shiftAmount, true);
                 return m_builder.CreateAShr(div, shiftVal, "fixed_div_scale_down");
             }

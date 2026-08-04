@@ -7,7 +7,6 @@
 #include "code_generator.hpp"
 
 #include "lib/frontend/semantics/program.hpp"
-#include "lib/support/vendor/fixed/dynamic_fixed.hpp"
 
 namespace coral66::semantics
 {

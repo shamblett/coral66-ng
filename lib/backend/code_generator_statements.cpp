@@ -230,10 +230,10 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
         else if (rhs->getType()->isIntegerTy() && targetType->isFloatingPointTy())
         {
             rhs = m_builder.CreateSIToFP(rhs, targetType);
-            const auto exprIt = m_program.getContext().expressionTypes.find(&statement.getExpression());
-            if (exprIt != m_program.getContext().expressionTypes.end())
+            if (const auto expressionIt = m_program.getContext().expressionTypes.find(&statement.getExpression());
+                expressionIt != m_program.getContext().expressionTypes.end())
             {
-                if (auto* fixedR = exprIt->second->tryAs<semantics::FixedType>())
+                if (auto* fixedR = expressionIt->second->tryAs<semantics::FixedType>())
                 {
                     if (fixedR->getFractionalBits() > 0)
                     {
@@ -765,7 +765,7 @@ void CodeGenerator::visit(const syntax::CodeStatement& statement)
             outputTypes.push_back(outType);
 
             if (!constraints.empty())
-                constraints += ",";
+                constraints += ',';
             constraints += "=r"; // Output constraint
         }
     }
@@ -790,14 +790,14 @@ void CodeGenerator::visit(const syntax::CodeStatement& statement)
             llvm::Value* val = m_builder.CreateLoad(type, addr);
             inputArgs.push_back(val);
             if (!constraints.empty())
-                constraints += ",";
-            constraints += "r"; // Input constraint
+                constraints += ',';
+            constraints += 'r'; // Input constraint
         }
     }
 
     // Include clobbers for safety as per specification recommendation
     if (!constraints.empty())
-        constraints += ",";
+        constraints += ',';
     constraints += "~{memory},~{dirflag},~{fpsr},~{flags},~{eax},~{ebx},~{ecx},~{edx},~{r10}";
 
     std::vector<llvm::Type*> argTypes;

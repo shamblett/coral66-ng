@@ -109,7 +109,7 @@ void CodeGenerator::generate()
 
         if (baseUsable && m_globals.contains(baseUsable))
         {
-            llvm::Constant* baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
+            const auto baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
             std::int64_t offsetVal = 0;
             if (overDecl->getOffset()->getType() == lexer::CToken::Integer)
             {
