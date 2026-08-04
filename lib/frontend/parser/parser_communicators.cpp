@@ -162,6 +162,60 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
 
     auto start = begin;
 
+    if (begin->getTokenType() == lexer::TokenType::LibraryKeyword)
+    {
+        begin++;
+        if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
+        {
+            context.log(errors::parser::EXPECTED_OPEN_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
+                                                                       context.getSourceInterface(),
+                                                                       *(begin == end ? end - 1 : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_OPEN_PARENTHESIS);
+            return nullptr;
+        }
+        begin++;
+        
+        std::vector<lexer::CTokenIterator> result;
+        while (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+        {
+            if (begin->getTokenType() == lexer::TokenType::Identifier)
+            {
+                result.push_back(begin);
+                begin++;
+            }
+            else
+            {
+                context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? end - 1 : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+                return nullptr;
+            }
+            
+            if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+            {
+                begin++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
+        {
+            context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
+                                                                        context.getSourceInterface(),
+                                                                        *(begin == end ? end - 1 : begin)));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
+            return nullptr;
+        }
+
+        auto endToken = begin;
+        begin++;
+        return std::make_unique<syntax::LibraryCommunicator>(start, endToken, std::move(result));
+    }
+
     const bool isCommon = begin->getTokenType() == lexer::TokenType::CommonKeyword;
 
     if (const bool isExternal = begin->getTokenType() == lexer::TokenType::ExternalKeyword; isCommon || isExternal)

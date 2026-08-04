@@ -10,6 +10,7 @@
 #include "test/common/test_config.hpp"
 #include "test/frontend/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
+#include <iostream>
 
 using namespace coral66;
 using namespace coral66::semantics;
@@ -80,6 +81,17 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         CHECK(res.errors == false);
     }
 
+    SECTION("Exported symbols captured correctly")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON(INTEGER A; FLOATING B) BEGIN INTEGER I ; END");
+        SymbolResolutionResult res(parsed);
+
+        REQUIRE(res.context.exportedSymbols.size() == 2);
+        CHECK(res.context.exportedSymbols[0]->as<semantics::VariableDeclaration>().getName() == "A");
+        CHECK(res.context.exportedSymbols[1]->as<semantics::VariableDeclaration>().getName() == "B");
+        CHECK(res.errors == false);
+    }
+
     SECTION("Error on duplicate symbol in COMMON communicator")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON(INTEGER A; FLOATING A) BEGIN END");
@@ -135,5 +147,22 @@ TEST_CASE("Symbol Resolution - External Communicators", "[Semantics][SymbolResol
             if (d.getName() == "REDEFINITION_OF_SYMBOL_N")
                 foundRedef = true;
         CHECK(foundRedef);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Library Communicators", "[Semantics][SymbolResolution][Communicator]")
+{
+    SECTION("Error when library CMI file cannot be read")
+    {
+        ParsedProgram parsed("PROGRAM TEST LIBRARY(NONEXISTENTLIB) BEGIN INTEGER I ; END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundError = false;
+        for (auto& d : diagnostics)
+            if (d.getName() == "FAILED_TO_READ_CMI_FILE_N")
+                foundError = true;
+        CHECK(foundError);
     }
 }
