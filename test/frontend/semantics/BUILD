@@ -24,6 +24,7 @@ cc_library(
     name = "semanticstest",
     srcs = [
         "benchmark_tests.cpp",
+        "cmi_processing_tests.cpp",
         "communicator_tests.cpp",
         "control_flow_tests.cpp",
         "generated_tests.cpp",
