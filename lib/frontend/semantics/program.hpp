@@ -45,6 +45,6 @@ public:
 };
 
 Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm::raw_ostream* reporter = &llvm::errs(),
-                bool* errors = nullptr);
+                bool* errors = nullptr, const std::string& libraryPath = "");
 
 } // namespace coral66::semantics

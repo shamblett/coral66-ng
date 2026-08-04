@@ -10,6 +10,7 @@
 #include <functional>
 #include <string>
 
+#include "cmi_processor.hpp"
 #include "control_flow_pass.hpp"
 #include "lib/frontend/common/diagnostic_collection.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
@@ -40,9 +41,14 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
     {
         if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(communicator))
         {
+            size_t usablesBefore = m_context.ownedUsables.size();
             for (const auto& item : commonCommunicator->getItems())
             {
                 visit(*item);
+            }
+            for (size_t i = usablesBefore; i < m_context.ownedUsables.size(); ++i)
+            {
+                m_context.exportedSymbols.push_back(m_context.ownedUsables[i].get());
             }
         }
         else if (auto* extCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(communicator))
@@ -50,6 +56,44 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
             for (const auto& item : extCommunicator->getItems())
             {
                 visit(*item);
+            }
+        }
+        else if (auto* libCommunicator = dynamic_cast<const syntax::LibraryCommunicator*>(communicator))
+        {
+            for (const auto& itemToken : libCommunicator->getItems())
+            {
+                const auto& libName = std::get<std::string>(itemToken->getValue());
+                std::filesystem::path cmiPath = m_context.libraryPath;
+                cmiPath /= (libName + ".cmi");
+                
+                std::vector<std::unique_ptr<Declaration>> importedSymbols;
+                if (!CMIProcessor::parseCMIFile(cmiPath, importedSymbols))
+                {
+                    m_context.log(errors::semantics::FAILED_TO_READ_CMI_FILE_N.args(*itemToken, m_context.source, *itemToken, cmiPath.string()));
+                    DiagnosticCollector::addDiagnostic(errors::semantics::FAILED_TO_READ_CMI_FILE_N);
+                }
+                else
+                {
+                    for (auto& decl : importedSymbols)
+                    {
+                        const auto name = std::string(decl->getName());
+                        decl->setScopeDepth(m_context.symbolTable.scopeCount());
+                        
+                        // Convert to IntrusiveVariantValue
+                        IntrVarPtr<Usable> usableDecl(decl.release());
+                        
+                        if (m_context.symbolTable.lookupInCurrentScope(name))
+                        {
+                            m_context.log(errors::semantics::REDEFINITION_OF_SYMBOL_N.args(*itemToken, m_context.source, *itemToken));
+                            DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
+                        }
+                        else
+                        {
+                            m_context.symbolTable.insert(name, usableDecl.get());
+                        }
+                        m_context.ownedUsables.push_back(std::move(usableDecl));
+                    }
+                }
             }
         }
     }

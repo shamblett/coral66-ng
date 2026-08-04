@@ -69,8 +69,14 @@ public:
     // Owns TableInfo structures
     TableInfos ownedTableInfos;
 
-    SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag)
-        : source(sourceInterface), m_reporter(reporterStream), m_errors(errorFlag)
+    // References to symbols that are exported via COMMON communicator
+    std::vector<const Usable*> exportedSymbols;
+
+    // The path to search for library CMI files
+    std::string libraryPath;
+
+    SemanticContext(const source_interface& sourceInterface, llvm::raw_ostream* reporterStream, bool* errorFlag, std::string libPath = "")
+        : source(sourceInterface), m_reporter(reporterStream), m_errors(errorFlag), libraryPath(std::move(libPath))
     {
     }
 

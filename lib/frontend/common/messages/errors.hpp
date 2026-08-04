@@ -115,6 +115,7 @@ CREATE_ERROR(CANNOT_ASSIGN_TO_CONST, "Cannot assign to constant or value paramet
 CREATE_ERROR(TABLE_ELEMENT_NOT_FOUND_N, "Element %0 not found in table", Underline<0>);
 CREATE_ERROR(INVALID_BIT_RANGE, "Invalid bit range specified", Underline<0>);
 CREATE_ERROR(LABEL_NOT_FOUND_N, "Label %0 not found", Underline<0>);
+CREATE_ERROR(FAILED_TO_READ_CMI_FILE_N, "Failed to read or parse CMI file: %1", Underline<0>);
 CREATE_ERROR(PROCEDURE_ARGUMENT_COUNT_MISMATCH, "Incorrect number of arguments for procedure call", Underline<0>);
 CREATE_ERROR(PROCEDURE_ARGUMENT_TYPE_MISMATCH, "Argument type mismatch", Underline<0>);
 CREATE_ERROR(LOCATION_PARAMETER_REQUIRES_LVALUE, "LOCATION parameter requires a variable (L-value)", Underline<0>);

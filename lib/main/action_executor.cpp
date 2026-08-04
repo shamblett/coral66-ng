@@ -23,6 +23,7 @@
 #include "lib/frontend/common/messages/warnings.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/cmi_processor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/support/filesystem.hpp"
 #include "lib/support/vendor/ctrack/include/ctrack.hpp"
@@ -117,7 +118,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         return std::optional<fs::path>{std::in_place};
     }
 
-    auto program = semantics::analyse(tree, std::move(cTokens), m_reporter, &errors);
+    auto program = semantics::analyse(tree, std::move(cTokens), m_reporter, &errors, cl::LibraryDirectory.getValue());
     if (errors)
     {
         return {};
@@ -283,6 +284,20 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         auto result = ctrack::result_as_string();
         *m_reporter << "\n" << result << "\n";
     }
+
+    if (tree.getIsSegment())
+    {
+        fs::path cmiPath = outputFile;
+        cmiPath.replace_extension("cmi");
+        
+        std::string libName = std::get<std::string>(tree.getName()->getValue());
+        
+        if (!semantics::CMIProcessor::generateCMIFile(libName, program.getContext().exportedSymbols, cmiPath))
+        {
+            *m_reporter << "Warning: Failed to generate CMI file for library '" << libName << "'\n";
+        }
+    }
+
     return fs::path(outputFile);
 }
 
