@@ -57,7 +57,6 @@ public:
     void visit(const syntax::Program& program);
     void visit(const syntax::Block& block);
     void visit(const syntax::Declaration& declaration);
-    void visit(const syntax::ProcedureDeclaration& declaration);
     void visit(const syntax::VariableDeclaration& declaration);
     void visit(const syntax::ArrayDeclaration& declaration);
     void visit(const syntax::TableDeclaration& declaration);
@@ -71,7 +70,6 @@ public:
     void visit(const syntax::AnswerStatement& statement);
     void visit(const syntax::CodeStatement& statement);
     void visit(const syntax::ProcedureCallStatement& statement);
-    void visit(const syntax::DummyStatement& statement);
     void visit(const syntax::BlockStatement& statement);
     void visit(const syntax::CompoundStatement& statement);
 

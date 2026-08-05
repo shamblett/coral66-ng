@@ -307,8 +307,6 @@ void CodeGenerator::visit(const syntax::Declaration& declaration)
         visit(*var);
     else if (auto* arr = dynamic_cast<const syntax::ArrayDeclaration*>(&declaration))
         visit(*arr);
-    else if (auto* proc = dynamic_cast<const syntax::ProcedureDeclaration*>(&declaration))
-        visit(*proc);
     else if (auto* tab = dynamic_cast<const syntax::TableDeclaration*>(&declaration))
         visit(*tab);
     else if (auto* over = dynamic_cast<const syntax::OverlayDeclaration*>(&declaration))
@@ -410,12 +408,6 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
             m_locals[targetUsable] = finalAddr;
         }
     }
-}
-
-void CodeGenerator::visit(const syntax::ProcedureDeclaration& declaration)
-{
-    // Nested procedures can be handled here if needed.
-    // For Phase 1, we only need top-level procedures.
 }
 
 } // namespace coral66::cgllvm

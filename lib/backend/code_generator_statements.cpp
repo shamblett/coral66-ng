@@ -95,16 +95,11 @@ void CodeGenerator::visit(const syntax::Statement& statement)
         visit(*s5);
     else if (auto* s6 = dynamic_cast<const syntax::ProcedureCallStatement*>(&statement))
         visit(*s6);
-    else if (auto* s7 = dynamic_cast<const syntax::DummyStatement*>(&statement))
-        visit(*s7);
     else if (auto* s8 = dynamic_cast<const syntax::BlockStatement*>(&statement))
         visit(*s8);
     else if (auto* s9 = dynamic_cast<const syntax::CompoundStatement*>(&statement))
         visit(*s9);
 }
-
-// ReSharper disable once CppMemberFunctionMayBeStatic
-void CodeGenerator::visit(const syntax::DummyStatement& statement) {}
 
 void CodeGenerator::visit(const syntax::BlockStatement& statement)
 {
