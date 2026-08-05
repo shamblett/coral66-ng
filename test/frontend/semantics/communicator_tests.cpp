@@ -33,7 +33,7 @@ struct SymbolResolutionResult
     }
 };
 
-inline const Usable* findDeclaration(const SemanticContext& ctx, const std::string& name)
+inline const Usable* findDeclarationComm(const SemanticContext& ctx, const std::string& name)
 {
     for (const auto& u : ctx.ownedUsables)
     {
@@ -42,6 +42,8 @@ inline const Usable* findDeclaration(const SemanticContext& ctx, const std::stri
         if (u->is<semantics::ProcedureDeclaration>() && u->as<semantics::ProcedureDeclaration>().getName() == name)
             return u.get();
         if (u->is<semantics::ArrayDeclaration>() && u->as<semantics::ArrayDeclaration>().getName() == name)
+            return u.get();
+        if (u->is<semantics::TableDeclaration>() && u->as<semantics::TableDeclaration>().getName() == name)
             return u.get();
         if (u->is<LabelDeclaration>() && u->as<LabelDeclaration>().getName() == name)
             return u.get();
@@ -56,9 +58,9 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         ParsedProgram parsed("PROGRAM TEST COMMON(INTEGER A; FLOATING B) BEGIN INTEGER I ; END");
         SymbolResolutionResult res(parsed);
 
-        CHECK(findDeclaration(res.context, "A") != nullptr);
-        CHECK(findDeclaration(res.context, "B") != nullptr);
-        CHECK(findDeclaration(res.context, "I") != nullptr);
+        CHECK(findDeclarationComm(res.context, "A") != nullptr);
+        CHECK(findDeclarationComm(res.context, "B") != nullptr);
+        CHECK(findDeclarationComm(res.context, "I") != nullptr);
         CHECK(res.errors == false);
     }
 
@@ -68,7 +70,7 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
             "PROGRAM TEST COMMON(INTEGER PROCEDURE P(VALUE INTEGER)) BEGIN INTEGER I ; I := P(10) END");
         SymbolResolutionResult res(parsed);
 
-        auto procedureDeclaration = findDeclaration(res.context, "P");
+        auto procedureDeclaration = findDeclarationComm(res.context, "P");
         CHECK(procedureDeclaration != nullptr);
         CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(res.errors == false);
@@ -129,7 +131,7 @@ TEST_CASE("Symbol Resolution - External Communicators", "[Semantics][SymbolResol
         const ParsedProgram parsed("PROGRAM TEST EXTERNAL(INTEGER PROCEDURE P(VALUE INTEGER))");
         const SymbolResolutionResult res(parsed);
 
-        auto procedureDeclaration = findDeclaration(res.context, "P");
+        auto procedureDeclaration = findDeclarationComm(res.context, "P");
         CHECK(procedureDeclaration != nullptr);
         CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(res.errors == false);
@@ -163,6 +165,71 @@ TEST_CASE("Symbol Resolution - Library Communicators", "[Semantics][SymbolResolu
         bool foundError = false;
         for (auto& d : diagnostics)
             if (d.getName() == "FAILED_TO_READ_CMI_FILE_N")
+                foundError = true;
+        CHECK(foundError);
+    }
+}
+
+TEST_CASE("Symbol Resolution - Absolute Communicators", "[Semantics][SymbolResolution][Communicator]")
+{
+    SECTION("Valid Absolute Variables With Constant Addresses")
+    {
+        ParsedProgram parsed("PROGRAM TEST ABSOLUTE ( INTEGER X / 1024, Y / 2048 ) BEGIN END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+
+        auto xVar = findDeclarationComm(res.context, "X");
+        CHECK(xVar != nullptr);
+        auto varDeclX = xVar->tryAs<semantics::VariableDeclaration>();
+        CHECK(varDeclX != nullptr);
+        CHECK(varDeclX->getAbsoluteAddress() == 1024);
+
+        auto yVar = findDeclarationComm(res.context, "Y");
+        CHECK(yVar != nullptr);
+        auto varDeclY = yVar->tryAs<semantics::VariableDeclaration>();
+        CHECK(varDeclY != nullptr);
+        CHECK(varDeclY->getAbsoluteAddress() == 2048);
+    }
+
+    SECTION("Absolute Arrays With Address")
+    {
+        ParsedProgram parsed("PROGRAM TEST ABSOLUTE ( INTEGER ARRAY A / 4096 [1:10] ) BEGIN END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+
+        auto aVar = findDeclarationComm(res.context, "A");
+        CHECK(aVar != nullptr);
+        auto arrDecl = aVar->tryAs<semantics::ArrayDeclaration>();
+        CHECK(arrDecl != nullptr);
+        CHECK(arrDecl->getAbsoluteAddress() == 4096);
+    }
+
+    SECTION("Absolute Tables With Address")
+    {
+        ParsedProgram parsed("PROGRAM TEST ABSOLUTE ( TABLE T / 8192 [10, 5] [ I INTEGER 0 ] ) BEGIN END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+
+        auto tVar = findDeclarationComm(res.context, "T");
+        REQUIRE(tVar != nullptr);
+        auto tabDecl = tVar->tryAs<semantics::TableDeclaration>();
+        REQUIRE(tabDecl != nullptr);
+        CHECK(tabDecl->getAbsoluteAddress() == 8192);
+    }
+
+    SECTION("Absolute Address Evaluation Failure")
+    {
+        ParsedProgram parsed("PROGRAM TEST ABSOLUTE ( INTEGER X / Y ) BEGIN END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == true);
+        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        bool foundError = false;
+        for (auto& d : diagnostics)
+            if (d.getName() == "EXPECTED_CONSTANT_EXPRESSION")
                 foundError = true;
         CHECK(foundError);
     }

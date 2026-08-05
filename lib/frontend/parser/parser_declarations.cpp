@@ -389,6 +389,16 @@ std::vector<std::unique_ptr<syntax::Declaration>>
         {
             auto id = begin;
             begin++;
+
+            if (outAbsoluteAddresses && begin != end && begin->getTokenType() == lexer::TokenType::Division)
+            {
+                begin++;
+                if (auto addrExpr = parseExpression(begin, end, context))
+                {
+                    (*outAbsoluteAddresses)[id] = std::move(addrExpr);
+                }
+            }
+
             std::unique_ptr<syntax::Expression> width, length;
             if (begin != end && begin->getTokenType() == lexer::TokenType::OpenSquareBracket)
             {

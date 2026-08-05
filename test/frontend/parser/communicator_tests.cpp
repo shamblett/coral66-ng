@@ -242,3 +242,69 @@ TEST_CASE("Coral Parse External Communicator", "[Parser][Communicator]")
         CHECK(procSpec2->getParameters().empty());
     }
 }
+
+TEST_CASE("Coral Parse Absolute Communicator", "[Parser][Communicator]")
+{
+    SECTION("Empty Absolute")
+    {
+        const ParsedCommunicator p("ABSOLUTE ()");
+        auto communicatorReference = dynamic_cast<AbsoluteCommunicator*>(p.communicator.get());
+        CHECK(communicatorReference != nullptr);
+        CHECK(communicatorReference->getItems().empty());
+        CHECK(communicatorReference->getAddresses().empty());
+    }
+
+    SECTION("Absolute With Variable Without Division")
+    {
+        const ParsedCommunicator p("ABSOLUTE ( INTEGER X )");
+        auto communicatorReference = dynamic_cast<AbsoluteCommunicator*>(p.communicator.get());
+        CHECK(communicatorReference != nullptr);
+        CHECK(communicatorReference->getItems().size() == 1);
+        CHECK(communicatorReference->getAddresses().empty());
+    }
+
+    SECTION("Absolute With Variable With Division (Address)")
+    {
+        const ParsedCommunicator p("ABSOLUTE ( INTEGER X / 1024 )");
+        auto communicatorReference = dynamic_cast<AbsoluteCommunicator*>(p.communicator.get());
+        CHECK(communicatorReference != nullptr);
+        CHECK(communicatorReference->getItems().size() == 1);
+        CHECK(communicatorReference->getAddresses().size() == 1);
+
+        auto varNode = dynamic_cast<const VariableDeclaration*>(communicatorReference->getItems()[0].get());
+        CHECK(varNode != nullptr);
+        CHECK(std::get<std::string>(varNode->getIdentifiers()[0]->getValue()) == "X");
+
+        auto addressExpr = communicatorReference->getAddresses().at(varNode->getIdentifiers()[0]).get();
+        auto literalExpr = dynamic_cast<const LiteralExpression*>(addressExpr);
+        CHECK(literalExpr != nullptr);
+        CHECK(std::get<llvm::APSInt>(literalExpr->getLiteral()->getValue()).getExtValue() == 1024);
+    }
+
+    SECTION("Absolute With Multiple Items")
+    {
+        const ParsedCommunicator p("ABSOLUTE ( INTEGER X / 1024, Y / 2048 ; FLOATING Z / 4096 )");
+        auto communicatorReference = dynamic_cast<AbsoluteCommunicator*>(p.communicator.get());
+        CHECK(communicatorReference != nullptr);
+        CHECK(communicatorReference->getItems().size() == 2);
+        CHECK(communicatorReference->getAddresses().size() == 3);
+    }
+
+    SECTION("Absolute With Array")
+    {
+        const ParsedCommunicator p("ABSOLUTE ( INTEGER ARRAY A / 8192 [1:10] )");
+        auto communicatorReference = dynamic_cast<AbsoluteCommunicator*>(p.communicator.get());
+        CHECK(communicatorReference != nullptr);
+        CHECK(communicatorReference->getItems().size() == 1);
+        CHECK(communicatorReference->getAddresses().size() == 1);
+    }
+
+    SECTION("Absolute With Table")
+    {
+        const ParsedCommunicator p("ABSOLUTE ( TABLE T / 16384 [10, 5] [ I INTEGER 0 ] )");
+        auto communicatorReference = dynamic_cast<AbsoluteCommunicator*>(p.communicator.get());
+        REQUIRE(communicatorReference != nullptr);
+        CHECK(communicatorReference->getItems().size() == 1);
+        CHECK(communicatorReference->getAddresses().size() == 1);
+    }
+}
