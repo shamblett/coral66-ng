@@ -48,6 +48,10 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
     if ((action == Action::Compile || action == Action::Link) && !cl::SyntaxOnly)
     {
         m_linkableFiles.emplace_back(*objectFile);
+        for (const auto& obj : cl::ObjectFiles)
+        {
+            m_linkableFiles.emplace_back(obj);
+        }
     }
     if (action == Action::Link && !cl::SyntaxOnly && !cl::ParseOnly)
     {

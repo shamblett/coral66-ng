@@ -61,6 +61,8 @@ inline llvm::cl::opt<OptLevel> OptimizationLevel(llvm::cl::desc("Optimization le
                                                                   clEnumVal(O3, "Enable expensive optimizations")));
 inline llvm::cl::opt<std::string> LibraryDirectory("L", llvm::cl::desc("Library directory path"),
                                                    llvm::cl::value_desc("dirpath"));
+inline llvm::cl::opt<std::string> ExternalDirectory("X", llvm::cl::desc("External code directory path"),
+                                                    llvm::cl::value_desc("dirpath"));
 inline llvm::cl::opt<bool> Pie("pie", llvm::cl::desc("Build a position independent executable"));
 inline llvm::cl::opt<bool> Pic("pic", llvm::cl::desc("Build position independent code"));
 inline llvm::cl::opt<bool> Version("v", llvm::cl::desc("Version"));
@@ -75,7 +77,9 @@ inline llvm::cl::opt<bool> Time("time", llvm::cl::desc("Output time taken for ea
 inline llvm::cl::opt<bool> NoAction("noact",
                                     llvm::cl::desc("Check command line parameter validity, take no further action"));
 
-// The source file name
+// The source file name and object files
 inline llvm::cl::opt<std::string> SourceFilename(llvm::cl::Positional, llvm::cl::desc("<input source file>"));
+inline llvm::cl::list<std::string> ObjectFiles(llvm::cl::Positional, llvm::cl::desc("[object files...]"),
+                                               llvm::cl::ZeroOrMore);
 
 } // namespace coral66::cl
