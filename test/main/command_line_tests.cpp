@@ -20,6 +20,7 @@ TEST_CASE("Initial state", "[cli]")
     CHECK(EmitLLVM == false);
     CHECK(OptimizationLevel == OptLevel::None);
     CHECK(LibraryDirectory.empty());
+    CHECK(ExternalDirectory.empty());
     CHECK(Pie == false);
     CHECK(Pic == false);
     CHECK(Version == false);
@@ -28,6 +29,7 @@ TEST_CASE("Initial state", "[cli]")
     CHECK(Time == false);
     CHECK(NoAction == false);
     CHECK(SourceFilename.empty());
+    CHECK(ObjectFiles.empty());
 }
 TEST_CASE("Commandline without args", "[cli]")
 {
@@ -169,5 +171,25 @@ TEST_CASE("String options")
         auto [argc, argv] = createArgs("-L path/to/libs");
         coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
         CHECK(LibraryDirectory == "path/to/libs");
+    }
+
+    SECTION("External directory")
+    {
+        auto [argc, argv] = createArgs("-X path/to/ext");
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(ExternalDirectory == "path/to/ext");
+    }
+}
+
+TEST_CASE("Positional options")
+{
+    SECTION("Object files")
+    {
+        auto [argc, argv] = createArgs("main.cor obj1.o obj2.o");
+        coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
+        CHECK(SourceFilename == "main.cor");
+        CHECK(ObjectFiles.size() == 2);
+        CHECK(ObjectFiles[0] == "obj1.o");
+        CHECK(ObjectFiles[1] == "obj2.o");
     }
 }
