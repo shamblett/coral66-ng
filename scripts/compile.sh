@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # compile.sh: A friendly wrapper for the Coral 66 compiler
 
 set -e
