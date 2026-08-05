@@ -8,6 +8,7 @@ load("@rules_cc//cc:cc_test.bzl", "cc_test")
 cc_library(
     name = "backendtest",
     srcs = [
+        "code_generator_absolute_tests.cpp",
         "code_generator_phase1_tests.cpp",
         "code_generator_phase2_tests.cpp",
         "code_generator_phase3_tests.cpp",

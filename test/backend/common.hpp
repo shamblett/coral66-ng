@@ -18,7 +18,7 @@
 #include "lib/support/function_ref.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
-inline coral66::semantics::Program generateProgram(std::string source)
+inline std::pair<coral66::syntax::Program, coral66::semantics::Program> generateProgramPair(std::string source)
 {
     bool errors = false;
     auto pptokens = coral66::lexer::tokenize(std::move(source), &llvm::errs(), &errors);
@@ -29,9 +29,16 @@ inline coral66::semantics::Program generateProgram(std::string source)
     REQUIRE_FALSE(errors);
     auto tree = coral66::parser::parseProgram(ctokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
+    
+    // We make a copy of the tree since we need to return it as well.
     auto program = coral66::semantics::analyse(tree, std::move(ctokens), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    return program;
+    return {std::move(tree), std::move(program)};
+}
+
+inline coral66::semantics::Program generateProgram(std::string source)
+{
+    return std::move(generateProgramPair(std::move(source)).second);
 }
 
 namespace coral66::Tests
@@ -120,6 +127,6 @@ struct Catch::StringMaker<llvm::Module>
             llvm::raw_string_ostream ss(s);
             module.print(ss, nullptr);
         }
-        return "'" + s + "'";
+        return " + s + ";
     }
 }; // namespace Catch
