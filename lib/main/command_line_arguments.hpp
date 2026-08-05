@@ -49,12 +49,23 @@ enum DebugLevel
     g3
 };
 
+enum class TargetEnvironment
+{
+    OS,
+    Baremetal
+};
+
 inline llvm::cl::opt<std::string> OutputFilename("o", llvm::cl::desc("Output filename"),
                                                  llvm::cl::value_desc("filename"));
 inline llvm::cl::opt<bool> CompileOnly("c", llvm::cl::desc("Stop after compiling object files"));
 inline llvm::cl::opt<bool> CompileAndAssembly("s", llvm::cl::desc("Stop after compiling and output assembly files"));
 inline llvm::cl::opt<bool> PreprocessOutput("e", llvm::cl::desc("Preprocess to stdout or output file"));
 inline llvm::cl::opt<bool> EmitLLVM("emit-llvm", llvm::cl::desc("Emit LLVM IR instead of machine code and assembly"));
+inline llvm::cl::opt<TargetEnvironment>
+    TargetEnv("target-env", llvm::cl::desc("Target environment:"), llvm::cl::init(TargetEnvironment::OS),
+              llvm::cl::values(clEnumValN(TargetEnvironment::OS, "os", "Operating System (default)"),
+                               clEnumValN(TargetEnvironment::Baremetal, "baremetal",
+                                          "Bare-metal (supports absolute addressing)")));
 inline llvm::cl::opt<OptLevel> OptimizationLevel(llvm::cl::desc("Optimization level:"),
                                                  llvm::cl::values(clEnumVal(O1, "Enable trivial optimizations"),
                                                                   clEnumVal(O2, "Enable default optimizations"),

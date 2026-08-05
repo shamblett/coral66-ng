@@ -113,9 +113,20 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
             }
         }
 
-        auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
-                                                   initializer, var->getName());
-        m_globals[var] = globalVar;
+        if (m_options.baremetal && var->getAbsoluteAddress().has_value())
+        {
+            llvm::Constant* addrInt =
+                llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(64, var->getAbsoluteAddress().value()));
+            llvm::Constant* ptr =
+                llvm::ConstantExpr::getIntToPtr(addrInt, llvm::PointerType::getUnqual(m_module.getContext()));
+            m_globals[var] = ptr;
+        }
+        else
+        {
+            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+                                                       initializer, var->getName());
+            m_globals[var] = globalVar;
+        }
     }
     else if (auto* arr = dynamic_cast<const semantics::ArrayDeclaration*>(&declaration))
     {
@@ -133,9 +144,20 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
             }
         }
 
-        auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
-                                                   initializer, arr->getName());
-        m_globals[arr] = globalVar;
+        if (m_options.baremetal && arr->getAbsoluteAddress().has_value())
+        {
+            llvm::Constant* addrInt =
+                llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(64, arr->getAbsoluteAddress().value()));
+            llvm::Constant* ptr =
+                llvm::ConstantExpr::getIntToPtr(addrInt, llvm::PointerType::getUnqual(m_module.getContext()));
+            m_globals[arr] = ptr;
+        }
+        else
+        {
+            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+                                                       initializer, arr->getName());
+            m_globals[arr] = globalVar;
+        }
     }
     else if (auto* tab = dynamic_cast<const semantics::TableDeclaration*>(&declaration))
     {
@@ -153,9 +175,20 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
             }
         }
 
-        auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
-                                                   initializer, tab->getName());
-        m_globals[tab] = globalVar;
+        if (m_options.baremetal && tab->getAbsoluteAddress().has_value())
+        {
+            llvm::Constant* addrInt =
+                llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(64, tab->getAbsoluteAddress().value()));
+            llvm::Constant* ptr =
+                llvm::ConstantExpr::getIntToPtr(addrInt, llvm::PointerType::getUnqual(m_module.getContext()));
+            m_globals[tab] = ptr;
+        }
+        else
+        {
+            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+                                                       initializer, tab->getName());
+            m_globals[tab] = globalVar;
+        }
     }
     else if (auto* over = dynamic_cast<const semantics::OverlayDeclaration*>(&declaration))
     {

@@ -105,6 +105,7 @@ CREATE_ERROR(TYPE_MISMATCH, "Type mismatch in expression", Underline<0>);
 CREATE_ERROR(EXPECTED_INTEGER_TYPE, "Expected INTEGER type", Underline<0>);
 CREATE_ERROR(EXPECTED_FLOATING_TYPE, "Expected FLOATING type", Underline<0>);
 CREATE_ERROR(EXPECTED_NUMERIC_TYPE, "Expected numeric type", Underline<0>);
+CREATE_ERROR(EXPECTED_CONSTANT_EXPRESSION, "Expected constant expression", Underline<0>);
 CREATE_ERROR(INCORRECT_NUMBER_OF_INDICES, "Incorrect number of indices for array access", Underline<0>);
 CREATE_ERROR(ARRAY_INDEX_OUT_OF_BOUNDS, "Array index out of bounds", Underline<0>);
 CREATE_ERROR(INVALID_ARRAY_BOUNDS, "Invalid array bounds: lower bound must be <= upper bound", Underline<0>);

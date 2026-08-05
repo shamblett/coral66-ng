@@ -167,6 +167,8 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         default: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
     }
 
+    codegenOptions.baremetal = (cl::TargetEnv == cl::TargetEnvironment::Baremetal);
+
     auto targetMachine = coral66::cgllvm::generateLLVM(module, tree, program, codegenOptions);
     if (!targetMachine)
     {

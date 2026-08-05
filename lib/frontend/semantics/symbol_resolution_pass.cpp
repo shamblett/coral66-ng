@@ -58,6 +58,43 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 visit(*item);
             }
         }
+        else if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(communicator))
+        {
+            size_t usablesBefore = m_context.ownedUsables.size();
+            for (const auto& item : absoluteCommunicator->getItems())
+            {
+                visit(*item);
+            }
+            for (size_t i = usablesBefore; i < m_context.ownedUsables.size(); ++i)
+            {
+                auto* usable = m_context.ownedUsables[i].get();
+                Declaration* decl = nullptr;
+                if (auto* var = usable->tryAs<VariableDeclaration>())
+                    decl = var;
+                else if (auto* arr = usable->tryAs<ArrayDeclaration>())
+                    decl = arr;
+                else if (auto* tab = usable->tryAs<TableDeclaration>())
+                    decl = tab;
+
+                if (decl)
+                {
+                    auto it = absoluteCommunicator->getAddresses().find(decl->getNameToken());
+                    if (it != absoluteCommunicator->getAddresses().end())
+                    {
+                        if (auto val = evaluateConstantInteger(*it->second))
+                        {
+                            decl->setAbsoluteAddress(*val);
+                        }
+                        else
+                        {
+                            m_context.log(errors::semantics::EXPECTED_CONSTANT_EXPRESSION.args(
+                                *it->second->begin(), m_context.source, *it->second->begin()));
+                            DiagnosticCollector::addDiagnostic(errors::semantics::EXPECTED_CONSTANT_EXPRESSION);
+                        }
+                    }
+                }
+            }
+        }
         else if (auto* libCommunicator = dynamic_cast<const syntax::LibraryCommunicator*>(communicator))
         {
             for (const auto& itemToken : libCommunicator->getItems())

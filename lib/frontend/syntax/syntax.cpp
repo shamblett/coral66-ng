@@ -93,7 +93,9 @@ ParameterDeclaration::ParameterDeclaration(const lexer::CTokenIterator begin, co
                                            std::unique_ptr<Expression> fixedTotalBits,
                                            std::unique_ptr<Expression> fixedFractionBits)
 
-    : Declaration(begin, end), m_mode(mode), m_type(type), 
+    : Declaration(begin, end),
+      m_mode(mode),
+      m_type(type),
       m_fixedTotalBits(std::move(fixedTotalBits)),
       m_fixedFractionBits(std::move(fixedFractionBits)),
       m_identifiers(std::move(identifiers))
@@ -122,7 +124,7 @@ const std::vector<lexer::CTokenIterator>& ParameterDeclaration::getIdentifiers()
 // VariableDeclaration
 VariableDeclaration::VariableDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
                                          const lexer::CTokenIterator type,
-                                         std::vector<lexer::CTokenIterator>&& identifiers, 
+                                         std::vector<lexer::CTokenIterator>&& identifiers,
                                          std::unique_ptr<Expression> fixedTotalBits,
                                          std::unique_ptr<Expression> fixedFractionBits, const bool hasPreset,
                                          std::vector<lexer::CTokenIterator>&& presetTokens)
@@ -191,8 +193,7 @@ ArrayDeclaration::ArrayDeclaration(
     const lexer::CTokenIterator begin, const lexer::CTokenIterator end, const lexer::CTokenIterator type,
     std::vector<lexer::CTokenIterator>&& identifiers,
     std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
-    std::unique_ptr<Expression> fixedTotalBits,
-    std::unique_ptr<Expression> fixedFractionBits, const bool hasPreset,
+    std::unique_ptr<Expression> fixedTotalBits, std::unique_ptr<Expression> fixedFractionBits, const bool hasPreset,
     std::vector<lexer::CTokenIterator>&& presetTokens)
     : Declaration(begin, end),
       m_type(type),
@@ -761,6 +762,25 @@ ExternalCommunicator::ExternalCommunicator(const lexer::CTokenIterator begin, co
 const std::vector<std::unique_ptr<Declaration>>& ExternalCommunicator::getItems() const
 {
     return m_items;
+}
+
+// AbsoluteCommunicator
+AbsoluteCommunicator::AbsoluteCommunicator(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+                                           std::vector<std::unique_ptr<Declaration>>&& items,
+                                           std::map<lexer::CTokenIterator, std::unique_ptr<Expression>>&& addresses)
+
+    : Communicator(begin, end), m_items(std::move(items)), m_addresses(std::move(addresses))
+{
+}
+
+const std::vector<std::unique_ptr<Declaration>>& AbsoluteCommunicator::getItems() const
+{
+    return m_items;
+}
+
+const std::map<lexer::CTokenIterator, std::unique_ptr<Expression>>& AbsoluteCommunicator::getAddresses() const
+{
+    return m_addresses;
 }
 
 } // namespace coral66::syntax

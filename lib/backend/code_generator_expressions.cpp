@@ -296,7 +296,24 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
     {
         type = llvm::Type::getInt32Ty(m_module.getContext());
     }
-    return m_builder.CreateLoad(type, addr);
+    bool isVolatile = false;
+    if (m_options.baremetal)
+    {
+        if (const auto declIt = m_program.getContext().resolvedIdentifiers.find(&expression);
+            declIt != m_program.getContext().resolvedIdentifiers.end())
+        {
+            if (auto* var = declIt->second->tryAs<semantics::VariableDeclaration>())
+                isVolatile = var->getAbsoluteAddress().has_value();
+            else if (auto* arr = declIt->second->tryAs<semantics::ArrayDeclaration>())
+                isVolatile = arr->getAbsoluteAddress().has_value();
+            else if (auto* tab = declIt->second->tryAs<semantics::TableDeclaration>())
+                isVolatile = tab->getAbsoluteAddress().has_value();
+        }
+    }
+    llvm::LoadInst* loadInst = m_builder.CreateLoad(type, addr);
+    if (isVolatile)
+        loadInst->setVolatile(true);
+    return loadInst;
 }
 
 llvm::Value* CodeGenerator::visit(const syntax::BinaryExpression& expression)
@@ -557,7 +574,25 @@ llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expressio
         }
     }
 
-    llvm::Value* loaded = m_builder.CreateLoad(type, addr, "arrayload");
+    bool isVolatile = false;
+    if (m_options.baremetal)
+    {
+        if (const auto declIt = m_program.getContext().resolvedIdentifiers.find(&expression);
+            declIt != m_program.getContext().resolvedIdentifiers.end())
+        {
+            if (auto* var = declIt->second->tryAs<semantics::VariableDeclaration>())
+                isVolatile = var->getAbsoluteAddress().has_value();
+            else if (auto* arr = declIt->second->tryAs<semantics::ArrayDeclaration>())
+                isVolatile = arr->getAbsoluteAddress().has_value();
+            else if (auto* tab = declIt->second->tryAs<semantics::TableDeclaration>())
+                isVolatile = tab->getAbsoluteAddress().has_value();
+        }
+    }
+
+    llvm::LoadInst* loadInst = m_builder.CreateLoad(type, addr, "arrayload");
+    if (isVolatile)
+        loadInst->setVolatile(true);
+    llvm::Value* loaded = loadInst;
 
     if (tableElem && tableElem->getBitPosition().has_value())
     {

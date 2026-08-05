@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include <map>
 #include <vector>
 
 #include "lib/frontend/common/messages/message.hpp"
@@ -76,8 +77,9 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
 
 std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
 
-std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
-                                                                   lexer::CTokenIterator end, Context& context);
+std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(
+    lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context,
+    std::map<lexer::CTokenIterator, std::unique_ptr<syntax::Expression>>* outAbsoluteAddresses = nullptr);
 std::unique_ptr<syntax::Statement> parseStatement(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context, bool isConsequence = false);
 std::unique_ptr<syntax::Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,

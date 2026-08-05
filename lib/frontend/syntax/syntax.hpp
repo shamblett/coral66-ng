@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -106,8 +107,14 @@ public:
     [[nodiscard]] ParameterMode getMode() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
-    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
-    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
+    [[nodiscard]] const Expression* getFixedTotalBits() const
+    {
+        return m_fixedTotalBits.get();
+    }
+    [[nodiscard]] const Expression* getFixedFractionBits() const
+    {
+        return m_fixedFractionBits.get();
+    }
 };
 
 class VariableDeclaration final : public Declaration
@@ -121,18 +128,23 @@ class VariableDeclaration final : public Declaration
 
 public:
     VariableDeclaration(lexer::CTokenIterator begin, lexer::CTokenIterator end, lexer::CTokenIterator type,
-                        std::vector<lexer::CTokenIterator>&& identifiers, 
+                        std::vector<lexer::CTokenIterator>&& identifiers,
                         std::unique_ptr<Expression> fixedTotalBits = nullptr,
-                        std::unique_ptr<Expression> fixedFractionBits = nullptr,
-                        bool hasPreset = false,
+                        std::unique_ptr<Expression> fixedFractionBits = nullptr, bool hasPreset = false,
                         std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
     [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
     void setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens);
-    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
-    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
+    [[nodiscard]] const Expression* getFixedTotalBits() const
+    {
+        return m_fixedTotalBits.get();
+    }
+    [[nodiscard]] const Expression* getFixedFractionBits() const
+    {
+        return m_fixedFractionBits.get();
+    }
 };
 
 class ProcedureDeclaration final : public Declaration
@@ -175,8 +187,8 @@ public:
                      std::vector<lexer::CTokenIterator>&& identifiers,
                      std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&& dimensions,
                      std::unique_ptr<Expression> fixedTotalBits = nullptr,
-                     std::unique_ptr<Expression> fixedFractionBits = nullptr,
-                     bool hasPreset = false, std::vector<lexer::CTokenIterator>&& presetTokens = {});
+                     std::unique_ptr<Expression> fixedFractionBits = nullptr, bool hasPreset = false,
+                     std::vector<lexer::CTokenIterator>&& presetTokens = {});
     [[nodiscard]] lexer::CTokenIterator getType() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getIdentifiers() const;
     [[nodiscard]] const std::vector<std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>>&
@@ -184,8 +196,14 @@ public:
     [[nodiscard]] bool hasPreset() const;
     [[nodiscard]] const std::vector<lexer::CTokenIterator>& getPresetTokens() const;
     void setPreset(bool hasPreset, const std::vector<lexer::CTokenIterator>& tokens);
-    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
-    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
+    [[nodiscard]] const Expression* getFixedTotalBits() const
+    {
+        return m_fixedTotalBits.get();
+    }
+    [[nodiscard]] const Expression* getFixedFractionBits() const
+    {
+        return m_fixedFractionBits.get();
+    }
 };
 
 class TableElementDeclaration final : public Declaration
@@ -210,8 +228,14 @@ public:
     [[nodiscard]] bool isUnsigned() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getWordPosition() const;
     [[nodiscard]] std::optional<lexer::CTokenIterator> getBitPosition() const;
-    [[nodiscard]] const Expression* getFixedTotalBits() const { return m_fixedTotalBits.get(); }
-    [[nodiscard]] const Expression* getFixedFractionBits() const { return m_fixedFractionBits.get(); }
+    [[nodiscard]] const Expression* getFixedTotalBits() const
+    {
+        return m_fixedTotalBits.get();
+    }
+    [[nodiscard]] const Expression* getFixedFractionBits() const
+    {
+        return m_fixedFractionBits.get();
+    }
 };
 
 class TableDeclaration final : public Declaration
@@ -260,8 +284,7 @@ class SwitchDeclaration final : public Declaration
 
 public:
     SwitchDeclaration(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
-                      const lexer::CTokenIterator identifier,
-                      std::vector<lexer::CTokenIterator> labels)
+                      const lexer::CTokenIterator identifier, std::vector<lexer::CTokenIterator> labels)
         : Declaration(begin, end), m_identifier(identifier), m_labels(std::move(labels))
     {
     }
@@ -311,7 +334,8 @@ class Statement : public Node
 
 public:
     using Node::Node;
-    Statement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::vector<lexer::CTokenIterator> labels)
+    Statement(const lexer::CTokenIterator begin, const lexer::CTokenIterator end,
+              std::vector<lexer::CTokenIterator> labels)
         : Node(begin, end), m_labels(std::move(labels))
     {
     }
@@ -605,6 +629,19 @@ public:
     ExternalCommunicator(lexer::CTokenIterator begin, lexer::CTokenIterator end,
                          std::vector<std::unique_ptr<Declaration>>&& items);
     [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getItems() const;
+};
+
+class AbsoluteCommunicator final : public Communicator
+{
+    std::vector<std::unique_ptr<Declaration>> m_items;
+    std::map<lexer::CTokenIterator, std::unique_ptr<Expression>> m_addresses;
+
+public:
+    AbsoluteCommunicator(lexer::CTokenIterator begin, lexer::CTokenIterator end,
+                         std::vector<std::unique_ptr<Declaration>>&& items,
+                         std::map<lexer::CTokenIterator, std::unique_ptr<Expression>>&& addresses);
+    [[nodiscard]] const std::vector<std::unique_ptr<Declaration>>& getItems() const;
+    [[nodiscard]] const std::map<lexer::CTokenIterator, std::unique_ptr<Expression>>& getAddresses() const;
 };
 
 } // namespace coral66::syntax

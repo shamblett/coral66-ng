@@ -29,6 +29,7 @@ void CommandLineProcessor::ParseCommandLine(const int argc, char** argv)
     cl::CompileAndAssembly = false;
     cl::PreprocessOutput = false;
     cl::EmitLLVM = false;
+    cl::TargetEnv = cl::TargetEnvironment::OS;
     cl::OptimizationLevel = cl::OptLevel::None;
     cl::LibraryDirectory = "";
     cl::ExternalDirectory = "";

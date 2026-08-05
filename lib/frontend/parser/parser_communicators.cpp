@@ -218,10 +218,13 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
     }
 
     const bool isCommon = begin->getTokenType() == lexer::TokenType::CommonKeyword;
+    const bool isAbsolute = begin->getTokenType() == lexer::TokenType::AbsoluteKeyword;
 
-    if (const bool isExternal = begin->getTokenType() == lexer::TokenType::ExternalKeyword; isCommon || isExternal)
+    if (const bool isExternal = begin->getTokenType() == lexer::TokenType::ExternalKeyword;
+        isCommon || isExternal || isAbsolute)
     {
         std::vector<std::unique_ptr<syntax::Declaration>> result;
+        std::map<lexer::CTokenIterator, std::unique_ptr<syntax::Expression>> absoluteAddresses;
         begin++;
         if (begin != end && begin->getTokenType() != lexer::TokenType::OpenParentheses)
         {
@@ -358,7 +361,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 }
                 else
                 {
-                    if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
+                    if (auto declarations =
+                            parseDeclaration(begin, end, context, isAbsolute ? &absoluteAddresses : nullptr);
+                        !declarations.empty())
                     {
                         for (auto& d : declarations)
                         {
@@ -395,6 +400,9 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
 
         if (isCommon)
             return std::make_unique<syntax::CommonCommunicator>(start, endToken, std::move(result));
+        if (isAbsolute)
+            return std::make_unique<syntax::AbsoluteCommunicator>(start, endToken, std::move(result),
+                                                                  std::move(absoluteAddresses));
         return std::make_unique<syntax::ExternalCommunicator>(start, endToken, std::move(result));
     }
 

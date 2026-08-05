@@ -37,8 +37,9 @@
 
 namespace coral66::parser
 {
-std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CTokenIterator& begin,
-                                                                   lexer::CTokenIterator end, Context& context)
+std::vector<std::unique_ptr<syntax::Declaration>>
+    parseDeclaration(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context,
+                     std::map<lexer::CTokenIterator, std::unique_ptr<syntax::Expression>>* outAbsoluteAddresses)
 {
     std::vector<std::unique_ptr<syntax::Declaration>> result;
     if (begin == end)
@@ -179,6 +180,14 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
                 {
                     ids.push_back(begin);
                     begin++;
+                    if (outAbsoluteAddresses && begin != end && begin->getTokenType() == lexer::TokenType::Division)
+                    {
+                        begin++;
+                        if (auto addrExpr = parseExpression(begin, end, context))
+                        {
+                            (*outAbsoluteAddresses)[ids.back()] = std::move(addrExpr);
+                        }
+                    }
                     if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                     {
                         // Check if the next token is an identifier and the token after is NOT a bracket.
@@ -272,6 +281,14 @@ std::vector<std::unique_ptr<syntax::Declaration>> parseDeclaration(lexer::CToken
             {
                 identifiers.push_back(begin);
                 begin++;
+                if (outAbsoluteAddresses && begin != end && begin->getTokenType() == lexer::TokenType::Division)
+                {
+                    begin++;
+                    if (auto addrExpr = parseExpression(begin, end, context))
+                    {
+                        (*outAbsoluteAddresses)[identifiers.back()] = std::move(addrExpr);
+                    }
+                }
                 if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 {
                     if (begin + 1 != end && (begin + 1)->getTokenType() == lexer::TokenType::Identifier)

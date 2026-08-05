@@ -864,6 +864,7 @@ class Declaration : public Usable
     lexer::CTokenIterator m_nameToken;
     const syntax::Declaration* m_astNode = nullptr;
     int m_scopeDepth = 0;
+    std::optional<std::uint64_t> m_absoluteAddress = std::nullopt;
 
 protected:
     template <class T>
@@ -897,6 +898,15 @@ public:
     [[nodiscard]] int getScopeDepth() const
     {
         return m_scopeDepth;
+    }
+
+    void setAbsoluteAddress(std::uint64_t address)
+    {
+        m_absoluteAddress = address;
+    }
+    [[nodiscard]] std::optional<std::uint64_t> getAbsoluteAddress() const
+    {
+        return m_absoluteAddress;
     }
 };
 

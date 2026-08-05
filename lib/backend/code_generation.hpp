@@ -32,6 +32,7 @@ enum class DebugEmission
 struct Options
 {
     bool emitAllDeclarations{};
+    bool baremetal{};
     DebugEmission debugEmission = DebugEmission::None;
     std::optional<llvm::Reloc::Model> reloc = std::nullopt;
     llvm::CodeGenOptLevel ol = llvm::CodeGenOpt::parseLevel('0').value();

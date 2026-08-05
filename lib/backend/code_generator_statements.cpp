@@ -120,6 +120,21 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
     if (!targetAddr || !rhs)
         return;
 
+    bool isVolatile = false;
+    if (m_options.baremetal)
+    {
+        if (const auto declIt = m_program.getContext().resolvedIdentifiers.find(&statement.getVariable());
+            declIt != m_program.getContext().resolvedIdentifiers.end())
+        {
+            if (auto* var = declIt->second->tryAs<semantics::VariableDeclaration>())
+                isVolatile = var->getAbsoluteAddress().has_value();
+            else if (auto* arr = declIt->second->tryAs<semantics::ArrayDeclaration>())
+                isVolatile = arr->getAbsoluteAddress().has_value();
+            else if (auto* tab = declIt->second->tryAs<semantics::TableDeclaration>())
+                isVolatile = tab->getAbsoluteAddress().has_value();
+        }
+    }
+
     const auto it = m_program.getContext().expressionTypes.find(&statement.getVariable());
     llvm::Type* targetType = nullptr;
     if (it != m_program.getContext().expressionTypes.end())
@@ -184,14 +199,18 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
                     llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
                     llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
-                    m_builder.CreateStore(storeRhs, targetAddr);
+                    auto* storeInst = m_builder.CreateStore(storeRhs, targetAddr);
+                    if (isVolatile)
+                        storeInst->setVolatile(true);
                     return;
                 }
 
                 // Integer type: already scaled by rhsFraction. Scale up by the difference.
                 llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), targetFraction - rhsFraction);
                 llvm::Value* scaledRhs = m_builder.CreateShl(rhs, shiftVal, "scaled_val_up");
-                m_builder.CreateStore(scaledRhs, targetAddr);
+                auto* storeInst = m_builder.CreateStore(scaledRhs, targetAddr);
+                if (isVolatile)
+                    storeInst->setVolatile(true);
                 return;
             }
             if (rhsFraction > targetFraction)
@@ -203,14 +222,18 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
                     llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
                     llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
-                    m_builder.CreateStore(storeRhs, targetAddr);
+                    auto* storeInst = m_builder.CreateStore(storeRhs, targetAddr);
+                    if (isVolatile)
+                        storeInst->setVolatile(true);
                     return;
                 }
 
                 // Integer type: already scaled by rhsFraction. Scale down by the difference.
                 llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), rhsFraction - targetFraction);
                 llvm::Value* scaledRhs = m_builder.CreateAShr(rhs, shiftVal, "scaled_val_down");
-                m_builder.CreateStore(scaledRhs, targetAddr);
+                auto* storeInst = m_builder.CreateStore(scaledRhs, targetAddr);
+                if (isVolatile)
+                    storeInst->setVolatile(true);
                 return;
             }
         }
@@ -348,7 +371,9 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
         }
     }
 
-    m_builder.CreateStore(rhs, targetAddr);
+    auto* storeInst = m_builder.CreateStore(rhs, targetAddr);
+    if (isVolatile)
+        storeInst->setVolatile(true);
 }
 
 void CodeGenerator::visit(const syntax::IfStatement& statement)
@@ -546,6 +571,21 @@ void CodeGenerator::visit(const syntax::GotoStatement& statement)
 void CodeGenerator::visit(const syntax::ForStatement& statement)
 {
     llvm::Value* loopVarAddr = emitAddress(statement.getVariable());
+
+    bool isVolatile = false;
+    if (m_options.baremetal)
+    {
+        if (const auto declIt = m_program.getContext().resolvedIdentifiers.find(&statement.getVariable());
+            declIt != m_program.getContext().resolvedIdentifiers.end())
+        {
+            if (auto* var = declIt->second->tryAs<semantics::VariableDeclaration>())
+                isVolatile = var->getAbsoluteAddress().has_value();
+            else if (auto* arr = declIt->second->tryAs<semantics::ArrayDeclaration>())
+                isVolatile = arr->getAbsoluteAddress().has_value();
+            else if (auto* tab = declIt->second->tryAs<semantics::TableDeclaration>())
+                isVolatile = tab->getAbsoluteAddress().has_value();
+        }
+    }
     llvm::Type* loopVarType = nullptr;
 
     if (const auto it = m_program.getContext().expressionTypes.find(&statement.getVariable());
@@ -609,7 +649,11 @@ void CodeGenerator::visit(const syntax::ForStatement& statement)
 
             llvm::Value* currV1 = m_builder.CreateLoad(loopVarType, v1Addr);
             if (loopVarAddr)
-                m_builder.CreateStore(currV1, loopVarAddr);
+            {
+                auto* st = m_builder.CreateStore(currV1, loopVarAddr);
+                if (isVolatile)
+                    st->setVolatile(true);
+            }
 
             llvm::Value* currV2 = m_builder.CreateLoad(loopVarType, v2Addr);
             llvm::Value* currV3 = m_builder.CreateLoad(loopVarType, v3Addr);
@@ -634,7 +678,9 @@ void CodeGenerator::visit(const syntax::ForStatement& statement)
             m_builder.CreateBr(incBB);
 
             m_builder.SetInsertPoint(incBB);
-            llvm::Value* cv = m_builder.CreateLoad(loopVarType, loopVarAddr);
+            llvm::LoadInst* cv = m_builder.CreateLoad(loopVarType, loopVarAddr);
+            if (isVolatile)
+                cv->setVolatile(true);
             llvm::Value* nextV1 =
                 loopVarType->isFloatingPointTy() ? m_builder.CreateFAdd(cv, currV2) : m_builder.CreateAdd(cv, currV2);
             m_builder.CreateStore(nextV1, v1Addr);
@@ -665,7 +711,11 @@ void CodeGenerator::visit(const syntax::ForStatement& statement)
                     exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
             }
             if (loopVarAddr)
-                m_builder.CreateStore(exprVal, loopVarAddr);
+            {
+                auto* st = m_builder.CreateStore(exprVal, loopVarAddr);
+                if (isVolatile)
+                    st->setVolatile(true);
+            }
 
             m_builder.CreateBr(condBB);
             m_builder.SetInsertPoint(condBB);
@@ -695,7 +745,11 @@ void CodeGenerator::visit(const syntax::ForStatement& statement)
                     exprVal = m_builder.CreateIntCast(exprVal, loopVarType, true);
             }
             if (loopVarAddr)
-                m_builder.CreateStore(exprVal, loopVarAddr);
+            {
+                auto* st = m_builder.CreateStore(exprVal, loopVarAddr);
+                if (isVolatile)
+                    st->setVolatile(true);
+            }
 
             visit(statement.getBody());
             m_builder.CreateBr(nextElBB);
