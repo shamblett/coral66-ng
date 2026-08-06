@@ -60,10 +60,13 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
         }
         else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
                  || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
-                 || type == lexer::TokenType::FixedKeyword)
+                 || type == lexer::TokenType::FixedKeyword || type == lexer::TokenType::ArrayKeyword)
         {
             paramTypeToken = begin;
-            begin++;
+            if (type != lexer::TokenType::ArrayKeyword)
+            {
+                begin++;
+            }
             if (type == lexer::TokenType::FixedKeyword)
             {
                 validateFixedFormat(begin, end, context);
@@ -272,9 +275,13 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                          || procLookahead->getTokenType() == lexer::TokenType::FloatingKeyword
                          || procLookahead->getTokenType() == lexer::TokenType::BitsKeyword
                          || procLookahead->getTokenType() == lexer::TokenType::BitKeyword
-                         || procLookahead->getTokenType() == lexer::TokenType::FixedKeyword)
+                         || procLookahead->getTokenType() == lexer::TokenType::FixedKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::ArrayKeyword)
                 {
-                    procLookahead++;
+                    if (procLookahead->getTokenType() != lexer::TokenType::ArrayKeyword)
+                    {
+                        procLookahead++;
+                    }
                     if (procLookahead != end && procLookahead->getTokenType() == lexer::TokenType::ProcedureKeyword)
                     {
                         isProcedure = true;
@@ -308,10 +315,14 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                         || begin->getTokenType() == lexer::TokenType::FloatingKeyword
                         || begin->getTokenType() == lexer::TokenType::BitsKeyword
                         || begin->getTokenType() == lexer::TokenType::BitKeyword
-                        || begin->getTokenType() == lexer::TokenType::FixedKeyword)
+                        || begin->getTokenType() == lexer::TokenType::FixedKeyword
+                        || begin->getTokenType() == lexer::TokenType::ArrayKeyword)
                     {
                         typeToken = begin;
-                        begin++;
+                        if (begin->getTokenType() != lexer::TokenType::ArrayKeyword)
+                        {
+                            begin++;
+                        }
                         if (typeToken.value()->getTokenType() == lexer::TokenType::FixedKeyword)
                         {
                             validateFixedFormat(begin, end, context);

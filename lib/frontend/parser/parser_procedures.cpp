@@ -42,10 +42,13 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 if (const auto nextType = begin->getTokenType();
                     nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword
                     || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
-                    || nextType == lexer::TokenType::FixedKeyword)
+                    || nextType == lexer::TokenType::FixedKeyword || nextType == lexer::TokenType::ArrayKeyword)
                 {
                     auto paramTypeToken = begin;
-                    begin++;
+                    if (nextType != lexer::TokenType::ArrayKeyword)
+                    {
+                        begin++;
+                    }
 
                     std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> fixedScale;
                     if (nextType == lexer::TokenType::FixedKeyword)

@@ -158,10 +158,14 @@ std::vector<std::unique_ptr<syntax::Declaration>>
     };
 
     if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
-        || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::FixedKeyword)
+        || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::FixedKeyword
+        || type == lexer::TokenType::ArrayKeyword)
     {
         auto typeToken = begin;
-        begin++;
+        if (type != lexer::TokenType::ArrayKeyword)
+        {
+            begin++;
+        }
 
         std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> fixedScale;
         if (type == lexer::TokenType::FixedKeyword)
