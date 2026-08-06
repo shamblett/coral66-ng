@@ -421,6 +421,17 @@ static std::unique_ptr<syntax::Statement> parseStatementImpl(lexer::CTokenIterat
         return std::make_unique<syntax::DummyStatement>(begin, begin);
     }
 
+    if (begin->getTokenType() == lexer::TokenType::SegmentKeyword)
+    {
+        auto start = begin;
+        begin++;
+        if (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+        {
+            begin++;
+        }
+        return std::make_unique<syntax::DummyStatement>(start, begin);
+    }
+
     if (begin->getTokenType() == lexer::TokenType::BeginKeyword)
     {
         auto blockStart = begin;
