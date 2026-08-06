@@ -48,9 +48,8 @@ TEST_CASE("Code Generator Absolute Communicator", "[CodeGenerator][Absolute]")
 
     SECTION("Generates Volatile Accesses in Baremetal Mode - Table")
     {
-        SKIP();
         auto [syntaxTree, program] = generateProgramPair(
-            "PROGRAM MAIN ABSOLUTE ( TABLE T / 4096 [10, 5] [ I INTEGER 0 ] ) BEGIN X := 10; I[T] := 2; END");
+            "PROGRAM MAIN ABSOLUTE ( INTEGER X / 1024; TABLE T / 4096 [10, 5] [ I INTEGER 0 ]; ) BEGIN X := 10; I[0] := 2; END");
 
         llvm::LLVMContext context;
         auto module = std::make_unique<llvm::Module>("coral_module", context);
