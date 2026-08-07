@@ -797,10 +797,10 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_IDENTIFIER.args(*(begin == end ? end - 1 : begin),
-                                                                         context.getSourceInterface(),
-                                                                         *(begin == end ? end - 1 : begin)));
-                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+                    context.log(errors::parser::EXPECTED_LABELS.args(*(begin == end ? end - 1 : begin),
+                                                                     context.getSourceInterface(),
+                                                                     *(begin == end ? end - 1 : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_LABELS);
                 }
             }
             else

@@ -94,7 +94,6 @@ CREATE_ERROR(ANSWER_OUTSIDE_PROCEDURE, "Answer statement used outside procedure 
 CREATE_ERROR(ANSWER_IN_UNTYPED_PROCEDURE, "Answer statement used inside untyped procedure", InsertAfter<0>);
 CREATE_ERROR(MISSING_ANSWER_STATEMENT, "Typed procedure must contain an answer statement", InsertAfter<0>);
 CREATE_ERROR(MALFORMED_COMMUNICATOR, "Invalid format for communicator", Underline<0>);
-CREATE_ERROR(EXPECTED_N_AFTER_N, "Expected %0 after %1", InsertAfter<1, 0>);
 } // namespace parser
 
 namespace semantics

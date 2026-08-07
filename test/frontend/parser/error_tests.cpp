@@ -600,6 +600,13 @@ TEST_CASE("Declarations - Errors", "[Parser][Declaration]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_EXPRESSION));
     }
 
+    SECTION("Missing Switch Labels")
+    {
+        ParsedDeclaration p("SWITCH s :=");
+        CHECK(p.declaration.empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_LABELS));
+    }
+
     SECTION("Expected Declaration")
     {
         ParsedDeclaration p("OVERLAY x WITH");
