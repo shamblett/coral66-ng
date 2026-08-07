@@ -63,6 +63,10 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             context.log(errors::parser::EXPECTED_IDENTIFIER.args(
                 *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+            if (errors)
+            {
+                *errors = context.getErrorCount() > 0;
+            }
             return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
     }
@@ -79,12 +83,16 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             context.log(errors::parser::EXPECTED_IDENTIFIER.args(
                 *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_IDENTIFIER);
+            if (errors)
+            {
+                *errors = context.getErrorCount() > 0;
+            }
             return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
         }
     }
     else
     {
-        context.log(errors::parser::EXPECTED_PROGRAM_SEGMENT.args(*begin, context.getSourceInterface(), *begin));
+        context.log(errors::parser::EXPECTED_PROGRAM_SEGMENT.args(*(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_PROGRAM_SEGMENT);
         if (errors)
         {
