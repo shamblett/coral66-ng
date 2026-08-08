@@ -231,4 +231,27 @@ TEST_CASE("Generated", "[Parser][Golden]")
 
         CHECK(sourceAst == ast);
     }
+
+    SECTION("G7")
+    {
+        auto sourcePath = getTestDataPath("generated/g7.cor", "GOLDEN_DIR");
+        auto source = readFile(sourcePath);
+        CHECK(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        parser::DiagnosticCollector::clearDiagnostics();
+        auto parsed = parser::parseProgram(cTokens, &ss);
+
+        auto sourceAst = tools::AstDump::dumpToString(parsed);
+        auto astPath = getTestDataPath("generated/g67ast.json", "GOLDEN_DIR");
+        auto ast = readFile(astPath);
+        CHECK(!ast.empty());
+
+        CHECK(sourceAst == ast);
+    }
 }
