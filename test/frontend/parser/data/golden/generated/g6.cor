@@ -4,6 +4,10 @@ EXTERNAL (
   INTEGER PROCEDURE computeStatus ( VALUE INTEGER );
 )
 
+LIBRARY ( myMathsLib; MyIOLib; )
+
+ABSOLUTE { INTEGER register \ 1024; )
+
 BEGIN
   INTEGER val;
   INTEGER ARRAY sharedArr [ 0 : 5 ];

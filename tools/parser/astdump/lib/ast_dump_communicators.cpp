@@ -35,6 +35,26 @@ rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
         obj.AddMember("External", externals, m_alloc);
     }
 
+    if (auto* libraryCommunicator = dynamic_cast<const syntax::LibraryCommunicator*>(communicator))
+    {
+        rapidjson::Value libraries(rapidjson::kArrayType);
+        for (const auto& library : libraryCommunicator->getItems())
+        {
+            libraries.PushBack(getTokenString(library), m_alloc);
+        }
+        obj.AddMember("Library", libraries, m_alloc);
+    }
+
+    if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(communicator))
+    {
+        rapidjson::Value absolutes(rapidjson::kArrayType);
+        for (const auto& absolute : absoluteCommunicator->getItems())
+        {
+            absolutes.PushBack(dump(absolute.get()), m_alloc);
+        }
+        obj.AddMember("Absolute", absolutes, m_alloc);
+    }
+
     return obj;
 }
 
