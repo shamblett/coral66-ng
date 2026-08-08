@@ -5,7 +5,7 @@ COMMON (
   FLOATING commonFloat
 )
 
-LIBRARY(NONEXISTENTLIB);
+LIBRARY(myMathsLib, myIOLib);
 
 ABSOLUTE ( INTEGER register / 1024; );
 

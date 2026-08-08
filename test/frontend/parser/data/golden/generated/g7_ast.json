@@ -61,7 +61,11 @@
             "Library": [
                 {
                     "Class": "identifier",
-                    "Value": "NONEXISTENTLIB"
+                    "Value": "myMathsLib"
+                },
+                {
+                    "Class": "identifier",
+                    "Value": "myIOLib"
                 }
             ]
         },
