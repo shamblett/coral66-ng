@@ -115,12 +115,32 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[0].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 123);
+
         CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[1].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[1].getValue()) == 0);
+
         CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
         CHECK(result.data()[2].getType() == coral66::lexer::CToken::Integer);
         CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 9999);
+    }
+
+    SECTION("Hexadecimal Integers")
+    {
+        auto result = lex("0x1000 0XABCD 0x0");
+        CHECK(result.data().size() == 3);
+
+        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[0].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[0].getValue()) == 0x1000);
+
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[1].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[1].getValue()) == 0xABCD);
+
+        CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[2].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 0);
     }
 
     SECTION("Floating Point")

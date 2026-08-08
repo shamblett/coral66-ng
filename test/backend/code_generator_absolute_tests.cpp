@@ -27,6 +27,25 @@ TEST_CASE("Code Generator Absolute Communicator", "[CodeGenerator][Absolute]")
         CHECK_THAT(*module, ContainsIR("inttoptr \\(i64 1024 to ptr\\)"));
     }
 
+    SECTION("Generates Volatile Accesses in Baremetal Mode - Integer Hex Value")
+    {
+        auto [syntaxTree, program] =
+            generateProgramPair("PROGRAM MAIN ABSOLUTE ( INTEGER X / 0x400 ) BEGIN X := 10; END");
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("coral_module", context);
+
+        cgllvm::Options codegenOptions;
+        codegenOptions.baremetal = true;
+
+        auto targetMachine = cgllvm::generateLLVM(*module, syntaxTree, program, codegenOptions);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // Inspect IR using the ContainsIR matcher
+        CHECK_THAT(*module, ContainsIR("store volatile i32 10, ptr inttoptr \\(i64 1024 to ptr\\)"));
+        CHECK_THAT(*module, ContainsIR("inttoptr \\(i64 1024 to ptr\\)"));
+    }
+
     SECTION("Generates Volatile Accesses in Baremetal Mode - Array")
     {
         auto [syntaxTree, program] = generateProgramPair(

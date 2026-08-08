@@ -347,11 +347,18 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
         }
         return {{std::move(number), CToken::Floating}};
     }
-    // Integer (Decimal)
+    // Integer (Decimal or Hex)
     // Coral 66 integers are decimal. OCTAL is handled via OCTAL().
     const llvm::StringRef ref(text);
     llvm::APInt value;
-    if (ref.getAsInteger(10, value))
+    bool failed = false;
+    if (text.starts_with("0x") || text.starts_with("0X")) {
+        failed = ref.drop_front(2).getAsInteger(16, value);
+    } else {
+        failed = ref.getAsInteger(10, value);
+    }
+    
+    if (failed)
     {
         return {};
     }
@@ -406,7 +413,21 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
             if (iter->getTokenType() == TokenType::PPNumber)
             {
                 numberText += std::string(iter->getValue());
-                if (auto next = iter + 1; next != end && (next->getTokenType() == TokenType::Apostrophe || (next->getTokenType() == TokenType::Identifier && (next->getValue().starts_with("e") || next->getValue().starts_with("E")))))
+                if (auto next = iter + 1; next != end && next->getTokenType() == TokenType::Identifier && numberText == "0" && (next->getValue().starts_with("x") || next->getValue().starts_with("X")))
+                {
+                    bool all_hex = true;
+                    for (size_t i = 1; i < next->getValue().size(); ++i) {
+                        if (!std::isxdigit(static_cast<unsigned char>(next->getValue()[i]))) {
+                            all_hex = false;
+                            break;
+                        }
+                    }
+                    if (all_hex && next->getValue().size() > 1) {
+                        numberText += std::string(next->getValue());
+                        iter = next;
+                    }
+                }
+                else if (auto next = iter + 1; next != end && (next->getTokenType() == TokenType::Apostrophe || (next->getTokenType() == TokenType::Identifier && (next->getValue().starts_with("e") || next->getValue().starts_with("E")))))
                 {
                     if (next->getTokenType() == TokenType::Identifier && next->getValue().size() > 1) {
                         bool all_digits = true;
