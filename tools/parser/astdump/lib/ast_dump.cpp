@@ -30,14 +30,20 @@ rapidjson::Value AstDump::dump(const syntax::Program& program)
     }
     obj.AddMember("Name", getTokenString(program.getName()), m_alloc);
 
-    // Dump Communicator
-    if (const auto* communicator = program.getCommunicator())
+    // Dump Communicators
+    auto& communicators = program.getCommunicators();
+    if (!communicators.empty())
     {
-        obj.AddMember("Communicator", dump(communicator), m_alloc);
+        rapidjson::Value commArray(rapidjson::kArrayType);
+        for (const auto& comm : communicators)
+        {
+            commArray.PushBack(dump(comm.get()), m_alloc);
+        }
+        obj.AddMember("Communicators", commArray, m_alloc);
     }
     else
     {
-        obj.AddMember("Communicator", rapidjson::Value(rapidjson::kNullType), m_alloc);
+        obj.AddMember("Communicators", rapidjson::Value(rapidjson::kNullType), m_alloc);
     }
 
     // Dump Block

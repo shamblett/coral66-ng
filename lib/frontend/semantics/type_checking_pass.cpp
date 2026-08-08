@@ -69,9 +69,9 @@ void TypeCheckingPass::run(const syntax::Program& program)
 
 void TypeCheckingPass::visit(const syntax::Program& node)
 {
-    if (const auto* communicator = node.getCommunicator())
+    for (const auto& comm : node.getCommunicators())
     {
-        if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(communicator))
+        if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(comm.get()))
         {
             for (const auto& item : commonCommunicator->getItems())
             {

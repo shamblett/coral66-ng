@@ -186,7 +186,7 @@ struct ParsedProgram
     Program program;
 
     explicit ParsedProgram(std::string src)
-        : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, nullptr, nullptr, false)
+        : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), nullptr, false)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);

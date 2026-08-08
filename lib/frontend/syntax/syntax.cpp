@@ -23,9 +23,9 @@ lexer::CTokenIterator Node::end() const
 
 // Program
 Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
-                 std::unique_ptr<Communicator>&& communicator, const lexer::CTokenIterator name, const bool isSegment)
+                 std::vector<std::unique_ptr<Communicator>>&& communicators, const lexer::CTokenIterator name, const bool isSegment)
     : Node(begin, end),
-      m_communicator(std::move(communicator)),
+      m_communicators(std::move(communicators)),
       m_block(std::move(block)),
       m_name(name),
       m_segment(isSegment)
@@ -42,9 +42,9 @@ const Block& Program::getBlock() const
     return *m_block;
 }
 
-const Communicator* Program::getCommunicator() const
+const std::vector<std::unique_ptr<Communicator>>& Program::getCommunicators() const
 {
-    return m_communicator.get();
+    return m_communicators;
 }
 
 lexer::CTokenIterator Program::getName() const

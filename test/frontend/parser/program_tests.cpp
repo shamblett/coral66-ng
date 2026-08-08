@@ -16,8 +16,8 @@ TEST_CASE("Coral Parse Program with Communicator", "[Parser][Program]")
     SECTION("Empty Common Communicator")
     {
         const ParsedProgram p("PROGRAM TEST COMMON () BEGIN END");
-        CHECK(p.program.getCommunicator() != nullptr);
-        auto communicatorReference = dynamic_cast<const CommonCommunicator*>(p.program.getCommunicator());
+        CHECK(p.program.getCommunicators().size() == 1);
+        auto communicatorReference = dynamic_cast<const CommonCommunicator*>(p.program.getCommunicators()[0].get());
         CHECK(communicatorReference != nullptr);
         CHECK(communicatorReference->getItems().empty());
     }
@@ -25,8 +25,8 @@ TEST_CASE("Coral Parse Program with Communicator", "[Parser][Program]")
     SECTION("Common Communicator with Items")
     {
         const ParsedProgram p("PROGRAM TEST COMMON ( INTEGER A ; LABEL B ) BEGIN END");
-        CHECK(p.program.getCommunicator() != nullptr);
-        auto communicatorReference = dynamic_cast<const CommonCommunicator*>(p.program.getCommunicator());
+        CHECK(p.program.getCommunicators().size() == 1);
+        auto communicatorReference = dynamic_cast<const CommonCommunicator*>(p.program.getCommunicators()[0].get());
         CHECK(communicatorReference != nullptr);
         const auto& items = communicatorReference->getItems();
         CHECK(items.size() == 2);
@@ -46,8 +46,8 @@ TEST_CASE("Coral Parse Program with Communicator", "[Parser][Program]")
     SECTION("Segment with Common Communicator")
     {
         const ParsedProgram p("SEGMENT TEST COMMON ( INTEGER A ) BEGIN END");
-        CHECK(p.program.getCommunicator() != nullptr);
-        auto communicatorReference = dynamic_cast<const CommonCommunicator*>(p.program.getCommunicator());
+        CHECK(p.program.getCommunicators().size() == 1);
+        auto communicatorReference = dynamic_cast<const CommonCommunicator*>(p.program.getCommunicators()[0].get());
         CHECK(communicatorReference != nullptr);
     }
 }

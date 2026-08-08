@@ -1,0 +1,16 @@
+PROGRAM G7
+
+COMMON (
+  INTEGER ARRAY commonArray [ 1 : 10 ];
+  FLOATING commonFloat
+)
+
+LIBRARY(NONEXISTENTLIB);
+
+ABSOLUTE ( INTEGER register / 1024; );
+
+EXTERNAL (  INTEGER PROCEDURE myExternal ( VALUE INTEGER ) );
+
+BEGIN
+
+END end of program ;

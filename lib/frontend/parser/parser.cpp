@@ -67,7 +67,7 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             {
                 *errors = context.getErrorCount() > 0;
             }
-            return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
+            return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), begin, false};
         }
     }
     else if (begin != end && begin->getTokenType() == lexer::TokenType::SegmentKeyword)
@@ -87,7 +87,7 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             {
                 *errors = context.getErrorCount() > 0;
             }
-            return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
+            return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), begin, false};
         }
     }
     else
@@ -98,23 +98,40 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         {
             *errors = context.getErrorCount() > 0;
         }
-        return {sourceObject.data().data(), end, nullptr, nullptr, name, false};
+        return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), name, false};
     }
 
-    // Communicator
+    // Communicators
     begin++;
-    std::unique_ptr<syntax::Communicator> communicator = parseCommunicator(begin, end, context);
-    if (!communicator && context.getErrorCount() > 0)
+    std::vector<std::unique_ptr<syntax::Communicator>> communicators;
+    while (begin != end && begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {
-        if (begin != end)
+        std::unique_ptr<syntax::Communicator> communicator = parseCommunicator(begin, end, context);
+        if (communicator)
         {
-            context.log(errors::parser::MALFORMED_COMMUNICATOR.args(*begin, context.getSourceInterface(), *begin));
-            DiagnosticCollector::addDiagnostic(errors::parser::MALFORMED_COMMUNICATOR);
-            if (errors)
+            communicators.push_back(std::move(communicator));
+            if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)
             {
-                *errors = context.getErrorCount() > 0;
+                begin++;
             }
-            return {sourceObject.data().data(), end, nullptr, nullptr, begin, false};
+        }
+        else if (context.getErrorCount() > 0)
+        {
+            if (begin != end)
+            {
+                context.log(errors::parser::MALFORMED_COMMUNICATOR.args(*begin, context.getSourceInterface(), *begin));
+                DiagnosticCollector::addDiagnostic(errors::parser::MALFORMED_COMMUNICATOR);
+                if (errors)
+                {
+                    *errors = context.getErrorCount() > 0;
+                }
+                return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), begin, false};
+            }
+        }
+        else
+        {
+            // Not a communicator keyword, likely a missing BEGIN or bad token
+            break;
         }
     }
 
@@ -134,7 +151,7 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
         *errors = context.getErrorCount() > 0;
     }
 
-    return {sourceObject.data().data(), end, std::move(block), std::move(communicator), name, isSegment};
+    return {sourceObject.data().data(), end, std::move(block), std::move(communicators), name, isSegment};
 }
 
 std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,

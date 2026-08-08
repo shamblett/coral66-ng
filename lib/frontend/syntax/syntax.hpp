@@ -40,17 +40,17 @@ public:
 
 class Program final : public Node
 {
-    std::unique_ptr<Communicator> m_communicator;
+    std::vector<std::unique_ptr<Communicator>> m_communicators;
     std::unique_ptr<Block> m_block;
     lexer::CTokenIterator m_name;
     bool m_segment;
 
 public:
     Program(lexer::CTokenIterator begin, lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
-            std::unique_ptr<Communicator>&& communicator, lexer::CTokenIterator name, bool isSegment);
+            std::vector<std::unique_ptr<Communicator>>&& communicators, lexer::CTokenIterator name, bool isSegment);
     [[nodiscard]] const Block& getBlock() const;
     [[nodiscard]] bool hasBlock() const;
-    [[nodiscard]] const Communicator* getCommunicator() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<Communicator>>& getCommunicators() const;
     [[nodiscard]] lexer::CTokenIterator getName() const;
     [[nodiscard]] bool getIsSegment() const;
 };

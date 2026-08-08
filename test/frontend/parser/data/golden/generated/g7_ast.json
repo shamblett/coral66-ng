@@ -1,0 +1,117 @@
+{
+    "NodeType": "Program",
+    "Name": {
+        "Class": "identifier",
+        "Value": "G7"
+    },
+    "Communicators": [
+        {
+            "Common": [
+                {
+                    "NodeType": "ArrayDeclaration",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Identifiers": [
+                        {
+                            "Class": "identifier",
+                            "Value": "commonArray"
+                        }
+                    ],
+                    "Dimensions": [
+                        [
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "1"
+                                }
+                            },
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "10"
+                                }
+                            }
+                        ]
+                    ],
+                    "Has Preset": false,
+                    "Preset Tokens": []
+                },
+                {
+                    "NodeType": "VariableDeclaration",
+                    "Type": {
+                        "Class": "FLOATING",
+                        "Value": "FLOATING"
+                    },
+                    "Identifiers": [
+                        {
+                            "Class": "identifier",
+                            "Value": "commonFloat"
+                        }
+                    ],
+                    "Preset": false,
+                    "Preset Tokens": []
+                }
+            ]
+        },
+        {
+            "Library": [
+                {
+                    "Class": "identifier",
+                    "Value": "NONEXISTENTLIB"
+                }
+            ]
+        },
+        {
+            "Absolute": [
+                {
+                    "NodeType": "VariableDeclaration",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Identifiers": [
+                        {
+                            "Class": "identifier",
+                            "Value": "register"
+                        }
+                    ],
+                    "Preset": false,
+                    "Preset Tokens": []
+                }
+            ]
+        },
+        {
+            "External": [
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "myExternal"
+                    },
+                    "Parameters": [
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "Block": {
+        "NodeType": "Block"
+    }
+}

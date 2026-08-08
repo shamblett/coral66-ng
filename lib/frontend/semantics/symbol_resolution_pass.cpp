@@ -37,9 +37,9 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
 {
     m_context.symbolTable.enterScope();
 
-    if (const auto* communicator = node.getCommunicator())
+    for (const auto& comm : node.getCommunicators())
     {
-        if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(communicator))
+        if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(comm.get()))
         {
             size_t usablesBefore = m_context.ownedUsables.size();
             for (const auto& item : commonCommunicator->getItems())
@@ -51,14 +51,14 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 m_context.exportedSymbols.push_back(m_context.ownedUsables[i].get());
             }
         }
-        else if (auto* extCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(communicator))
+        else if (auto* extCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(comm.get()))
         {
             for (const auto& item : extCommunicator->getItems())
             {
                 visit(*item);
             }
         }
-        else if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(communicator))
+        else if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(comm.get()))
         {
             size_t usablesBefore = m_context.ownedUsables.size();
             for (const auto& item : absoluteCommunicator->getItems())
@@ -95,7 +95,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 }
             }
         }
-        else if (auto* libCommunicator = dynamic_cast<const syntax::LibraryCommunicator*>(communicator))
+        else if (auto* libCommunicator = dynamic_cast<const syntax::LibraryCommunicator*>(comm.get()))
         {
             for (const auto& itemToken : libCommunicator->getItems())
             {
