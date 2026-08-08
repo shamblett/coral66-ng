@@ -94,7 +94,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N);
         return {{}, nullptr};
     }
-    
+
     const auto* identifierPos = &defineDirective.tokens[0];
     const auto* curr = identifierPos + 1;
     const auto* end = defineDirective.tokens.data() + defineDirective.tokens.size();
@@ -121,8 +121,8 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     {
         log(errors::pp::PP_EXPECTED_N.args(*openP, *this, lexer::TokenType::CloseParentheses, *openP));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N);
-        log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
-        preprocessor::DiagnosticCollector::addDiagnostic(notes::TO_MATCH_N_HERE);
+        log(notes::pp::TO_MATCH_N_HERE.args(*openP, *this, *openP));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::pp::TO_MATCH_N_HERE);
         return {{}, nullptr};
     }
 
@@ -169,7 +169,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         }
         log(errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N.args(*curr, *this, *curr));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::REDEFINITION_OF_MACRO_PARAMETER_N);
-        log(notes::PREVIOUSLY_DECLARED_HERE.args(*result, *this, *result));
+        log(notes::pp::PREVIOUSLY_DECLARED_HERE.args(*result, *this, *result));
         preprocessor::DiagnosticCollector::addDiagnostic(notes::pp::PREVIOUSLY_DECLARED_HERE);
         curr++;
     }
@@ -177,16 +177,16 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     {
         log(errors::pp::PP_EXPECTED_N.args(*(curr - 1), *this, lexer::TokenType::CloseParentheses, *(curr - 1)));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N);
-        log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
-        preprocessor::DiagnosticCollector::addDiagnostic(notes::TO_MATCH_N_HERE);
+        log(notes::pp::TO_MATCH_N_HERE.args(*openP, *this, *openP));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::pp::TO_MATCH_N_HERE);
         return {{}, nullptr};
     }
     if (curr->getTokenType() != lexer::TokenType::CloseParentheses)
     {
         log(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N.args(*curr, *this, lexer::TokenType::CloseParentheses, *curr));
         preprocessor::DiagnosticCollector::addDiagnostic(errors::pp::PP_EXPECTED_N_INSTEAD_OF_N);
-        log(notes::TO_MATCH_N_HERE.args(*openP, *this, *openP));
-        preprocessor::DiagnosticCollector::addDiagnostic(notes::TO_MATCH_N_HERE);
+        log(notes::pp::TO_MATCH_N_HERE.args(*openP, *this, *openP));
+        preprocessor::DiagnosticCollector::addDiagnostic(notes::pp::TO_MATCH_N_HERE);
         return {{}, nullptr};
     }
 

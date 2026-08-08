@@ -41,18 +41,10 @@
 
 namespace coral66::notes
 {
-CREATE_NOTE(TYPEDEF_OVERSHADOWED_BY_DECLARATION, "%0 is a typedef but overshadowed by declaration here:", PointAt<0>);
-
-CREATE_NOTE(IDENTIFIER_IS_TYPEDEF,
-            "%0 is a typename and not an identifier due to typedef declaration here:", Underline<0>);
-
-CREATE_NOTE(TO_MATCH_N_HERE, "To match %0 here:", PointAt<0>);
-
-CREATE_NOTE(PREVIOUSLY_DECLARED_HERE, "Previously declared here:", Underline<0>);
 
 namespace pp
 {
-CREATE_NOTE(WHEN_CONCATENATING_N_AND_N, "When concatenating %0 and %2", Underline<0>, PointAt<1>, Underline<2>);
+CREATE_NOTE(TO_MATCH_N_HERE, "To match %0 here:", PointAt<0>);
 CREATE_NOTE(PREVIOUSLY_DECLARED_HERE, "Previously declared here:", Underline<0>);
 } // namespace pp
 } // namespace coral66::notes

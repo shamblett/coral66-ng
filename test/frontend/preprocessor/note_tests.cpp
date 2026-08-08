@@ -41,7 +41,7 @@ TEST_CASE("Preprocess - Notes", "[PP]")
         bool errors = false;
         auto result = preprocess("DEFINE id(p1,p2;", errors);
         CHECK(errors);
-        CHECK(result.findDiagnostic(TO_MATCH_N_HERE));
+        CHECK(result.findDiagnostic(pp::TO_MATCH_N_HERE));
     }
 
     SECTION("Macro Parameter Redefinition")
@@ -57,7 +57,7 @@ TEST_CASE("Preprocess - Notes", "[PP]")
         bool errors = false;
         auto result = preprocess("DEFINE id(p1,p2;", errors);
         CHECK(errors);
-        CHECK(result.findDiagnostic(TO_MATCH_N_HERE));
+        CHECK(result.findDiagnostic(pp::TO_MATCH_N_HERE));
     }
 
     SECTION("Missing Close Parenthesis - Not Parenthesis")
@@ -65,6 +65,6 @@ TEST_CASE("Preprocess - Notes", "[PP]")
         bool errors = false;
         auto result = preprocess("DEFINE id(p1,p2!;", errors);
         CHECK(errors);
-        CHECK(result.findDiagnostic(TO_MATCH_N_HERE));
+        CHECK(result.findDiagnostic(pp::TO_MATCH_N_HERE));
     }
 }

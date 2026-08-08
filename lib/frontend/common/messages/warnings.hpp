@@ -43,12 +43,7 @@
 
 namespace coral66::warnings
 {
-namespace semantics
-{
-CREATE_WARNING(UNUSED_VARIABLE_N, "unused-variable", "Unused variable %0", PointAt<0>);
-CREATE_WARNING(POSSIBLE_PRECISION_LOSS, "precision-loss", "Possible loss of precision in fixed point operation",
-               Underline<0>);
-} // namespace semantics
+
 namespace CLI
 {
 CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME, "command-line-argument-combination",
@@ -60,17 +55,6 @@ CREATE_WARNING(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME, "comm
 CREATE_WARNING(NO_ACTION_SPEFIFIED, "command-line-noaction", "No action specified - command line checked");
 } // namespace CLI
 
-namespace pp
-{
-CREATE_WARNING(N_REDEFINED, "macro-redefined", "%0 redefined", Underline<0>);
-
-CREATE_WARNING(TOKEN_CONCATENATION_RESULTING_IN_AN_INVALID_TOKEN_IS_UB, "token-concat",
-               "Token concatenation resulting in an invalid token is undefined behaviour", Underline<0>, PointAt<1>,
-               Underline<2>);
-
-CREATE_WARNING(MACRO_EXPANSION_PRODUCING_DEFINED_IS_NOT_PORTABLE, "expansion-to-defined",
-               "Macro expansion producing 'defined' is not portable", Underline<0>);
-} // namespace pp
 } // namespace coral66::warnings
 
 #undef CREATE_WARNING
