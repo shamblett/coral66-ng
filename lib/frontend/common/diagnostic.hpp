@@ -18,7 +18,6 @@
 #include "diagnostic_utilities.hpp"
 #include "lib/support/constexpr.hpp"
 #include "lib/support/text.hpp"
-#include "lib/support/utilities.hpp"
 #include "messages/message.hpp"
 
 /**
