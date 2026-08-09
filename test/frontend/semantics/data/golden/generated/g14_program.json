@@ -1,0 +1,91 @@
+{
+    "Symbol Table": {
+        "Symbols": [
+            {
+                "Name": "commonArray",
+                "Scope Depth": 2
+            },
+            {
+                "Name": "commonFloat",
+                "Scope Depth": 2
+            },
+            {
+                "Name": "register",
+                "Scope Depth": 2
+            },
+            {
+                "Name": "myExternal",
+                "Scope Depth": 2
+            }
+        ]
+    },
+    "Resolved Identifiers": [],
+    "Expression Types": [
+        {
+            "ExpressionText": "1",
+            "Location": {
+                "FileId": 0,
+                "Line": 4,
+                "Column": 31
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        },
+        {
+            "ExpressionText": "10",
+            "Location": {
+                "FileId": 0,
+                "Line": 4,
+                "Column": 35
+            },
+            "Type": {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            }
+        }
+    ],
+    "Auxiliary Types": {
+        "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            }
+        ]
+    },
+    "Table Info": {
+        "Infos": []
+    },
+    "Diagnostics": {
+        "ErrorCount": 2,
+        "Name": "FAILED_TO_READ_CMI_FILE_N",
+        "severity": "Error",
+        "Name": "FAILED_TO_READ_CMI_FILE_N",
+        "severity": "Error",
+        "Reports": "<stdin>:8:9: error: Failed to read or parse CMI file: myMathsLib.cmi\n   8 | LIBRARY(myMathsLib, myIOLib);\n     |         ~~~~~~~~~~           \n<stdin>:8:21: error: Failed to read or parse CMI file: myIOLib.cmi\n   8 | LIBRARY(myMathsLib, myIOLib);\n     |                     ~~~~~~~  \n"
+    }
+}

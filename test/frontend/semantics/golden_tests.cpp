@@ -397,4 +397,27 @@ TEST_CASE("Generated", "[Semantics][Golden]")
 
         CHECK(sourceProgram.size() == generatedProgram.size());
     }
+
+    SECTION("G14")
+    {
+        auto sourcePath = getTestDataPath("generated/g14.cor", "GOLDEN_DIR");
+        auto source = readFile(sourcePath);
+        CHECK(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        auto parsed = parser::parseProgram(cTokens, &ss);
+        bool errors = false;
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        auto sourceProgram = tools::ProgramDump::dumpToString(program, reporterString);
+        auto programPath = getTestDataPath("generated/g14_program.json", "GOLDEN_DIR");
+        auto generatedProgram = readFile(programPath);
+        CHECK(!generatedProgram.empty());
+
+        CHECK(sourceProgram.size() == generatedProgram.size());
+    }
 }
