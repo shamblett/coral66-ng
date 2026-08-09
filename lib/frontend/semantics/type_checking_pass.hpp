@@ -41,7 +41,6 @@ private:
     void visit(const syntax::AssignmentStatement& node);
     void visit(const syntax::GotoStatement& node);
     void visit(const syntax::AnswerStatement& node);
-    void visit(const syntax::CodeStatement& node);
     void visit(const syntax::ProcedureCallStatement& node);
 
     // Declarations

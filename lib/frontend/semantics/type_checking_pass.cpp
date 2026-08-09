@@ -114,8 +114,6 @@ void TypeCheckingPass::visit(const syntax::Statement& node)
         visit(*gotoStmt);
     else if (auto* answerStmt = dynamic_cast<const syntax::AnswerStatement*>(&node))
         visit(*answerStmt);
-    else if (auto* codeStmt = dynamic_cast<const syntax::CodeStatement*>(&node))
-        visit(*codeStmt);
     else if (auto* callStmt = dynamic_cast<const syntax::ProcedureCallStatement*>(&node))
         visit(*callStmt);
 }
@@ -1184,5 +1182,5 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
     }
 }
 
-void TypeCheckingPass::visit(const syntax::CodeStatement& node) {}
+
 } // namespace coral66::semantics
