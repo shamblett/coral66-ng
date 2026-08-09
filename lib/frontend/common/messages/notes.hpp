@@ -39,15 +39,11 @@
     constexpr auto variableName = ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text), __VA_ARGS__>( \
         ::coral66::Severity::Note, "")
 
-namespace coral66::notes
-{
-
-namespace pp
+namespace coral66::notes::pp
 {
 CREATE_NOTE(TO_MATCH_N_HERE, "To match %0 here:", PointAt<0>);
 CREATE_NOTE(PREVIOUSLY_DECLARED_HERE, "Previously declared here:", Underline<0>);
-} // namespace pp
-} // namespace coral66::notes
+} // namespace coral66::notes::pp
 
 #undef CREATE_NOTE
 #undef CREATE_NOTE_2

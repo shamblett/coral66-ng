@@ -90,7 +90,7 @@ std::string CMIProcessor::generateCMIString(const std::string& libraryName,
     const rapidjson::Document doc = createDocument(libraryName, exportedSymbols);
 
     rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+    rapidjson::PrettyWriter writer(buffer);
     doc.Accept(writer);
 
     return buffer.GetString();
@@ -105,7 +105,7 @@ bool CMIProcessor::parseCMIFile(const std::filesystem::path& inputPath,
         return false;
     }
 
-    const std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    const std::string content((std::istreambuf_iterator(in)), std::istreambuf_iterator<char>());
 
     return parseCMIString(content, importedSymbols);
 }
@@ -383,7 +383,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 }
 
                 auto arrayType =
-                    IntrusiveVariantValue<Type>(std::in_place_type<ArrayType>, elemType, std::move(dimensions));
+                    IntrusiveVariantValue(std::in_place_type<ArrayType>, elemType, std::move(dimensions));
                 auto arrayDeclaration = std::make_unique<ArrayDeclaration>(syntheticToken, std::move(arrayType));
 
                 importedSymbols.push_back(std::move(arrayDeclaration));
@@ -417,7 +417,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 g_syntheticTableInfos.push_back(std::move(info));
 
                 auto tableType =
-                    IntrusiveVariantValue<Type>(std::in_place_type<TableType>, g_syntheticTableInfos.back());
+                    IntrusiveVariantValue(std::in_place_type<TableType>, g_syntheticTableInfos.back());
                 auto tableDeclaration = std::make_unique<TableDeclaration>(syntheticToken, std::move(tableType));
 
                 importedSymbols.push_back(std::move(tableDeclaration));
@@ -450,7 +450,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 g_syntheticOverlayInfos.push_back(std::move(info));
 
                 auto overlayType =
-                    IntrusiveVariantValue<Type>(std::in_place_type<OverlayType>, g_syntheticOverlayInfos.back());
+                    IntrusiveVariantValue(std::in_place_type<OverlayType>, g_syntheticOverlayInfos.back());
                 auto overlayDeclaration = std::make_unique<OverlayDeclaration>(syntheticToken, std::move(overlayType));
 
                 importedSymbols.push_back(std::move(overlayDeclaration));

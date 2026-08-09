@@ -41,10 +41,7 @@
     constexpr auto variableName = ::coral66::makeDiagnostic<detail::CORAL66_PASTE2(variableName, Text), __VA_ARGS__>( \
         ::coral66::Severity::Warning, cliName)
 
-namespace coral66::warnings
-{
-
-namespace CLI
+namespace coral66::warnings::CLI
 {
 CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_ASSEMBLY_AT_THE_SAME_TIME, "command-line-argument-combination",
                "Cannot compile to object file and assembly at the same time - ignoring option");
@@ -53,9 +50,7 @@ CREATE_WARNING(CANNOT_COMPILE_TO_OBJECT_FILE_AND_PREPROCESS_AT_THE_SAME_TIME, "c
 CREATE_WARNING(CANNOT_COMPILE_TO_ASSEMBLY_AND_PREPROCESS_AT_THE_SAME_TIME, "command-line-argument-combination",
                "Cannot compile to assembly and preprocess at the same time - ignoring option");
 CREATE_WARNING(NO_ACTION_SPEFIFIED, "command-line-noaction", "No action specified - command line checked");
-} // namespace CLI
-
-} // namespace coral66::warnings
+} // namespace coral66::warnings::CLI
 
 #undef CREATE_WARNING
 #undef CREATE_WARNING_3

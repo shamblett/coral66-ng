@@ -630,8 +630,8 @@ IntrusiveVariantValue<Type> TypeCheckingPass::getCommonType(const Type& t1, cons
         auto f2 = rt2.tryAs<FixedType>();
         if (f1 && f2)
         {
-            return f1->getFractionalBits() >= f2->getFractionalBits() ? IntrusiveVariantValue<Type>{*f1} :
-                                                                        IntrusiveVariantValue<Type>{*f2};
+            return f1->getFractionalBits() >= f2->getFractionalBits() ? IntrusiveVariantValue{*f1} :
+                                                                        IntrusiveVariantValue{*f2};
         }
         if (f1)
             return {*f1};

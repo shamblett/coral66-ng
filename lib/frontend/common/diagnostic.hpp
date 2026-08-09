@@ -120,7 +120,7 @@ constexpr bool checkForNoHoles(std::string_view text)
 
 // Got these due to a bug in VS not allowing to make a IsSpecializationOf struct
 
-template <class T>
+template <class>
 struct IsUnderline : std::false_type
 {
 };
@@ -130,7 +130,7 @@ struct IsUnderline<Underline<index, character, continuous>> : std::true_type
 {
 };
 
-template <class T>
+template <class>
 struct IsInsertAfter : std::false_type
 {
 };
@@ -140,7 +140,7 @@ struct IsInsertAfter<InsertAfter<index, text>> : std::true_type
 {
 };
 
-template <class T>
+template <class>
 struct IsAnnotate : std::false_type
 {
 };
@@ -150,7 +150,7 @@ struct IsAnnotate<Annotate<index, text>> : std::true_type
 {
 };
 
-template <class T>
+template <class>
 struct IsAnnotateExpr : std::false_type
 {
 };

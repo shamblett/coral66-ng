@@ -101,7 +101,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
             {
                 const auto& libName = std::get<std::string>(itemToken->getValue());
                 std::filesystem::path cmiPath = m_context.libraryPath;
-                cmiPath /= (libName + ".cmi");
+                cmiPath /= libName + ".cmi";
 
                 std::vector<std::unique_ptr<Declaration>> importedSymbols;
                 if (!CMIProcessor::parseCMIFile(cmiPath, importedSymbols))
