@@ -143,7 +143,7 @@ coral66::pp::ControlLine coral66::pp::parseControlLine(lexer::PPTokenIterator& b
         expect(lexer::TokenType::SemiColon, eol, end, context);
         const auto* lineStart = begin;
         begin = eol;
-        return {DefineDirective{lineStart - 1, {lineStart, eol - 1}}};
+        return {DefineDirective{.defineToken = lineStart - 1, .tokens = {lineStart, eol - 1}}};
     }
     if (value == lexer::tokenName(lexer::TokenType::DeleteKeyword))
     {

@@ -350,7 +350,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                         pType = new PrimitiveType(PrimitiveType::Bits);
 
                     lexer::CTokenIterator paramToken = createSyntheticIdentifierToken(pName);
-                    parameters.push_back({pType, paramToken->getText(), isValue});
+                    parameters.push_back({.type = pType, .name = paramToken->getText(), .isValue = isValue});
                 }
 
                 auto procedureType =
@@ -404,7 +404,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     std::string fTypeStr = f["data_type"].GetString();
 
                     IntrusiveVariantValue<Type> fType = stringToType(fTypeStr);
-                    fields.push_back({std::move(fType), fName});
+                    fields.push_back({.type = std::move(fType), .name = fName});
                 }
 
                 TableDefinition def(std::move(fields), sym["width"].GetUint64(), sym["length"].GetUint64());
@@ -437,7 +437,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     std::string fTypeStr = f["data_type"].GetString();
 
                     IntrusiveVariantValue<Type> fType = stringToType(fTypeStr);
-                    fields.push_back({std::move(fType), fName});
+                    fields.push_back({.type = std::move(fType), .name = fName});
                 }
 
                 OverlayDefinition def(std::move(fields));

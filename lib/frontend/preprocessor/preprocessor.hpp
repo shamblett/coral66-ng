@@ -164,7 +164,8 @@ class Preprocessor final : PPSourceInterface
             // Expand Macro
             const auto i = ++m_macroID;
             m_substitutions.emplace_back(
-                Source::Substitution{*result->second.back().identifierPos, tokens[idx], {}, false});
+                Source::Substitution{.macroIdentifier = *result->second.back().identifierPos, .replacedIdentifier = tokens[idx],
+                                                              .closeParentheses = {}, .empty = false});
 
             std::vector replacement(result->second.back().replacement.begin(), result->second.back().replacement.end());
             for (auto& tok : replacement)

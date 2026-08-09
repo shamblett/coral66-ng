@@ -37,12 +37,12 @@ bool coral66::pp::Preprocessor::log(const Message& message)
 void coral66::pp::Preprocessor::process(PPSourceObject&& sourceObject)
 {
     CORAL66_ASSERT(sourceObject.getFiles().size() == 1);
-    m_files.push_back({std::move(sourceObject.getFiles()[0].path),
-                       std::move(sourceObject.getFiles()[0].source),
-                       std::move(sourceObject.getFiles()[0].starts),
-                       sourceObject.getFiles()[0].systemHeader,
-                       {},
-                       {}});
+    m_files.push_back({.path = std::move(sourceObject.getFiles()[0].path),
+                       .source = std::move(sourceObject.getFiles()[0].source),
+                       .starts = std::move(sourceObject.getFiles()[0].starts),
+                       .systemHeader = sourceObject.getFiles()[0].systemHeader,
+                       .includedBy = {},
+                       .lineAndFileMapping = {}});
     m_intervalMaps.push_back(std::move(sourceObject.getIntervalMap()[0]));
 
     Context context(*this, m_reporter);
@@ -112,7 +112,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
             preprocessor::DiagnosticCollector::addDiagnostic(
                 errors::pp::WHITESPACE_REQUIRED_AFTER_OBJECT_MACRO_DEFINITION);
         }
-        return {Macro{identifierPos, std::nullopt}, curr};
+        return {Macro{.identifierPos = identifierPos, .argumentList = std::nullopt}, curr};
     }
 
     // We are a function like macro from here on
@@ -130,7 +130,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     {
         case lexer::TokenType::CloseParentheses:
         {
-            return {Macro{identifierPos, {std::vector<lexer::PPToken>{}}}, curr + 1};
+            return {Macro{.identifierPos = identifierPos, .argumentList = {std::vector<lexer::PPToken>{}}}, curr + 1};
         }
 
         default: break;
@@ -190,7 +190,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         return {{}, nullptr};
     }
 
-    return {Macro{identifierPos, std::move(argumentList)}, curr + 1};
+    return {Macro{.identifierPos = identifierPos, .argumentList = std::move(argumentList)}, curr + 1};
 }
 
 std::uint64_t coral66::pp::Preprocessor::getLineNumber(const std::uint32_t fileID,

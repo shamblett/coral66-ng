@@ -183,7 +183,8 @@ public:
           m_offset(offset),
           m_lineStarts(std::move(lineStarts)),
           m_characterToSourceSpace(characterToSourceSpace),
-          m_fakeFile{coral66::to_string(path), coral66::to_string(sourceSpace), {}, false},
+          m_fakeFile{.path = coral66::to_string(path), .source = coral66::to_string(sourceSpace),
+                     .starts = {}, .systemHeader = false},
           tokenStartOffset(0)
     {
     }

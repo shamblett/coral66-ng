@@ -258,7 +258,7 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     }
 
     auto result = PPSourceObject(std::move(context.getResult()),
-                                 {Source::File{to_string(sourcePath), std::move(source), std::move(starts), false}}, {},
+                                 {Source::File{.path = to_string(sourcePath), .source = std::move(source), .starts = std::move(starts), .systemHeader = false}}, {},
                                  {{std::move(characterToSourceSpace)}});
     result.addDiagnostics(DiagnosticCollector::getDiagnostics());
     return result;
@@ -478,7 +478,7 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                 }
             }
 
-            ConversionContext context{reporter, sourceInterface, *startIter, errorsOccurred};
+            ConversionContext context{.reporter = reporter, .sourceInterface = sourceInterface, .token = *startIter, .errorsOccurred = errorsOccurred};
             auto number = processNumber(numberText.data(), numberText.data() + numberText.size(),
                                         startIter->getCharSpaceOffset(), context);
             if (number)

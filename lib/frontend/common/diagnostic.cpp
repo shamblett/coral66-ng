@@ -30,19 +30,19 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
             [](std::monostate) -> PointLocation { CORAL66_UNREACHABLE; },
             [](const coral66::Source::Substitution& substitution) -> PointLocation
             {
-                return {substitution.replacedIdentifier.getOffset(), substitution.replacedIdentifier.getFileId(),
-                        substitution.replacedIdentifier.getMacroId()};
+                return {.offset = substitution.replacedIdentifier.getOffset(), .fileId = substitution.replacedIdentifier.getFileId(),
+                        .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::Stringification& substitution) -> PointLocation
             {
-                return {substitution.replacedIdentifier.getOffset(), substitution.replacedIdentifier.getFileId(),
-                        substitution.replacedIdentifier.getMacroId()};
+                return {.offset = substitution.replacedIdentifier.getOffset(), .fileId = substitution.replacedIdentifier.getFileId(),
+                        .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::TokenConcatenation& substitution) -> PointLocation
             {
                 // I think it doesn't matter which we return here? Let's do left for now
-                return {substitution.leftToken.getOffset(), substitution.leftToken.getFileId(),
-                        substitution.leftToken.getMacroId()};
+                return {.offset = substitution.leftToken.getOffset(), .fileId = substitution.leftToken.getFileId(),
+                        .macroId = substitution.leftToken.getMacroId()};
             });
     }
     while (location.second.macroId != 0)
@@ -52,19 +52,21 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
             [](std::monostate) -> PointLocation { CORAL66_UNREACHABLE; },
             [](const coral66::Source::Substitution& substitution) -> PointLocation
             {
-                return {substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
-                        substitution.replacedIdentifier.getFileId(), substitution.replacedIdentifier.getMacroId()};
+                return {.offset =
+                            substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
+                        .fileId = substitution.replacedIdentifier.getFileId(), .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::Stringification& substitution) -> PointLocation
             {
-                return {substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
-                        substitution.replacedIdentifier.getFileId(), substitution.replacedIdentifier.getMacroId()};
+                return {.offset =
+                            substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
+                        .fileId = substitution.replacedIdentifier.getFileId(), .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::TokenConcatenation& substitution) -> PointLocation
             {
                 // I think it doesn't matter which we return here? Let's do left for now
-                return {substitution.rightToken.getOffset() + substitution.rightToken.getLength(),
-                        substitution.rightToken.getFileId(), substitution.rightToken.getMacroId()};
+                return {.offset = substitution.rightToken.getOffset() + substitution.rightToken.getLength(),
+                        .fileId = substitution.rightToken.getFileId(), .macroId = substitution.rightToken.getMacroId()};
             });
     }
     return location;
@@ -406,7 +408,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                   std::min(arguments[index].range->second.offset, endOffset)},
                  match(
                      iter, [](const Underline& underline) -> ModifierOfLine::variant
-                     { return ModifierOfLine::Underline{underline.character, underline.continuous}; },
+                     { return ModifierOfLine::Underline{.character = underline.character, .continuous = underline.continuous}; },
                      [&arguments](const InsertAfter& insertAfter) -> ModifierOfLine::variant
                      {
                          if (insertAfter.text >= 0)
@@ -421,8 +423,8 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                          CORAL66_ASSERT(arguments[annotate.text].inArgText);
                          const auto begin = arguments[index].range->first.offset;
                          const auto end = arguments[index].range->second.offset;
-                         return ModifierOfLine::Annotate{*arguments[annotate.text].inArgText,
-                                                         begin + (end - begin) / 2};
+                         return ModifierOfLine::Annotate{.text = *arguments[annotate.text].inArgText,
+                                                         .pos = begin + (end - begin) / 2};
                      })});
         }
     }

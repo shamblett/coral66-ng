@@ -160,7 +160,7 @@ StateMachine Start::advance(std::uint32_t const c, Context& context)
     {
         case '.': return Dot{};
         case '\'': return Prime{};
-        case '"': return StringLiteral{false, "\""};
+        case '"': return StringLiteral{.wide = false, .characters = "\""};
         case '0':
         case '1':
         case '2':

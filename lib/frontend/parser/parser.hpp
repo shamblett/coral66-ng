@@ -36,7 +36,7 @@ public:
 
     void enterProcedure(const bool isTyped)
     {
-        m_procedureStack.push_back({isTyped, false});
+        m_procedureStack.push_back({.isTyped = isTyped, .hasAnswer = false});
     }
     void exitProcedure()
     {

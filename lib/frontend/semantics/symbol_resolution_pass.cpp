@@ -482,7 +482,8 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     }
 
     m_context.ownedTableInfos.push_back(
-        TableInfo{std::get<std::string>(id->getValue()), 0, TableDefinition{{}, widthVal, lengthVal}});
+        TableInfo{
+        .name = std::get<std::string>(id->getValue()), .id = 0, .type = TableDefinition{{}, widthVal, lengthVal}});
 
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
     auto declaration = makeIntrusiveVariant<TableDeclaration>(id, std::move(typeCopy));
@@ -713,7 +714,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 
             for (const auto paramId : paramNode->getIdentifiers())
             {
-                parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), isValue});
+                parameters.push_back({.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = isValue});
             }
         }
         else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclarationNode.get()))
@@ -727,7 +728,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 
             for (const auto paramId : arrayNode->getIdentifiers())
             {
-                parameters.push_back({finalParamTypePtr, std::get<std::string>(paramId->getValue()), false});
+                parameters.push_back({.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = false});
             }
         }
     }
@@ -832,7 +833,7 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
             }
 
             m_context.ownedTypes.push_back(std::move(paramTypeVal));
-            parameters.push_back({m_context.ownedTypes.back().data(), "", isValue});
+            parameters.push_back({.type = m_context.ownedTypes.back().data(), .name = "", .isValue = isValue});
         }
     }
 
@@ -1115,7 +1116,7 @@ void SymbolResolutionPass::visit(const syntax::CodeStatement& node)
             }
             if (!idStr.empty())
             {
-                tokens.push_back({isOutput, idStr, pos});
+                tokens.push_back({.isOutput = isOutput, .name = idStr, .pos = pos});
             }
         }
         else

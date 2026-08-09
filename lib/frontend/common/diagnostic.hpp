@@ -75,7 +75,7 @@ constexpr std::optional<Arg> nextArg(std::string_view& text)
     modifier.remove_suffix(1);
     const auto index = static_cast<std::size_t>(text[modifierEnd] - '0');
     text.remove_prefix(modifierEnd + 1);
-    return Arg{modifier, index, view};
+    return Arg{.modifier = modifier, .index = index, .view = view};
 }
 
 template <class... Args>
