@@ -6,7 +6,6 @@
 
 #include <llvm/Support/TargetSelect.h>
 
-#include "test/common/test_config.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 int main(const int argc, char* argv[])

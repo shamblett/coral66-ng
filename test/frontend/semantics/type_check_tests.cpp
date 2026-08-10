@@ -153,7 +153,7 @@ TEST_CASE("Type Checking - Procedure Calls", "[Semantics][TypeChecking]")
 
         static PrimitiveType intType(PrimitiveType::Integer);
         std::vector<ProcedureType::Parameter> params;
-        params.push_back({&intType, "X", false});
+        params.push_back({.type = &intType, .name = "X", .isValue = false});
 
         auto procType = IntrusiveVariantValue(ProcedureType{nullptr, std::move(params)});
 
@@ -260,7 +260,7 @@ TEST_CASE("Type Checking - Procedure Calls Coercion", "[Semantics][TypeChecking]
 
         static PrimitiveType intType(PrimitiveType::Integer);
         std::vector<ProcedureType::Parameter> params;
-        params.push_back({&intType, "X", true}); // isValue = true
+        params.push_back({.type = &intType, .name = "X", .isValue = true}); // isValue = true
 
         auto procType = IntrusiveVariantValue(ProcedureType{nullptr, std::move(params)});
 

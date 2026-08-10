@@ -14,7 +14,6 @@
 #include "lib/frontend/lexer/lexer.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/parser/parser_support.hpp"
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
 using namespace coral66::syntax;
@@ -186,7 +185,7 @@ struct ParsedProgram
     Program program;
 
     explicit ParsedProgram(std::string src)
-        : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), nullptr, false)
+        : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, std::vector<std::unique_ptr<Communicator>>(), nullptr, false)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);

@@ -45,7 +45,7 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
 
     SECTION("Variable Generation")
     {
-        auto type = IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Integer));
+        auto type = IntrusiveVariantValue(PrimitiveType(PrimitiveType::Integer));
         VariableDeclaration varDecl(makeToken("my_var"), std::move(type));
         exportedSymbols.push_back(&varDecl);
 
@@ -59,10 +59,10 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
     SECTION("Procedure Generation")
     {
         std::vector<ProcedureType::Parameter> params;
-        params.push_back({makeType(IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Floating))), "p1", true});
+        params.push_back({.type = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating))), .name = "p1", .isValue = true});
 
         const Type* returnType = makeType(IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Integer)));
-        auto type = IntrusiveVariantValue<Type>(ProcedureType(returnType, std::move(params)));
+        auto type = IntrusiveVariantValue(ProcedureType(returnType, std::move(params)));
 
         ProcedureDeclaration procDecl(makeToken("my_proc"), std::move(type));
         exportedSymbols.push_back(&procDecl);
@@ -79,9 +79,9 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
 
     SECTION("Array Generation")
     {
-        const Type* elemType = makeType(IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Bits)));
+        const Type* elemType = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Bits)));
         std::vector<std::uint64_t> dims = {10, 20};
-        auto type = IntrusiveVariantValue<Type>(ArrayType(elemType, dims));
+        auto type = IntrusiveVariantValue(ArrayType(elemType, dims));
 
         ArrayDeclaration arrDecl(makeToken("my_arr"), std::move(type));
         exportedSymbols.push_back(&arrDecl);
@@ -97,12 +97,12 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
 
     SECTION("Combined Representative Example")
     {
-        auto type1 = IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Integer));
+        auto type1 = IntrusiveVariantValue(PrimitiveType(PrimitiveType::Integer));
         VariableDeclaration varDecl(makeToken("my_var"), std::move(type1));
         exportedSymbols.push_back(&varDecl);
 
-        const Type* returnType = makeType(IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Floating)));
-        auto type2 = IntrusiveVariantValue<Type>(ProcedureType(returnType, {}));
+        const Type* returnType = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating)));
+        auto type2 = IntrusiveVariantValue(ProcedureType(returnType, {}));
         ProcedureDeclaration procDecl(makeToken("my_proc"), std::move(type2));
         exportedSymbols.push_back(&procDecl);
 

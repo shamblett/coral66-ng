@@ -64,7 +64,7 @@ public:
 class DestrSideEffect : public Base
 {
 public:
-    inline thread_local static int i = 0;
+    inline thread_local static int i{};
 
     DestrSideEffect() : Base(std::in_place_type<DestrSideEffect>)
     {

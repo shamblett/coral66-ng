@@ -19,7 +19,6 @@
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "llvm/IR/DataLayout.h"
-#include "llvm/IR/GlobalVariable.h"
 #include "test/common/test_config.hpp"
 #include "test/compliance/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

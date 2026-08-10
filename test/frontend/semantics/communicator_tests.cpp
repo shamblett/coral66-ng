@@ -16,6 +16,8 @@
 using namespace coral66;
 using namespace coral66::semantics;
 
+namespace
+{
 // Helper to run symbol resolution pass
 struct SymbolResolutionResult
 {
@@ -32,8 +34,9 @@ struct SymbolResolutionResult
         pass.run(parsed.program); // always call pass.run(parsed.program)
     }
 };
+} // namespace
 
-inline const Usable* findDeclarationComm(const SemanticContext& ctx, const std::string& name)
+static inline const Usable* findDeclarationComm(const SemanticContext& ctx, const std::string& name)
 {
     for (const auto& u : ctx.ownedUsables)
     {
@@ -157,11 +160,11 @@ TEST_CASE("Symbol Resolution - Library Communicators", "[Semantics][SymbolResolu
 {
     SECTION("Error when library CMI file cannot be read")
     {
-        ParsedProgram parsed("PROGRAM TEST LIBRARY(NONEXISTENTLIB) BEGIN INTEGER I ; END");
-        SymbolResolutionResult res(parsed);
+        const ParsedProgram parsed("PROGRAM TEST LIBRARY(NONEXISTENTLIB) BEGIN INTEGER I ; END");
+        const SymbolResolutionResult res(parsed);
 
         CHECK(res.errors == true);
-        auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
+        const auto diagnostics = DiagnosticCollection<coral66::detail::Diagnostic::DiagnosticBase>::getDiagnostics();
         bool foundError = false;
         for (auto& d : diagnostics)
             if (d.getName() == "FAILED_TO_READ_CMI_FILE_N")

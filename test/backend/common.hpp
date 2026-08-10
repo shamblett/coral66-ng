@@ -122,8 +122,8 @@ struct Catch::StringMaker<llvm::Module>
 {
     static std::string convert(const llvm::Module& module)
     {
-        std::string s;
         {
+            std::string s;
             llvm::raw_string_ostream ss(s);
             module.print(ss, nullptr);
         }
