@@ -167,7 +167,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         default: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
     }
 
-    codegenOptions.baremetal = (cl::TargetEnv == cl::TargetEnvironment::Baremetal);
+    codegenOptions.baremetal = cl::TargetEnv == cl::TargetEnvironment::Baremetal;
 
     auto targetMachine = coral66::cgllvm::generateLLVM(module, tree, program, codegenOptions);
     if (!targetMachine)
@@ -293,9 +293,8 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         fs::path cmiPath = outputFile;
         cmiPath.replace_extension("cmi");
 
-        std::string libName = std::get<std::string>(tree.getName()->getValue());
-
-        if (!semantics::CMIProcessor::generateCMIFile(libName, program.getContext().exportedSymbols, cmiPath))
+        if (auto libName = std::get<std::string>(tree.getName()->getValue());
+            !semantics::CMIProcessor::generateCMIFile(libName, program.getContext().exportedSymbols, cmiPath))
         {
             *m_reporter << "Warning: Failed to generate CMI file for library '" << libName << "'\n";
         }

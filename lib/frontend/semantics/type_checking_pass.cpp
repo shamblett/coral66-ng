@@ -946,8 +946,8 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
 
         if (auto it = m_context.expressionTypes.find(idx.get()); it != m_context.expressionTypes.end())
         {
-            const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
-            if (!prim || prim->getKind() != PrimitiveType::Integer)
+            if (const auto prim = resolveExprType(*it->second).tryAs<PrimitiveType>();
+                !prim || prim->getKind() != PrimitiveType::Integer)
             {
                 m_context.log(
                     errors::semantics::EXPECTED_INTEGER_TYPE.args(*idx->begin(), m_context.source, *idx->begin()));
