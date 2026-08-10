@@ -100,7 +100,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
     const auto* end = defineDirective.tokens.data() + defineDirective.tokens.size();
     if (curr == end)
     {
-        return {Macro{identifierPos, {}}, curr};
+        return {Macro{.identifierPos = identifierPos, .argumentList = {}}, curr};
     }
     if (curr->getTokenType() != lexer::TokenType::OpenParentheses
         || curr->getOffset() != identifierPos->getOffset() + identifierPos->getLength())

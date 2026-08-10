@@ -18,46 +18,46 @@ namespace coral66::parser
  *  Section 6
  */
 
-std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+static std::unique_ptr<Expression> parseConditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                        Context& context);
-std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+static std::unique_ptr<Expression> parseUnconditionalExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                          Context& context);
-std::unique_ptr<Expression> parseCondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+
+static std::unique_ptr<Expression> parseSubcondition(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                               Context& context);
-std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+static std::unique_ptr<Expression> parseComparison(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+static std::unique_ptr<Expression> parseSimpleExpression(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                   Context& context);
-std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+static std::unique_ptr<Expression> parseTerm(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+static std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+static std::unique_ptr<Expression> parseBitwiseDiffer(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                                Context& context);
-std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+static std::unique_ptr<Expression> parseBitwiseUnion(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                               Context& context);
-std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
-std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+static std::unique_ptr<Expression> parseBitwiseMask(lexer::CTokenIterator& begin, lexer::CTokenIterator end, Context& context);
+static std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
                                               Context& context);
-std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end,
+std::unique_ptr<Expression> parseWordReference(lexer::CTokenIterator& begin, lexer::CTokenIterator end, // NOLINT(*-redundant-declaration)
                                                Context& context);
 
-bool isComparator(const lexer::TokenType t)
+static bool isComparator(const lexer::TokenType t)
 {
     return t == lexer::TokenType::LessThan || t == lexer::TokenType::LessThanOrEqual || t == lexer::TokenType::Equal
            || t == lexer::TokenType::GreaterThanOrEqual || t == lexer::TokenType::GreaterThan
            || t == lexer::TokenType::NotEqual;
 }
 
-bool isAddOperator(const lexer::TokenType t)
+static bool isAddOperator(const lexer::TokenType t)
 {
     return t == lexer::TokenType::Plus || t == lexer::TokenType::Minus;
 }
 
-bool isMultOperator(const lexer::TokenType t)
+static bool isMultOperator(const lexer::TokenType t)
 {
     return t == lexer::TokenType::Asterisk || t == lexer::TokenType::Division;
 }
 
-bool isNumberType(const lexer::TokenType t)
+static bool isNumberType(const lexer::TokenType t)
 {
     return t == lexer::TokenType::IntegerKeyword || t == lexer::TokenType::FloatingKeyword
            || t == lexer::TokenType::FixedKeyword;

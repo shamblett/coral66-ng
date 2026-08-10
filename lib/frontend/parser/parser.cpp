@@ -106,8 +106,7 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
     std::vector<std::unique_ptr<syntax::Communicator>> communicators;
     while (begin != end && begin->getTokenType() != lexer::TokenType::BeginKeyword)
     {
-        std::unique_ptr<syntax::Communicator> communicator = parseCommunicator(begin, end, context);
-        if (communicator)
+        if (std::unique_ptr<syntax::Communicator> communicator = parseCommunicator(begin, end, context))
         {
             communicators.push_back(std::move(communicator));
             if (begin != end && begin->getTokenType() == lexer::TokenType::SemiColon)

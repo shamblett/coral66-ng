@@ -21,7 +21,7 @@ namespace coral66::semantics
 {
 
 template <class T, class... Args>
-IntrVarPtr<T> makeIntrusiveVariant(Args&&... args)
+static IntrVarPtr<T> makeIntrusiveVariant(Args&&... args)
 {
     return IntrVarPtr<T>(new T(std::forward<Args>(args)...));
 }
@@ -41,7 +41,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
     {
         if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(comm.get()))
         {
-            size_t usablesBefore = m_context.ownedUsables.size();
+            const size_t usablesBefore = m_context.ownedUsables.size();
             for (const auto& item : commonCommunicator->getItems())
             {
                 visit(*item);
@@ -60,7 +60,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
         }
         else if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(comm.get()))
         {
-            size_t usablesBefore = m_context.ownedUsables.size();
+            const size_t usablesBefore = m_context.ownedUsables.size();
             for (const auto& item : absoluteCommunicator->getItems())
             {
                 visit(*item);
@@ -78,8 +78,8 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
 
                 if (decl)
                 {
-                    auto it = absoluteCommunicator->getAddresses().find(decl->getNameToken());
-                    if (it != absoluteCommunicator->getAddresses().end())
+                    if (auto it = absoluteCommunicator->getAddresses().find(decl->getNameToken());
+                        it != absoluteCommunicator->getAddresses().end())
                     {
                         if (auto val = evaluateConstantInteger(*it->second))
                         {
@@ -103,8 +103,8 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 std::filesystem::path cmiPath = m_context.libraryPath;
                 cmiPath /= libName + ".cmi";
 
-                std::vector<std::unique_ptr<Declaration>> importedSymbols;
-                if (!CMIProcessor::parseCMIFile(cmiPath, importedSymbols))
+                if (std::vector<std::unique_ptr<Declaration>> importedSymbols;
+                    !CMIProcessor::parseCMIFile(cmiPath, importedSymbols))
                 {
                     m_context.log(errors::semantics::FAILED_TO_READ_CMI_FILE_N.args(*itemToken, m_context.source,
                                                                                     *itemToken, cmiPath.string()));
@@ -526,11 +526,11 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     else if (node.getFixedTotalBits())
     {
         uint32_t total = 16;
-        uint32_t frac = 0;
         if (const auto tVal = evaluateConstantInteger(*node.getFixedTotalBits()); tVal && *tVal > 0)
             total = static_cast<uint32_t>(*tVal);
         if (node.getFixedFractionBits())
         {
+            uint32_t frac = 0;
             if (const auto fVal = evaluateConstantInteger(*node.getFixedFractionBits()); fVal && *fVal >= 0)
                 frac = static_cast<uint32_t>(*fVal);
             typeCopy = IntrusiveVariantValue(FixedType{static_cast<uint8_t>(total), static_cast<uint8_t>(frac)});

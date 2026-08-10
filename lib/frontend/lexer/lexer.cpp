@@ -413,7 +413,7 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
             if (iter->getTokenType() == TokenType::PPNumber)
             {
                 numberText += std::string(iter->getValue());
-                if (auto next = iter + 1; next != end && next->getTokenType() == TokenType::Identifier && numberText == "0" && (next->getValue().starts_with("x") || next->getValue().starts_with("X")))
+                if (const auto next = iter + 1; next != end && next->getTokenType() == TokenType::Identifier && numberText == "0" && (next->getValue().starts_with("x") || next->getValue().starts_with("X")))
                 {
                     bool all_hex = true;
                     for (size_t i = 1; i < next->getValue().size(); ++i) {

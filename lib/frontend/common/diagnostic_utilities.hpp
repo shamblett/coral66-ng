@@ -51,7 +51,7 @@ PointRange getPointRange(const T& arg)
     }
     else if constexpr (std::is_convertible_v<U, std::uint64_t>)
     {
-        return {{.offset = static_cast<std::uint64_t>(arg), .fileId = 0, .macroId = 0}, {static_cast<std::uint64_t>(arg) + 1, 0, 0}};
+        return {{.offset = static_cast<std::uint64_t>(arg), .fileId = 0, .macroId = 0}, {.offset = static_cast<std::uint64_t>(arg) + 1, .fileId = 0, .macroId = 0}};
     }
     else if constexpr (detail::IsIterable<T>)
     {
@@ -131,7 +131,7 @@ PointRange getPointRange(const T& arg)
         else if constexpr (std::is_convertible_v<T1, std::uint64_t> && std::is_convertible_v<T2, std::uint64_t>)
         {
             auto& [arg1, arg2] = arg;
-            return {{.offset = static_cast<std::uint64_t>(arg1), .fileId = 0, .macroId = 0}, {static_cast<std::uint64_t>(arg2), 0, 0}};
+            return {{.offset = static_cast<std::uint64_t>(arg1), .fileId = 0, .macroId = 0}, {.offset = static_cast<std::uint64_t>(arg2), .fileId = 0, .macroId = 0}};
         }
         else
         {

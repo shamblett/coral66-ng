@@ -127,7 +127,7 @@ TokenType charactersToKeyword(const std::string_view characters)
     CORAL66_UNREACHABLE;
 }
 
-std::uint8_t getNumUTF8ForUTF32(const std::uint32_t c)
+static std::uint8_t getNumUTF8ForUTF32(const std::uint32_t c)
 {
     if (c <= 0x007F)
     {
@@ -149,7 +149,7 @@ std::uint8_t getNumUTF8ForUTF32(const std::uint32_t c)
 }
 
 template <class Iter>
-[[maybe_unused]] Iter findUTF8StartByte(Iter begin, Iter end)
+[[maybe_unused]] static Iter findUTF8StartByte(Iter begin, Iter end)
 {
     return std::find_if(begin, end, [](std::uint8_t const c) { return c >= 0b1100'0000 || c < 0b1000'0000; });
 }

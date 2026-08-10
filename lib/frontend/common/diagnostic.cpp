@@ -404,28 +404,32 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                 continue;
             }
             vector.push_back(
-                {{std::max(arguments[index].range->first.offset, startOffset),
-                  std::min(arguments[index].range->second.offset, endOffset)},
-                 match(
-                     iter, [](const Underline& underline) -> ModifierOfLine::variant
-                     { return ModifierOfLine::Underline{.character = underline.character, .continuous = underline.continuous}; },
-                     [&arguments](const InsertAfter& insertAfter) -> ModifierOfLine::variant
-                     {
-                         if (insertAfter.text >= 0)
-                         {
-                             CORAL66_ASSERT(arguments[insertAfter.text].inArgText);
-                             return ModifierOfLine::InsertAfter{*arguments[insertAfter.text].inArgText};
-                         }
-                         return ModifierOfLine::InsertAfter{};
-                     },
-                     [&arguments, index](const Annotate& annotate) -> ModifierOfLine::variant
-                     {
-                         CORAL66_ASSERT(arguments[annotate.text].inArgText);
-                         const auto begin = arguments[index].range->first.offset;
-                         const auto end = arguments[index].range->second.offset;
-                         return ModifierOfLine::Annotate{.text = *arguments[annotate.text].inArgText,
-                                                         .pos = begin + (end - begin) / 2};
-                     })});
+                {.fromToInLine = {std::max(arguments[index].range->first.offset, startOffset),
+                                               std::min(arguments[index].range->second.offset, endOffset)},
+                 .value = match(
+                                  iter,
+                                  [](const Underline& underline) -> ModifierOfLine::variant
+                                  {
+                                      return ModifierOfLine::Underline{.character = underline.character,
+                                                                       .continuous = underline.continuous};
+                                  },
+                                  [&arguments](const InsertAfter& insertAfter) -> ModifierOfLine::variant
+                                  {
+                                      if (insertAfter.text >= 0)
+                                      {
+                                          CORAL66_ASSERT(arguments[insertAfter.text].inArgText);
+                                          return ModifierOfLine::InsertAfter{*arguments[insertAfter.text].inArgText};
+                                      }
+                                      return ModifierOfLine::InsertAfter{};
+                                  },
+                                  [&arguments, index](const Annotate& annotate) -> ModifierOfLine::variant
+                                  {
+                                      CORAL66_ASSERT(arguments[annotate.text].inArgText);
+                                      const auto begin = arguments[index].range->first.offset;
+                                      const auto end = arguments[index].range->second.offset;
+                                      return ModifierOfLine::Annotate{.text = *arguments[annotate.text].inArgText,
+                                                                      .pos = begin + (end - begin) / 2};
+                                  })});
         }
     }
 
