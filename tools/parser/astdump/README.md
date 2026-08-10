@@ -1,6 +1,6 @@
 # Parser ASTDump tool
 
-This package provides a dump tool that dumps a program AST as produced by the parser to a json formatted output file.
+This package provides a dump tool that dumps a program AST as produced by the parser to a JSON formatted output file.
 
 It is intended to be used as a general fault investigation tool and as a test tool in parser golden testing.
 

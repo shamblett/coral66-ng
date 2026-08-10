@@ -31,8 +31,7 @@ rapidjson::Value AstDump::dump(const syntax::Program& program)
     obj.AddMember("Name", getTokenString(program.getName()), m_alloc);
 
     // Dump Communicators
-    auto& communicators = program.getCommunicators();
-    if (!communicators.empty())
+    if (auto& communicators = program.getCommunicators(); !communicators.empty())
     {
         rapidjson::Value commArray(rapidjson::kArrayType);
         for (const auto& comm : communicators)

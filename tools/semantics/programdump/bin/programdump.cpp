@@ -18,7 +18,7 @@
 #include "sysexits.h"
 #include "tools/semantics/programdump/lib/program_dump.hpp"
 
-std::string readInputFile(const std::string& inputFile)
+static std::string readInputFile(const std::string& inputFile)
 {
     coral66::fs::ifstream file(inputFile, std::ios_base::in | std::ios_base::ate);
     if (!file.is_open())
@@ -36,7 +36,7 @@ std::string readInputFile(const std::string& inputFile)
     return input;
 }
 
-void generateOutputFile(const std::string& inputFile, const rapidjson::StringBuffer& buffer)
+static void generateOutputFile(const std::string& inputFile, const rapidjson::StringBuffer& buffer)
 {
     coral66::fs::path input_path = inputFile;
     coral66::fs::path output_path = input_path.parent_path() / (input_path.stem().string() + "_program");
