@@ -30,7 +30,7 @@
  */
 namespace coral66
 {
-template <class T, class U = decltype(detail::AbstractIntrusiveVariant::deduceArgs(std::declval<T*>()))>
+template <class T, class = decltype(detail::AbstractIntrusiveVariant::deduceArgs(std::declval<T*>()))>
 class IntrusiveVariantAllocator
 {
     static_assert(always_false<T>, "Allocator only works for allocating subclasses of AbstractIntrusiveVariant");
@@ -138,7 +138,7 @@ class IntrusiveVariantAllocator<Base, AbstractIntrusiveVariant<Base, Subclasses.
 {
     constexpr static std::size_t largestAlign = std::max({alignof(Subclasses)...});
     constexpr static std::size_t largestSize = std::max({sizeof(Subclasses)...});
-    constexpr static std::size_t allocSize = coral66::roundUpTo(largestSize, largestAlign);
+    constexpr static std::size_t allocSize = roundUpTo(largestSize, largestAlign);
 
     constexpr static bool needsDestructor = (!std::is_trivially_destructible_v<Subclasses> || ...);
 
@@ -303,7 +303,7 @@ public:
 
     template <class U = Base>
     requires(std::is_same_v<U, Base> && (std::is_copy_constructible_v<Subclasses> && ...))
-        [[nodiscard]] coral66::not_null<Base> alloc(const Base& value)
+        [[nodiscard]] not_null<Base> alloc(const Base& value)
     {
         constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, const Base&), sizeof...(Subclasses)>
             copyConstructors = {
@@ -314,7 +314,7 @@ public:
 
     template <class U = Base>
     requires(std::is_same_v<U, Base> && (std::is_move_constructible_v<Subclasses> && ...))
-        [[nodiscard]] coral66::not_null<Base> alloc(Base&& value)
+        [[nodiscard]] not_null<Base> alloc(Base&& value)
     {
         constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, Base&&), sizeof...(Subclasses)> moveConstructors = {
             +[](IntrusiveVariantAllocator* self, Base&& value1) -> Base*
@@ -323,7 +323,7 @@ public:
     }
 
     template <class U, class... Args>
-    requires(std::is_same_v<U, Subclasses> || ...) [[nodiscard]] coral66::not_null<U> alloc(Args&&... args)
+    requires(std::is_same_v<U, Subclasses> || ...) [[nodiscard]] not_null<U> alloc(Args&&... args)
     {
         auto head = getFreeHead();
         __asan_unpoison_memory_region(*head, std::max(sizeof(U), sizeof(std::byte*)));

@@ -8,7 +8,7 @@
 
 #include "utilities.hpp"
 
-coral66::Triple::Triple(Architecture const architecture, coral66::Platform const operatingSystem,
+coral66::Triple::Triple(Architecture const architecture, Platform const operatingSystem,
                         Environment const environment)
     : m_architecture(architecture), m_operatingSystem(operatingSystem), m_environment(environment)
 {

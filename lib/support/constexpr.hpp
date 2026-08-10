@@ -134,7 +134,7 @@ concept TupleLike = requires
     typename std::tuple_size<T>::type;
 };
 
-template <class T>
+template <class>
 struct is_tuple_impl : std::false_type
 {
 };
@@ -146,7 +146,7 @@ struct is_tuple_impl<std::tuple<T...>> : std::true_type
 template <class T>
 concept Tuple = is_tuple_impl<T>::value;
 
-template <class T>
+template <class>
 struct is_variant_impl : std::false_type
 {
 };
@@ -158,7 +158,7 @@ struct is_variant_impl<std::variant<T...>> : std::true_type
 template <class T>
 concept Variant = is_variant_impl<T>::value;
 
-template <class T>
+template <class>
 struct is_unique_ptr_impl : std::false_type
 {
 };
@@ -170,7 +170,7 @@ struct is_unique_ptr_impl<std::unique_ptr<T, Del>> : std::true_type
 template <class T>
 concept UniquePtr = is_unique_ptr_impl<T>::value;
 
-template <class T>
+template <class>
 struct is_optional_impl : std::false_type
 {
 };
@@ -182,7 +182,7 @@ struct is_optional_impl<std::optional<T>> : std::true_type
 template <class T>
 concept Optional = is_optional_impl<T>::value;
 
-template <class T>
+template <class>
 struct is_vector_impl : std::false_type
 {
 };
@@ -194,7 +194,7 @@ struct is_vector_impl<std::vector<T>> : std::true_type
 template <class T>
 concept Vector = is_vector_impl<T>::value;
 
-template <class T>
+template <class>
 struct is_shared_ptr_impl : std::false_type
 {
 };

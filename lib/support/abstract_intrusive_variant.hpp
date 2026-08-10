@@ -58,7 +58,7 @@ template <class T, std::size_t i, class First, class... Rest>
 template <class Base, class... Args>
 class AbstractIntrusiveVariant
 {
-    coral66::suitableUInt<sizeof...(Args) - 1> m_index;
+    suitableUInt<sizeof...(Args) - 1> m_index;
 
     template <class First, class...>
     static First first()
@@ -182,11 +182,10 @@ namespace detail::AbstractIntrusiveVariant
 {
 template <class Base, class... Args>
 // ReSharper disable once CppFunctionIsNotImplemented
-auto deduceArgs(::coral66::AbstractIntrusiveVariant<Base, Args...>*)
-    -> ::coral66::AbstractIntrusiveVariant<Base, Args...>;
+auto deduceArgs(coral66::AbstractIntrusiveVariant<Base, Args...>*) -> coral66::AbstractIntrusiveVariant<Base, Args...>;
 } // namespace detail::AbstractIntrusiveVariant
 
-template <class T, class U = decltype(detail::AbstractIntrusiveVariant::deduceArgs(std::declval<T*>()))>
+template <class T, class = decltype(detail::AbstractIntrusiveVariant::deduceArgs(std::declval<T*>()))>
 class IntrusiveVariantDeleter
 {
     static_assert(always_false<T>, "Can't delete pointer that isn't a subclass of AbstractIntrusiveVariant");
@@ -229,7 +228,7 @@ public:
 };
 
 template <class T>
-using IntrVarPtr = std::unique_ptr<T, ::coral66::IntrusiveVariantDeleter<T>>;
+using IntrVarPtr = std::unique_ptr<T, IntrusiveVariantDeleter<T>>;
 
 } // namespace coral66
 

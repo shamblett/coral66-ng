@@ -32,7 +32,7 @@ namespace detail::IntrusiveVariantStorage
 {
 template <class... Args>
 // ReSharper disable once CppFunctionIsNotImplemented
-auto deduceArgs(::coral66::AbstractIntrusiveVariant<Args...>*) -> ::coral66::AbstractIntrusiveVariant<Args...>;
+auto deduceArgs(coral66::AbstractIntrusiveVariant<Args...>*) -> coral66::AbstractIntrusiveVariant<Args...>;
 
 template <class Base, class... SubClasses>
 class IntrusiveVariantStorageBase
@@ -444,7 +444,7 @@ constexpr SpecialMem moveAss()
 
 } // namespace detail::IntrusiveVariantStorage
 
-template <class T, class U = decltype(detail::IntrusiveVariantStorage::deduceArgs(std::declval<T*>()))>
+template <class T, class = decltype(detail::IntrusiveVariantStorage::deduceArgs(std::declval<T*>()))>
 class IntrusiveVariantValue
 {
     static_assert(always_false<T>,

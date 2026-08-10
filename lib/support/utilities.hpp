@@ -433,7 +433,7 @@ constexpr std::size_t hashCombine(const Args&... args)
     return seed;
 }
 
-template <template <class> class Hasher = std::hash, class... Args>
+template <template <class> class = std::hash, class... Args>
 constexpr std::size_t rawHashCombine(Args... args)
 {
     static_assert((std::is_integral_v<Args> && ...));
@@ -629,7 +629,7 @@ not_null<T> operator+(std::ptrdiff_t, not_null<T>) = delete;
 template <class Key, class Mapped, class Hash = std::hash<Key>, class KeyEqual = std::equal_to<Key>,
           class Allocator = std::allocator<std::pair<Key, Mapped>>,
           class ValueTypeContainer = std::vector<std::pair<Key, Mapped>, Allocator>>
-using ordered_map = ::tsl::ordered_map<Key, Mapped, Hash, KeyEqual, Allocator, ValueTypeContainer>;
+using ordered_map = tsl::ordered_map<Key, Mapped, Hash, KeyEqual, Allocator, ValueTypeContainer>;
 
 } // namespace coral66
 
