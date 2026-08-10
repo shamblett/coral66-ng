@@ -61,7 +61,7 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
         std::vector<ProcedureType::Parameter> params;
         params.push_back({.type = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating))), .name = "p1", .isValue = true});
 
-        const Type* returnType = makeType(IntrusiveVariantValue<Type>(PrimitiveType(PrimitiveType::Integer)));
+        const Type* returnType = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Integer)));
         auto type = IntrusiveVariantValue(ProcedureType(returnType, std::move(params)));
 
         ProcedureDeclaration procDecl(makeToken("my_proc"), std::move(type));

@@ -16,6 +16,8 @@
 using namespace coral66;
 using namespace coral66::semantics;
 
+namespace
+{
 struct ControlFlowResult
 {
     std::string outStr;
@@ -45,6 +47,7 @@ struct ControlFlowResult
                                    [name](const auto& d) { return d.getName() == name; });
     }
 };
+} // namespace
 
 TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
 {

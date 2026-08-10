@@ -19,6 +19,8 @@
 using namespace coral66;
 using namespace coral66::semantics;
 
+namespace
+{
 struct TypeCheckingResult
 {
     std::string outStr;
@@ -47,6 +49,7 @@ struct TypeCheckingResult
                                    [name](const auto& d) { return d.getName() == name; });
     }
 };
+} // namespace
 
 TEST_CASE("Type Checking - IF Condition", "[Semantics][TypeChecking]")
 {

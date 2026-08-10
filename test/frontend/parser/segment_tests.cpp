@@ -8,14 +8,14 @@ TEST_CASE("Parser Segment Keyword Compatibility", "[Parser][Segment]")
 {
     SECTION("Ignores SEGMENT keyword inside block")
     {
-        ParsedStatement p("BEGIN SEGMENT S1 ; END");
+        const ParsedStatement p("BEGIN SEGMENT S1 ; END");
         REQUIRE(DiagnosticCollector::getDiagnostics().empty());
         CHECK(dynamic_cast<syntax::CompoundStatement*>(p.statement.get()) != nullptr);
     }
 
     SECTION("Ignores SEGMENT keyword without identifier inside block")
     {
-        ParsedStatement p("BEGIN SEGMENT ; END");
+        const ParsedStatement p("BEGIN SEGMENT ; END");
         REQUIRE(DiagnosticCollector::getDiagnostics().empty());
         CHECK(dynamic_cast<syntax::CompoundStatement*>(p.statement.get()) != nullptr);
     }

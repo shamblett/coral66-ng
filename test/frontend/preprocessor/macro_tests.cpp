@@ -37,6 +37,8 @@ coral66::PPSourceObject preprocess(std::string source)
 
 namespace coral66::Tests
 {
+namespace
+{
 struct ProducesPP : Catch::Matchers::MatcherBase<PPSourceObject>
 {
 private:
@@ -70,6 +72,7 @@ protected:
         return "produces pp tokens of:\n" + m_source;
     }
 };
+} // namespace
 } // namespace coral66::Tests
 
 using namespace coral66::Tests;

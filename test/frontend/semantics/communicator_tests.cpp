@@ -36,7 +36,7 @@ struct SymbolResolutionResult
 };
 } // namespace
 
-static inline const Usable* findDeclarationComm(const SemanticContext& ctx, const std::string& name)
+static const Usable* findDeclarationComm(const SemanticContext& ctx, const std::string& name)
 {
     for (const auto& u : ctx.ownedUsables)
     {

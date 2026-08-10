@@ -5,7 +5,7 @@ This directory contains a suite of tests to verify compiler behaviour against th
 The test are arranged on a specification section by section basis, each section test having its own tests and data.
 Functional language areas such as array semantics say may be split over several sections, unlike unit testing which is more
 area based the test suite adheres strictly to the specification sections for traceability purposes. This means that a semantic
-area may well be tested in its entirety across several compliance test.
+area may well be tested in its entirety across some compliance test.
 
 In general the tests use the same strategy as that used in the backend tests, i.e. a Coral 66 source code file is compiled 
 and JIT'd with variable values set during the test being inspected and verified for correctness. This may vary however if

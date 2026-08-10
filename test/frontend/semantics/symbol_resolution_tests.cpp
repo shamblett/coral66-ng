@@ -14,6 +14,8 @@
 using namespace coral66;
 using namespace coral66::semantics;
 
+namespace
+{
 // Helper to run symbol resolution pass
 struct SymbolResolutionResult
 {
@@ -35,8 +37,9 @@ struct SymbolResolutionResult
         }
     }
 };
+} // namespace
 
-const Usable* findDeclaration(const SemanticContext& ctx, const std::string& name)
+static const Usable* findDeclaration(const SemanticContext& ctx, const std::string& name)
 {
     for (const auto& u : ctx.ownedUsables)
     {
