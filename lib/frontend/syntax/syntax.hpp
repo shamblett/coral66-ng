@@ -18,7 +18,6 @@ namespace coral66::syntax
 class Block;
 class Declaration;
 class Statement;
-class Expression;
 class Communicator;
 
 class Node
@@ -69,6 +68,12 @@ public:
 
     std::vector<std::unique_ptr<Declaration>> takeDeclarations();
     std::vector<std::unique_ptr<Statement>> takeStatements();
+};
+
+// Expressions
+class Expression : public Node
+{
+    using Node::Node;
 };
 
 // Declarations
@@ -464,11 +469,6 @@ public:
 };
 
 // Expressions
-class Expression : public Node
-{
-    using Node::Node;
-};
-
 class LiteralExpression final : public Expression
 {
     lexer::CTokenIterator m_literal;
