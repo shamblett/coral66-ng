@@ -29,9 +29,6 @@ Program analyse(const syntax::Program& parseTree, CSourceObject&& cTokens, llvm:
     ControlFlowPass cfPass(context);
     cfPass.run(parseTree);
 
-    // TODO maybe remove
-    std::vector<lexer::CToken> syntheticTokens;
-
-    return {std::move(cTokens), std::move(syntheticTokens), std::move(context.ownedUsables), std::move(context)};
+    return {std::move(cTokens), std::move(context.ownedUsables), std::move(context)};
 }
 } // namespace coral66::semantics

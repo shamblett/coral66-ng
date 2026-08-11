@@ -17,15 +17,13 @@ namespace coral66::semantics
 class Program
 {
     CSourceObject m_source;
-    std::vector<lexer::CToken> m_syntheticTokens;
     OwnedUsables m_globals;
     SemanticContext m_context;
 
 public:
-    Program(CSourceObject&& source, std::vector<lexer::CToken> synthetic, OwnedUsables globals,
+    Program(CSourceObject&& source, OwnedUsables globals,
             SemanticContext&& context)
         : m_source(std::move(source)),
-          m_syntheticTokens(std::move(synthetic)),
           m_globals(std::move(globals)),
           m_context(std::move(context))
     {
