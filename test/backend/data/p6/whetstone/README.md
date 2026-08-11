@@ -30,3 +30,4 @@ Summary
 Yes, this is an LLVM IR Generation / Optimization problem. The Whetstone benchmark unintentionally creates a pathological case for LLVM's SelectionDAG when fully unrolled. By using 0.77,
 the compile-time values overflow to NaN, allowing LLVM's constant-folding passes to short-circuit the massive dependency graph and bypass the compiler hang.
 
+Note that it makes no difference what LLVM optimization level is set, the hang persists
