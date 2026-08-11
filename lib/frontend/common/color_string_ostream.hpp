@@ -5,27 +5,42 @@
  */
 
 #pragma once
+#include "messages/message.hpp"
 #include <llvm/Support/raw_ostream.h>
 
 #include <string>
+#include <vector>
 
 namespace coral66::detail
 {
 
 /**
  *
- * LLVM raw_string_stream override for diagnostic colour handling.
+ * LLVM raw_ostream override for building Message Segments
  *
  */
-class ColorStringOstream : public llvm::raw_string_ostream
+class ColorStringOstream : public llvm::raw_ostream
 {
+    std::vector<Message::Segment>& m_segments;
+    llvm::raw_ostream::Colors m_currentColor = llvm::raw_ostream::SAVEDCOLOR;
+    bool m_currentBold = false;
+    bool m_currentBg = false;
+    uint64_t m_pos = 0;
+
 public:
-    explicit ColorStringOstream(std::string& O) : raw_string_ostream(O)
+    explicit ColorStringOstream(std::vector<Message::Segment>& segments) : m_segments(segments)
     {
-        // Only actually emit color codes if enable_colors(true) was called AND has_colors() allows it.
-        // Or in tests we might want to suppress it entirely or strip ANSI codes.
     }
 
+    ~ColorStringOstream() override
+    {
+        flush();
+    }
+
+    // By default, llvm::raw_ostream::has_colors() returns false.
+    // llvm::WithColor checks this, and if it's true, it calls changeColor().
+    // We *always* want ColorStringOstream to capture colors into segments.
+    // The actual stream that prints the Message will decide whether to emit them.
     [[nodiscard]] bool has_colors() const override
     {
         return true;
@@ -33,60 +48,45 @@ public:
 
     raw_ostream& changeColor(const Colors Color, const bool Bold = false, const bool BG = false) override
     { // NOLINT(*-default-arguments)
-        if (!colors_enabled())
-            return *this;
-
-        auto color_code = "";
-        if (BG)
-        {
-            switch (Color)
-            {
-                case BLACK: color_code = "\033[40m"; break;
-                case RED: color_code = "\033[41m"; break;
-                case GREEN: color_code = "\033[42m"; break;
-                case YELLOW: color_code = "\033[43m"; break;
-                case BLUE: color_code = "\033[44m"; break;
-                case MAGENTA: color_code = "\033[45m"; break;
-                case CYAN: color_code = "\033[46m"; break;
-                case WHITE: color_code = "\033[47m"; break;
-                case SAVEDCOLOR: break;
-                case RESET: return resetColor();
-                default: break;
-            }
-        }
-        else
-        {
-            switch (Color)
-            {
-                case BLACK: color_code = Bold ? "\033[1;30m" : "\033[0;30m"; break;
-                case RED: color_code = Bold ? "\033[1;31m" : "\033[0;31m"; break;
-                case GREEN: color_code = Bold ? "\033[1;32m" : "\033[0;32m"; break;
-                case YELLOW: color_code = Bold ? "\033[1;33m" : "\033[0;33m"; break;
-                case BLUE: color_code = Bold ? "\033[1;34m" : "\033[0;34m"; break;
-                case MAGENTA: color_code = Bold ? "\033[1;35m" : "\033[0;35m"; break;
-                case CYAN: color_code = Bold ? "\033[1;36m" : "\033[0;36m"; break;
-                case WHITE: color_code = Bold ? "\033[1;37m" : "\033[0;37m"; break;
-                case SAVEDCOLOR: break;
-                case RESET: return resetColor();
-                default: break;
-            }
-        }
-        *this << color_code;
+        m_currentColor = Color;
+        m_currentBold = Bold;
+        m_currentBg = BG;
         return *this;
     }
 
     raw_ostream& resetColor() override
     {
-        if (colors_enabled())
-            *this << "\033[0m";
+        m_currentColor = llvm::raw_ostream::SAVEDCOLOR;
+        m_currentBold = false;
+        m_currentBg = false;
         return *this;
     }
 
     raw_ostream& reverseColor() override
     {
-        if (colors_enabled())
-            *this << "\033[7m";
         return *this;
+    }
+
+    void write_impl(const char* Ptr, size_t Size) override
+    {
+        if (Size == 0)
+            return;
+            
+        std::string text(Ptr, Size);
+        if (!m_segments.empty() && m_segments.back().color == m_currentColor && m_segments.back().bold == m_currentBold && m_segments.back().bg == m_currentBg)
+        {
+            m_segments.back().text += text;
+        }
+        else
+        {
+            m_segments.push_back({std::move(text), m_currentColor, m_currentBold, m_currentBg});
+        }
+        m_pos += Size;
+    }
+
+    uint64_t current_pos() const override
+    {
+        return m_pos;
     }
 };
 

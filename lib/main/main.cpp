@@ -34,7 +34,7 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
 
     // Set and Enable colours. default for errors is red, warnings yellow.
     reporter->changeColor(llvm::raw_ostream::RED);
-    reporter->enable_colors(true);
+    reporter->enable_colors(reporter->has_colors());
 
     // Initialise the action executor
     auto executor = ActionExecutor(reporter);

@@ -290,11 +290,9 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     {
         return {};
     }
-    std::string result;
-    // TODO: Right now the colour is useless. Just putting it here to know what the colour when and were.
-    // Will have to create a segment map or so in coral66::Message that stores the colour and boldness information
-    // and then emits it correctly in it's operator<<
-    ColorStringOstream ss(result);
+    
+    std::vector<Message::Segment> segments;
+    ColorStringOstream ss(segments);
 
     {
         auto file = sourceInterface.getFiles()[location.first.fileId].includedBy;
@@ -366,7 +364,6 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         {location.first.fileId,
          {getLineCol(location.first, sourceInterface).first,
           sourceInterface.getLineNumber(location.second.fileId, location.second.offset - 1)}}};
-    // Using a map cause I am too lazy to get a std::hash function for std::pair now. Future TODO
     std::map<std::pair<std::uint32_t, std::uint64_t>, std::vector<ModifierOfLine>> fileAndLineToModifiers;
     for (auto& iter : modifiers)
     {
@@ -385,12 +382,10 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         }
         else
         {
-            // TODO: Might need to split up fileID here
             fileToMaxMinLine.insert({fileId, {startLine, endLine}});
         }
         for (auto i = startLine; i <= endLine; i++)
         {
-            // TODO: Might need to split up fileID here
             auto& vector = fileAndLineToModifiers[{fileId, i}];
             auto startOffset = sourceInterface.getLineStartOffset(fileId, i);
             auto endOffset = sourceInterface.getLineEndOffset(fileId, i);
@@ -498,12 +493,12 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     }
 
     ss.flush();
-    return {m_severity, std::move(result)};
+    return {m_severity, std::move(segments)};
 }
 
 void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const std::string_view message,
                                                                            const std::span<Argument> arguments,
-                                                                           llvm::raw_string_ostream& ss) const
+                                                                           llvm::raw_ostream& ss) const
 {
     switch (this->m_severity)
     {
@@ -542,14 +537,14 @@ void coral66::detail::Diagnostic::DiagnosticBase::evaluateFormatsInMessage(const
 coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(const std::string_view message,
                                                                     const std::span<Argument> arguments) const
 {
-    std::string result;
-    ColorStringOstream ss(result);
+    std::vector<Message::Segment> segments;
+    ColorStringOstream ss(segments);
     llvm::WithColor(ss, llvm::raw_string_ostream::RED, true) << "coral66"
 
                                                                 ": ";
     evaluateFormatsInMessage(message, arguments, ss);
     ss.flush();
-    return {m_severity, std::move(result)};
+    return {m_severity, std::move(segments)};
 }
 
 std::unordered_set<std::string_view>& coral66::detail::Diagnostic::DiagnosticBase::allWarnings()

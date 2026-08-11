@@ -9,7 +9,26 @@
 llvm::raw_ostream& coral66::operator<<(llvm::raw_ostream& os, const Message& message)
 
 {
-    os << message.m_text;
+    if (message.getSegments().empty())
+    {
+        os << message.m_text;
+    }
+    else
+    {
+        for (const auto& segment : message.getSegments())
+        {
+            if (segment.color != llvm::raw_ostream::SAVEDCOLOR && os.colors_enabled())
+            {
+                os.changeColor(segment.color, segment.bold, segment.bg);
+                os << segment.text;
+                os.resetColor();
+            }
+            else
+            {
+                os << segment.text;
+            }
+        }
+    }
     os.flush();
     return os;
 }

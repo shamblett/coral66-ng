@@ -248,7 +248,7 @@ protected:
     [[nodiscard]] Message print(std::string_view message, std::span<Argument> arguments) const;
 
     void evaluateFormatsInMessage(std::string_view message, std::span<Argument> arguments,
-                                  llvm::raw_string_ostream& ss) const;
+                                  llvm::raw_ostream& ss) const;
 
 public:
     constexpr DiagnosticBase(const Severity severity, const std::string_view name) : m_severity(severity), m_name(name) {}
