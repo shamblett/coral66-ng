@@ -283,6 +283,9 @@
 
       j := 0;
    lab:
+      'COMMENT' The line below should end in t like the others;
+      'COMMENT' however if t is used then the test hangs, the value to use;
+      'COMMENT' must be greater than t for dome reason.;
       e[1] := (e[1] + e[2] + e[3] - e[4]) * 0.77;
       e[2] := (e[1] + e[2] - e[3] + e[4]) * t;
       e[3] := (e[1] - e[2] + e[3] + e[4]) * t;
