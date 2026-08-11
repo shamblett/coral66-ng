@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+#
+# Project: coral66
+# Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+# Date   : 11/08/2026
+#
+
 set -e
 
 # Default values

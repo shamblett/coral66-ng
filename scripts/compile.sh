@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# compile.sh: A friendly wrapper for the Coral 66 compiler
+
+#
+# Project: coral66
+# Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+# Date   : 11/08/2026
+#
 
 set -e
 
