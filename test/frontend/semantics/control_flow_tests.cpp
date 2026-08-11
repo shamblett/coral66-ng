@@ -252,15 +252,17 @@ TEST_CASE("Control Flow - Switch & Presets", "[Semantics][ControlFlow]")
         CHECK(!res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     }
 
-    // TODO SECTION("Switch bounds constant evaluation too small")
-    // {
-    //     ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ;
-    //     END"); ControlFlowResult res(parsed); CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
-    // }
-    //
-    // SECTION("Switch bounds constant evaluation too large")
-    // {
-    //     ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ;
-    //     END"); ControlFlowResult res(parsed); CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
-    // }
+    SECTION("Switch bounds constant evaluation too small")
+    {
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ; END"); 
+        ControlFlowResult res(parsed); 
+        CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+    }
+
+    SECTION("Switch bounds constant evaluation too large")
+    {
+        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ; END"); 
+        ControlFlowResult res(parsed); 
+        CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
+    }
 }
