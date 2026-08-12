@@ -1,0 +1,578 @@
+{
+    "header": {
+        "library_name": "libcstdio",
+        "cmi_version": "1.0.0"
+    },
+    "symbols": [
+        {
+            "name": "fopen",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fclose",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fflush",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "setbuf",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fread",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fwrite",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fgetc",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fgets",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fputc",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fputs",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "getchar",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": []
+        },
+        {
+            "name": "gets",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "putchar",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "puts",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "ungetc",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "ftell",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fgetpos",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fseek",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fsetpos",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "rewind",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "remove",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "rename",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "printfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "printfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "printf2int",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fprintfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fprintfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "sprintfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "sprintfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "scanfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "scanfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fscanfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fscanfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        }
+    ]
+}
