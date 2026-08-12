@@ -1,5 +1,13 @@
 SEGMENT libcstring
 
+COMMENT
+/*
+ * Project: coral66
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 12/08/2026
+ */
+ ;
+
 COMMENT 
   Standard C Library <string.h> bindings for Coral 66
   
