@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -54,12 +54,15 @@ std::unique_ptr<llvm::TargetMachine> generateLLVM(llvm::Module& module, const sy
 
     std::string error;
     std::unique_ptr<llvm::TargetMachine> targetMachine;
-    
+
     // Only attempt to set up TargetMachine and DataLayout if a target triple is provided
-    if (!module.getTargetTriple().empty()) {
-        if (const auto target = llvm::TargetRegistry::lookupTarget(module.getTargetTriple(), error)) {
+    if (!module.getTargetTriple().empty())
+    {
+        if (const auto target = llvm::TargetRegistry::lookupTarget(module.getTargetTriple(), error))
+        {
             targetMachine.reset(target->createTargetMachine(module.getTargetTriple(), "generic", "", {}, {}));
-            if (targetMachine) {
+            if (targetMachine)
+            {
                 module.setDataLayout(targetMachine->createDataLayout());
             }
         }
