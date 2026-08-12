@@ -1,0 +1,378 @@
+{
+    "header": {
+        "library_name": "libcstring",
+        "cmi_version": "1.0.0"
+    },
+    "symbols": [
+        {
+            "name": "memcpy",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "memmove",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "memcmp",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "memchr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "memset",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strcpy",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strncpy",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strcat",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strncat",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strcmp",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strncmp",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strchr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strrchr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strspn",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strcspn",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strpbrk",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strlen",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strtok",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "strerror",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        }
+    ]
+}
