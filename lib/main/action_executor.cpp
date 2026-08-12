@@ -141,7 +141,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     cgllvm::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
-    module.setTargetTriple(llvm::Triple(llvm::sys::getDefaultTargetTriple()));
+    module.setTargetTriple(llvm::Triple(llvm::sys::getDefaultTargetTriple()).get32BitArchVariant());
     if (cl::Pie || cl::Pic)
     {
         codegenOptions.reloc = llvm::Reloc::Model::PIC_;
