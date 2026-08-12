@@ -1,5 +1,5 @@
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 #include "test/frontend/common/common.hpp"
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 using namespace coral66;
 using namespace coral66::parser;

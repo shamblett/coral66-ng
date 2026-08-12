@@ -1,12 +1,14 @@
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 11/08/2026
  */
 
 #include "lib/frontend/common/messages/message.hpp"
-#include "test/vendor/catch2v3/catch_amalgamated.hpp"
+
 #include <llvm/Support/raw_ostream.h>
+
+#include "test/vendor/catch2v3/catch_amalgamated.hpp"
 
 TEST_CASE("Message construction and segment validation", "[Message]")
 {
@@ -30,17 +32,16 @@ TEST_CASE("Message construction and segment validation", "[Message]")
     {
         std::vector<coral66::Message::Segment> segments = {
             {"Error: ", llvm::raw_ostream::RED, true, false},
-            {"Something went wrong", llvm::raw_ostream::SAVEDCOLOR, false, false}
-        };
+            {"Something went wrong", llvm::raw_ostream::SAVEDCOLOR, false, false}};
         coral66::Message msg(coral66::Severity::Warning, std::move(segments));
-        
+
         CHECK(msg.getSeverity() == coral66::Severity::Warning);
         CHECK(msg.getText() == "Error: Something went wrong");
         REQUIRE(msg.getSegments().size() == 2);
         CHECK(msg.getSegments()[0].text == "Error: ");
         CHECK(msg.getSegments()[0].color == llvm::raw_ostream::RED);
         CHECK(msg.getSegments()[0].bold == true);
-        
+
         CHECK(msg.getSegments()[1].text == "Something went wrong");
         CHECK(msg.getSegments()[1].color == llvm::raw_ostream::SAVEDCOLOR);
     }
@@ -48,10 +49,8 @@ TEST_CASE("Message construction and segment validation", "[Message]")
 
 TEST_CASE("Message segment streaming with colors_enabled", "[Message]")
 {
-    std::vector<coral66::Message::Segment> segments = {
-        {"RedBold", llvm::raw_ostream::RED, true, false},
-        {"Normal", llvm::raw_ostream::SAVEDCOLOR, false, false}
-    };
+    std::vector<coral66::Message::Segment> segments = {{"RedBold", llvm::raw_ostream::RED, true, false},
+                                                       {"Normal", llvm::raw_ostream::SAVEDCOLOR, false, false}};
     coral66::Message msg(coral66::Severity::Error, std::move(segments));
 
     SECTION("Streaming with colors disabled")
@@ -61,7 +60,7 @@ TEST_CASE("Message segment streaming with colors_enabled", "[Message]")
         os.enable_colors(false);
         os << msg;
         os.flush();
-        
+
         // When colors are disabled, no ANSI codes should be emitted.
         CHECK(out == "RedBoldNormal");
     }
@@ -73,12 +72,12 @@ TEST_CASE("Message segment streaming with colors_enabled", "[Message]")
         os.enable_colors(true);
         os << msg;
         os.flush();
-        
+
         // When colors are enabled, we expect ANSI codes around RedBold.
         // llvm::raw_ostream outputs specific codes. We just verify they are present.
         CHECK(out.find("RedBold") != std::string::npos);
         CHECK(out.find("Normal") != std::string::npos);
         CHECK(out.find("\033[") != std::string::npos); // Verify ANSI escape was used
-        CHECK(out != "RedBoldNormal"); // Verify it is different from plain text
+        CHECK(out != "RedBoldNormal");                 // Verify it is different from plain text
     }
 }

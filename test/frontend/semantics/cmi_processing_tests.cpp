@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 03/08/2026
  */
@@ -59,7 +59,9 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
     SECTION("Procedure Generation")
     {
         std::vector<ProcedureType::Parameter> params;
-        params.push_back({.type = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating))), .name = "p1", .isValue = true});
+        params.push_back({.type = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating))),
+                          .name = "p1",
+                          .isValue = true});
 
         const Type* returnType = makeType(IntrusiveVariantValue(PrimitiveType(PrimitiveType::Integer)));
         auto type = IntrusiveVariantValue(ProcedureType(returnType, std::move(params)));

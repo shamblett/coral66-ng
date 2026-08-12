@@ -1,10 +1,10 @@
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -33,7 +33,9 @@ public:
     std::size_t size;
     float thing;
 
-    Derived1(const std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
+    Derived1(const std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing)
+    {
+    }
 };
 
 class DestrSideEffect : public Base
@@ -378,7 +380,9 @@ public:
     std::size_t size;
     float thing;
 
-    Derived2(const std::size_t size, const float thing) : Base2(std::in_place_type<Derived2>), size(size), thing(thing) {}
+    Derived2(const std::size_t size, const float thing) : Base2(std::in_place_type<Derived2>), size(size), thing(thing)
+    {
+    }
 };
 
 } // namespace

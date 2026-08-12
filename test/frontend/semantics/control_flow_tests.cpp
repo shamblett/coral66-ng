@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
@@ -254,15 +254,17 @@ TEST_CASE("Control Flow - Switch & Presets", "[Semantics][ControlFlow]")
 
     SECTION("Switch bounds constant evaluation too small")
     {
-        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ; END"); 
-        ControlFlowResult res(parsed); 
+        const ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[0] ; END ; END");
+        ControlFlowResult res(parsed);
         CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     }
 
     SECTION("Switch bounds constant evaluation too large")
     {
-        const ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ; END"); 
-        ControlFlowResult res(parsed); 
+        const ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN MYLABEL: BEGIN SWITCH S := MYLABEL ; GOTO S[2] ; END ; END");
+        ControlFlowResult res(parsed);
         CHECK(res.hasDiagnostic("SWITCH_INDEX_OUT_OF_BOUNDS"));
     }
 }

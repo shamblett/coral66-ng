@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 10/04/2026
  */
@@ -169,11 +169,11 @@ rapidjson::Value AstDump::dump(const syntax::Declaration* declaration)
         obj.AddMember("Parameters", parameters, m_alloc);
     }
 
-        else if (auto* switchDeclaration = dynamic_cast<const syntax::SwitchDeclaration*>(declaration))
+    else if (auto* switchDeclaration = dynamic_cast<const syntax::SwitchDeclaration*>(declaration))
     {
         obj.AddMember("NodeType", "SwitchDeclaration", m_alloc);
         obj.AddMember("Name", getTokenString(switchDeclaration->getIdentifier()), m_alloc);
-        
+
         rapidjson::Value labels(rapidjson::kArrayType);
         for (const auto& l : switchDeclaration->getLabels())
         {

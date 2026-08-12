@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -29,7 +29,7 @@ inline std::pair<coral66::syntax::Program, coral66::semantics::Program> generate
     REQUIRE_FALSE(errors);
     auto tree = coral66::parser::parseProgram(ctokens, &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);
-    
+
     // We make a copy of the tree since we need to return it as well.
     auto program = coral66::semantics::analyse(tree, std::move(ctokens), &llvm::errs(), &errors);
     REQUIRE_FALSE(errors);

@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 04/07/2026
  */
@@ -9,6 +9,7 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/TargetSelect.h>
+
 #include <iostream>
 
 #include "common.hpp"
@@ -43,14 +44,18 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
         // Frontend passes
         bool errors = false;
         auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
-        if (errors) { std::cerr << "LEXER ERROR: " << ss.str() << std::endl; }
+        if (errors)
+        {
+            std::cerr << "LEXER ERROR: " << ss.str() << std::endl;
+        }
         REQUIRE_FALSE(errors);
 
         ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
         REQUIRE_FALSE(errors);
 
         auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
-        if (errors) WARN(ss.str());
+        if (errors)
+            WARN(ss.str());
         REQUIRE_FALSE(errors);
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
@@ -111,4 +116,3 @@ TEST_CASE("Phase 2", "[Backend][Execution]")
         delete ee;
     }
 }
-

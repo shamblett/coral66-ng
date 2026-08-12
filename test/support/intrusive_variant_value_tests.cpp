@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -26,7 +26,8 @@ public:
     std::size_t size;
     float thing;
 
-    TrivDerived1(const std::size_t size, const float thing) : TrivBase(std::in_place_type<TrivDerived1>), size(size), thing(thing)
+    TrivDerived1(const std::size_t size, const float thing)
+        : TrivBase(std::in_place_type<TrivDerived1>), size(size), thing(thing)
     {
     }
 };
@@ -58,7 +59,9 @@ public:
     float thing;
 
     // ReSharper disable once CppDFAConstantParameter
-    Derived1(const std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing) {}
+    Derived1(const std::size_t size, const float thing) : Base(std::in_place_type<Derived1>), size(size), thing(thing)
+    {
+    }
 };
 
 class DestrSideEffect : public Base

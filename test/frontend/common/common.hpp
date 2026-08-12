@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 07/03/2026
  */
@@ -185,7 +185,9 @@ struct ParsedProgram
     Program program;
 
     explicit ParsedProgram(std::string src)
-        : source(std::move(src)), ss(outStr), program(nullptr, nullptr, nullptr, std::vector<std::unique_ptr<Communicator>>(), nullptr, false)
+        : source(std::move(src)),
+          ss(outStr),
+          program(nullptr, nullptr, nullptr, std::vector<std::unique_ptr<Communicator>>(), nullptr, false)
     {
         ppTokens = lexer::tokenize(source, &ss);
         cTokens = lexer::toCTokens(ppTokens, &ss);
