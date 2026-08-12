@@ -84,4 +84,35 @@ Here is an example compilation command:
 the gcc-multilib package, and on Fedora/RHEL, you would need glibc-devel.i686.)
 
 
+1. Using EXTERNAL for Standard C Library Functions
+   You can absolutely use the EXTERNAL communicator to map directly to <string.h> functions (or any libc function) without needing an intermediate C wrapper.
+
+According to the compiler's design (detailed in external-specification.md), coral66-ng is explicitly built to map EXTERNAL procedures directly to the standard C
+Application Binary Interface (C ABI) for the target. When the compiler parses an EXTERNAL block, it emits an unresolved LLVM function declaration using
+llvm::GlobalValue::ExternalLinkage rather than attempting to define it.
+
+Since coral66-ng's build driver (action_executor.cpp) invokes gcc to perform the final linking step, and gcc inherently links against libc by default, standard
+library functions will automatically be resolved at link time.
+
+You can declare a C function directly in your .cor source file like this (using INTEGER since Coral 66 typically handles addresses/pointers as integers):
+
+1 EXTERNAL (
+2     INTEGER PROCEDURE strlen(VALUE INTEGER str_ptr);
+3     INTEGER PROCEDURE puts(VALUE INTEGER str_ptr)
+4 );
+
+2. Linking against arbitrary libxxx external libraries
+   You can supply external libraries for the compiler to link against, but there is a slight caveat on the syntax.
+
+While the design specs mention a desire to support gcc-style -lxxx and -Lxxx flags natively, the current LLVM command-line parser in coral66-ng does not have a
+generic -l flag implemented yet.
+
+However, there is a built-in workaround: The compiler accepts any number of positional [object files...] arguments and passes them verbatim to the underlying gcc
+command during the final link phase. To link an external library, you simply provide the path to the .a or .so file directly as an argument:
+
+1 # Instead of `-lmath`, provide the path to the shared object or archive
+2 coral66 myprog.cor /usr/lib/x86_64-linux-gnu/libm.so
+
+Because gcc natively understands how to link directly against object and library files passed positionally, the coral66-ng compiler will successfully combine your
+Coral 66 code with the external library code seamlessly.
 
