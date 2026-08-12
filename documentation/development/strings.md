@@ -104,3 +104,28 @@ Summary: The EXTERNAL communicator mapping strings to INTEGERs is perfectly idio
 address the 32-bit INTEGER versus 64-bit pointer mismatch at the compiler's code-generation layer before mapping these pointers into your C library.
 
 
+Note that strings are 0 terminated by the backend :-
+
+Yes, the compiler code applies it automatically! The user never types \0.
+
+Here is the exact mechanism under the hood:
+
+When coral66-ng parses a string like "HELLO CORAL", it reads it as a standard C++ std::string containing exactly those 11 characters.
+
+When the backend (lib/backend/code_generator_expressions.cpp) generates the machine code (LLVM IR) for that string literal, it calls a specific function built into
+LLVM called CreateGlobalString:
+
+1 if (std::holds_alternative<std::string>(val))
+2 {
+3     const auto& strValue = std::get<std::string>(val);
+4     // Standard Coral string literals should be emitted as global string constants
+5     // returning an i8* (pointer to characters) which allows passing to EXTERNAL C functions.
+6     return m_builder.CreateGlobalString(strValue);
+7 }
+
+LLVM's IRBuilder::CreateGlobalString API has a hardcoded, default behavior: it automatically injects a trailing null byte (\0) into the global constant array it
+creates.
+
+So, by simply relying on the standard LLVM API for generating string constants, coral66-ng natively and automatically ensures C-string compatibility for all Coral 66
+string literals without the user ever needing to think about null termination.
+
