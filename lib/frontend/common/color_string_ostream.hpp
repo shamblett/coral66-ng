@@ -1,15 +1,16 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 05/04/2026
  */
 
 #pragma once
-#include "messages/message.hpp"
 #include <llvm/Support/raw_ostream.h>
 
 #include <string>
 #include <vector>
+
+#include "messages/message.hpp"
 
 namespace coral66::detail
 {
@@ -28,9 +29,7 @@ class ColorStringOstream : public llvm::raw_ostream
     uint64_t m_pos = 0;
 
 public:
-    explicit ColorStringOstream(std::vector<Message::Segment>& segments) : m_segments(segments)
-    {
-    }
+    explicit ColorStringOstream(std::vector<Message::Segment>& segments) : m_segments(segments) {}
 
     ~ColorStringOstream() override
     {
@@ -71,9 +70,10 @@ public:
     {
         if (Size == 0)
             return;
-            
+
         std::string text(Ptr, Size);
-        if (!m_segments.empty() && m_segments.back().color == m_currentColor && m_segments.back().bold == m_currentBold && m_segments.back().bg == m_currentBg)
+        if (!m_segments.empty() && m_segments.back().color == m_currentColor && m_segments.back().bold == m_currentBold
+            && m_segments.back().bg == m_currentBg)
         {
             m_segments.back().text += text;
         }

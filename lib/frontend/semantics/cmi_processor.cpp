@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 03/08/2026
  */
@@ -382,8 +382,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     dimensions.push_back(dims[j].GetUint64());
                 }
 
-                auto arrayType =
-                    IntrusiveVariantValue(std::in_place_type<ArrayType>, elemType, std::move(dimensions));
+                auto arrayType = IntrusiveVariantValue(std::in_place_type<ArrayType>, elemType, std::move(dimensions));
                 auto arrayDeclaration = std::make_unique<ArrayDeclaration>(syntheticToken, std::move(arrayType));
 
                 importedSymbols.push_back(std::move(arrayDeclaration));
@@ -416,8 +415,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
 
                 g_syntheticTableInfos.push_back(std::move(info));
 
-                auto tableType =
-                    IntrusiveVariantValue(std::in_place_type<TableType>, g_syntheticTableInfos.back());
+                auto tableType = IntrusiveVariantValue(std::in_place_type<TableType>, g_syntheticTableInfos.back());
                 auto tableDeclaration = std::make_unique<TableDeclaration>(syntheticToken, std::move(tableType));
 
                 importedSymbols.push_back(std::move(tableDeclaration));

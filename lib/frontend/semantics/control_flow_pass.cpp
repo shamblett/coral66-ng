@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
@@ -348,6 +348,5 @@ void ControlFlowPass::visit(const syntax::FunctionCallExpression& node)
     for (const auto& arg : node.getArguments())
         visit(*arg);
 }
-
 
 } // namespace coral66::semantics

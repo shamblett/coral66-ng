@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -38,8 +38,7 @@ struct File;
 struct Substitution;
 struct Stringification;
 struct TokenConcatenation;
-using PPRecord =
-    std::variant<std::monostate, Substitution, Stringification, TokenConcatenation>;
+using PPRecord = std::variant<std::monostate, Substitution, Stringification, TokenConcatenation>;
 } // namespace Source
 
 class source_interface

@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -163,9 +163,10 @@ class Preprocessor final : PPSourceInterface
 
             // Expand Macro
             const auto i = ++m_macroID;
-            m_substitutions.emplace_back(
-                Source::Substitution{.macroIdentifier = *result->second.back().identifierPos, .replacedIdentifier = tokens[idx],
-                                                              .closeParentheses = {}, .empty = false});
+            m_substitutions.emplace_back(Source::Substitution{.macroIdentifier = *result->second.back().identifierPos,
+                                                              .replacedIdentifier = tokens[idx],
+                                                              .closeParentheses = {},
+                                                              .empty = false});
 
             std::vector replacement(result->second.back().replacement.begin(), result->second.back().replacement.end());
             for (auto& tok : replacement)
@@ -184,8 +185,7 @@ class Preprocessor final : PPSourceInterface
                 while (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == lexer::TokenType::Newline)
                     arg_idx++;
 
-                if (arg_idx == tokens.size()
-                    || tokens[arg_idx].getTokenType() != lexer::TokenType::OpenParentheses)
+                if (arg_idx == tokens.size() || tokens[arg_idx].getTokenType() != lexer::TokenType::OpenParentheses)
                 {
                     output.push_back(std::move(tokens[idx]));
                     idx++;
@@ -225,8 +225,7 @@ class Preprocessor final : PPSourceInterface
                     arg_idx++;
                 }
                 actual_args.push_back(current_arg);
-                if (arg_idx < tokens.size()
-                    && tokens[arg_idx].getTokenType() == lexer::TokenType::CloseParentheses)
+                if (arg_idx < tokens.size() && tokens[arg_idx].getTokenType() == lexer::TokenType::CloseParentheses)
                     arg_idx++;
 
                 if (actual_args.size() != param_count

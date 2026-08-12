@@ -1,6 +1,6 @@
 #include "lib/frontend/common/color_string_ostream.hpp"
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -30,18 +30,21 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
             [](std::monostate) -> PointLocation { CORAL66_UNREACHABLE; },
             [](const coral66::Source::Substitution& substitution) -> PointLocation
             {
-                return {.offset = substitution.replacedIdentifier.getOffset(), .fileId = substitution.replacedIdentifier.getFileId(),
+                return {.offset = substitution.replacedIdentifier.getOffset(),
+                        .fileId = substitution.replacedIdentifier.getFileId(),
                         .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::Stringification& substitution) -> PointLocation
             {
-                return {.offset = substitution.replacedIdentifier.getOffset(), .fileId = substitution.replacedIdentifier.getFileId(),
+                return {.offset = substitution.replacedIdentifier.getOffset(),
+                        .fileId = substitution.replacedIdentifier.getFileId(),
                         .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::TokenConcatenation& substitution) -> PointLocation
             {
                 // I think it doesn't matter which we return here? Let's do left for now
-                return {.offset = substitution.leftToken.getOffset(), .fileId = substitution.leftToken.getFileId(),
+                return {.offset = substitution.leftToken.getOffset(),
+                        .fileId = substitution.leftToken.getFileId(),
                         .macroId = substitution.leftToken.getMacroId()};
             });
     }
@@ -54,19 +57,22 @@ std::pair<PointLocation, PointLocation> toMacroId0Range(std::pair<PointLocation,
             {
                 return {.offset =
                             substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
-                        .fileId = substitution.replacedIdentifier.getFileId(), .macroId = substitution.replacedIdentifier.getMacroId()};
+                        .fileId = substitution.replacedIdentifier.getFileId(),
+                        .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::Stringification& substitution) -> PointLocation
             {
                 return {.offset =
                             substitution.replacedIdentifier.getOffset() + substitution.replacedIdentifier.getLength(),
-                        .fileId = substitution.replacedIdentifier.getFileId(), .macroId = substitution.replacedIdentifier.getMacroId()};
+                        .fileId = substitution.replacedIdentifier.getFileId(),
+                        .macroId = substitution.replacedIdentifier.getMacroId()};
             },
             [](const coral66::Source::TokenConcatenation& substitution) -> PointLocation
             {
                 // I think it doesn't matter which we return here? Let's do left for now
                 return {.offset = substitution.rightToken.getOffset() + substitution.rightToken.getLength(),
-                        .fileId = substitution.rightToken.getFileId(), .macroId = substitution.rightToken.getMacroId()};
+                        .fileId = substitution.rightToken.getFileId(),
+                        .macroId = substitution.rightToken.getMacroId()};
             });
     }
     return location;
@@ -132,14 +138,14 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
 
                 if (underline.continuous)
                 {
-                    const auto sizeOfTextAbove = coral66::unsafeColumnWidth(text.substr(
-                        fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first));
+                    const auto sizeOfTextAbove = coral66::unsafeColumnWidth(
+                        text.substr(fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first));
                     std::fill_n(canvas[0].begin() + indent, sizeOfTextAbove, underline.character);
                     return;
                 }
 
-                const auto textAbove = text.substr(fromToInLine.first - lineStartOffset,
-                                                   fromToInLine.second - fromToInLine.first);
+                const auto textAbove =
+                    text.substr(fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first);
                 for (const auto* ptr = textAbove.data(); ptr != textAbove.data() + textAbove.size();)
                 {
                     // Skip all whitespace first
@@ -150,8 +156,8 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                         const auto* before = ptr;
                         const auto result = llvm::ConvertUTF8toUTF32(
                             reinterpret_cast<const llvm::UTF8**>(&ptr),
-                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart, targetStart + 1,
-                            llvm::strictConversion);
+                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart,
+                            targetStart + 1, llvm::strictConversion);
                         (void)result;
                         CORAL66_ASSERT(result == llvm::conversionOK || result == llvm::targetExhausted);
                         if (!coral66::isWhitespace(utf32))
@@ -170,8 +176,8 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                         const auto* before = start;
                         const auto result = llvm::ConvertUTF8toUTF32(
                             reinterpret_cast<const llvm::UTF8**>(&start),
-                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart, targetStart + 1,
-                            llvm::strictConversion);
+                            reinterpret_cast<const llvm::UTF8*>(textAbove.data() + textAbove.size()), &targetStart,
+                            targetStart + 1, llvm::strictConversion);
                         (void)result;
                         CORAL66_ASSERT(result == llvm::conversionOK || result == llvm::targetExhausted);
                         if (coral66::isWhitespace(utf32))
@@ -195,8 +201,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                     extraAtEnd = std::string(width, ' ') + " > " + coral66::to_string(insertAfter.text);
                     return;
                 }
-                const auto indent =
-                    coral66::unsafeColumnWidth(text.substr(0, fromToInLine.second - lineStartOffset));
+                const auto indent = coral66::unsafeColumnWidth(text.substr(0, fromToInLine.second - lineStartOffset));
                 canvas.resize(std::max<std::size_t>(1, canvas.size()), std::string(widthOfText, ' '));
                 canvas[0].resize(std::max<std::size_t>(canvas[0].size(), indent + 1));
                 canvas[0][indent] = '^';
@@ -234,8 +239,8 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
             {
                 auto indent = coral66::unsafeColumnWidth(text.substr(0, fromToInLine.first - lineStartOffset));
                 canvas.resize(std::max<std::size_t>(1, canvas.size()), std::string(widthOfText, ' '));
-                const auto sizeOfTextAbove = coral66::unsafeColumnWidth(text.substr(
-                    fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first));
+                const auto sizeOfTextAbove = coral66::unsafeColumnWidth(
+                    text.substr(fromToInLine.first - lineStartOffset, fromToInLine.second - fromToInLine.first));
                 std::fill_n(canvas[0].begin() + indent, sizeOfTextAbove, sizeOfTextAbove == 1 ? '^' : '~');
                 if (fromToInLine.first > annotate.pos || annotate.pos > fromToInLine.second)
                 {
@@ -290,7 +295,7 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     {
         return {};
     }
-    
+
     std::vector<Message::Segment> segments;
     ColorStringOstream ss(segments);
 
@@ -307,8 +312,8 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
         {
             auto line = sourceInterface.getLineNumber(fst, snd);
             const auto& range = sourceInterface.getFiles()[fst].lineAndFileMapping;
-            auto map =
-                llvm::upper_bound(range, line, [](auto line1, const auto& tuple) { return line1 < std::get<0>(tuple); });
+            auto map = llvm::upper_bound(range, line,
+                                         [](auto line1, const auto& tuple) { return line1 < std::get<0>(tuple); });
             if (!range.empty() && map == range.end())
             {
                 --map;
@@ -368,9 +373,8 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
     for (auto& iter : modifiers)
     {
         const auto index = match(
-            iter, [](const Underline& underline) { return underline.index; },
-            [](const InsertAfter& insertAfter) { return insertAfter.index; },
-            [](const Annotate& annotate) { return annotate.index; });
+            iter, [](const Underline& underline) { return underline.index; }, [](const InsertAfter& insertAfter)
+            { return insertAfter.index; }, [](const Annotate& annotate) { return annotate.index; });
         CORAL66_ASSERT(arguments[index].range);
         arguments[index].range = toMacroId0Range(*arguments[index].range, sourceInterface);
         auto startLine = getLineCol(arguments[index].range->first, sourceInterface).first;
@@ -398,10 +402,9 @@ coral66::Message coral66::detail::Diagnostic::DiagnosticBase::print(
                 CORAL66_ASSERT(!std::holds_alternative<Annotate>(iter));
                 continue;
             }
-            vector.push_back(
-                {.fromToInLine = {std::max(arguments[index].range->first.offset, startOffset),
+            vector.push_back({.fromToInLine = {std::max(arguments[index].range->first.offset, startOffset),
                                                std::min(arguments[index].range->second.offset, endOffset)},
-                 .value = match(
+                              .value = match(
                                   iter,
                                   [](const Underline& underline) -> ModifierOfLine::variant
                                   {

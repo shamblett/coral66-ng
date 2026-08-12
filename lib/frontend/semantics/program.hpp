@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -21,11 +21,8 @@ class Program
     SemanticContext m_context;
 
 public:
-    Program(CSourceObject&& source, OwnedUsables globals,
-            SemanticContext&& context)
-        : m_source(std::move(source)),
-          m_globals(std::move(globals)),
-          m_context(std::move(context))
+    Program(CSourceObject&& source, OwnedUsables globals, SemanticContext&& context)
+        : m_source(std::move(source)), m_globals(std::move(globals)), m_context(std::move(context))
     {
     }
 

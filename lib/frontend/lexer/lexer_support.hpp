@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -183,8 +183,10 @@ public:
           m_offset(offset),
           m_lineStarts(std::move(lineStarts)),
           m_characterToSourceSpace(characterToSourceSpace),
-          m_fakeFile{.path = coral66::to_string(path), .source = coral66::to_string(sourceSpace),
-                     .starts = {}, .systemHeader = false},
+          m_fakeFile{.path = coral66::to_string(path),
+                     .source = coral66::to_string(sourceSpace),
+                     .starts = {},
+                     .systemHeader = false},
           tokenStartOffset(0)
     {
     }
@@ -204,7 +206,7 @@ public:
                     if constexpr (std::is_integral_v<std::decay_t<Location>>)
                     {
                         *m_reporter << diagnostics.args(map(m_characterToSourceSpace, location).first, *this,
-                                                 std::forward<T0>(args1)...);
+                                                        std::forward<T0>(args1)...);
                         return;
                     }
                     if constexpr (coral66::TupleLike<std::decay_t<Location>>)
@@ -215,13 +217,13 @@ public:
                             using T2 = std::decay_t<std::tuple_element_t<1, std::decay_t<Location>>>;
                             if constexpr (std::is_integral_v<T1> && std::is_integral_v<T2>)
                             {
-                                *m_reporter << diagnostics.args(map(std::get<0>(location), map(std::get<1>(location))), *this,
-                                                         std::forward<T0>(args1)...);
+                                *m_reporter << diagnostics.args(map(std::get<0>(location), map(std::get<1>(location))),
+                                                                *this, std::forward<T0>(args1)...);
                             }
                         }
                     }
                     *m_reporter << diagnostics.args(mapArgument(m_characterToSourceSpace, location), *this,
-                                             std::forward<T0>(args1)...);
+                                                    std::forward<T0>(args1)...);
                 },
                 mapArguments(diagnostics, m_characterToSourceSpace, std::forward_as_tuple(std::forward<Args>(args)...),
                              std::index_sequence_for<Args...>{}));

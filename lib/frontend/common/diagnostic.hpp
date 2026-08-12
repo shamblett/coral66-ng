@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -241,17 +241,18 @@ protected:
         std::unordered_map<std::string_view, std::string> customModifiers;
     };
 
-    [[nodiscard]] Message print(std::pair<diagnostics::PointLocation, diagnostics::PointLocation> location, std::string_view message,
-                                std::span<Argument> arguments, std::span<const Modifiers> modifiers,
-                                const source_interface& sourceInterface) const;
+    [[nodiscard]] Message print(std::pair<diagnostics::PointLocation, diagnostics::PointLocation> location,
+                                std::string_view message, std::span<Argument> arguments,
+                                std::span<const Modifiers> modifiers, const source_interface& sourceInterface) const;
 
     [[nodiscard]] Message print(std::string_view message, std::span<Argument> arguments) const;
 
-    void evaluateFormatsInMessage(std::string_view message, std::span<Argument> arguments,
-                                  llvm::raw_ostream& ss) const;
+    void evaluateFormatsInMessage(std::string_view message, std::span<Argument> arguments, llvm::raw_ostream& ss) const;
 
 public:
-    constexpr DiagnosticBase(const Severity severity, const std::string_view name) : m_severity(severity), m_name(name) {}
+    constexpr DiagnosticBase(const Severity severity, const std::string_view name) : m_severity(severity), m_name(name)
+    {
+    }
 
     [[nodiscard]] constexpr Severity getSeverity() const noexcept
     {
@@ -753,10 +754,10 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args, std::inde
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::StringConstraint))
             {
-                result[IntegerTy::value].inFormatText =
-                    diagnostics::StringConverter<ArgTy>::inFormat(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
-                result[IntegerTy::value].inArgText =
-                    diagnostics::StringConverter<ArgTy>::inArg(std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
+                result[IntegerTy::value].inFormatText = diagnostics::StringConverter<ArgTy>::inFormat(
+                    std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
+                result[IntegerTy::value].inArgText = diagnostics::StringConverter<ArgTy>::inArg(
+                    std::get<IntegerTy::value>(args), std::forward<Ctx>(ctx)...);
             }
             if constexpr (static_cast<bool>(constraints[IntegerTy::value] & Constraint::TypeConstraint))
             {

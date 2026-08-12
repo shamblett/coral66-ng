@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -90,8 +90,8 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
                 const auto* start = iter;
                 llvm::UTF32* targetStart = &result;
                 const auto convRes = llvm::ConvertUTF8toUTF32(reinterpret_cast<const llvm::UTF8**>(&start),
-                                                        reinterpret_cast<const llvm::UTF8*>(end), &targetStart,
-                                                        targetStart + 1, llvm::strictConversion);
+                                                              reinterpret_cast<const llvm::UTF8*>(end), &targetStart,
+                                                              targetStart + 1, llvm::strictConversion);
 
                 if (convRes != llvm::conversionOK && convRes != llvm::targetExhausted)
                 {
@@ -258,8 +258,11 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     }
 
     auto result = PPSourceObject(std::move(context.getResult()),
-                                 {Source::File{.path = to_string(sourcePath), .source = std::move(source), .starts = std::move(starts), .systemHeader = false}}, {},
-                                 {{std::move(characterToSourceSpace)}});
+                                 {Source::File{.path = to_string(sourcePath),
+                                               .source = std::move(source),
+                                               .starts = std::move(starts),
+                                               .systemHeader = false}},
+                                 {}, {{std::move(characterToSourceSpace)}});
     result.addDiagnostics(DiagnosticCollector::getDiagnostics());
     return result;
 }
@@ -319,13 +322,14 @@ struct ConversionContext
                             if constexpr (std::is_integral_v<T1> && std::is_integral_v<T2>)
                             {
                                 *reporter << diagnostics.args(std::forward_as_tuple(token, map(std::get<0>(location)),
-                                                                             map(std::get<1>(location))),
-                                                       sourceInterface, std::forward<T0>(args1)...);
+                                                                                    map(std::get<1>(location))),
+                                                              sourceInterface, std::forward<T0>(args1)...);
                             }
                         }
                     }
-                    *reporter << diagnostics.args(mapArgument(sourceInterface.getIntervalMaps()[token.getFileId()], location),
-                                           sourceInterface, std::forward<T0>(args1)...);
+                    *reporter << diagnostics.args(
+                        mapArgument(sourceInterface.getIntervalMaps()[token.getFileId()], location), sourceInterface,
+                        std::forward<T0>(args1)...);
                 },
                 mapArguments(diagnostics, sourceInterface.getIntervalMaps()[token.getFileId()],
                              std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{}));
@@ -352,12 +356,15 @@ std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const ch
     const llvm::StringRef ref(text);
     llvm::APInt value;
     bool failed = false;
-    if (text.starts_with("0x") || text.starts_with("0X")) {
+    if (text.starts_with("0x") || text.starts_with("0X"))
+    {
         failed = ref.drop_front(2).getAsInteger(16, value);
-    } else {
+    }
+    else
+    {
         failed = ref.getAsInteger(10, value);
     }
-    
+
     if (failed)
     {
         return {};
@@ -413,35 +420,50 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
             if (iter->getTokenType() == TokenType::PPNumber)
             {
                 numberText += std::string(iter->getValue());
-                if (const auto next = iter + 1; next != end && next->getTokenType() == TokenType::Identifier && numberText == "0" && (next->getValue().starts_with("x") || next->getValue().starts_with("X")))
+                if (const auto next = iter + 1;
+                    next != end && next->getTokenType() == TokenType::Identifier && numberText == "0"
+                    && (next->getValue().starts_with("x") || next->getValue().starts_with("X")))
                 {
                     bool all_hex = true;
-                    for (size_t i = 1; i < next->getValue().size(); ++i) {
-                        if (!std::isxdigit(static_cast<unsigned char>(next->getValue()[i]))) {
+                    for (size_t i = 1; i < next->getValue().size(); ++i)
+                    {
+                        if (!std::isxdigit(static_cast<unsigned char>(next->getValue()[i])))
+                        {
                             all_hex = false;
                             break;
                         }
                     }
-                    if (all_hex && next->getValue().size() > 1) {
+                    if (all_hex && next->getValue().size() > 1)
+                    {
                         numberText += std::string(next->getValue());
                         iter = next;
                     }
                 }
-                else if (auto next1 = iter + 1; next1 != end && (next1->getTokenType() == TokenType::Apostrophe || (next1->getTokenType() == TokenType::Identifier && (next1->getValue().starts_with("e") || next1->getValue().starts_with("E")))))
+                else if (auto next1 = iter + 1;
+                         next1 != end
+                         && (next1->getTokenType() == TokenType::Apostrophe
+                             || (next1->getTokenType() == TokenType::Identifier
+                                 && (next1->getValue().starts_with("e") || next1->getValue().starts_with("E")))))
                 {
-                    if (next1->getTokenType() == TokenType::Identifier && next1->getValue().size() > 1) {
+                    if (next1->getTokenType() == TokenType::Identifier && next1->getValue().size() > 1)
+                    {
                         bool all_digits = true;
-                        for (size_t i = 1; i < next1->getValue().size(); ++i) {
-                            if (!std::isdigit(next1->getValue()[i])) {
+                        for (size_t i = 1; i < next1->getValue().size(); ++i)
+                        {
+                            if (!std::isdigit(next1->getValue()[i]))
+                            {
                                 all_digits = false;
                                 break;
                             }
                         }
-                        if (all_digits) {
+                        if (all_digits)
+                        {
                             numberText += std::string(next1->getValue());
                             iter = next1;
                         }
-                    } else {
+                    }
+                    else
+                    {
                         numberText += "e";
                         iter = next1;
                         next1 = iter + 1;
@@ -478,7 +500,10 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                 }
             }
 
-            ConversionContext context{.reporter = reporter, .sourceInterface = sourceInterface, .token = *startIter, .errorsOccurred = errorsOccurred};
+            ConversionContext context{.reporter = reporter,
+                                      .sourceInterface = sourceInterface,
+                                      .token = *startIter,
+                                      .errorsOccurred = errorsOccurred};
             auto number = processNumber(numberText.data(), numberText.data() + numberText.size(),
                                         startIter->getCharSpaceOffset(), context);
             if (number)

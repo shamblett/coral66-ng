@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -23,7 +23,8 @@ lexer::CTokenIterator Node::end() const
 
 // Program
 Program::Program(const lexer::CTokenIterator begin, const lexer::CTokenIterator end, std::unique_ptr<Block>&& block,
-                 std::vector<std::unique_ptr<Communicator>>&& communicators, const lexer::CTokenIterator name, const bool isSegment)
+                 std::vector<std::unique_ptr<Communicator>>&& communicators, const lexer::CTokenIterator name,
+                 const bool isSegment)
     : Node(begin, end),
       m_communicators(std::move(communicators)),
       m_block(std::move(block)),

@@ -1,6 +1,6 @@
 
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
@@ -481,8 +481,7 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
             lengthVal = static_cast<std::uint64_t>(*l);
     }
 
-    m_context.ownedTableInfos.push_back(
-        TableInfo{
+    m_context.ownedTableInfos.push_back(TableInfo{
         .name = std::get<std::string>(id->getValue()), .id = 0, .type = TableDefinition{{}, widthVal, lengthVal}});
 
     auto typeCopy = IntrusiveVariantValue(TableType{m_context.ownedTableInfos.back()});
@@ -714,7 +713,9 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 
             for (const auto paramId : paramNode->getIdentifiers())
             {
-                parameters.push_back({.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = isValue});
+                parameters.push_back({.type = finalParamTypePtr,
+                                      .name = std::get<std::string>(paramId->getValue()),
+                                      .isValue = isValue});
             }
         }
         else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclarationNode.get()))
@@ -728,7 +729,8 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 
             for (const auto paramId : arrayNode->getIdentifiers())
             {
-                parameters.push_back({.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = false});
+                parameters.push_back(
+                    {.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = false});
             }
         }
     }

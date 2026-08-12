@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -67,7 +67,12 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             {
                 *errors = context.getErrorCount() > 0;
             }
-            return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), begin, false};
+            return {sourceObject.data().data(),
+                    end,
+                    nullptr,
+                    std::vector<std::unique_ptr<syntax::Communicator>>(),
+                    begin,
+                    false};
         }
     }
     else if (begin != end && begin->getTokenType() == lexer::TokenType::SegmentKeyword)
@@ -87,18 +92,29 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
             {
                 *errors = context.getErrorCount() > 0;
             }
-            return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), begin, false};
+            return {sourceObject.data().data(),
+                    end,
+                    nullptr,
+                    std::vector<std::unique_ptr<syntax::Communicator>>(),
+                    begin,
+                    false};
         }
     }
     else
     {
-        context.log(errors::parser::EXPECTED_PROGRAM_SEGMENT.args(*(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
+        context.log(errors::parser::EXPECTED_PROGRAM_SEGMENT.args(
+            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
         DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_PROGRAM_SEGMENT);
         if (errors)
         {
             *errors = context.getErrorCount() > 0;
         }
-        return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), name, false};
+        return {sourceObject.data().data(),
+                end,
+                nullptr,
+                std::vector<std::unique_ptr<syntax::Communicator>>(),
+                name,
+                false};
     }
 
     // Communicators
@@ -124,7 +140,12 @@ syntax::Program parseProgram(const CSourceObject& sourceObject, llvm::raw_ostrea
                 {
                     *errors = context.getErrorCount() > 0;
                 }
-                return {sourceObject.data().data(), end, nullptr, std::vector<std::unique_ptr<syntax::Communicator>>(), begin, false};
+                return {sourceObject.data().data(),
+                        end,
+                        nullptr,
+                        std::vector<std::unique_ptr<syntax::Communicator>>(),
+                        begin,
+                        false};
             }
         }
         else

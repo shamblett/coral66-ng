@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -47,7 +47,8 @@ public:
 
     Message(const Severity severity, std::string text) : m_severity(severity), m_text(std::move(text)) {}
 
-    Message(const Severity severity, std::vector<Segment> segments) : m_severity(severity), m_segments(std::move(segments))
+    Message(const Severity severity, std::vector<Segment> segments)
+        : m_severity(severity), m_segments(std::move(segments))
     {
         for (const auto& segment : m_segments)
         {
@@ -64,7 +65,7 @@ public:
     {
         return m_text;
     }
-    
+
     [[nodiscard]] const std::vector<Segment>& getSegments() const
     {
         return m_segments;

@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -51,7 +51,8 @@ PointRange getPointRange(const T& arg)
     }
     else if constexpr (std::is_convertible_v<U, std::uint64_t>)
     {
-        return {{.offset = static_cast<std::uint64_t>(arg), .fileId = 0, .macroId = 0}, {.offset = static_cast<std::uint64_t>(arg) + 1, .fileId = 0, .macroId = 0}};
+        return {{.offset = static_cast<std::uint64_t>(arg), .fileId = 0, .macroId = 0},
+                {.offset = static_cast<std::uint64_t>(arg) + 1, .fileId = 0, .macroId = 0}};
     }
     else if constexpr (detail::IsIterable<T>)
     {
@@ -108,30 +109,41 @@ PointRange getPointRange(const T& arg)
             if constexpr (std::is_pointer_v<T2>)
             {
                 CORAL66_ASSERT(arg2);
-                second = {.offset = arg2->getOffset() + arg2->getLength(), .fileId = arg2->getFileId(), .macroId = arg2->getMacroId()};
+                second = {.offset = arg2->getOffset() + arg2->getLength(),
+                          .fileId = arg2->getFileId(),
+                          .macroId = arg2->getMacroId()};
             }
             else
             {
-                second = {.offset = arg2.getOffset() + arg2.getLength(), .fileId = arg2.getFileId(), .macroId = arg2.getMacroId()};
+                second = {.offset = arg2.getOffset() + arg2.getLength(),
+                          .fileId = arg2.getFileId(),
+                          .macroId = arg2.getMacroId()};
             }
             return {first, second};
         }
         else if constexpr (std::is_base_of_v<lexer::TokenBase, T1> && std::is_convertible_v<T2, std::uint64_t>)
         {
             auto& [arg1, arg2] = arg;
-            return {{.offset = static_cast<std::uint64_t>(arg2), .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()},
-                    {.offset = static_cast<std::uint64_t>(arg2) + 1, .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()}};
+            return {
+                {.offset = static_cast<std::uint64_t>(arg2), .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()},
+                {.offset = static_cast<std::uint64_t>(arg2) + 1,
+                 .fileId = arg1.getFileId(),
+                 .macroId = arg1.getMacroId()}};
         }
         else if constexpr (std::is_base_of_v<lexer::TokenBase, T2> && std::is_convertible_v<T1, std::uint64_t>)
         {
             auto& [arg1, arg2] = arg;
-            return {{.offset = static_cast<std::uint64_t>(arg1), .fileId = arg2.getFileId(), .macroId = arg2.getMacroId()},
-                    {.offset = static_cast<std::uint64_t>(arg1) + 1, .fileId = arg2.getFileId(), .macroId = arg2.getMacroId()}};
+            return {
+                {.offset = static_cast<std::uint64_t>(arg1), .fileId = arg2.getFileId(), .macroId = arg2.getMacroId()},
+                {.offset = static_cast<std::uint64_t>(arg1) + 1,
+                 .fileId = arg2.getFileId(),
+                 .macroId = arg2.getMacroId()}};
         }
         else if constexpr (std::is_convertible_v<T1, std::uint64_t> && std::is_convertible_v<T2, std::uint64_t>)
         {
             auto& [arg1, arg2] = arg;
-            return {{.offset = static_cast<std::uint64_t>(arg1), .fileId = 0, .macroId = 0}, {.offset = static_cast<std::uint64_t>(arg2), .fileId = 0, .macroId = 0}};
+            return {{.offset = static_cast<std::uint64_t>(arg1), .fileId = 0, .macroId = 0},
+                    {.offset = static_cast<std::uint64_t>(arg2), .fileId = 0, .macroId = 0}};
         }
         else
         {
@@ -147,14 +159,16 @@ PointRange getPointRange(const T& arg)
         if constexpr (std::is_base_of_v<lexer::TokenBase, T1>)
         {
             auto& [arg1, arg2, arg3] = arg;
-            return {{.offset = static_cast<std::uint64_t>(arg2), .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()},
-                    {.offset = static_cast<std::uint64_t>(arg3), .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()}};
+            return {
+                {.offset = static_cast<std::uint64_t>(arg2), .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()},
+                {.offset = static_cast<std::uint64_t>(arg3), .fileId = arg1.getFileId(), .macroId = arg1.getMacroId()}};
         }
         else
         {
             auto& [arg1, arg2, arg3] = arg;
-            return {{.offset = static_cast<std::uint64_t>(arg1), .fileId = arg3.getFileId(), .macroId = arg3.getMacroId()},
-                    {.offset = static_cast<std::uint64_t>(arg2), .fileId = arg3.getFileId(), .macroId = arg3.getMacroId()}};
+            return {
+                {.offset = static_cast<std::uint64_t>(arg1), .fileId = arg3.getFileId(), .macroId = arg3.getMacroId()},
+                {.offset = static_cast<std::uint64_t>(arg2), .fileId = arg3.getFileId(), .macroId = arg3.getMacroId()}};
         }
     }
 }

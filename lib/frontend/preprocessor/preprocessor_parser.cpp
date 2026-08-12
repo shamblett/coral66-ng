@@ -1,5 +1,5 @@
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 31/01/2026
  */
@@ -117,7 +117,7 @@ coral66::pp::Group coral66::pp::parseGroup(lexer::PPTokenIterator& begin, lexer:
         if (begin->getTokenType() == lexer::TokenType::Identifier)
         {
             if (const auto value = begin->getValue(); value == lexer::tokenName(lexer::TokenType::DefineKeyword)
-                                                || value == tokenName(lexer::TokenType::DeleteKeyword))
+                                                      || value == tokenName(lexer::TokenType::DeleteKeyword))
             {
                 flushText();
                 parts.emplace_back(parseControlLine(begin, end, context));
