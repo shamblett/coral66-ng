@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Project: coral66
+# Project: coral66-ng
 # Author : Copyright S. Hamblett <steve.hamblett@linux.com>
 # Date   : 11/08/2026
 #

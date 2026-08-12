@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+
+#
+# Project: coral66-ng
+# Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+# Date   : 11/08/2026
+#
+
 #
 # compile_external.sh
 # Safely compiles C code into a 32-bit object file for linkage 
