@@ -11,7 +11,11 @@
 # Builds external C files for coral66-ng
 #
 
-EXT_DIR="support/external"
+# Resolve absolute path to script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+EXT_DIR="$ROOT_DIR/support/external"
 
 while getopts "X:" opt; do
   case $opt in
@@ -20,8 +24,6 @@ while getopts "X:" opt; do
   esac
 done
 
-# Resolve absolute path to script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPILE_EXT_SH="$SCRIPT_DIR/compile-external.sh"
 
 shopt -s nullglob
