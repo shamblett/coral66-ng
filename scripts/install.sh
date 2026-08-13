@@ -78,6 +78,9 @@ if [[ ! -d "$INSTALL_DIR" ]]; then
     fi
 fi
 
+# Remove existing binary to prevent permission errors if it is read-only
+rm -f "$INSTALL_DIR/coral66"
+
 if ! cp "$CORAL_BIN" "$INSTALL_DIR/coral66"; then
     echo "Error: Failed to copy coral66 binary to $INSTALL_DIR" >&2
     exit 1
