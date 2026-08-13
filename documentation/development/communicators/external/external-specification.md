@@ -7,7 +7,7 @@ communicator, here is a specification detailing how to achieve this, covering pa
 Transparent C-ABI Mapping via EXTERNAL
 
 Map EXTERNAL procedures directly to the standard C Application Binary Interface (C ABI) for the target
-platform (e.g., sysv-x64).
+platform.
 
 1. Parsing (lib/frontend/parser/)
 

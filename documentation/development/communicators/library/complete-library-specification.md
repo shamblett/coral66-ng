@@ -140,7 +140,7 @@ Now, in your main Coral 66 program (main.cor), you simply consume the library:
 5 END;
 
 How coral66-ng handles it under the hood:
-1. Semantic Phase: When the compiler parses LIBRARY cstring; in main.cor, it looks for cstring.cmi in the current directory (or -L paths). It deserializes the JSON
+1. Semantic Phase: When the compiler parses LIBRARY string; in main.cor, it looks for cstring.cmi in the current directory (or -L paths). It deserializes the JSON
    and registers strlen and puts into the semantic symbol table, tagging them as External linkage symbols.
 2. Code Generation: The compiler generates LLVM IR for main.cor, emitting external declarations (declare i32 @strlen(i32)) because the symbols came from a .cmi
    file.
