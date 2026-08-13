@@ -322,7 +322,7 @@ int coral66::ActionExecutor::linkExecutable() const
         outName = p.string();
     }
 
-    std::string command = "gcc";
+    std::string command = "gcc -m32";
     for (const auto& file : m_linkableFiles)
     {
         command += " " + file.string();

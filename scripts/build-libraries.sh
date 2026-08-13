@@ -11,7 +11,11 @@
 # Builds Coral 66 library files for coral66-ng
 #
 
-LIB_DIR="support/library"
+# Resolve absolute path to script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+
+LIB_DIR="$ROOT_DIR/support/library"
 
 while getopts "L:" opt; do
   case $opt in
@@ -20,7 +24,6 @@ while getopts "L:" opt; do
   esac
 done
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 COMPILE_SH="$SCRIPT_DIR/compile.sh"
 
 shopt -s nullglob
