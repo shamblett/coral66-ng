@@ -8,6 +8,7 @@
 #include "symbol_resolution_pass.hpp"
 
 #include <functional>
+#include <iostream>
 #include <string>
 
 #include "cmi_processor.hpp"
@@ -114,7 +115,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                 {
                     for (auto& decl : importedSymbols)
                     {
-                        const auto name = std::string(decl->getName());
+                        const auto name = decl->getName(); // Returns string_view
                         decl->setScopeDepth(m_context.symbolTable.scopeCount());
 
                         // Convert to IntrusiveVariantValue
