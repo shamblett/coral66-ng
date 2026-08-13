@@ -15,7 +15,7 @@ set -e
 
 if [ "$#" -eq 0 ]; then
     echo "Usage: $0 <source.c> [additional gcc options]"
-    echo "Example: $0 libstring.c -O2"
+    echo "Example: $0 string.c -O2"
     exit 1
 fi
 
