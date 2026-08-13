@@ -263,7 +263,7 @@ void CodeGenerator::visit(const syntax::Program& program)
     }
 
     // Now generate the main program block (if any)
-    if (program.hasBlock())
+    if (program.hasBlock() && !program.getIsSegment())
     {
         m_labels.clear();
         m_namedLabels.clear();
