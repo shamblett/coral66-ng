@@ -1,4 +1,4 @@
-SEGMENT libcstdio
+SEGMENT stdio
 
 COMMENT
 /*

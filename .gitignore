@@ -57,3 +57,6 @@
 
 # Individual binary files
 /test/backend/data/p1/sieve-external/sieve
+
+# CMI
+*.cmi

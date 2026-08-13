@@ -1,8 +1,7 @@
 /*
- * Project: coral66-ng
- * Author : Gemini
- * Date   : 12/08/2026
- * Description: Fixed-arity C wrappers for variadic stdio functions.
+* Project: coral66-ng
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 13/08/2026
  */
 
 #include <stdio.h>

@@ -1,8 +1,8 @@
-SEGMENT libcstring
+SEGMENT string
 
 COMMENT
 /*
- * Project: coral66
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 12/08/2026
  */
