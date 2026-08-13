@@ -1,0 +1,9 @@
+PROGRAM HelloWorld
+
+LIBRARY (stdio);
+
+BEGIN
+
+printfstr("Hello World from Coral 66", "%s");
+
+END;

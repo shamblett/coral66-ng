@@ -12,10 +12,11 @@
 #
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 COMPILE_SH="$SCRIPT_DIR/compile.sh"
 
-EXT_DIR="support/external"
-LIB_DIR="support/library"
+EXT_DIR="$ROOT_DIR/support/external"
+LIB_DIR="$ROOT_DIR/support/library"
 
 # Determine if user has provided -X or -L to override search directories
 USER_EXT_DIR="$EXT_DIR"
