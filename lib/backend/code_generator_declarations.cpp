@@ -123,7 +123,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
         else
         {
-            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage : llvm::GlobalValue::ExternalLinkage,
                                                        initializer, var->getName());
             m_globals[var] = globalVar;
         }
@@ -154,7 +154,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
         else
         {
-            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage : llvm::GlobalValue::ExternalLinkage,
                                                        initializer, arr->getName());
             m_globals[arr] = globalVar;
         }
@@ -185,7 +185,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
         else
         {
-            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, llvm::GlobalValue::ExternalLinkage,
+            auto* globalVar = new llvm::GlobalVariable(m_module, llvmType, false, declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage : llvm::GlobalValue::ExternalLinkage,
                                                        initializer, tab->getName());
             m_globals[tab] = globalVar;
         }
