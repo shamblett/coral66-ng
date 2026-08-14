@@ -73,12 +73,10 @@ Coral 66 Code:
 Pros: Type safe, handles C varargs/format strings effortlessly, and requires no changes to coral66-ng. You just link the compiled wrapper.o with your Coral 66 object
 file.
 
-To compile your external C string library (e.g., libstring.c), you must include the -m32 flag to instruct GCC (or Clang) to generate 32-bit object code.
-
 Here is an example compilation command:
 
-1 # Compile the C string library into a 32-bit object file
-2 gcc -m32 -c libstring.c -o libstring.o -O2 -Wall
+1 # Compile the C string library into an object file
+2 gcc -c string.c -o libstring.o -O2 -Wall
 
 (Note: Depending on your Linux distribution, you may need to install the 32-bit C library headers and multilib support. For example, on Debian/Ubuntu, you would need
 the gcc-multilib package, and on Fedora/RHEL, you would need glibc-devel.i686.)

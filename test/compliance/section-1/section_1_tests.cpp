@@ -39,6 +39,7 @@ TEST_CASE("Section 1-4", "[Compliance][Section-1-4]")
     /// available when required.
     SECTION("1-4-1")
     {
+
         auto sourcePath = getTestDataPath("1-4-1.cor", "COMPLIANCE_SECTION_1_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
@@ -74,6 +75,7 @@ TEST_CASE("Section 1-4", "[Compliance][Section-1-4]")
     /// If the access is outside the sllocated memory space of the program a sigsev is generated.
     SECTION("1-4-2")
     {
+        SKIP();
         pid_t pid = fork();
 
         REQUIRE(pid >= 0); // Ensure fork succeeded

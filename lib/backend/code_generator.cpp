@@ -270,7 +270,9 @@ void CodeGenerator::visit(const syntax::Program& program)
         m_locals.clear();
 
         llvm::FunctionType* ft = llvm::FunctionType::get(llvm::Type::getInt32Ty(m_module.getContext()), false);
-        llvm::Function* f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, "main", m_module);
+        llvm::FunctionCallee callee = m_module.getOrInsertFunction("main", ft);
+        llvm::Function* f = llvm::cast<llvm::Function>(callee.getCallee());
+        f->setLinkage(llvm::Function::ExternalLinkage);
         m_currentFunction = f;
 
         llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "entry", f);
