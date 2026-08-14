@@ -75,3 +75,129 @@ int fscanfstrp(FILE* stream, const char* fmt, char* arg)
 {
     return fscanf(stream, fmt, arg);
 }
+
+// ---------------------------------------------------------
+// File Access wrappers
+// ---------------------------------------------------------
+FILE* fopenp(const char* filename, const char* mode)
+{
+    return fopen(filename, mode);
+}
+
+int fclosep(FILE* stream)
+{
+    return fclose(stream);
+}
+
+int fflushp(FILE* stream)
+{
+    return fflush(stream);
+}
+
+void setbufp(FILE* stream, char* buffer)
+{
+    setbuf(stream, buffer);
+}
+
+// ---------------------------------------------------------
+// Direct Input/Output wrappers
+// ---------------------------------------------------------
+size_t freadp(void* ptr, size_t size, size_t nmemb, FILE* stream)
+{
+    return fread(ptr, size, nmemb, stream);
+}
+
+size_t fwritep(const void* ptr, size_t size, size_t nmemb, FILE* stream)
+{
+    return fwrite(ptr, size, nmemb, stream);
+}
+
+// ---------------------------------------------------------
+// Character and String I/O wrappers
+// ---------------------------------------------------------
+int fgetcp(FILE* stream)
+{
+    return fgetc(stream);
+}
+
+char* fgetsp(char* str, int n, FILE* stream)
+{
+    return fgets(str, n, stream);
+}
+
+int fputcp(int c, FILE* stream)
+{
+    return fputc(c, stream);
+}
+
+int fputsp(const char* str, FILE* stream)
+{
+    return fputs(str, stream);
+}
+
+int getcharp(void)
+{
+    return getchar();
+}
+
+char* getsp(char* str)
+{
+    return fgets(str, 1024, stdin);
+}
+
+int putcharp(int c)
+{
+    return putchar(c);
+}
+
+int putsp(const char* str)
+{
+    return puts(str);
+}
+
+int ungetcp(int c, FILE* stream)
+{
+    return ungetc(c, stream);
+}
+
+// ---------------------------------------------------------
+// File Positioning wrappers
+// ---------------------------------------------------------
+long ftellp(FILE* stream)
+{
+    return ftell(stream);
+}
+
+int fgetposp(FILE* stream, fpos_t* pos)
+{
+    return fgetpos(stream, pos);
+}
+
+int fseekp(FILE* stream, long offset, int whence)
+{
+    return fseek(stream, offset, whence);
+}
+
+int fsetposp(FILE* stream, const fpos_t* pos)
+{
+    return fsetpos(stream, pos);
+}
+
+void rewindp(FILE* stream)
+{
+    rewind(stream);
+}
+
+// ---------------------------------------------------------
+// File Operations wrappers
+// ---------------------------------------------------------
+int removep(const char* filename)
+{
+    return remove(filename);
+}
+
+int renamep(const char* oldfilename, const char* newfilename)
+{
+    return rename(oldfilename, newfilename);
+}
+

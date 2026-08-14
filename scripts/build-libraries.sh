@@ -37,5 +37,5 @@ fi
 
 for file in "${COR_FILES[@]}"; do
   echo "Building library $file..."
-  (cd "$LIB_DIR" && "$COMPILE_SH" "$(basename "$file")")
+  (cd "$LIB_DIR" && "$COMPILE_SH" "$(basename "$file")" -c)
 done

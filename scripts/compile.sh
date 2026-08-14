@@ -21,6 +21,7 @@ while [[ "$#" -gt 0 ]]; do
         -X|--extpath) EXT_PATH="$2"; shift ;;
         -x|--ext) EXTS+=("$2"); shift ;;
         *.cor) SRC_FILE="$1" ;;
+        -c) EXTRA_ARGS+=("-c") ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
     shift
@@ -47,4 +48,8 @@ OUT_EXE="${SRC_FILE%.cor}"
 # 3. Execute the explicit compiler command
 echo "Compiling $SRC_FILE with libraries: ${LIBS[*]} and externals: ${EXTS[*]}..."
 # Execute the compiler - assuming it's available in PATH or a known location
-coral66 "$SRC_FILE" $OBJ_FILES -L "$LIB_PATH" -X "$EXT_PATH" -o "$OUT_EXE"
+if [ ${#EXTRA_ARGS[@]} -eq 0 ]; then
+  coral66 "$SRC_FILE" $OBJ_FILES -L "$LIB_PATH" -X "$EXT_PATH" -o "$OUT_EXE"
+else
+  coral66 "$SRC_FILE" $OBJ_FILES -L "$LIB_PATH" -X "$EXT_PATH" "${EXTRA_ARGS[@]}" -o "$OUT_EXE.o"
+fi
