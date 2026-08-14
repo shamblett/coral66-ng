@@ -141,7 +141,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     cgllvm::Options codegenOptions;
     llvm::LLVMContext context;
     llvm::Module module("", context);
-    module.setTargetTriple(llvm::Triple(llvm::sys::getDefaultTargetTriple()).get32BitArchVariant());
+    module.setTargetTriple(llvm::Triple(llvm::sys::getDefaultTargetTriple()));
     if (cl::Pie || cl::Pic)
     {
         codegenOptions.reloc = llvm::Reloc::Model::PIC_;
@@ -322,7 +322,7 @@ int coral66::ActionExecutor::linkExecutable() const
         outName = p.string();
     }
 
-    std::string command = "gcc -m32";
+    std::string command = "gcc";
     for (const auto& file : m_linkableFiles)
     {
         command += " " + file.string();
