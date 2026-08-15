@@ -719,6 +719,33 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
                                       .isValue = isValue});
             }
         }
+        else if (auto* varNode = dynamic_cast<const syntax::VariableDeclaration*>(paramDeclarationNode.get()))
+        {
+            auto baseTypeVal = createTypeFromToken(varNode->getType(), varNode->getFixedTotalBits(),
+                                                   varNode->getFixedFractionBits());
+
+            IntrusiveVariantValue paramTypeVal{UntypedType{}};
+            
+            if (baseTypeVal->is<PrimitiveType>())
+                paramTypeVal = IntrusiveVariantValue(
+                    PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+            else if (baseTypeVal->is<FixedType>())
+                paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                               baseTypeVal->as<FixedType>().getFractionalBits(),
+                                                               Type::Location});
+            else
+                paramTypeVal = std::move(baseTypeVal);
+
+            m_context.ownedTypes.push_back(std::move(paramTypeVal));
+            const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+            for (const auto paramId : varNode->getIdentifiers())
+            {
+                parameters.push_back({.type = finalParamTypePtr,
+                                      .name = std::get<std::string>(paramId->getValue()),
+                                      .isValue = false});
+            }
+        }
         else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclarationNode.get()))
         {
             auto baseTypeVal = createTypeFromToken(arrayNode->getType());
@@ -837,6 +864,28 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
 
             m_context.ownedTypes.push_back(std::move(paramTypeVal));
             parameters.push_back({.type = m_context.ownedTypes.back().data(), .name = "", .isValue = isValue});
+        }
+        else if (auto* varNode = dynamic_cast<const syntax::VariableDeclaration*>(paramDeclarationNode.get()))
+        {
+            auto baseTypeVal = createTypeFromToken(varNode->getType(), varNode->getFixedTotalBits(),
+                                                   varNode->getFixedFractionBits());
+
+            IntrusiveVariantValue paramTypeVal{UntypedType{}};
+            
+            if (baseTypeVal->is<PrimitiveType>())
+                paramTypeVal = IntrusiveVariantValue(
+                    PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+            else if (baseTypeVal->is<FixedType>())
+                paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                               baseTypeVal->as<FixedType>().getFractionalBits(),
+                                                               Type::Location});
+            else
+                paramTypeVal = std::move(baseTypeVal);
+
+            m_context.ownedTypes.push_back(std::move(paramTypeVal));
+            
+            for (size_t i = 0; i < varNode->getIdentifiers().size(); ++i)
+                parameters.push_back({.type = m_context.ownedTypes.back().data(), .name = "", .isValue = false});
         }
     }
 

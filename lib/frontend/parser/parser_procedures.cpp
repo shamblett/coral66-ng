@@ -219,7 +219,16 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 begin++; // NOLINT(*-branch-clone)
             else if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 begin++;
-            else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+            else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses 
+                     && begin->getTokenType() != lexer::TokenType::ValueKeyword
+                     && begin->getTokenType() != lexer::TokenType::LocationKeyword
+                     && begin->getTokenType() != lexer::TokenType::LabelKeyword
+                     && begin->getTokenType() != lexer::TokenType::SwitchKeyword
+                     && begin->getTokenType() != lexer::TokenType::IntegerKeyword
+                     && begin->getTokenType() != lexer::TokenType::FloatingKeyword
+                     && begin->getTokenType() != lexer::TokenType::BitsKeyword
+                     && begin->getTokenType() != lexer::TokenType::BitKeyword
+                     && begin->getTokenType() != lexer::TokenType::FixedKeyword)
                 begin++;
         }
         if (begin != end)

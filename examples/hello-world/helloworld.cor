@@ -17,7 +17,7 @@ LIBRARY (stdio);
 BEGIN
 
 
-printfstr("Hello World from Coral 66", "%s\n");
+printfstr("%s\n", "Hello World from Coral 66");
 
 
 END;
