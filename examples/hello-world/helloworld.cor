@@ -1,9 +1,23 @@
 PROGRAM HelloWorld
 
+COMMENT
+/*
+ * Project: coral66-ng
+ * Author : Gemini
+ * Date   : 12/08/2026
+ */
+ ;
+
+COMMENT
+  Obligatory hello world program for Coral 66.
+;
+
 LIBRARY (stdio);
 
 BEGIN
 
+newline;
 printfstr("Hello World from Coral 66", "%s");
+newline;
 
 END;

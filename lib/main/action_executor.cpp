@@ -335,11 +335,5 @@ int coral66::ActionExecutor::linkExecutable() const
         return EXIT_FAILURE;
     }
 
-    // Clean up temporary object files if linking succeeded
-    for (const auto& file : m_linkableFiles)
-    {
-        fs::remove(file);
-    }
-
     return EXIT_SUCCESS;
 }

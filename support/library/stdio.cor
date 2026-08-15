@@ -109,8 +109,16 @@ COMMON (
   INTEGER PROCEDURE scanfstr(VALUE INTEGER, VALUE INTEGER);
   INTEGER PROCEDURE fscanfint(VALUE INTEGER, VALUE INTEGER, VALUE INTEGER);
   INTEGER PROCEDURE fscanfstr(VALUE INTEGER, VALUE INTEGER, VALUE INTEGER);
+
+  COMMENT Expose library procedures ;
+
+  PROCEDURE newline;
 )
+
 BEGIN
+
+  COMMENT Wrappers ;
+
   INTEGER PROCEDURE fopen(VALUE INTEGER filename, VALUE INTEGER mode);
   BEGIN ANSWER fopenp(filename, mode); END;
 
@@ -214,4 +222,10 @@ BEGIN
   INTEGER PROCEDURE fscanfstr(VALUE INTEGER stream, VALUE INTEGER fmt, VALUE INTEGER arg);
   BEGIN ANSWER fscanfstrp(stream, fmt, arg); END;
 
+  COMMENT Library procedures ;
+
+  PROCEDURE newline
+     BEGIN
+       putsp("\n");
+     END;
 END
