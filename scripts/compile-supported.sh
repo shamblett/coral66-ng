@@ -8,7 +8,8 @@
 
 #
 # compile-supported.sh
-# Compiles a Coral 66 source file against default external and library directories
+# Compiles a Coral 66 source file against default external and library directories.
+# Uses compile.sh
 #
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

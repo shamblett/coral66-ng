@@ -6,6 +6,11 @@
 # Date   : 11/08/2026
 #
 
+#
+# compile.sh
+# Compiles a single Coral 66 source file
+#
+
 set -e
 
 SRC_FILE=""

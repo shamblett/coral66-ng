@@ -8,7 +8,7 @@
 
 #
 # compile_external.sh
-# Safely compiles C code into a 32-bit object file for linkage 
+# Safely compiles C code into an object file for linkage
 # with the coral66-ng compiler.
 
 set -e
