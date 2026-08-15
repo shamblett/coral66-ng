@@ -179,6 +179,7 @@ llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
         switch (prim->getKind())
         {
             case semantics::PrimitiveType::Integer: baseType = llvm::Type::getInt32Ty(ctx); break;
+            case semantics::PrimitiveType::Pointer: baseType = llvm::PointerType::getUnqual(ctx); break;
             case semantics::PrimitiveType::Floating: baseType = llvm::Type::getFloatTy(ctx); break;
             case semantics::PrimitiveType::Bits: baseType = llvm::Type::getInt32Ty(ctx); break;
         }

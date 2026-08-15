@@ -327,6 +327,8 @@ IntrusiveVariantValue<Type> SymbolResolutionPass::createTypeFromToken( // NOLINT
     const auto type = typeToken.value()->getTokenType();
     if (type == lexer::TokenType::FloatingKeyword)
         return {PrimitiveType{PrimitiveType::Floating}};
+    if (type == lexer::TokenType::PointerKeyword)
+        return {PrimitiveType{PrimitiveType::Pointer}};
     if (type == lexer::TokenType::FixedKeyword)
     {
         uint32_t total = 16;

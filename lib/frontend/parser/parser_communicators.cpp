@@ -39,6 +39,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
             paramTypeToken = begin;
             if (begin != end
                 && (begin->getTokenType() == lexer::TokenType::IntegerKeyword
+                    || begin->getTokenType() == lexer::TokenType::PointerKeyword
                     || begin->getTokenType() == lexer::TokenType::FloatingKeyword
                     || begin->getTokenType() == lexer::TokenType::BitsKeyword
                     || begin->getTokenType() == lexer::TokenType::BitKeyword
@@ -58,7 +59,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                                                             syntax::ParameterDeclaration::ParameterMode::Switch;
             begin++;
         }
-        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword || type == lexer::TokenType::FloatingKeyword
                  || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
                  || type == lexer::TokenType::FixedKeyword || type == lexer::TokenType::ArrayKeyword)
         {
@@ -272,6 +273,7 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                     isProcedure = true;
                 }
                 else if (procLookahead->getTokenType() == lexer::TokenType::IntegerKeyword
+                         || procLookahead->getTokenType() == lexer::TokenType::PointerKeyword
                          || procLookahead->getTokenType() == lexer::TokenType::FloatingKeyword
                          || procLookahead->getTokenType() == lexer::TokenType::BitsKeyword
                          || procLookahead->getTokenType() == lexer::TokenType::BitKeyword
@@ -312,6 +314,7 @@ std::unique_ptr<syntax::Communicator> parseCommunicator(lexer::CTokenIterator& b
                 {
                     std::optional<lexer::CTokenIterator> typeToken = std::nullopt;
                     if (begin->getTokenType() == lexer::TokenType::IntegerKeyword
+                        || begin->getTokenType() == lexer::TokenType::PointerKeyword
                         || begin->getTokenType() == lexer::TokenType::FloatingKeyword
                         || begin->getTokenType() == lexer::TokenType::BitsKeyword
                         || begin->getTokenType() == lexer::TokenType::BitKeyword

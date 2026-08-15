@@ -44,6 +44,7 @@ static std::string typeToString(const Type& type)
             case PrimitiveType::Integer: return "INTEGER";
             case PrimitiveType::Floating: return "REAL";
             case PrimitiveType::Bits: return "BITS"; // Or part word
+            case PrimitiveType::Pointer: return "POINTER";
         }
     }
     else if (type.is<UntypedType>())

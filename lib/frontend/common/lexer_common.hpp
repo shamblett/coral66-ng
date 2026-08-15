@@ -88,6 +88,7 @@ enum class TokenType : std::uint8_t
     OctalKeyword,
     OrKeyword,
     OverlayKeyword,
+    PointerKeyword,
     PresetKeyword,
     ProcedureKeyword,
     ProgramKeyword,

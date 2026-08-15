@@ -157,7 +157,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
         return false;
     };
 
-    if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+    if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword || type == lexer::TokenType::FloatingKeyword
         || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::FixedKeyword
         || type == lexer::TokenType::ArrayKeyword)
     {
@@ -534,6 +534,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                         else if (!isPartWord
                                  && (begin->getTokenType() == lexer::TokenType::FloatingKeyword
                                      || begin->getTokenType() == lexer::TokenType::IntegerKeyword
+                                     || begin->getTokenType() == lexer::TokenType::PointerKeyword
                                      || begin->getTokenType() == lexer::TokenType::FixedKeyword
                                      || begin->getTokenType() == lexer::TokenType::BitsKeyword))
                         {
