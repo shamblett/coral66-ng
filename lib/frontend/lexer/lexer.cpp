@@ -596,6 +596,24 @@ std::optional<CToken> coral66::lexer::parseStringLiteral(const PPToken& PPToken,
             finalValue += '"';
             i++; // skip next quote
         }
+        else if (value[i] == '\\' && i + 1 < value.size())
+        {
+            switch (value[i + 1])
+            {
+                case 'n': finalValue += '\n'; break;
+                case 't': finalValue += '\t'; break;
+                case 'r': finalValue += '\r'; break;
+                case '\\': finalValue += '\\'; break;
+                case '"': finalValue += '"'; break;
+                case '0': finalValue += '\0'; break;
+                default:
+                    // If it's an unrecognized escape, just keep both characters
+                    finalValue += '\\';
+                    finalValue += value[i + 1];
+                    break;
+            }
+            i++; // skip escaped char
+        }
         else
         {
             finalValue += value[i];
