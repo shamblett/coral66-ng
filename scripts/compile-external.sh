@@ -39,7 +39,7 @@ echo "Compiling $SOURCE_FILE to object file: $OUTPUT_FILE"
 gcc -c "$SOURCE_FILE" -o "$OUTPUT_FILE" "$@"
 
 if [ $? -eq 0 ]; then
-    echo "Success! Linked via: coral66 my_program.o $OUTPUT_FILE -o my_program"
+    echo "Success!"
 else
     echo "Compilation failed."
     exit 1
