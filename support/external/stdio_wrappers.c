@@ -1,3 +1,5 @@
+// NOLINTBEGIN(misc-use-internal-linkage)
+
 /*
  * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
@@ -9,7 +11,7 @@
 // ---------------------------------------------------------
 // printf family wrappers
 // ---------------------------------------------------------
-int printfintp(const char* fmt, int arg)
+int printfintp(const char* fmt, const int arg)
 {
     return printf(fmt, arg);
 }
@@ -19,7 +21,7 @@ int printfstrp(const char* fmt, const char* arg)
     return printf(fmt, arg);
 }
 
-int printf2intp(const char* fmt, int arg1, int arg2)
+int printf2intp(const char* fmt, const int arg1, const int arg2)
 {
     return printf(fmt, arg1, arg2);
 }
@@ -27,7 +29,7 @@ int printf2intp(const char* fmt, int arg1, int arg2)
 // ---------------------------------------------------------
 // fprintf family wrappers
 // ---------------------------------------------------------
-int fprintfintp(FILE* stream, const char* fmt, int arg)
+int fprintfintp(FILE* stream, const char* fmt, const int arg)
 {
     return fprintf(stream, fmt, arg);
 }
@@ -40,7 +42,7 @@ int fprintfstrp(FILE* stream, const char* fmt, const char* arg)
 // ---------------------------------------------------------
 // sprintf family wrappers
 // ---------------------------------------------------------
-int sprintfintp(char* str, const char* fmt, int arg)
+int sprintfintp(char* str, const char* fmt, const int arg)
 {
     return sprintf(str, fmt, arg);
 }
@@ -102,12 +104,12 @@ void setbufp(FILE* stream, char* buffer)
 // ---------------------------------------------------------
 // Direct Input/Output wrappers
 // ---------------------------------------------------------
-size_t freadp(void* ptr, size_t size, size_t nmemb, FILE* stream)
+size_t freadp(void* ptr, const size_t size, const size_t nmemb, FILE* stream)
 {
     return fread(ptr, size, nmemb, stream);
 }
 
-size_t fwritep(const void* ptr, size_t size, size_t nmemb, FILE* stream)
+size_t fwritep(const void* ptr, const size_t size, const size_t nmemb, FILE* stream)
 {
     return fwrite(ptr, size, nmemb, stream);
 }
@@ -120,12 +122,12 @@ int fgetcp(FILE* stream)
     return fgetc(stream);
 }
 
-char* fgetsp(char* str, int n, FILE* stream)
+char* fgetsp(char* str, const int n, FILE* stream)
 {
     return fgets(str, n, stream);
 }
 
-int fputcp(int c, FILE* stream)
+int fputcp(const int c, FILE* stream)
 {
     return fputc(c, stream);
 }
@@ -145,7 +147,7 @@ char* getsp(char* str)
     return fgets(str, 1024, stdin);
 }
 
-int putcharp(int c)
+int putcharp(const int c)
 {
     return putchar(c);
 }
@@ -155,7 +157,7 @@ int putsp(const char* str)
     return puts(str);
 }
 
-int ungetcp(int c, FILE* stream)
+int ungetcp(const int c, FILE* stream)
 {
     return ungetc(c, stream);
 }
@@ -173,7 +175,7 @@ int fgetposp(FILE* stream, fpos_t* pos)
     return fgetpos(stream, pos);
 }
 
-int fseekp(FILE* stream, long offset, int whence)
+int fseekp(FILE* stream, const long offset, const int whence)
 {
     return fseek(stream, offset, whence);
 }
@@ -201,3 +203,4 @@ int renamep(const char* oldfilename, const char* newfilename)
     return rename(oldfilename, newfilename);
 }
 
+#pragma GCC diagnostic pop
