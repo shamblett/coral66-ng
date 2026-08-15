@@ -51,7 +51,15 @@ done
 OUT_EXE="${SRC_FILE%.cor}"
 
 # 3. Execute the explicit compiler command
-echo "Compiling $SRC_FILE with libraries: ${LIBS[*]} and externals: ${EXTS[*]}..."
+PRINT_LIBS="${LIBS[*]}"
+if [ -z "$PRINT_LIBS" ]; then
+    PRINT_LIBS="default"
+fi
+PRINT_EXTS="${EXTS[*]}"
+if [ -z "$PRINT_EXTS" ]; then
+    PRINT_EXTS="default"
+fi
+echo "Compiling $SRC_FILE with libraries: $PRINT_LIBS and externals: $PRINT_EXTS..."
 # Execute the compiler - assuming it's available in PATH or a known location
 if [ ${#EXTRA_ARGS[@]} -eq 0 ]; then
   coral66 "$SRC_FILE" $OBJ_FILES -L "$LIB_PATH" -X "$EXT_PATH" -o "$OUT_EXE"
