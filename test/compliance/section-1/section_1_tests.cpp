@@ -75,7 +75,6 @@ TEST_CASE("Section 1-4", "[Compliance][Section-1-4]")
     /// If the access is outside the sllocated memory space of the program a sigsev is generated.
     SECTION("1-4-2")
     {
-        SKIP();
         pid_t pid = fork();
 
         REQUIRE(pid >= 0); // Ensure fork succeeded
