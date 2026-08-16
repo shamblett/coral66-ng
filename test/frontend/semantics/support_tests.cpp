@@ -36,6 +36,11 @@ TEST_CASE("Support", "[Semantics][Support]")
         auto cTokens = lexer::toCTokens(ppTokens, &ss);
         auto context = std::make_unique<parser::Context>(cTokens, &ss);
         auto parsed = parser::parseProgram(cTokens, &ss);
+        if (!ss.str().empty())
+        {
+            std::cout << ss.str() << std::endl;
+        }
+        CHECK(ss.str().empty());
 
         bool errors = false;
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
