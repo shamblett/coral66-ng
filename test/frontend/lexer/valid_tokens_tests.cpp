@@ -57,7 +57,7 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
         TokenType::ProgramKeyword,  TokenType::RecursiveKeyword, TokenType::SegmentKeyword, TokenType::StepKeyword,
         TokenType::SwitchKeyword,   TokenType::TableKeyword,     TokenType::ThenKeyword,    TokenType::UnionKeyword,
         TokenType::UnsignedKeyword, TokenType::UntilKeyword,     TokenType::ValueKeyword,   TokenType::WhileKeyword,
-        TokenType::WithKeyword};
+        TokenType::WithKeyword,     TokenType::PointerKeyword};
 
     SECTION("Stropped")
     {
@@ -65,7 +65,7 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
                           "'COMMON' 'DEFINE' 'DELETE' 'DIFFER' 'DO' 'ELSE' 'END' DUMMY 'EXTERNAL' 'FIXED' 'FLOATING' "
                           "'FOR' 'GOTO' 'IF' 'INTEGER' 'LABEL' 'LIBRARY' 'LITERAL' 'LOCATION' 'MASK' 'OCTAL' 'OR' "
                           "'OVERLAY' 'PRESET' 'PROCEDURE' 'PROGRAM' 'RECURSIVE' 'SEGMENT' 'STEP' 'SWITCH' 'TABLE' "
-                          "'THEN' 'UNION' 'UNSIGNED' 'UNTIL' 'VALUE' 'WHILE' 'WITH'");
+                          "'THEN' 'UNION' 'UNSIGNED' 'UNTIL' 'VALUE' 'WHILE' 'WITH' 'POINTER' ");
 
         std::vector<TokenType> tokens;
         tokens.reserve(result.data().size());
@@ -80,7 +80,7 @@ TEST_CASE("Coral Lexing Keywords", "[lexer]")
                           "COMMON DEFINE DELETE DIFFER DO ELSE END DUMMY EXTERNAL FIXED FLOATING "
                           "FOR GOTO IF INTEGER LABEL LIBRARY LITERAL LOCATION MASK OCTAL OR "
                           "OVERLAY PRESET PROCEDURE PROGRAM RECURSIVE SEGMENT STEP SWITCH TABLE "
-                          "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH");
+                          "THEN UNION UNSIGNED UNTIL VALUE WHILE WITH POINTER");
 
         std::vector<TokenType> tokens;
         tokens.reserve(result.data().size());
