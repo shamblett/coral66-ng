@@ -1,5 +1,5 @@
 /*
- * Project: coral66-ng-ng
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 04/07/2026
  */
