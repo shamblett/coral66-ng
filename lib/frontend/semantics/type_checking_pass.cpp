@@ -927,7 +927,8 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                                     if (const auto* argPointer = itArg->second->tryAs<PrimitiveType>())
                                     {
                                         if (paramPointer->getKind() == PrimitiveType::Pointer
-                                            && argPointer->getKind() == PrimitiveType::Integer)
+                                            && (argPointer->getKind() == PrimitiveType::Integer
+                                                || argPointer->getKind() == PrimitiveType::Pointer))
                                             isCompatible = true;
                                     }
                                 }

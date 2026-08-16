@@ -12,9 +12,10 @@ COMMENT
   Obligatory hello world program for Coral 66.
 ;
 
-LIBRARY (stdio);
+
+COMMON ( INTEGER PROCEDURE printfstr(VALUE POINTER, VALUE POINTER);)
 
 BEGIN
   printfstr("%s\n", "Hello World from Coral 66");
-  newline;
+
 END;
