@@ -1,0 +1,294 @@
+{
+    "header": {
+        "library_name": "stdio",
+        "cmi_version": "1.0.0"
+    },
+    "symbols": [
+        {
+            "name": "printfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "printfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "printf2int",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fprintfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fprintfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "sprintfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "sprintfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "scanfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "LOCATION",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "scanfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "fscanfint",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "LOCATION",
+                    "data_type": "INTEGER"
+                }
+            ]
+        },
+        {
+            "name": "fscanfstr",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "fopen",
+            "symbol_category": "procedure",
+            "return_type": "POINTER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "fclose",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "fflush",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "setbuf",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": [
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                },
+                {
+                    "name": "",
+                    "pass_by": "VALUE",
+                    "data_type": "POINTER"
+                }
+            ]
+        },
+        {
+            "name": "newline",
+            "symbol_category": "procedure",
+            "return_type": "INTEGER",
+            "parameters": []
+        }
+    ]
+}

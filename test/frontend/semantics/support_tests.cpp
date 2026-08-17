@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include <llvm/Support/Process.h>
+
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantic_support.hpp"
@@ -103,7 +105,12 @@ TEST_CASE("Support", "[Semantics][Support]")
         CHECK(ss.str().empty());
 
         bool errors = false;
-        std::string libraryPath = sourcePath.substr(0, sourcePath.find_last_of("\\/"));
+        std::string sourceLibraryPath = sourcePath.substr(0, sourcePath.find_last_of("\\/"));
+        auto tmpDir = llvm::sys::Process::GetEnv("TEST_TMPDIR");
+        std::string libraryPath = tmpDir ? *tmpDir : coral66::fs::temp_directory_path().string();
+        auto from = sourceLibraryPath + "/" + "stdio.cmi.test";
+        auto to = libraryPath + "/" + "stdio.cmi";
+        coral66::fs::copy_file(from, to, coral66::fs::copy_options::overwrite_existing);
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors, libraryPath);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
         if (!ss.str().empty())
