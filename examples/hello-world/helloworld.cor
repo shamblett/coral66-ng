@@ -1,9 +1,26 @@
 PROGRAM HelloWorld
 
-LIBRARY (stdio);
+COMMENT
+/*
+ * Project: coral66-ng
+ * Author : Gemini
+ * Date   : 12/08/2026
+ */
+ ;
+
+COMMENT
+  Obligatory hello world program for Coral 66.
+
+  Note there is no need for a COMMON communicator to import
+  procedures etc. from the stdio library as its exported interface
+  is exported via a COMMON communicator, thus you can use anything
+  exported by the library directly.
+;
+
+
+LIBRARY ( stdio )
 
 BEGIN
-
-printfstr("Hello World from Coral 66", "%s");
+  printfstr("%s\n", "Hello World from Coral 66");
 
 END;

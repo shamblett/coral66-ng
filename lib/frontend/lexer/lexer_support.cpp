@@ -21,7 +21,8 @@ bool isKeyword(const std::string_view characters)
            || characters == "EXTERNAL" || characters == "FIXED" || characters == "FLOATING" || characters == "FOR"
            || characters == "GOTO" || characters == "IF" || characters == "INTEGER" || characters == "LABEL"
            || characters == "LIBRARY" || characters == "LITERAL" || characters == "LOCATION" || characters == "MASK"
-           || characters == "OCTAL" || characters == "OR" || characters == "OVERLAY" || characters == "PRESET"
+           || characters == "OCTAL" || characters == "OR" || characters == "OVERLAY" || characters == "POINTER" 
+           || characters == "PRESET"
            || characters == "PROCEDURE" || characters == "PROGRAM" || characters == "RECURSIVE"
            || characters == "SEGMENT" || characters == "STEP" || characters == "SWITCH" || characters == "TABLE"
            || characters == "THEN" || characters == "UNION" || characters == "UNSIGNED" || characters == "UNTIL"
@@ -93,6 +94,8 @@ TokenType charactersToKeyword(const std::string_view characters)
         return TokenType::OrKeyword;
     if (characters == "OVERLAY")
         return TokenType::OverlayKeyword;
+    if (characters == "POINTER")
+        return TokenType::PointerKeyword;
     if (characters == "PRESET")
         return TokenType::PresetKeyword;
     if (characters == "PROCEDURE")

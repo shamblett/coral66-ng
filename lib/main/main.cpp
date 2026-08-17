@@ -16,6 +16,7 @@
 #include "command_line_processor.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/warnings.hpp"
+#include "lib/support/scope_exit.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/support/filesystem.hpp"
@@ -33,8 +34,12 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     llvm::InitializeAllAsmParsers();
 
     // Set and Enable colours. default for errors is red, warnings yellow.
-    reporter->changeColor(llvm::raw_ostream::RED);
     reporter->enable_colors(reporter->has_colors());
+    reporter->changeColor(llvm::raw_ostream::RED);
+    coral66::ScopeExit colorResetter([reporter]() {
+        reporter->resetColor();
+        reporter->flush();
+    });
 
     // Initialise the action executor
     auto executor = ActionExecutor(reporter);

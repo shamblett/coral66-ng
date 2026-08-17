@@ -6,6 +6,10 @@
 # Date   : 11/08/2026
 #
 
+#
+# install.sh
+# Install the coral66 compiler into the users bin directory.
+#
 set -e
 
 # Default values

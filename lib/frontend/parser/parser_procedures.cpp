@@ -40,7 +40,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                                 syntax::ParameterDeclaration::ParameterMode::Location;
 
                 if (const auto nextType = begin->getTokenType();
-                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::FloatingKeyword
+                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::PointerKeyword || nextType == lexer::TokenType::FloatingKeyword
                     || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
                     || nextType == lexer::TokenType::FixedKeyword || nextType == lexer::TokenType::ArrayKeyword)
                 {
@@ -180,7 +180,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                     startMode, begin, syntax::ParameterDeclaration::ParameterMode::Procedure, std::nullopt,
                     std::move(ids)));
             }
-            else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::FloatingKeyword
+            else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword || type == lexer::TokenType::FloatingKeyword
                      || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
                      || type == lexer::TokenType::FixedKeyword)
             {
@@ -219,7 +219,17 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 begin++; // NOLINT(*-branch-clone)
             else if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 begin++;
-            else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses)
+            else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses 
+                     && begin->getTokenType() != lexer::TokenType::ValueKeyword
+                     && begin->getTokenType() != lexer::TokenType::LocationKeyword
+                     && begin->getTokenType() != lexer::TokenType::LabelKeyword
+                     && begin->getTokenType() != lexer::TokenType::SwitchKeyword
+                     && begin->getTokenType() != lexer::TokenType::IntegerKeyword
+                     && begin->getTokenType() != lexer::TokenType::PointerKeyword
+                     && begin->getTokenType() != lexer::TokenType::FloatingKeyword
+                     && begin->getTokenType() != lexer::TokenType::BitsKeyword
+                     && begin->getTokenType() != lexer::TokenType::BitKeyword
+                     && begin->getTokenType() != lexer::TokenType::FixedKeyword)
                 begin++;
         }
         if (begin != end)
@@ -242,6 +252,7 @@ std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
 
     if (begin != end
         && (begin->getTokenType() == lexer::TokenType::IntegerKeyword
+            || begin->getTokenType() == lexer::TokenType::PointerKeyword
             || begin->getTokenType() == lexer::TokenType::FloatingKeyword
             || begin->getTokenType() == lexer::TokenType::BitsKeyword
             || begin->getTokenType() == lexer::TokenType::BitKeyword

@@ -11,6 +11,11 @@ filegroup(
 )
 
 filegroup(
+    name = "support_dir",
+    srcs = ["data/support"],
+)
+
+filegroup(
     name = "generated_dir",
     srcs = ["data/generated"],
 )
@@ -29,6 +34,7 @@ cc_library(
         "control_flow_tests.cpp",
         "generated_tests.cpp",
         "golden_tests.cpp",
+        "support_tests.cpp",
         "symbol_resolution_tests.cpp",
         "symbol_table_tests.cpp",
         "type_check_tests.cpp",
@@ -55,11 +61,13 @@ cc_test(
         ":benchmark_dir",
         ":generated_dir",
         ":golden_dir",
+        ":support_dir",
     ],
     env = {
         "BENCHMARK_DIR": "$(rootpath :benchmark_dir)",
         "GENERATED_DIR": "$(rootpath :generated_dir)",
         "GOLDEN_DIR": "$(rootpath :golden_dir)",
+        "SUPPORT_DIR": "$(rootpath :support_dir)",
     },
     visibility = ["//test:__pkg__"],
     deps = [

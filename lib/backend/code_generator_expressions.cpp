@@ -196,7 +196,7 @@ llvm::Value* CodeGenerator::visit(const syntax::LiteralExpression& expression)
         const auto& strValue = std::get<std::string>(val);
         // Standard Coral string literals should be emitted as global string constants
         // returning an i8* (pointer to characters) which allows passing to EXTERNAL C functions.
-        return m_builder.CreateGlobalString(strValue);
+        return m_builder.CreateGlobalStringPtr(strValue);
     }
     return nullptr;
 }

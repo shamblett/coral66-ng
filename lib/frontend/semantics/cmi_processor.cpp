@@ -44,6 +44,7 @@ static std::string typeToString(const Type& type)
             case PrimitiveType::Integer: return "INTEGER";
             case PrimitiveType::Floating: return "REAL";
             case PrimitiveType::Bits: return "BITS"; // Or part word
+            case PrimitiveType::Pointer: return "POINTER";
         }
     }
     else if (type.is<UntypedType>())
@@ -66,6 +67,10 @@ static IntrusiveVariantValue<Type> stringToType(const std::string& typeStr)
     if (typeStr == "BITS")
     {
         return PrimitiveType(PrimitiveType::Bits);
+    }
+    if (typeStr == "POINTER")
+    {
+        return PrimitiveType(PrimitiveType::Pointer);
     }
     return UntypedType();
 }
@@ -330,6 +335,8 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     returnType = new PrimitiveType(PrimitiveType::Floating);
                 else if (returnTypeStr == "BITS")
                     returnType = new PrimitiveType(PrimitiveType::Bits);
+                else if (returnTypeStr == "POINTER")
+                    returnType = new PrimitiveType(PrimitiveType::Pointer);
 
                 std::vector<ProcedureType::Parameter> parameters;
                 const rapidjson::Value& params = sym["parameters"];
@@ -348,6 +355,8 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                         pType = new PrimitiveType(PrimitiveType::Floating);
                     else if (pTypeStr == "BITS")
                         pType = new PrimitiveType(PrimitiveType::Bits);
+                    else if (pTypeStr == "POINTER")
+                        pType = new PrimitiveType(PrimitiveType::Pointer);
 
                     lexer::CTokenIterator paramToken = createSyntheticIdentifierToken(pName);
                     parameters.push_back({.type = pType, .name = paramToken->getText(), .isValue = isValue});
@@ -374,6 +383,8 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     elemType = new PrimitiveType(PrimitiveType::Floating);
                 else if (typeStr == "BITS")
                     elemType = new PrimitiveType(PrimitiveType::Bits);
+                else if (typeStr == "POINTER")
+                    elemType = new PrimitiveType(PrimitiveType::Pointer);
 
                 std::vector<std::uint64_t> dimensions;
                 const rapidjson::Value& dims = sym["dimensions"];

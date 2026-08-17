@@ -110,7 +110,8 @@ public:
     {
         Integer,
         Floating,
-        Bits // Part word
+        Bits, // Part word
+        Pointer
     };
 
 private:

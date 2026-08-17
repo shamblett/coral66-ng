@@ -1,5 +1,5 @@
 /*
- * Project: coral66-ng-ng
+ * Project: coral66-ng
  * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
  * Date   : 02/05/2026
  */
@@ -67,10 +67,33 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         CHECK(res.errors == false);
     }
 
+    SECTION("Variable Declarations in Common With Pointer Type")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON(INTEGER A; POINTER B) BEGIN INTEGER I ; END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(findDeclarationComm(res.context, "A") != nullptr);
+        CHECK(findDeclarationComm(res.context, "B") != nullptr);
+        CHECK(findDeclarationComm(res.context, "I") != nullptr);
+        CHECK(res.errors == false);
+    }
+
     SECTION("Procedure Specification in Common")
     {
         ParsedProgram parsed(
             "PROGRAM TEST COMMON(INTEGER PROCEDURE P(VALUE INTEGER)) BEGIN INTEGER I ; I := P(10) END");
+        SymbolResolutionResult res(parsed);
+
+        auto procedureDeclaration = findDeclarationComm(res.context, "P");
+        CHECK(procedureDeclaration != nullptr);
+        CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
+        CHECK(res.errors == false);
+    }
+
+    SECTION("Procedure Specification in Common With Pointer Type")
+    {
+        ParsedProgram parsed(
+            "PROGRAM TEST COMMON(INTEGER PROCEDURE P(VALUE POINTER)) BEGIN INTEGER I ; I := P(10) END");
         SymbolResolutionResult res(parsed);
 
         auto procedureDeclaration = findDeclarationComm(res.context, "P");
@@ -170,6 +193,20 @@ TEST_CASE("Symbol Resolution - Library Communicators", "[Semantics][SymbolResolu
             if (d.getName() == "FAILED_TO_READ_CMI_FILE_N")
                 foundError = true;
         CHECK(foundError);
+    }
+
+    SECTION("Multiple Libraries Not Added As Symbols")
+    {
+        ParsedProgram parsed("PROGRAM TEST LIBRARY ( stdio string) BEGIN END");
+        SymbolResolutionResult res(parsed);
+
+        CHECK(res.errors == false);
+
+        auto xVar = findDeclarationComm(res.context, "stdio");
+        CHECK(xVar == nullptr);
+
+        auto yVar = findDeclarationComm(res.context, "string");
+        CHECK(yVar == nullptr);
     }
 }
 

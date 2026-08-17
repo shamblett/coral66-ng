@@ -8,7 +8,7 @@
 
 #
 # compile_external.sh
-# Safely compiles C code into a 32-bit object file for linkage 
+# Safely compiles C code into an object file for linkage
 # with the coral66-ng compiler.
 
 set -e
@@ -33,13 +33,13 @@ BASENAME=${SOURCE_FILE##*/}
 BASENAME=${BASENAME%.c}
 OUTPUT_FILE="${BASENAME}.o"
 
-echo "Compiling $SOURCE_FILE to 32-bit object file: $OUTPUT_FILE"
+echo "Compiling $SOURCE_FILE to object file: $OUTPUT_FILE"
 
-# Execute gcc with -m32 for 32-bit compilation, -c to output an object file
-gcc -m32 -c "$SOURCE_FILE" -o "$OUTPUT_FILE" "$@"
+# Execute gcc with -c to output an object file
+gcc -c "$SOURCE_FILE" -o "$OUTPUT_FILE" "$@"
 
 if [ $? -eq 0 ]; then
-    echo "Success! Linked via: coral66 my_program.o $OUTPUT_FILE -o my_program"
+    echo "Success!"
 else
     echo "Compilation failed."
     exit 1

@@ -179,6 +179,7 @@ llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
         switch (prim->getKind())
         {
             case semantics::PrimitiveType::Integer: baseType = llvm::Type::getInt32Ty(ctx); break;
+            case semantics::PrimitiveType::Pointer: baseType = llvm::PointerType::getUnqual(ctx); break;
             case semantics::PrimitiveType::Floating: baseType = llvm::Type::getFloatTy(ctx); break;
             case semantics::PrimitiveType::Bits: baseType = llvm::Type::getInt32Ty(ctx); break;
         }
@@ -270,7 +271,9 @@ void CodeGenerator::visit(const syntax::Program& program)
         m_locals.clear();
 
         llvm::FunctionType* ft = llvm::FunctionType::get(llvm::Type::getInt32Ty(m_module.getContext()), false);
-        llvm::Function* f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, "main", m_module);
+        llvm::FunctionCallee callee = m_module.getOrInsertFunction("main", ft);
+        llvm::Function* f = llvm::cast<llvm::Function>(callee.getCallee());
+        f->setLinkage(llvm::Function::ExternalLinkage);
         m_currentFunction = f;
 
         llvm::BasicBlock* bb = llvm::BasicBlock::Create(m_module.getContext(), "entry", f);
