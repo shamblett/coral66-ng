@@ -10,10 +10,15 @@ COMMENT
 
 COMMENT
   Obligatory hello world program for Coral 66.
+
+  Note there is no need for a COMMON communicator to import
+  procedures etc. from the stdio library as its exported interface
+  is exported via a COMMON communicator, thus you can use anything
+  exported by the library directly.
 ;
 
 
-COMMON ( INTEGER PROCEDURE printfstr(VALUE POINTER, VALUE POINTER);)
+LIBRARY ( stdio )
 
 BEGIN
   printfstr("%s\n", "Hello World from Coral 66");
