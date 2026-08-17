@@ -16,9 +16,7 @@ COMMENT
    Import only what we need from supported libraries, no need to
    include them explicitly.
 ;
-
-COMMON ( INTEGER PROCEDURE printfstr(VALUE POINTER, VALUE POINTER);
-         PROCEDURE newline;)
+LIBRARY ( stdio )
 
 BEGIN
   newline;

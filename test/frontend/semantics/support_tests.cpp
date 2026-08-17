@@ -103,7 +103,8 @@ TEST_CASE("Support", "[Semantics][Support]")
         CHECK(ss.str().empty());
 
         bool errors = false;
-        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        std::string libraryPath = sourcePath.substr(0, sourcePath.find_last_of("\\/"));
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors, libraryPath);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
         if (!ss.str().empty())
         {
