@@ -6,7 +6,7 @@
 
 #include "ast_dump.hpp"
 
-#include <rapidjson/stringbuffer.h>
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 
 namespace coral66::tools
 {

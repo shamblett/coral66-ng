@@ -9,8 +9,8 @@
 #include <deque>
 #include <fstream>
 
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "lib/support/vendor/rapidjson/prettywriter.h"
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"

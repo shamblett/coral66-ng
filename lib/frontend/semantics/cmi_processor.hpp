@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <rapidjson/document.h>
+#include "lib/support/vendor/rapidjson/document.h"
 
 namespace coral66::semantics
 {

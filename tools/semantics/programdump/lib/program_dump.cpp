@@ -8,8 +8,8 @@
 
 #include <ranges>
 
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "lib/support/vendor/rapidjson/prettywriter.h"
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 
 #include "lib/frontend/semantics/semantic_support.hpp"
 #include "lib/support/text.hpp"

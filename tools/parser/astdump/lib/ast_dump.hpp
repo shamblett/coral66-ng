@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <rapidjson/document.h>
+#include "lib/support/vendor/rapidjson/document.h"
 
 #include "lib/frontend/syntax/syntax.hpp"
 

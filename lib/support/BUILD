@@ -30,7 +30,7 @@ cc_library(
         "vendor/magic_enum/magic_enum.hpp",
         "vendor/tsl/ordered_hash.h",
         "vendor/tsl/ordered_map.h",
-    ],
+    ] + glob(["vendor/rapidjson/**/*.h"]),
     visibility = [
         "//lib/backend:__subpackages__",
         "//lib/frontend:__subpackages__",

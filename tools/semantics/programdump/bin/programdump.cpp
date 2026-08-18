@@ -8,8 +8,8 @@
 
 #include <iostream>
 
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "lib/support/vendor/rapidjson/prettywriter.h"
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
