@@ -97,8 +97,9 @@ COMMON (
   INTEGER PROCEDURE fflush(VALUE POINTER);
   PROCEDURE setbuf(VALUE POINTER, VALUE POINTER);
 
-  COMMENT Library procedures ;
+  COMMENT Library convenience  procedures ;
   PROCEDURE newline;
+  PROCEDURE print(VALUE POINTER);
 )
 
 BEGIN
@@ -153,10 +154,16 @@ BEGIN
   PROCEDURE setbuf(VALUE POINTER stream, VALUE POINTER buffer);
   BEGIN setbufp(stream, buffer); END;
 
-  COMMENT Library procedures ;
+  COMMENT Library convenience procedures ;
 
   PROCEDURE newline;
      BEGIN
-       putsp("\n");
+       printfstr("%s\n", "");
      END;
+
+   PROCEDURE print(VALUE POINTER string)
+      BEGIN
+        printfstr("%s\n", string);
+
+      END;
 END

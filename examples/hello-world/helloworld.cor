@@ -21,6 +21,6 @@ COMMENT
 LIBRARY ( stdio )
 
 BEGIN
-  printfstr("%s\n", "Hello World from Coral 66");
-
+  newline;
+  print("Hello World from Coral 66");
 END;
