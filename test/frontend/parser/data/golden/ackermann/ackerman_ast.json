@@ -4,97 +4,99 @@
         "Class": "identifier",
         "Value": "Ackermann"
     },
-    "Communicator": {
-        "Common": [
-            {
-                "NodeType": "ProcedureSpecification",
-                "Type": {
-                    "Class": "None",
-                    "Value": "None"
-                },
-                "Name": {
-                    "Class": "identifier",
-                    "Value": "test"
-                },
-                "Parameters": [
-                    {
-                        "NodeType": "ParameterDeclaration",
-                        "Mode": "Value",
-                        "Type": {
-                            "Class": "INTEGER",
-                            "Value": "INTEGER"
-                        },
-                        "Identifiers": []
+    "Communicators": [
+        {
+            "Common": [
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "None",
+                        "Value": "None"
                     },
-                    {
-                        "NodeType": "ParameterDeclaration",
-                        "Mode": "Value",
-                        "Type": {
-                            "Class": "INTEGER",
-                            "Value": "INTEGER"
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "test"
+                    },
+                    "Parameters": [
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
                         },
-                        "Identifiers": []
-                    }
-                ]
-            },
-            {
-                "NodeType": "ProcedureSpecification",
-                "Type": {
-                    "Class": "None",
-                    "Value": "None"
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
+                        }
+                    ]
                 },
-                "Name": {
-                    "Class": "identifier",
-                    "Value": "commenter"
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "None",
+                        "Value": "None"
+                    },
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "commenter"
+                    },
+                    "Parameters": [
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
+                        }
+                    ]
                 },
-                "Parameters": [
-                    {
-                        "NodeType": "ParameterDeclaration",
-                        "Mode": "Value",
-                        "Type": {
-                            "Class": "INTEGER",
-                            "Value": "INTEGER"
-                        },
-                        "Identifiers": []
-                    }
-                ]
-            },
-            {
-                "NodeType": "ProcedureSpecification",
-                "Type": {
-                    "Class": "None",
-                    "Value": "None"
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "None",
+                        "Value": "None"
+                    },
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "failed"
+                    },
+                    "Parameters": [
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
+                        }
+                    ]
                 },
-                "Name": {
-                    "Class": "identifier",
-                    "Value": "failed"
-                },
-                "Parameters": [
-                    {
-                        "NodeType": "ParameterDeclaration",
-                        "Mode": "Value",
-                        "Type": {
-                            "Class": "INTEGER",
-                            "Value": "INTEGER"
-                        },
-                        "Identifiers": []
-                    }
-                ]
-            },
-            {
-                "NodeType": "ProcedureSpecification",
-                "Type": {
-                    "Class": "None",
-                    "Value": "None"
-                },
-                "Name": {
-                    "Class": "identifier",
-                    "Value": "result"
-                },
-                "Parameters": []
-            }
-        ]
-    },
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "None",
+                        "Value": "None"
+                    },
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "result"
+                    },
+                    "Parameters": []
+                }
+            ]
+        }
+    ],
     "Block": {
         "NodeType": "Block",
         "Declarations": [

@@ -4,58 +4,60 @@
         "Class": "identifier",
         "Value": "goldenOne"
     },
-    "Communicator": {
-        "Common": [
-            {
-                "NodeType": "ArrayDeclaration",
-                "Type": {
-                    "Class": "INTEGER",
-                    "Value": "INTEGER"
-                },
-                "Identifiers": [
-                    {
-                        "Class": "identifier",
-                        "Value": "commonArray"
-                    }
-                ],
-                "Dimensions": [
-                    [
+    "Communicators": [
+        {
+            "Common": [
+                {
+                    "NodeType": "ArrayDeclaration",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Identifiers": [
                         {
-                            "NodeType": "LiteralExpression",
-                            "Literal": {
-                                "Class": "literal",
-                                "Value": "1"
-                            }
-                        },
-                        {
-                            "NodeType": "LiteralExpression",
-                            "Literal": {
-                                "Class": "literal",
-                                "Value": "10"
-                            }
+                            "Class": "identifier",
+                            "Value": "commonArray"
                         }
-                    ]
-                ],
-                "Has Preset": false,
-                "Preset Tokens": []
-            },
-            {
-                "NodeType": "VariableDeclaration",
-                "Type": {
-                    "Class": "FLOATING",
-                    "Value": "FLOATING"
+                    ],
+                    "Dimensions": [
+                        [
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "1"
+                                }
+                            },
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "10"
+                                }
+                            }
+                        ]
+                    ],
+                    "Has Preset": false,
+                    "Preset Tokens": []
                 },
-                "Identifiers": [
-                    {
-                        "Class": "identifier",
-                        "Value": "commonFloat"
-                    }
-                ],
-                "Preset": false,
-                "Preset Tokens": []
-            }
-        ]
-    },
+                {
+                    "NodeType": "VariableDeclaration",
+                    "Type": {
+                        "Class": "FLOATING",
+                        "Value": "FLOATING"
+                    },
+                    "Identifiers": [
+                        {
+                            "Class": "identifier",
+                            "Value": "commonFloat"
+                        }
+                    ],
+                    "Preset": false,
+                    "Preset Tokens": []
+                }
+            ]
+        }
+    ],
     "Block": {
         "NodeType": "Block",
         "Declarations": [

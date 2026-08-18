@@ -2,6 +2,10 @@
     "Symbol Table": {
         "Symbols": [
             {
+                "Name": "printfint",
+                "Scope Depth": 2
+            },
+            {
                 "Name": "ptr",
                 "Scope Depth": 4
             },
@@ -471,6 +475,27 @@
     ],
     "Auxiliary Types": {
         "Types": [
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": false
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Pointer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            },
+            {
+                "Name": "PrimitiveType",
+                "Kind": "Integer",
+                "IsLocation": false,
+                "IsUndefined": false,
+                "IsValue": true
+            },
             {
                 "Name": "UntypedType"
             },

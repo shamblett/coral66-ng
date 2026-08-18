@@ -2,7 +2,8 @@ PROGRAM G7
 
 COMMON (
   INTEGER ARRAY commonArray [ 1 : 10 ];
-  FLOATING commonFloat
+  FLOATING commonFloat;
+  INTEGER PROCEDURE printfint(VALUE POINTER, VALUE INTEGER);
 )
 
 LIBRARY(myMathsLib, myIOLib);

@@ -4,25 +4,27 @@
         "Class": "identifier",
         "Value": "goldenThree"
     },
-    "Communicator": {
-        "Common": [
-            {
-                "NodeType": "VariableDeclaration",
-                "Type": {
-                    "Class": "INTEGER",
-                    "Value": "INTEGER"
-                },
-                "Identifiers": [
-                    {
-                        "Class": "identifier",
-                        "Value": "statusVal"
-                    }
-                ],
-                "Preset": false,
-                "Preset Tokens": []
-            }
-        ]
-    },
+    "Communicators": [
+        {
+            "Common": [
+                {
+                    "NodeType": "VariableDeclaration",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Identifiers": [
+                        {
+                            "Class": "identifier",
+                            "Value": "statusVal"
+                        }
+                    ],
+                    "Preset": false,
+                    "Preset Tokens": []
+                }
+            ]
+        }
+    ],
     "Block": {
         "NodeType": "Block",
         "Declarations": [

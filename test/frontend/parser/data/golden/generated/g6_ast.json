@@ -4,32 +4,34 @@
         "Class": "identifier",
         "Value": "G6"
     },
-    "Communicator": {
-        "External": [
-            {
-                "NodeType": "ProcedureSpecification",
-                "Type": {
-                    "Class": "INTEGER",
-                    "Value": "INTEGER"
-                },
-                "Name": {
-                    "Class": "identifier",
-                    "Value": "computeStatus"
-                },
-                "Parameters": [
-                    {
-                        "NodeType": "ParameterDeclaration",
-                        "Mode": "Value",
-                        "Type": {
-                            "Class": "INTEGER",
-                            "Value": "INTEGER"
-                        },
-                        "Identifiers": []
-                    }
-                ]
-            }
-        ]
-    },
+    "Communicators": [
+        {
+            "External": [
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "computeStatus"
+                    },
+                    "Parameters": [
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
     "Block": {
         "NodeType": "Block",
         "Declarations": [

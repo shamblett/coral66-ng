@@ -248,7 +248,7 @@ TEST_CASE("Generated", "[Parser][Golden]")
         auto parsed = parser::parseProgram(cTokens, &ss);
 
         auto sourceAst = tools::AstDump::dumpToString(parsed);
-        auto astPath = getTestDataPath("generated/g67ast.json", "GOLDEN_DIR");
+        auto astPath = getTestDataPath("generated/g7_ast.json", "GOLDEN_DIR");
         auto ast = readFile(astPath);
         CHECK(!ast.empty());
 

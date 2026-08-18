@@ -4,43 +4,45 @@
         "Class": "identifier",
         "Value": "goldenTwo"
     },
-    "Communicator": {
-        "Common": [
-            {
-                "NodeType": "ArrayDeclaration",
-                "Type": {
-                    "Class": "FLOATING",
-                    "Value": "FLOATING"
-                },
-                "Identifiers": [
-                    {
-                        "Class": "identifier",
-                        "Value": "floatArray"
-                    }
-                ],
-                "Dimensions": [
-                    [
+    "Communicators": [
+        {
+            "Common": [
+                {
+                    "NodeType": "ArrayDeclaration",
+                    "Type": {
+                        "Class": "FLOATING",
+                        "Value": "FLOATING"
+                    },
+                    "Identifiers": [
                         {
-                            "NodeType": "LiteralExpression",
-                            "Literal": {
-                                "Class": "literal",
-                                "Value": "0"
-                            }
-                        },
-                        {
-                            "NodeType": "LiteralExpression",
-                            "Literal": {
-                                "Class": "literal",
-                                "Value": "5"
-                            }
+                            "Class": "identifier",
+                            "Value": "floatArray"
                         }
-                    ]
-                ],
-                "Has Preset": false,
-                "Preset Tokens": []
-            }
-        ]
-    },
+                    ],
+                    "Dimensions": [
+                        [
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "0"
+                                }
+                            },
+                            {
+                                "NodeType": "LiteralExpression",
+                                "Literal": {
+                                    "Class": "literal",
+                                    "Value": "5"
+                                }
+                            }
+                        ]
+                    ],
+                    "Has Preset": false,
+                    "Preset Tokens": []
+                }
+            ]
+        }
+    ],
     "Block": {
         "NodeType": "Block",
         "Declarations": [

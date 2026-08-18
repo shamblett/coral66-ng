@@ -1,6 +1,6 @@
 PROGRAM G10
 
-COMMON ()
+COMMON (INTEGER PROCEDURE printfint(VALUE POINTER, VALUE INTEGER);)
 
 BEGIN
   COMMENT STRING literals and block scope tests ;

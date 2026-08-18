@@ -54,6 +54,37 @@
                     ],
                     "Preset": false,
                     "Preset Tokens": []
+                },
+                {
+                    "NodeType": "ProcedureSpecification",
+                    "Type": {
+                        "Class": "INTEGER",
+                        "Value": "INTEGER"
+                    },
+                    "Name": {
+                        "Class": "identifier",
+                        "Value": "printfint"
+                    },
+                    "Parameters": [
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "POINTER",
+                                "Value": "POINTER"
+                            },
+                            "Identifiers": []
+                        },
+                        {
+                            "NodeType": "ParameterDeclaration",
+                            "Mode": "Value",
+                            "Type": {
+                                "Class": "INTEGER",
+                                "Value": "INTEGER"
+                            },
+                            "Identifiers": []
+                        }
+                    ]
                 }
             ]
         },
