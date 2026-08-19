@@ -43,7 +43,7 @@ TEST_CASE("Section 3", "[Compliance][Section-3]")
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
-        auto sourcePath = getTestDataPath("3-2.cor", "COMPLIANCE_SECTION_3_DIR");
+        auto sourcePath = getTestDataPath("section-3/3-2.cor", "COMPLIANCE_DATA_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
 

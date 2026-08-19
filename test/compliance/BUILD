@@ -1,14 +1,17 @@
 #
-# Compliance tests section 1
+# Compliance tests
 #
 
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 
 cc_library(
-    name = "section2test",
+    name = "compliancetests",
     srcs = [
+        "section_1_tests.cpp",
         "section_2_tests.cpp",
+        "section_3_tests.cpp",
+        "section_4_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
@@ -27,7 +30,7 @@ filegroup(
 )
 
 cc_test(
-    name = "section2",
+    name = "compliance",
     srcs = [
         "main.cpp",
     ],
@@ -35,10 +38,10 @@ cc_test(
         ":data_dir",
     ],
     env = {
-        "COMPLIANCE_SECTION_2_DIR": "test/compliance/section-2/data",
+        "COMPLIANCE_DATA_DIR": "test/compliance/data",
     },
     visibility = ["//test:__pkg__"],
     deps = [
-        "section2test",
+        "compliancetests",
     ],
 )

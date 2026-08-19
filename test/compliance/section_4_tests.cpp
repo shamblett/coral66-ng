@@ -44,7 +44,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
-        auto sourcePath = getTestDataPath("4-1-1.cor", "COMPLIANCE_SECTION_4_DIR");
+        auto sourcePath = getTestDataPath("section-4/4-1-1.cor", "COMPLIANCE_DATA_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
 
@@ -139,7 +139,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
-        auto sourcePath = getTestDataPath("4-1-2.cor", "COMPLIANCE_SECTION_4_DIR");
+        auto sourcePath = getTestDataPath("section-4/4-1-2.cor", "COMPLIANCE_DATA_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
 
