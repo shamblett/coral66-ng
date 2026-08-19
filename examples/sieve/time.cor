@@ -1,0 +1,76 @@
+PROGRAM TmStructExample
+
+COMMENT
+  The C tm struct size is 56 bytes (on 64-bit Linux).
+  In Coral 66, an INTEGER is 32 bits (4 bytes).
+  We allocate 56 / 4 = 14 INTEGER elements in our TABLE.
+  
+  C struct layout mapped to Coral TABLE fields:
+  Offset  0: tmsec    (int, 4 bytes)
+  Offset  4: tmmin    (int, 4 bytes)
+  Offset  8: tmhour   (int, 4 bytes)
+  Offset 12: tmmday   (int, 4 bytes)
+  Offset 16: tmmon    (int, 4 bytes)
+  Offset 20: tmyear   (int, 4 bytes)
+  Offset 24: tmwday   (int, 4 bytes)
+  Offset 28: tmyday   (int, 4 bytes)
+  Offset 32: tmisdst  (int, 4 bytes)
+  Offset 36: tmpad    (4 bytes alignment padding)
+  Offset 40: tmgmtoffl (lower word of long int)
+  Offset 44: tmgmtoffh (upper word of long int)
+  Offset 48: tmzonel   (lower word of pointer)
+  Offset 52: tmzoneh   (upper word of pointer)
+;
+
+EXTERNAL (
+    COMMENT Wrapper for time_t mktime(struct tm *timeptr) ;
+    COMMENT We use LOCATION INTEGER to accept the first field of the TABLE as a pointer ;
+    POINTER PROCEDURE mktime(LOCATION INTEGER);
+)
+
+BEGIN
+    COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
+    TABLE tm [14, 1] [
+        tmsec INTEGER 0;
+        tmmin INTEGER 1;
+        tmhour INTEGER 2;
+        tmmday INTEGER 3;
+        tmmon INTEGER 4;
+        tmyear INTEGER 5;
+        tmwday INTEGER 6;
+        tmyday INTEGER 7;
+        tmisdst INTEGER 8;
+        tmpad INTEGER 9;
+        tmgmtoffl INTEGER 10;
+        tmgmtoffh INTEGER 11;
+        tmzonel INTEGER 12;
+        tmzoneh INTEGER 13
+    ];
+    
+    POINTER timeval;
+    
+    COMMENT Fill in the struct for a specific time ;
+    COMMENT Example: 1st Jan 2024, 12:00:00 ;
+    
+    tmsec[0] := 0;    
+    tmmin[0] := 0;    
+    tmhour[0] := 12;   
+    tmmday[0] := 1;    
+    tmmon[0] := 0;    COMMENT Jan is 0 ;
+    tmyear[0] := 124; COMMENT Years since 1900 (2024 - 1900) ;
+    tmwday[0] := 0;   COMMENT ignored by mktime, it calculates this ;
+    tmyday[0] := 0;   COMMENT ignored by mktime, it calculates this ;
+    tmisdst[0] := -1; COMMENT -1 means info not available ;
+    
+    COMMENT C ABI Padding and remaining 64-bit fields must be zeroed ;
+    tmpad[0] := 0;     
+    tmgmtoffl[0] := 0; 
+    tmgmtoffh[0] := 0; 
+    tmzonel[0] := 0;   
+    tmzoneh[0] := 0;   
+    
+    COMMENT Call mktime, passing the location of the first element of the table. ;
+    COMMENT This correctly passes the base pointer to the C-ABI function. ;
+    timeval := mktime(tmsec[0]);
+    
+END
