@@ -10,12 +10,6 @@
 
 #include <string.h>
 
-// Suppress missing prototype warnings for these exported wrappers
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-prototypes"
-#pragma GCC diagnostic ignored "-Wmissing-declarations"
-
-
 // ---------------------------------------------------------
 // Memory primitive wrappers
 // ---------------------------------------------------------
@@ -44,4 +38,4 @@ char* strstrp(const char* haystack, const char* needle) { return (char*)strstr(h
 size_t strlenp(const char* s) { return strlen(s); }
 char* strtokp(char* str, const char* delim) { return strtok(str, delim); }
 char* strerrorp(const int errnum) { return strerror(errnum); }
-#pragma GCC diagnostic pop
+

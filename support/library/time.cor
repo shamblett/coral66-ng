@@ -1,0 +1,47 @@
+COMMENT
+/*
+ * Project: coral66-ng
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 13/08/2026
+ */
+ ;
+
+COMMENT 
+  Standard C Library <time.h> for Coral 66
+
+;
+
+SEGMENT time
+
+ EXTERNAL (
+    POINTER PROCEDURE mktimep(LOCATION INTEGER);
+
+  )
+
+COMMON (
+  COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
+  TABLE tm [14, 1] [
+            tmsec INTEGER 0;
+            tmmin INTEGER 1;
+            tmhour INTEGER 2;
+            tmmday INTEGER 3;
+            tmmon INTEGER 4;
+            tmyear INTEGER 5;
+            tmwday INTEGER 6;
+            tmyday INTEGER 7;
+            tmisdst INTEGER 8;
+            tmpad INTEGER 9;
+            tmgmtoffl INTEGER 10;
+            tmgmtoffh INTEGER 11;
+            tmzonel INTEGER 12;
+            tmzoneh INTEGER 13
+  ];
+
+  POINTER PROCEDURE mktimep(LOCATION INTEGER);
+)
+
+BEGIN
+ POINTER PROCEDURE mktimep(LOCATION INTEGER tm)
+ BEGIN ANSWER mktimep(tm); END;
+
+END

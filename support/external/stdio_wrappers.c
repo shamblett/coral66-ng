@@ -203,4 +203,3 @@ int renamep(const char* oldfilename, const char* newfilename)
     return rename(oldfilename, newfilename);
 }
 
-#pragma GCC diagnostic pop
