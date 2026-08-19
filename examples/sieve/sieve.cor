@@ -1,0 +1,102 @@
+'COMMENT' -----------------------------------------------------------------
+ -
+ -  Filename:
+ -
+ -     sieve.cor
+ -
+ -  Description:
+ -   
+ -     The Sieve of Eratosthenes benchmark, from Byte Magazine early 1980s,
+ -     when a PC would do well to run this in 10 seconds. This version
+ -     really does count prime numbers but omits the numbers 1, 3 and all 
+ -     even numbers. The expected count is 1899.   
+ -
+ -  Revision: 
+ -
+ -     $Id: $
+ -
+ ---------------------------------------------------------------------------;
+
+'COMMON'(
+   'PROCEDURE' test    ('VALUE''INTEGER', 'VALUE''INTEGER');
+   'PROCEDURE' comment ('VALUE''INTEGER');
+   'PROCEDURE' failed  ('VALUE''INTEGER');
+   'PROCEDURE' result;
+)
+
+'COMMON' (
+   'PROCEDURE' outchar ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' outstring ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' outinteger ('VALUE''INTEGER','VALUE''INTEGER');
+   'PROCEDURE' outnewline ('VALUE''INTEGER');
+)
+
+'INCLUDE' "time.cor";
+
+
+'DEFINE' SIZE "8190";
+
+'SEGMENT' main
+'BEGIN'
+   'INTEGER' ans;
+   'LONG''INTEGER' start_time, stop_time;
+
+   'COMMENT' ---------
+             - sieve -
+             ---------;
+
+   'BYTE''ARRAY' Flags [0 : SIZE];
+
+   'INTEGER''PROCEDURE' sieve;
+   'BEGIN'
+      'INTEGER' iter;
+      'INTEGER' count;
+   
+      'FOR' iter := 1 'STEP' 1 'UNTIL' 10 'DO'
+      'BEGIN'
+         'INTEGER' i, prime, k;
+   
+         count := 0;
+   
+         'FOR' i := 0 'STEP' 1 'UNTIL' SIZE 'DO'
+            Flags [i] := 1;
+   
+         'FOR' i := 0 'STEP' 1 'UNTIL' SIZE 'DO'
+         'BEGIN'
+            'IF' Flags [i] <> 0 'THEN'
+            'BEGIN'
+               prime := i + i + 3;
+               k := i + prime;
+               'FOR' i := i 'WHILE' k <= SIZE 'DO'
+               'BEGIN'
+                   Flags [k] := 0;
+                   k := k + prime;
+               'END';
+   
+               count := count + 1
+            'END'
+         'END'
+      'END';
+   
+      'ANSWER' count
+   'END' sieve;
+   
+   
+   test ("sieve", "Sieve of Eratosthenes");
+   
+   start_time := clock;
+   ans := sieve;
+   stop_time := clock;
+   
+   'IF' ans <> 1899 'THEN'
+      failed ("Result wrong");
+
+   outstring (1, "Time taken = ");
+   outinteger (1, 1000 * (stop_time - start_time) / CLOCKS PER SEC);
+   outstring (1, " milliseconds");
+   outnewline (1);
+
+   result
+
+'END'
+
