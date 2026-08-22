@@ -41,6 +41,14 @@ static bool isBitsType(const Type& t)
     return false;
 }
 
+static bool isPointerType(const Type& t)
+{
+    const Type& rt = resolveExprType(t);
+    if (const auto p = rt.tryAs<PrimitiveType>())
+        return p->getKind() == PrimitiveType::Pointer;
+    return false;
+}
+
 static bool isLValue(const syntax::Expression& expr, const SemanticContext& ctx)
 {
     if (auto* id = dynamic_cast<const syntax::IdentifierExpression*>(&expr))
@@ -251,11 +259,10 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             {
                 // Match
             }
-            else if (const auto pL = lType->tryAs<PrimitiveType>(); pL && pL->getKind() == PrimitiveType::Pointer)
+            else if (isPointerType(*lType))
             {
                 // Accept Pointer to Pointer, Pointer to Integer, or Integer to Pointer
-                if (const auto pR = rType->tryAs<PrimitiveType>();
-                    pR && (pR->getKind() == PrimitiveType::Pointer || pR->getKind() == PrimitiveType::Integer))
+                if (isPointerType(*rType) || (resolveExprType(*rType).tryAs<PrimitiveType>() && resolveExprType(*rType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
                 {
                     // Match
                 }
@@ -264,11 +271,10 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
                     mismatch = true;
                 }
             }
-            else if (const auto pR = rType->tryAs<PrimitiveType>(); pR && pR->getKind() == PrimitiveType::Pointer)
+            else if (isPointerType(*rType))
             {
                 // Accept Integer to Pointer
-                if (const auto pL = lType->tryAs<PrimitiveType>();
-                    pL && (pL->getKind() == PrimitiveType::Pointer || pL->getKind() == PrimitiveType::Integer))
+                if (isPointerType(*lType) || (resolveExprType(*lType).tryAs<PrimitiveType>() && resolveExprType(*lType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
                 {
                     // Match
                 }
@@ -343,9 +349,7 @@ void TypeCheckingPass::visit(const syntax::AnswerStatement& node)
             if (const auto it = m_context.expressionTypes.find(&node.getExpression());
                 it != m_context.expressionTypes.end() && !it->second->is<ErrorType>())
             {
-                if (!isNumericType(*it->second)
-                    && !(it->second->is<PrimitiveType>()
-                         && it->second->as<PrimitiveType>().getKind() == PrimitiveType::Pointer))
+                if (!isNumericType(*it->second) && !isPointerType(*it->second))
                 {
                     m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getExpression().begin(), m_context.source,
                                                                         *node.getExpression().begin()));
@@ -924,7 +928,7 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
 
                                 if (auto* paramPointer = param.type->tryAs<PrimitiveType>())
                                 {
-                                    if (const auto* argPointer = itArg->second->tryAs<PrimitiveType>())
+                                    if (const auto* argPointer = resolveExprType(*itArg->second).tryAs<PrimitiveType>())
                                     {
                                         if (paramPointer->getKind() == PrimitiveType::Pointer
                                             && (argPointer->getKind() == PrimitiveType::Integer
