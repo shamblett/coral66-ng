@@ -58,6 +58,7 @@
 # Individual binary files
 /test/backend/data/p1/sieve-external/sieve
 /examples/hello-world/helloworld
+/examples/sieve/sieve
 
 # CMI
 *.cmi
