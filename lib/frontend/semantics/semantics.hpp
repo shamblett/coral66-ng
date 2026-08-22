@@ -865,6 +865,7 @@ class Declaration : public Usable
     const syntax::Declaration* m_astNode = nullptr;
     int m_scopeDepth = 0;
     std::optional<std::uint64_t> m_absoluteAddress = std::nullopt;
+    bool m_isExternal = false;
 
 protected:
     template <class T>
@@ -907,6 +908,15 @@ public:
     [[nodiscard]] std::optional<std::uint64_t> getAbsoluteAddress() const
     {
         return m_absoluteAddress;
+    }
+
+    void setIsExternal(bool isExternal)
+    {
+        m_isExternal = isExternal;
+    }
+    [[nodiscard]] bool isExternal() const
+    {
+        return m_isExternal;
     }
 };
 

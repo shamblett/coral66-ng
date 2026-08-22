@@ -1,3 +1,4 @@
+'PROGRAM' Sieve
 'COMMENT' -----------------------------------------------------------------
  -
  -  Filename:
@@ -17,35 +18,19 @@
  -
  ---------------------------------------------------------------------------;
 
-'COMMON'(
-   'PROCEDURE' test    ('VALUE''INTEGER', 'VALUE''INTEGER');
-   'PROCEDURE' comment ('VALUE''INTEGER');
-   'PROCEDURE' failed  ('VALUE''INTEGER');
-   'PROCEDURE' result;
-)
-
-'COMMON' (
-   'PROCEDURE' outchar ('VALUE''INTEGER','VALUE''INTEGER');
-   'PROCEDURE' outstring ('VALUE''INTEGER','VALUE''INTEGER');
-   'PROCEDURE' outinteger ('VALUE''INTEGER','VALUE''INTEGER');
-   'PROCEDURE' outnewline ('VALUE''INTEGER');
-)
-
-'INCLUDE' "time.cor";
-
+'LIBRARY' ( stdio, time)
 
 'DEFINE' SIZE "8190";
 
-'SEGMENT' main
 'BEGIN'
    'INTEGER' ans;
-   'LONG''INTEGER' start_time, stop_time;
+   'INTEGER' startTime, stopTime;
 
    'COMMENT' ---------
              - sieve -
              ---------;
 
-   'BYTE''ARRAY' Flags [0 : SIZE];
+   'ARRAY' Flags [0 : SIZE];
 
    'INTEGER''PROCEDURE' sieve;
    'BEGIN'
@@ -82,21 +67,18 @@
    'END' sieve;
    
    
-   test ("sieve", "Sieve of Eratosthenes");
+   print("Sieve of Eratosthenes");
+   newline;
    
-   start_time := clock;
+   startTime := clock;
    ans := sieve;
-   stop_time := clock;
+   stopTime := clock;
    
    'IF' ans <> 1899 'THEN'
-      failed ("Result wrong");
+      print("Result wrong - Failed");
 
-   outstring (1, "Time taken = ");
-   outinteger (1, 1000 * (stop_time - start_time) / CLOCKS PER SEC);
-   outstring (1, " milliseconds");
-   outnewline (1);
-
-   result
+   printfint("Time taken = %d milliseconds", 1000 * (stopTime - startTime));
+   newline;
 
 'END'
 

@@ -54,9 +54,22 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
         }
         else if (auto* extCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(comm.get()))
         {
+            const size_t usablesBefore = m_context.ownedUsables.size();
             for (const auto& item : extCommunicator->getItems())
             {
                 visit(*item);
+            }
+            for (size_t i = usablesBefore; i < m_context.ownedUsables.size(); ++i)
+            {
+                auto* usable = m_context.ownedUsables[i].get();
+                usable->match([&](VariableDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](ProcedureDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](ArrayDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](TableDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](OverlayDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](SwitchDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](LabelDeclaration& decl) { decl.setIsExternal(true); },
+                              [&](TableElementDeclaration& decl) { decl.setIsExternal(true); });
             }
         }
         else if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(comm.get()))
@@ -117,6 +130,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                     {
                         const auto name = decl->getName(); // Returns string_view
                         decl->setScopeDepth(m_context.symbolTable.scopeCount());
+                        decl->setIsExternal(true);
 
                         // Convert to IntrusiveVariantValue
                         IntrVarPtr<Usable> usableDecl(decl.release());

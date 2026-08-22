@@ -21,9 +21,9 @@ time_t timep(time_t* arg)
     return time(arg);
 }
 
-clock_t clockp(void)
+int clockp(void)
 {
-    return clock();
+    return (int)clock();
 }
 
 // ---------------------------------------------------------
