@@ -69,9 +69,9 @@
       'ANSWER' count
    'END' sieve;
    
-   newline;
-   print("Sieve of Eratosthenes");
-   newline;
+   Newline;
+   Print("Sieve of Eratosthenes");
+   Newline;
    
    startTime := Clock;
    ans := sieve;
@@ -79,17 +79,17 @@
    
    'IF' ans <> EXPECTED 'THEN'
       'BEGIN'
-         print("Result is wrong - Failed");
-         newline;
+         Print("Result is wrong - Failed");
+         Newline;
          'GOTO' FailExit;
        'END';
 
-   printfint("The limit is %d", SIZE);
-   newline;
-   printfint("The Answer is %d, this is correct", ans);
-   newline;
-   printfint("Time taken = %d millisecond(s)", 1000 * (stopTime - startTime) / CLOCKSPERSEC);
-   newline;
+   Printfint("The limit is %d", SIZE);
+   Newline;
+   Printfint("The Answer is %d, this is correct", ans);
+   Newline;
+   Printfint("Time taken = %d millisecond(s)", 1000 * (stopTime - startTime) / CLOCKSPERSEC);
+   Newline;
 
 FailExit:
 'END'

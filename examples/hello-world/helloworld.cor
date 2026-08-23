@@ -21,6 +21,6 @@ COMMENT
 LIBRARY ( stdio )
 
 BEGIN
-  newline;
-  print("Hello World from Coral 66");
+  Newline;
+  Print("Hello World from Coral 66");
 END;
