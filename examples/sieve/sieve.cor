@@ -21,6 +21,9 @@
 'LIBRARY' ( stdio, time)
 
 'DEFINE' SIZE "8190";
+'DEFINE' EXPECTED "1899";
+
+'DEFINE' CLOCKSPERSEC "(1000000)";
 
 'BEGIN'
    'INTEGER' ans;
@@ -66,19 +69,28 @@
       'ANSWER' count
    'END' sieve;
    
-   
+   newline;
    print("Sieve of Eratosthenes");
    newline;
    
-   startTime := clock;
+   startTime := Clock;
    ans := sieve;
-   stopTime := clock;
+   stopTime := Clock;
    
-   'IF' ans <> 1899 'THEN'
-      print("Result wrong - Failed");
+   'IF' ans <> EXPECTED 'THEN'
+      'BEGIN'
+         print("Result is wrong - Failed");
+         newline;
+         'GOTO' FailExit;
+       'END';
 
-   printfint("Time taken = %d milliseconds", 1000 * (stopTime - startTime));
+   printfint("The limit is %d", SIZE);
+   newline;
+   printfint("The Answer is %d, this is correct", ans);
+   newline;
+   printfint("Time taken = %d millisecond(s)", 1000 * (stopTime - startTime) / CLOCKSPERSEC);
    newline;
 
+FailExit:
 'END'
 
