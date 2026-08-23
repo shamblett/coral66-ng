@@ -84,6 +84,8 @@
       <item>'TABLE'</item>
       <item>UNSIGNED</item>
       <item>'UNSIGNED'</item>
+      <item>POINTER</item>
+      <item>'POINTER'</item>
     </list>
 
     <list name="operators">
