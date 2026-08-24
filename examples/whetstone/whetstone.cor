@@ -73,8 +73,8 @@ LIBRARY ( stdio, time)
      Baltimore, MD 21203.
      ----------------------------------------------------------------------;
 
-   DEFINE pi "3.14159265358978";
-   DEFINE piby2 := "pi / 2.0";
+   'DEFINE' pi "3.14159265358978";
+   'DEFINE' piby2 "pi / 2.0";
   
    'FLOATING''RECURSIVE' sin ('VALUE''FLOATING' x);
    'BEGIN'
@@ -105,7 +105,7 @@ LIBRARY ( stdio, time)
          xnorm := -2.0 - xnorm;
    
       x2 := xnorm * xnorm;
-      y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * x_2 ) * x_2) * x_2) * x_2) * xnorm;
+      y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * x2 ) * x2) * x2) * x2) * xnorm;
    
       'ANSWER' y;
    'END' sin;
@@ -315,7 +315,7 @@ LIBRARY ( stdio, time)
    Print("Whetstone scientific benchmark");
    Newline;
 
-   startTime := clock;
+   startTime := Clock;
  
    'COMMENT' initialize constants ;
 
@@ -475,7 +475,7 @@ LIBRARY ( stdio, time)
     
    'COMMENT' Get stop time after ntimes ;
 
-   stopTime := clock;
+   stopTime := Clock;
 
    'COMMENT'  Now compute number of K Whetstones per sec;
 

@@ -60,6 +60,7 @@
 /examples/hello-world/helloworld
 /examples/sieve/sieve
 /examples/time/time
+/examples/whetstone/whetstone
 
 # CMI
 *.cmi
