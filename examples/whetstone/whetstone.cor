@@ -45,12 +45,14 @@
 
 LIBRARY ( stdio, time)
 
+'DEFINE' CLOCKSPERSEC "(1000000)";
+
 'BEGIN'
 
    'INTEGER' ntimes := 1; (number of times to run the benchmark)
     
    'COMMENT' Benchmark timing stuff ;
-   'FLOATING' rating;
+   'INTEGER' rating;
    'INTEGER' startTime;
    'INTEGER' stopTime;
   
@@ -219,44 +221,44 @@ LIBRARY ( stdio, time)
    
    'FLOATING''RECURSIVE' log10 ('VALUE''FLOATING' x);
    'BEGIN'
-     'CONSTANT' c1 := 0.868591718;
-     'CONSTANT' c3 := 0.289335524;
-     'CONSTANT' c5 := 0.177522071;
-     'CONSTANT' c7 := 0.094376476;
-     'CONSTANT' c9 := 0.191337714;
-     'CONSTANT' c_r10 := 3.1622777;
+     'DEFINE' c13 "0.868591718";
+     'DEFINE' c33 "0.289335524";
+     'DEFINE' c53 "0.177522071";
+     'DEFINE' c73 "0.094376476";
+     'DEFINE' c93 "0.191337714";
+     'DEFINE' cr10 "3.1622777";
    
-     'FLOATING' y, x_norm, x_log, frac, frac_2;
+     'FLOATING' y, xnorm, xlog, frac, frac2;
    
-     x_log := 0.5;
+     xlog := 0.5;
      'IF' x <= 0.0 'THEN'
        'ANSWER' 0.0;
    
      'IF' x >= 10.0 'THEN'
        'BEGIN'
           'COMMENT' reduce to 1.0 .. 10.0 ;
-         'FOR' x_norm := x 'WHILE' x_norm >= 10.0 'DO' 
+         'FOR' xnorm := x 'WHILE' xnorm >= 10.0 'DO'
            'BEGIN'
-             x_log := x_log + 1.0;
-             x_norm := x_norm * 0.1
+             xlog := xlog + 1.0;
+             xnorm := xnorm * 0.1
            'END'
        'END'
      'ELSE'
        'BEGIN'
           'COMMENT' reduce to 1.0 .. 10.0 ;
-         'FOR' x_norm := x 'WHILE' x_norm < 1.0 'DO'
+         'FOR' xnorm := x 'WHILE' xnorm < 1.0 'DO'
            'BEGIN'
-             x_log := x_log - 1.0;
-             x_norm := x_norm * 10.0
+             xlog := xlog - 1.0;
+             xnorm := xnorm * 10.0
            'END'
        'END';
    
-       frac := ( x_norm - c_r10 ) / ( x_norm + c_r10 );
-       frac_2 := frac * frac;
-       y := ( c1 + ( c3 + ( c5 + ( c7 + c9 * frac_2 ) * frac_2) * frac_2) * frac_2)
+       frac := ( xnorm - cr10 ) / ( xnorm + cr10 );
+       frac2 := frac * frac;
+       y := ( c13 + ( c33 + ( c53 + ( c73 + c93 * frac2 ) * frac2) * frac2) * frac2)
            * frac;
 
-       'ANSWER' y + x_log
+       'ANSWER' y + xlog
    'END';
    
    
@@ -272,7 +274,7 @@ LIBRARY ( stdio, time)
 
 
    'COMMENT' Major loop counter ; 
-   'INTEGER' cycle_no; 
+   'INTEGER' cycleno;
 
    'FLOATING' x1, x2, x3, x4, x, y, z, t, t1, t2;
    'FLOATING''ARRAY' e1[1:4];
@@ -308,10 +310,12 @@ LIBRARY ( stdio, time)
       z := (x + y) / t2;
    'END';
 
- 
-   test ("whetstone", "Whetstone scientific benchmark");
-  
-   start_time := clock;
+
+   Newline;
+   Print("Whetstone scientific benchmark");
+   Newline;
+
+   startTime := clock;
  
    'COMMENT' initialize constants ;
 
@@ -331,7 +335,7 @@ LIBRARY ( stdio, time)
    n7 := 32 * i;   n8 := 899 * i;  n9 := 616 * i;
    n10 := 0;       n11 := 93 * i;
 
-   'FOR' cycle_no := 1 'STEP' 1 'UNTIL' ntimes 'DO'
+   'FOR' cycleno := 1 'STEP' 1 'UNTIL' ntimes 'DO'
       'BEGIN'
 
          'COMMENT' module 1: simple identifiers ;
@@ -446,7 +450,7 @@ LIBRARY ( stdio, time)
             p0;
       
       
-         'COMMENT' module 10: integer arithmetik ;
+         'COMMENT' module 10: integer arithmetic ;
       
          j := 2;  
          k := 3;
@@ -471,19 +475,14 @@ LIBRARY ( stdio, time)
     
    'COMMENT' Get stop time after ntimes ;
 
-   stop_time := clock;
+   stopTime := clock;
 
    'COMMENT'  Now compute number of K Whetstones per sec;
 
-   rating := 1000.0 * CLOCKS_PER_SEC * ntimes / 
-                'FLOATING'(stop_time - start_time);
+   rating := 1000.0 * CLOCKSPERSEC * ntimes / (stopTime - startTime);
 
-   outstring (1, "Rating = ");
-   outinteger (1, rating);
-   outstring (1, " KWIPS");
-   outnewline (1);
-
-   result ;
+   Printfint("Rating = %d KWIPS", rating);
+   Newline;
 
 'END' main
 
