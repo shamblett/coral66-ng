@@ -80,13 +80,13 @@ BEGIN
  POINTER PROCEDURE Strftime(POINTER str, VALUE POINTER count, POINTER format, LOCATION INTEGER tp)
  BEGIN ANSWER strftimep(str, count, format, tp); END;
 
- POINTER PROCEDURE gmtime(POINTER timer)
+ POINTER PROCEDURE Gmtime(POINTER timer)
  BEGIN ANSWER gmtimep(timer); END;
 
- POINTER PROCEDURE localtime(POINTER timer)
+ POINTER PROCEDURE Localtime(POINTER timer)
  BEGIN ANSWER localtimep(timer); END;
 
- POINTER PROCEDURE mktime(LOCATION INTEGER arg)
+ POINTER PROCEDURE Mktime(LOCATION INTEGER arg)
  BEGIN ANSWER mktimep(arg); END;
 
 END
