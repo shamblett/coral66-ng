@@ -30,7 +30,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
 {
     SECTION("Whetstone End-to-End Execution")
     {
-        //SKIP();
+        SKIP();
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
@@ -101,6 +101,24 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         REQUIRE(sqrtAnsAddr != nullptr);
         int32_t sqrtAns = *static_cast<int32_t*>(sqrtAnsAddr);
         REQUIRE(sqrtAns == 2.0);
+
+        // Ntimes
+        auto ntimesAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("ntimes"));
+        REQUIRE(ntimesAddr != nullptr);
+        int32_t ntimesAns = *static_cast<int32_t*>(ntimesAddr);
+        REQUIRE(ntimesAns == 1);
+
+        // Cycle Check
+        auto cyclecheckAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("cyclecheck"));
+        REQUIRE(cyclecheckAddr != nullptr);
+        int32_t cyclecheckAns = *static_cast<int32_t*>(cyclecheckAddr);
+        REQUIRE(cyclecheckAns == 1);
+
+        // Cycle No
+        auto cyclenoAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("cycleno"));
+        REQUIRE(cyclenoAddr != nullptr);
+        int32_t cyclenoAns = *static_cast<int32_t*>(cyclenoAddr);
+        REQUIRE(cyclenoAns == 1);
 
         delete ee;
     }

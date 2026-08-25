@@ -271,6 +271,8 @@
    'COMMENT' Major loop counter ; 
    'INTEGER' cycleno; 
    'INTEGER' sqrtans;
+   'INTEGER' cyclecheck;
+
 
    'FLOATING' x1, x2, x3, x4, x, y, z, t, t1, t2, tTest;
    'FLOATING''ARRAY' e1[1:4];
@@ -327,9 +329,11 @@
    n7 := 32 * i;   n8 := 899 * i;  n9 := 616 * i;
    n10 := 0;       n11 := 93 * i;
 
+   cyclecheck := 0;
    'FOR' cycleno := 1 'STEP' 1 'UNTIL' ntimes 'DO'
       'BEGIN'
 
+         cyclecheck := cyclecheck + 1;
          'COMMENT' module 1: simple identifiers ;
    
          x1 := 1.0;

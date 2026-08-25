@@ -543,10 +543,17 @@ TEST_CASE("Symbol Resolution - Extended Redefinitions", "[Semantics][SymbolResol
 
 TEST_CASE("Symbol Resolution - Complex Statements", "[Semantics][SymbolResolution]")
 {
-    SECTION("For Statement")
+    SECTION("For Statement With While")
     {
         ParsedProgram parsed(
             "PROGRAM TEST COMMON() BEGIN INTEGER I ; FOR I := 1 STEP 1 UNTIL 10 WHILE I < 5 DO I := 1 END");
+        SymbolResolutionResult res(parsed);
+        CHECK(res.errors == false);
+    }
+    SECTION("For Statement With Until")
+    {
+        ParsedProgram parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; INTEGER ntimes ; ntimes := 10; FOR I := 1 STEP 1 UNTIL ntimes DO I := 1 END");
         SymbolResolutionResult res(parsed);
         CHECK(res.errors == false);
     }
