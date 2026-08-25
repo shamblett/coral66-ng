@@ -61,6 +61,7 @@
 /examples/sieve/sieve
 /examples/time/time
 /examples/whetstone/whetstone
+/examples/ackerman/ackerman
 
 # CMI
 *.cmi

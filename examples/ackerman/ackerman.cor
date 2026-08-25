@@ -1,0 +1,83 @@
+'PROGRAM' Ackermann
+'COMMENT'  ----------------------------------------------------------------
+ -
+ -  Filename:
+ -
+ -     ackermann.cor
+ -
+ -  Description:
+ -
+ -     Ackermann's function "is an example of a recursive function which 
+ -     is not primitive recursive". It is interesting from the point of 
+ -     view of benchmarking because it "grows faster thany any primitive 
+ -     recursive function" and gives us a lot of nested function calls
+ -     for little effort.
+ -     
+ -     It is defined as follows:
+ -        Ackermann(0, n) = n+1 
+ -        Ackermann(m, 0) = Ackermann(m-1, 1) 
+ -        Ackermann(m, n) = Ackermann(m-1, Ackermann(m, n-1)) 
+ -
+ -     We use Ackermann(3,6) as the benchmark. This used to take long enough to 
+ -     confirm the execution time with a stopwatch. Nowadays that's out
+ -     of the question. BTW, the value of Ackermann(4,2) has 19729 digits!
+ -
+ -     Ackermann (3,6) gives us 172233 calls, with a nesting depth of 511. But
+ -     beware of tail recursion optimization.
+ -
+ -  Credits:
+ -
+ -     Ackermann's function is named after Wilhelm Ackermann, a 
+ -     mathematical logician who worked in Germany during the first half
+ -     of the 20th century.
+ -
+ -  Revision:
+ -
+ -     $Id: ackermann.c,v $
+ -
+ --------------------------------------------------------------------------;
+
+'DEFINE' EXPECTED "509";
+
+'DEFINE' CLOCKSPERSEC "(1000000)";
+
+LIBRARY ( stdio, time)
+
+'BEGIN'
+   'INTEGER' ans;
+   'INTEGER' starttime, stoptime;
+
+   'INTEGER''RECURSIVE' Ackermann ('VALUE''INTEGER' m, n);
+   'BEGIN'
+      'IF' m = 0 'THEN'
+         'ANSWER' n + 1
+      'ELSE''IF' n = 0 'THEN'
+         'ANSWER' Ackermann (m - 1, 1)
+      'ELSE'
+         'ANSWER' Ackermann (m - 1, Ackermann (m, n - 1));
+   'END' Ackermann;
+
+   Newline;
+   Print("Function call benchmark, Ackermann (3, 6)");
+   Newline;
+
+   starttime := Clock;
+   ans := Ackermann (3,6);
+   stoptime := Clock;
+
+   'IF' ans <> EXPECTED 'THEN'
+         'BEGIN'
+            Print("Result is wrong - Failed");
+            Newline;
+            'GOTO' FailExit;
+          'END';
+
+
+   Printfint("Time taken : %d milliseconds", 1000 * (stoptime - starttime) / CLOCKSPERSEC);
+   Newline;
+
+FailExit:
+
+'END' main
+
+
