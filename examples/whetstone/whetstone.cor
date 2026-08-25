@@ -43,7 +43,7 @@
  -
  --------------------------------------------------------------------------;
 
-LIBRARY ( stdio, time, unistd)
+LIBRARY ( stdio, time)
 
 'DEFINE' CLOCKSPERSEC "(1000000)";
 
@@ -296,11 +296,11 @@ LIBRARY ( stdio, time, unistd)
          'GOTO' lab;
    'END';
 
-   'PROCEDURE' p0;
-      e1[j] := e1[k];
-      e1[k] := e1[l];
-      e1[l] := e1[j];
-   'END';
+   'COMMENT' TODO 'PROCEDURE' p0;
+   'COMMENT'   e1[j] := e1[k];
+   'COMMENT' e1[k] := e1[l];
+   'COMMENT' e1[l] := e1[j];
+   'COMMENT' 'END';
 
    'PROCEDURE' p3 ('LOCATION''FLOATING' x, y, z);
    'BEGIN'
@@ -339,7 +339,7 @@ LIBRARY ( stdio, time, unistd)
 
    'FOR' cycleno := 1 'STEP' 1 'UNTIL' ntimes 'DO'
       'BEGIN'
-         Sleep(3);
+
          Newline;
          Printfint("----> Start Of Cycle <----", cycleno);
          Newline;
@@ -460,8 +460,8 @@ LIBRARY ( stdio, time, unistd)
          e1[2] := 2.0;  
          e1[3] := 3.0;
       
-         'FOR' i := 1 'STEP' 1 'UNTIL' n9 'DO'
-            p0;
+         'COMMENT' TODO 'FOR' i := 1 'STEP' 1 'UNTIL' n9 'DO';
+         'COMMENT' p0;
       
       
          'COMMENT' module 10: integer arithmetic ;
@@ -485,6 +485,7 @@ LIBRARY ( stdio, time, unistd)
          'FOR' i := 1 'STEP' 1 'UNTIL' n11 'DO'
             x := sqrt (exp (ln (x) / t1));
 
+         cycleno := cycleno + 1;
 
       'END';
     
