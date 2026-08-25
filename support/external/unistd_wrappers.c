@@ -15,7 +15,7 @@
 // ---------------------------------------------------------
 char* cuseridp(void)
 {
-    struct passwd* pws = getpwuid(geteuid());
+    const struct passwd* pws = getpwuid(geteuid());
     return pws->pw_name;
 }
 
@@ -34,7 +34,7 @@ int getgidp(void)
     return (int)getgid();
 }
 
-int getpgidp(int pid)
+int getpgidp(const int pid)
 {
     return getpgid(pid);
 }
@@ -54,7 +54,7 @@ int getppidp(void)
     return getppid();
 }
 
-int getsidp(int pid)
+int getsidp(const int pid)
 {
     return getsid(pid);
 }
@@ -72,7 +72,7 @@ void exitp(const int code)
     exit(code);
 }
 
-void sleepp(int seconds)
+void sleepp(const int seconds)
 {
     sleep(seconds);
 }
