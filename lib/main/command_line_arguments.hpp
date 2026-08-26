@@ -76,7 +76,7 @@ inline llvm::cl::opt<std::string> ExternalDirectory("X", llvm::cl::desc("Externa
                                                     llvm::cl::value_desc("dirpath"));
 inline llvm::cl::opt<bool> Pie("pie", llvm::cl::desc("Build a position independent executable"));
 inline llvm::cl::opt<bool> Pic("pic", llvm::cl::desc("Build position independent code"));
-inline llvm::cl::opt<bool> Version("v", llvm::cl::desc("Version"));
+inline llvm::cl::opt<bool> Version("version", llvm::cl::desc("Version"));
 inline llvm::cl::opt<DebugLevel> DebugLevel(llvm::cl::desc("Debug level:"),
                                             llvm::cl::values(clEnumVal(g1, "Lines only"),
                                                              clEnumVal(g2, "Generate debugging info"),

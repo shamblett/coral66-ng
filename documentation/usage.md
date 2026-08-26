@@ -13,7 +13,7 @@ coral66 [options] <input source file> [object files...]
 
 ### Core Options
 
-*   **`<input source file>`**: The main Coral 66 source file to compile (usually `.cor`).
+*   **`<input source file>`**: The main Coral 66 source file to compile (has to be `.cor`).
 *   **`[object files...]`**: Optional compiled object files (`.o`) to link into the final executable.
 *   **`-o <filename>`**: Specifies the name of the output executable or object file.
 *   **`-c`**: Stop after compiling object files. Does not link the final executable. Useful for creating libraries.
@@ -45,7 +45,7 @@ coral66 [options] <input source file> [object files...]
 
 ### Other Options
 
-*   **`-v`**: Display the version of this program.
+*   **`-version`**: Display the version of this program.
 *   **`--noact`**: Check command line parameter validity, take no further action.
 
 ## 2. Common Tasks
