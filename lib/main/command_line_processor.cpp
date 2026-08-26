@@ -43,7 +43,16 @@ void CommandLineProcessor::ParseCommandLine(const int argc, char** argv)
     cl::NoAction = false;
     cl::SourceFilename = "";
 
+    // Print the version if the command line is empty
+    if (argc == 1) {
+        if (strcmp(argv[1], "coral66") == 0)
+        {
+            PrintVersion(llvm::outs());
+            return;
+        }
+    }
     llvm::cl::SetVersionPrinter([](llvm::raw_ostream& OS) { PrintVersion(OS); });
+    llvm::cl::HideUnrelatedOptions(llvm::cl::getGeneralCategory());
     llvm::cl::ParseCommandLineOptions(argc, argv);
 }
 
