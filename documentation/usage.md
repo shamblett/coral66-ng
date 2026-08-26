@@ -1,6 +1,7 @@
 # Coral 66 Compiler Usage Guide
 
 This document provides instructions on how to use the `coral66` compiler command line options and its supporting scripts.
+It is assumed the coral66 binary is on your path, this can be achieved by running the install.sh script before using the compiler.
 
 ## 1. Command Line
 
@@ -91,15 +92,33 @@ coral66 main.cor ext_src/my_c_funcs.o -X ext_src -o main_app
 
 ## 3. Helper Scripts
 
-To simplify the compilation process, especially when dealing with multiple libraries and external dependencies, a helper script is provided at `scripts/compile.sh`. This script is a wrapper around the `coral66` command line that automatically handles object file linking and path management for you. 
+To simplify the compilation process, especially when dealing with multiple libraries and external dependencies, helper scripts are provided named`scripts/compile.sh`
+and `scripts/compile-supported.sh`.
+The compile script is a wrapper around the `coral66` compiler that automatically handles object file linking and path management for you. 
+The compile-supported script wraps the compile script but links the source file against the supported libraries and externals without needing to specify them on the 
+command line. For new users and getting started tasks this script is highly recommended. 
 
-### Script Usage
+### Compile Supported Script Usage
+
+```bash
+./scripts/compile-supported.sh <source_file.cor>
+```
+### Examples using the compile supported helper script
+
+**1. Compiling a simple program:**
+The script automatically finds and links the supported libraries and externals. To compile the helloworld example in its directory
+
+```bash
+../../scripts/compile-supported.sh helloworld.cor
+```
+
+### Compile Script Usage
 
 ```bash
 ./scripts/compile.sh <source_file.cor> [-l library_name] [-L library_path] [-x external_name] [-X external_path]
 ```
 
-### Examples using the Helper Script
+### Examples using the Compile helper Script
 
 **1. Compiling a simple program:**
 The script automatically names the output executable based on the source file name (e.g., `main`).
