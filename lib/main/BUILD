@@ -9,6 +9,7 @@ cc_library(
     srcs = [
         "action_executor.cpp",
         "command_line_processor.cpp",
+        "command_line_arguments.cpp",
         "main.cpp",
     ],
     hdrs = [

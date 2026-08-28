@@ -160,10 +160,10 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
     // Debug level
     switch (cl::DebugLevel)
     {
-        case cl::DebugLevel::NoDebug: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
-        case cl::DebugLevel::g1: codegenOptions.debugEmission = cgllvm::DebugEmission::Line; break;
-        case cl::DebugLevel::g2: codegenOptions.debugEmission = cgllvm::DebugEmission::Default; break;
-        case cl::DebugLevel::g3: codegenOptions.debugEmission = cgllvm::DebugEmission::Extended; break;
+        case cl::DebugLevels::NoDebug: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
+        case cl::DebugLevels::g1: codegenOptions.debugEmission = cgllvm::DebugEmission::Line; break;
+        case cl::DebugLevels::g2: codegenOptions.debugEmission = cgllvm::DebugEmission::Default; break;
+        case cl::DebugLevels::g3: codegenOptions.debugEmission = cgllvm::DebugEmission::Extended; break;
         default: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
     }
 

@@ -23,8 +23,7 @@ TEST_CASE("Initial state", "[cli]")
     CHECK(ExternalDirectory.empty());
     CHECK(Pie == false);
     CHECK(Pic == false);
-    CHECK(Version == false);
-    CHECK(DebugLevel == DebugLevel::NoDebug);
+    CHECK(DebugLevel == DebugLevels::NoDebug);
     CHECK(SyntaxOnly == false);
     CHECK(Time == false);
     CHECK(NoAction == false);
@@ -138,14 +137,14 @@ TEST_CASE("Alternative options", "[cli]")
     {
         auto [argc, argv] = createArgs("-g2 main.cor");
         coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
-        CHECK(DebugLevel == DebugLevel::g2);
+        CHECK(DebugLevel == DebugLevels::g2);
     }
 
     SECTION("Debug level - multi")
     {
         auto [argc, argv] = createArgs("-g2 -g1 -g3 main.cor");
         coral66::CommandLineProcessor::ParseCommandLine(argc, argv);
-        CHECK(DebugLevel == DebugLevel::g3);
+        CHECK(DebugLevel == DebugLevels::g3);
     }
 }
 
