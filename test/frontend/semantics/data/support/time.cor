@@ -1,0 +1,109 @@
+COMMENT
+/*
+ * Project: coral66-ng
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 13/08/2026
+ */
+ ;
+
+COMMENT 
+  Standard C Library <time.h> for Coral 66
+
+;
+
+SEGMENT time
+
+ EXTERNAL (
+    FLOATING PROCEDURE difftimep(VALUE POINTER, VALUE POINTER);
+    POINTER PROCEDURE timep(LOCATION INTEGER);
+    INTEGER PROCEDURE clockp;
+
+    POINTER PROCEDURE asctimep(LOCATION INTEGER);
+    POINTER PROCEDURE ctimep(VALUE POINTER);
+    POINTER PROCEDURE strftimep(POINTER, VALUE POINTER, POINTER, LOCATION INTEGER);
+    POINTER PROCEDURE gmtimep(POINTER);
+    POINTER PROCEDURE localtimep(POINTER);
+    POINTER PROCEDURE mktimep(LOCATION INTEGER);
+
+  )
+
+COMMON (
+  COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
+  TABLE tm [14, 1] [
+            tmsec INTEGER 0;
+            tmmin INTEGER 1;
+            tmhour INTEGER 2;
+            tmmday INTEGER 3;
+            tmmon INTEGER 4;
+            tmyear INTEGER 5;
+            tmwday INTEGER 6;
+            tmyday INTEGER 7;
+            tmisdst INTEGER 8;
+            tmpad INTEGER 9;
+            tmgmtoffl INTEGER 10;
+            tmgmtoffh INTEGER 11;
+            tmzonel INTEGER 12;
+            tmzoneh INTEGER 13
+  ];
+
+  FLOATING PROCEDURE Difftime(VALUE POINTER, VALUE POINTER);
+  POINTER PROCEDURE Time(LOCATION INTEGER);
+  INTEGER PROCEDURE Clock;
+
+  POINTER PROCEDURE Asctime(LOCATION INTEGER);
+  POINTER PROCEDURE Ctime(VALUE POINTER);
+  POINTER PROCEDURE Strftime(POINTER, VALUE POINTER, POINTER, LOCATION INTEGER);
+  POINTER PROCEDURE Gmtime(POINTER);
+  POINTER PROCEDURE Localtime(POINTER);
+  POINTER PROCEDURE Mktime(LOCATION INTEGER);
+
+
+)
+
+BEGIN
+
+TABLE tm [14, 1] [
+            tmsec INTEGER 0;
+            tmmin INTEGER 1;
+            tmhour INTEGER 2;
+            tmmday INTEGER 3;
+            tmmon INTEGER 4;
+            tmyear INTEGER 5;
+            tmwday INTEGER 6;
+            tmyday INTEGER 7;
+            tmisdst INTEGER 8;
+            tmpad INTEGER 9;
+            tmgmtoffl INTEGER 10;
+            tmgmtoffh INTEGER 11;
+            tmzonel INTEGER 12;
+            tmzoneh INTEGER 13
+  ];
+
+ FLOATING PROCEDURE Difftime(VALUE POINTER endt, VALUE POINTER begint)
+ BEGIN ANSWER difftimep(endt, begint); END;
+
+ POINTER PROCEDURE Time(LOCATION INTEGER arg)
+ BEGIN ANSWER timep(arg); END;
+
+ INTEGER PROCEDURE Clock
+ BEGIN ANSWER clockp; END;
+
+ POINTER PROCEDURE Asctime(LOCATION INTEGER timeptr)
+ BEGIN ANSWER asctimep(timeptr); END;
+
+ POINTER PROCEDURE Ctime(VALUE POINTER timer);
+ BEGIN ANSWER ctimep(timer); END;
+
+ POINTER PROCEDURE Strftime(POINTER str, VALUE POINTER count, POINTER format, LOCATION INTEGER tp)
+ BEGIN ANSWER strftimep(str, count, format, tp); END;
+
+ POINTER PROCEDURE Gmtime(POINTER timer)
+ BEGIN ANSWER gmtimep(timer); END;
+
+ POINTER PROCEDURE Localtime(POINTER timer)
+ BEGIN ANSWER localtimep(timer); END;
+
+ POINTER PROCEDURE Mktime(LOCATION INTEGER arg)
+ BEGIN ANSWER mktimep(arg); END;
+
+END

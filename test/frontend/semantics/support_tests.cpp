@@ -4,11 +4,12 @@
  * Date   : 16/08/2026
  */
 
-#include <iostream>
-
 #include <llvm/Support/Process.h>
 
+#include <iostream>
+
 #include "lib/frontend/preprocessor/preprocessor.hpp"
+#include "lib/frontend/semantics/cmi_processor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantic_support.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
@@ -107,10 +108,10 @@ TEST_CASE("Support", "[Semantics][Support]")
         bool errors = false;
         std::string sourceLibraryPath = sourcePath.substr(0, sourcePath.find_last_of("\\/"));
         auto tmpDir = llvm::sys::Process::GetEnv("TEST_TMPDIR");
-        std::string libraryPath = tmpDir ? *tmpDir : coral66::fs::temp_directory_path().string();
+        std::string libraryPath = tmpDir ? *tmpDir : fs::temp_directory_path().string();
         auto from = sourceLibraryPath + "/" + "stdio.cmi.test";
         auto to = libraryPath + "/" + "stdio.cmi";
-        coral66::fs::copy_file(from, to, coral66::fs::copy_options::overwrite_existing);
+        coral66::fs::copy_file(from, to, fs::copy_options::overwrite_existing);
         auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors, libraryPath);
         auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
         if (!ss.str().empty())
@@ -119,5 +120,38 @@ TEST_CASE("Support", "[Semantics][Support]")
         }
         CHECK(ss.str().empty());
         CHECK(diagnostics.empty());
+    }
+
+    SECTION("time")
+    {
+        auto sourcePath = getTestDataPath("time.cor", "SUPPORT_DIR");
+        auto source = readFile(sourcePath);
+        CHECK(!source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+        auto ppTokens = lexer::tokenize(source, &ss);
+        ppTokens = pp::preprocess(std::move(ppTokens), &ss);
+        auto cTokens = lexer::toCTokens(ppTokens, &ss);
+        auto context = std::make_unique<parser::Context>(cTokens, &ss);
+        auto parsed = parser::parseProgram(cTokens, &ss);
+        if (!ss.str().empty())
+        {
+            std::cout << ss.str() << std::endl;
+        }
+        CHECK(ss.str().empty());
+
+        bool errors = false;
+        auto program = semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        auto diagnostics = semantics::DiagnosticCollector::getDiagnostics();
+        if (!ss.str().empty())
+        {
+            std::cout << ss.str() << std::endl;
+        }
+        CHECK(ss.str().empty());
+        CHECK(diagnostics.empty());
+
+        auto cmiString = semantics::CMIProcessor::generateCMIString("time", program.getContext().exportedSymbols);
+        CHECK(!cmiString.empty());
     }
 }
