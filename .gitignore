@@ -37,6 +37,9 @@
 *.out
 *.app
 
+# Assembly listings
+*.s
+
 # debug information files
 *.dwo
 
