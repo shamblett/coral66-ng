@@ -296,19 +296,18 @@ LIBRARY ( stdio, time)
          'GOTO' lab;
    'END';
 
-   'COMMENT' TODO 'PROCEDURE' p0;
-   'COMMENT'   e1[j] := e1[k];
-   'COMMENT' e1[k] := e1[l];
-   'COMMENT' e1[l] := e1[j];
-   'COMMENT' 'END';
-
-   'PROCEDURE' p3 ('LOCATION''FLOATING' x, y, z);
+'PROCEDURE' p3 ('LOCATION''FLOATING' x, y, z);
    'BEGIN'
       x := t * (x + y);
       y := t * (x + y);
       z := (x + y) / t2;
    'END';
 
+   'PROCEDURE' p0;
+      e1[j] := e1[k];
+      e1[k] := e1[l];
+      e1[l] := e1[j];
+   'END';
 
    Newline;
    Print("Whetstone scientific benchmark");
