@@ -36,7 +36,8 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     // Set and Enable colours. default for errors is red, warnings yellow.
     reporter->enable_colors(reporter->has_colors());
     reporter->changeColor(llvm::raw_ostream::RED);
-    coral66::ScopeExit colorResetter([reporter]() {
+    ScopeExit colorResetter([reporter]
+        {
         reporter->resetColor();
         reporter->flush();
     });
