@@ -26,11 +26,11 @@ USER_LIB_DIR="$LIB_DIR"
 ARGS=("$@")
 for (( i=0; i<${#ARGS[@]}; i++ )); do
     if [[ "${ARGS[$i]}" == "-X" || "${ARGS[$i]}" == "--extpath" ]]; then
-        if [[ $((i+1)) < ${#ARGS[@]} ]]; then
+        if [[ $((i+1)) -lt ${#ARGS[@]} ]]; then
             USER_EXT_DIR="${ARGS[$((i+1))]}"
         fi
     elif [[ "${ARGS[$i]}" == "-L" || "${ARGS[$i]}" == "--libpath" ]]; then
-        if [[ $((i+1)) < ${#ARGS[@]} ]]; then
+        if [[ $((i+1)) -lt ${#ARGS[@]} ]]; then
             USER_LIB_DIR="${ARGS[$((i+1))]}"
         fi
     fi

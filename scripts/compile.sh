@@ -62,7 +62,7 @@ fi
 echo "Compiling $SRC_FILE with libraries: $PRINT_LIBS and externals: $PRINT_EXTS..."
 # Execute the compiler - assuming it's available in PATH or a known location
 if [ ${#EXTRA_ARGS[@]} -eq 0 ]; then
-  coral66 "$SRC_FILE" $OBJ_FILES -L "$LIB_PATH" -X "$EXT_PATH" -o "$OUT_EXE"
+  coral66 "$SRC_FILE" "$OBJ_FILES" -L "$LIB_PATH" -X "$EXT_PATH" -o "$OUT_EXE"
 else
-  coral66 "$SRC_FILE" $OBJ_FILES -L "$LIB_PATH" -X "$EXT_PATH" "${EXTRA_ARGS[@]}" -o "$OUT_EXE.o"
+  coral66 "$SRC_FILE" "$OBJ_FILES" -L "$LIB_PATH" -X "$EXT_PATH" "${EXTRA_ARGS[@]}" -o "$OUT_EXE.o"
 fi
