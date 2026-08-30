@@ -23,52 +23,51 @@ BEGIN
 
     COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
     TABLE tm1 [14, 1] [
-            tmsec INTEGER 0;
-            tmmin INTEGER 1;
-            tmhour INTEGER 2;
-            tmmday INTEGER 3;
-            tmmon INTEGER 4;
-            tmyear INTEGER 5;
-            tmwday INTEGER 6;
-            tmyday INTEGER 7;
-            tmisdst INTEGER 8;
-            tmpad INTEGER 9;
-            tmgmtoffl INTEGER 10;
-            tmgmtoffh INTEGER 11;
-            tmzonel INTEGER 12;
-            tmzoneh INTEGER 13
+            tm1sec INTEGER 0;
+            tm1min INTEGER 1;
+            tm1hour INTEGER 2;
+            tm1mday INTEGER 3;
+            tm1mon INTEGER 4;
+            tm1year INTEGER 5;
+            tm1wday INTEGER 6;
+            tm1yday INTEGER 7;
+            tm1isdst INTEGER 8;
+            tm1pad INTEGER 9;
+            tm1gmtoffl INTEGER 10;
+            tm1gmtoffh INTEGER 11;
+            tm1zonel INTEGER 12;
+            tm1zoneh INTEGER 13
     ];
 
     COMMENT Fill in the struct for a specific time ;
     COMMENT Example: 1st Jan 2024, 12:00:00 ;
     
-    tmsec[0] := 0;    
-    tmmin[0] := 0;    
-    tmhour[0] := 12;   
-    tmmday[0] := 1;    
-    tmmon[0] := 0;    COMMENT Jan is 0 ;
-    tmyear[0] := 124; COMMENT Years since 1900 (2024 - 1900) ;
-    tmwday[0] := 0;   COMMENT ignored by mktime, it calculates this ;
-    tmyday[0] := 0;   COMMENT ignored by mktime, it calculates this ;
-    tmisdst[0] := -1; COMMENT -1 means info not available ;
+    tm1sec[0] := 0;
+    tm1min[0] := 0;
+    tm1hour[0] := 12;
+    tm1mday[0] := 1;
+    tm1mon[0] := 0;    COMMENT Jan is 0 ;
+    tm1year[0] := 124; COMMENT Years since 1900 (2024 - 1900) ;
+    tm1wday[0] := 0;   COMMENT ignored by mktime, it calculates this ;
+    tm1yday[0] := 0;   COMMENT ignored by mktime, it calculates this ;
+    tm1isdst[0] := -1; COMMENT -1 means info not available ;
     
     COMMENT C ABI Padding and remaining 64-bit fields must be zeroed ;
-    tmpad[0] := 0;     
-    tmgmtoffl[0] := 0; 
-    tmgmtoffh[0] := 0; 
-    tmzonel[0] := 0;   
-    tmzoneh[0] := 0;   
-    
+    tm1pad[0] := 0;
+    tm1gmtoffl[0] := 0;
+    tm1gmtoffh[0] := 0;
+    tm1zonel[0] := 0;
+    tm1zoneh[0] := 0;
+
+    Newline;
+    Print("Time library examples");
+    Newline;
+
     COMMENT Call mktime, passing the location of the first element of the table. ;
     COMMENT This correctly passes the base pointer to the C-ABI function. ;
-    timeval := Mktime(tmsec[0]);
+    timeval := Mktime(tm1sec[0]);
+    Printfint("Timeval is : %d", timeval);
+    Newline;
 
-    COMMENT Print the time;
-    timestring := Asctime(timeval);
-    Newline;
-    Print("Simple time example");
-    Newline;
-    timestring := Strcat("The time is :- ", timestring);
-    Printfstr("%s", timestring);
-    Newline;
+
 END
