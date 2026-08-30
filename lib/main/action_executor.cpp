@@ -164,7 +164,7 @@ std::optional<std::string> coral66::ActionExecutor::compileCoral66File(const Act
         case cl::DebugLevels::g1: codegenOptions.debugEmission = cgllvm::DebugEmission::Line; break;
         case cl::DebugLevels::g2: codegenOptions.debugEmission = cgllvm::DebugEmission::Default; break;
         case cl::DebugLevels::g3: codegenOptions.debugEmission = cgllvm::DebugEmission::Extended; break;
-        default: codegenOptions.debugEmission = cgllvm::DebugEmission::None; break;
+        default: codegenOptions.debugEmission = cgllvm::DebugEmission::Extended; break;
     }
 
     codegenOptions.baremetal = cl::TargetEnv == cl::TargetEnvironment::Baremetal;
