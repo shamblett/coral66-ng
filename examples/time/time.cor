@@ -23,7 +23,7 @@ BEGIN
 
     COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
     TABLE tm1 [14, 1] [
-            tm1sec INTEGER 0;
+            tm1sec INTEGER 10;
             tm1min INTEGER 1;
             tm1hour INTEGER 2;
             tm1mday INTEGER 3;
