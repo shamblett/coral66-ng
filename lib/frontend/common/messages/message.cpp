@@ -15,17 +15,17 @@ llvm::raw_ostream& coral66::operator<<(llvm::raw_ostream& os, const Message& mes
     }
     else
     {
-        for (const auto& segment : message.getSegments())
+        for (const auto& [text, color, bold, bg] : message.getSegments())
         {
-            if (segment.color != llvm::raw_ostream::SAVEDCOLOR && os.colors_enabled())
+            if (color != llvm::raw_ostream::SAVEDCOLOR && os.colors_enabled())
             {
-                os.changeColor(segment.color, segment.bold, segment.bg);
-                os << segment.text;
+                os.changeColor(color, bold, bg);
+                os << text;
                 os.resetColor();
             }
             else
             {
-                os << segment.text;
+                os << text;
             }
         }
     }

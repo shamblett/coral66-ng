@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include "lib/support/vendor/rapidjson/document.h"
-
 #include "lib/frontend/syntax/syntax.hpp"
+#include "lib/support/vendor/rapidjson/document.h"
 
 namespace coral66::tools
 {
+using namespace syntax;
 
 /*
  * Dumper for the parser AST.
@@ -26,34 +26,34 @@ public:
     explicit AstDump(rapidjson::Document::AllocatorType& allocator) : m_alloc(allocator) {}
 
     // Main dump method
-    rapidjson::Value dump(const syntax::Program& program);
+    rapidjson::Value dump(const Program& program);
 
     // Dump to a string
-    static std::string dumpToString(const syntax::Program& program);
+    static std::string dumpToString(const Program& program);
 
 private:
     // Node Dispatcher
-    rapidjson::Value dump(const syntax::Node* node);
+    rapidjson::Value dump(const Node* node);
 
     // Block dump
-    rapidjson::Value dump(const syntax::Block& block);
+    rapidjson::Value dump(const Block& block);
 
     // Communicator
-    rapidjson::Value dump(const syntax::Communicator* communicator);
+    rapidjson::Value dump(const Communicator* communicator);
 
     // Place references
 
     // Declarations
-    rapidjson::Value dump(const syntax::Declaration* declaration);
+    rapidjson::Value dump(const Declaration* declaration);
 
     // Statements
-    rapidjson::Value dump(const syntax::Statement* statement);
+    rapidjson::Value dump(const Statement* statement);
 
     // For element
-    rapidjson::Value dump(const syntax::ForElement& element);
+    rapidjson::Value dump(const ForElement& element);
 
     // Expressions
-    rapidjson::Value dump(const syntax::Expression* expression);
+    rapidjson::Value dump(const Expression* expression);
 
     // Helper function to extract text from a Lexer CTokenIterator
     rapidjson::Value getTokenString(const lexer::CTokenIterator& token);

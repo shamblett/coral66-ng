@@ -11,11 +11,11 @@
 namespace coral66::tools
 {
 
-rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
+rapidjson::Value AstDump::dump(const Communicator* communicator)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
-    if (auto* commonCommunicator = dynamic_cast<const syntax::CommonCommunicator*>(communicator))
+    if (auto* commonCommunicator = dynamic_cast<const CommonCommunicator*>(communicator))
     {
         rapidjson::Value commons(rapidjson::kArrayType);
         for (const auto& common : commonCommunicator->getItems())
@@ -25,7 +25,7 @@ rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
         obj.AddMember("Common", commons, m_alloc);
     }
 
-    if (auto* externalCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(communicator))
+    if (auto* externalCommunicator = dynamic_cast<const ExternalCommunicator*>(communicator))
     {
         rapidjson::Value externals(rapidjson::kArrayType);
         for (const auto& external : externalCommunicator->getItems())
@@ -35,7 +35,7 @@ rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
         obj.AddMember("External", externals, m_alloc);
     }
 
-    if (auto* libraryCommunicator = dynamic_cast<const syntax::LibraryCommunicator*>(communicator))
+    if (auto* libraryCommunicator = dynamic_cast<const LibraryCommunicator*>(communicator))
     {
         rapidjson::Value libraries(rapidjson::kArrayType);
         for (const auto& library : libraryCommunicator->getItems())
@@ -45,7 +45,7 @@ rapidjson::Value AstDump::dump(const syntax::Communicator* communicator)
         obj.AddMember("Library", libraries, m_alloc);
     }
 
-    if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(communicator))
+    if (auto* absoluteCommunicator = dynamic_cast<const AbsoluteCommunicator*>(communicator))
     {
         rapidjson::Value absolutes(rapidjson::kArrayType);
         for (const auto& absolute : absoluteCommunicator->getItems())

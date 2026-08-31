@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <llvm/IR/DebugInfoMetadata.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 

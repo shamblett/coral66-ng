@@ -910,7 +910,7 @@ public:
         return m_absoluteAddress;
     }
 
-    void setIsExternal(bool isExternal)
+    void setIsExternal(const bool isExternal)
     {
         m_isExternal = isExternal;
     }

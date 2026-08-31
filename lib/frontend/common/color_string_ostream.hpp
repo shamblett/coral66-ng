@@ -23,7 +23,7 @@ namespace coral66::detail
 class ColorStringOstream : public llvm::raw_ostream
 {
     std::vector<Message::Segment>& m_segments;
-    llvm::raw_ostream::Colors m_currentColor = llvm::raw_ostream::SAVEDCOLOR;
+    Colors m_currentColor = SAVEDCOLOR;
     bool m_currentBold = false;
     bool m_currentBg = false;
     uint64_t m_pos = 0;
@@ -55,7 +55,7 @@ public:
 
     raw_ostream& resetColor() override
     {
-        m_currentColor = llvm::raw_ostream::SAVEDCOLOR;
+        m_currentColor = SAVEDCOLOR;
         m_currentBold = false;
         m_currentBg = false;
         return *this;
@@ -66,7 +66,8 @@ public:
         return *this;
     }
 
-    void write_impl(const char* Ptr, size_t Size) override
+    // ReSharper disable once CppOverrideWithDifferentVisibility
+    void write_impl(const char* Ptr, const size_t Size) override
     {
         if (Size == 0)
             return;
@@ -79,11 +80,12 @@ public:
         }
         else
         {
-            m_segments.push_back({std::move(text), m_currentColor, m_currentBold, m_currentBg});
+            m_segments.push_back({.text = std::move(text), .color = m_currentColor, .bold = m_currentBold, .bg = m_currentBg});
         }
         m_pos += Size;
     }
 
+    // ReSharper disable once CppOverrideWithDifferentVisibility
     uint64_t current_pos() const override
     {
         return m_pos;

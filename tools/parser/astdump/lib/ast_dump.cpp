@@ -15,7 +15,7 @@ namespace coral66::tools
 {
 
 // Main entry point
-rapidjson::Value AstDump::dump(const syntax::Program& program)
+rapidjson::Value AstDump::dump(const Program& program)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
@@ -59,7 +59,7 @@ rapidjson::Value AstDump::dump(const syntax::Program& program)
 }
 
 // String dump
-std::string AstDump::dumpToString(const syntax::Program& program)
+std::string AstDump::dumpToString(const Program& program)
 {
     // Create the RapidJSON Document
     rapidjson::Document doc;
@@ -82,7 +82,7 @@ std::string AstDump::dumpToString(const syntax::Program& program)
 }
 
 // Block
-rapidjson::Value AstDump::dump(const syntax::Block& block)
+rapidjson::Value AstDump::dump(const Block& block)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
     obj.AddMember("NodeType", "Block", m_alloc);
@@ -113,7 +113,7 @@ rapidjson::Value AstDump::dump(const syntax::Block& block)
 }
 
 // Dispatcher
-rapidjson::Value AstDump::dump(const syntax::Node* node)
+rapidjson::Value AstDump::dump(const Node* node)
 {
     if (!node)
         return rapidjson::Value(rapidjson::kNullType);
@@ -121,17 +121,17 @@ rapidjson::Value AstDump::dump(const syntax::Node* node)
     rapidjson::Value obj(rapidjson::kObjectType);
 
     // Declarations
-    if (auto* declaration = dynamic_cast<const syntax::Declaration*>(node))
+    if (auto* declaration = dynamic_cast<const Declaration*>(node))
     {
         obj.AddMember("Declaration", dump(declaration), m_alloc);
     }
     // Statements
-    else if (auto* statement = dynamic_cast<const syntax::Statement*>(node))
+    else if (auto* statement = dynamic_cast<const Statement*>(node))
     {
         obj.AddMember("Statement", dump(statement), m_alloc);
     }
     // Expressions
-    else if (auto* expression = dynamic_cast<const syntax::Expression*>(node))
+    else if (auto* expression = dynamic_cast<const Expression*>(node))
     {
         obj.AddMember("Expression", dump(expression), m_alloc);
     }
@@ -148,7 +148,7 @@ rapidjson::Value AstDump::dump(const syntax::Node* node)
 }
 
 // For element
-rapidjson::Value AstDump::dump(const syntax::ForElement& element)
+rapidjson::Value AstDump::dump(const ForElement& element)
 {
     rapidjson::Value obj(rapidjson::kObjectType);
 
