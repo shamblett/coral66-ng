@@ -23,7 +23,7 @@ BEGIN
 
     COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
     TABLE tm1 [14, 1] [
-            tm1sec INTEGER 10;
+            tm1sec INTEGER 0;
             tm1min INTEGER 1;
             tm1hour INTEGER 2;
             tm1mday INTEGER 3;
@@ -32,18 +32,18 @@ BEGIN
             tm1wday INTEGER 6;
             tm1yday INTEGER 7;
             tm1isdst INTEGER 8;
-            tm1pad INTEGER 9;
-            tm1gmtoffl INTEGER 10;
-            tm1gmtoffh INTEGER 11;
+            tm1gmtoffl INTEGER 9;
+            tm1gmtoffh INTEGER 10;
+            tm1pad INTEGER 11;
             tm1zonel INTEGER 12;
             tm1zoneh INTEGER 13
     ];
 
     COMMENT Fill in the struct for a specific time ;
-    COMMENT Example: 1st Jan 2024, 12:00:00 ;
+    COMMENT Example: 1st Jan 2024, 12:40:30 ;
     
-    tm1sec[0] := 0;
-    tm1min[0] := 0;
+    tm1sec[0] := 30;
+    tm1min[0] := 40;
     tm1hour[0] := 12;
     tm1mday[0] := 1;
     tm1mon[0] := 0;    COMMENT Jan is 0 ;
