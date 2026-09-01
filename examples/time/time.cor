@@ -14,7 +14,7 @@ COMMENT
 
 
 
-LIBRARY (stdio, time)
+LIBRARY (stdio, time, unistd)
 
 BEGIN
 
@@ -67,6 +67,16 @@ BEGIN
     COMMENT This correctly passes the base pointer to the C-ABI function. ;
     timeval := Mktime(tm1);
     Printfint("Timeval is : %d", timeval);
+    Newline;
+    IF timeval = 1704112830 THEN
+      Print("This is correct")
+    ELSE
+      BEGIN
+        Printfint("Oops - timeval is incorrect : %d - exiting", timeval);
+        Newline;
+        Exit(-1);
+      END;
+
     Newline;
 
 
