@@ -935,6 +935,11 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                                                 || argPointer->getKind() == PrimitiveType::Pointer))
                                             isCompatible = true;
                                     }
+                                    if (!param.isValue && paramPointer->getKind() == PrimitiveType::Integer)
+                                    {
+                                        if (itArg->second->is<TableType>() || itArg->second->is<ArrayType>())
+                                            isCompatible = true;
+                                    }
                                 }
                             }
 

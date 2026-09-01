@@ -14,7 +14,7 @@ COMMENT
 
 
 
-LIBRARY (stdio, time, string)
+LIBRARY (stdio, time)
 
 BEGIN
 
@@ -65,7 +65,7 @@ BEGIN
 
     COMMENT Call mktime, passing the location of the first element of the table. ;
     COMMENT This correctly passes the base pointer to the C-ABI function. ;
-    timeval := Mktime(tm1sec[0]);
+    timeval := Mktime(tm1);
     Printfint("Timeval is : %d", timeval);
     Newline;
 

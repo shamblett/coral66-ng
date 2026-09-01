@@ -280,6 +280,11 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
     if (const auto typeIt = m_program.getContext().expressionTypes.find(&expression);
         typeIt != m_program.getContext().expressionTypes.end())
     {
+        if (typeIt->second->is<semantics::TableType>() || typeIt->second->is<semantics::ArrayType>())
+        {
+            return addr;
+        }
+
         type = convertType(*typeIt->second);
         // If the variable is a LOCATION parameter, the address holds a pointer to the actual value.
         // Wait, emitAddress returns the pointer. So if type is ptr, we want to load the underlying primitive type.

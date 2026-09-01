@@ -97,6 +97,9 @@ COMMON (
   INTEGER PROCEDURE Fflush(VALUE POINTER);
   PROCEDURE Setbuf(VALUE POINTER, VALUE POINTER);
 
+  COMMENT Character and String I/O wrappers ;
+  INTEGER PROCEDURE Getchar;
+
   COMMENT Library convenience  procedures ;
   PROCEDURE Newline;
   PROCEDURE Print(VALUE POINTER);
@@ -153,6 +156,10 @@ BEGIN
 
   PROCEDURE Setbuf(VALUE POINTER stream, VALUE POINTER buffer);
   BEGIN setbufp(stream, buffer); END;
+
+   COMMENT Character and String I/O wrappers ;
+   INTEGER PROCEDURE Getchar
+   BEGIN ANSWER getcharp; END;
 
   COMMENT Library convenience procedures ;
 
