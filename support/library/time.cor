@@ -28,7 +28,10 @@ SEGMENT time
   )
 
 COMMON (
-  COMMENT Define the tm struct as a TABLE of width 14 words and length 1 ;
+  COMMENT Define the C tm struct as a TABLE of width 14 words and length 1 ;
+  COMMENT Call time externals that need this by passing the location of the first element of the table by name. ;
+  COMMENT This correctly passes the base pointer to the C-ABI function. ;
+  COMMENT Example Mktime(tm);
   TABLE tm [14, 1] [
             tmsec INTEGER 0;
             tmmin INTEGER 1;
@@ -39,9 +42,9 @@ COMMON (
             tmwday INTEGER 6;
             tmyday INTEGER 7;
             tmisdst INTEGER 8;
-            tmpad INTEGER 9;
-            tmgmtoffl INTEGER 10;
-            tmgmtoffh INTEGER 11;
+            tmgmtoffl INTEGER 9;
+            tmgmtoffh INTEGER 10;
+            tmpad INTEGER 11;
             tmzonel INTEGER 12;
             tmzoneh INTEGER 13
   ];
