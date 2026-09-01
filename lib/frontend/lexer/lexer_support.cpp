@@ -21,12 +21,11 @@ bool isKeyword(const std::string_view characters)
            || characters == "EXTERNAL" || characters == "FIXED" || characters == "FLOATING" || characters == "FOR"
            || characters == "GOTO" || characters == "IF" || characters == "INTEGER" || characters == "LABEL"
            || characters == "LIBRARY" || characters == "LITERAL" || characters == "LOCATION" || characters == "MASK"
-           || characters == "OCTAL" || characters == "OR" || characters == "OVERLAY" || characters == "POINTER" 
-           || characters == "PRESET"
-           || characters == "PROCEDURE" || characters == "PROGRAM" || characters == "RECURSIVE"
-           || characters == "SEGMENT" || characters == "STEP" || characters == "SWITCH" || characters == "TABLE"
-           || characters == "THEN" || characters == "UNION" || characters == "UNSIGNED" || characters == "UNTIL"
-           || characters == "VALUE" || characters == "WHILE" || characters == "WITH";
+           || characters == "OCTAL" || characters == "OR" || characters == "OVERLAY" || characters == "POINTER"
+           || characters == "PRESET" || characters == "PROCEDURE" || characters == "PROGRAM"
+           || characters == "RECURSIVE" || characters == "SEGMENT" || characters == "STEP" || characters == "SWITCH"
+           || characters == "TABLE" || characters == "THEN" || characters == "UNION" || characters == "UNSIGNED"
+           || characters == "UNTIL" || characters == "VALUE" || characters == "WHILE" || characters == "WITH";
 }
 
 TokenType charactersToKeyword(const std::string_view characters)
@@ -343,6 +342,10 @@ std::pair<StateMachine, bool> EndComment::advance(char const c, Context& context
         {
             return {std::move(*this), true};
         }
+        if (isKeyword(characters))
+        {
+            context.push(1, TokenType::Identifier, characters);
+        }
         return {Start{}, false};
     }
     if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
@@ -360,6 +363,10 @@ std::pair<StateMachine, bool> EndComment::advance(char const c, Context& context
         }
         characters += c;
         return {std::move(*this), true};
+    }
+    if (!characters.empty() && isKeyword(characters))
+    {
+        context.push(1, TokenType::Identifier, characters);
     }
     return {Start{}, false};
 }

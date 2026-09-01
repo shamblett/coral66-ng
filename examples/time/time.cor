@@ -69,12 +69,14 @@ BEGIN
     Printfint("Timeval is : %d", timeval);
     Newline;
     IF timeval = 1704112830 THEN
-      Print("This is correct")
+      BEGIN
+         Print("This is correct");
+      END
     ELSE
       BEGIN
         Printfint("Oops - timeval is incorrect : %d - exiting", timeval);
         Newline;
-        Exit(-1);
+        Exit(-1)
       END;
 
     Newline;
