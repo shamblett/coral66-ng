@@ -459,8 +459,8 @@ LIBRARY ( stdio, time)
          e1[2] := 2.0;  
          e1[3] := 3.0;
       
-         'COMMENT' TODO 'FOR' i := 1 'STEP' 1 'UNTIL' n9 'DO';
-         'COMMENT' p0;
+         'FOR' i := 1 'STEP' 1 'UNTIL' n9 'DO';
+         p0;
       
       
          'COMMENT' module 10: integer arithmetic ;
@@ -483,8 +483,6 @@ LIBRARY ( stdio, time)
          x := 0.75;
          'FOR' i := 1 'STEP' 1 'UNTIL' n11 'DO'
             x := sqrt (exp (ln (x) / t1));
-
-         cycleno := cycleno + 1;
 
       'END';
     
