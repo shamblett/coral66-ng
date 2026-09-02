@@ -1,0 +1,18 @@
+PROGRAM StepTest
+
+COMMENT Tests simple increment processing in step until statements ;
+
+BEGIN
+
+   INTEGER cycleno;
+   INTEGER loopcount;
+
+   cycleno := 0;
+   loopcount := 0;
+
+   FOR cycleno := 1 STEP 1 UNTIL 10 DO
+   BEGIN
+     loopcount := loopcount + 1;
+   END;
+
+   END;
