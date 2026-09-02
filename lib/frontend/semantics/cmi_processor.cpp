@@ -9,11 +9,10 @@
 #include <deque>
 #include <fstream>
 
-#include "lib/support/vendor/rapidjson/prettywriter.h"
-#include "lib/support/vendor/rapidjson/stringbuffer.h"
-
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/support/filesystem.hpp"
+#include "lib/support/vendor/rapidjson/prettywriter.h"
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 
 namespace coral66::semantics
 {
@@ -264,6 +263,29 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
                 }
             }
         }
+        else if (auto* tableElementDeclaration = declaration->tryAs<TableElementDeclaration>())
+        {
+            symbolObj.AddMember("symbol_category", "table_element", allocator);
+
+            std::string elemTypeStr = typeToString(tableElementDeclaration->getType());
+            symbolObj.AddMember("data_type", rapidjson::Value(elemTypeStr.c_str(), allocator), allocator);
+
+            symbolObj.AddMember("is_unsigned", tableElementDeclaration->isUnsigned(), allocator);
+
+            if (auto wordPos = tableElementDeclaration->getWordPosition())
+            {
+                symbolObj.AddMember("word_position", *wordPos, allocator);
+            }
+            if (auto bitPos = tableElementDeclaration->getBitPosition())
+            {
+                symbolObj.AddMember("bit_position", *bitPos, allocator);
+            }
+            if (auto* parent = tableElementDeclaration->getParentTable())
+            {
+                std::string parentName(parent->getName());
+                symbolObj.AddMember("parent_table", rapidjson::Value(parentName.c_str(), allocator), allocator);
+            }
+        }
         else
         {
             // E.g., SwitchDeclaration, LabelDeclaration - Ignored for CMI export as they don't map to
@@ -463,6 +485,45 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 auto overlayDeclaration = std::make_unique<OverlayDeclaration>(syntheticToken, std::move(overlayType));
 
                 importedSymbols.push_back(std::move(overlayDeclaration));
+            }
+        }
+        else if (category == "table_element")
+        {
+            if (sym.HasMember("data_type"))
+            {
+                std::string typeStr = sym["data_type"].GetString();
+                IntrusiveVariantValue<Type> type = stringToType(typeStr);
+
+                bool isUnsigned = sym.HasMember("is_unsigned") ? sym["is_unsigned"].GetBool() : false;
+                std::optional<std::uint32_t> wordPos = std::nullopt;
+                if (sym.HasMember("word_position"))
+                    wordPos = sym["word_position"].GetUint();
+
+                std::optional<std::uint32_t> bitPos = std::nullopt;
+                if (sym.HasMember("bit_position"))
+                    bitPos = sym["bit_position"].GetUint();
+
+                const TableDeclaration* parentTable = nullptr;
+                if (sym.HasMember("parent_table"))
+                {
+                    std::string parentName = sym["parent_table"].GetString();
+                    for (const auto& decl : importedSymbols)
+                    {
+                        if (auto* tbl = decl->tryAs<TableDeclaration>())
+                        {
+                            if (tbl->getName() == parentName)
+                            {
+                                parentTable = tbl;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                auto tableElementDeclaration = std::make_unique<TableElementDeclaration>(
+                    syntheticToken, std::move(type), isUnsigned, wordPos, bitPos, parentTable);
+
+                importedSymbols.push_back(std::move(tableElementDeclaration));
             }
         }
     }
