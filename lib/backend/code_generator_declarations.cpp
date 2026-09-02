@@ -304,24 +304,28 @@ void CodeGenerator::generateProcedure(const semantics::ProcedureDeclaration& pro
             const semantics::Usable* parameterDeclaration = nullptr;
             for (const auto& usable : m_program.getGlobals())
             {
-                if (const auto* variableDeclaration = usable->tryAs<semantics::VariableDeclaration>())
+                std::string usableName;
+                const syntax::Node* usableAst = nullptr;
+                usable->match([&](const semantics::VariableDeclaration& v) { usableName = v.getName(); usableAst = v.getAstNode(); },
+                              [&](const semantics::ArrayDeclaration& a) { usableName = a.getName(); usableAst = a.getAstNode(); },
+                              [&](const semantics::TableDeclaration& t) { usableName = t.getName(); usableAst = t.getAstNode(); },
+                              [](const auto&) {});
+
+                if (usableName == param.name)
                 {
-                    if (variableDeclaration->getName() == param.name)
+                    bool found = false;
+                    for (const auto& p : astNode.getParameters())
                     {
-                        bool found = false;
-                        for (const auto& p : astNode.getParameters())
+                        if (usableAst == p.get())
                         {
-                            if (variableDeclaration->getAstNode() == p.get())
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (found)
-                        {
-                            parameterDeclaration = usable.get();
+                            found = true;
                             break;
                         }
+                    }
+                    if (found)
+                    {
+                        parameterDeclaration = usable.get();
+                        break;
                     }
                 }
             }

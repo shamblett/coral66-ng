@@ -304,6 +304,7 @@ LIBRARY ( stdio, time)
    'END';
 
    'PROCEDURE' p0;
+   'BEGIN'
       e1[j] := e1[k];
       e1[k] := e1[l];
       e1[l] := e1[j];
@@ -338,10 +339,6 @@ LIBRARY ( stdio, time)
 
    'FOR' cycleno := 1 'STEP' 1 'UNTIL' ntimes 'DO'
       'BEGIN'
-
-         Newline;
-         Printfint("----> Start Of Cycle <----", cycleno);
-         Newline;
 
          'COMMENT' module 1: simple identifiers ;
          Print("Simple Identifiers");
