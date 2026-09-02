@@ -18,6 +18,8 @@ LIB_PATH="."
 LIBS=()
 EXT_PATH="."
 EXTS=()
+EXTRA_ARGS=()
+OUT_EXT=""
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -25,8 +27,10 @@ while [[ "$#" -gt 0 ]]; do
         -l|--lib) LIBS+=("$2"); shift ;;
         -X|--extpath) EXT_PATH="$2"; shift ;;
         -x|--ext) EXTS+=("$2"); shift ;;
+        -c) EXTRA_ARGS+=("-c"); OUT_EXT=".o" ;;
+        -s) EXTRA_ARGS+=("-s"); OUT_EXT=".s" ;;
+        -*) EXTRA_ARGS+=("$1") ;;
         *.cor) SRC_FILE="$1" ;;
-        -c) EXTRA_ARGS+=("-c") ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
     esac
     shift
@@ -64,5 +68,5 @@ echo "Compiling $SRC_FILE with libraries: $PRINT_LIBS and externals: $PRINT_EXTS
 if [ ${#EXTRA_ARGS[@]} -eq 0 ]; then
   coral66 "$SRC_FILE" "$OBJ_FILES" -L "$LIB_PATH" -X "$EXT_PATH" -o "$OUT_EXE"
 else
-  coral66 "$SRC_FILE" "$OBJ_FILES" -L "$LIB_PATH" -X "$EXT_PATH" "${EXTRA_ARGS[@]}" -o "$OUT_EXE.o"
+  coral66 "$SRC_FILE" "$OBJ_FILES" -L "$LIB_PATH" -X "$EXT_PATH" "${EXTRA_ARGS[@]}" -o "$OUT_EXE$OUT_EXT"
 fi
