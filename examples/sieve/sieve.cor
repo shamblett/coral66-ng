@@ -23,8 +23,6 @@
 'DEFINE' SIZE "8190";
 'DEFINE' EXPECTED "1899";
 
-'DEFINE' CLOCKSPERSEC "(1000000)";
-
 'BEGIN'
    'INTEGER' ans;
    'INTEGER' startTime, stopTime;

@@ -45,8 +45,6 @@
 
 LIBRARY ( stdio, time)
 
-'DEFINE' CLOCKSPERSEC "(1000000)";
-
 'BEGIN'
 
    'INTEGER' ntimes := 1; (number of times to run the benchmark)
