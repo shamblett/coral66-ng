@@ -180,9 +180,66 @@ BEGIN
   PROCEDURE Setbuf(VALUE POINTER stream, VALUE POINTER buffer);
   BEGIN setbufp(stream, buffer); END;
 
+  COMMENT Direct Input/Output;
+  INTEGER PROCEDURE Fread(VALUE POINTER ptr, VALUE INTEGER size, VALUE INTEGER nmemb, VALUE POINTER stream)
+  BEGIN ANSWER freadp(ptr, size, nmemb, stream); END;
+
+  INTEGER PROCEDURE Fwrite(VALUE POINTER ptr, VALUE INTEGER size, VALUE INTEGER nmemb, VALUE POINTER stream)
+  BEGIN ANSWER fwritep(ptr, size, nmemb, stream); END;
+
+  COMMENT Character and String I/O;
+  INTEGER PROCEDURE Fgetc(VALUE POINTER stream)
+  BEGIN ANSWER fgetcp(stream); END;
+
+  POINTER PROCEDURE Fgets(VALUE POINTER str, VALUE INTEGER n, VALUE POINTER stream)
+  BEGIN ANSWER fgetsp(str, n, stream); END;
+
+  INTEGER PROCEDURE Fputc(VALUE INTEGER c, VALUE POINTER stream)
+  BEGIN ANSWER fputsp(c, stream); END;
+
+
+  INTEGER PROCEDURE Fputs(VALUE POINTER str, VALUE POINTER stream)
+  BEGIN ANSWER fputsp(str, stream); END;
+
+  INTEGER PROCEDURE Getchar
+  BEGIN ANSWER getcharp; END;
+
+  POINTER PROCEDURE Gets(VALUE POINTER str)
+  BEGIN ANSWER getsp(str); END;
+
+  INTEGER PROCEDURE Putchar(VALUE INTEGER c)
+  BEGIN ANSWER putcharp(c); END;
+
+  INTEGER PROCEDURE Putsp(VALUE POINTER str)
+  BEGIN ANSWER putsp(str); END;
+
+  INTEGER PROCEDURE Ungetc(VALUE INTEGER c, VALUE POINTER stream)
+  BEGIN ANSWER ungetcp(c, stream); END;
+
+  COMMENT File Positioning ;
+  INTEGER PROCEDURE Ftell(VALUE POINTER stream)
+  BEGIN ANSWER ftellp(stream); END;
+
+  INTEGER PROCEDURE Fgetpos(VALUE POINTER stream, VALUE POINTER pos)
+  BEGIN ANSWER fgetposp(stream, pos); END;
+
+  INTEGER PROCEDURE Fseek(VALUE POINTER stream, VALUE INTEGER offset, VALUE INTEGER whence)
+  BEGIN ANSWER fseekp(stream, offset, whence); END;
+
+  INTEGER PROCEDURE Fsetposp(VALUE POINTER stream, VALUE POINTER pos)
+  BEGIN ANSWER fsetposp(stream, pos); END;
+
+  PROCEDURE Rewind(VALUE POINTER stream)
+  BEGIN rewindp(stream); END;
+
+  COMMENT File Operations ;
+  INTEGER PROCEDURE Remove(VALUE POINTER filename)
+  BEGIN ANSWER removep(filename); END;
+
+  INTEGER PROCEDURE Rename(VALUE POINTER oldfilename, VALUE POINTER newfilename)
+  BEGIN ANSWER renamep(oldfilename, newfilename); END;
 
   COMMENT Library convenience procedures ;
-
   PROCEDURE Newline;
      BEGIN
        Printfstr("%s\n", "");
