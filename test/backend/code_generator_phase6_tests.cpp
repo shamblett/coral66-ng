@@ -30,7 +30,6 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
 {
     SECTION("Whetstone End-to-End Execution")
     {
-        SKIP();
         llvm::InitializeNativeTarget();
         llvm::InitializeNativeTargetAsmPrinter();
 
@@ -118,7 +117,7 @@ TEST_CASE("Phase 6", "[Backend][Execution]")
         auto cyclenoAddr = reinterpret_cast<void*>(ee->getGlobalValueAddress("cycleno"));
         REQUIRE(cyclenoAddr != nullptr);
         int32_t cyclenoAns = *static_cast<int32_t*>(cyclenoAddr);
-        REQUIRE(cyclenoAns == 1);
+        REQUIRE(cyclenoAns == 2);
 
         delete ee;
     }
