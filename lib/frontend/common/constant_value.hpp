@@ -20,6 +20,10 @@ class Type;
 class ProgramInterface;
 class Issue;
 
+/*
+ * A representation of compile-time constant expressions.
+ */
+
 class constant_value final
 {
 public:
