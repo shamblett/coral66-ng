@@ -60,7 +60,7 @@
 
 # Individual binary files
 /test/backend/data/p1/sieve-external/sieve
-/examples/hello-world/helloworld
+/examples/helloworld/helloworld
 /examples/sieve/sieve
 /examples/time/time
 /examples/whetstone/whetstone
