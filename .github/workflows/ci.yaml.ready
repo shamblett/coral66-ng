@@ -1,0 +1,40 @@
+name: C++ CI (Ubuntu 26.04 + LLVM 22)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    # Forces GitHub Actions to provision the correct OS tier
+    runs-on: ubuntu-26.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install LLVM 22 Toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget lsb-release software-properties-common gnupg
+          
+          # Download and execute the official LLVM installation script
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 22 all
+
+      - name: Setup Bazelisk (Bazel Wrapper)
+        run: |
+          sudo apt-get install -y curl
+          sudo curl -L "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64" -o /usr/local/bin/bazel
+          sudo chmod +x /usr/local/bin/bazel
+
+      - name: Build and Testwith Bazel (Forced LLVM 22)
+        env:
+          # Tells Bazel's auto-configuring system rules where to find LLVM 22
+          CC: /usr/bin/clang-22
+          CXX: /usr/bin/clang++-22
+        run: |
+          bazel test //... --repo_env=CC=/usr/bin/clang-22 --repo_env=CXX=/usr/bin/clang++-22
