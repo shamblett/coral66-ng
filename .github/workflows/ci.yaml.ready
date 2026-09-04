@@ -31,7 +31,11 @@ jobs:
           sudo curl -L "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64" -o /usr/local/bin/bazel
           sudo chmod +x /usr/local/bin/bazel
 
-      - name: Build and Testwith Bazel (Forced LLVM 22)
+      - name: Bazel Information
+        run: |
+          bazel info
+
+      - name: Build and Test with Bazel (Force LLVM 22)
         env:
           # Tells Bazel's auto-configuring system rules where to find LLVM 22
           CC: /usr/bin/clang-22
