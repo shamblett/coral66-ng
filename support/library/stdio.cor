@@ -126,6 +126,14 @@ COMMON (
   COMMENT Library convenience  procedures ;
   PROCEDURE Newline;
   PROCEDURE Print(VALUE POINTER);
+
+  COMMENT Defines and constants ;
+  INTEGER BUFSIZ := 8192;
+  INTEGER EOF := -1;
+  INTEGER SEEKSET := 0;
+  INTEGER SEEKCUR := 1;
+  INTEGER SEEKEND := 2;
+  INTEGER FOPENMAX := 16;
 )
 
 BEGIN
@@ -196,7 +204,6 @@ BEGIN
 
   INTEGER PROCEDURE Fputc(VALUE INTEGER c, VALUE POINTER stream)
   BEGIN ANSWER fputsp(c, stream); END;
-
 
   INTEGER PROCEDURE Fputs(VALUE POINTER str, VALUE POINTER stream)
   BEGIN ANSWER fputsp(str, stream); END;

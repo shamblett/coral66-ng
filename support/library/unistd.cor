@@ -51,6 +51,13 @@ COMMON (
   COMMENT process control ;
   PROCEDURE Sleep(VALUE INTEGER);
   PROCEDURE Exit(VALUE INTEGER);
+
+  COMMENT Defines and constants ;
+  INTEGER ROK := 4;
+  INTEGER WOK := 2;
+  INTEGER XOK := 1;
+  INTEGER FOK := 0;
+
 )
 
 BEGIN
