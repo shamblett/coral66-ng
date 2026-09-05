@@ -113,7 +113,7 @@
             "Usable": {
                 "Kind": "LabelDeclaration",
                 "Name": "errorPoint",
-                "MangledName": "errorPoint"
+                "MangledName": "_c66_common_errorPoint"
             }
         },
         {
