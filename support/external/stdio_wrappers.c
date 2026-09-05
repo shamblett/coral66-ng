@@ -11,17 +11,17 @@
 // ---------------------------------------------------------
 // printf family wrappers
 // ---------------------------------------------------------
-int printfintp(const char* fmt, const int arg)
+int _c66_common_printfint(const char* fmt, const int arg)
 {
     return printf(fmt, arg);
 }
 
-int printfstrp(const char* fmt, const char* arg)
+int _c66_common_printfstr(const char* fmt, const char* arg)
 {
     return printf(fmt, arg);
 }
 
-int printf2intp(const char* fmt, const int arg1, const int arg2)
+int _c66_common_printf2int(const char* fmt, const int arg1, const int arg2)
 {
     return printf(fmt, arg1, arg2);
 }
@@ -29,12 +29,12 @@ int printf2intp(const char* fmt, const int arg1, const int arg2)
 // ---------------------------------------------------------
 // fprintf family wrappers
 // ---------------------------------------------------------
-int fprintfintp(FILE* stream, const char* fmt, const int arg)
+int _c66_common_fprintfint(FILE* stream, const char* fmt, const int arg)
 {
     return fprintf(stream, fmt, arg);
 }
 
-int fprintfstrp(FILE* stream, const char* fmt, const char* arg)
+int _c66_common_fprintfstr(FILE* stream, const char* fmt, const char* arg)
 {
     return fprintf(stream, fmt, arg);
 }
@@ -42,12 +42,12 @@ int fprintfstrp(FILE* stream, const char* fmt, const char* arg)
 // ---------------------------------------------------------
 // sprintf family wrappers
 // ---------------------------------------------------------
-int sprintfintp(char* str, const char* fmt, const int arg)
+int _c66_common_sprintfint(char* str, const char* fmt, const int arg)
 {
     return sprintf(str, fmt, arg);
 }
 
-int sprintfstrp(char* str, const char* fmt, const char* arg)
+int _c66_common_sprintfstr(char* str, const char* fmt, const char* arg)
 {
     return sprintf(str, fmt, arg);
 }
@@ -55,12 +55,12 @@ int sprintfstrp(char* str, const char* fmt, const char* arg)
 // ---------------------------------------------------------
 // scanf family wrappers
 // ---------------------------------------------------------
-int scanfintp(const char* fmt, int* arg)
+int _c66_common_scanfint(const char* fmt, int* arg)
 {
     return scanf(fmt, arg);
 }
 
-int scanfstrp(const char* fmt, char* arg)
+int _c66_common_scanfstr(const char* fmt, char* arg)
 {
     return scanf(fmt, arg);
 }
@@ -68,12 +68,12 @@ int scanfstrp(const char* fmt, char* arg)
 // ---------------------------------------------------------
 // fscanf family wrappers
 // ---------------------------------------------------------
-int fscanfintp(FILE* stream, const char* fmt, int* arg)
+int _c66_common_fscanfint(FILE* stream, const char* fmt, int* arg)
 {
     return fscanf(stream, fmt, arg);
 }
 
-int fscanfstrp(FILE* stream, const char* fmt, char* arg)
+int _c66_common_fscanfstr(FILE* stream, const char* fmt, char* arg)
 {
     return fscanf(stream, fmt, arg);
 }
@@ -81,22 +81,22 @@ int fscanfstrp(FILE* stream, const char* fmt, char* arg)
 // ---------------------------------------------------------
 // File Access wrappers
 // ---------------------------------------------------------
-FILE* fopenp(const char* filename, const char* mode)
+FILE* _c66_common_fopen(const char* filename, const char* mode)
 {
     return fopen(filename, mode);
 }
 
-int fclosep(FILE* stream)
+int _c66_common_fclose(FILE* stream)
 {
     return fclose(stream);
 }
 
-int fflushp(FILE* stream)
+int _c66_common_fflush(FILE* stream)
 {
     return fflush(stream);
 }
 
-void setbufp(FILE* stream, char* buffer)
+void _c66_common_setbuf(FILE* stream, char* buffer)
 {
     setbuf(stream, buffer);
 }
@@ -104,12 +104,12 @@ void setbufp(FILE* stream, char* buffer)
 // ---------------------------------------------------------
 // Direct Input/Output wrappers
 // ---------------------------------------------------------
-size_t freadp(void* ptr, const size_t size, const size_t nmemb, FILE* stream)
+size_t _c66_common_fread(void* ptr, const size_t size, const size_t nmemb, FILE* stream)
 {
     return fread(ptr, size, nmemb, stream);
 }
 
-size_t fwritep(const void* ptr, const size_t size, const size_t nmemb, FILE* stream)
+size_t _c66_common_fwrite(const void* ptr, const size_t size, const size_t nmemb, FILE* stream)
 {
     return fwrite(ptr, size, nmemb, stream);
 }
@@ -117,47 +117,47 @@ size_t fwritep(const void* ptr, const size_t size, const size_t nmemb, FILE* str
 // ---------------------------------------------------------
 // Character and String I/O wrappers
 // ---------------------------------------------------------
-int fgetcp(FILE* stream)
+int _c66_common_fgetc(FILE* stream)
 {
     return fgetc(stream);
 }
 
-char* fgetsp(char* str, const int n, FILE* stream)
+char* _c66_common_fgets(char* str, const int n, FILE* stream)
 {
     return fgets(str, n, stream);
 }
 
-int fputcp(const int c, FILE* stream)
+int _c66_common_fputc(const int c, FILE* stream)
 {
     return fputc(c, stream);
 }
 
-int fputsp(const char* str, FILE* stream)
+int _c66_common_fputs(const char* str, FILE* stream)
 {
     return fputs(str, stream);
 }
 
-int getcharp(void)
+int _c66_common_getchar(void)
 {
     return getchar();
 }
 
-char* getsp(char* str)
+char* _c66_common_gets(char* str)
 {
     return fgets(str, 1024, stdin);
 }
 
-int putcharp(const int c)
+int _c66_common_putchar(const int c)
 {
     return putchar(c);
 }
 
-int putsp(const char* str)
+int _c66_common_puts(const char* str)
 {
     return puts(str);
 }
 
-int ungetcp(const int c, FILE* stream)
+int _c66_common_ungetc(const int c, FILE* stream)
 {
     return ungetc(c, stream);
 }
@@ -165,27 +165,27 @@ int ungetcp(const int c, FILE* stream)
 // ---------------------------------------------------------
 // File Positioning wrappers
 // ---------------------------------------------------------
-long ftellp(FILE* stream)
+long _c66_common_ftell(FILE* stream)
 {
     return ftell(stream);
 }
 
-int fgetposp(FILE* stream, fpos_t* pos)
+int _c66_common_fgetpos(FILE* stream, fpos_t* pos)
 {
     return fgetpos(stream, pos);
 }
 
-int fseekp(FILE* stream, const long offset, const int whence)
+int _c66_common_fseek(FILE* stream, const long offset, const int whence)
 {
     return fseek(stream, offset, whence);
 }
 
-int fsetposp(FILE* stream, const fpos_t* pos)
+int _c66_common_fsetpos(FILE* stream, const fpos_t* pos)
 {
     return fsetpos(stream, pos);
 }
 
-void rewindp(FILE* stream)
+void _c66_common_rewind(FILE* stream)
 {
     rewind(stream);
 }
@@ -193,12 +193,12 @@ void rewindp(FILE* stream)
 // ---------------------------------------------------------
 // File Operations wrappers
 // ---------------------------------------------------------
-int removep(const char* filename)
+int _c66_common_remove(const char* filename)
 {
     return remove(filename);
 }
 
-int renamep(const char* oldfilename, const char* newfilename)
+int _c66_common_rename(const char* oldfilename, const char* newfilename)
 {
     return rename(oldfilename, newfilename);
 }

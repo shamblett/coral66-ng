@@ -13,53 +13,53 @@
 // ---------------------------------------------------------
 // process information
 // ---------------------------------------------------------
-char* cuseridp(void)
+char* _c66_common_cuserid(void)
 {
     const struct passwd* pws = getpwuid(geteuid());
     return pws->pw_name;
 }
 
-int getegidp(void)
+int _c66_common_getegid(void)
 {
     return (int)getegid();
 }
 
-int geteuidp(void)
+int _c66_common_geteuid(void)
 {
     return (int)geteuid();
 }
 
-int getgidp(void)
+int _c66_common_getgid(void)
 {
     return (int)getgid();
 }
 
-int getpgidp(const int pid)
+int _c66_common_getpgid(const int pid)
 {
     return getpgid(pid);
 }
 
-int getpgrpp(void)
+int _c66_common_getpgrp(void)
 {
     return getpgrp();
 }
 
-int getpidp(void)
+int _c66_common_getpid(void)
 {
     return getpid();
 }
 
-int getppidp(void)
+int _c66_common_getppid(void)
 {
     return getppid();
 }
 
-int getsidp(const int pid)
+int _c66_common_getsid(const int pid)
 {
     return getsid(pid);
 }
 
-int getuidp(void)
+int _c66_common_getuid(void)
 {
     return getuid();
 }
@@ -67,12 +67,12 @@ int getuidp(void)
 // ---------------------------------------------------------
 // process control
 // ---------------------------------------------------------
-void exitp(const int code)
+void _c66_common_exit(const int code)
 {
     exit(code);
 }
 
-void sleepp(const int seconds)
+void _c66_common_sleep(const int seconds)
 {
     sleep(seconds);
 }
