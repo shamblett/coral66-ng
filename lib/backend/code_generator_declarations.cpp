@@ -123,15 +123,16 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
         else
         {
-            m_module.getOrInsertGlobal(var->getName(), llvmType);
-            llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(var->getName());
+            m_module.getOrInsertGlobal(var->getMangledName(), llvmType);
+            llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(var->getMangledName());
             if (declaration.isExternal())
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
             }
             else
             {
-                globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage : llvm::GlobalValue::ExternalLinkage);
+                globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage :
+                                                                        llvm::GlobalValue::ExternalLinkage);
                 if (!globalVar->hasInitializer() && initializer)
                 {
                     globalVar->setInitializer(initializer);
@@ -166,15 +167,16 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
         else
         {
-            m_module.getOrInsertGlobal(arr->getName(), llvmType);
-            llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(arr->getName());
+            m_module.getOrInsertGlobal(arr->getMangledName(), llvmType);
+            llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(arr->getMangledName());
             if (declaration.isExternal())
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
             }
             else
             {
-                globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage : llvm::GlobalValue::ExternalLinkage);
+                globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage :
+                                                                        llvm::GlobalValue::ExternalLinkage);
                 if (!globalVar->hasInitializer() && initializer)
                 {
                     globalVar->setInitializer(initializer);
@@ -209,15 +211,16 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
         else
         {
-            m_module.getOrInsertGlobal(tab->getName(), llvmType);
-            llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(tab->getName());
+            m_module.getOrInsertGlobal(tab->getMangledName(), llvmType);
+            llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(tab->getMangledName());
             if (declaration.isExternal())
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
             }
             else
             {
-                globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage : llvm::GlobalValue::ExternalLinkage);
+                globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage :
+                                                                        llvm::GlobalValue::ExternalLinkage);
                 if (!globalVar->hasInitializer() && initializer)
                 {
                     globalVar->setInitializer(initializer);
@@ -272,7 +275,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         }
 
         llvm::FunctionType* ft = llvm::FunctionType::get(retType, paramTypes, false);
-        llvm::FunctionCallee callee = m_module.getOrInsertFunction(proc->getName(), ft);
+        llvm::FunctionCallee callee = m_module.getOrInsertFunction(proc->getMangledName(), ft);
         llvm::Function* f = llvm::cast<llvm::Function>(callee.getCallee());
         f->setLinkage(llvm::Function::ExternalLinkage);
         m_globals[proc] = f;
@@ -306,10 +309,23 @@ void CodeGenerator::generateProcedure(const semantics::ProcedureDeclaration& pro
             {
                 std::string usableName;
                 const syntax::Node* usableAst = nullptr;
-                usable->match([&](const semantics::VariableDeclaration& v) { usableName = v.getName(); usableAst = v.getAstNode(); },
-                              [&](const semantics::ArrayDeclaration& a) { usableName = a.getName(); usableAst = a.getAstNode(); },
-                              [&](const semantics::TableDeclaration& t) { usableName = t.getName(); usableAst = t.getAstNode(); },
-                              [](const auto&) {});
+                usable->match(
+                    [&](const semantics::VariableDeclaration& v)
+                    {
+                        usableName = v.getMangledName();
+                        usableAst = v.getAstNode();
+                    },
+                    [&](const semantics::ArrayDeclaration& a)
+                    {
+                        usableName = a.getMangledName();
+                        usableAst = a.getAstNode();
+                    },
+                    [&](const semantics::TableDeclaration& t)
+                    {
+                        usableName = t.getMangledName();
+                        usableAst = t.getAstNode();
+                    },
+                    [](const auto&) {});
 
                 if (usableName == param.name)
                 {
@@ -396,7 +412,7 @@ void CodeGenerator::visit(const syntax::VariableDeclaration& declaration)
         if (auto* semVar = it->second->tryAs<semantics::VariableDeclaration>())
         {
             auto* llvmType = convertType(semVar->getType());
-            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semVar->getName());
+            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semVar->getMangledName());
             m_locals[it->second] = alloca;
         }
     }
@@ -410,7 +426,7 @@ void CodeGenerator::visit(const syntax::ArrayDeclaration& declaration)
         if (auto* semArr = it->second->tryAs<semantics::ArrayDeclaration>())
         {
             auto* llvmType = convertType(semArr->getType());
-            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semArr->getName());
+            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semArr->getMangledName());
             m_locals[it->second] = alloca;
         }
     }
@@ -424,7 +440,7 @@ void CodeGenerator::visit(const syntax::TableDeclaration& declaration)
         if (auto* semTab = it->second->tryAs<semantics::TableDeclaration>())
         {
             auto* llvmType = convertType(semTab->getType());
-            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semTab->getName());
+            auto* alloca = m_builder.CreateAlloca(llvmType, nullptr, semTab->getMangledName());
             m_locals[it->second] = alloca;
         }
     }

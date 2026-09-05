@@ -154,6 +154,25 @@ std::string_view Declaration::getName() const
     return "";
 }
 
+std::string Declaration::getMangledName() const
+{
+    std::string name(getName());
+    if (m_scopeDepth > 0)
+    {
+        return name; // Local variables are not mangled
+    }
+
+    switch (m_communicatorType)
+    {
+        case CommunicatorType::External: return name;
+        case CommunicatorType::Common: return "_c66_common_" + name;
+        case CommunicatorType::Library: return "_c66_lib_" + name;
+        case CommunicatorType::Absolute:
+        case CommunicatorType::None:
+        default: return "_c66_global_" + name;
+    }
+}
+
 // Expression Base
 lexer::CTokenIterator ExpressionBase::begin() const
 {

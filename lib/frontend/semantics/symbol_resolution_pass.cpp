@@ -49,7 +49,17 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
             }
             for (size_t i = usablesBefore; i < m_context.ownedUsables.size(); ++i)
             {
-                m_context.exportedSymbols.push_back(m_context.ownedUsables[i].get());
+                auto* usable = m_context.ownedUsables[i].get();
+                usable->match([&](VariableDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](ProcedureDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](ArrayDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](TableDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](OverlayDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](SwitchDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](LabelDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::Common); },
+                              [&](TableElementDeclaration& decl)
+                              { decl.setCommunicatorType(CommunicatorType::Common); });
+                m_context.exportedSymbols.push_back(usable);
             }
         }
         else if (auto* extCommunicator = dynamic_cast<const syntax::ExternalCommunicator*>(comm.get()))
@@ -62,14 +72,15 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
             for (size_t i = usablesBefore; i < m_context.ownedUsables.size(); ++i)
             {
                 auto* usable = m_context.ownedUsables[i].get();
-                usable->match([&](VariableDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](ProcedureDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](ArrayDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](TableDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](OverlayDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](SwitchDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](LabelDeclaration& decl) { decl.setIsExternal(true); },
-                              [&](TableElementDeclaration& decl) { decl.setIsExternal(true); });
+                usable->match([&](VariableDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](ProcedureDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](ArrayDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](TableDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](OverlayDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](SwitchDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](LabelDeclaration& decl) { decl.setCommunicatorType(CommunicatorType::External); },
+                              [&](TableElementDeclaration& decl)
+                              { decl.setCommunicatorType(CommunicatorType::External); });
             }
         }
         else if (auto* absoluteCommunicator = dynamic_cast<const syntax::AbsoluteCommunicator*>(comm.get()))
@@ -98,6 +109,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                         if (auto val = evaluateConstantInteger(*it->second))
                         {
                             decl->setAbsoluteAddress(*val);
+                            decl->setCommunicatorType(CommunicatorType::Absolute);
                         }
                         else
                         {
@@ -130,7 +142,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                     {
                         const auto name = decl->getName(); // Returns string_view
                         decl->setScopeDepth(m_context.symbolTable.scopeCount());
-                        decl->setIsExternal(true);
+                        decl->setCommunicatorType(CommunicatorType::Library);
 
                         // Convert to IntrusiveVariantValue
                         IntrVarPtr<Usable> usableDecl(decl.release());
@@ -737,18 +749,18 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
         }
         else if (auto* varNode = dynamic_cast<const syntax::VariableDeclaration*>(paramDeclarationNode.get()))
         {
-            auto baseTypeVal = createTypeFromToken(varNode->getType(), varNode->getFixedTotalBits(),
-                                                   varNode->getFixedFractionBits());
+            auto baseTypeVal =
+                createTypeFromToken(varNode->getType(), varNode->getFixedTotalBits(), varNode->getFixedFractionBits());
 
             IntrusiveVariantValue paramTypeVal{UntypedType{}};
-            
+
             if (baseTypeVal->is<PrimitiveType>())
-                paramTypeVal = IntrusiveVariantValue(
-                    PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+                paramTypeVal =
+                    IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
             else if (baseTypeVal->is<FixedType>())
-                paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
-                                                               baseTypeVal->as<FixedType>().getFractionalBits(),
-                                                               Type::Location});
+                paramTypeVal =
+                    IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                    baseTypeVal->as<FixedType>().getFractionalBits(), Type::Location});
             else
                 paramTypeVal = std::move(baseTypeVal);
 
@@ -757,9 +769,8 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
 
             for (const auto paramId : varNode->getIdentifiers())
             {
-                parameters.push_back({.type = finalParamTypePtr,
-                                      .name = std::get<std::string>(paramId->getValue()),
-                                      .isValue = false});
+                parameters.push_back(
+                    {.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = false});
             }
         }
         else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclarationNode.get()))
@@ -883,23 +894,23 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
         }
         else if (auto* varNode = dynamic_cast<const syntax::VariableDeclaration*>(paramDeclarationNode.get()))
         {
-            auto baseTypeVal = createTypeFromToken(varNode->getType(), varNode->getFixedTotalBits(),
-                                                   varNode->getFixedFractionBits());
+            auto baseTypeVal =
+                createTypeFromToken(varNode->getType(), varNode->getFixedTotalBits(), varNode->getFixedFractionBits());
 
             IntrusiveVariantValue paramTypeVal{UntypedType{}};
-            
+
             if (baseTypeVal->is<PrimitiveType>())
-                paramTypeVal = IntrusiveVariantValue(
-                    PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
+                paramTypeVal =
+                    IntrusiveVariantValue(PrimitiveType{baseTypeVal->as<PrimitiveType>().getKind(), Type::Location});
             else if (baseTypeVal->is<FixedType>())
-                paramTypeVal = IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
-                                                               baseTypeVal->as<FixedType>().getFractionalBits(),
-                                                               Type::Location});
+                paramTypeVal =
+                    IntrusiveVariantValue(FixedType{baseTypeVal->as<FixedType>().getTotalBits(),
+                                                    baseTypeVal->as<FixedType>().getFractionalBits(), Type::Location});
             else
                 paramTypeVal = std::move(baseTypeVal);
 
             m_context.ownedTypes.push_back(std::move(paramTypeVal));
-            
+
             for (size_t i = 0; i < varNode->getIdentifiers().size(); ++i)
                 parameters.push_back({.type = m_context.ownedTypes.back().data(), .name = "", .isValue = false});
         }
