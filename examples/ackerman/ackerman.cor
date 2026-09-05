@@ -57,24 +57,24 @@ LIBRARY ( stdio, time)
          'ANSWER' Ackermann (m - 1, Ackermann (m, n - 1));
    'END' Ackermann;
 
-   Newline;
-   Print("Function call benchmark, Ackermann (3, 6)");
-   Newline;
+   newline;
+   print("Function call benchmark, Ackermann (3, 6)");
+   newline;
 
-   starttime := Clock;
+   starttime := clock;
    ans := Ackermann (3,6);
-   stoptime := Clock;
+   stoptime := clock;
 
    'IF' ans <> EXPECTED 'THEN'
          'BEGIN'
-            Print("Result is wrong - Failed");
-            Newline;
+            print("Result is wrong - Failed");
+            newline;
             'GOTO' FailExit;
           'END';
 
 
-   Printfint("Time taken : %d milliseconds", 1000 * (stoptime - starttime) / CLOCKSPERSEC);
-   Newline;
+   printfint("Time taken : %d milliseconds", 1000 * (stoptime - starttime) / CLOCKSPERSEC);
+   newline;
 
 FailExit:
 

@@ -104,12 +104,14 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
     {
         auto* llvmType = convertType(var->getType());
         llvm::Constant* initializer = llvm::Constant::getNullValue(llvmType);
+        bool hasExplicitPreset = false;
 
         if (auto* astNode = dynamic_cast<const syntax::VariableDeclaration*>(var->getAstNode()))
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1);
+                hasExplicitPreset = true;
             }
         }
 
@@ -125,15 +127,31 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(var->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(var->getMangledName());
-            if (declaration.isExternal())
+            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External ||
+                declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
+            }
+            else if (declaration.getCommunicatorType() == semantics::CommunicatorType::Common)
+            {
+                if (hasExplicitPreset)
+                {
+                    globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
+                    if (!globalVar->hasInitializer())
+                        globalVar->setInitializer(initializer);
+                }
+                else
+                {
+                    globalVar->setLinkage(llvm::GlobalValue::CommonLinkage);
+                    if (!globalVar->hasInitializer())
+                        globalVar->setInitializer(initializer);
+                }
             }
             else
             {
                 globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage :
                                                                         llvm::GlobalValue::ExternalLinkage);
-                if (!globalVar->hasInitializer() && initializer)
+                if (!globalVar->hasInitializer())
                 {
                     globalVar->setInitializer(initializer);
                 }
@@ -145,6 +163,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
     {
         auto* llvmType = convertType(arr->getType());
         llvm::Constant* initializer = llvm::Constant::getNullValue(llvmType);
+        bool hasExplicitPreset = false;
 
         if (auto* astNode = dynamic_cast<const syntax::ArrayDeclaration*>(arr->getAstNode()))
         {
@@ -154,6 +173,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements);
+                hasExplicitPreset = true;
             }
         }
 
@@ -169,15 +189,31 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(arr->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(arr->getMangledName());
-            if (declaration.isExternal())
+            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External ||
+                declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
+            }
+            else if (declaration.getCommunicatorType() == semantics::CommunicatorType::Common)
+            {
+                if (hasExplicitPreset)
+                {
+                    globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
+                    if (!globalVar->hasInitializer())
+                        globalVar->setInitializer(initializer);
+                }
+                else
+                {
+                    globalVar->setLinkage(llvm::GlobalValue::CommonLinkage);
+                    if (!globalVar->hasInitializer())
+                        globalVar->setInitializer(initializer);
+                }
             }
             else
             {
                 globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage :
                                                                         llvm::GlobalValue::ExternalLinkage);
-                if (!globalVar->hasInitializer() && initializer)
+                if (!globalVar->hasInitializer())
                 {
                     globalVar->setInitializer(initializer);
                 }
@@ -189,6 +225,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
     {
         auto* llvmType = convertType(tab->getType());
         llvm::Constant* initializer = llvm::Constant::getNullValue(llvmType);
+        bool hasExplicitPreset = false;
 
         if (auto* astNode = dynamic_cast<const syntax::TableDeclaration*>(tab->getAstNode()))
         {
@@ -198,6 +235,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements);
+                hasExplicitPreset = true;
             }
         }
 
@@ -213,15 +251,31 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(tab->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(tab->getMangledName());
-            if (declaration.isExternal())
+            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External ||
+                declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
+            }
+            else if (declaration.getCommunicatorType() == semantics::CommunicatorType::Common)
+            {
+                if (hasExplicitPreset)
+                {
+                    globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
+                    if (!globalVar->hasInitializer())
+                        globalVar->setInitializer(initializer);
+                }
+                else
+                {
+                    globalVar->setLinkage(llvm::GlobalValue::CommonLinkage);
+                    if (!globalVar->hasInitializer())
+                        globalVar->setInitializer(initializer);
+                }
             }
             else
             {
                 globalVar->setLinkage(declaration.getScopeDepth() > 3 ? llvm::GlobalValue::InternalLinkage :
                                                                         llvm::GlobalValue::ExternalLinkage);
-                if (!globalVar->hasInitializer() && initializer)
+                if (!globalVar->hasInitializer())
                 {
                     globalVar->setInitializer(initializer);
                 }
