@@ -42,27 +42,27 @@ BEGIN
     tmzonel[0] := 0;
     tmzoneh[0] := 0;
 
-    Newline;
-    Print("Time library examples");
-    Newline;
+    newline;
+    print("Time library examples");
+    newline;
 
     COMMENT Call mktime, passing the location of the first element of the table. ;
     COMMENT This correctly passes the base pointer to the C-ABI function. ;
-    timeval := Mktime(tm);
-    Printfint("Timeval is : %d", timeval);
-    Newline;
+    timeval := mktime(tm);
+    printfint("Timeval is : %d", timeval);
+    newline;
     IF timeval = 1704112830 THEN
       BEGIN
-         Print("This is correct");
+         print("This is correct");
       END
     ELSE
       BEGIN
-        Printfint("Oops - timeval is incorrect : %d - exiting", timeval);
-        Newline;
-        Exit(-1)
+        printfint("Oops - timeval is incorrect : %d - exiting", timeval);
+        newline;
+        exit(-1)
       END;
 
-    Newline;
+    newline;
 
 
 END

@@ -22,6 +22,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "status",
+                "MangledName": "status",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",

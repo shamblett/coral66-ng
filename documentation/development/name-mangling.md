@@ -95,6 +95,7 @@ Variables declared inside procedures or blocks.
 *   **Format:** `<identifier>`
 *   **Rationale:** Local variables are not visible to the linker.
 
+
 ### 4. Demangling (For Diagnostics)
 The compiler's error reporting (e.g., in `semantic_context` or `astdump`) and debugging output should implement a demangling utility to ensure users see original Coral 66 names.
 *   If a string starts with `_c66_common_`, strip it and report as `COMMON <name>`.

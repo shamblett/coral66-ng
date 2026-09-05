@@ -55,6 +55,15 @@ enum class ValueCategory : std::uint8_t
     Rvalue
 };
 
+enum class CommunicatorType : std::uint8_t
+{
+    None,
+    Common,
+    External,
+    Library,
+    Absolute
+};
+
 class ScopePoint
 {
     std::size_t m_scopeId;
@@ -865,7 +874,7 @@ class Declaration : public Usable
     const syntax::Declaration* m_astNode = nullptr;
     int m_scopeDepth = 0;
     std::optional<std::uint64_t> m_absoluteAddress = std::nullopt;
-    bool m_isExternal = false;
+    CommunicatorType m_communicatorType = CommunicatorType::None;
 
 protected:
     template <class T>
@@ -881,6 +890,7 @@ public:
         return m_nameToken;
     }
     [[nodiscard]] std::string_view getName() const;
+    [[nodiscard]] std::string getMangledName() const;
 
     void setAstNode(const syntax::Declaration* node)
     {
@@ -910,13 +920,18 @@ public:
         return m_absoluteAddress;
     }
 
-    void setIsExternal(const bool isExternal)
+    void setCommunicatorType(const CommunicatorType type)
     {
-        m_isExternal = isExternal;
+        m_communicatorType = type;
+    }
+    [[nodiscard]] CommunicatorType getCommunicatorType() const
+    {
+        return m_communicatorType;
     }
     [[nodiscard]] bool isExternal() const
     {
-        return m_isExternal;
+        return m_communicatorType == CommunicatorType::External || m_communicatorType == CommunicatorType::Common
+               || m_communicatorType == CommunicatorType::Library;
     }
 };
 

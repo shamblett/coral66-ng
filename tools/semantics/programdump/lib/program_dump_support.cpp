@@ -29,6 +29,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "VariableDeclaration", m_alloc);
             const auto name = variableDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = variableDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(variableDeclaration.getType()), m_alloc);
             return obj;
         },
@@ -38,6 +41,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "ProcedureDeclaration", m_alloc);
             const auto name = procedureDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = procedureDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(procedureDeclaration.getType()), m_alloc);
             return obj;
         },
@@ -47,6 +53,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "LabelDeclaration", m_alloc);
             const auto name = labelDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = labelDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             return obj;
         },
         [&](const semantics::TableElementDeclaration& tableElementDeclaration)
@@ -55,6 +64,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "TableElementDeclaration", m_alloc);
             const auto name = tableElementDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = tableElementDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(tableElementDeclaration.getType()), m_alloc);
             if (const auto bitPos = tableElementDeclaration.getBitPosition())
             {
@@ -73,6 +85,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "ArrayDeclaration", m_alloc);
             const auto name = arrayDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = arrayDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(arrayDeclaration.getType()), m_alloc);
             return obj;
         },
@@ -82,6 +97,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "TableDeclaration", m_alloc);
             const auto name = tableDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = tableDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(tableDeclaration.getType()), m_alloc);
             return obj;
         },
@@ -91,6 +109,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "OverlayDeclaration", m_alloc);
             const auto name = overlayDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = overlayDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(overlayDeclaration.getType()), m_alloc);
             return obj;
         },
@@ -100,6 +121,9 @@ rapidjson::Value ProgramDump::dump(const semantics::Usable* usable) const
             obj.AddMember("Kind", "SwitchDeclaration", m_alloc);
             const auto name = switchDeclaration.getName();
             obj.AddMember("Name", rapidjson::StringRef(name.data(), name.size()), m_alloc);
+            const auto mangledName = switchDeclaration.getMangledName();
+            rapidjson::Value mnValue(mangledName.c_str(), m_alloc);
+            obj.AddMember("MangledName", mnValue, m_alloc);
             obj.AddMember("Type", dump(switchDeclaration.getType()), m_alloc);
             for (const auto label : switchDeclaration.getLabels())
             {

@@ -66,6 +66,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -85,6 +86,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "size",
+                "MangledName": "size",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -104,6 +106,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -123,6 +126,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "fallback",
+                "MangledName": "fallback",
                 "Type": {
                     "Name": "LabelType"
                 }
@@ -138,6 +142,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "mode",
+                "MangledName": "mode",
                 "Type": {
                     "Name": "SwitchType"
                 }
@@ -153,6 +158,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "sum",
+                "MangledName": "sum",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -172,6 +178,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "process",
+                "MangledName": "process",
                 "Type": {
                     "Parameters": [
                         {
@@ -231,6 +238,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "dataArr",
+                "MangledName": "dataArr",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -258,7 +266,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "fallbackLabel"
+                "Name": "fallbackLabel",
+                "MangledName": "fallbackLabel"
             }
         },
         {
@@ -271,6 +280,7 @@
             "Usable": {
                 "Kind": "SwitchDeclaration",
                 "Name": "modeSwitch",
+                "MangledName": "modeSwitch",
                 "Type": {
                     "Name": "SwitchType"
                 }
@@ -285,7 +295,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "endProc"
+                "Name": "endProc",
+                "MangledName": "endProc"
             }
         },
         {
@@ -298,6 +309,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "sum",
+                "MangledName": "sum",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -316,7 +328,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "endProc"
+                "Name": "endProc",
+                "MangledName": "endProc"
             }
         },
         {
@@ -329,6 +342,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "sum",
+                "MangledName": "sum",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -347,7 +361,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "endProc"
+                "Name": "endProc",
+                "MangledName": "endProc"
             }
         },
         {
@@ -360,6 +375,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "sum",
+                "MangledName": "sum",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -379,6 +395,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "sum",
+                "MangledName": "sum",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -398,6 +415,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "sum",
+                "MangledName": "sum",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",

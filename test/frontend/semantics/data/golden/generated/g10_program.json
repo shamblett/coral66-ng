@@ -42,6 +42,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "printString",
+                "MangledName": "printString",
                 "Type": {
                     "Parameters": [
                         {
@@ -69,6 +70,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -88,6 +90,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -107,6 +110,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "z",
+                "MangledName": "z",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -126,6 +130,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -145,6 +150,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -164,6 +170,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "z",
+                "MangledName": "z",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -183,6 +190,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -202,6 +210,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -221,6 +230,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "printString",
+                "MangledName": "printString",
                 "Type": {
                     "Parameters": [
                         {

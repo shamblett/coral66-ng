@@ -308,11 +308,11 @@ LIBRARY ( stdio, time)
       e1[l] := e1[j];
    'END';
 
-   Newline;
-   Print("Whetstone scientific benchmark");
-   Newline;
+   newline;
+   print("Whetstone scientific benchmark");
+   newline;
 
-   startTime := Clock;
+   startTime := clock;
  
    'COMMENT' initialize constants ;
 
@@ -332,14 +332,14 @@ LIBRARY ( stdio, time)
    n7 := 32 * i;   n8 := 899 * i;  n9 := 616 * i;
    n10 := 0;       n11 := 93 * i;
 
-   Printfint("Number of times is : %d", ntimes);
-   Newline;
+   printfint("Number of times is : %d", ntimes);
+   newline;
 
    'FOR' cycleno := 1 'STEP' 1 'UNTIL' ntimes 'DO'
       'BEGIN'
 
          'COMMENT' module 1: simple identifiers ;
-         Print("Simple Identifiers");
+         print("Simple Identifiers");
    
          x1 := 1.0;
          x2 := -1.0;
@@ -355,7 +355,7 @@ LIBRARY ( stdio, time)
          'END';
    
          'COMMENT' module 2: array elements ;
-         Print("Array Elements");
+         print("Array Elements");
       
          e1[1] := 1.0;
          e1[2] := -1.0;
@@ -372,14 +372,14 @@ LIBRARY ( stdio, time)
       
 
          'COMMENT' module 3: as array parameter ;
-         Print("As Array Parameter");
+         print("As Array Parameter");
       
          'FOR' i:= 1 'STEP' 1 'UNTIL' n3 'DO'
             pa (e1);
       
       
          'COMMENT' module 4: conditional jumps ;
-         Print("Conditional Jumps");
+         print("Conditional Jumps");
       
          j := 1;
          'FOR' i := 1 'STEP' 1 'UNTIL' n4 'DO'
@@ -404,7 +404,7 @@ LIBRARY ( stdio, time)
          'COMMENT' module 5: omitted ;
     
          'COMMENT' module 6: integer arithmetic ;
-         Print("Integer Arithmetic");
+         print("Integer Arithmetic");
       
          j := 1;   k := 2;   l := 3;
       
@@ -419,7 +419,7 @@ LIBRARY ( stdio, time)
       
       
          'COMMENT' module 7: trig functions ;
-         Print("Trig Functions");
+         print("Trig Functions");
 
          x := 0.5;
          y := 0.5;
@@ -434,7 +434,7 @@ LIBRARY ( stdio, time)
 
 
          'COMMENT' module 8: procedure calls ;
-         Print("Procedure Calls");
+         print("Procedure Calls");
       
          x := 1.0;
          y := 1.0;
@@ -445,7 +445,7 @@ LIBRARY ( stdio, time)
       
       
          'COMMENT' module 9: array references ;
-         Print("Array References");
+         print("Array References");
       
          j := 1;  
          k := 2;  
@@ -473,7 +473,7 @@ LIBRARY ( stdio, time)
       
    
          'COMMENT' module 11: standard functions ;
-         Print("Standard Functions");
+         print("Standard Functions");
       
          x := 0.75;
          'FOR' i := 1 'STEP' 1 'UNTIL' n11 'DO'
@@ -483,14 +483,14 @@ LIBRARY ( stdio, time)
     
    'COMMENT' Get stop time after ntimes ;
 
-   stopTime := Clock;
+   stopTime := clock;
 
    'COMMENT'  Now compute number of K Whetstones per sec;
 
    rating := 1000.0 * CLOCKSPERSEC * ntimes / (stopTime - startTime);
 
-   Printfint("Rating = %d KWIPS", rating);
-   Newline;
+   printfint("Rating = %d KWIPS", rating);
+   newline;
 
 'END' main
 

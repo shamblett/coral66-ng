@@ -34,6 +34,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val1",
+                "MangledName": "val1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -53,6 +54,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "fval",
+                "MangledName": "fval",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -72,6 +74,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val2",
+                "MangledName": "val2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -91,6 +94,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "myArr",
+                "MangledName": "myArr",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -119,6 +123,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "result",
+                "MangledName": "result",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -138,6 +143,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val1",
+                "MangledName": "val1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -157,6 +163,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val2",
+                "MangledName": "val2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",

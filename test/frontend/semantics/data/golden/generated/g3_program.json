@@ -42,6 +42,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "myState",
+                "MangledName": "myState",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -61,6 +62,7 @@
             "Usable": {
                 "Kind": "SwitchDeclaration",
                 "Name": "mySwitch",
+                "MangledName": "mySwitch",
                 "Type": {
                     "Name": "SwitchType"
                 }
@@ -76,6 +78,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "myState",
+                "MangledName": "myState",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -95,6 +98,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "statusVal",
+                "MangledName": "statusVal",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -113,7 +117,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "endLabel"
+                "Name": "endLabel",
+                "MangledName": "endLabel"
             }
         },
         {
@@ -126,6 +131,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "statusVal",
+                "MangledName": "statusVal",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -144,7 +150,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "endLabel"
+                "Name": "endLabel",
+                "MangledName": "endLabel"
             }
         },
         {
@@ -157,6 +164,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "statusVal",
+                "MangledName": "statusVal",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -176,6 +184,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "statusVal",
+                "MangledName": "statusVal",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -195,6 +204,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "statusVal",
+                "MangledName": "statusVal",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",

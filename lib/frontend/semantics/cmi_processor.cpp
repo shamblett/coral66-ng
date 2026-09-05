@@ -155,6 +155,17 @@ rapidjson::Document CMIProcessor::createDocument(const std::string& libraryName,
         rapidjson::Value symbolObj(rapidjson::kObjectType);
         symbolObj.AddMember("name", rapidjson::Value(name.c_str(), allocator), allocator);
 
+        std::string commTypeStr;
+        switch (declaration->getCommunicatorType())
+        {
+            case CommunicatorType::External: commTypeStr = "External"; break;
+            case CommunicatorType::Common: commTypeStr = "Common"; break;
+            case CommunicatorType::Library: commTypeStr = "Library"; break;
+            case CommunicatorType::Absolute: commTypeStr = "Absolute"; break;
+            default: commTypeStr = "None"; break;
+        }
+        symbolObj.AddMember("communicator_type", rapidjson::Value(commTypeStr.c_str(), allocator), allocator);
+
         if (auto* variableDeclaration = declaration->tryAs<VariableDeclaration>())
         {
             symbolObj.AddMember("symbol_category", "data", allocator);
@@ -331,6 +342,22 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
         std::string name = sym["name"].GetString();
         std::string category = sym["symbol_category"].GetString();
 
+        CommunicatorType commType = CommunicatorType::Library;
+        if (sym.HasMember("communicator_type"))
+        {
+            std::string ctStr = sym["communicator_type"].GetString();
+            if (ctStr == "Common")
+                commType = CommunicatorType::Common;
+            else if (ctStr == "External")
+                commType = CommunicatorType::External;
+            else if (ctStr == "Library")
+                commType = CommunicatorType::Library;
+            else if (ctStr == "Absolute")
+                commType = CommunicatorType::Absolute;
+            else
+                commType = CommunicatorType::None;
+        }
+
         lexer::CTokenIterator syntheticToken = createSyntheticIdentifierToken(name);
 
         if (category == "data")
@@ -341,6 +368,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 IntrusiveVariantValue<Type> type = stringToType(typeStr);
 
                 auto variableDeclaration = std::make_unique<VariableDeclaration>(syntheticToken, std::move(type));
+                variableDeclaration->setCommunicatorType(commType);
                 importedSymbols.push_back(std::move(variableDeclaration));
             }
         }
@@ -389,6 +417,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 auto procedureDeclaration =
                     std::make_unique<ProcedureDeclaration>(syntheticToken, std::move(procedureType));
 
+                procedureDeclaration->setCommunicatorType(commType);
                 importedSymbols.push_back(std::move(procedureDeclaration));
             }
         }
@@ -418,6 +447,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 auto arrayType = IntrusiveVariantValue(std::in_place_type<ArrayType>, elemType, std::move(dimensions));
                 auto arrayDeclaration = std::make_unique<ArrayDeclaration>(syntheticToken, std::move(arrayType));
 
+                arrayDeclaration->setCommunicatorType(commType);
                 importedSymbols.push_back(std::move(arrayDeclaration));
             }
         }
@@ -451,6 +481,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 auto tableType = IntrusiveVariantValue(std::in_place_type<TableType>, g_syntheticTableInfos.back());
                 auto tableDeclaration = std::make_unique<TableDeclaration>(syntheticToken, std::move(tableType));
 
+                tableDeclaration->setCommunicatorType(commType);
                 importedSymbols.push_back(std::move(tableDeclaration));
             }
         }
@@ -484,6 +515,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                     IntrusiveVariantValue(std::in_place_type<OverlayType>, g_syntheticOverlayInfos.back());
                 auto overlayDeclaration = std::make_unique<OverlayDeclaration>(syntheticToken, std::move(overlayType));
 
+                overlayDeclaration->setCommunicatorType(commType);
                 importedSymbols.push_back(std::move(overlayDeclaration));
             }
         }
@@ -523,6 +555,7 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
                 auto tableElementDeclaration = std::make_unique<TableElementDeclaration>(
                     syntheticToken, std::move(type), isUnsigned, wordPos, bitPos, parentTable);
 
+                tableElementDeclaration->setCommunicatorType(commType);
                 importedSymbols.push_back(std::move(tableElementDeclaration));
             }
         }

@@ -11,17 +11,17 @@
 // ---------------------------------------------------------
 // time manipulation family wrappers
 // ---------------------------------------------------------
-double difftimep(time_t time_end, time_t time_beg)
+double _c66_common_difftime(time_t time_end, time_t time_beg)
 {
     return (float)difftime(time_end, time_beg);
 }
 
-time_t timep(time_t* arg)
+time_t _c66_common_time(time_t* arg)
 {
     return time(arg);
 }
 
-int clockp(void)
+int _c66_common_clock(void)
 {
     return (int)clock();
 }
@@ -29,32 +29,32 @@ int clockp(void)
 // ---------------------------------------------------------
 // format conversion family wrappers
 // ---------------------------------------------------------
-char* asctimep(const struct tm* time_ptr)
+char* _c66_common_asctime(const struct tm* time_ptr)
 {
     return asctime(time_ptr);
 }
 
-char* ctimep(const time_t* timer)
+char* _c66_common_ctime(const time_t* timer)
 {
     return ctime(timer);
 }
 
-size_t strftimep(char* str, size_t count, const char* format, const struct tm* tp)
+size_t _c66_common_strftime(char* str, size_t count, const char* format, const struct tm* tp)
 {
     return strftime(str, count, format, tp);
 }
 
-struct tm* gmtimep(const time_t* timer)
+struct tm* _c66_common_gmtime(const time_t* timer)
 {
     return gmtime(timer);
 }
 
-struct tm* localtimep(const time_t* timer)
+struct tm* _c66_common_localtime(const time_t* timer)
 {
     return localtime(timer);
 }
 
-time_t mktimep(struct tm* arg)
+time_t _c66_common_mktime(struct tm* arg)
 {
     return mktime(arg);
 }

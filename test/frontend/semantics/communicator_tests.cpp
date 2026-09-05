@@ -62,6 +62,9 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         CHECK(findDeclarationComm(res.context, "A") != nullptr);
+        auto* declA = findDeclarationComm(res.context, "A");
+        CHECK(declA->as<semantics::VariableDeclaration>().getCommunicatorType() == semantics::CommunicatorType::Common);
+        CHECK(declA->as<semantics::VariableDeclaration>().getMangledName() == "_c66_common_A");
         CHECK(findDeclarationComm(res.context, "B") != nullptr);
         CHECK(findDeclarationComm(res.context, "I") != nullptr);
         CHECK(res.errors == false);
@@ -73,6 +76,9 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         SymbolResolutionResult res(parsed);
 
         CHECK(findDeclarationComm(res.context, "A") != nullptr);
+        auto* declA = findDeclarationComm(res.context, "A");
+        CHECK(declA->as<semantics::VariableDeclaration>().getCommunicatorType() == semantics::CommunicatorType::Common);
+        CHECK(declA->as<semantics::VariableDeclaration>().getMangledName() == "_c66_common_A");
         CHECK(findDeclarationComm(res.context, "B") != nullptr);
         CHECK(findDeclarationComm(res.context, "I") != nullptr);
         CHECK(res.errors == false);
@@ -88,6 +94,9 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         CHECK(procedureDeclaration != nullptr);
         CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(res.errors == false);
+        CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getCommunicatorType()
+              == semantics::CommunicatorType::Common);
+        CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getMangledName() == "_c66_common_P");
     }
 
     SECTION("Procedure Specification in Common With Pointer Type")
@@ -100,6 +109,9 @@ TEST_CASE("Symbol Resolution - Common Communicators", "[Semantics][SymbolResolut
         CHECK(procedureDeclaration != nullptr);
         CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(res.errors == false);
+        CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getCommunicatorType()
+              == semantics::CommunicatorType::Common);
+        CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getMangledName() == "_c66_common_P");
     }
 
     SECTION("Place Specification in Common")
@@ -161,6 +173,9 @@ TEST_CASE("Symbol Resolution - External Communicators", "[Semantics][SymbolResol
         CHECK(procedureDeclaration != nullptr);
         CHECK(procedureDeclaration->is<semantics::ProcedureDeclaration>());
         CHECK(res.errors == false);
+        CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getCommunicatorType()
+              == semantics::CommunicatorType::External);
+        CHECK(procedureDeclaration->as<semantics::ProcedureDeclaration>().getMangledName() == "P");
     }
 
     SECTION("Error on duplicate symbol in EXTERNAL communicator")
@@ -224,6 +239,8 @@ TEST_CASE("Symbol Resolution - Absolute Communicators", "[Semantics][SymbolResol
         auto varDeclX = xVar->tryAs<semantics::VariableDeclaration>();
         CHECK(varDeclX != nullptr);
         CHECK(varDeclX->getAbsoluteAddress() == 1024);
+        CHECK(varDeclX->getCommunicatorType() == semantics::CommunicatorType::Absolute);
+        CHECK(varDeclX->getMangledName() == "_c66_global_X");
 
         auto yVar = findDeclarationComm(res.context, "Y");
         CHECK(yVar != nullptr);
@@ -244,6 +261,8 @@ TEST_CASE("Symbol Resolution - Absolute Communicators", "[Semantics][SymbolResol
         auto arrDecl = aVar->tryAs<semantics::ArrayDeclaration>();
         CHECK(arrDecl != nullptr);
         CHECK(arrDecl->getAbsoluteAddress() == 4096);
+        CHECK(arrDecl->getCommunicatorType() == semantics::CommunicatorType::Absolute);
+        CHECK(arrDecl->getMangledName() == "_c66_global_A");
     }
 
     SECTION("Absolute Tables With Address")
@@ -258,6 +277,8 @@ TEST_CASE("Symbol Resolution - Absolute Communicators", "[Semantics][SymbolResol
         auto tabDecl = tVar->tryAs<semantics::TableDeclaration>();
         REQUIRE(tabDecl != nullptr);
         CHECK(tabDecl->getAbsoluteAddress() == 8192);
+        CHECK(tabDecl->getCommunicatorType() == semantics::CommunicatorType::Absolute);
+        CHECK(tabDecl->getMangledName() == "_c66_global_T");
     }
 
     SECTION("Absolute Address Evaluation Failure")
