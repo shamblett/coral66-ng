@@ -54,6 +54,11 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
         CHECK(cmiString.find("\"name\": \"my_var\"") != std::string::npos);
         CHECK(cmiString.find("\"symbol_category\": \"data\"") != std::string::npos);
         CHECK(cmiString.find("\"data_type\": \"INTEGER\"") != std::string::npos);
+        CHECK(cmiString.find("\"communicator_type\": \"None\"") != std::string::npos);
+
+        varDecl.setCommunicatorType(CommunicatorType::Common);
+        cmiString = CMIProcessor::generateCMIString("test_lib", exportedSymbols);
+        CHECK(cmiString.find("\"communicator_type\": \"Common\"") != std::string::npos);
     }
 
     SECTION("Procedure Generation")
@@ -290,6 +295,7 @@ TEST_CASE("CMI Processor Parsing", "[Semantics][CMI]")
                     "name": "parsed_arr",
                     "symbol_category": "array",
                     "data_type": "BITS",
+                    "communicator_type": "Common",
                     "dimensions": [10, 20]
                 }
             ]
@@ -301,6 +307,7 @@ TEST_CASE("CMI Processor Parsing", "[Semantics][CMI]")
 
         auto* decl = importedSymbols[0].get();
         CHECK(decl->getName() == "parsed_arr");
+        CHECK(decl->getCommunicatorType() == CommunicatorType::Common);
         REQUIRE(decl->is<ArrayDeclaration>());
         auto* arrDecl = decl->tryAs<ArrayDeclaration>();
         REQUIRE(arrDecl->getType().is<ArrayType>());

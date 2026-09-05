@@ -157,7 +157,7 @@ std::string_view Declaration::getName() const
 std::string Declaration::getMangledName() const
 {
     std::string name(getName());
-    if (m_scopeDepth > 0)
+    if (m_scopeDepth > 2)
     {
         return name; // Local variables are not mangled
     }
