@@ -22,6 +22,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "counter",
+                "MangledName": "counter",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -41,6 +42,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "floatArray",
+                "MangledName": "floatArray",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -69,6 +71,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "counter",
+                "MangledName": "counter",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",

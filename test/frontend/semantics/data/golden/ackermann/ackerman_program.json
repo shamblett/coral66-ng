@@ -54,6 +54,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "m",
+                "MangledName": "m",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -73,6 +74,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n",
+                "MangledName": "n",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -92,6 +94,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n",
+                "MangledName": "n",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -111,6 +114,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "Ackermann",
+                "MangledName": "Ackermann",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -156,6 +160,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "m",
+                "MangledName": "m",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -175,6 +180,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "Ackermann",
+                "MangledName": "Ackermann",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -220,6 +226,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "m",
+                "MangledName": "m",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -239,6 +246,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "Ackermann",
+                "MangledName": "Ackermann",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -284,6 +292,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "m",
+                "MangledName": "m",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -303,6 +312,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n",
+                "MangledName": "n",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -322,6 +332,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "ans",
+                "MangledName": "ans",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -341,6 +352,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "Ackermann",
+                "MangledName": "Ackermann",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",

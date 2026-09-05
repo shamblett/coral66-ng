@@ -70,6 +70,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "iter",
+                "MangledName": "iter",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -89,6 +90,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "count",
+                "MangledName": "count",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -108,6 +110,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -127,6 +130,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "Flags",
+                "MangledName": "Flags",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -155,6 +159,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -174,6 +179,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -193,6 +199,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "Flags",
+                "MangledName": "Flags",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -221,6 +228,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -240,6 +248,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "prime",
+                "MangledName": "prime",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -259,6 +268,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -278,6 +288,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -297,6 +308,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -316,6 +328,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -335,6 +348,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "prime",
+                "MangledName": "prime",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -354,6 +368,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -373,6 +388,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -392,6 +408,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -411,6 +428,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "Flags",
+                "MangledName": "Flags",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -439,6 +457,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -458,6 +477,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -477,6 +497,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -496,6 +517,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "prime",
+                "MangledName": "prime",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -515,6 +537,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "count",
+                "MangledName": "count",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -534,6 +557,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "count",
+                "MangledName": "count",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -553,6 +577,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "count",
+                "MangledName": "count",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -572,6 +597,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "ans",
+                "MangledName": "ans",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -591,6 +617,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "sieve",
+                "MangledName": "sieve",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",

@@ -34,6 +34,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val",
+                "MangledName": "val",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -53,6 +54,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "computeStatus",
+                "MangledName": "computeStatus",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -87,6 +89,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val",
+                "MangledName": "val",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -105,7 +108,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "errorPoint"
+                "Name": "errorPoint",
+                "MangledName": "errorPoint"
             }
         },
         {
@@ -118,6 +122,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "sharedArr",
+                "MangledName": "sharedArr",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -146,6 +151,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val",
+                "MangledName": "val",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -164,7 +170,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "skipError"
+                "Name": "skipError",
+                "MangledName": "skipError"
             }
         },
         {
@@ -177,6 +184,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val",
+                "MangledName": "val",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -196,6 +204,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "val",
+                "MangledName": "val",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",

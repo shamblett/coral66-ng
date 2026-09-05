@@ -346,6 +346,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -365,6 +366,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -384,6 +386,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -403,6 +406,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -422,6 +426,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -441,6 +446,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "fabsf",
+                "MangledName": "fabsf",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -475,6 +481,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -494,6 +501,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xint",
+                "MangledName": "xint",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -513,6 +521,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -532,6 +541,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -551,6 +561,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -570,6 +581,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xint",
+                "MangledName": "xint",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -589,6 +601,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -608,6 +621,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -627,6 +641,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -646,6 +661,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -665,6 +681,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -684,6 +701,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -703,6 +721,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -722,6 +741,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -741,6 +761,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -760,6 +781,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -779,6 +801,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -798,6 +821,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -817,6 +841,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -836,6 +861,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -855,6 +881,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -874,6 +901,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -893,6 +921,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -912,6 +941,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -931,6 +961,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -950,6 +981,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -969,6 +1001,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -988,6 +1021,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1007,6 +1041,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "sin",
+                "MangledName": "sin",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -1041,6 +1076,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1060,6 +1096,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1079,6 +1116,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1098,6 +1136,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "fabsf",
+                "MangledName": "fabsf",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -1132,6 +1171,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1151,6 +1191,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1170,6 +1211,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1189,6 +1231,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1208,6 +1251,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1227,6 +1271,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1246,6 +1291,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1265,6 +1311,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1284,6 +1331,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1303,6 +1351,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1322,6 +1371,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1341,6 +1391,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1360,6 +1411,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1379,6 +1431,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a2",
+                "MangledName": "a2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1398,6 +1451,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "a",
+                "MangledName": "a",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1417,6 +1471,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "fabsf",
+                "MangledName": "fabsf",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -1451,6 +1506,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1470,6 +1526,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1489,6 +1546,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1508,6 +1566,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1527,6 +1586,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1546,6 +1606,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1565,6 +1626,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1584,6 +1646,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rootpwr",
+                "MangledName": "rootpwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1603,6 +1666,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1622,6 +1686,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1641,6 +1706,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1660,6 +1726,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1679,6 +1746,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1698,6 +1766,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rootpwr",
+                "MangledName": "rootpwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1717,6 +1786,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rootpwr",
+                "MangledName": "rootpwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1736,6 +1806,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1755,6 +1826,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1774,6 +1846,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1793,6 +1866,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1812,6 +1886,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1831,6 +1906,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rootpwr",
+                "MangledName": "rootpwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1850,6 +1926,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rootpwr",
+                "MangledName": "rootpwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1869,6 +1946,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1888,6 +1966,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1907,6 +1986,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1926,6 +2006,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1945,6 +2026,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1964,6 +2046,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -1983,6 +2066,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2002,6 +2086,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2021,6 +2106,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2040,6 +2126,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2059,6 +2146,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2078,6 +2166,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2097,6 +2186,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2116,6 +2206,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2135,6 +2226,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rootpwr",
+                "MangledName": "rootpwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2154,6 +2246,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2173,6 +2266,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "epwr",
+                "MangledName": "epwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2192,6 +2286,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2211,6 +2306,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "fabsf",
+                "MangledName": "fabsf",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -2245,6 +2341,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2264,6 +2361,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2283,6 +2381,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "fabsf",
+                "MangledName": "fabsf",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -2317,6 +2416,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2336,6 +2436,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2355,6 +2456,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "epwr",
+                "MangledName": "epwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2374,6 +2476,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "epwr",
+                "MangledName": "epwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2393,6 +2496,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2412,6 +2516,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2431,6 +2536,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2450,6 +2556,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2469,6 +2576,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2488,6 +2596,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2507,6 +2616,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2526,6 +2636,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2545,6 +2656,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2564,6 +2676,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2583,6 +2696,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2602,6 +2716,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2621,6 +2736,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2640,6 +2756,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2659,6 +2776,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "epwr",
+                "MangledName": "epwr",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2678,6 +2796,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2697,6 +2816,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2716,6 +2836,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2735,6 +2856,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2754,6 +2876,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xlog",
+                "MangledName": "xlog",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2773,6 +2896,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2792,6 +2916,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2811,6 +2936,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2830,6 +2956,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2849,6 +2976,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2868,6 +2996,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xlog",
+                "MangledName": "xlog",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2887,6 +3016,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xlog",
+                "MangledName": "xlog",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2906,6 +3036,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2925,6 +3056,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2944,6 +3076,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2963,6 +3096,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -2982,6 +3116,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3001,6 +3136,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xlog",
+                "MangledName": "xlog",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3020,6 +3156,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xlog",
+                "MangledName": "xlog",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3039,6 +3176,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3058,6 +3196,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3077,6 +3216,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac",
+                "MangledName": "frac",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3096,6 +3236,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3115,6 +3256,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xnorm",
+                "MangledName": "xnorm",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3134,6 +3276,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac2",
+                "MangledName": "frac2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3153,6 +3296,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac",
+                "MangledName": "frac",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3172,6 +3316,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac",
+                "MangledName": "frac",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3191,6 +3336,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3210,6 +3356,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac2",
+                "MangledName": "frac2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3229,6 +3376,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac2",
+                "MangledName": "frac2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3248,6 +3396,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac2",
+                "MangledName": "frac2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3267,6 +3416,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac2",
+                "MangledName": "frac2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3286,6 +3436,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "frac",
+                "MangledName": "frac",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3305,6 +3456,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3324,6 +3476,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "xlog",
+                "MangledName": "xlog",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3343,6 +3496,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "log10",
+                "MangledName": "log10",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -3377,6 +3531,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3396,6 +3551,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -3415,6 +3571,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3441,6 +3598,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3467,6 +3625,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3493,6 +3652,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3519,6 +3679,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3545,6 +3706,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3564,6 +3726,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3590,6 +3753,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3616,6 +3780,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3642,6 +3807,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3668,6 +3834,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3694,6 +3861,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3713,6 +3881,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3739,6 +3908,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3765,6 +3935,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3791,6 +3962,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3817,6 +3989,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3843,6 +4016,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -3862,6 +4036,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3888,6 +4063,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3914,6 +4090,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3940,6 +4117,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3966,6 +4144,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e",
+                "MangledName": "e",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -3992,6 +4171,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t2",
+                "MangledName": "t2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4011,6 +4191,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4030,6 +4211,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4049,6 +4231,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4067,7 +4250,8 @@
             },
             "Usable": {
                 "Kind": "LabelDeclaration",
-                "Name": "lab"
+                "Name": "lab",
+                "MangledName": "lab"
             }
         },
         {
@@ -4080,6 +4264,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -4108,6 +4293,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4127,6 +4313,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -4155,6 +4342,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4174,6 +4362,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -4202,6 +4391,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4221,6 +4411,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -4249,6 +4440,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4268,6 +4460,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -4296,6 +4489,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4315,6 +4509,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -4343,6 +4538,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4362,6 +4558,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4381,6 +4578,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4400,6 +4598,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4419,6 +4618,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4438,6 +4638,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4457,6 +4658,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4476,6 +4678,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4495,6 +4698,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4514,6 +4718,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "z",
+                "MangledName": "z",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4533,6 +4738,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4552,6 +4758,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4571,6 +4778,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t2",
+                "MangledName": "t2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4590,6 +4798,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4609,6 +4818,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t1",
+                "MangledName": "t1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4628,6 +4838,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t2",
+                "MangledName": "t2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -4647,6 +4858,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4666,6 +4878,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n1",
+                "MangledName": "n1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4685,6 +4898,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n2",
+                "MangledName": "n2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4704,6 +4918,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4723,6 +4938,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n3",
+                "MangledName": "n3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4742,6 +4958,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4761,6 +4978,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n4",
+                "MangledName": "n4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4780,6 +4998,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4799,6 +5018,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n5",
+                "MangledName": "n5",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4818,6 +5038,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n6",
+                "MangledName": "n6",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4837,6 +5058,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4856,6 +5078,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n7",
+                "MangledName": "n7",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4875,6 +5098,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4894,6 +5118,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n8",
+                "MangledName": "n8",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4913,6 +5138,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4932,6 +5158,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n9",
+                "MangledName": "n9",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4951,6 +5178,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4970,6 +5198,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n10",
+                "MangledName": "n10",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -4989,6 +5218,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n11",
+                "MangledName": "n11",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5008,6 +5238,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5027,6 +5258,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "cycleno",
+                "MangledName": "cycleno",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5046,6 +5278,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "ntimes",
+                "MangledName": "ntimes",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5065,6 +5298,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5084,6 +5318,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5103,6 +5338,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x3",
+                "MangledName": "x3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5122,6 +5358,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x4",
+                "MangledName": "x4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5141,6 +5378,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5160,6 +5398,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n1",
+                "MangledName": "n1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5179,6 +5418,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5198,6 +5438,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5217,6 +5458,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5236,6 +5478,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x3",
+                "MangledName": "x3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5255,6 +5498,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x4",
+                "MangledName": "x4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5274,6 +5518,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5293,6 +5538,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5312,6 +5558,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5331,6 +5578,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5350,6 +5598,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x3",
+                "MangledName": "x3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5369,6 +5618,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x4",
+                "MangledName": "x4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5388,6 +5638,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5407,6 +5658,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x3",
+                "MangledName": "x3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5426,6 +5678,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5445,6 +5698,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5464,6 +5718,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x3",
+                "MangledName": "x3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5483,6 +5738,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x4",
+                "MangledName": "x4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5502,6 +5758,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5521,6 +5778,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x4",
+                "MangledName": "x4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5540,6 +5798,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x1",
+                "MangledName": "x1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5559,6 +5818,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x2",
+                "MangledName": "x2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5578,6 +5838,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x3",
+                "MangledName": "x3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5597,6 +5858,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x4",
+                "MangledName": "x4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5616,6 +5878,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5635,6 +5898,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5663,6 +5927,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5691,6 +5956,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5719,6 +5985,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5747,6 +6014,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5766,6 +6034,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n2",
+                "MangledName": "n2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -5785,6 +6054,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5813,6 +6083,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5841,6 +6112,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5869,6 +6141,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5897,6 +6170,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5925,6 +6199,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -5944,6 +6219,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -5972,6 +6248,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6000,6 +6277,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6028,6 +6306,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6056,6 +6335,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6084,6 +6364,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -6103,6 +6384,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6131,6 +6413,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6159,6 +6442,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6187,6 +6471,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6215,6 +6500,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6243,6 +6529,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -6262,6 +6549,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6290,6 +6578,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6318,6 +6607,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6346,6 +6636,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6374,6 +6665,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6402,6 +6694,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -6421,6 +6714,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6440,6 +6734,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n3",
+                "MangledName": "n3",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6459,6 +6754,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "pa",
+                "MangledName": "pa",
                 "Type": {
                     "Parameters": [
                         {
@@ -6493,6 +6789,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -6521,6 +6818,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6540,6 +6838,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6559,6 +6858,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n4",
+                "MangledName": "n4",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6578,6 +6878,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6597,6 +6898,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6616,6 +6918,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6635,6 +6938,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6654,6 +6958,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6673,6 +6978,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6692,6 +6998,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6711,6 +7018,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6730,6 +7038,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6749,6 +7058,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6768,6 +7078,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6787,6 +7098,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6806,6 +7118,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6825,6 +7138,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n6",
+                "MangledName": "n6",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6844,6 +7158,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6863,6 +7178,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6882,6 +7198,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6901,6 +7218,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6920,6 +7238,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6939,6 +7258,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6958,6 +7278,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6977,6 +7298,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -6996,6 +7318,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7015,6 +7338,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7034,6 +7358,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7053,6 +7378,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7072,6 +7398,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7091,6 +7418,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7110,6 +7438,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7129,6 +7458,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7148,6 +7478,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7167,6 +7498,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -7195,6 +7527,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7214,6 +7547,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7233,6 +7567,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7252,6 +7587,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7271,6 +7607,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -7299,6 +7636,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7318,6 +7656,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7337,6 +7676,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7356,6 +7696,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7375,6 +7716,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7394,6 +7736,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7413,6 +7756,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7432,6 +7776,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n7",
+                "MangledName": "n7",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -7451,6 +7796,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7470,6 +7816,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7489,6 +7836,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "arctan",
+                "MangledName": "arctan",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7523,6 +7871,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t2",
+                "MangledName": "t2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7542,6 +7891,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "sin",
+                "MangledName": "sin",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7576,6 +7926,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7595,6 +7946,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "cos",
+                "MangledName": "cos",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7629,6 +7981,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7648,6 +8001,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "cos",
+                "MangledName": "cos",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7682,6 +8036,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7701,6 +8056,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7720,6 +8076,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "cos",
+                "MangledName": "cos",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7754,6 +8111,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7773,6 +8131,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7792,6 +8151,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7811,6 +8171,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t",
+                "MangledName": "t",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7830,6 +8191,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "arctan",
+                "MangledName": "arctan",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7864,6 +8226,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t2",
+                "MangledName": "t2",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7883,6 +8246,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "sin",
+                "MangledName": "sin",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7917,6 +8281,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7936,6 +8301,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "cos",
+                "MangledName": "cos",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -7970,6 +8336,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -7989,6 +8356,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "cos",
+                "MangledName": "cos",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -8023,6 +8391,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8042,6 +8411,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8061,6 +8431,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "cos",
+                "MangledName": "cos",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -8095,6 +8466,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8114,6 +8486,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8133,6 +8506,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8152,6 +8526,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8171,6 +8546,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "z",
+                "MangledName": "z",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8190,6 +8566,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8209,6 +8586,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n8",
+                "MangledName": "n8",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8228,6 +8606,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "p3",
+                "MangledName": "p3",
                 "Type": {
                     "Parameters": [
                         {
@@ -8277,6 +8656,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8296,6 +8676,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "y",
+                "MangledName": "y",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8315,6 +8696,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "z",
+                "MangledName": "z",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8334,6 +8716,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8353,6 +8736,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8372,6 +8756,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "l",
+                "MangledName": "l",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8391,6 +8776,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -8419,6 +8805,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -8447,6 +8834,7 @@
             "Usable": {
                 "Kind": "ArrayDeclaration",
                 "Name": "e1",
+                "MangledName": "e1",
                 "Type": {
                     "Name": "ArrayType",
                     "ElementType": {
@@ -8475,6 +8863,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8494,6 +8883,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n9",
+                "MangledName": "n9",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8513,6 +8903,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "p0",
+                "MangledName": "p0",
                 "Type": {
                     "Parameters": []
                 }
@@ -8528,6 +8919,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8547,6 +8939,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8566,6 +8959,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8585,6 +8979,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n10",
+                "MangledName": "n10",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8604,6 +8999,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8623,6 +9019,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8642,6 +9039,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8661,6 +9059,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8680,6 +9079,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8699,6 +9099,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8718,6 +9119,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8737,6 +9139,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8756,6 +9159,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8775,6 +9179,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8794,6 +9199,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "k",
+                "MangledName": "k",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8813,6 +9219,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8832,6 +9239,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "j",
+                "MangledName": "j",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8851,6 +9259,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8870,6 +9279,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "i",
+                "MangledName": "i",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8889,6 +9299,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "n11",
+                "MangledName": "n11",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -8908,6 +9319,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -8927,6 +9339,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "sqrt",
+                "MangledName": "sqrt",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -8961,6 +9374,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "exp",
+                "MangledName": "exp",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -8995,6 +9409,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "ln",
+                "MangledName": "ln",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",
@@ -9029,6 +9444,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -9048,6 +9464,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "t1",
+                "MangledName": "t1",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -9067,6 +9484,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "rating",
+                "MangledName": "rating",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Floating",
@@ -9086,6 +9504,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "ntimes",
+                "MangledName": "ntimes",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -9105,6 +9524,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "stoptime",
+                "MangledName": "stoptime",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -9124,6 +9544,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "starttime",
+                "MangledName": "starttime",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
@@ -9143,6 +9564,7 @@
             "Usable": {
                 "Kind": "ProcedureDeclaration",
                 "Name": "result",
+                "MangledName": "_c66_common_result",
                 "Type": {
                     "ReturnType": {
                         "Name": "PrimitiveType",

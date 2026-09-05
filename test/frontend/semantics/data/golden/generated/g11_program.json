@@ -34,6 +34,7 @@
             "Usable": {
                 "Kind": "VariableDeclaration",
                 "Name": "x",
+                "MangledName": "x",
                 "Type": {
                     "Name": "PrimitiveType",
                     "Kind": "Integer",
