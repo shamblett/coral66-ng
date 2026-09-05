@@ -14,43 +14,25 @@ COMMENT
 
 SEGMENT unistd
 
-  EXTERNAL (
-
-      COMMENT process information ;
-      POINTER PROCEDURE cuseridp;
-      INTEGER PROCEDURE getegidp;
-      INTEGER PROCEDURE geteuidp;
-      INTEGER PROCEDURE getgidp;
-      INTEGER PROCEDURE getpgidp(VALUE INTEGER);
-      INTEGER PROCEDURE getpgrpp;
-      INTEGER PROCEDURE getpidp;
-      INTEGER PROCEDURE getppidp;
-      INTEGER PROCEDURE getsidp(VALUE INTEGER);
-      INTEGER PROCEDURE getuidp;
-
-      COMMENT process control ;
-      PROCEDURE sleepp(VALUE INTEGER);
-      PROCEDURE exitp(VALUE INTEGER);
-
-  )
+  
 
 COMMON (
 
   COMMENT process information ;
-  POINTER PROCEDURE Cuserid;
-  INTEGER PROCEDURE Getegid;
-  INTEGER PROCEDURE Geteuid;
-  INTEGER PROCEDURE Getgid;
-  INTEGER PROCEDURE Getpgid(VALUE INTEGER);
-  INTEGER PROCEDURE Getpgrp;
-  INTEGER PROCEDURE Getpid;
-  INTEGER PROCEDURE Getppid;
-  INTEGER PROCEDURE Getsid(VALUE INTEGER);
-  INTEGER PROCEDURE Getuid;
+  POINTER PROCEDURE cuserid;
+  INTEGER PROCEDURE getegid;
+  INTEGER PROCEDURE geteuid;
+  INTEGER PROCEDURE getgid;
+  INTEGER PROCEDURE getpgid(VALUE INTEGER);
+  INTEGER PROCEDURE getpgrp;
+  INTEGER PROCEDURE getpid;
+  INTEGER PROCEDURE getppid;
+  INTEGER PROCEDURE getsid(VALUE INTEGER);
+  INTEGER PROCEDURE getuid;
 
   COMMENT process control ;
-  PROCEDURE Sleep(VALUE INTEGER);
-  PROCEDURE Exit(VALUE INTEGER);
+  PROCEDURE sleep(VALUE INTEGER);
+  PROCEDURE exit(VALUE INTEGER);
 
   COMMENT Defines and constants ;
   INTEGER ROK := 4;
@@ -61,45 +43,4 @@ COMMON (
 )
 
 BEGIN
-
-   COMMENT Process information ;
-
-   POINTER PROCEDURE Cuserid
-   BEGIN ANSWER cuseridp; END;
-
-   INTEGER PROCEDURE Getegid
-   BEGIN ANSWER getegidp; END;
-
-   INTEGER PROCEDURE Geteuid
-   BEGIN ANSWER geteuidp; END;
-
-   INTEGER PROCEDURE Getgid
-   BEGIN ANSWER getgidp; END;
-
-   INTEGER PROCEDURE Getpgid(VALUE INTEGER pid)
-   BEGIN ANSWER getpgidp(pid); END;
-
-   INTEGER PROCEDURE Getpgrp
-   BEGIN ANSWER getpgrpp; END;
-
-   INTEGER PROCEDURE Getpid
-   BEGIN ANSWER getpidp; END;
-
-   INTEGER PROCEDURE Getppid
-   BEGIN ANSWER getppidp; END;
-
-   INTEGER PROCEDURE Getsid(VALUE INTEGER pid)
-   BEGIN ANSWER getsidp(pid); END;
-
-   INTEGER PROCEDURE Getuid
-   BEGIN ANSWER getuidp; END;
-
-   COMMENT Process control ;
-
-   PROCEDURE Sleep(VALUE INTEGER seconds)
-   BEGIN sleepp(seconds); END;
-
-   PROCEDURE Exit(VALUE INTEGER exitCode)
-   BEGIN exitp(exitCode); END;
-
 END

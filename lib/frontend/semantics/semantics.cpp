@@ -157,19 +157,20 @@ std::string_view Declaration::getName() const
 std::string Declaration::getMangledName() const
 {
     std::string name(getName());
-    if (m_scopeDepth > 2)
-    {
-        return name; // Local variables are not mangled
-    }
 
     switch (m_communicatorType)
     {
         case CommunicatorType::External: return name;
         case CommunicatorType::Common: return "_c66_common_" + name;
         case CommunicatorType::Library: return "_c66_lib_" + name;
-        case CommunicatorType::Absolute:
+        case CommunicatorType::Absolute: return "_c66_global_" + name;
         case CommunicatorType::None:
-        default: return "_c66_global_" + name;
+        default:
+            if (m_scopeDepth > 2)
+            {
+                return name;
+            }
+            return "_c66_global_" + name;
     }
 }
 

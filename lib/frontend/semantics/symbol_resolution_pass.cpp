@@ -142,7 +142,7 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                     {
                         const auto name = decl->getName(); // Returns string_view
                         decl->setScopeDepth(m_context.symbolTable.scopeCount());
-                        decl->setCommunicatorType(CommunicatorType::Library);
+                        
 
                         // Convert to IntrusiveVariantValue
                         IntrVarPtr<Usable> usableDecl(decl.release());
@@ -188,10 +188,20 @@ void SymbolResolutionPass::visit(const syntax::Block& node)
                 DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
             }
             else
+        {
+            if (const Usable* existing = m_context.symbolTable.lookup(name))
             {
-                declaration->setScopeDepth(m_context.symbolTable.scopeCount());
-                m_context.symbolTable.insert(name, declaration.get());
+                existing->match(
+                    [&](const auto& existingDecl)
+                    {
+                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                        if (existingDecl.getAbsoluteAddress().has_value())
+                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                    });
             }
+            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
+            m_context.symbolTable.insert(name, declaration.get());
+        }
             m_context.ownedUsables.push_back(std::move(declaration));
         }
 
@@ -424,6 +434,16 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
         }
         else
         {
+            if (const Usable* existing = m_context.symbolTable.lookup(name))
+            {
+                existing->match(
+                    [&](const auto& existingDecl)
+                    {
+                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                        if (existingDecl.getAbsoluteAddress().has_value())
+                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                    });
+            }
             declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
@@ -472,6 +492,16 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
         }
         else
         {
+            if (const Usable* existing = m_context.symbolTable.lookup(name))
+            {
+                existing->match(
+                    [&](const auto& existingDecl)
+                    {
+                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                        if (existingDecl.getAbsoluteAddress().has_value())
+                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                    });
+            }
             declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
@@ -529,6 +559,16 @@ void SymbolResolutionPass::visit(const syntax::TableDeclaration& node)
     }
     else
     {
+        if (const Usable* existing = m_context.symbolTable.lookup(name))
+        {
+            existing->match(
+                [&](const auto& existingDecl)
+                {
+                    declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                    if (existingDecl.getAbsoluteAddress().has_value())
+                        declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                });
+        }
         declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
@@ -597,6 +637,16 @@ void SymbolResolutionPass::visit(const syntax::TableElementDeclaration& node)
     }
     else
     {
+        if (const Usable* existing = m_context.symbolTable.lookup(name))
+        {
+            existing->match(
+                [&](const auto& existingDecl)
+                {
+                    declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                    if (existingDecl.getAbsoluteAddress().has_value())
+                        declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                });
+        }
         declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
@@ -642,6 +692,16 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
     }
     else
     {
+        if (const Usable* existing = m_context.symbolTable.lookup(name))
+        {
+            existing->match(
+                [&](const auto& existingDecl)
+                {
+                    declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                    if (existingDecl.getAbsoluteAddress().has_value())
+                        declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                });
+        }
         declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
@@ -805,6 +865,16 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
         }
         else
         {
+            if (const Usable* existing = m_context.symbolTable.lookup(name))
+            {
+                existing->match(
+                    [&](const auto& existingDecl)
+                    {
+                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                        if (existingDecl.getAbsoluteAddress().has_value())
+                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                    });
+            }
             declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
@@ -930,6 +1000,16 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
     }
     else
     {
+        if (const Usable* existing = m_context.symbolTable.lookup(name))
+        {
+            existing->match(
+                [&](const auto& existingDecl)
+                {
+                    declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                    if (existingDecl.getAbsoluteAddress().has_value())
+                        declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                });
+        }
         declaration->setScopeDepth(m_context.symbolTable.scopeCount());
         m_context.symbolTable.insert(name, declaration.get());
     }
@@ -953,6 +1033,16 @@ void SymbolResolutionPass::visit(const syntax::PlaceSpecification& node)
         }
         else
         {
+            if (const Usable* existing = m_context.symbolTable.lookup(name))
+            {
+                existing->match(
+                    [&](const auto& existingDecl)
+                    {
+                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                        if (existingDecl.getAbsoluteAddress().has_value())
+                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                    });
+            }
             declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
@@ -1034,6 +1124,16 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
         }
         else
         {
+            if (const Usable* existing = m_context.symbolTable.lookup(name))
+            {
+                existing->match(
+                    [&](const auto& existingDecl)
+                    {
+                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                        if (existingDecl.getAbsoluteAddress().has_value())
+                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                    });
+            }
             declaration->setScopeDepth(m_context.symbolTable.scopeCount());
             m_context.symbolTable.insert(name, declaration.get());
         }
