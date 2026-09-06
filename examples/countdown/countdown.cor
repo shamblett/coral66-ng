@@ -1,4 +1,38 @@
 'PROGRAM' countdown
+'COMMENT'
+/*
+ * Project: coral66-ng
+ * Author : Copyright S. Hamblett <steve.hamblett@linux.com>
+ * Date   : 24/08/2026
+ */
+ ;
+
+'COMMENT' Solves the Countdown numbers game (from UK Channel 4).;
+'COMMENT' Ported from the C++ implementation https://github.com/dave-hudson/countdown as modified by myself.;
+
+'COMMENT'
+    Implementation notes :-
+
+    Recursion: mutual recursion is implemented using the COMMON communicator to forward-declare permuteAll.
+
+    State Management: Because Coral 66 lacks object-orientation, the original countdown class has been flattened into global state variables
+    and parallel arrays (workingRes,workingOpType, etc.) which tracked the permutation states correctly.
+
+    Array Scope Passing: In C++, std::array was being passed by value. In Coral 66, arrays are passed by reference (LOCATION).
+    To mimic pass-by-value on the recursive descent, the current array state was saved, then loaded into the new recursive permutation,
+    descent performed, then the array state was restored.
+
+    Bitwise Operations: Coral 66 uses MASK, UNION, and DIFFER instead of &, |, and ^. However, the Coral 66 specification
+    requires that bracketed expressions used with these logical operators are explicitly typed.
+    So, (a + b) 'MASK' 214 had to become 'INTEGER' (a + b) 'MASK' 214.
+
+    Random Numbers: S small Linear Congruential Generator (LCG) is implemented directly in the code,
+    seeded using the time() wrapper from the time library.
+
+    Loops: Coral 66 does not natively support an unbounded WHILE loop, so while(x < y) has been translated
+    into a standard IF ... THEN GOTO label jump.
+    ;
+
 'LIBRARY' (stdio, time);
 'COMMON' (
    'PROCEDURE' permuteAll('VALUE' 'INTEGER');
