@@ -523,6 +523,22 @@ TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::EXPECTED_STATEMENT));
     }
+
+    SECTION("Missing BEGIN")
+    {
+        ParsedProcedure p("PROCEDURE p; a := 10; END;");
+        CHECK(p.procedure != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_BEGIN_FOR_PROCEDURE));
+    }
+
+    SECTION("Missing END")
+    {
+        ParsedProcedure p("'PROCEDURE' p0;'BEGIN' e1[j] := e1[k];e1[k] := e1[l];e1[l] := e1[j];newline;'PROCEDURE' p1;'BEGIN' e1[j] := e1[k]; END;");
+        CHECK(p.procedure != nullptr);
+        CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
+        CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_END_FOR_PROCEDURE));
+    }
 }
 
 TEST_CASE("Communicators - Errors", "[Parser][Communicator]")

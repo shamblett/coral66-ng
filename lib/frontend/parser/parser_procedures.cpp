@@ -311,6 +311,34 @@ std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
 
             context.enterProcedure(isTyped);
 
+            bool hasBegin = (begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword);
+
+            if (!hasBegin)
+            {
+                // Scan ahead to see if there is an END without a preceding BEGIN in the same scope, before another PROCEDURE or END of file
+                int depth = 0;
+                auto it = begin;
+                while (it != end)
+                {
+                    if (it->getTokenType() == lexer::TokenType::BeginKeyword) depth++;
+                    else if (it->getTokenType() == lexer::TokenType::EndKeyword)
+                    {
+                        if (depth == 0)
+                        {
+                            context.log(errors::parser::MISSING_BEGIN_FOR_PROCEDURE.args(*start, context.getSourceInterface(), *start));
+                            DiagnosticCollector::addDiagnostic(errors::parser::MISSING_BEGIN_FOR_PROCEDURE);
+                            break;
+                        }
+                        depth--;
+                    }
+                    else if (it->getTokenType() == lexer::TokenType::ProcedureKeyword || it->getTokenType() == lexer::TokenType::RecursiveKeyword)
+                    {
+                        break;
+                    }
+                    it++;
+                }
+            }
+
             if (auto body = parseStatement(begin, end, context))
             {
                 if (isTyped && !context.isAnswerStatementFound())

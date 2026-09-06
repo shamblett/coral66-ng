@@ -56,6 +56,8 @@ CREATE_ERROR(EXPECTED_CONDITION, "Expected Condition %0", InsertAfter<1, 0>);
 CREATE_ERROR(EXPECTED_BEGIN, "Expected 'BEGIN' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_PROGRAM_SEGMENT, "Expected 'PROGRAM' or 'SEGMENT' keyword", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_END, "Expected 'END' keyword", InsertAfter<0>);
+CREATE_ERROR(MISSING_END_FOR_PROCEDURE, "Procedure has a begin statement but no end is found before the next procedure is declared", InsertAfter<0>);
+CREATE_ERROR(MISSING_BEGIN_FOR_PROCEDURE, "Procedure has an end statement without a preceeding begin statement", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_SEMICOLON, "Expected semicolon", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_IDENTIFIER, "Expected identifier", InsertAfter<0>);
 CREATE_ERROR(EXPECTED_LABELS, "Expected at least one label", InsertAfter<0>);

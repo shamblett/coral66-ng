@@ -228,6 +228,22 @@ std::unique_ptr<syntax::Block> parseBlock(lexer::CTokenIterator& begin, const le
             }
         }
 
+        if (context.isInsideProcedure() && (begin->getTokenType() == lexer::TokenType::ProcedureKeyword || begin->getTokenType() == lexer::TokenType::RecursiveKeyword || begin->getTokenType() == lexer::TokenType::IntegerKeyword || begin->getTokenType() == lexer::TokenType::FloatingKeyword || begin->getTokenType() == lexer::TokenType::PointerKeyword || begin->getTokenType() == lexer::TokenType::BitsKeyword || begin->getTokenType() == lexer::TokenType::BitKeyword || begin->getTokenType() == lexer::TokenType::FixedKeyword))
+        {
+            auto peek = begin;
+            if (peek->getTokenType() != lexer::TokenType::ProcedureKeyword && peek->getTokenType() != lexer::TokenType::RecursiveKeyword)
+            {
+                peek++;
+            }
+            if (peek != end && peek->getTokenType() == lexer::TokenType::RecursiveKeyword) peek++;
+            if (peek != end && peek->getTokenType() == lexer::TokenType::ProcedureKeyword)
+            {
+                context.log(errors::parser::MISSING_END_FOR_PROCEDURE.args(*begin, context.getSourceInterface(), *begin));
+                DiagnosticCollector::addDiagnostic(errors::parser::MISSING_END_FOR_PROCEDURE);
+                break;
+            }
+        }
+
         if (declarationsAllowed)
         {
             if (auto procedure = parseProcedure(begin, end, context))
