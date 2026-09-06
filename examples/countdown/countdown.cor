@@ -1,0 +1,282 @@
+'PROGRAM' countdown
+'COMMON' (
+   'INTEGER' 'PROCEDURE' printfint('VALUE' 'POINTER', 'VALUE' 'INTEGER');
+   'INTEGER' 'PROCEDURE' printfstr('VALUE' 'POINTER', 'VALUE' 'POINTER');
+   'INTEGER' 'PROCEDURE' printf2int('VALUE' 'POINTER', 'VALUE' 'INTEGER', 'VALUE' 'INTEGER');
+   'INTEGER' 'PROCEDURE' printf3int('VALUE' 'POINTER', 'VALUE' 'INTEGER', 'VALUE' 'INTEGER', 'VALUE' 'INTEGER');
+   'INTEGER' 'PROCEDURE' printf4int('VALUE' 'POINTER', 'VALUE' 'INTEGER', 'VALUE' 'INTEGER', 'VALUE' 'INTEGER', 'VALUE' 'INTEGER');
+   'POINTER' 'PROCEDURE' time('LOCATION' 'INTEGER');
+
+   'PROCEDURE' permuteAll('VALUE' 'INTEGER');
+)
+'BEGIN'
+   'INTEGER' target;
+   'INTEGER' closest;
+   'INTEGER' rounds;
+   'INTEGER' fewestSteps;
+   'INTEGER' workingStepsSz;
+   'INTEGER' bestStepsSz;
+
+   'INTEGER' 'ARRAY' tiles[0:5];
+   
+   'INTEGER' 'ARRAY' workingRes[0:5];
+   'INTEGER' 'ARRAY' workingOpType[0:5];
+   'INTEGER' 'ARRAY' workingOp1[0:5];
+   'INTEGER' 'ARRAY' workingOp2[0:5];
+
+   'INTEGER' 'ARRAY' bestRes[0:5];
+   'INTEGER' 'ARRAY' bestOpType[0:5];
+   'INTEGER' 'ARRAY' bestOp1[0:5];
+   'INTEGER' 'ARRAY' bestOp2[0:5];
+
+   'INTEGER' 'ARRAY' startGrid[0:23];
+
+   'INTEGER' lcgSeed;
+
+   'INTEGER' 'PROCEDURE' abs('VALUE' 'INTEGER' val);
+   'BEGIN'
+      'IF' val < 0 'THEN' 'ANSWER' -val
+      'ELSE' 'ANSWER' val
+   'END';
+
+   'INTEGER' 'PROCEDURE' lcgRandom;
+   'BEGIN'
+      lcgSeed := 'INTEGER' (lcgSeed * 1103515245 + 12345) 'MASK' 2147483647;
+      'ANSWER' lcgSeed
+   'END';
+
+   'PROCEDURE' permuteCommon('VALUE' 'INTEGER' newVal, op, i, j, vSz);
+   'BEGIN'
+      'INTEGER' x, k, idx;
+      'INTEGER' 'ARRAY' newV[0:5];
+
+      workingRes[workingStepsSz] := newVal;
+      workingOpType[workingStepsSz] := op;
+      workingOp1[workingStepsSz] := tiles[i];
+      workingOp2[workingStepsSz] := tiles[j];
+      workingStepsSz := workingStepsSz + 1;
+
+      'IF' abs(target - newVal) < abs(target - closest) 'THEN'
+      'BEGIN'
+         'FOR' x := 0 'STEP' 1 'UNTIL' workingStepsSz - 1 'DO'
+         'BEGIN'
+            bestRes[x] := workingRes[x];
+            bestOpType[x] := workingOpType[x];
+            bestOp1[x] := workingOp1[x];
+            bestOp2[x] := workingOp2[x];
+         'END';
+         bestStepsSz := workingStepsSz;
+         closest := newVal;
+
+         'IF' newVal = target 'THEN'
+         'BEGIN'
+            fewestSteps := workingStepsSz;
+            workingStepsSz := workingStepsSz - 1;
+            'GOTO' done
+         'END'
+      'END';
+
+      'IF' (fewestSteps - 1) > workingStepsSz 'THEN'
+      'BEGIN'
+         'IF' vSz > 2 'THEN'
+         'BEGIN'
+            idx := 0;
+            newV[idx] := newVal;
+            idx := idx + 1;
+
+            'FOR' k := 0 'STEP' 1 'UNTIL' vSz - 1 'DO'
+            'BEGIN'
+               'IF' k <> i 'AND' k <> j 'THEN'
+               'BEGIN'
+                  newV[idx] := tiles[k];
+                  idx := idx + 1
+               'END'
+            'END';
+
+            'COMMENT' Save current tiles state before recursion;
+            'FOR' k := 0 'STEP' 1 'UNTIL' vSz - 1 'DO'
+               newV[k] := newV[k]; 'COMMENT' Logic is handled by the caller creating a new scope or array.;
+            
+            'COMMENT' In Coral 66, passing arrays down the recursive stack requires manual management;
+            'COMMENT' We will temporarily swap the tiles array with newV, and restore after.;
+            'BEGIN'
+               'INTEGER' 'ARRAY' oldTiles[0:5];
+               'FOR' k := 0 'STEP' 1 'UNTIL' 5 'DO' oldTiles[k] := tiles[k];
+               'FOR' k := 0 'STEP' 1 'UNTIL' vSz - 2 'DO' tiles[k] := newV[k];
+               permuteAll(vSz - 1);
+               'FOR' k := 0 'STEP' 1 'UNTIL' 5 'DO' tiles[k] := oldTiles[k];
+            'END'
+         'END'
+      'END';
+
+done:
+      workingStepsSz := workingStepsSz - 1
+   'END';
+
+
+   'PROCEDURE' permuteAdd('VALUE' 'INTEGER' vSz);
+   'BEGIN'
+      'INTEGER' i, j, newVal;
+      'IF' vSz > 1 'THEN'
+      'BEGIN'
+         'FOR' i := 0 'STEP' 1 'UNTIL' vSz - 2 'DO'
+         'BEGIN'
+            'FOR' j := i + 1 'STEP' 1 'UNTIL' vSz - 1 'DO'
+            'BEGIN'
+               newVal := tiles[i] + tiles[j];
+               permuteCommon(newVal, 1, i, j, vSz)
+            'END'
+         'END'
+      'END'
+   'END';
+
+
+   'PROCEDURE' permuteSubtract('VALUE' 'INTEGER' vSz);
+   'BEGIN'
+      'INTEGER' i, j, newVal;
+      'FOR' i := 0 'STEP' 1 'UNTIL' vSz - 1 'DO'
+      'BEGIN'
+         'FOR' j := 0 'STEP' 1 'UNTIL' vSz - 1 'DO'
+         'BEGIN'
+            'IF' i <> j 'THEN'
+            'BEGIN'
+               newVal := tiles[i] - tiles[j];
+               'IF' newVal > 0 'THEN'
+               'BEGIN'
+                  'IF' newVal <> tiles[j] 'THEN'
+                     permuteCommon(newVal, 2, i, j, vSz)
+               'END'
+            'END'
+         'END'
+      'END'
+   'END';
+
+   'PROCEDURE' permuteMultiply('VALUE' 'INTEGER' vSz);
+   'BEGIN'
+      'INTEGER' i, j, newVal;
+      'IF' vSz > 1 'THEN'
+      'BEGIN'
+         'FOR' i := 0 'STEP' 1 'UNTIL' vSz - 2 'DO'
+         'BEGIN'
+            'IF' tiles[i] <> 1 'THEN'
+            'BEGIN'
+               'FOR' j := i + 1 'STEP' 1 'UNTIL' vSz - 1 'DO'
+               'BEGIN'
+                  'IF' tiles[j] <> 1 'THEN'
+                  'BEGIN'
+                     newVal := tiles[i] * tiles[j];
+                     permuteCommon(newVal, 3, i, j, vSz)
+                  'END'
+               'END'
+            'END'
+         'END'
+      'END'
+   'END';
+
+
+   'PROCEDURE' permuteDivide('VALUE' 'INTEGER' vSz);
+   'BEGIN'
+      'INTEGER' i, j, newVal;
+      'FOR' i := 0 'STEP' 1 'UNTIL' vSz - 1 'DO'
+      'BEGIN'
+         'FOR' j := 0 'STEP' 1 'UNTIL' vSz - 1 'DO'
+         'BEGIN'
+            'IF' i <> j 'THEN'
+            'BEGIN'
+               'IF' tiles[j] <> 1 'THEN'
+               'BEGIN'
+                  'IF' (tiles[i] - ((tiles[i]/tiles[j])*tiles[j])) = 0 'THEN'
+                  'BEGIN'
+                     newVal := tiles[i] / tiles[j];
+                     'IF' newVal <> tiles[j] 'THEN'
+                        permuteCommon(newVal, 4, i, j, vSz)
+                  'END'
+               'END'
+            'END'
+         'END'
+      'END'
+   'END';
+
+   'PROCEDURE' permuteAll('VALUE' 'INTEGER' vSz);
+   'BEGIN'
+      rounds := rounds + 1;
+      permuteAdd(vSz);
+      permuteSubtract(vSz);
+      permuteMultiply(vSz);
+      permuteDivide(vSz)
+   'END';
+
+   'PROCEDURE' dumpSteps;
+   'BEGIN'
+      'INTEGER' i, t1;
+      'FOR' i := 0 'STEP' 1 'UNTIL' bestStepsSz - 1 'DO'
+      'BEGIN'
+         t1 := printfint("%d", bestOp1[i]);
+         'IF' bestOpType[i] = 1 'THEN' t1 := printfstr(" %s ", "+");
+         'IF' bestOpType[i] = 2 'THEN' t1 := printfstr(" %s ", "-");
+         'IF' bestOpType[i] = 3 'THEN' t1 := printfstr(" %s ", "*");
+         'IF' bestOpType[i] = 4 'THEN' t1 := printfstr(" %s ", "/");
+         t1 := printf2int("%d = %d\n", bestOp2[i], bestRes[i])
+      'END';
+      t1 := printfstr("%s\n", "")
+   'END';
+
+   'INTEGER' idx, tmptime, iter;
+   'POINTER' t;
+   'INTEGER' 'ARRAY' tmp[0:0];
+
+   'COMMENT' Initialize starting grid;
+   startGrid[0]:=100; startGrid[1]:=75; startGrid[2]:=50; startGrid[3]:=25;
+   startGrid[4]:=10; startGrid[5]:=10; startGrid[6]:=9; startGrid[7]:=9;
+   startGrid[8]:=8; startGrid[9]:=8; startGrid[10]:=7; startGrid[11]:=7;
+   startGrid[12]:=6; startGrid[13]:=6; startGrid[14]:=5; startGrid[15]:=5;
+   startGrid[16]:=4; startGrid[17]:=4; startGrid[18]:=3; startGrid[19]:=3;
+   startGrid[20]:=2; startGrid[21]:=2; startGrid[22]:=1; startGrid[23]:=1;
+
+   'COMMENT' Set seed using time(0);
+   t := time(tmp[0]);
+   lcgSeed := tmp[0];
+
+   idx := printfstr("%s", "Numbers are:");
+
+   'FOR' iter := 0 'STEP' 1 'UNTIL' 5 'DO'
+   'BEGIN'
+      pick:
+      tmptime := lcgRandom() 'MASK' 31;
+      'IF' tmptime > 23 'THEN' 'GOTO' pick;
+      'IF' startGrid[tmptime] < 0 'THEN' 'GOTO' pick;
+      tiles[iter] := startGrid[tmptime];
+      startGrid[tmptime] := -1;
+      idx := printfint(" %d", tiles[iter])
+   'END';
+
+   targetpick:
+   target := 'INTEGER' (lcgRandom()) 'MASK' 1023;
+   'IF' target > 899 'OR' target < 101 'THEN' 'GOTO' targetpick;
+
+   idx := printfint(", target is: %d\n\n", target);
+
+   closest := 0;
+   fewestSteps := 7;
+   rounds := 0;
+   workingStepsSz := 0;
+   bestStepsSz := 0;
+
+   permuteAll(6);
+
+   idx := printfstr("%s", "after: ");
+   idx := printfint("%d", rounds);
+   idx := printfstr("%s", " rounds, ");
+
+   'IF' closest = target 'THEN'
+   'BEGIN'
+      idx := printfstr("%s", "solved:\n\n")
+   'END'
+   'ELSE'
+   'BEGIN'
+      idx := printfint("%d", abs(target - closest));
+      idx := printfstr("%s", " away:\n\n")
+   'END';
+
+   dumpSteps()
+'END'
