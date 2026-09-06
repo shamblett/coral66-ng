@@ -262,20 +262,19 @@ done:
 
    idx := printfstr("%s", "Numbers are:");
 
-   tiles[0] := 10;
-   tiles[1] := 8;
-   tiles[2] := 2;
-   tiles[3] := 7;
-   tiles[4] := 7;
-   tiles[5] := 75;
-
-   'FOR' iter := 0 'STEP' 1 'UNTIL' 5 'DO'
+ 'FOR' iter := 0 'STEP' 1 'UNTIL' 5 'DO'
    'BEGIN'
+      pick:
+      tmptime := lcgRandom() 'MASK' 31;
+      'IF' tmptime > 23 'THEN' 'GOTO' pick;
+      'IF' startGrid[tmptime] < 0 'THEN' 'GOTO' pick;
+      tiles[iter] := startGrid[tmptime];
+      startGrid[tmptime] := -1;
       idx := printfint(" %d", tiles[iter])
    'END';
 
    targetpick:
-   target := 191;
+   target := 'INTEGER' (lcgRandom()) 'MASK' 1023;
    'IF' target > 899 'OR' target < 101 'THEN' 'GOTO' targetpick;
 
    idx := printfint(", target is: %d\n\n", target);
