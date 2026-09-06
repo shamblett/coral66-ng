@@ -258,7 +258,7 @@ done:
 
    'COMMENT' Set seed using time(0);
    t := time(tmp[0]);
-   lcgSeed := tmp[0];
+   lcgSeed := clock();
 
    idx := printfstr("%s", "Numbers are:");
 
