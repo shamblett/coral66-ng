@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <type_traits>
 #include <utility>
 
 namespace coral66
@@ -20,13 +21,15 @@ namespace coral66
  * @tparam F The type of the callable to execute.
  */
 template <class F>
-class ScopeExit
+class [[nodiscard]] ScopeExit
 {
     F m_exit;
     bool m_engaged = true;
 
 public:
-    explicit ScopeExit(F&& t) : m_exit(std::move(t)) {}
+    template <class Callable>
+    requires std::is_constructible_v<F, Callable>
+    explicit ScopeExit(Callable&& t) : m_exit(std::forward<Callable>(t)) {}
 
     ~ScopeExit()
     {
@@ -51,4 +54,9 @@ public:
         return *this;
     }
 };
+
+
+template <class Callable>
+ScopeExit(Callable&&) -> ScopeExit<std::remove_cvref_t<Callable>>;
+
 } // namespace coral66
