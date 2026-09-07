@@ -15,7 +15,6 @@ cc_library(
     hdrs = [
         "abstract_intrusive_variant.hpp",
         "constexpr.hpp",
-        "expected.hpp",
         "filesystem.hpp",
         "function_ref.hpp",
         "intrusive_variant_allocator.hpp",
