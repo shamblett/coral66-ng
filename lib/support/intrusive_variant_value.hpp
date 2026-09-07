@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 
 #include "abstract_intrusive_variant.hpp"
 #include "constexpr.hpp"
@@ -41,19 +42,16 @@ protected:
     alignas(SubClasses...) std::byte m_storage[std::max({sizeof(SubClasses)...})] = {};
     suitableUInt<sizeof...(SubClasses)> m_index;
 
-    [[nodiscard]] Base& get()
+    template <class Self>
+    [[nodiscard]] decltype(auto) get(this Self&& self)
     {
-        constexpr std::array<Base& (*)(std::byte*), sizeof...(SubClasses)> converters = {
-            +[](std::byte* ptr) -> Base& { return *std::launder(reinterpret_cast<SubClasses*>(ptr)); }...};
-        return converters[m_index](m_storage);
-    }
-
-    [[nodiscard]] const Base& get() const
-    {
-        constexpr std::array<const Base& (*)(const std::byte*), sizeof...(SubClasses)> converters = {
-            +[](const std::byte* ptr) -> const Base&
-            { return *std::launder(reinterpret_cast<const SubClasses*>(ptr)); }...};
-        return converters[m_index](m_storage);
+        using BaseType = std::conditional_t<std::is_const_v<std::remove_reference_t<Self>>, const Base, Base>;
+        constexpr std::array<BaseType& (*)(std::byte*), sizeof...(SubClasses)> converters = {
+            +[](std::byte* ptr) -> BaseType& { 
+                using SubType = std::conditional_t<std::is_const_v<std::remove_reference_t<Self>>, const SubClasses, SubClasses>;
+                return *std::launder(reinterpret_cast<SubType*>(ptr)); 
+            }...};
+        return converters[self.m_index](const_cast<std::byte*>(self.m_storage));
     }
 };
 
@@ -129,7 +127,7 @@ protected:
     void copyConstruct(const IntrusiveVariantStorageCopy& rhs)
     {
         constexpr std::array<void (*)(std::byte*, Base*), sizeof...(SubClasses)> copyFuncs = {
-            {+[](std::byte* storage, Base* ptr) { new (storage) SubClasses(*static_cast<SubClasses*>(ptr)); }...}};
+            {+[](std::byte* storage, Base* ptr) { std::construct_at(reinterpret_cast<SubClasses*>(storage), *static_cast<SubClasses*>(ptr)); }...}};
         copyFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_storage = rhs.m_index;
     }
@@ -170,7 +168,7 @@ protected:
     {
         constexpr std::array<void (*)(std::byte*, const Base*), sizeof...(SubClasses)> copyFuncs = {
             {+[](std::byte* storage, const Base* ptr)
-             { new (storage) SubClasses(*static_cast<const SubClasses*>(ptr)); }...}};
+             { std::construct_at(reinterpret_cast<SubClasses*>(storage), *static_cast<const SubClasses*>(ptr)); }...}};
         copyFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_index = rhs.m_index;
     }
@@ -292,7 +290,7 @@ protected:
     {
         constexpr std::array<void (*)(std::byte*, Base*), sizeof...(SubClasses)> moveFuncs = {
             {+[](std::byte* storage, Base* ptr)
-             { new (storage) SubClasses(std::move(*static_cast<SubClasses*>(ptr))); }...}};
+             { std::construct_at(reinterpret_cast<SubClasses*>(storage), std::move(*static_cast<SubClasses*>(ptr))); }...}};
         moveFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_index = rhs.m_index;
     }
@@ -332,7 +330,7 @@ protected:
     {
         constexpr std::array<void (*)(std::byte*, Base*), sizeof...(SubClasses)> moveFuncs = {
             {+[](std::byte* storage, Base* ptr)
-             { new (storage) SubClasses(std::move(*static_cast<SubClasses*>(ptr))); }...}};
+             { std::construct_at(reinterpret_cast<SubClasses*>(storage), std::move(*static_cast<SubClasses*>(ptr))); }...}};
         moveFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_index = rhs.m_index;
     }
@@ -493,7 +491,7 @@ public:
     // ReSharper disable once CppNonExplicitConvertingConstructor
     requires(std::is_same_v<T, SubClasses> || ...) IntrusiveVariantValue(std::in_place_type_t<T>, Args&&... args)
     {
-        new (this->m_storage) T(std::forward<Args>(args)...);
+        std::construct_at(reinterpret_cast<T*>(this->m_storage), std::forward<Args>(args)...);
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
@@ -503,7 +501,7 @@ public:
         // ReSharper disable once CppNonExplicitConvertingConstructor
         IntrusiveVariantValue(T&& value) noexcept(std::is_nothrow_move_constructible_v<T>)
     {
-        new (this->m_storage) T(std::forward<T>(value));
+        std::construct_at(reinterpret_cast<T*>(this->m_storage), std::forward<T>(value));
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
@@ -520,7 +518,7 @@ public:
         else
         {
             this->destruct();
-            new (this->m_storage) T(std::forward<T>(value));
+            std::construct_at(reinterpret_cast<T*>(this->m_storage), std::forward<T>(value));
             this->m_index = var;
         }
         return *this;
@@ -531,7 +529,7 @@ public:
         // ReSharper disable once CppNonExplicitConvertingConstructor
         IntrusiveVariantValue(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>)
     {
-        new (this->m_storage) T(value);
+        std::construct_at(reinterpret_cast<T*>(this->m_storage), value);
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
     }
@@ -549,7 +547,7 @@ public:
         else
         {
             this->destruct();
-            new (this->m_storage) T(value);
+            std::construct_at(reinterpret_cast<T*>(this->m_storage), value);
             this->m_index = var;
         }
         return *this;
@@ -563,7 +561,7 @@ public:
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, const Base&), sizeof...(SubClasses)> copyConstructors = {
             +[](std::byte* storage, const Base& value1)
-            { new (storage) SubClasses(static_cast<const SubClasses&>(value1)); }...};
+            { std::construct_at(reinterpret_cast<SubClasses*>(storage), static_cast<const SubClasses&>(value1)); }...};
         copyConstructors[this->m_index](this->m_storage, value);
     }
 
@@ -577,7 +575,7 @@ public:
     {
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, Base&&), sizeof...(SubClasses)> moveConstructors = {
-            +[](std::byte* storage, Base&& value1) { new (storage) SubClasses(static_cast<SubClasses&&>(value1)); }...};
+            +[](std::byte* storage, Base&& value1) { std::construct_at(reinterpret_cast<SubClasses*>(storage), static_cast<SubClasses&&>(value1)); }...};
         moveConstructors[this->m_index](this->m_storage, std::forward<U>(value));
     }
 
@@ -585,30 +583,22 @@ public:
     requires(std::is_same_v<T, SubClasses> || ...) T& emplace(Args&&... args)
     {
         this->destruct();
-        auto* object = new (this->m_storage) T(std::forward<Args>(args)...);
+        auto* object = std::construct_at(reinterpret_cast<T*>(this->m_storage), std::forward<Args>(args)...);
         constexpr auto var = Base::template indexOf<T>();
         this->m_index = var;
         return *object;
     }
 
-    Base* CORAL66_NON_NULL operator->()
+    template <class Self>
+    auto* CORAL66_NON_NULL operator->(this Self&& self)
     {
-        return &get();
+        return &std::forward<Self>(self).get();
     }
 
-    const Base* CORAL66_NON_NULL operator->() const
+    template <class Self>
+    auto* CORAL66_NON_NULL data(this Self&& self)
     {
-        return &get();
-    }
-
-    Base* CORAL66_NON_NULL data()
-    {
-        return &get();
-    }
-
-    const Base* CORAL66_NON_NULL data() const
-    {
-        return &get();
+        return &std::forward<Self>(self).get();
     }
 
     explicit operator const Base&() const&
@@ -616,19 +606,10 @@ public:
         return get();
     }
 
-    Base& operator*() &
+    template <class Self>
+    decltype(auto) operator*(this Self&& self)
     {
-        return get();
-    }
-
-    const Base& operator*() const&
-    {
-        return get();
-    }
-
-    Base&& operator*() &&
-    {
-        return std::move(get());
+        return std::forward<Self>(self).get();
     }
 };
 
