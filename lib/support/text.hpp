@@ -141,7 +141,7 @@ BackInserter stringOfSameWidth(std::string_view const original, char characterTo
 
 inline std::string to_string(std::string_view stringView)
 {
-    return {stringView.begin(), stringView.end()};
+    return std::string(stringView);
 }
 
 namespace Constexpr
@@ -181,10 +181,7 @@ constexpr MaxVector<char, maxSize> utf32ToUtf8(std::u32string_view const stringV
 } // namespace Constexpr
 
 template <class T>
-requires requires(T value)
-{
-    std::to_string(value);
-}
+requires requires(T value) { std::to_string(value); }
 std::string to_string(T value)
 {
     return std::to_string(value);
