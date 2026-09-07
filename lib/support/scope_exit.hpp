@@ -28,8 +28,9 @@ class [[nodiscard]] ScopeExit
 
 public:
     template <class Callable>
-    requires std::is_constructible_v<F, Callable>
-    explicit ScopeExit(Callable&& t) : m_exit(std::forward<Callable>(t)) {}
+    requires std::is_constructible_v<F, Callable> explicit ScopeExit(Callable&& t) : m_exit(std::forward<Callable>(t))
+    {
+    }
 
     ~ScopeExit()
     {
@@ -54,7 +55,6 @@ public:
         return *this;
     }
 };
-
 
 template <class Callable>
 ScopeExit(Callable&&) -> ScopeExit<std::remove_cvref_t<Callable>>;

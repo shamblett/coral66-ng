@@ -29,8 +29,7 @@ class [[nodiscard]] ValueReset
 
 public:
     template <class U>
-    requires std::is_constructible_v<T, U>
-    explicit ValueReset(T& assignedTo, U&& valueAfter)
+    requires std::is_constructible_v<T, U> explicit ValueReset(T& assignedTo, U&& valueAfter)
         : m_valueAfter(std::forward<U>(valueAfter)), m_assignedTo(&assignedTo)
     {
     }
@@ -47,8 +46,7 @@ public:
     ValueReset& operator=(const ValueReset&) = delete;
 
     ValueReset(ValueReset&& rhs) noexcept
-        : m_valueAfter(std::move(rhs.m_valueAfter)), 
-          m_assignedTo(std::exchange(rhs.m_assignedTo, nullptr))
+        : m_valueAfter(std::move(rhs.m_valueAfter)), m_assignedTo(std::exchange(rhs.m_assignedTo, nullptr))
     {
     }
 
@@ -59,7 +57,6 @@ public:
         return *this;
     }
 };
-
 
 template <class T, class U>
 ValueReset(T&, U&&) -> ValueReset<T>;

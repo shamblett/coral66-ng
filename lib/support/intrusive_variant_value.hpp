@@ -47,9 +47,11 @@ protected:
     {
         using BaseType = std::conditional_t<std::is_const_v<std::remove_reference_t<Self>>, const Base, Base>;
         constexpr std::array<BaseType& (*)(std::byte*), sizeof...(SubClasses)> converters = {
-            +[](std::byte* ptr) -> BaseType& { 
-                using SubType = std::conditional_t<std::is_const_v<std::remove_reference_t<Self>>, const SubClasses, SubClasses>;
-                return *std::launder(reinterpret_cast<SubType*>(ptr)); 
+            +[](std::byte* ptr) -> BaseType&
+            {
+                using SubType =
+                    std::conditional_t<std::is_const_v<std::remove_reference_t<Self>>, const SubClasses, SubClasses>;
+                return *std::launder(reinterpret_cast<SubType*>(ptr));
             }...};
         return converters[self.m_index](const_cast<std::byte*>(self.m_storage));
     }
@@ -127,7 +129,8 @@ protected:
     void copyConstruct(const IntrusiveVariantStorageCopy& rhs)
     {
         constexpr std::array<void (*)(std::byte*, Base*), sizeof...(SubClasses)> copyFuncs = {
-            {+[](std::byte* storage, Base* ptr) { std::construct_at(reinterpret_cast<SubClasses*>(storage), *static_cast<SubClasses*>(ptr)); }...}};
+            {+[](std::byte* storage, Base* ptr)
+             { std::construct_at(reinterpret_cast<SubClasses*>(storage), *static_cast<SubClasses*>(ptr)); }...}};
         copyFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_storage = rhs.m_index;
     }
@@ -290,7 +293,9 @@ protected:
     {
         constexpr std::array<void (*)(std::byte*, Base*), sizeof...(SubClasses)> moveFuncs = {
             {+[](std::byte* storage, Base* ptr)
-             { std::construct_at(reinterpret_cast<SubClasses*>(storage), std::move(*static_cast<SubClasses*>(ptr))); }...}};
+             {
+                 std::construct_at(reinterpret_cast<SubClasses*>(storage), std::move(*static_cast<SubClasses*>(ptr)));
+             }...}};
         moveFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_index = rhs.m_index;
     }
@@ -330,7 +335,9 @@ protected:
     {
         constexpr std::array<void (*)(std::byte*, Base*), sizeof...(SubClasses)> moveFuncs = {
             {+[](std::byte* storage, Base* ptr)
-             { std::construct_at(reinterpret_cast<SubClasses*>(storage), std::move(*static_cast<SubClasses*>(ptr))); }...}};
+             {
+                 std::construct_at(reinterpret_cast<SubClasses*>(storage), std::move(*static_cast<SubClasses*>(ptr)));
+             }...}};
         moveFuncs[rhs.m_index](this->m_storage, &rhs.get());
         this->m_index = rhs.m_index;
     }
@@ -575,7 +582,8 @@ public:
     {
         this->m_index = value.index();
         constexpr std::array<void (*)(std::byte*, Base&&), sizeof...(SubClasses)> moveConstructors = {
-            +[](std::byte* storage, Base&& value1) { std::construct_at(reinterpret_cast<SubClasses*>(storage), static_cast<SubClasses&&>(value1)); }...};
+            +[](std::byte* storage, Base&& value1)
+            { std::construct_at(reinterpret_cast<SubClasses*>(storage), static_cast<SubClasses&&>(value1)); }...};
         moveConstructors[this->m_index](this->m_storage, std::forward<U>(value));
     }
 

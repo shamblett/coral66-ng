@@ -113,7 +113,8 @@ public:
 
     constexpr void resize(std::size_t size, const T& value) noexcept
     {
-        if (size > m_size) {
+        if (size > m_size)
+        {
             std::fill(m_array.begin() + m_size, m_array.begin() + size, value);
         }
         m_size = size;

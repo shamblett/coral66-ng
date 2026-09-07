@@ -7,11 +7,11 @@
 
 #include <llvm/Support/Compiler.h>
 
+#include <bit>
 #include <cstring>
 #include <type_traits>
 #include <unordered_set>
 #include <vector>
-#include <bit>
 
 #include "abstract_intrusive_variant.hpp"
 #include "utilities.hpp"
@@ -275,16 +275,14 @@ public:
     }
 
     template <class T>
-    requires(std::is_same_v<std::remove_cvref_t<T>, Base>)
-        [[nodiscard]] not_null<Base> alloc(T&& value)
+    requires(std::is_same_v<std::remove_cvref_t<T>, Base>) [[nodiscard]] not_null<Base> alloc(T&& value)
     {
-        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, T&&), sizeof...(Subclasses)>
-            constructors = {
-                +[](IntrusiveVariantAllocator* self, T&& value1) -> Base*
-                {
-                    using SubclassRef = decltype(std::forward_like<T>(std::declval<Subclasses&>()));
-                    return self->template alloc<Subclasses>(static_cast<SubclassRef>(value1));
-                }...};
+        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, T&&), sizeof...(Subclasses)> constructors = {
+            +[](IntrusiveVariantAllocator* self, T&& value1) -> Base*
+            {
+                using SubclassRef = decltype(std::forward_like<T>(std::declval<Subclasses&>()));
+                return self->template alloc<Subclasses>(static_cast<SubclassRef>(value1));
+            }...};
         return constructors[value.index()](this, std::forward<T>(value));
     }
 

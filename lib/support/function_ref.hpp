@@ -42,14 +42,12 @@ public:
     FunctionRef(std::nullptr_t) noexcept {}
 
     template <class Callable>
-    requires(!std::is_same_v<std::remove_cvref_t<Callable>, FunctionRef> &&
-             std::is_invocable_r_v<Ret, Callable, Params...>)
-    explicit FunctionRef(Callable&& callable) noexcept
+    requires(!std::is_same_v<std::remove_cvref_t<Callable>, FunctionRef>
+             && std::is_invocable_r_v<Ret, Callable, Params...>) explicit FunctionRef(Callable&& callable) noexcept
         : m_callback(+[](void* callable1, Params... params) -> Ret
                      {
-                         return std::invoke_r<Ret>(
-                             *static_cast<std::remove_reference_t<Callable>*>(callable1),
-                             std::forward<Params>(params)...);
+                         return std::invoke_r<Ret>(*static_cast<std::remove_reference_t<Callable>*>(callable1),
+                                                   std::forward<Params>(params)...);
                      }),
           m_callable(const_cast<void*>(static_cast<const void*>(std::addressof(callable))))
     {

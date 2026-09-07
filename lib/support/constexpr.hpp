@@ -135,49 +135,73 @@ concept TupleLike = requires
 };
 
 template <class>
-struct is_tuple : std::false_type {};
+struct is_tuple : std::false_type
+{
+};
 template <class... T>
-struct is_tuple<std::tuple<T...>> : std::true_type {};
+struct is_tuple<std::tuple<T...>> : std::true_type
+{
+};
 
 template <class T>
 concept Tuple = is_tuple<std::remove_cvref_t<T>>::value;
 
 template <class>
-struct is_variant : std::false_type {};
+struct is_variant : std::false_type
+{
+};
 template <class... T>
-struct is_variant<std::variant<T...>> : std::true_type {};
+struct is_variant<std::variant<T...>> : std::true_type
+{
+};
 
 template <class T>
 concept Variant = is_variant<std::remove_cvref_t<T>>::value;
 
 template <class>
-struct is_unique_ptr : std::false_type {};
+struct is_unique_ptr : std::false_type
+{
+};
 template <class T, class Del>
-struct is_unique_ptr<std::unique_ptr<T, Del>> : std::true_type {};
+struct is_unique_ptr<std::unique_ptr<T, Del>> : std::true_type
+{
+};
 
 template <class T>
 concept UniquePtr = is_unique_ptr<std::remove_cvref_t<T>>::value;
 
 template <class>
-struct is_optional : std::false_type {};
+struct is_optional : std::false_type
+{
+};
 template <class T>
-struct is_optional<std::optional<T>> : std::true_type {};
+struct is_optional<std::optional<T>> : std::true_type
+{
+};
 
 template <class T>
 concept Optional = is_optional<std::remove_cvref_t<T>>::value;
 
 template <class>
-struct is_vector : std::false_type {};
+struct is_vector : std::false_type
+{
+};
 template <class T>
-struct is_vector<std::vector<T>> : std::true_type {};
+struct is_vector<std::vector<T>> : std::true_type
+{
+};
 
 template <class T>
 concept Vector = is_vector<std::remove_cvref_t<T>>::value;
 
 template <class>
-struct is_shared_ptr : std::false_type {};
+struct is_shared_ptr : std::false_type
+{
+};
 template <class T>
-struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type
+{
+};
 
 template <class T>
 concept SharedPtr = is_shared_ptr<std::remove_cvref_t<T>>::value;

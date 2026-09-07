@@ -58,11 +58,13 @@ public:
     template <class T>
     constexpr static index_type indexOf() noexcept
     {
-        static_assert((std::is_same_v<T, Args> || ...), "Template type was not specified in the sets of possible base classes");
+        static_assert((std::is_same_v<T, Args> || ...),
+                      "Template type was not specified in the sets of possible base classes");
         constexpr std::array<bool, sizeof...(Args)> matches = {std::is_same_v<T, Args>...};
         for (std::size_t i = 0; i < matches.size(); ++i)
         {
-            if (matches[i]) return i;
+            if (matches[i])
+                return i;
         }
         std::unreachable();
     }
@@ -103,20 +105,18 @@ public:
     {
         using Callable = decltype(detail::overload{std::forward<F>(f)...});
         using FirstArg = std::tuple_element_t<0, std::tuple<Args...>>;
-        
+
         using ForwardedBase = decltype(std::forward_like<Self>(std::declval<AbstractIntrusiveVariant&>()));
         using ReturnType = std::invoke_result_t<Callable, decltype(std::forward_like<Self>(std::declval<FirstArg&>()))>;
 
-        constexpr std::array<ReturnType (*)(ForwardedBase, Callable&&), sizeof...(Args)>
-            calling = {{+[](ForwardedBase base, Callable&& callable) -> ReturnType
-                        {
-                            using TargetType = std::remove_reference_t<decltype(std::forward_like<Self>(std::declval<Args&>()))>;
-                            return callable(static_cast<TargetType&>(base));
-                        }...}};
+        constexpr std::array<ReturnType (*)(ForwardedBase, Callable&&), sizeof...(Args)> calling = {
+            {+[](ForwardedBase base, Callable&& callable) -> ReturnType
+             {
+                 using TargetType = std::remove_reference_t<decltype(std::forward_like<Self>(std::declval<Args&>()))>;
+                 return callable(static_cast<TargetType&>(base));
+             }...}};
         return calling[self.index()](static_cast<ForwardedBase>(self), Callable{std::forward<F>(f)...});
     }
-
-
 
     [[nodiscard]] friend bool operator==(const AbstractIntrusiveVariant& lhs,
                                          const AbstractIntrusiveVariant& rhs) noexcept
@@ -214,22 +214,24 @@ using IntrVarPtr = std::unique_ptr<T, IntrusiveVariantDeleter<T>>;
                                                                                                                        \
     template <class T, class Self>                                                                                     \
     requires(!std::is_same_v<T, ThisClass>) CORAL66_ERROR_ON_USAGE("Cast will never succeed")                          \
-    CORAL66_ALWAYS_INLINE decltype(auto) as(this Self&& self) noexcept                                                 \
+        CORAL66_ALWAYS_INLINE decltype(auto)                                                                           \
+            as(this Self&& self) noexcept                                                                              \
     {                                                                                                                  \
-        return std::forward<Self>(self).AbstractIntrusiveVariant::template as<T>();                                                        \
+        return std::forward<Self>(self).AbstractIntrusiveVariant::template as<T>();                                    \
     }                                                                                                                  \
                                                                                                                        \
     template <class T, class Self>                                                                                     \
-    requires std::is_same_v<T, ThisClass>                                                                              \
-    CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                                                      \
-    CORAL66_ALWAYS_INLINE decltype(auto) as(this Self&& self) noexcept                                                 \
+    requires std::is_same_v<T, ThisClass> CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                \
+        CORAL66_ALWAYS_INLINE decltype(auto)                                                                           \
+            as(this Self&& self) noexcept                                                                              \
     {                                                                                                                  \
         return std::forward<Self>(self);                                                                               \
     }                                                                                                                  \
                                                                                                                        \
     template <class T, class Self>                                                                                     \
     requires(!std::is_same_v<T, ThisClass>) CORAL66_WARN_ON_USAGE("Function will always return nullptr")               \
-    CORAL66_ALWAYS_INLINE auto tryAs(this Self&& self) noexcept                                                        \
+        CORAL66_ALWAYS_INLINE auto                                                                                     \
+        tryAs(this Self&& self) noexcept                                                                               \
     {                                                                                                                  \
         using Target = std::remove_reference_t<decltype(std::forward_like<Self>(std::declval<T&>()))>;                 \
         return static_cast<Target*>(nullptr);                                                                          \
@@ -237,7 +239,8 @@ using IntrVarPtr = std::unique_ptr<T, IntrusiveVariantDeleter<T>>;
                                                                                                                        \
     template <class T, class Self>                                                                                     \
     requires std::is_same_v<T, ThisClass> CORAL66_WARN_ON_USAGE("Class is already of type " #ThisClass)                \
-    CORAL66_ALWAYS_INLINE auto tryAs(this Self&& self) noexcept                                                        \
+        CORAL66_ALWAYS_INLINE auto                                                                                     \
+        tryAs(this Self&& self) noexcept                                                                               \
     {                                                                                                                  \
         using Target = std::remove_reference_t<decltype(std::forward_like<Self>(std::declval<T&>()))>;                 \
         return static_cast<Target*>(&self);                                                                            \
@@ -247,5 +250,5 @@ using IntrVarPtr = std::unique_ptr<T, IntrusiveVariantDeleter<T>>;
     CORAL66_WARN_ON_USAGE("Class type " #ThisClass " known ahead of time already")                                     \
     CORAL66_ALWAYS_INLINE decltype(auto) match(this Self&& self, F&&... f)                                             \
     {                                                                                                                  \
-        return std::forward<Self>(self).AbstractIntrusiveVariant::match(std::forward<F>(f)...);                                            \
+        return std::forward<Self>(self).AbstractIntrusiveVariant::match(std::forward<F>(f)...);                        \
     }

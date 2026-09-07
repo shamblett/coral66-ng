@@ -181,7 +181,10 @@ constexpr MaxVector<char, maxSize> utf32ToUtf8(std::u32string_view const stringV
 } // namespace Constexpr
 
 template <class T>
-requires requires(T value) { std::to_string(value); }
+requires requires(T value)
+{
+    std::to_string(value);
+}
 std::string to_string(T value)
 {
     return std::to_string(value);
