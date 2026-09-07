@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <array>
 
 #include "constexpr.hpp"
@@ -44,41 +45,29 @@ public:
     constexpr MaxVector(std::initializer_list<T> initializerList) noexcept : m_size(initializerList.size())
     {
         CORAL66_ASSERT(m_size <= N);
-        for (std::size_t i = 0; i < m_size; i++)
-        {
-            m_array[i] = initializerList[i];
-        }
+        std::copy(initializerList.begin(), initializerList.end(), m_array.begin());
     }
 
     template <std::size_t N2>
     explicit constexpr MaxVector(const MaxVector<T, N2>& rhs) noexcept : m_size(rhs.size())
     {
         CORAL66_ASSERT(m_size <= N);
-        for (std::size_t i = 0; i < m_size; i++)
-        {
-            m_array[i] = rhs[i];
-        }
+        std::copy(rhs.begin(), rhs.end(), m_array.begin());
     }
 
     constexpr MaxVector& operator=(std::initializer_list<T> initializerList) noexcept
     {
         m_size = initializerList.size();
         CORAL66_ASSERT(m_size <= N);
-        for (std::size_t i = 0; i < m_size; i++)
-        {
-            m_array[i] = initializerList[i];
-        }
+        std::copy(initializerList.begin(), initializerList.end(), m_array.begin());
         return *this;
     }
 
     template <class Iter>
-    constexpr MaxVector(Iter first, Iter last) : m_size(last - first)
+    constexpr MaxVector(Iter first, Iter last) : m_size(std::distance(first, last))
     {
         CORAL66_ASSERT(m_size <= N);
-        for (auto iter = first; iter != last; ++iter)
-        {
-            m_array[iter - first] = *iter;
-        }
+        std::copy(first, last, m_array.begin());
     }
 
     [[nodiscard]] constexpr std::size_t size() const noexcept
@@ -124,9 +113,8 @@ public:
 
     constexpr void resize(std::size_t size, const T& value) noexcept
     {
-        for (std::size_t i = m_size; i < size; ++i)
-        {
-            m_array[i] = value;
+        if (size > m_size) {
+            std::fill(m_array.begin() + m_size, m_array.begin() + size, value);
         }
         m_size = size;
         CORAL66_ASSERT(m_size <= N);
@@ -134,7 +122,7 @@ public:
 
     [[nodiscard]] constexpr bool empty() const noexcept
     {
-        return m_size;
+        return m_size == 0;
     }
 
     [[nodiscard]] constexpr T& operator[](std::size_t n) noexcept
