@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <type_traits>
 #include <utility>
 
 namespace coral66
@@ -21,14 +22,16 @@ namespace coral66
  * @tparam T The type of the variable to be reset.
  */
 template <class T>
-class ValueReset
+class [[nodiscard]] ValueReset
 {
     T m_valueAfter;
     T* m_assignedTo;
 
 public:
-    template <class U = T>
-    ValueReset(T& assignedTo, U valueAfter) : m_valueAfter(valueAfter), m_assignedTo(&assignedTo)
+    template <class U>
+    requires std::is_constructible_v<T, U>
+    explicit ValueReset(T& assignedTo, U&& valueAfter)
+        : m_valueAfter(std::forward<U>(valueAfter)), m_assignedTo(&assignedTo)
     {
     }
 
@@ -36,7 +39,7 @@ public:
     {
         if (m_assignedTo)
         {
-            *m_assignedTo = m_valueAfter;
+            *m_assignedTo = std::move(m_valueAfter);
         }
     }
 
@@ -44,16 +47,21 @@ public:
     ValueReset& operator=(const ValueReset&) = delete;
 
     ValueReset(ValueReset&& rhs) noexcept
+        : m_valueAfter(std::move(rhs.m_valueAfter)), 
+          m_assignedTo(std::exchange(rhs.m_assignedTo, nullptr))
     {
-        m_assignedTo = std::exchange(rhs.m_assignedTo, nullptr);
-        m_valueAfter = rhs.m_valueAfter;
     }
 
     ValueReset& operator=(ValueReset&& rhs) noexcept
     {
         m_assignedTo = std::exchange(rhs.m_assignedTo, nullptr);
-        m_valueAfter = rhs.m_valueAfter;
+        m_valueAfter = std::move(rhs.m_valueAfter);
         return *this;
     }
 };
+
+
+template <class T, class U>
+ValueReset(T&, U&&) -> ValueReset<T>;
+
 } // namespace coral66
