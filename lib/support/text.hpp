@@ -139,7 +139,7 @@ BackInserter stringOfSameWidth(std::string_view const original, char characterTo
     return std::fill_n(backInserter, utf8Width, characterToReplace);
 }
 
-inline std::string to_string(std::string_view stringView)
+inline std::string to_string(const std::string_view stringView)
 {
     return std::string(stringView);
 }

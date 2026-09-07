@@ -39,7 +39,7 @@ class FunctionRef<Ret(Params...)>
 
 public:
     FunctionRef() = default;
-    FunctionRef(std::nullptr_t) noexcept {}
+    explicit FunctionRef(std::nullptr_t) noexcept {}
 
     template <class Callable>
     requires(!std::is_same_v<std::remove_cvref_t<Callable>, FunctionRef>
