@@ -12,6 +12,8 @@
  */
 
 #include <cassert>
+#include <type_traits>
+#include <utility>
 #include <cstdio>
 #include <cstdlib>
 #include <functional>
@@ -102,16 +104,10 @@ constexpr decltype(auto) get(Variant&& variant) noexcept
 template <typename G>
 struct YComb
 {
-    template <typename... X>
-    constexpr decltype(auto) operator()(X&&... x) const
+    template <class Self, typename... X>
+    constexpr decltype(auto) operator()(this Self&& self, X&&... x)
     {
-        return g(*this, std::forward<X>(x)...);
-    }
-
-    template <typename... X>
-    constexpr decltype(auto) operator()(X&&... x)
-    {
-        return g(*this, std::forward<X>(x)...);
+        return self.g(std::forward<Self>(self), std::forward<X>(x)...);
     }
 
     G g;
@@ -139,10 +135,10 @@ overload(Ts...) -> overload<Ts...>;
 template <typename G, class Ret>
 struct YWithRet
 {
-    template <typename... X>
-    Ret operator()(X&&... x) const&
+    template <class Self, typename... X>
+    Ret operator()(this Self&& self, X&&... x)
     {
-        return g(*this, std::forward<X>(x)...);
+        return self.g(std::forward<Self>(self), std::forward<X>(x)...);
     }
 
     G g;
@@ -458,58 +454,6 @@ constexpr T1 roundUpTo(T1 number, T2 multiple)
     }
 
     return number + multiple - remainder;
-}
-
-namespace detail
-{
-template <class F, class... Args>
-class BindFrontImpl
-{
-    F f;
-    std::tuple<Args...> front;
-
-public:
-    explicit BindFrontImpl(F f, std::tuple<Args...> args) : f(std::move(f)), front(std::move(args)) {}
-
-    template <class... Last>
-    decltype(auto) operator()(Last&&... last) & noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
-    {
-        return std::apply([&]<typename... T0>(T0&&... members) -> decltype(auto)
-                          { return std::invoke(f, std::forward<T0>(members)..., std::forward<Last>(last)...); }, front);
-    }
-
-    template <class... Last>
-    decltype(auto) operator()(Last&&... last) const& noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
-    {
-        return std::apply([&]<typename... T0>(T0&&... members) -> decltype(auto)
-                          { return std::invoke(f, std::forward<T0>(members)..., std::forward<Last>(last)...); }, front);
-    }
-
-    template <class... Last>
-    decltype(auto) operator()(Last&&... last) && noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
-    {
-        return std::apply(
-            [&]<typename... T0>(T0&&... members) -> decltype(auto)
-            { return std::invoke(std::move(f), std::forward<T0>(members)..., std::forward<Last>(last)...); },
-            std::move(front));
-    }
-
-    template <class... Last>
-    decltype(auto) operator()(Last&&... last) const&& noexcept(std::is_nothrow_invocable_v<F, Args..., Last...>)
-    {
-        return std::apply(
-            [&]<typename... T0>(T0&&... members) -> decltype(auto)
-            { return std::invoke(std::move(f), std::forward<T0>(members)..., std::forward<Last>(last)...); },
-            std::move(front));
-    }
-};
-
-} // namespace detail
-
-template <class F, class... Args>
-auto bind_front(F&& f, Args&&... args)
-{
-    return detail::BindFrontImpl(std::forward<F>(f), std::make_tuple(std::forward<Args>(args)...));
 }
 
 template <class F, class G>

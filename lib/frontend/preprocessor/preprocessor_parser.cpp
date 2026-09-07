@@ -38,7 +38,7 @@ coral66::lexer::PPTokenIterator findNewline(coral66::lexer::PPTokenIterator cons
                                             coral66::lexer::PPTokenIterator const end)
 {
     return std::find_if(begin, end,
-                        coral66::compose(coral66::bind_front(std::equal_to{}, coral66::lexer::TokenType::Newline),
+                        coral66::compose(std::bind_front(std::equal_to{}, coral66::lexer::TokenType::Newline),
                                          &coral66::lexer::PPToken::getTokenType));
 }
 
@@ -46,7 +46,7 @@ coral66::lexer::PPTokenIterator findSemicolon(coral66::lexer::PPTokenIterator co
                                               coral66::lexer::PPTokenIterator const end)
 {
     return std::find_if(begin, end,
-                        coral66::compose(coral66::bind_front(std::equal_to{}, coral66::lexer::TokenType::SemiColon),
+                        coral66::compose(std::bind_front(std::equal_to{}, coral66::lexer::TokenType::SemiColon),
                                          &coral66::lexer::PPToken::getTokenType));
 }
 

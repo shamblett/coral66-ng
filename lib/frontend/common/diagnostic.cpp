@@ -221,7 +221,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                         canvas.back().begin() + indent,
                         canvas.back().begin()
                             + std::min<std::size_t>(indent + insertAfter.text.size() + 1, canvas.back().size()),
-                        coral66::bind_front(std::equal_to{}, ' '));
+                        std::bind_front(std::equal_to{}, ' '));
                     if (!allAreSpace)
                     {
                         canvas.resize(canvas.size() + 1, std::string(widthOfText, ' '));
@@ -256,7 +256,7 @@ void printLine(llvm::raw_ostream& ss, std::uint64_t const line, std::uint64_t co
                     std::all_of(canvas.back().begin() + indent,
                                 canvas.back().begin()
                                     + std::min<std::size_t>(indent + annotate.text.size() + 1, canvas.back().size()),
-                                coral66::bind_front(std::equal_to{}, ' '));
+                                std::bind_front(std::equal_to{}, ' '));
                 if (!allAreSpace)
                 {
                     canvas.resize(canvas.size() + 1, std::string(widthOfText, ' '));

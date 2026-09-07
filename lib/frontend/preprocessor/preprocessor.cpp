@@ -161,7 +161,7 @@ std::pair<std::optional<coral66::pp::Preprocessor::Macro>, const coral66::lexer:
         }
         auto string = curr->getValue();
         auto result = std::ranges::find_if(
-            argumentList, compose(coral66::bind_front(std::equal_to{}, string), &lexer::PPToken::getValue));
+            argumentList, compose(std::bind_front(std::equal_to{}, string), &lexer::PPToken::getValue));
         if (result == argumentList.end())
         {
             argumentList.push_back(*curr++);
@@ -219,7 +219,7 @@ std::uint64_t coral66::pp::Preprocessor::getLineEndOffset(std::uint32_t const fi
 
 void coral66::pp::Preprocessor::visit(const TextBlock& text)
 {
-    macroSubstitute({text.tokens.begin(), text.tokens.end()}, coral66::bind_front(&Preprocessor::pushLine, this));
+    macroSubstitute({text.tokens.begin(), text.tokens.end()}, std::bind_front(&Preprocessor::pushLine, this));
 }
 
 void coral66::pp::Preprocessor::visit(const File& file)
