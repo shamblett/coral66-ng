@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <unordered_set>
 #include <vector>
+#include <bit>
 
 #include "abstract_intrusive_variant.hpp"
 #include "utilities.hpp"
@@ -55,34 +56,6 @@ struct Slab<allocSize, align, count, false>
     }
 };
 
-constexpr std::size_t log2n(std::size_t n)
-{
-    std::size_t r = 0;
-    if (n >> 16)
-    {
-        r += 16;
-        n >>= 16;
-    }
-    if (n >> 8)
-    {
-        r += 8;
-        n >>= 8;
-    }
-    if (n >> 4)
-    {
-        r += 4;
-        n >>= 4;
-    }
-    if (n >> 2)
-    {
-        r += 2;
-        n >>= 2;
-    }
-    if (n - 1)
-        ++r;
-    return r;
-}
-
 template <std::size_t allocSize, std::size_t align, std::size_t count>
 struct Slab<allocSize, align, count, true>
 {
@@ -90,7 +63,7 @@ struct Slab<allocSize, align, count, true>
     alignas(align) std::byte storage[size]{};
     struct
     {
-        suitableUInt<count> index : log2n(count) + 1;
+        suitableUInt<count> index : std::bit_width(count);
         suitableUInt<count> destroyed : 1;
     } metadata[size / allocSize]{};
 
@@ -301,25 +274,18 @@ public:
         head = pointerToStart;
     }
 
-    template <class U = Base>
-    requires(std::is_same_v<U, Base> && (std::is_copy_constructible_v<Subclasses> && ...))
-        [[nodiscard]] not_null<Base> alloc(const Base& value)
+    template <class T>
+    requires(std::is_same_v<std::remove_cvref_t<T>, Base>)
+        [[nodiscard]] not_null<Base> alloc(T&& value)
     {
-        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, const Base&), sizeof...(Subclasses)>
-            copyConstructors = {
-                +[](IntrusiveVariantAllocator* self, const Base& value1) -> Base*
-                { return self->template alloc<Subclasses>(static_cast<const Subclasses&>(value1)); }...};
-        return copyConstructors[value.index()](this, value);
-    }
-
-    template <class U = Base>
-    requires(std::is_same_v<U, Base> && (std::is_move_constructible_v<Subclasses> && ...))
-        [[nodiscard]] not_null<Base> alloc(Base&& value)
-    {
-        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, Base&&), sizeof...(Subclasses)> moveConstructors = {
-            +[](IntrusiveVariantAllocator* self, Base&& value1) -> Base*
-            { return self->template alloc<Subclasses>(static_cast<Subclasses&&>(std::move(value1))); }...};
-        return moveConstructors[value.index()](this, std::move(value));
+        constexpr std::array<Base* (*)(IntrusiveVariantAllocator*, T&&), sizeof...(Subclasses)>
+            constructors = {
+                +[](IntrusiveVariantAllocator* self, T&& value1) -> Base*
+                {
+                    using SubclassRef = decltype(std::forward_like<T>(std::declval<Subclasses&>()));
+                    return self->template alloc<Subclasses>(static_cast<SubclassRef>(value1));
+                }...};
+        return constructors[value.index()](this, std::forward<T>(value));
     }
 
     template <class U, class... Args>
@@ -330,7 +296,7 @@ public:
         std::byte* previouslyContained;
         std::memcpy(&previouslyContained, *head, sizeof(std::byte*));
         __asan_poison_memory_region(*head + sizeof(U), allocSize - sizeof(U));
-        auto* object = new (*head) U(std::forward<Args>(args)...);
+        auto* object = std::construct_at(reinterpret_cast<U*>(*head), std::forward<Args>(args)...);
         if constexpr (needsDestructor)
         {
             auto& slab = *m_slabs[head - m_heads.begin()];
