@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <functional>
+#include <memory>
 #include <type_traits>
 
 #include "utilities.hpp"
@@ -37,15 +39,19 @@ class FunctionRef<Ret(Params...)>
 
 public:
     FunctionRef() = default;
+    FunctionRef(std::nullptr_t) noexcept {}
 
     template <class Callable>
-    requires(!std::is_same_v<std::decay_t<Callable>, FunctionRef>) explicit FunctionRef(Callable&& callable)
+    requires(!std::is_same_v<std::remove_cvref_t<Callable>, FunctionRef> &&
+             std::is_invocable_r_v<Ret, Callable, Params...>)
+    explicit FunctionRef(Callable&& callable) noexcept
         : m_callback(+[](void* callable1, Params... params) -> Ret
                      {
-                         return (*static_cast<std::remove_reference_t<Callable>*>(callable1))(
+                         return std::invoke_r<Ret>(
+                             *static_cast<std::remove_reference_t<Callable>*>(callable1),
                              std::forward<Params>(params)...);
                      }),
-          m_callable(&callable)
+          m_callable(const_cast<void*>(static_cast<const void*>(std::addressof(callable))))
     {
     }
 
