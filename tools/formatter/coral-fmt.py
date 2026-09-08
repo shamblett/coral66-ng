@@ -2,7 +2,7 @@
 import sys
 import re
 
-def format_coral66(source_code, indent_size=4):
+def format_coral66(source_code, indent_size=2):
     lines = source_code.splitlines()
     formatted_lines = []
     indent_level = 0
@@ -54,7 +54,7 @@ if __name__ == "__main__":
         sys.exit(1)
         
     file_path = sys.argv[1]
-    indent_size = 4
+    indent_size = 2
     
     if "--indent" in sys.argv:
         try:
