@@ -72,7 +72,7 @@ struct CustomFormat<U's'>
 {
     // Greedily accept everything so we can properly error
     template <class T>
-    std::string operator()(T integer) const
+    static std::string operator()(T integer)
     {
         static_assert(std::is_integral_v<std::decay_t<T>>, "Argument to %s must be an integer type");
         if (integer != 1)

@@ -20,7 +20,7 @@ class Type;
 class ProgramInterface;
 class Issue;
 
-/*
+/**
  * A representation of compile-time constant expressions.
  */
 
