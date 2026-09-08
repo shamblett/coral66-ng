@@ -14,7 +14,7 @@
 namespace coral66::semantics
 {
 
-/*
+/**
  * Structure for the third pass. This checks for valid goto label boundaries, unreachable code,
  * bounds checking for array access, part word accesses, fixed scaling, and procedure return paths.
  */

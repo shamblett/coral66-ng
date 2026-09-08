@@ -11,6 +11,15 @@
 #include "lib/frontend/semantics/semantic_context.hpp"
 #include "lib/frontend/semantics/semantics.hpp"
 
+/**
+ * Defines the main semantics Program object and semantic analysis entry point.
+ *
+ * This file contains the declaration for the Program class, which encapsulates the fully
+ * analyzed state of a translation unit, including the source object, global symbols, and
+ * semantic context. It also declares the analyse() function, which orchestrates the
+ * semantic phase (name resolution, type checking, etc.) on an Abstract Syntax Tree (AST).
+ */
+
 namespace coral66::semantics
 {
 

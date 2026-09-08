@@ -10,7 +10,7 @@
 
 #include "lib/frontend/common/diagnostic_collection.hpp"
 
-/*
+/**
  * Preprocessor support functions.
  */
 
