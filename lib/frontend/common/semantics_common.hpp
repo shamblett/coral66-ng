@@ -20,7 +20,9 @@
 namespace coral66::semantics
 {
 
-struct ProgramInterface {};
+struct ProgramInterface
+{
+};
 
 struct TableInfo;
 struct OverlayInfo;

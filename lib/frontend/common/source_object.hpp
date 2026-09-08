@@ -219,9 +219,8 @@ public:
     template <typename DiagnosticType>
     bool findDiagnostic(const DiagnosticType& diagnostic) const
     {
-        if (auto result =
-                std::ranges::find_if(m_diagnostics, [&diagnostic](auto const& item)
-                                     { return item.getName() == diagnostic.getName(); });
+        if (auto result = std::ranges::find_if(m_diagnostics, [&diagnostic](auto const& item)
+                                               { return item.getName() == diagnostic.getName(); });
             result != m_diagnostics.end())
         {
             return true;

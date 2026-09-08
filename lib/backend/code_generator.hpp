@@ -12,6 +12,15 @@
 #include "lib/frontend/semantics/semantics.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 
+/** Internal LLVM Code Generation Implementation
+ *
+ * This file defines the `CodeGenerator` class, which implements the detailed
+ * AST visitor pattern for the Coral 66 compiler. It is responsible for recursively
+ * walking the semantically validated Abstract Syntax Tree (AST) and emitting the
+ * corresponding LLVM Intermediate Representation (IR) instructions, managing scopes,
+ * types, and variables.
+ */
+
 namespace coral66::cgllvm
 {
 

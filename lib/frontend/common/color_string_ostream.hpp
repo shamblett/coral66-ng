@@ -80,7 +80,8 @@ public:
         }
         else
         {
-            m_segments.push_back({.text = std::move(text), .color = m_currentColor, .bold = m_currentBold, .bg = m_currentBg});
+            m_segments.push_back(
+                {.text = std::move(text), .color = m_currentColor, .bold = m_currentBold, .bg = m_currentBg});
         }
         m_pos += Size;
     }

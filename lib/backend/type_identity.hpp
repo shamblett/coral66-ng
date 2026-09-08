@@ -14,7 +14,6 @@
 #include "lib/frontend/semantics/semantics.hpp"
 
 /**
- *  TypeIdentity.hpp
  *  Defines backend-specific type hashing and equality comparison.
  *
  * This file contains TypeHasher and TypeEqual structures for semantics::Type.

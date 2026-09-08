@@ -12,6 +12,17 @@
 #include "lib/frontend/syntax/syntax.hpp"
 #include "lib/support/filesystem.hpp"
 
+/**
+ * This file defines the primary entry point for the Coral 66 compiler's
+ * LLVM backend. It provides the `generateLLVM` function, which is responsible
+ * for orchestrating the translation of a semantically validated Coral 66
+ * Abstract Syntax Tree (AST) into LLVM Intermediate Representation (IR).
+ *
+ * The `Options` struct allows configuration of the code generation process,
+ * such as controlling debug information emission, relocation models, and
+ * optimization levels.
+ */
+
 namespace coral66
 {
 namespace semantics

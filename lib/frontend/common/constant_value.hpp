@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "semantics_common.hpp"
-
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/APSInt.h>
 
@@ -15,6 +13,7 @@
 #include <variant>
 
 #include "language_options.hpp"
+#include "semantics_common.hpp"
 
 namespace coral66::semantics
 {

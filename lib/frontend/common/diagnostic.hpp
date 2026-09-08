@@ -85,8 +85,7 @@ constexpr std::int64_t getBiggestPercentArg(std::string_view text)
     {
         max = std::max<std::int64_t>(max, result->index);
     }
-    std::int64_t sizes[] = {
-        max, static_cast<std::int64_t>(std::ranges::max(Args::indices))...};
+    std::int64_t sizes[] = {max, static_cast<std::int64_t>(std::ranges::max(Args::indices))...};
     return std::ranges::max(sizes) + 1;
 }
 
@@ -664,9 +663,8 @@ Message diagnostic<N, format, Mods...>::args(const T& location, const source_int
                                              Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
-    [[maybe_unused]] auto v =
-        this->checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
-                                                                  // function to improve debug perf a lil
+    [[maybe_unused]] auto v = this->checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
+                                                                                 // function to improve debug perf a lil
     static_assert(locationConstraintCheck<T>(), "First argument must denote a location");
     auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
                                      std::index_sequence_for<Args...>{}, sourceInterface);
@@ -678,8 +676,7 @@ template <class... Args>
 Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
-    [[maybe_unused]] auto v =
-        this->checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
+    [[maybe_unused]] auto v = this->checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
     auto array =
         createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{});
     return print(getFormat(), array);
