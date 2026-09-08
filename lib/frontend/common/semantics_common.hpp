@@ -13,6 +13,10 @@
 #include "lib/support/abstract_intrusive_variant.hpp"
 #include "lib/support/utilities.hpp"
 
+/**
+ *  Semantics declarations common to the front end and semantics.
+ */
+
 namespace coral66::semantics
 {
 

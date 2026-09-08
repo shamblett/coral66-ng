@@ -16,6 +16,10 @@
 #include "lib/support/utilities.hpp"
 #include "source_interface.hpp"
 
+/**
+ *  Lexer declarations common to the front end and the lexer.
+ */
+
 namespace coral66::lexer
 {
 struct NonCharString;
