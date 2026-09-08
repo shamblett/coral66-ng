@@ -11,6 +11,14 @@
 #include "lib/frontend/common/messages/message.hpp"
 #include "lib/frontend/syntax/syntax.hpp"
 
+/**
+ * Defines the Parser interface and parsing context.
+ *
+ * This file contains the declarations for the Context class, which manages
+ * state and diagnostics during parsing, and the main entry points for parsing
+ * a Coral66 token stream into an Abstract Syntax Tree (AST).
+ */
+
 namespace coral66::parser
 {
 
