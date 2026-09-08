@@ -342,11 +342,10 @@ bool CMIProcessor::parseDocument(const rapidjson::Document& doc,
         std::string name = sym["name"].GetString();
         std::string category = sym["symbol_category"].GetString();
 
-        CommunicatorType commType = CommunicatorType::Library;
+        auto commType = CommunicatorType::Library;
         if (sym.HasMember("communicator_type"))
         {
-            std::string ctStr = sym["communicator_type"].GetString();
-            if (ctStr == "Common")
+            if (std::string ctStr = sym["communicator_type"].GetString(); ctStr == "Common")
                 commType = CommunicatorType::Common;
             else if (ctStr == "External")
                 commType = CommunicatorType::External;

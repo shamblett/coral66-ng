@@ -311,9 +311,7 @@ std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
 
             context.enterProcedure(isTyped);
 
-            bool hasBegin = (begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword);
-
-            if (!hasBegin)
+            if (const bool hasBegin = begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword; !hasBegin)
             {
                 // Scan ahead to see if there is an END without a preceding BEGIN in the same scope, before another PROCEDURE or END of file
                 int depth = 0;

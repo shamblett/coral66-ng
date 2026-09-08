@@ -665,7 +665,7 @@ Message diagnostic<N, format, Mods...>::args(const T& location, const source_int
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
     [[maybe_unused]] auto v =
-        this->template checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
+        this->checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
                                                                   // function to improve debug perf a lil
     static_assert(locationConstraintCheck<T>(), "First argument must denote a location");
     auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
@@ -679,7 +679,7 @@ Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
     [[maybe_unused]] auto v =
-        this->template checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
+        this->checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
     auto array =
         createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{});
     return print(getFormat(), array);

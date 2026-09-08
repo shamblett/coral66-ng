@@ -252,10 +252,10 @@ coral66::PPSourceObject coral66::lexer::tokenize(std::string source, llvm::raw_o
     }
     if (std::holds_alternative<EndComment>(stateMachine))
     {
-        auto& endComment = std::get<EndComment>(stateMachine);
-        if (!endComment.characters.empty() && isKeyword(endComment.characters))
+        auto& [characters] = std::get<EndComment>(stateMachine);
+        if (!characters.empty() && isKeyword(characters))
         {
-            context.push(1, TokenType::Identifier, endComment.characters);
+            context.push(1, TokenType::Identifier, characters);
         }
     }
     characterToSourceSpace.shrink_to_fit();
