@@ -26,7 +26,7 @@ namespace coral66::cgllvm
 {
 // Default std::hash and operator== of semantics::Type and subclasses make use of equality the way C defines it. This
 // does not equal the type system a backend may care about, however. The LLVM backend eg, does not care about any
-// qualifiers, making nonqualified, const qualpragma once
+// qualifiers, making nonqualified and const qualified types identical.
 
 template <class T>
 struct TypeHasher
@@ -85,9 +85,9 @@ struct TypeHasher<semantics::FunctionType>
     std::size_t operator()(const semantics::FunctionType& arg) const noexcept
     {
         const std::size_t hash =
-            std::accumulate(arg.getParameters().begin(), arg.getParameters().end(), 0,
-                            [](std::size_t hash, const semantics::FunctionType::Parameter& param)
-                            { return coral66::rawHashCombine(hash, TypeHasher<semantics::Type>{}(*param.type)); });
+            std::ranges::fold_left(arg.getParameters(), 0ULL,
+                                   [](std::size_t h, const semantics::FunctionType::Parameter& param)
+                                   { return coral66::rawHashCombine(h, TypeHasher<semantics::Type>{}(*param.type)); });
         return coral66::rawHashCombine(hash, coral66::hashCombine<TypeHasher>(arg.isLastVararg(), arg.getReturnType()));
     }
 };
