@@ -10,8 +10,10 @@
 
 namespace coral66
 {
-/*
+/**
+ *
  * Diagnostics collector.
+ *
  * Used to collect generated diagnostic messages in a particular pass.
  */
 template <typename DiagnosticType>

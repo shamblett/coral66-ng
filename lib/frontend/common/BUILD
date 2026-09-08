@@ -22,7 +22,6 @@ cc_library(
         "diagnostic_utilities.hpp",
         "language_options.hpp",
         "lexer_common.hpp",
-        "limits.hpp",
         "messages/errors.hpp",
         "messages/message.hpp",
         "messages/notes.hpp",
