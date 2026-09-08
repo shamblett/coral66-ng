@@ -7,22 +7,17 @@ load("@rules_cc//cc:cc_library.bzl", "cc_library")
 cc_library(
     name = "backend",
     srcs = [
-        "abi_implementation.cpp",
         "code_generation.cpp",
         "code_generator.cpp",
         "code_generator_declarations.cpp",
         "code_generator_expressions.cpp",
         "code_generator_statements.cpp",
         "numeric_support.cpp",
-        "x64_abi.cpp",
     ],
     hdrs = [
-        "abi_implementation.hpp",
         "code_generation.hpp",
         "code_generator.hpp",
-        "common_abi_implementation.hpp",
         "type_identity.hpp",
-        "x64_abi.hpp",
     ],
     visibility = [
         "//lib/main:__pkg__",
