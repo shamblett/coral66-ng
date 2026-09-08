@@ -40,9 +40,10 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                                 syntax::ParameterDeclaration::ParameterMode::Location;
 
                 if (const auto nextType = begin->getTokenType();
-                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::PointerKeyword || nextType == lexer::TokenType::FloatingKeyword
-                    || nextType == lexer::TokenType::BitsKeyword || nextType == lexer::TokenType::BitKeyword
-                    || nextType == lexer::TokenType::FixedKeyword || nextType == lexer::TokenType::ArrayKeyword)
+                    nextType == lexer::TokenType::IntegerKeyword || nextType == lexer::TokenType::PointerKeyword
+                    || nextType == lexer::TokenType::FloatingKeyword || nextType == lexer::TokenType::BitsKeyword
+                    || nextType == lexer::TokenType::BitKeyword || nextType == lexer::TokenType::FixedKeyword
+                    || nextType == lexer::TokenType::ArrayKeyword)
                 {
                     auto paramTypeToken = begin;
                     if (nextType != lexer::TokenType::ArrayKeyword)
@@ -180,9 +181,9 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                     startMode, begin, syntax::ParameterDeclaration::ParameterMode::Procedure, std::nullopt,
                     std::move(ids)));
             }
-            else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword || type == lexer::TokenType::FloatingKeyword
-                     || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
-                     || type == lexer::TokenType::FixedKeyword)
+            else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword
+                     || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword
+                     || type == lexer::TokenType::BitKeyword || type == lexer::TokenType::FixedKeyword)
             {
                 if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
                 {
@@ -219,7 +220,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                 begin++; // NOLINT(*-branch-clone)
             else if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                 begin++;
-            else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses 
+            else if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses
                      && begin->getTokenType() != lexer::TokenType::ValueKeyword
                      && begin->getTokenType() != lexer::TokenType::LocationKeyword
                      && begin->getTokenType() != lexer::TokenType::LabelKeyword
@@ -311,25 +312,30 @@ std::unique_ptr<syntax::ProcedureDeclaration> parseProcedure(lexer::CTokenIterat
 
             context.enterProcedure(isTyped);
 
-            if (const bool hasBegin = begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword; !hasBegin)
+            if (const bool hasBegin = begin != end && begin->getTokenType() == lexer::TokenType::BeginKeyword;
+                !hasBegin)
             {
-                // Scan ahead to see if there is an END without a preceding BEGIN in the same scope, before another PROCEDURE or END of file
+                // Scan ahead to see if there is an END without a preceding BEGIN in the same scope, before another
+                // PROCEDURE or END of file
                 int depth = 0;
                 auto it = begin;
                 while (it != end)
                 {
-                    if (it->getTokenType() == lexer::TokenType::BeginKeyword) depth++;
+                    if (it->getTokenType() == lexer::TokenType::BeginKeyword)
+                        depth++;
                     else if (it->getTokenType() == lexer::TokenType::EndKeyword)
                     {
                         if (depth == 0)
                         {
-                            context.log(errors::parser::MISSING_BEGIN_FOR_PROCEDURE.args(*start, context.getSourceInterface(), *start));
+                            context.log(errors::parser::MISSING_BEGIN_FOR_PROCEDURE.args(
+                                *start, context.getSourceInterface(), *start));
                             DiagnosticCollector::addDiagnostic(errors::parser::MISSING_BEGIN_FOR_PROCEDURE);
                             break;
                         }
                         depth--;
                     }
-                    else if (it->getTokenType() == lexer::TokenType::ProcedureKeyword || it->getTokenType() == lexer::TokenType::RecursiveKeyword)
+                    else if (it->getTokenType() == lexer::TokenType::ProcedureKeyword
+                             || it->getTokenType() == lexer::TokenType::RecursiveKeyword)
                     {
                         break;
                     }

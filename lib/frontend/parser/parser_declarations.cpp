@@ -157,9 +157,9 @@ std::vector<std::unique_ptr<syntax::Declaration>>
         return false;
     };
 
-    if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword || type == lexer::TokenType::FloatingKeyword
-        || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::FixedKeyword
-        || type == lexer::TokenType::ArrayKeyword)
+    if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword
+        || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword
+        || type == lexer::TokenType::FixedKeyword || type == lexer::TokenType::ArrayKeyword)
     {
         auto typeToken = begin;
         if (type != lexer::TokenType::ArrayKeyword)

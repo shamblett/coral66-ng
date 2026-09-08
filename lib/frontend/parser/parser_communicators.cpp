@@ -59,9 +59,10 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                                                             syntax::ParameterDeclaration::ParameterMode::Switch;
             begin++;
         }
-        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword || type == lexer::TokenType::FloatingKeyword
-                 || type == lexer::TokenType::BitsKeyword || type == lexer::TokenType::BitKeyword
-                 || type == lexer::TokenType::FixedKeyword || type == lexer::TokenType::ArrayKeyword)
+        else if (type == lexer::TokenType::IntegerKeyword || type == lexer::TokenType::PointerKeyword
+                 || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword
+                 || type == lexer::TokenType::BitKeyword || type == lexer::TokenType::FixedKeyword
+                 || type == lexer::TokenType::ArrayKeyword)
         {
             paramTypeToken = begin;
             if (type != lexer::TokenType::ArrayKeyword)

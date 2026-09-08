@@ -63,8 +63,8 @@ static bool isMultOperator(const lexer::TokenType t)
 
 static bool isNumberType(const lexer::TokenType t)
 {
-    return t == lexer::TokenType::IntegerKeyword || t == lexer::TokenType::PointerKeyword || t == lexer::TokenType::FloatingKeyword
-           || t == lexer::TokenType::FixedKeyword;
+    return t == lexer::TokenType::IntegerKeyword || t == lexer::TokenType::PointerKeyword
+           || t == lexer::TokenType::FloatingKeyword || t == lexer::TokenType::FixedKeyword;
 }
 
 std::unique_ptr<Expression> parseExpression(lexer::CTokenIterator& begin, const lexer::CTokenIterator end,
