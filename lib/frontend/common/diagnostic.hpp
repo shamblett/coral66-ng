@@ -86,8 +86,8 @@ constexpr std::int64_t getBiggestPercentArg(std::string_view text)
         max = std::max<std::int64_t>(max, result->index);
     }
     std::int64_t sizes[] = {
-        max, static_cast<std::int64_t>(*std::max_element(Args::indices.begin(), Args::indices.end()))...};
-    return *std::max_element(std::begin(sizes), std::end(sizes)) + 1;
+        max, static_cast<std::int64_t>(std::ranges::max(Args::indices))...};
+    return std::ranges::max(sizes) + 1;
 }
 
 template <std::size_t N, class... Args>
@@ -419,7 +419,7 @@ concept HasType = requires(T t)
 
 } // namespace detail
 
-template <std::size_t N, auto& format, class... Mods>
+template <std::size_t N, Constexpr::basic_fixed_string format, class... Mods>
 class diagnostic : public detail::Diagnostic::DiagnosticBase
 {
 public:
@@ -527,16 +527,17 @@ private:
         static_assert(!(constraint & TypeConstraint) || detail::HasType<T>, "Argument must have a type");
     };
 
-    template <auto&, std::size_t>
-    constexpr static void checkConstraints()
+    template <auto, std::size_t>
+    constexpr static int checkConstraints()
     {
+        return 0;
     }
 
-    template <auto& array, std::size_t i, class Curr, class... Args>
-    constexpr static void checkConstraints()
+    template <auto array, std::size_t i, class Curr, class... Args>
+    constexpr static int checkConstraints()
     {
         [[maybe_unused]] constexpr auto v = ConstraintCheck<array[i], Curr>{};
-        checkConstraints<array, i + 1, Args...>();
+        return checkConstraints<array, i + 1, Args...>();
     }
 
     template <class Tuple, class... Ctx, std::size_t... ints>
@@ -596,7 +597,7 @@ public:
 
     constexpr static std::string_view getFormat()
     {
-        return {format.begin(), format.size()};
+        return format.view();
     }
 
     template <class T, class... Args>
@@ -646,25 +647,25 @@ const std::unordered_set<std::string_view>& getAllWarnings();
  * @param name The unique name of the diagnostic.
  * @return A Diagnostic object specialized for the given format and modifiers.
  */
-template <const auto& text, class... Args>
+template <Constexpr::basic_fixed_string text, class... Args>
 constexpr auto makeDiagnostic(Severity category, std::string_view name)
 {
-    constexpr auto n = detail::Diagnostic::getBiggestPercentArg<Args...>({text.begin(), text.size()});
-    constexpr bool tmp = detail::Diagnostic::checkForNoHoles<n, Args...>({text.begin(), text.size()});
+    constexpr auto n = detail::Diagnostic::getBiggestPercentArg<Args...>(text.view());
+    constexpr bool tmp = detail::Diagnostic::checkForNoHoles<n, Args...>(text.view());
     static_assert(tmp, "Not allowed to have any holes between % indices");
     constexpr bool duplicates = detail::Diagnostic::checkForNoDuplicates<n, Args...>();
     static_assert(duplicates, "Not allowed to have any duplicate indices in Modifiers");
     return diagnostic<n, text, Args...>(category, name);
 }
 
-template <std::size_t N, auto& format, class... Mods>
+template <std::size_t N, Constexpr::basic_fixed_string format, class... Mods>
 template <class T, class... Args>
 Message diagnostic<N, format, Mods...>::args(const T& location, const source_interface& sourceInterface,
                                              Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
-    [[maybe_unused]] auto* v =
-        this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
+    [[maybe_unused]] auto v =
+        this->template checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
                                                                   // function to improve debug perf a lil
     static_assert(locationConstraintCheck<T>(), "First argument must denote a location");
     auto array = createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...),
@@ -672,19 +673,19 @@ Message diagnostic<N, format, Mods...>::args(const T& location, const source_int
     return print(diagnostics::getPointRange(location), getFormat(), array, modifiers, sourceInterface);
 }
 
-template <std::size_t N, auto& format, class... Mods>
+template <std::size_t N, Constexpr::basic_fixed_string format, class... Mods>
 template <class... Args>
 Message diagnostic<N, format, Mods...>::argsCLI(Args&&... args) const
 {
     static_assert(sizeof...(Args) == N, "Not the same amount of argument as needed by the format");
-    [[maybe_unused]] auto* v =
-        this->template checkConstraints<constraints, 0, Args...>; // Instantiate but don't call the
+    [[maybe_unused]] auto v =
+        this->template checkConstraints<constraints, 0, Args...>(); // Instantiate but don't call the
     auto array =
         createArgumentArray(std::forward_as_tuple(std::forward<Args>(args)...), std::index_sequence_for<Args...>{});
     return print(getFormat(), array);
 }
 
-template <std::size_t N, auto& format, class... Mods>
+template <std::size_t N, Constexpr::basic_fixed_string format, class... Mods>
 constexpr auto diagnostic<N, format, Mods...>::getConstraints() -> std::array<std::underlying_type_t<Constraint>, N>
 {
     std::array<std::underlying_type_t<Constraint>, N> result{};
@@ -732,7 +733,7 @@ constexpr auto diagnostic<N, format, Mods...>::getConstraints() -> std::array<st
     return result;
 }
 
-template <std::size_t N, auto& format, class... Mods>
+template <std::size_t N, Constexpr::basic_fixed_string format, class... Mods>
 template <class Tuple, class... Ctx, std::size_t... ints>
 auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args, std::index_sequence<ints...>, Ctx&&... ctx)
     -> std::array<Argument, N>
@@ -775,7 +776,7 @@ auto diagnostic<N, format, Mods...>::createArgumentArray(Tuple&& args, std::inde
     return result;
 }
 
-template <std::size_t N, auto& format, class... Mods>
+template <std::size_t N, Constexpr::basic_fixed_string format, class... Mods>
 template <std::size_t... ints>
 constexpr auto diagnostic<N, format, Mods...>::getModifiers(std::index_sequence<ints...>)
     -> std::array<Modifiers, sizeof...(Mods)>

@@ -34,7 +34,7 @@ public:
     T m_data[N] = {};
 
     template <class U, std::size_t M>
-    explicit constexpr basic_fixed_string(const U (&input)[M]) noexcept
+    constexpr basic_fixed_string(const U (&input)[M]) noexcept
     {
         for (std::size_t i = 0; i < N; i++)
         {
@@ -74,7 +74,7 @@ class basic_fixed_string<T, 0>
 {
 public:
     template <class U, std::size_t M>
-    explicit constexpr basic_fixed_string(const U (&)[M]) noexcept
+    constexpr basic_fixed_string(const U (&)[M]) noexcept
     {
     }
 
