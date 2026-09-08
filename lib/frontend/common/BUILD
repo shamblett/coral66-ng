@@ -12,7 +12,6 @@ cc_library(
         "language_options.cpp",
         "messages/message.cpp",
         "source_object.cpp",
-        "targets/x86_target_features.cpp",
     ],
     hdrs = [
         "color_string_ostream.hpp",
@@ -31,8 +30,6 @@ cc_library(
         "semantics_common.hpp",
         "source_interface.hpp",
         "source_object.hpp",
-        "targets/x86_features.def",
-        "targets/x86_target_features.hpp",
     ],
     visibility = [
         "//lib/backend:__subpackages__",

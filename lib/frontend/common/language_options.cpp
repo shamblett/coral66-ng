@@ -5,13 +5,3 @@
  */
 
 #include "language_options.hpp"
-
-bool coral66::DefaultTargetFeatures::hasFeature(Features) const
-{
-    return false;
-}
-
-bool coral66::DefaultTargetFeatures::setFeature(Features, bool)
-{
-    return false;
-}
