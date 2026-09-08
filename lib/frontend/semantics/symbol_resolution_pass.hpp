@@ -12,7 +12,7 @@
 namespace coral66::semantics
 {
 
-/*
+/**
  * Structure for the first pass. This pass will walk the syntax::Program,
  * establish scopes in the symbol table, and resolve/bind identifiers to their
  * declarations without worrying about expression type rules.
