@@ -8,11 +8,10 @@
 
 #include <ranges>
 
-#include "lib/support/vendor/rapidjson/prettywriter.h"
-#include "lib/support/vendor/rapidjson/stringbuffer.h"
-
 #include "lib/frontend/semantics/semantic_support.hpp"
 #include "lib/support/text.hpp"
+#include "lib/support/vendor/rapidjson/prettywriter.h"
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 
 namespace coral66::tools
 {

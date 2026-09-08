@@ -142,7 +142,6 @@ void SymbolResolutionPass::visit(const syntax::Program& node)
                     {
                         const auto name = decl->getName(); // Returns string_view
                         decl->setScopeDepth(m_context.symbolTable.scopeCount());
-                        
 
                         // Convert to IntrusiveVariantValue
                         IntrVarPtr<Usable> usableDecl(decl.release());
@@ -188,20 +187,20 @@ void SymbolResolutionPass::visit(const syntax::Block& node)
                 DiagnosticCollector::addDiagnostic(errors::semantics::REDEFINITION_OF_SYMBOL_N);
             }
             else
-        {
-            if (const Usable* existing = m_context.symbolTable.lookup(name))
             {
-                existing->match(
-                    [&](const auto& existingDecl)
-                    {
-                        declaration->setCommunicatorType(existingDecl.getCommunicatorType());
-                        if (existingDecl.getAbsoluteAddress().has_value())
-                            declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
-                    });
+                if (const Usable* existing = m_context.symbolTable.lookup(name))
+                {
+                    existing->match(
+                        [&](const auto& existingDecl)
+                        {
+                            declaration->setCommunicatorType(existingDecl.getCommunicatorType());
+                            if (existingDecl.getAbsoluteAddress().has_value())
+                                declaration->setAbsoluteAddress(existingDecl.getAbsoluteAddress().value());
+                        });
+                }
+                declaration->setScopeDepth(m_context.symbolTable.scopeCount());
+                m_context.symbolTable.insert(name, declaration.get());
             }
-            declaration->setScopeDepth(m_context.symbolTable.scopeCount());
-            m_context.symbolTable.insert(name, declaration.get());
-        }
             m_context.ownedUsables.push_back(std::move(declaration));
         }
 

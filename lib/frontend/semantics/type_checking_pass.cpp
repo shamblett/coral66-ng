@@ -262,7 +262,9 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             else if (isPointerType(*lType))
             {
                 // Accept Pointer to Pointer, Pointer to Integer, or Integer to Pointer
-                if (isPointerType(*rType) || (resolveExprType(*rType).tryAs<PrimitiveType>() && resolveExprType(*rType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
+                if (isPointerType(*rType)
+                    || (resolveExprType(*rType).tryAs<PrimitiveType>()
+                        && resolveExprType(*rType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
                 {
                     // Match
                 }
@@ -274,7 +276,9 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             else if (isPointerType(*rType))
             {
                 // Accept Integer to Pointer
-                if (isPointerType(*lType) || (resolveExprType(*lType).tryAs<PrimitiveType>() && resolveExprType(*lType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
+                if (isPointerType(*lType)
+                    || (resolveExprType(*lType).tryAs<PrimitiveType>()
+                        && resolveExprType(*lType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
                 {
                     // Match
                 }

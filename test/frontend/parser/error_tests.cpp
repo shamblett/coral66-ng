@@ -534,7 +534,8 @@ TEST_CASE("Procedures - Errors", "[Parser][Procedure]")
 
     SECTION("Missing END")
     {
-        ParsedProcedure p("'PROCEDURE' p0;'BEGIN' e1[j] := e1[k];e1[k] := e1[l];e1[l] := e1[j];newline;'PROCEDURE' p1;'BEGIN' e1[j] := e1[k]; END;");
+        ParsedProcedure p(
+            "'PROCEDURE' p0;'BEGIN' e1[j] := e1[k];e1[k] := e1[l];e1[l] := e1[j];newline;'PROCEDURE' p1;'BEGIN' e1[j] := e1[k]; END;");
         CHECK(p.procedure != nullptr);
         CHECK(!parser::DiagnosticCollector::getDiagnostics().empty());
         CHECK(parser::DiagnosticCollector::findDiagnostic(errors::parser::MISSING_END_FOR_PROCEDURE));

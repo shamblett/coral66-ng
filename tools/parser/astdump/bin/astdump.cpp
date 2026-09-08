@@ -6,13 +6,12 @@
 
 #include <iostream>
 
-#include "lib/support/vendor/rapidjson/prettywriter.h"
-#include "lib/support/vendor/rapidjson/stringbuffer.h"
-
 #include "lib/frontend/common/source_object.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/support/filesystem.hpp"
+#include "lib/support/vendor/rapidjson/prettywriter.h"
+#include "lib/support/vendor/rapidjson/stringbuffer.h"
 #include "sysexits.h"
 #include "tools/parser/astdump/lib/ast_dump.hpp"
 

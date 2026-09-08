@@ -109,5 +109,4 @@ TEST_CASE("Sundry", "[Backend][Execution]")
 
         delete ee;
     }
-
 }
