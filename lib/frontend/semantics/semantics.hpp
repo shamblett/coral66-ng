@@ -33,7 +33,7 @@ class Declaration;
 namespace coral66::semantics
 {
 
-class ProgramInterface;
+
 
 // ============================================================================
 // Forward Declarations & Enums

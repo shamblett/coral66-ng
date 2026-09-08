@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "semantics_common.hpp"
+
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/APSInt.h>
 
@@ -17,7 +19,7 @@
 namespace coral66::semantics
 {
 class Type;
-class ProgramInterface;
+
 class Issue;
 
 /**

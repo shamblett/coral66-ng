@@ -16,7 +16,7 @@
 namespace coral66::semantics
 {
 
-class ProgramInterface;
+struct ProgramInterface {};
 
 struct TableInfo;
 struct OverlayInfo;
