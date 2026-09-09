@@ -50,6 +50,7 @@ cleanup() {
     mkdir -p clean_build_artifacts
 
     # Attempt to copy logs if they exist
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_info.log ./clean_build_artifacts/bazel_info.log 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_test.log ./clean_build_artifacts/bazel_test.log 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_build.log ./clean_build_artifacts/bazel_build.log 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/bin/coral66 ./clean_build_artifacts/coral66 2>/dev/null || true
@@ -75,19 +76,18 @@ podman exec "$CONTAINER_NAME" /bin/bash -c "
     export CC=clang
     export CXX=clang++
 
-    echo 'Running bazel tests...'
-    bazel test //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_test.log 2>&1 || {
-        echo 'Bazel test failed, extracting log...';
-        exit 1;
-    }
-    
+    echo 'Bazel Information...'
+    # Bazel build and install info
+    bazel info bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
+
     echo 'Running bazel build...'
-    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_build.log 2>&1 || {
-        echo 'Bazel build failed, extracting log...';
-        exit 1;
-    }
+    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_build.log 2>&1 || { echo 'Bazel build failed, extracting log...'; exit 1; }
+
+    echo 'Running bazel tests...'
+    bazel test //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_test.log 2>&1 || { echo 'Bazel test failed, extracting log...'; exit 1; }
+
     
-    echo 'Build and test phases completed successfully.'
+    echo 'Info, build and test phases completed successfully.'
 "
 
 echo "================================================="

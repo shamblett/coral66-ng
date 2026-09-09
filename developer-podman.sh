@@ -41,18 +41,22 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
     export CC=clang
     export CXX=clang++
 
+    echo 'Bazel Information...'
+    # Bazel build and install info
+    bazel info bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
+
+    echo 'Running bazel build...'
+    # Build everything and output log to host directory
+    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
     bazel test //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
     
-    echo 'Running bazel build...'
-    # Build everything and output log to host directory
-    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
-    
     echo 'Copying produced coral66 binary to workspace root...'
     cp bazel-bin/bin/coral66 ./coral66
     
-    echo 'Build and test phases completed successfully.'
+    echo 'Info, build and test phases completed successfully.'
 "
 
 echo "================================================="
