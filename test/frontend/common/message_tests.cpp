@@ -31,8 +31,8 @@ TEST_CASE("Message construction and segment validation", "[Message]")
     SECTION("Segment constructor builds text correctly")
     {
         std::vector<coral66::Message::Segment> segments = {
-            {"Error: ", llvm::raw_ostream::RED, true, false},
-            {"Something went wrong", llvm::raw_ostream::SAVEDCOLOR, false, false}};
+            {.text = "Error: ", .color = llvm::raw_ostream::RED, .bold = true, .bg = false},
+            {.text = "Something went wrong", .color = llvm::raw_ostream::SAVEDCOLOR, .bold = false, .bg = false}};
         coral66::Message msg(coral66::Severity::Warning, std::move(segments));
 
         CHECK(msg.getSeverity() == coral66::Severity::Warning);
@@ -49,8 +49,8 @@ TEST_CASE("Message construction and segment validation", "[Message]")
 
 TEST_CASE("Message segment streaming with colors_enabled", "[Message]")
 {
-    std::vector<coral66::Message::Segment> segments = {{"RedBold", llvm::raw_ostream::RED, true, false},
-                                                       {"Normal", llvm::raw_ostream::SAVEDCOLOR, false, false}};
+    std::vector<coral66::Message::Segment> segments = {{.text = "RedBold", .color = llvm::raw_ostream::RED, .bold = true, .bg = false},
+                                                       {.text = "Normal", .color = llvm::raw_ostream::SAVEDCOLOR, .bold = false, .bg = false}};
     coral66::Message msg(coral66::Severity::Error, std::move(segments));
 
     SECTION("Streaming with colors disabled")

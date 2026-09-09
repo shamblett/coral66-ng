@@ -19,7 +19,6 @@
 #include <string>
 #include <string_view>
 
-#include "constexpr.hpp"
 #include "max_vector.hpp"
 #include "utilities.hpp"
 

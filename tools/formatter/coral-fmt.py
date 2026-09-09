@@ -2,7 +2,7 @@
 import sys
 import re
 
-def format_coral66(source_code, indent_size=2):
+def format_coral66(source_code, indent_size_1=2):
     lines = source_code.splitlines()
     formatted_lines = []
     indent_level = 0
@@ -26,7 +26,7 @@ def format_coral66(source_code, indent_size=2):
             indent_level = max(0, indent_level - 1)
             
         # Apply current calculated structural indentation
-        indent_space = " " * (indent_level * indent_size)
+        indent_space = " " * (indent_level * indent_size_1)
         formatted_lines.append(f"{indent_space}{cleaned}")
         
         # Calculate trailing operations for subsequent lines

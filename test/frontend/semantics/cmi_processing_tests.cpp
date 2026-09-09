@@ -105,7 +105,7 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
     SECTION("Table Generation")
     {
         std::vector<Field> fields;
-        fields.push_back({IntrusiveVariantValue(PrimitiveType(PrimitiveType::Integer)), "field1"});
+        fields.push_back({.type = IntrusiveVariantValue(PrimitiveType(PrimitiveType::Integer)), .name = "field1"});
         TableDefinition tableDef(std::move(fields), 14, 1);
         TableInfo tableInfo;
         tableInfo.name = "my_table";
@@ -129,7 +129,7 @@ TEST_CASE("CMI Processor Generation", "[Semantics][CMI]")
     SECTION("Overlay Generation")
     {
         std::vector<Field> fields;
-        fields.push_back({IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating)), "ofield"});
+        fields.push_back({.type = IntrusiveVariantValue(PrimitiveType(PrimitiveType::Floating)), .name = "ofield"});
         OverlayDefinition overlayDef(std::move(fields));
         OverlayInfo overlayInfo;
         overlayInfo.name = "my_overlay";

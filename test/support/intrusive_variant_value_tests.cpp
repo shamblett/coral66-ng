@@ -67,17 +67,9 @@ public:
 class DestrSideEffect : public Base
 {
 public:
-    inline thread_local static int i{};
+    DestrSideEffect() : Base(std::in_place_type<DestrSideEffect>) {}
 
-    DestrSideEffect() : Base(std::in_place_type<DestrSideEffect>)
-    {
-        i = 1;
-    }
-
-    ~DestrSideEffect()
-    {
-        i = -1;
-    }
+    ~DestrSideEffect() {}
 };
 
 class MoveConstrSideEffect : public Base
