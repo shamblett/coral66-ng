@@ -16,7 +16,7 @@ FROM registry.fedoraproject.org/fedora:44
 # 2. Install full SW development environment and LLVM dev packages
 RUN dnf -y update && \
     dnf -y group install development-tools && \
-    dnf -y install llvm-devel clang lld curl wget findutils && \
+    dnf -y install llvm-devel curl wget findutils && \
     dnf -y clean all
 
 # 3. Install Bazelisk as /usr/local/bin/bazel
@@ -37,9 +37,9 @@ echo "================================================="
 # We mount the current directory into /workspace.
 # The :Z flag ensures SELinux context is correctly handled on Fedora/RHEL.
 podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
-    echo 'Setting compiler to clang/LLVM...'
-    export CC=clang
-    export CXX=clang++
+    echo 'Setting compiler to GCC...'
+    export CC=gcc
+    export CXX=g++
 
     echo 'Creating required ccache directory for sandbox...'
     mkdir -p /home/steve/.cache/ccache
@@ -50,11 +50,11 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 
     echo 'Running bazel build...'
     # Build everything and output log to host directory
-    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+    bazel build //... --repo_env=CC=gcc --repo_env=CXX=g++ > build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
 
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
-    bazel test //... --repo_env=CC=clang --repo_env=CXX=clang++ > build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
+    bazel test //... --repo_env=CC=gcc --repo_env=CXX=g++ > build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
     
     echo 'Copying produced coral66 binary to workspace root...'
     cp bazel-bin/bin/coral66 ./coral66
