@@ -9,7 +9,7 @@ echo "================================================="
 echo " Generating Containerfile for Fedora 44 builder"
 echo "================================================="
 
-cat << 'EOF' > Containerfile.fedora44
+cat << 'EOF' > ./podman-build/Containerfile.fedora44
 # 1. Pull down the latest Fedora 44 image
 FROM registry.fedoraproject.org/fedora:44
 
@@ -29,7 +29,7 @@ EOF
 echo "================================================="
 echo " Building Podman image (fedora44-coral66-builder)"
 echo "================================================="
-podman build -t fedora44-coral66-builder -f Containerfile.fedora44 .
+podman build -t fedora44-coral66-builder -f ./podman-build/Containerfile.fedora44 .
 
 echo "================================================="
 echo " Running Bazel tests and build inside Podman"
@@ -62,6 +62,6 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 echo "================================================="
 echo " Build Completed successfully!"
 echo "================================================="
-echo "The coral66 binary is available at: ./coral66"
-echo "The test logs are available at: ./bazel_test.log"
-echo "The build logs are available at: ./bazel_build.log"
+echo "The coral66 binary is available at: ./podman-build/coral66"
+echo "The test logs are available at: ./podman-build/build-logs/bazel_test.log"
+echo "The build logs are available at: ./podman-build/build-logs/bazel_build.log"
