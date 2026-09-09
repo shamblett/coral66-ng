@@ -39,7 +39,9 @@ echo "================================================="
 podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 
     echo 'Creating required ccache directory for sandbox...'
-    mkdir -p /home/steve/.cache/ccache
+    sudo mkdir -p /var/cache/ccache
+    sudo chown $USER:$USER /var/cache/ccache
+    sudo chmod 1777 /var/cache/ccache
 
     echo 'Bazel Information...'
     # Bazel build and install info
@@ -47,11 +49,11 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 
     echo 'Running bazel build...'
     # Build everything and output log to host directory
-    bazel build //... > podman-build/build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+    bazel build --symlink_prefix=podman- //... > podman-build/build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
 
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
-    bazel test //... > podman-build/build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
+    bazel test --symlink_prefix=podman- //... > podman-build/build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
     
     echo 'Copying produced coral66 binary to podman-build...'
     cp bazel-bin/bin/coral66 ./podman-build//coral66

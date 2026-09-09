@@ -5,7 +5,8 @@ common --enable_bzlmod
 build --cxxopt="-std=c++23"
 
 # Write to ccache cache
-build --sandbox_writable_path=/home/steve/.cache/ccache
+build --sandbox_writable_path=/var/cache/ccache
+build --action_env=CCACHE_DIR=/var/cache/ccache
 
 # Colour
 build --color=yes
