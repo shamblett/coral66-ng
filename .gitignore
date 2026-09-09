@@ -69,3 +69,6 @@
 
 # CMI
 *.cmi
+
+# Podman
+/build-logs/
