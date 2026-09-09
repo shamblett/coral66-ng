@@ -41,6 +41,9 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
     export CC=clang
     export CXX=clang++
 
+    echo 'Creating required ccache directory for sandbox...'
+    mkdir -p /home/steve/.cache/ccache
+
     echo 'Bazel Information...'
     # Bazel build and install info
     bazel info > build-logs/bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
