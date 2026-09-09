@@ -1,1 +1,0 @@
-This directory will contain the log files generated from running the podman builder scripts
