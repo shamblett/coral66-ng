@@ -45,15 +45,15 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 
     echo 'Bazel Information...'
     # Bazel build and install info
-    bazel info > podman-build/build-logs/bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
+    bazel info > ./podman-build/build-logs/bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
 
     echo 'Running bazel build...'
     # Build everything and output log to host directory
-    bazel build --symlink_prefix=podman- //... > podman-build/build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+    bazel build --symlink_prefix=podman- //... > ./podman-build/build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
 
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
-    bazel test --symlink_prefix=podman- //... > podman-build/build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
+    bazel test --symlink_prefix=podman- //... > ./podman-build/build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
     
     echo 'Copying produced coral66 binary to podman-build...'
     cp bazel-bin/bin/coral66 ./podman-build//coral66
