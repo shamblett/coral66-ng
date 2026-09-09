@@ -1,0 +1,3 @@
+sudo setsebool -P container_manage_cgroup 1
+sudo ausearch -c 'linux-sandbox' --raw | audit2allow -M my-linuxsandbox
+sudo semodule -X 300 -i my-linuxsandbox.pp
