@@ -15,7 +15,7 @@ FROM registry.fedoraproject.org/fedora:44
 
 # 2. Install full SW development environment and LLVM dev packages
 RUN dnf -y update && \
-    dnf -y groupinstall "Development Tools" "C Development Tools and Libraries" && \
+    dnf -y group install development-tools && \
     dnf -y install llvm-devel clang lld curl wget findutils && \
     dnf -y clean all
 
@@ -43,15 +43,15 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 
     echo 'Bazel Information...'
     # Bazel build and install info
-    bazel info bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
+    bazel info > build-logs/bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
 
     echo 'Running bazel build...'
     # Build everything and output log to host directory
-    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+    bazel build //... --repo_env=CC=clang --repo_env=CXX=clang++ > build-logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
 
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
-    bazel test //... --repo_env=CC=clang --repo_env=CXX=clang++ > bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
+    bazel test //... --repo_env=CC=clang --repo_env=CXX=clang++ > build-logs/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
     
     echo 'Copying produced coral66 binary to workspace root...'
     cp bazel-bin/bin/coral66 ./coral66
