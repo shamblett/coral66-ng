@@ -71,6 +71,5 @@
 *.cmi
 
 # Podman
-podman-build/build-logs/
 podman-build/coral66
 podman-build/Containerfile.fedora44
