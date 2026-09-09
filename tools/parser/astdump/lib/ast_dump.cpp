@@ -8,8 +8,8 @@
 
 #include <iostream>
 
-#include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
+#include "lib/support/vendor/rapidjson//stringbuffer.h"
+#include "lib/support/vendor/rapidjson/prettywriter.h"
 
 namespace coral66::tools
 {
