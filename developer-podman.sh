@@ -40,7 +40,7 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
 
     echo 'Creating required ccache directory for sandbox...'
     sudo mkdir -p /var/cache/ccache
-    sudo chown $USER:$USER /var/cache/ccache
+    sudo chown \$(whoami):\$(whoami) /var/cache/ccache
     sudo chmod 1777 /var/cache/ccache
 
     echo 'Bazel Information...'
