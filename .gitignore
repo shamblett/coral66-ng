@@ -73,4 +73,4 @@
 # Podman
 podman-build/build-logs/
 podman-build/coral66
-Containerfile.fedora44
+podman-build/Containerfile.fedora44
