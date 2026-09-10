@@ -27,4 +27,5 @@ for dir in "$EXAMPLES_DIR"/*/; do
     else
         echo "Warning: Source file $COR_FILE not found."
     fi
+     echo ""
 done
