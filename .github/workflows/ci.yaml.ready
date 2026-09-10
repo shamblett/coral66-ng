@@ -15,6 +15,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Prepare the build environment
+        run: |
+          sudo apt install build-essential
+          sudo apt install ccache
+          sudo mkdir -p /var/cache/ccache
+          sudo chown \$(whoami):\$(whoami) /var/cache/ccache
+          sudo chmod 1777 /var/cache/ccache
+
       - name: Install LLVM 22 Toolchain
         run: |
           sudo apt-get update
@@ -25,7 +33,7 @@ jobs:
           chmod +x llvm.sh
           sudo ./llvm.sh 22 all
 
-      - name: Setup Bazelisk (Bazel Wrapper)
+      - name: Install Bazel using Bazelisk
         run: |
           sudo apt-get install -y curl
           sudo curl -L "https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64" -o /usr/local/bin/bazel
@@ -35,10 +43,7 @@ jobs:
         run: |
           bazel info
 
-      - name: Build and Test with Bazel (Force LLVM 22)
-        env:
-          # Tells Bazel's auto-configuring system rules where to find LLVM 22
-          CC: /usr/bin/clang-22
-          CXX: /usr/bin/clang++-22
+      - name: Bazel Build and Test
         run: |
-          bazel test //... --repo_env=CC=/usr/bin/clang-22 --repo_env=CXX=/usr/bin/clang++-22
+          bazel test //...
+
