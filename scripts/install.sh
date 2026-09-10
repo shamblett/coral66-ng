@@ -62,14 +62,21 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Paths to the source files
-CORAL_BIN="$ROOT_DIR/bazel-bin/bin/coral66"
+BAZEL_BIN="$ROOT_DIR/bazel-bin/bin/coral66"
+PODMAN_BIN="$ROOT_DIR/podman-build/coral66"
 EXTERNAL_SRC="$ROOT_DIR/external"
 LIBRARY_SRC="$ROOT_DIR/library"
 
-# 1. Copy the coral66 binary
-if [[ ! -f "$CORAL_BIN" ]]; then
-    echo "Error: coral66 binary not found at $CORAL_BIN" >&2
-    echo "Please build the project first (e.g., 'bazel build //bin:coral66')." >&2
+# 1. Locate the coral66 binary
+if [[ -f "$BAZEL_BIN" ]]; then
+    CORAL_BIN="$BAZEL_BIN"
+    echo "Using coral66 from local bazel build: $CORAL_BIN"
+elif [[ -f "$PODMAN_BIN" ]]; then
+    CORAL_BIN="$PODMAN_BIN"
+    echo "Using coral66 from podman build: $CORAL_BIN"
+else
+    echo "Error: coral66 binary not found in local bazel build ($BAZEL_BIN) or podman build ($PODMAN_BIN)." >&2
+    echo "Please build the project first." >&2
     exit 1
 fi
 
