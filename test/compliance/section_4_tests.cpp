@@ -256,9 +256,9 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK(errors);
-        
+
         CHECK(reporterString.find("Type mismatch in expression") != std::string::npos);
-        CHECK(reporterString.find("b[0] :=") == std::string::npos);
-        CHECK(reporterString.find("b[3] :=") != std::string::npos);
+        CHECK(reporterString.find("b[0] :=") == std::string::npos); // No type mismatch
+        CHECK(reporterString.find("b[3] :=") != std::string::npos); // Type mismatch
     }
 }
