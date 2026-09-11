@@ -224,4 +224,41 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // Clean up
         delete ee;
     }
+
+    /// An array is restricted to a one or two dimensional set of numbers all of the
+    /// same type (including scale for fixed-point).
+    SECTION("4-3-1")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-4/4-3-1.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK(errors);
+        
+        CHECK(reporterString.find("Type mismatch in expression") != std::string::npos);
+        CHECK(reporterString.find("b[0] :=") == std::string::npos);
+        CHECK(reporterString.find("b[3] :=") != std::string::npos);
+    }
 }

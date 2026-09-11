@@ -307,6 +307,21 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             {
                 mismatch = true;
             }
+            else if (const auto lf = resolveExprType(*lType).tryAs<FixedType>(); lf)
+            {
+                if (const auto rf = resolveExprType(*rType).tryAs<FixedType>(); rf)
+                {
+                    if (lf->getTotalBits() != rf->getTotalBits() || lf->getFractionalBits() != rf->getFractionalBits())
+                    {
+                        if (dynamic_cast<const syntax::ArrayAccessExpression*>(&node.getVariable()) != nullptr)
+                        {
+                            mismatch = true;
+                        }
+                    }
+                }
+            }
+
+
 
             if (mismatch)
             {
@@ -1036,14 +1051,7 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
                 DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_NUMBER_OF_INDICES);
             }
 
-            if (const auto p = arrType->getElementType().tryAs<PrimitiveType>())
-            {
-                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{p->getKind()}));
-            }
-            else
-            {
-                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
-            }
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(arrType->getElementType()));
         }
         else if (auto* tableElement = usable->tryAs<TableElementDeclaration>())
         {

@@ -1,0 +1,16 @@
+PROGRAM FOURONETHREE
+COMMENT Array element type match tests ;
+
+BEGIN
+
+   FIXED(13,5) f1351 := 2.5;
+   FIXED(10,2) f1021 := 3.0;
+
+   FIXED (13,5) ARRAY b[0:10];
+
+   b[0] := f1351;
+   b[1] := f1351;
+   b[2] := f1351;
+   b[3] := f1021;
+
+END
