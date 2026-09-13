@@ -1,0 +1,8 @@
+PROGRAM FOURTHREETWO
+COMMENT Array lower bound must never exceed the corresponding upper bound;
+
+BEGIN
+
+   INTEGER ARRAY b[10:2];
+
+END

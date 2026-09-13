@@ -18,6 +18,7 @@
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
+#include "lib/frontend/semantics/semantic_support.hpp"
 #include "llvm/IR/DataLayout.h"
 #include "test/common/test_config.hpp"
 #include "test/compliance/common/common.hpp"
@@ -260,5 +261,163 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         CHECK(reporterString.find("Type mismatch in expression") != std::string::npos);
         CHECK(reporterString.find("b[0] :=") == std::string::npos); // No type mismatch
         CHECK(reporterString.find("b[3] :=") != std::string::npos); // Type mismatch
+    }
+
+    /// An array lower bound must never exceed the corresponding upper bound.
+    SECTION("4-3-2")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-4/4-3-2.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK(errors);
+
+        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(INVALID_ARRAY_BOUNDS));
+    }
+
+    /// If more than one array is required with the same numeric type, and the same
+    /// dimensions and bounds, a list of array identifiers separated by commas may
+    /// replace the single identifiers. Arrays with the
+    /// same numeric type but different bounds or dimensions may also be included
+    /// in a composite declaration.
+    SECTION("4-3-3")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-4/4-3-3.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("fourthreethree", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        // Run the `main` function
+
+        // Ensure all globals are allocated and JIT compilation is done before running
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        // p[1]
+        // 1. Get the base address of the array (points to the lower bound element)
+        auto arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("p"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        // 2. Cast the address to an integer pointer (since it's an INTEGER ARRAY)
+        auto elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        // 3. Access the element by applying the zero-indexed offset (index - lower_bound)
+        //    e.g. for b[6] where lower bound is 1, the offset is 6 - 1 = 5
+        int32_t value = elements[0];
+        CHECK(value == 10);
+
+        // q[1]
+        arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("q"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        value = elements[0];
+        CHECK(value == 20);
+
+        // r[1]
+        arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("r"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        value = elements[0];
+        CHECK(value == 30);
+
+        // s[2]
+        arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("s"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        value = elements[1];
+        CHECK(value == 40);
+
+        // u[2,3]
+        arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("u"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        // For multi-dimensional arrays, the Coral 66 LLVM backend uses nested LLVM arrays.
+        // The elements are laid out in row-major order.
+        // If you want to read u[2, 3]:
+        // 1. Calculate the row offset: 2 - 1 = 1
+        // 2. Multiply by column dimension size: 1 * 3 = 3
+        // 3. Calculate the column offset: 3 - 1 = 2
+        // 4. Add them together: 3 + 2 = 5
+
+        value = elements[5];
+        CHECK(value == 50);
+
+        // Clean up
+        delete ee;
     }
 }
