@@ -1,0 +1,17 @@
+PROGRAM FOURTHREETHREE
+COMMENT Table sizing ;
+
+BEGIN
+
+  TABLE april [ 3,30 ]
+
+  [ tickets INTEGER 0;
+  weight FIXED (16,-4) 1;
+  rain UNSIGNED (4,2) 2,0;
+  sunshine UNSIGNED (4) 2,4;
+  humidity UNSIGNED (6,6) 2,8;
+  temperature (10,2) 2,14 ];
+
+  COMMENT Size should be 3 * 30 32 bit words. ;
+
+END
