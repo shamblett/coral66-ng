@@ -3,14 +3,14 @@ COMMENT Table word and bit position;
 
 BEGIN
 
-  TABLE weather[ 1,10 ]
+  TABLE weather[ 1,1 ]
 
   [ fullday INTEGER 0;
   rain UNSIGNED (16) 0,0;
   humidity UNSIGNED (16) 0,16];
 
-  rain[0] :=  57005; COMMENT 0xDEAD ;
-  humidity[0] := 48879; COMMENT 0xBEEF ;
+  rain[0] :=  48879; COMMENT LSB 0xBEEF;
+  humidity[0] := 57005; COMMENT MSB 0xDEAD ;
 
   COMMENT fullday should equal 0xDEADBEEF, -559,038,737;
 

@@ -571,7 +571,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         auto elements = static_cast<int32_t*>(tableBaseAddress);
 
         // Fullday
-        CHECK(elements[0] == -559038737); // 0xDEADBEEF
+        CHECK(elements[0] == -559038737); // Signed integer value of 0xDEADBEEF
 
         // Clean up
         delete ee;
