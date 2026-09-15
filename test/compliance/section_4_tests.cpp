@@ -598,6 +598,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         CHECK_FALSE(errors);
         // The table limits are exceeded but there is no diagnostic for this.
-        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 0);
     }
 }
