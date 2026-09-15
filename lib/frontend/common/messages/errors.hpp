@@ -91,6 +91,7 @@ constexpr auto LOCATION_PARAMETER_REQUIRES_LVALUE = makeDiagnostic<"LOCATION par
 constexpr auto INVALID_SCALE_FOR_FIXED = makeDiagnostic<"Invalid scale for FIXED point operation", Underline<0>>(Severity::Error, "INVALID_SCALE_FOR_FIXED");
 constexpr auto RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE = makeDiagnostic<"Procedure calls itself but is not declared RECURSIVE",
              Underline<0>>(Severity::Error, "RECURSIVE_CALL_ON_NON_RECURSIVE_PROCEDURE");
+constexpr auto PRESET_IN_RECURSIVE_PROCEDURE = makeDiagnostic<"Presetting is not allowed in the body of a recursive procedure", Underline<0>>(Severity::Error, "PRESET_IN_RECURSIVE_PROCEDURE");
 constexpr auto PRESET_TYPE_MISMATCH = makeDiagnostic<"Preset value type does not match declaration type", Underline<0>>(Severity::Error, "PRESET_TYPE_MISMATCH");
 constexpr auto PRESET_FIXED_POINT_OVERFLOW = makeDiagnostic<"Preset value exceeds fixed point scale bounds", Underline<0>>(Severity::Error, "PRESET_FIXED_POINT_OVERFLOW");
 } // namespace semantics

@@ -1,0 +1,11 @@
+PROGRAM FOURSIXONE
+COMMENT Presetting is not allowed in the body of a recursive procedure ;
+
+BEGIN
+
+  RECURSIVE PROCEDURE rproc
+  BEGIN
+    INTEGER k := 10; COMMENT Invalid in a recursive procedure ;
+  END;
+
+END

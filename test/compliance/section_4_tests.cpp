@@ -600,4 +600,37 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // The table limits are exceeded but there is no diagnostic for this.
         CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 0);
     }
+
+    /// An object is not eligible for presetting if it is declared anywhere within
+    /// the body of a recursive procedure
+    SECTION("4-6-1")
+    {
+        auto sourcePath = getTestDataPath("section-4/4-6-1.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+
+        // Cant preset in a recursive procedure
+        CHECK(errors);
+        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(PRESET_IN_RECURSIVE_PROCEDURE));
+    }
 }

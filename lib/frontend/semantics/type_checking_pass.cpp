@@ -405,6 +405,12 @@ void TypeCheckingPass::visit(const syntax::VariableDeclaration& node)
 {
     if (node.hasPreset())
     {
+        if (m_currentProcedure && m_currentProcedure->isRecursive())
+        {
+            m_context.log(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE);
+        }
+
         IntrusiveVariantValue type{PrimitiveType{PrimitiveType::Integer}};
         if (node.getType()->getTokenType() == lexer::TokenType::FloatingKeyword)
             type = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Floating});
@@ -439,6 +445,12 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
 
     if (node.hasPreset())
     {
+        if (m_currentProcedure && m_currentProcedure->isRecursive())
+        {
+            m_context.log(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE);
+        }
+
         std::uint64_t totalElements = 1;
         for (const auto& [fst, snd] : node.getDimensions())
         {
@@ -510,6 +522,12 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
 
     if (node.hasPreset())
     {
+        if (m_currentProcedure && m_currentProcedure->isRecursive())
+        {
+            m_context.log(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE);
+        }
+
         std::uint64_t totalElements = 1;
         if (const auto w = evaluateConstantInteger(*node.getWidth()))
             totalElements *= static_cast<std::uint64_t>(*w);
