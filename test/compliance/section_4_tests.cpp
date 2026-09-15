@@ -238,10 +238,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
     /// same type (including scale for fixed-point).
     SECTION("4-3-1")
     {
-        // Initialize LLVM Native Target for JIT Execution
-        llvm::InitializeNativeTarget();
-        llvm::InitializeNativeTargetAsmPrinter();
-
         auto sourcePath = getTestDataPath("section-4/4-3-1.cor", "COMPLIANCE_DATA_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
@@ -274,10 +270,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
     /// An array lower bound must never exceed the corresponding upper bound.
     SECTION("4-3-2")
     {
-        // Initialize LLVM Native Target for JIT Execution
-        llvm::InitializeNativeTarget();
-        llvm::InitializeNativeTargetAsmPrinter();
-
         auto sourcePath = getTestDataPath("section-4/4-3-2.cor", "COMPLIANCE_DATA_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
@@ -570,10 +562,42 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto elements = static_cast<int32_t*>(tableBaseAddress);
 
-        // Fullday
+        // Fullday is element 0 from the table base
         CHECK(elements[0] == -559038737); // Signed integer value of 0xDEADBEEF
 
         // Clean up
         delete ee;
+    }
+
+    /// Normally, table elements will be located so that they fall within the declared width of the
+    /// table, but a Coral 66 compiler does not check the limits
+    SECTION("4-4-3")
+    {
+        auto sourcePath = getTestDataPath("section-4/4-4-3.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+
+        CHECK_FALSE(errors);
+        // The table limits are exceeded but there is no diagnostic for this.
+        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
     }
 }

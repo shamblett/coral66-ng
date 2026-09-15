@@ -1,0 +1,15 @@
+PROGRAM FOURFOURTHREE
+COMMENT Table declaration limits are not checked by a Coral 66 compiler ;
+
+BEGIN
+
+  TABLE weather[ 1,1 ]
+
+  [ fullday INTEGER 0;
+  rain UNSIGNED (16) 0,0;
+  humidity UNSIGNED (16) 0,16;
+  toofar INTEGER 1];
+
+  COMMENT toofar is outside the table limit of 1 word ;
+
+END
