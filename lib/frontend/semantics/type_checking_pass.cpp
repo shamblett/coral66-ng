@@ -599,12 +599,16 @@ void TypeCheckingPass::visit(const syntax::ProcedureDeclaration& node)
     auto* oldProc = m_currentProcedure;
     m_currentProcedure = &node;
 
+    int oldBlockDepth = m_blockDepth;
+    m_blockDepth = 0;
+
     for (const auto& param : node.getParameters())
     {
         visit(*param);
     }
     visit(node.getBody());
 
+    m_blockDepth = oldBlockDepth;
     m_currentProcedure = oldProc;
 }
 

@@ -1,0 +1,14 @@
+PROGRAM FOURSIXTHREE
+COMMENT Presetting is not allowed in an inner block of a procedure;
+
+BEGIN
+
+  PROCEDURE g
+  BEGIN
+    INTEGER outerblock := 10;
+    BEGIN
+      INTEGER innerblock := 20; COMMENT Invalid in a procedure inner block;
+    END;
+  END;
+
+END
