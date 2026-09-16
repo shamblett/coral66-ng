@@ -22,6 +22,7 @@ class TypeCheckingPass
 {
     SemanticContext& m_context;
     const syntax::ProcedureDeclaration* m_currentProcedure = nullptr;
+    int m_blockDepth = 0;
 
 public:
     explicit TypeCheckingPass(SemanticContext& context);

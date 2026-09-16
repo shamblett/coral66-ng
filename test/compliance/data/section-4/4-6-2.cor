@@ -1,0 +1,11 @@
+PROGRAM FOURSIXTWO
+COMMENT Presetting is not allowed in an inner block of a program ;
+
+BEGIN
+
+  INTEGER outerblock := 10;
+  BEGIN
+    INTEGER innerblock := 20; COMMENT Invalid in an inner block;
+  END;
+
+END

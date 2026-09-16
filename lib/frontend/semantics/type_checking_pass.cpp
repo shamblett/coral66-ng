@@ -96,6 +96,7 @@ void TypeCheckingPass::visit(const syntax::Program& node)
 
 void TypeCheckingPass::visit(const syntax::Block& node)
 {
+    m_blockDepth++;
     for (const auto& declaration : node.getDeclarations())
     {
         visit(*declaration);
@@ -104,6 +105,7 @@ void TypeCheckingPass::visit(const syntax::Block& node)
     {
         visit(*stmt);
     }
+    m_blockDepth--;
 }
 
 void TypeCheckingPass::visit(const syntax::Statement& node)
@@ -321,8 +323,6 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
                 }
             }
 
-
-
             if (mismatch)
             {
                 m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getVariable().begin(), m_context.source,
@@ -407,8 +407,15 @@ void TypeCheckingPass::visit(const syntax::VariableDeclaration& node)
     {
         if (m_currentProcedure && m_currentProcedure->isRecursive())
         {
-            m_context.log(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
+            m_context.log(
+                errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE);
+        }
+        else if (m_blockDepth > 1)
+        {
+            m_context.log(
+                errors::semantics::PRESET_IN_INNER_BLOCK.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_INNER_BLOCK);
         }
 
         IntrusiveVariantValue type{PrimitiveType{PrimitiveType::Integer}};
@@ -447,8 +454,15 @@ void TypeCheckingPass::visit(const syntax::ArrayDeclaration& node)
     {
         if (m_currentProcedure && m_currentProcedure->isRecursive())
         {
-            m_context.log(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
+            m_context.log(
+                errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE);
+        }
+        else if (m_blockDepth > 1)
+        {
+            m_context.log(
+                errors::semantics::PRESET_IN_INNER_BLOCK.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_INNER_BLOCK);
         }
 
         std::uint64_t totalElements = 1;
@@ -524,8 +538,15 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
     {
         if (m_currentProcedure && m_currentProcedure->isRecursive())
         {
-            m_context.log(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
+            m_context.log(
+                errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE.args(*node.begin(), m_context.source, *node.begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_RECURSIVE_PROCEDURE);
+        }
+        else if (m_blockDepth > 1)
+        {
+            m_context.log(
+                errors::semantics::PRESET_IN_INNER_BLOCK.args(*node.begin(), m_context.source, *node.begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::PRESET_IN_INNER_BLOCK);
         }
 
         std::uint64_t totalElements = 1;
