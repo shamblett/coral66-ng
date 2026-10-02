@@ -413,6 +413,7 @@ void SymbolResolutionPass::visit(const syntax::Declaration& node)
 void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
 {
     auto type = createTypeFromToken(node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits());
+    std::size_t identifierIndex = 0;
     for (auto id : node.getIdentifiers())
     {
         auto typeCopy = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer});
@@ -424,6 +425,7 @@ void SymbolResolutionPass::visit(const syntax::VariableDeclaration& node)
 
         auto declaration = makeIntrusiveVariant<VariableDeclaration>(id, std::move(typeCopy));
         declaration->setAstNode(&node);
+        declaration->setPresetIndex(identifierIndex++);
         const auto& name = std::get<std::string>(id->getValue());
 
         if (m_context.symbolTable.lookupInCurrentScope(name))
@@ -476,12 +478,22 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
             dims.push_back(0);
         }
     }
+    std::size_t arraySize = 1;
+    for (auto dim : dims)
+    {
+        if (dim > 0)
+            arraySize *= dim;
+    }
+
+    std::size_t elementOffset = 0;
     for (auto id : node.getIdentifiers())
     {
         auto typeCopy = IntrusiveVariantValue(ArrayType{baseTypePtr, dims});
 
         auto declaration = makeIntrusiveVariant<ArrayDeclaration>(id, std::move(typeCopy));
         declaration->setAstNode(&node);
+        declaration->setPresetIndex(elementOffset);
+        elementOffset += arraySize;
         const auto& name = std::get<std::string>(id->getValue());
 
         if (m_context.symbolTable.lookupInCurrentScope(name))

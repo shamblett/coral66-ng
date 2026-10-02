@@ -96,7 +96,7 @@ public:
 
 private:
     static llvm::Constant* parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
-                                           std::size_t numElements);
+                                           std::size_t numElements, std::size_t startElementIndex = 0);
 
     void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
                            const syntax::ProcedureDeclaration& astNode);

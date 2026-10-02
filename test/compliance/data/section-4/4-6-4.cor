@@ -1,0 +1,10 @@
+PROGRAM FOURSIXFOUR
+COMMENT Presetting, integers and arrays;
+
+BEGIN
+
+   INTEGER a, b, c := 1, 2, 3;
+
+   INTEGER ARRAY k[1 :2, 1:2] := 11, 12, 21, 22;
+
+END

@@ -873,6 +873,7 @@ class Declaration : public Usable
     int m_scopeDepth = 0;
     std::optional<std::uint64_t> m_absoluteAddress = std::nullopt;
     CommunicatorType m_communicatorType = CommunicatorType::None;
+    std::size_t m_presetIndex = 0;
 
 protected:
     template <class T>
@@ -889,6 +890,15 @@ public:
     }
     [[nodiscard]] std::string_view getName() const;
     [[nodiscard]] std::string getMangledName() const;
+
+    void setPresetIndex(std::size_t index)
+    {
+        m_presetIndex = index;
+    }
+    [[nodiscard]] std::size_t getPresetIndex() const
+    {
+        return m_presetIndex;
+    }
 
     void setAstNode(const syntax::Declaration* node)
     {

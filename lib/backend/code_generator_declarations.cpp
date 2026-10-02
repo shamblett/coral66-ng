@@ -12,7 +12,7 @@ namespace coral66::cgllvm
 {
 
 llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
-                                               const std::size_t numElements)
+                                               const std::size_t numElements, const std::size_t startElementIndex)
 {
     std::vector<llvm::Constant*> elements;
     llvm::Type* elemType = nullptr;
@@ -23,7 +23,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
 
     std::size_t currentElement = 0;
 
-    for (std::size_t i = 0; i < tokens.size() && currentElement < numElements; ++i)
+    for (std::size_t i = 0; i < tokens.size() && elements.size() < numElements; ++i)
     {
         auto tType = tokens[i]->getTokenType();
         if (tType == lexer::TokenType::Comma)
@@ -31,7 +31,8 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             // Void item if it's consecutive commas or leading comma
             if (i == 0 || tokens[i - 1]->getTokenType() == lexer::TokenType::Comma)
             {
-                elements.push_back(llvm::Constant::getNullValue(elemType));
+                if (currentElement >= startElementIndex)
+                    elements.push_back(llvm::Constant::getNullValue(elemType));
                 currentElement++;
             }
             continue;
@@ -75,17 +76,17 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
 
             if (val)
             {
-                elements.push_back(val);
+                if (currentElement >= startElementIndex)
+                    elements.push_back(val);
                 currentElement++;
             }
         }
     }
 
     // Fill remaining elements with zero
-    while (currentElement < numElements)
+    while (elements.size() < numElements)
     {
         elements.push_back(llvm::Constant::getNullValue(elemType));
-        currentElement++;
     }
 
     if (auto* arrType = llvm::dyn_cast<llvm::ArrayType>(targetType))
@@ -110,7 +111,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1);
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1, var->getPresetIndex());
                 hasExplicitPreset = true;
             }
         }
@@ -172,7 +173,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 std::size_t numElements = 1;
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements);
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, arr->getPresetIndex());
                 hasExplicitPreset = true;
             }
         }
@@ -234,7 +235,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 std::size_t numElements = 1;
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements);
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex());
                 hasExplicitPreset = true;
             }
         }

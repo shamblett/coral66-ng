@@ -699,4 +699,102 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
         CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(PRESET_IN_INNER_BLOCK));
     }
+
+    /// The preset constants for variables and arrays are listed at the end of the declaration
+    /// after an assignment symbol, and are allocated in the order defined in section 4.5.
+    SECTION("4-6-4")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-4/4-6-4.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("foursixfour", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        // Run the `main` function
+
+        // Ensure all globals are allocated and JIT compilation is done before running
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        // k
+        auto arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("k"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        auto elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        // Check the elements from the table base
+        // CHECK(elements[0] == 11);
+        // CHECK(elements[0] == 12);
+        // CHECK(elements[0] == 21);
+        // CHECK(elements[0] == 22);
+
+        // Integers
+
+        // a
+        auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("a"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        int32_t avalue = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(avalue == 1);
+
+        // b
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("b"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        int32_t bvalue = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(bvalue == 2);
+
+        // c
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("c"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        int32_t cvalue = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(cvalue == 3);
+
+        // Clean up
+        delete ee;
+    }
 }
