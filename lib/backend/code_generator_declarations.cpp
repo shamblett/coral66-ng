@@ -11,15 +11,38 @@
 namespace coral66::cgllvm
 {
 
+llvm::Constant* CodeGenerator::reshapeArray(llvm::Type* targetType, const std::vector<llvm::Constant*>& flatElements, std::size_t& offset)
+{
+    if (auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(targetType))
+    {
+        std::vector<llvm::Constant*> subElements;
+        std::size_t numElements = arrayType->getNumElements();
+        llvm::Type* elementType = arrayType->getElementType();
+        for (std::size_t i = 0; i < numElements; ++i)
+        {
+            subElements.push_back(reshapeArray(elementType, flatElements, offset));
+        }
+        return llvm::ConstantArray::get(arrayType, subElements);
+    }
+    
+    // Base case: primitive type
+    if (offset < flatElements.size())
+    {
+        return flatElements[offset++];
+    }
+    
+    return llvm::Constant::getNullValue(targetType);
+}
+
 llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
                                                const std::size_t numElements, const std::size_t startElementIndex)
 {
     std::vector<llvm::Constant*> elements;
-    llvm::Type* elemType = nullptr;
-    if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(targetType))
+    llvm::Type* elemType = targetType;
+    while (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(elemType))
+    {
         elemType = arrayType->getElementType();
-    else
-        elemType = targetType; // Not really expected for arrays/tables, but safe fallback
+    }
 
     std::size_t currentElement = 0;
 
@@ -89,9 +112,10 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
         elements.push_back(llvm::Constant::getNullValue(elemType));
     }
 
-    if (auto* arrType = llvm::dyn_cast<llvm::ArrayType>(targetType))
+    if (llvm::isa<llvm::ArrayType>(targetType))
     {
-        return llvm::ConstantArray::get(arrType, elements);
+        std::size_t offset = 0;
+        return reshapeArray(targetType, elements, offset);
     }
 
     return elements.empty() ? llvm::Constant::getNullValue(targetType) : elements[0];
@@ -171,8 +195,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
                 std::size_t numElements = 1;
-                if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
-                    numElements = arrayType->getNumElements();
+                for (auto dim : arr->getType().as<semantics::ArrayType>().getDimensions())
+                    numElements *= dim;
                 initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, arr->getPresetIndex());
                 hasExplicitPreset = true;
             }

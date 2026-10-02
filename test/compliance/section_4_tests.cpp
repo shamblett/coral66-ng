@@ -766,10 +766,10 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         auto elements = static_cast<int32_t*>(arrayBaseAddress);
 
         // Check the elements from the table base
-        // CHECK(elements[0] == 11);
-        // CHECK(elements[0] == 12);
-        // CHECK(elements[0] == 21);
-        // CHECK(elements[0] == 22);
+        CHECK(elements[0] == 11);
+        CHECK(elements[1] == 12);
+        CHECK(elements[2] == 21);
+        CHECK(elements[3] == 22);
 
         // Integers
 
