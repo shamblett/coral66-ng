@@ -759,7 +759,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-        // k
+        // k array multi dimensional
         auto arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("k"));
         REQUIRE(arrayBaseAddress != nullptr);
 
@@ -771,28 +771,39 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         CHECK(elements[2] == 21);
         CHECK(elements[3] == 22);
 
+        // l array single dimensional
+        arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("l"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        // Check the elements from the table base
+        CHECK(elements[0] == 11);
+        CHECK(elements[1] == 12);
+        CHECK(elements[2] == 13);
+
         // Integers
 
         // a
         auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("a"));
         REQUIRE(variableAddress != nullptr);
         // Dereference to get the actual value
-        int32_t avalue = *static_cast<int32_t*>(variableAddress);
-        REQUIRE(avalue == 1);
+        int32_t value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 1);
 
         // b
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("b"));
         REQUIRE(variableAddress != nullptr);
         // Dereference to get the actual value
-        int32_t bvalue = *static_cast<int32_t*>(variableAddress);
-        REQUIRE(bvalue == 2);
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 2);
 
         // c
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("c"));
         REQUIRE(variableAddress != nullptr);
         // Dereference to get the actual value
-        int32_t cvalue = *static_cast<int32_t*>(variableAddress);
-        REQUIRE(cvalue == 3);
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 3);
 
         // Clean up
         delete ee;
