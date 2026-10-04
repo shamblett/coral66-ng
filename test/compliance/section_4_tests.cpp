@@ -805,6 +805,50 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         value = *static_cast<int32_t*>(variableAddress);
         REQUIRE(value == 3);
 
+        // Floating
+
+        // d
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("d"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        auto fvalue = *static_cast<float*>(variableAddress);
+        REQUIRE(fvalue == 2.0);
+
+        // e
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("e"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        fvalue = *static_cast<float*>(variableAddress);
+        REQUIRE(fvalue == 3.0);
+
+        // f
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("f"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        fvalue = *static_cast<float*>(variableAddress);
+        REQUIRE(fvalue == 4.0);
+
+        // Fixed
+
+        // g
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("g"));
+        REQUIRE(variableAddress != nullptr);
+        int32_t fixed = *static_cast<int32_t*>(variableAddress);
+        CHECK(fixed == 280);
+
+        // h
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("h"));
+        REQUIRE(variableAddress != nullptr);
+        fixed = *static_cast<int32_t*>(variableAddress);
+        CHECK(fixed == 2800);
+
+        // i
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("i"));
+        REQUIRE(variableAddress != nullptr);
+        fixed = *static_cast<int32_t*>(variableAddress);
+        CHECK(fixed == 28000);
+
+
         // Clean up
         delete ee;
     }
