@@ -96,7 +96,8 @@ public:
 
 private:
     static llvm::Constant* parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
-                                           std::size_t numElements, std::size_t startElementIndex = 0);
+                                           std::size_t numElements, std::size_t startElementIndex = 0,
+                                           const semantics::Type* semanticType = nullptr);
     static llvm::Constant* reshapeArray(llvm::Type* targetType, const std::vector<llvm::Constant*>& flatElements, std::size_t& offset);
 
     void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,

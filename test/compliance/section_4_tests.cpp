@@ -731,6 +731,8 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
+        ss.flush();
+        std::cout << reporterString << "\n";
 
         // Code Generation
         llvm::LLVMContext context;
@@ -847,7 +849,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         REQUIRE(variableAddress != nullptr);
         fixed = *static_cast<int32_t*>(variableAddress);
         CHECK(fixed == 28000);
-
 
         // Clean up
         delete ee;

@@ -6,6 +6,8 @@
 
 #include "code_generator.hpp"
 
+#include <cmath>
+
 #include "lib/frontend/semantics/program.hpp"
 
 namespace coral66::cgllvm
@@ -35,7 +37,8 @@ llvm::Constant* CodeGenerator::reshapeArray(llvm::Type* targetType, const std::v
 }
 
 llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
-                                               const std::size_t numElements, const std::size_t startElementIndex)
+                                               const std::size_t numElements, const std::size_t startElementIndex,
+                                               const semantics::Type* semanticType)
 {
     std::vector<llvm::Constant*> elements;
     llvm::Type* elemType = targetType;
@@ -43,6 +46,18 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
     {
         elemType = arrayType->getElementType();
     }
+
+    std::uint8_t fractionBits = 0;
+    if (semanticType)
+    {
+        const semantics::Type* st = semanticType;
+        while (const auto* arr = st->tryAs<semantics::ArrayType>())
+            st = &arr->getElementType();
+        
+        if (const auto* fixed = st->tryAs<semantics::FixedType>())
+            fractionBits = fixed->getFractionalBits();
+    }
+
 
     std::size_t currentElement = 0;
 
@@ -84,7 +99,11 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 if (elemType->isFloatingPointTy())
                     val = llvm::ConstantFP::get(elemType, static_cast<double>(v));
                 else
+                {
+                    if (fractionBits > 0)
+                        v = v << fractionBits;
                     val = llvm::ConstantInt::get(elemType, v, true);
+                }
             }
             else if (auto* floatVal = std::get_if<llvm::APFloat>(&tokens[i]->getValue()))
             {
@@ -94,7 +113,11 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 if (elemType->isFloatingPointTy())
                     val = llvm::ConstantFP::get(elemType, v);
                 else
-                    val = llvm::ConstantInt::get(elemType, static_cast<std::int64_t>(v), true);
+                {
+                    if (fractionBits > 0)
+                        v *= std::pow(2.0, fractionBits);
+                    val = llvm::ConstantInt::get(elemType, static_cast<std::int64_t>(std::round(v)), true);
+                }
             }
 
             if (val)
@@ -135,7 +158,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1, var->getPresetIndex());
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1, var->getPresetIndex(), &var->getType());
                 hasExplicitPreset = true;
             }
         }
@@ -197,7 +220,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 std::size_t numElements = 1;
                 for (auto dim : arr->getType().as<semantics::ArrayType>().getDimensions())
                     numElements *= dim;
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, arr->getPresetIndex());
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, arr->getPresetIndex(), &arr->getType());
                 hasExplicitPreset = true;
             }
         }
@@ -259,7 +282,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 std::size_t numElements = 1;
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex());
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex(), &tab->getType());
                 hasExplicitPreset = true;
             }
         }
