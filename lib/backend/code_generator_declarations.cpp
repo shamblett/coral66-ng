@@ -86,6 +86,18 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             tType = tokens[i]->getTokenType();
         }
 
+        bool isOctal = false;
+        if (tType == lexer::TokenType::OctalKeyword)
+        {
+            isOctal = true;
+            i++;
+            if (i < tokens.size() && tokens[i]->getTokenType() == lexer::TokenType::OpenParentheses)
+                i++;
+            if (i >= tokens.size())
+                break;
+            tType = tokens[i]->getTokenType();
+        }
+
         if (tType == lexer::TokenType::Literal
             && (tokens[i]->getType() == lexer::CToken::Type::Integer
                 || tokens[i]->getType() == lexer::CToken::Type::Floating))
@@ -93,7 +105,17 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             llvm::Constant* val = nullptr;
             if (auto* intVal = std::get_if<llvm::APSInt>(&tokens[i]->getValue()))
             {
-                std::int64_t v = intVal->getExtValue();
+                llvm::APSInt vInt = *intVal;
+                if (isOctal)
+                {
+                    llvm::SmallString<32> str;
+                    vInt.toString(str, 10);
+                    llvm::APInt octalVal;
+                    llvm::StringRef(str).getAsInteger(8, octalVal);
+                    octalVal = octalVal.zextOrTrunc(vInt.getBitWidth());
+                    vInt = llvm::APSInt(octalVal, vInt.isUnsigned());
+                }
+                std::int64_t v = vInt.getExtValue();
                 if (isNegative)
                     v = -v;
                 if (elemType->isFloatingPointTy())
@@ -107,6 +129,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             }
             else if (auto* floatVal = std::get_if<llvm::APFloat>(&tokens[i]->getValue()))
             {
+                // We do not handle octal floating point correctly yet, but we will pass it through
                 double v = floatVal->convertToDouble();
                 if (isNegative)
                     v = -v;
@@ -125,6 +148,13 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 if (currentElement >= startElementIndex)
                     elements.push_back(val);
                 currentElement++;
+            }
+            
+            // If it was an OCTAL expression, we should skip the closing parenthesis
+            if (isOctal)
+            {
+                if (i + 1 < tokens.size() && tokens[i + 1]->getTokenType() == lexer::TokenType::CloseParentheses)
+                    i++;
             }
         }
     }

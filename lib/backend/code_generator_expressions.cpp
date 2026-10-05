@@ -185,7 +185,21 @@ llvm::Value* CodeGenerator::visit(const syntax::LiteralExpression& expression)
     auto& val = expression.getLiteral()->getValue();
     if (std::holds_alternative<llvm::APSInt>(val))
     {
-        return llvm::ConstantInt::get(m_module.getContext(), std::get<llvm::APSInt>(val));
+        auto intVal = std::get<llvm::APSInt>(val);
+        if (expression.begin()->getTokenType() == lexer::TokenType::OctalKeyword)
+        {
+            // The lexer parses the sequence of digits as a decimal integer.
+            // For an OCTAL expression, we convert the decimal value back to its
+            // sequence of digits and then parse that sequence as base 8.
+            llvm::SmallString<32> str;
+            intVal.toString(str, 10);
+            llvm::APInt octalVal;
+            llvm::StringRef(str).getAsInteger(8, octalVal);
+            // Maintain the same bit width as the original APSInt
+            octalVal = octalVal.zextOrTrunc(intVal.getBitWidth());
+            intVal = llvm::APSInt(octalVal, intVal.isUnsigned());
+        }
+        return llvm::ConstantInt::get(m_module.getContext(), intVal);
     }
     if (std::holds_alternative<llvm::APFloat>(val))
     {

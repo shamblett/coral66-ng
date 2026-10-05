@@ -853,4 +853,80 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // Clean up
         delete ee;
     }
+
+    /// If the internal structure of a table is completely disregarded, the table can be treated as an
+    /// ordinary one-dimensional array of whole computer words (4.4.4), and preset as such (4.6.1)
+    SECTION("4-6-5")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-4/4-6-5.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+        ss.flush();
+        std::cout << reporterString << "\n";
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("foursixfive", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        // Run the `main` function
+
+        // Ensure all globals are allocated and JIT compilation is done before running
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        // l array single dimensional
+        auto arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("gears"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        auto elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        // Check the elements from the table base
+        CHECK(elements[0] == 01402371);
+        CHECK(elements[1] == 01003162);
+        CHECK(elements[2] == 0603655);
+
+        // Clean up
+        delete ee;
+    }
 }
