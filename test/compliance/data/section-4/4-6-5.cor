@@ -1,13 +1,23 @@
 PROGRAM FOURSIXFIVE
-COMMENT Presetting, table as ome dimensional array;
+COMMENT Table resetting;
 
 BEGIN
 
-TABLE gears [1,3]
 
+COMMENT Preset the table as ome dimensional array;
+TABLE gears [1,3]
 [ teeth1 UNSIGNED (6) 0,0;
 teeth2 UNSIGNED (6) 0,6;
 ratio UNSIGNED (11,5) 0,12;
 arc UNSIGNED (5,5) 0,12 ]  := OCTAL(1402371), OCTAL(1003162), OCTAL(603655);
+
+
+COMMENT Preset the table using a preset list;
+TABLE gears1 [1,3]
+[ teeth3 UNSIGNED (6) 0,0;
+teeth4 UNSIGNED (6) 0,6;
+ratio1 UNSIGNED (11,5) 0,12;
+arc1 UNSIGNED (5,5) 0,12
+PRESET (57,19,3.0, ), (50,25,2.0, ), (45,30,1.5, ) ];
 
 END

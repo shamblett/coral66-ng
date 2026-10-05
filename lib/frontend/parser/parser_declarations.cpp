@@ -428,6 +428,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                 {
                     if (begin->getTokenType() == lexer::TokenType::PresetKeyword)
                     {
+                        hasPresetAssignment = true;
                         begin++;
 
                         bool parsedAny = false;
@@ -468,6 +469,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                             parsedAny = true;
                             if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                             {
+                                presetTokens.push_back(begin);
                                 begin++;
                             }
                             else
@@ -511,10 +513,18 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                             auto savedBegin = begin;
                             begin++;
                             fixedScale.first = parseExpression(begin, end, context);
+                            
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                            {
+                                begin++;
+                                fixedScale.second = parseExpression(begin, end, context);
+                            }
+                            
                             if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
                             {
                                 begin = savedBegin;
                                 fixedScale.first = nullptr;
+                                fixedScale.second = nullptr;
                                 int depth = 1;
                                 begin++;
                                 while (begin != end && depth > 0)

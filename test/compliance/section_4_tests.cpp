@@ -855,7 +855,9 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
     }
 
     /// If the internal structure of a table is completely disregarded, the table can be treated as an
-    /// ordinary one-dimensional array of whole computer words (4.4.4), and preset as such (4.6.1)
+    /// ordinary one-dimensional array of whole computer words (4.4.4), and preset as such (4.6.1).
+    /// Alternatively, all the table-elements may be preset after their declaration list,
+    /// as shown at Elementpresetlist in the syntax of 4.4.1.
     SECTION("4-6-5")
     {
         // Initialize LLVM Native Target for JIT Execution
@@ -915,11 +917,22 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-        // l array single dimensional
+        // Table preset as single dimensional array
         auto arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("gears"));
         REQUIRE(arrayBaseAddress != nullptr);
 
         auto elements = static_cast<int32_t*>(arrayBaseAddress);
+
+        // Check the elements from the table base
+        CHECK(elements[0] == 01402371);
+        CHECK(elements[1] == 01003162);
+        CHECK(elements[2] == 0603655);
+
+        // Table preset using preset list
+        arrayBaseAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("gears1"));
+        REQUIRE(arrayBaseAddress != nullptr);
+
+        elements = static_cast<int32_t*>(arrayBaseAddress);
 
         // Check the elements from the table base
         CHECK(elements[0] == 01402371);

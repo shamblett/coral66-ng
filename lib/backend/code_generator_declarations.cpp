@@ -38,7 +38,8 @@ llvm::Constant* CodeGenerator::reshapeArray(llvm::Type* targetType, const std::v
 
 llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIterator>& tokens, llvm::Type* targetType,
                                                const std::size_t numElements, const std::size_t startElementIndex,
-                                               const semantics::Type* semanticType)
+                                               const semantics::Type* semanticType,
+                                               const syntax::TableDeclaration* astTable)
 {
     std::vector<llvm::Constant*> elements;
     llvm::Type* elemType = targetType;
@@ -60,18 +61,67 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
 
 
     std::size_t currentElement = 0;
+    
+    // Support for table element packing
+    std::size_t tableElementIndex = 0;
+    std::size_t tableFields = 1;
+    if (astTable)
+        tableFields = astTable->getElements().size();
+    
+    std::vector<std::int64_t> currentTableWord(numElements, 0);
+    std::vector<bool> currentTableWordSet(numElements, false);
 
-    for (std::size_t i = 0; i < tokens.size() && elements.size() < numElements; ++i)
+    for (std::size_t i = 0; i < tokens.size() && currentElement < numElements; ++i)
     {
         auto tType = tokens[i]->getTokenType();
+        
+        // Skip parentheses as they are just grouping
+        if (tType == lexer::TokenType::OpenParentheses || tType == lexer::TokenType::CloseParentheses)
+            continue;
+
         if (tType == lexer::TokenType::Comma)
         {
-            // Void item if it's consecutive commas or leading comma
-            if (i == 0 || tokens[i - 1]->getTokenType() == lexer::TokenType::Comma)
+            // Void item if it's consecutive commas or leading comma or comma after parenthesis
+            // Basically if the previous non-parenthesis token was a comma (or there was no previous)
+            bool isVoid = false;
+            if (i == 0) isVoid = true;
+            else {
+                for (std::int64_t j = i - 1; j >= 0; --j) {
+                    auto prevType = tokens[j]->getTokenType();
+                    if (prevType == lexer::TokenType::OpenParentheses || prevType == lexer::TokenType::CloseParentheses)
+                        continue;
+                    if (prevType == lexer::TokenType::Comma)
+                        isVoid = true;
+                    break; // Stop at first non-parenthesis token
+                }
+            }
+
+            if (isVoid)
             {
                 if (currentElement >= startElementIndex)
-                    elements.push_back(llvm::Constant::getNullValue(elemType));
-                currentElement++;
+                {
+                    if (astTable)
+                    {
+                        // Just advance the field index for tables, the default 0 will be left un-ORed
+                    }
+                    else
+                    {
+                        elements.push_back(llvm::Constant::getNullValue(elemType));
+                    }
+                }
+                if (astTable)
+                {
+                    tableElementIndex++;
+                    if (tableElementIndex >= tableFields)
+                    {
+                        tableElementIndex = 0;
+                        currentElement++;
+                    }
+                }
+                else
+                {
+                    currentElement++;
+                }
             }
             continue;
         }
@@ -103,6 +153,28 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 || tokens[i]->getType() == lexer::CToken::Type::Floating))
         {
             llvm::Constant* val = nullptr;
+            std::int64_t rawIntVal = 0;
+            
+            // Adjust fractionBits if we are packing table fields
+            std::uint8_t localFractionBits = fractionBits;
+            const syntax::TableElementDeclaration* elemDecl = nullptr;
+            if (astTable)
+            {
+                elemDecl = dynamic_cast<const syntax::TableElementDeclaration*>(astTable->getElements()[tableElementIndex].get());
+                if (elemDecl && elemDecl->getFixedFractionBits())
+                {
+                    // No access to evaluateConstantInteger in backend, but these are typically literals
+                    if (auto* lit = dynamic_cast<const syntax::LiteralExpression*>(elemDecl->getFixedFractionBits()))
+                    {
+                        if (auto* intVal = std::get_if<llvm::APSInt>(&lit->getLiteral()->getValue()))
+                        {
+                            if (intVal->getExtValue() > 0)
+                                localFractionBits = static_cast<std::uint8_t>(intVal->getExtValue());
+                        }
+                    }
+                }
+            }
+
             if (auto* intVal = std::get_if<llvm::APSInt>(&tokens[i]->getValue()))
             {
                 llvm::APSInt vInt = *intVal;
@@ -118,12 +190,16 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 std::int64_t v = vInt.getExtValue();
                 if (isNegative)
                     v = -v;
-                if (elemType->isFloatingPointTy())
+                
+                if (elemType->isFloatingPointTy() && !astTable)
+                {
                     val = llvm::ConstantFP::get(elemType, static_cast<double>(v));
+                }
                 else
                 {
-                    if (fractionBits > 0)
-                        v = v << fractionBits;
+                    if (localFractionBits > 0)
+                        v = v << localFractionBits;
+                    rawIntVal = v;
                     val = llvm::ConstantInt::get(elemType, v, true);
                 }
             }
@@ -133,21 +209,54 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 double v = floatVal->convertToDouble();
                 if (isNegative)
                     v = -v;
-                if (elemType->isFloatingPointTy())
+                if (elemType->isFloatingPointTy() && !astTable)
+                {
                     val = llvm::ConstantFP::get(elemType, v);
+                }
                 else
                 {
-                    if (fractionBits > 0)
-                        v *= std::pow(2.0, fractionBits);
-                    val = llvm::ConstantInt::get(elemType, static_cast<std::int64_t>(std::round(v)), true);
+                    if (localFractionBits > 0)
+                        v *= std::pow(2.0, localFractionBits);
+                    rawIntVal = static_cast<std::int64_t>(std::round(v));
+                    val = llvm::ConstantInt::get(elemType, rawIntVal, true);
                 }
             }
 
             if (val)
             {
                 if (currentElement >= startElementIndex)
-                    elements.push_back(val);
-                currentElement++;
+                {
+                    if (astTable)
+                    {
+                        std::int64_t bitOffset = 0;
+                        if (elemDecl && elemDecl->getBitPosition())
+                        {
+                            if (auto* bPos = std::get_if<llvm::APSInt>(&elemDecl->getBitPosition().value()->getValue()))
+                                bitOffset = bPos->getExtValue();
+                        }
+
+                        currentTableWord[currentElement] |= (rawIntVal << bitOffset);
+                        currentTableWordSet[currentElement] = true;
+                    }
+                    else
+                    {
+                        elements.push_back(val);
+                    }
+                }
+                
+                if (astTable)
+                {
+                    tableElementIndex++;
+                    if (tableElementIndex >= tableFields)
+                    {
+                        tableElementIndex = 0;
+                        currentElement++;
+                    }
+                }
+                else
+                {
+                    currentElement++;
+                }
             }
             
             // If it was an OCTAL expression, we should skip the closing parenthesis
@@ -155,6 +264,64 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             {
                 if (i + 1 < tokens.size() && tokens[i + 1]->getTokenType() == lexer::TokenType::CloseParentheses)
                     i++;
+            }
+        }
+    }
+    
+    // Process any trailing void if the last non-parenthesis token was a comma
+    if (!tokens.empty())
+    {
+        bool trailingVoid = false;
+        for (std::int64_t i = tokens.size() - 1; i >= 0; --i)
+        {
+            auto type = tokens[i]->getTokenType();
+            if (type == lexer::TokenType::OpenParentheses || type == lexer::TokenType::CloseParentheses)
+                continue;
+            if (type == lexer::TokenType::Comma)
+                trailingVoid = true;
+            break;
+        }
+        
+        if (trailingVoid && currentElement < numElements)
+        {
+            if (currentElement >= startElementIndex)
+            {
+                if (astTable)
+                {
+                    // advance field
+                }
+                else
+                {
+                    elements.push_back(llvm::Constant::getNullValue(elemType));
+                }
+            }
+            if (astTable)
+            {
+                tableElementIndex++;
+                if (tableElementIndex >= tableFields)
+                {
+                    tableElementIndex = 0;
+                    currentElement++;
+                }
+            }
+            else
+            {
+                currentElement++;
+            }
+        }
+    }
+
+    if (astTable)
+    {
+        for (std::size_t i = 0; i < currentElement; ++i)
+        {
+            if (i >= startElementIndex && currentTableWordSet[i])
+            {
+                elements.push_back(llvm::ConstantInt::get(elemType, currentTableWord[i], true));
+            }
+            else if (i >= startElementIndex)
+            {
+                elements.push_back(llvm::Constant::getNullValue(elemType));
             }
         }
     }
@@ -312,7 +479,19 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 std::size_t numElements = 1;
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex(), &tab->getType());
+                
+                bool isFieldPreset = false;
+                if (!astNode->getPresetTokens().empty())
+                {
+                    auto it = astNode->getPresetTokens().front();
+                    --it;
+                    if (it->getTokenType() == lexer::TokenType::PresetKeyword)
+                    {
+                        isFieldPreset = true;
+                    }
+                }
+                
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex(), &tab->getType(), isFieldPreset ? astNode : nullptr);
                 hasExplicitPreset = true;
             }
         }
