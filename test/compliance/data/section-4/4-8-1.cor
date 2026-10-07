@@ -1,0 +1,16 @@
+PROGRAM FOUREIGHTONE
+COMMENT Overlay declarations;
+
+BEGIN
+
+  COMMENT integer overlay;
+  INTEGER base;
+  OVERLAY base WITH INTEGER baseOverlay;
+
+  INTEGER base1;
+  OVERLAY base1 WITH INTEGER base1Overlay;
+
+  baseOverlay := 10;
+  base1 := 20;
+
+END
