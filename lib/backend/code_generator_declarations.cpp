@@ -68,10 +68,10 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
     if (astTable)
         tableFields = astTable->getElements().size();
     
-    std::vector<std::int64_t> currentTableWord(numElements, 0);
-    std::vector<bool> currentTableWordSet(numElements, false);
+    std::vector<std::int64_t> currentTableWord(startElementIndex + numElements, 0);
+    std::vector<bool> currentTableWordSet(startElementIndex + numElements, false);
 
-    for (std::size_t i = 0; i < tokens.size() && currentElement < numElements; ++i)
+    for (std::size_t i = 0; i < tokens.size() && currentElement < (startElementIndex + numElements); ++i)
     {
         auto tType = tokens[i]->getTokenType();
         
@@ -282,7 +282,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             break;
         }
         
-        if (trailingVoid && currentElement < numElements)
+        if (trailingVoid && currentElement < (startElementIndex + numElements))
         {
             if (currentElement >= startElementIndex)
             {
