@@ -160,7 +160,24 @@ void CodeGenerator::generate()
 
                 if (targetUsable)
                 {
-                    m_globals[targetUsable] = finalAddr;
+                    llvm::Type* valueTy = nullptr;
+                    targetUsable->match([&](const semantics::VariableDeclaration& var)
+                                        { valueTy = convertType(var.getType()); },
+                                        [&](const semantics::ArrayDeclaration& arr)
+                                        { valueTy = convertType(arr.getType()); },
+                                        [&](const semantics::TableDeclaration& tab)
+                                        { valueTy = convertType(tab.getType()); },
+                                        [](const auto&) {});
+
+                    llvm::Value* aliasOrAddr = finalAddr;
+                    if (valueTy)
+                    {
+                        aliasOrAddr = llvm::GlobalAlias::create(valueTy, 0, llvm::GlobalValue::ExternalLinkage,
+                                                                targetName, llvm::cast<llvm::Constant>(finalAddr),
+                                                                &m_module);
+                    }
+                    
+                    m_globals[targetUsable] = aliasOrAddr;
                 }
             }
         }
