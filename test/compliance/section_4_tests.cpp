@@ -1020,6 +1020,17 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         value = *static_cast<int32_t*>(variableAddress);
         REQUIRE(value == 20);
 
+
+        // Array overlay with array
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("arrayBaseOverlay"));
+        REQUIRE(variableAddress != nullptr);
+
+        auto elements = static_cast<int32_t*>(variableAddress);
+
+        // Check the elements from the array overlay
+        // arrayBase[1] corresponds to memory offset 0 because lower bound is 1 (index - lower_bound = 0)
+        CHECK(elements[0] == 10);
+
         // Clean up
         delete ee;
     }

@@ -10,7 +10,15 @@ BEGIN
   INTEGER base1;
   OVERLAY base1 WITH INTEGER base1Overlay;
 
+  COMMENT array overlay;
+  INTEGER ARRAY arrayBase[1:3];
+  OVERLAY arrayBase WITH INTEGER ARRAY arrayBaseOverlay[1:3];
+
   baseOverlay := 10;
   base1 := 20;
+
+  COMMENT 0'th element;
+  arrayBase[1] := 10;
+
 
 END
