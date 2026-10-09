@@ -1063,6 +1063,18 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         value = *static_cast<int32_t*>(variableAddress);
         REQUIRE(value == 20);
 
+        // Tables
+
+        // Table overlay with table
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("baseTable"));
+        REQUIRE(variableAddress != nullptr);
+
+        elements = static_cast<int32_t*>(variableAddress);
+
+        // Check the elements from the table overlay
+        CHECK(elements[0] == 40);
+        CHECK(elements[2] == 50);
+
         // Clean up
         delete ee;
     }

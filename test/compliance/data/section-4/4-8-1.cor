@@ -30,7 +30,20 @@ BEGIN
   COMMENT Array overlay with integer;
   OVERLAY arrayBase[2] WITH INTEGER arrayBaseIntegerOverlay;
 
-  COMMENT values;
+  COMMENT Tables;
+
+  COMMENT table overlay;
+  TABLE baseTable[2,1]
+  [ baseTableInteger0 INTEGER 0;
+    baseTableInteger1 INTEGER 1;
+  ];
+  OVERLAY baseTable WITH TABLE baseTableOverlay[2,1]
+                           [ baseTableOverlayInteger0 INTEGER 0;
+                             baseTableOverlayInteger1 INTEGER 1;
+                           ];
+
+
+  COMMENT Main value setting;
 
   baseOverlay := 10;
   base1 := 20;
@@ -42,5 +55,7 @@ BEGIN
   arrayBase[2] := 20;
   arrayBase[3] := 30;
 
+  baseTableOverlayInteger0 := 40;
+  baseTableOverlayInteger1 := 50;
 
 END
