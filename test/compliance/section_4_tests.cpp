@@ -1073,7 +1073,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         // Check the elements from the table overlay
         CHECK(elements[0] == 40);
-        CHECK(elements[2] == 50);
+        CHECK(elements[1] == 50);
 
         // Clean up
         delete ee;

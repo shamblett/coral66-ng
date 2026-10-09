@@ -28,6 +28,39 @@ llvm::Value* CodeGenerator::emitAddress(const syntax::Expression& expression)
                 return m_locals[declaration];
             if (m_globals.contains(declaration))
                 return m_globals[declaration];
+
+            if (auto* tableElem = declaration->tryAs<semantics::TableElementDeclaration>())
+            {
+                llvm::Value* baseAddr = nullptr;
+                llvm::Type* baseType = nullptr;
+                if (auto* parentTable = tableElem->getParentTable())
+                {
+                    if (m_locals.contains(parentTable))
+                        baseAddr = m_locals[parentTable];
+                    else if (m_globals.contains(parentTable))
+                        baseAddr = m_globals[parentTable];
+                    baseType = convertType(parentTable->getType());
+                }
+
+                if (baseAddr && baseType)
+                {
+                    std::vector<llvm::Value*> indices;
+                    if (baseType->isArrayTy())
+                        indices.push_back(llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(32, 0)));
+
+                    llvm::Value* idxVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0, true);
+
+                    if (tableElem->getWordPosition().has_value() && tableElem->getWordPosition().value() > 0)
+                    {
+                        llvm::Value* wordOffsetVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()),
+                                                                            tableElem->getWordPosition().value(), true);
+                        idxVal = m_builder.CreateAdd(idxVal, wordOffsetVal, "table_word_offset");
+                    }
+
+                    indices.push_back(idxVal);
+                    return m_builder.CreateGEP(baseType, baseAddr, indices, "table_elem_idx");
+                }
+            }
         }
     }
     else if (auto* part = dynamic_cast<const syntax::PartWordExpression*>(&expression))

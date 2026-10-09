@@ -831,6 +831,10 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
         if (!arrDecl->getIdentifiers().empty())
             targetName = std::get<std::string>(arrDecl->getIdentifiers()[0]->getValue());
     }
+    else if (auto* tabDecl = dynamic_cast<const syntax::TableDeclaration*>(&innerDecl))
+    {
+        targetName = std::get<std::string>(tabDecl->getIdentifier()->getValue());
+    }
 
     if (!targetName.empty())
     {
