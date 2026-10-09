@@ -27,6 +27,8 @@ BEGIN
   INTEGER ARRAY arrayBase[1:3];
   OVERLAY arrayBase WITH INTEGER ARRAY arrayBaseOverlay[1:3];
 
+  COMMENT Array overlay with integer;
+  OVERLAY arrayBase[2] WITH INTEGER arrayBaseIntegerOverlay;
 
   COMMENT values;
 
@@ -35,8 +37,9 @@ BEGIN
   fixedBase := 8.75;
   floatBase := 2.0;
 
-  COMMENT 0'th element;
+  COMMENT 0'th element at index 1;
   arrayBase[1] := 10;
+  arrayBase[2] := 20;
 
 
 END

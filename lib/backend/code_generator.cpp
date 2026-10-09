@@ -14,6 +14,11 @@
 
 #include "lib/frontend/semantics/program.hpp"
 
+namespace coral66::semantics
+{
+std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& expr);
+}
+
 namespace coral66::cgllvm
 {
 
@@ -118,15 +123,39 @@ void CodeGenerator::generate()
                     offsetVal = intVal->getExtValue();
             }
 
-            llvm::Constant* finalAddr = baseAddr;
-            if (offsetVal != 0)
+            std::int64_t baseLowerBound = 0;
+            if (auto* arrayDecl = baseUsable->tryAs<semantics::ArrayDeclaration>())
             {
-                llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
-                llvm::Constant* idx = llvm::ConstantInt::get(i32Ty, offsetVal, true);
-                finalAddr = llvm::ConstantExpr::getGetElementPtr(i32Ty, baseAddr, idx);
+                if (auto* astNode = dynamic_cast<const syntax::ArrayDeclaration*>(arrayDecl->getAstNode()))
+                {
+                    if (!astNode->getDimensions().empty())
+                    {
+                        if (auto lower = semantics::evaluateConstantInteger(*astNode->getDimensions()[0].first))
+                            baseLowerBound = *lower;
+                    }
+                }
             }
 
             const syntax::Declaration& innerDecl = overDecl->getOverlayDeclaration();
+            std::int64_t targetLowerBound = 0;
+            if (auto* arrDecl = dynamic_cast<const syntax::ArrayDeclaration*>(&innerDecl))
+            {
+                if (!arrDecl->getDimensions().empty())
+                {
+                    if (auto lower = semantics::evaluateConstantInteger(*arrDecl->getDimensions()[0].first))
+                        targetLowerBound = *lower;
+                }
+            }
+
+            std::int64_t totalOffset = offsetVal - baseLowerBound + targetLowerBound;
+
+            llvm::Constant* finalAddr = baseAddr;
+            if (totalOffset != 0)
+            {
+                llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
+                llvm::Constant* idx = llvm::ConstantInt::get(i32Ty, totalOffset, true);
+                finalAddr = llvm::ConstantExpr::getGetElementPtr(i32Ty, baseAddr, idx);
+            }
             std::string targetName;
             if (auto* varDecl = dynamic_cast<const syntax::VariableDeclaration*>(&innerDecl))
             {

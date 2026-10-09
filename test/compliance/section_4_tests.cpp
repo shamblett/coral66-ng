@@ -1055,6 +1055,13 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // arrayBase[1] corresponds to memory offset 0 because lower bound is 1 (index - lower_bound = 0)
         CHECK(elements[0] == 10);
 
+        // array base integer overlay
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("arrayBaseIntegerOverlay"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 20);
+
         // Clean up
         delete ee;
     }
