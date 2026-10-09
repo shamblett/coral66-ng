@@ -40,6 +40,7 @@ BEGIN
   COMMENT 0'th element at index 1;
   arrayBase[1] := 10;
   arrayBase[2] := 20;
+  arrayBase[3] := 30;
 
 
 END

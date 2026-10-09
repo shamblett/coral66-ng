@@ -1054,6 +1054,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // Check the elements from the array overlay
         // arrayBase[1] corresponds to memory offset 0 because lower bound is 1 (index - lower_bound = 0)
         CHECK(elements[0] == 10);
+        CHECK(elements[2] == 30);
 
         // array base integer overlay
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("arrayBaseIntegerOverlay"));
