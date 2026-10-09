@@ -1006,6 +1006,8 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
+        // Integers
+
         // base
         auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("base"));
         REQUIRE(variableAddress != nullptr);
@@ -1020,6 +1022,28 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         value = *static_cast<int32_t*>(variableAddress);
         REQUIRE(value == 20);
 
+        // fixedBase
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("fixedBaseOverlay"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 280);
+
+        // fixedBaseInteger
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("fixedBaseIntegerOverlay"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 280);
+
+        // Floating
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("floatBaseOverlay"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 1073741824);
+
+        // Arrays
 
         // Array overlay with array
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("arrayBaseOverlay"));

@@ -3,6 +3,8 @@ COMMENT Overlay declarations;
 
 BEGIN
 
+  COMMENT Integers, fixed, floating;
+
   COMMENT integer overlay;
   INTEGER base;
   OVERLAY base WITH INTEGER baseOverlay;
@@ -10,12 +12,28 @@ BEGIN
   INTEGER base1;
   OVERLAY base1 WITH INTEGER base1Overlay;
 
+  COMMENT fixed overlay;
+  FIXED(13,5) fixedBase;
+  OVERLAY fixedBase WITH FIXED(13,5) fixedBaseOverlay;
+  OVERLAY fixedBase WITH INTEGER fixedBaseIntegerOverlay;
+
+  COMMENT Floating overlay;
+  FLOATING floatBase;
+  OVERLAY floatBase WITH FLOATING floatBaseOverlay;
+
+  COMMENT Arrays;
+
   COMMENT array overlay;
   INTEGER ARRAY arrayBase[1:3];
   OVERLAY arrayBase WITH INTEGER ARRAY arrayBaseOverlay[1:3];
 
+
+  COMMENT values;
+
   baseOverlay := 10;
   base1 := 20;
+  fixedBase := 8.75;
+  floatBase := 2.0;
 
   COMMENT 0'th element;
   arrayBase[1] := 10;
