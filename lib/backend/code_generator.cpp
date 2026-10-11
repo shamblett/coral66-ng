@@ -62,6 +62,10 @@ void CodeGenerator::generate()
                 if (!arrDecl->getIdentifiers().empty())
                     innerName = std::get<std::string>(arrDecl->getIdentifiers()[0]->getValue());
             }
+            else if (auto* tabDecl = dynamic_cast<const syntax::TableDeclaration*>(&innerDecl))
+            {
+                innerName = std::get<std::string>(tabDecl->getIdentifier()->getValue());
+            }
 
             if (!innerName.empty())
             {

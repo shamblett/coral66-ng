@@ -1069,6 +1069,8 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("baseTable"));
         REQUIRE(variableAddress != nullptr);
 
+        std::cout << "arrayBase=" << ee->getGlobalValueAddress("arrayBase") << " baseTable=" << ee->getGlobalValueAddress("baseTable") << " baseTableOverlay=" << ee->getGlobalValueAddress("baseTableOverlay") << std::endl;
+
         elements = static_cast<int32_t*>(variableAddress);
 
         // Check the elements from the table overlay
@@ -1081,6 +1083,20 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // Dereference to get the actual value
         value = *static_cast<int32_t*>(variableAddress);
         REQUIRE(value == 50);
+
+        // bt1ArrayOverlay
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("bt1ArrayOverlay"));
+        REQUIRE(variableAddress != nullptr);
+
+        elements = static_cast<int32_t*>(variableAddress);
+
+        // Check the elements from the array overlay
+        // bt1ArrayOverlay[1] corresponds to memory offset 0 from the alias.
+        // Since bt1ArrayOverlay is 1-based and baseTable is 0-based, their 0'th elements align.
+        // Therefore bt1ArrayOverlay[1] aligns with baseTable[1] (which is 50).
+        CHECK(elements[0] == 50);
+        CHECK(elements[1] == 0);
+
 
         // Clean up
         delete ee;

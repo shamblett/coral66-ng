@@ -108,6 +108,11 @@ llvm::Value* CodeGenerator::emitAddress(const syntax::Expression& expression)
             [&](const semantics::TableElementDeclaration& tableElemDecl)
             {
                 tableElemNode = &tableElemDecl;
+                if (tableElemDecl.getWordPosition().has_value()) {
+                    llvm::errs() << "TableElem: " << tableElemDecl.getMangledName() << " WP: " << tableElemDecl.getWordPosition().value() << "\n";
+                } else {
+                    llvm::errs() << "TableElem: " << tableElemDecl.getMangledName() << " NO WP\n";
+                }
                 if (auto* parentTable = tableElemDecl.getParentTable())
                 {
                     baseType = convertType(parentTable->getType());

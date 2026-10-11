@@ -44,6 +44,7 @@ BEGIN
 
   OVERLAY baseTableInteger1[0] WITH INTEGER bti1Overlay;
 
+  OVERLAY baseTable WITH INTEGER ARRAY bt1ArrayOverlay[1:2];
 
   COMMENT Main value setting;
 
