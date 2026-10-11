@@ -6,7 +6,6 @@
 
 #pragma once
 
-#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -891,7 +890,7 @@ public:
     [[nodiscard]] std::string_view getName() const;
     [[nodiscard]] std::string getMangledName() const;
 
-    void setPresetIndex(std::size_t index)
+    void setPresetIndex(const std::size_t index)
     {
         m_presetIndex = index;
     }

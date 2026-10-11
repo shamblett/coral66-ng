@@ -479,7 +479,7 @@ void SymbolResolutionPass::visit(const syntax::ArrayDeclaration& node)
         }
     }
     std::size_t arraySize = 1;
-    for (auto dim : dims)
+    for (const auto dim : dims)
     {
         if (dim > 0)
             arraySize *= dim;

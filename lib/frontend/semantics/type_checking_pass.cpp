@@ -554,9 +554,9 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
             totalElements *= static_cast<std::uint64_t>(*w);
         if (const auto l = evaluateConstantInteger(*node.getLength()))
             totalElements *= static_cast<std::uint64_t>(*l);
-        
+
         // In a table element preset list, there is a preset value per field per row
-        std::uint64_t totalFields = node.getElements().size();
+        const std::uint64_t totalFields = node.getElements().size();
 
         std::uint64_t presetCount = 0;
         bool inPreset = false;
@@ -578,7 +578,7 @@ void TypeCheckingPass::visit(const syntax::TableDeclaration& node)
         if (inPreset)
             presetCount++;
 
-        if (presetCount > (totalElements * totalFields))
+        if (presetCount > totalElements * totalFields)
         {
             m_context.log(
                 errors::semantics::INCORRECT_PRESET_COUNT.args(*node.begin(), m_context.source, *node.begin()));
@@ -606,7 +606,7 @@ void TypeCheckingPass::visit(const syntax::ProcedureDeclaration& node)
     auto* oldProc = m_currentProcedure;
     m_currentProcedure = &node;
 
-    int oldBlockDepth = m_blockDepth;
+    const int oldBlockDepth = m_blockDepth;
     m_blockDepth = 0;
 
     for (const auto& param : node.getParameters())

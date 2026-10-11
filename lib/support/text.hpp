@@ -14,7 +14,6 @@
 #include <llvm/Support/ConvertUTF.h>
 #include <llvm/Support/Unicode.h>
 
-#include <cstdint>
 #include <cstring>
 #include <string>
 #include <string_view>

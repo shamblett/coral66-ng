@@ -18,12 +18,13 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
 namespace coral66::cgllvm
 {
 
-llvm::Constant* CodeGenerator::reshapeArray(llvm::Type* targetType, const std::vector<llvm::Constant*>& flatElements, std::size_t& offset)
+llvm::Constant* CodeGenerator::reshapeArray(llvm::Type* targetType, const std::vector<llvm::Constant*>& flatElements,
+                                            std::size_t& offset)
 {
     if (auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(targetType))
     {
         std::vector<llvm::Constant*> subElements;
-        std::size_t numElements = arrayType->getNumElements();
+        const std::size_t numElements = arrayType->getNumElements();
         llvm::Type* elementType = arrayType->getElementType();
         for (std::size_t i = 0; i < numElements; ++i)
         {
@@ -31,13 +32,13 @@ llvm::Constant* CodeGenerator::reshapeArray(llvm::Type* targetType, const std::v
         }
         return llvm::ConstantArray::get(arrayType, subElements);
     }
-    
+
     // Base case: primitive type
     if (offset < flatElements.size())
     {
         return flatElements[offset++];
     }
-    
+
     return llvm::Constant::getNullValue(targetType);
 }
 
@@ -59,27 +60,26 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
         const semantics::Type* st = semanticType;
         while (const auto* arr = st->tryAs<semantics::ArrayType>())
             st = &arr->getElementType();
-        
+
         if (const auto* fixed = st->tryAs<semantics::FixedType>())
             fractionBits = fixed->getFractionalBits();
     }
 
-
     std::size_t currentElement = 0;
-    
+
     // Support for table element packing
     std::size_t tableElementIndex = 0;
     std::size_t tableFields = 1;
     if (astTable)
         tableFields = astTable->getElements().size();
-    
-    std::vector<std::int64_t> currentTableWord(startElementIndex + numElements, 0);
-    std::vector<bool> currentTableWordSet(startElementIndex + numElements, false);
 
-    for (std::size_t i = 0; i < tokens.size() && currentElement < (startElementIndex + numElements); ++i)
+    std::vector<std::int64_t> currentTableWord(startElementIndex + numElements, 0);
+    std::vector currentTableWordSet(startElementIndex + numElements, false);
+
+    for (std::size_t i = 0; i < tokens.size() && currentElement < startElementIndex + numElements; ++i)
     {
         auto tType = tokens[i]->getTokenType();
-        
+
         // Skip parentheses as they are just grouping
         if (tType == lexer::TokenType::OpenParentheses || tType == lexer::TokenType::CloseParentheses)
             continue;
@@ -89,9 +89,12 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             // Void item if it's consecutive commas or leading comma or comma after parenthesis
             // Basically if the previous non-parenthesis token was a comma (or there was no previous)
             bool isVoid = false;
-            if (i == 0) isVoid = true;
-            else {
-                for (std::int64_t j = i - 1; j >= 0; --j) {
+            if (i == 0)
+                isVoid = true;
+            else
+            {
+                for (std::int64_t j = i - 1; j >= 0; --j)
+                {
                     auto prevType = tokens[j]->getTokenType();
                     if (prevType == lexer::TokenType::OpenParentheses || prevType == lexer::TokenType::CloseParentheses)
                         continue;
@@ -159,13 +162,14 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
         {
             llvm::Constant* val = nullptr;
             std::int64_t rawIntVal = 0;
-            
+
             // Adjust fractionBits if we are packing table fields
             std::uint8_t localFractionBits = fractionBits;
             const syntax::TableElementDeclaration* elemDecl = nullptr;
             if (astTable)
             {
-                elemDecl = dynamic_cast<const syntax::TableElementDeclaration*>(astTable->getElements()[tableElementIndex].get());
+                elemDecl = dynamic_cast<const syntax::TableElementDeclaration*>(
+                    astTable->getElements()[tableElementIndex].get());
                 if (elemDecl && elemDecl->getFixedFractionBits())
                 {
                     // No access to evaluateConstantInteger in backend, but these are typically literals
@@ -195,7 +199,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 std::int64_t v = vInt.getExtValue();
                 if (isNegative)
                     v = -v;
-                
+
                 if (elemType->isFloatingPointTy() && !astTable)
                 {
                     val = llvm::ConstantFP::get(elemType, static_cast<double>(v));
@@ -240,7 +244,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                                 bitOffset = bPos->getExtValue();
                         }
 
-                        currentTableWord[currentElement] |= (rawIntVal << bitOffset);
+                        currentTableWord[currentElement] |= rawIntVal << bitOffset;
                         currentTableWordSet[currentElement] = true;
                     }
                     else
@@ -248,7 +252,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                         elements.push_back(val);
                     }
                 }
-                
+
                 if (astTable)
                 {
                     tableElementIndex++;
@@ -263,7 +267,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                     currentElement++;
                 }
             }
-            
+
             // If it was an OCTAL expression, we should skip the closing parenthesis
             if (isOctal)
             {
@@ -272,7 +276,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             }
         }
     }
-    
+
     // Process any trailing void if the last non-parenthesis token was a comma
     if (!tokens.empty())
     {
@@ -286,8 +290,8 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
                 trailingVoid = true;
             break;
         }
-        
-        if (trailingVoid && currentElement < (startElementIndex + numElements))
+
+        if (trailingVoid && currentElement < startElementIndex + numElements)
         {
             if (currentElement >= startElementIndex)
             {
@@ -360,7 +364,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, 1, var->getPresetIndex(), &var->getType());
+                initializer =
+                    parsePresetList(astNode->getPresetTokens(), llvmType, 1, var->getPresetIndex(), &var->getType());
                 hasExplicitPreset = true;
             }
         }
@@ -377,8 +382,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(var->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(var->getMangledName());
-            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External ||
-                declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
+            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External
+                || declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
             }
@@ -420,9 +425,10 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
             if (astNode->hasPreset() && !astNode->getPresetTokens().empty())
             {
                 std::size_t numElements = 1;
-                for (auto dim : arr->getType().as<semantics::ArrayType>().getDimensions())
+                for (const auto dim : arr->getType().as<semantics::ArrayType>().getDimensions())
                     numElements *= dim;
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, arr->getPresetIndex(), &arr->getType());
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, arr->getPresetIndex(),
+                                              &arr->getType());
                 hasExplicitPreset = true;
             }
         }
@@ -439,8 +445,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(arr->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(arr->getMangledName());
-            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External ||
-                declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
+            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External
+                || declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
             }
@@ -484,7 +490,7 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                 std::size_t numElements = 1;
                 if (const auto* arrayType = llvm::dyn_cast<llvm::ArrayType>(llvmType))
                     numElements = arrayType->getNumElements();
-                
+
                 bool isFieldPreset = false;
                 if (!astNode->getPresetTokens().empty())
                 {
@@ -495,8 +501,9 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
                         isFieldPreset = true;
                     }
                 }
-                
-                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex(), &tab->getType(), isFieldPreset ? astNode : nullptr);
+
+                initializer = parsePresetList(astNode->getPresetTokens(), llvmType, numElements, tab->getPresetIndex(),
+                                              &tab->getType(), isFieldPreset ? astNode : nullptr);
                 hasExplicitPreset = true;
             }
         }
@@ -513,8 +520,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(tab->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(tab->getMangledName());
-            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External ||
-                declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
+            if (declaration.getCommunicatorType() == semantics::CommunicatorType::External
+                || declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
                 globalVar->setLinkage(llvm::GlobalValue::ExternalLinkage);
             }
@@ -783,7 +790,7 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
                 parentAddr = m_locals[parentTable];
             else if (m_globals.contains(parentTable))
                 parentAddr = m_globals[parentTable];
-                
+
             if (parentAddr)
             {
                 llvm::Type* parentType = convertType(parentTable->getType());
@@ -791,14 +798,15 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
                 std::vector<llvm::Value*> indices;
                 if (parentType->isArrayTy())
                     indices.push_back(llvm::ConstantInt::get(i32Ty, 0));
-                    
+
                 llvm::Value* idxVal = llvm::ConstantInt::get(i32Ty, 0, true);
                 if (tableElem->getWordPosition().has_value() && tableElem->getWordPosition().value() > 0)
                 {
-                    llvm::Value* wordOffsetVal = llvm::ConstantInt::get(i32Ty, tableElem->getWordPosition().value(), true);
+                    llvm::Value* wordOffsetVal =
+                        llvm::ConstantInt::get(i32Ty, tableElem->getWordPosition().value(), true);
                     idxVal = m_builder.CreateAdd(idxVal, wordOffsetVal, "table_word_offset");
                 }
-                
+
                 indices.push_back(idxVal);
                 baseAddr = m_builder.CreateGEP(parentType, parentAddr, indices, "table_elem_overlay_base");
             }
@@ -822,7 +830,7 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
         {
             if (!astNode->getDimensions().empty())
             {
-                if (auto lower = semantics::evaluateConstantInteger(*astNode->getDimensions()[0].first))
+                if (const auto lower = semantics::evaluateConstantInteger(*astNode->getDimensions()[0].first))
                     baseLowerBound = *lower;
             }
         }
@@ -834,12 +842,12 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
     {
         if (!arrDecl->getDimensions().empty())
         {
-            if (auto lower = semantics::evaluateConstantInteger(*arrDecl->getDimensions()[0].first))
+            if (const auto lower = semantics::evaluateConstantInteger(*arrDecl->getDimensions()[0].first))
                 targetLowerBound = *lower;
         }
     }
 
-    std::int64_t totalOffset = offsetVal - baseLowerBound + targetLowerBound;
+    const std::int64_t totalOffset = offsetVal - baseLowerBound + targetLowerBound;
 
     // Coral 66 OVERLAY array base offsets are usually 1 word (4 bytes) each, but depend on type.
     // Actually we just get the base address, GEP if offset != 0, and bitcast.
