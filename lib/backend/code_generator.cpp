@@ -105,6 +105,7 @@ void CodeGenerator::generate()
                      [&](const semantics::TableDeclaration& tab) { gName = tab.getMangledName(); },
                      [&](const semantics::OverlayDeclaration& over) { gName = over.getMangledName(); },
                      [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getMangledName(); },
+                     [&](const semantics::TableElementDeclaration& te) { gName = te.getMangledName(); },
                      [](const auto&) {});
             if (gName == baseName)
             {
@@ -113,9 +114,38 @@ void CodeGenerator::generate()
             }
         }
 
-        if (baseUsable && m_globals.contains(baseUsable))
+        llvm::Constant* baseAddr = nullptr;
+        if (baseUsable)
         {
-            const auto baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
+            if (m_globals.contains(baseUsable))
+                baseAddr = llvm::cast<llvm::Constant>(m_globals[baseUsable]);
+            else if (auto* tableElem = baseUsable->tryAs<semantics::TableElementDeclaration>())
+            {
+                if (auto* parentTable = tableElem->getParentTable())
+                {
+                    if (m_globals.contains(parentTable))
+                    {
+                        llvm::Constant* parentAddr = llvm::cast<llvm::Constant>(m_globals[parentTable]);
+                        llvm::Type* parentType = convertType(parentTable->getType());
+                        
+                        llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
+                        std::vector<llvm::Constant*> indices;
+                        if (parentType->isArrayTy())
+                            indices.push_back(llvm::ConstantInt::get(i32Ty, 0));
+                        
+                        std::int64_t idxVal = 0;
+                        if (tableElem->getWordPosition().has_value() && tableElem->getWordPosition().value() > 0)
+                            idxVal = tableElem->getWordPosition().value();
+                            
+                        indices.push_back(llvm::ConstantInt::get(i32Ty, idxVal));
+                        baseAddr = llvm::ConstantExpr::getGetElementPtr(parentType, parentAddr, indices);
+                    }
+                }
+            }
+        }
+
+        if (baseAddr)
+        {
             std::int64_t offsetVal = 0;
             if (overDecl->getOffset()->getType() == lexer::CToken::Integer)
             {

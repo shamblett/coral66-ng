@@ -774,6 +774,36 @@ void CodeGenerator::visit(const syntax::OverlayDeclaration& declaration)
         baseAddr = m_locals[baseUsable];
     else if (m_globals.contains(baseUsable))
         baseAddr = m_globals[baseUsable];
+    else if (auto* tableElem = baseUsable->tryAs<semantics::TableElementDeclaration>())
+    {
+        if (auto* parentTable = tableElem->getParentTable())
+        {
+            llvm::Value* parentAddr = nullptr;
+            if (m_locals.contains(parentTable))
+                parentAddr = m_locals[parentTable];
+            else if (m_globals.contains(parentTable))
+                parentAddr = m_globals[parentTable];
+                
+            if (parentAddr)
+            {
+                llvm::Type* parentType = convertType(parentTable->getType());
+                llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
+                std::vector<llvm::Value*> indices;
+                if (parentType->isArrayTy())
+                    indices.push_back(llvm::ConstantInt::get(i32Ty, 0));
+                    
+                llvm::Value* idxVal = llvm::ConstantInt::get(i32Ty, 0, true);
+                if (tableElem->getWordPosition().has_value() && tableElem->getWordPosition().value() > 0)
+                {
+                    llvm::Value* wordOffsetVal = llvm::ConstantInt::get(i32Ty, tableElem->getWordPosition().value(), true);
+                    idxVal = m_builder.CreateAdd(idxVal, wordOffsetVal, "table_word_offset");
+                }
+                
+                indices.push_back(idxVal);
+                baseAddr = m_builder.CreateGEP(parentType, parentAddr, indices, "table_elem_overlay_base");
+            }
+        }
+    }
 
     if (!baseAddr)
         return;

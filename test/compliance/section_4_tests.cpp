@@ -1075,6 +1075,13 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         CHECK(elements[0] == 40);
         CHECK(elements[1] == 50);
 
+        // bt1Overlay
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("bti1Overlay"));
+        REQUIRE(variableAddress != nullptr);
+        // Dereference to get the actual value
+        value = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(value == 50);
+
         // Clean up
         delete ee;
     }

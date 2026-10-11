@@ -42,6 +42,8 @@ BEGIN
                              baseTableOverlayInteger1 INTEGER 1;
                            ];
 
+  OVERLAY baseTableInteger1[0] WITH INTEGER bti1Overlay;
+
 
   COMMENT Main value setting;
 
@@ -55,7 +57,7 @@ BEGIN
   arrayBase[2] := 20;
   arrayBase[3] := 30;
 
-  baseTableOverlayInteger0 := 40;
-  baseTableOverlayInteger1 := 50;
+  baseTableOverlayInteger0[0] := 40;
+  baseTableOverlayInteger1[0] := 50;
 
 END
