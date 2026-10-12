@@ -1163,14 +1163,14 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         ee->runFunction(mainFunc, noArgs);
 
         // baseOverlay
-        auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("baseOverlay"));
+        auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("_c66_common_baseOverlay"));
         REQUIRE(variableAddress != nullptr);
         // Dereference to get the actual value
         int32_t value = *static_cast<int32_t*>(variableAddress);
         REQUIRE(value == 10);
 
         // array base integer overlay
-        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("arrayBaseIntegerOverlay"));
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("_c66_common_arrayBaseIntegerOverlay"));
         REQUIRE(variableAddress != nullptr);
         // Dereference to get the actual value
         value = *static_cast<int32_t*>(variableAddress);
