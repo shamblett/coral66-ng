@@ -1163,6 +1163,7 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         ee->runFunction(mainFunc, noArgs);
 
         // baseOverlay
+        // Note that as this is declared in a COMMON communicator the variable name is now mangled.
         auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("_c66_common_baseOverlay"));
         REQUIRE(variableAddress != nullptr);
         // Dereference to get the actual value
