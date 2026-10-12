@@ -272,8 +272,18 @@ void CodeGenerator::generate()
                     llvm::Value* aliasOrAddr = finalAddr;
                     if (valueTy)
                     {
+                        std::string mangledTargetName;
+                        targetUsable->match([&](const semantics::VariableDeclaration& var) { mangledTargetName = var.getMangledName(); },
+                                            [&](const semantics::ArrayDeclaration& arr) { mangledTargetName = arr.getMangledName(); },
+                                            [&](const semantics::TableDeclaration& tab) { mangledTargetName = tab.getMangledName(); },
+                                            [&](const semantics::OverlayDeclaration& over) { mangledTargetName = over.getMangledName(); },
+                                            [&](const semantics::ProcedureDeclaration& proc) { mangledTargetName = proc.getMangledName(); },
+                                            [](const auto&) {});
+                        if (mangledTargetName.empty())
+                            mangledTargetName = targetName;
+                            
                         aliasOrAddr = llvm::GlobalAlias::create(valueTy, 0, llvm::GlobalValue::ExternalLinkage,
-                                                                targetName, llvm::cast<llvm::Constant>(finalAddr),
+                                                                mangledTargetName, llvm::cast<llvm::Constant>(finalAddr),
                                                                 &m_module);
                     }
                     
