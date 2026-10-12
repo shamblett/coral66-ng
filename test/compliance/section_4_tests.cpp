@@ -1006,7 +1006,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-
         // base
         auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("baseOverlay"));
         REQUIRE(variableAddress != nullptr);
@@ -1068,7 +1067,9 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("baseTable"));
         REQUIRE(variableAddress != nullptr);
 
-        std::cout << "arrayBase=" << ee->getGlobalValueAddress("arrayBase") << " baseTable=" << ee->getGlobalValueAddress("baseTable") << " baseTableOverlay=" << ee->getGlobalValueAddress("baseTableOverlay") << std::endl;
+        std::cout << "arrayBase=" << ee->getGlobalValueAddress("arrayBase")
+                  << " baseTable=" << ee->getGlobalValueAddress("baseTable")
+                  << " baseTableOverlay=" << ee->getGlobalValueAddress("baseTableOverlay") << std::endl;
 
         elements = static_cast<int32_t*>(variableAddress);
 
@@ -1095,7 +1096,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         // Therefore bt1ArrayOverlay[1] aligns with baseTable[1] (which is 50).
         CHECK(elements[0] == 50);
         CHECK(elements[1] == 0);
-
 
         // Clean up
         delete ee;
