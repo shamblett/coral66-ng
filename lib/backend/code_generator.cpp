@@ -41,6 +41,39 @@ void CodeGenerator::generate()
             }
         }
     }
+    for (const auto& comm : m_tree.getCommunicators())
+    {
+        if (auto* commonComm = dynamic_cast<const syntax::CommonCommunicator*>(comm.get()))
+        {
+            for (const auto& decl : commonComm->getItems())
+            {
+                if (auto* overDecl = dynamic_cast<const syntax::OverlayDeclaration*>(decl.get()))
+                {
+                    m_globalOverlays.push_back(overDecl);
+                }
+            }
+        }
+        else if (auto* externalComm = dynamic_cast<const syntax::ExternalCommunicator*>(comm.get()))
+        {
+            for (const auto& decl : externalComm->getItems())
+            {
+                if (auto* overDecl = dynamic_cast<const syntax::OverlayDeclaration*>(decl.get()))
+                {
+                    m_globalOverlays.push_back(overDecl);
+                }
+            }
+        }
+        else if (auto* absoluteComm = dynamic_cast<const syntax::AbsoluteCommunicator*>(comm.get()))
+        {
+            for (const auto& decl : absoluteComm->getItems())
+            {
+                if (auto* overDecl = dynamic_cast<const syntax::OverlayDeclaration*>(decl.get()))
+                {
+                    m_globalOverlays.push_back(overDecl);
+                }
+            }
+        }
+    }
 
     // First pass: Global Declarations
     for (const auto& global : m_program.getGlobals())
@@ -70,11 +103,11 @@ void CodeGenerator::generate()
             if (!innerName.empty())
             {
                 std::string globalName;
-                global->match([&](const semantics::VariableDeclaration& var) { globalName = var.getMangledName(); },
-                              [&](const semantics::ArrayDeclaration& arr) { globalName = arr.getMangledName(); },
-                              [&](const semantics::TableDeclaration& tab) { globalName = tab.getMangledName(); },
-                              [&](const semantics::OverlayDeclaration& over) { globalName = over.getMangledName(); },
-                              [&](const semantics::ProcedureDeclaration& proc) { globalName = proc.getMangledName(); },
+                global->match([&](const semantics::VariableDeclaration& var) { globalName = var.getName(); },
+                              [&](const semantics::ArrayDeclaration& arr) { globalName = arr.getName(); },
+                              [&](const semantics::TableDeclaration& tab) { globalName = tab.getName(); },
+                              [&](const semantics::OverlayDeclaration& over) { globalName = over.getName(); },
+                              [&](const semantics::ProcedureDeclaration& proc) { globalName = proc.getName(); },
                               [](const auto&) {});
 
                 if (globalName == innerName)
@@ -104,12 +137,12 @@ void CodeGenerator::generate()
         for (const auto& g : m_program.getGlobals())
         {
             std::string gName;
-            g->match([&](const semantics::VariableDeclaration& var) { gName = var.getMangledName(); },
-                     [&](const semantics::ArrayDeclaration& arr) { gName = arr.getMangledName(); },
-                     [&](const semantics::TableDeclaration& tab) { gName = tab.getMangledName(); },
-                     [&](const semantics::OverlayDeclaration& over) { gName = over.getMangledName(); },
-                     [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getMangledName(); },
-                     [&](const semantics::TableElementDeclaration& te) { gName = te.getMangledName(); },
+            g->match([&](const semantics::VariableDeclaration& var) { gName = var.getName(); },
+                     [&](const semantics::ArrayDeclaration& arr) { gName = arr.getName(); },
+                     [&](const semantics::TableDeclaration& tab) { gName = tab.getName(); },
+                     [&](const semantics::OverlayDeclaration& over) { gName = over.getName(); },
+                     [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getName(); },
+                     [&](const semantics::TableElementDeclaration& te) { gName = te.getName(); },
                      [](const auto&) {});
             if (gName == baseName)
             {
@@ -212,11 +245,11 @@ void CodeGenerator::generate()
                 for (const auto& g : m_program.getGlobals())
                 {
                     std::string gName;
-                    g->match([&](const semantics::VariableDeclaration& var) { gName = var.getMangledName(); },
-                             [&](const semantics::ArrayDeclaration& arr) { gName = arr.getMangledName(); },
-                             [&](const semantics::TableDeclaration& tab) { gName = tab.getMangledName(); },
-                             [&](const semantics::OverlayDeclaration& over) { gName = over.getMangledName(); },
-                             [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getMangledName(); },
+                    g->match([&](const semantics::VariableDeclaration& var) { gName = var.getName(); },
+                             [&](const semantics::ArrayDeclaration& arr) { gName = arr.getName(); },
+                             [&](const semantics::TableDeclaration& tab) { gName = tab.getName(); },
+                             [&](const semantics::OverlayDeclaration& over) { gName = over.getName(); },
+                             [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getName(); },
                              [](const auto&) {});
                     if (gName == targetName)
                     {
