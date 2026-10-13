@@ -12,6 +12,7 @@ cc_library(
         "section_2_tests.cpp",
         "section_3_tests.cpp",
         "section_4_tests.cpp",
+        "section_5_tests.cpp",
     ],
     visibility = ["//test:__pkg__"],
     deps = [
