@@ -731,8 +731,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
-        ss.flush();
-        std::cout << reporterString << "\n";
 
         // Code Generation
         llvm::LLVMContext context;
@@ -887,8 +885,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
-        ss.flush();
-        std::cout << reporterString << "\n";
 
         // Code Generation
         llvm::LLVMContext context;
@@ -976,8 +972,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
-        ss.flush();
-        std::cout << reporterString << "\n";
 
         // Code Generation
         llvm::LLVMContext context;
@@ -1067,10 +1061,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
         variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("baseTable"));
         REQUIRE(variableAddress != nullptr);
 
-        std::cout << "arrayBase=" << ee->getGlobalValueAddress("arrayBase")
-                  << " baseTable=" << ee->getGlobalValueAddress("baseTable")
-                  << " baseTableOverlay=" << ee->getGlobalValueAddress("baseTableOverlay") << std::endl;
-
         elements = static_cast<int32_t*>(variableAddress);
 
         // Check the elements from the table overlay
@@ -1132,8 +1122,6 @@ TEST_CASE("Section 4", "[Compliance][Section-4]")
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
-        ss.flush();
-        std::cout << reporterString << "\n";
 
         // Code Generation
         llvm::LLVMContext context;
