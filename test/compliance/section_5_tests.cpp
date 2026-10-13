@@ -28,7 +28,7 @@ using namespace Catch::Matchers;
 using namespace coral66::errors::semantics;
 
 ///
-/// Section 4
+/// Section 5
 ///
 TEST_CASE("Section 5", "[Compliance][Section-5]")
 {
@@ -38,10 +38,6 @@ TEST_CASE("Section 5", "[Compliance][Section-5]")
     /// of the indexed switch name refers to the corresponding label.
     SECTION("5-1")
     {
-        // Initialize LLVM Native Target for JIT Execution
-        llvm::InitializeNativeTarget();
-        llvm::InitializeNativeTargetAsmPrinter();
-
         auto sourcePath = getTestDataPath("section-5/5-1.cor", "COMPLIANCE_DATA_DIR");
         auto source = readFile(sourcePath);
         CHECK_FALSE(source.empty());
@@ -64,72 +60,10 @@ TEST_CASE("Section 5", "[Compliance][Section-5]")
         CHECK_FALSE(errors);
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
-        CHECK_FALSE(errors);
 
-        // Code Generation
-        llvm::LLVMContext context;
-        auto module = std::make_unique<llvm::Module>("fiveone", context);
-        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
-
-        coral66::cgllvm::Options codegenOptions;
-        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
-
-        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
-
-        // JIT Execution
-        std::string errStr;
-        llvm::ExecutionEngine* ee =
-            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
-        REQUIRE(ee != nullptr); // Needs to be REQUIRE
-
-        // Run the `main` function
-
-        // Ensure all globals are allocated and JIT compilation is done before running
-        ee->finalizeObject();
-
-        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
-        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
-
-        std::vector<llvm::GenericValue> noArgs;
-        ee->runFunction(mainFunc, noArgs);
-
-        bool checkInteger = false;
-        bool checkFloating = false;
-        bool checkFixed = false;
-
-        // Integer
-        if (const llvm::GlobalVariable* gVal = ee->FindGlobalVariableNamed("theInteger"))
-        {
-            const llvm::DataLayout& dl = ee->getDataLayout();
-            uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
-            CHECK(sizeInBytes == 4);
-            checkInteger = true;
-        }
-
-        // Floating
-        if (const llvm::GlobalVariable* gVal = ee->FindGlobalVariableNamed("theFloat"))
-        {
-            const llvm::DataLayout& dl = ee->getDataLayout();
-            uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
-            CHECK(sizeInBytes == 4);
-            checkFloating = true;
-        }
-
-        // Fixed
-        if (const llvm::GlobalVariable* gVal = ee->FindGlobalVariableNamed("theFixed"))
-        {
-            const llvm::DataLayout& dl = ee->getDataLayout();
-            uint64_t sizeInBytes = dl.getTypeAllocSize(gVal->getValueType()).getFixedValue();
-            CHECK(sizeInBytes == 4);
-            checkFixed = true;
-        }
-
-        CHECK(checkInteger);
-        CHECK(checkFloating);
-        CHECK(checkFixed);
-
-        // Clean up
-        delete ee;
+        // Switch array is unalterable
+        CHECK(errors);
+        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(CANNOT_ASSIGN_TO_SWITCH));
     }
-
 }

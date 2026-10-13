@@ -139,6 +139,8 @@ constexpr auto TABLE_INVALID_DIMENSIONS =
                                                                                      "TABLE_INVALID_DIMENSIONS");
 constexpr auto CANNOT_ASSIGN_TO_CONST = makeDiagnostic<"Cannot assign to constant or value parameter", Underline<0>>(
     Severity::Error, "CANNOT_ASSIGN_TO_CONST");
+constexpr auto CANNOT_ASSIGN_TO_SWITCH =
+    makeDiagnostic<"Cannot assign to a switch", Underline<0>>(Severity::Error, "CANNOT_ASSIGN_TO_SWITCH");
 constexpr auto INVALID_BIT_RANGE =
     makeDiagnostic<"Invalid bit range specified", Underline<0>>(Severity::Error, "INVALID_BIT_RANGE");
 constexpr auto LABEL_NOT_FOUND_N =

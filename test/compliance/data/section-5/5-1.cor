@@ -1,0 +1,14 @@
+PROGRAM FIVEONE
+COMMENT Place references;
+
+BEGIN
+
+    SWITCH theSwitch := label1, label2, label3;
+
+    COMMENT TheSwitch array is unalterable;
+    label1:
+    label2:
+    label3:
+    theSwitch[1] := label3
+
+END

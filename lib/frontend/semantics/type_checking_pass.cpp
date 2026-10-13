@@ -49,6 +49,42 @@ static bool isPointerType(const Type& t)
     return false;
 }
 
+static bool isSwitchUsable(const Usable* usable)
+{
+    if (!usable)
+        return false;
+    if (usable->is<SwitchDeclaration>())
+        return true;
+    if (auto* var = usable->tryAs<VariableDeclaration>())
+        return var->getType().is<SwitchType>();
+    return false;
+}
+
+static bool isSwitch(const syntax::Expression& expr, const SemanticContext& ctx)
+{
+    if (auto* id = dynamic_cast<const syntax::IdentifierExpression*>(&expr))
+    {
+        if (const auto it = ctx.resolvedIdentifiers.find(id); it != ctx.resolvedIdentifiers.end())
+        {
+            return isSwitchUsable(it->second);
+        }
+        return false;
+    }
+    if (auto* arr = dynamic_cast<const syntax::ArrayAccessExpression*>(&expr))
+    {
+        if (const auto it = ctx.resolvedIdentifiers.find(arr); it != ctx.resolvedIdentifiers.end())
+        {
+            return isSwitchUsable(it->second);
+        }
+        return false;
+    }
+    if (auto* pw = dynamic_cast<const syntax::PartWordExpression*>(&expr))
+    {
+        return isSwitch(pw->getBase(), ctx);
+    }
+    return false;
+}
+
 static bool isLValue(const syntax::Expression& expr, const SemanticContext& ctx)
 {
     if (auto* id = dynamic_cast<const syntax::IdentifierExpression*>(&expr))
@@ -56,13 +92,27 @@ static bool isLValue(const syntax::Expression& expr, const SemanticContext& ctx)
         if (const auto it = ctx.resolvedIdentifiers.find(id); it != ctx.resolvedIdentifiers.end())
         {
             const Usable* usable = it->second;
+            if (isSwitchUsable(usable))
+                return false;
             return usable->is<VariableDeclaration>() || usable->is<ArrayDeclaration>() || usable->is<TableDeclaration>()
                    || usable->is<TableElementDeclaration>();
         }
         return false;
     }
-    if (dynamic_cast<const syntax::ArrayAccessExpression*>(&expr))
-        return true;
+    if (auto* arr = dynamic_cast<const syntax::ArrayAccessExpression*>(&expr))
+    {
+        if (arr->getArray() == nullptr)
+            return true;
+        if (const auto it = ctx.resolvedIdentifiers.find(arr); it != ctx.resolvedIdentifiers.end())
+        {
+            const Usable* usable = it->second;
+            if (isSwitchUsable(usable))
+                return false;
+            return usable->is<VariableDeclaration>() || usable->is<ArrayDeclaration>() || usable->is<TableDeclaration>()
+                   || usable->is<TableElementDeclaration>();
+        }
+        return false;
+    }
     if (auto* pw = dynamic_cast<const syntax::PartWordExpression*>(&expr))
         return isLValue(pw->getBase(), ctx);
     return false;
@@ -229,6 +279,14 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
 {
     visit(node.getVariable());
     visit(node.getExpression());
+
+    if (isSwitch(node.getVariable(), m_context))
+    {
+        m_context.log(errors::semantics::CANNOT_ASSIGN_TO_SWITCH.args(*node.getVariable().begin(), m_context.source,
+                                                                     *node.getVariable().begin()));
+        DiagnosticCollector::addDiagnostic(errors::semantics::CANNOT_ASSIGN_TO_SWITCH);
+        return;
+    }
 
     if (!isLValue(node.getVariable(), m_context))
     {
