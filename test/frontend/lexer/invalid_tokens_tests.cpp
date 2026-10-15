@@ -170,4 +170,27 @@ TEST_CASE("Coral Lexing Literals - Mixed Strings", "[lexer]")
         CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::Identifier);
         CHECK(std::get<std::string>(result.data()[3].getValue()) == "me");
     }
+
+    SECTION("Invalid Octal Literals")
+    {
+        bool errors = false;
+        std::ignore = lex("OCTAL(18)", errors);
+        CHECK(errors);
+
+        errors = false;
+        std::ignore = lex("OCTAL(1.8)", errors);
+        CHECK(errors);
+
+        errors = false;
+        std::ignore = lex("OCTAL(.4)", errors);
+        CHECK(errors);
+
+        errors = false;
+        std::ignore = lex("OCTAL(1.)", errors);
+        CHECK(errors);
+
+        errors = false;
+        std::ignore = lex("OCTAL(12'3)", errors);
+        CHECK(errors);
+    }
 }

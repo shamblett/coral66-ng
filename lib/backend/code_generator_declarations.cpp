@@ -186,17 +186,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
 
             if (auto* intVal = std::get_if<llvm::APSInt>(&tokens[i]->getValue()))
             {
-                llvm::APSInt vInt = *intVal;
-                if (isOctal)
-                {
-                    llvm::SmallString<32> str;
-                    vInt.toString(str, 10);
-                    llvm::APInt octalVal;
-                    llvm::StringRef(str).getAsInteger(8, octalVal);
-                    octalVal = octalVal.zextOrTrunc(vInt.getBitWidth());
-                    vInt = llvm::APSInt(octalVal, vInt.isUnsigned());
-                }
-                std::int64_t v = vInt.getExtValue();
+                std::int64_t v = intVal->getExtValue();
                 if (isNegative)
                     v = -v;
 
@@ -214,7 +204,6 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             }
             else if (auto* floatVal = std::get_if<llvm::APFloat>(&tokens[i]->getValue()))
             {
-                // We do not handle octal floating point correctly yet, but we will pass it through
                 double v = floatVal->convertToDouble();
                 if (isNegative)
                     v = -v;

@@ -213,6 +213,57 @@ TEST_CASE("Coral Lexing Literals", "[lexer]")
         CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::StringLiteral);
         CHECK(std::get<std::string>(result.data()[2].getValue()).empty());
     }
+
+    SECTION("Octal Integers")
+    {
+        auto result = lex("OCTAL(1234) OCTAL(0) OCTAL(77) 'OCTAL'(17)");
+        CHECK(result.data().size() == 16);
+
+        CHECK(result.data()[0].getTokenType() == coral66::lexer::TokenType::OctalKeyword);
+        CHECK(result.data()[1].getTokenType() == coral66::lexer::TokenType::OpenParentheses);
+        CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[2].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[2].getValue()) == 01234);
+        CHECK(result.data()[3].getTokenType() == coral66::lexer::TokenType::CloseParentheses);
+
+        CHECK(result.data()[6].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[6].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[6].getValue()) == 0);
+
+        CHECK(result.data()[10].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[10].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[10].getValue()) == 077);
+
+        CHECK(result.data()[14].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[14].getType() == coral66::lexer::CToken::Integer);
+        CHECK(std::get<llvm::APSInt>(result.data()[14].getValue()) == 017);
+    }
+
+    SECTION("Octal Points")
+    {
+        auto result = lex("OCTAL(1.4) OCTAL(0.1) OCTAL(12.34) OCTAL(12 . 34) 'OCTAL'(0.2)");
+        CHECK(result.data().size() == 20);
+
+        CHECK(result.data()[2].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[2].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[2].getValue()) == llvm::APFloat(1.5));
+
+        CHECK(result.data()[6].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[6].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[6].getValue()) == llvm::APFloat(0.125));
+
+        CHECK(result.data()[10].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[10].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[10].getValue()) == llvm::APFloat(10.4375));
+
+        CHECK(result.data()[14].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[14].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[14].getValue()) == llvm::APFloat(10.4375));
+
+        CHECK(result.data()[18].getTokenType() == coral66::lexer::TokenType::Literal);
+        CHECK(result.data()[18].getType() == coral66::lexer::CToken::Floating);
+        CHECK(std::get<llvm::APFloat>(result.data()[18].getValue()) == llvm::APFloat(0.25));
+    }
 }
 
 TEST_CASE("Nested Quotes in String Literals", "[lexer]")

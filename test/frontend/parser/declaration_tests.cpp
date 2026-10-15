@@ -112,6 +112,17 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 
+    SECTION("Octal Point Presetting")
+    {
+        ParsedDeclaration p1("FLOATING f := OCTAL(12.34)");
+        CHECK(p1.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+
+        ParsedDeclaration p2("FIXED(16, 4) x := -OCTAL(1.4)");
+        CHECK(p2.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+    }
+
     SECTION("String Literals")
     {
         ParsedDeclaration p(R"(INTEGER ARRAY a[1:10] := "HELLO", "WORLD")");

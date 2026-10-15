@@ -345,6 +345,72 @@ struct ConversionContext
     }
 };
 
+std::optional<std::pair<CToken::ValueType, CToken::Type>> processOctalNumber(const char* begin, const char* end)
+{
+    const std::string_view text(begin, end);
+    if (text.empty())
+    {
+        return {};
+    }
+
+    const auto dotPos = text.find('.');
+    if (dotPos == std::string_view::npos)
+    {
+        for (const char c : text)
+        {
+            if (c < '0' || c > '7')
+            {
+                return {};
+            }
+        }
+        llvm::APInt value;
+        if (llvm::StringRef(text).getAsInteger(8, value))
+        {
+            return {};
+        }
+        if (value.getBitWidth() < 64)
+        {
+            value = value.zextOrTrunc(64);
+        }
+        return {{llvm::APSInt(value, false), CToken::Integer}};
+    }
+
+    const auto intPart = text.substr(0, dotPos);
+    const auto fracPart = text.substr(dotPos + 1);
+    if (intPart.empty() || fracPart.empty())
+    {
+        return {};
+    }
+    for (const char c : intPart)
+    {
+        if (c < '0' || c > '7')
+        {
+            return {};
+        }
+    }
+    for (const char c : fracPart)
+    {
+        if (c < '0' || c > '7')
+        {
+            return {};
+        }
+    }
+
+    double intVal = 0.0;
+    for (const char c : intPart)
+    {
+        intVal = intVal * 8.0 + static_cast<double>(c - '0');
+    }
+
+    double fracVal = 0.0;
+    for (auto it = fracPart.rbegin(); it != fracPart.rend(); ++it)
+    {
+        fracVal = (fracVal + static_cast<double>(*it - '0')) / 8.0;
+    }
+
+    return {{llvm::APFloat(intVal + fracVal), CToken::Floating}};
+}
+
 std::optional<std::pair<CToken::ValueType, CToken::Type>> processNumber(const char* begin, const char* end,
                                                                         std::uint64_t, ConversionContext&)
 {
@@ -422,12 +488,44 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
     {
         if (iter->getTokenType() == TokenType::PPNumber || iter->getTokenType() == TokenType::Apostrophe)
         {
+            const bool isOctalContext = result.size() >= 2
+                                        && result[result.size() - 2].getTokenType() == TokenType::OctalKeyword
+                                        && result.back().getTokenType() == TokenType::OpenParentheses;
+
             std::string numberText;
             const auto startIter = iter;
 
             if (iter->getTokenType() == TokenType::PPNumber)
             {
                 numberText += std::string(iter->getValue());
+                if (isOctalContext)
+                {
+                    if (numberText.find('.') == std::string::npos && iter + 1 != end)
+                    {
+                        if ((iter + 1)->getTokenType() == TokenType::Dot)
+                        {
+                            numberText += ".";
+                            iter++;
+                            if (iter + 1 != end && (iter + 1)->getTokenType() == TokenType::PPNumber)
+                            {
+                                numberText += std::string((iter + 1)->getValue());
+                                iter++;
+                            }
+                        }
+                        else if ((iter + 1)->getTokenType() == TokenType::PPNumber
+                                 && (iter + 1)->getValue().starts_with("."))
+                        {
+                            numberText += std::string((iter + 1)->getValue());
+                            iter++;
+                        }
+                    }
+                    else if (numberText.ends_with(".") && iter + 1 != end
+                             && (iter + 1)->getTokenType() == TokenType::PPNumber)
+                    {
+                        numberText += std::string((iter + 1)->getValue());
+                        iter++;
+                    }
+                }
                 if (const auto next = iter + 1;
                     next != end && next->getTokenType() == TokenType::Identifier && numberText == "0"
                     && (next->getValue().starts_with("x") || next->getValue().starts_with("X")))
@@ -512,8 +610,10 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                                       .sourceInterface = sourceInterface,
                                       .token = *startIter,
                                       .errorsOccurred = errorsOccurred};
-            auto number = processNumber(numberText.data(), numberText.data() + numberText.size(),
-                                        startIter->getCharSpaceOffset(), context);
+            auto number = isOctalContext
+                              ? processOctalNumber(numberText.data(), numberText.data() + numberText.size())
+                              : processNumber(numberText.data(), numberText.data() + numberText.size(),
+                                              startIter->getCharSpaceOffset(), context);
             if (number)
             {
                 std::uint64_t length = iter->getOffset() + iter->getLength() - startIter->getOffset();

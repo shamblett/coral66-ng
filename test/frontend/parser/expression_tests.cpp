@@ -76,9 +76,35 @@ TEST_CASE("Coral Parse Expression - Typed Primaries", "[Parser][Expression]")
     {
         ParsedExpression p("OCTAL ( 1234 )");
         auto literal = dynamic_cast<LiteralExpression*>(p.expression.get());
-        CHECK(literal != nullptr);
+        REQUIRE(literal != nullptr);
         CHECK(literal->getLiteral()->getTokenType() == lexer::TokenType::Literal);
         CHECK(literal->getLiteral()->getType() == lexer::CToken::Type::Integer);
+        CHECK(std::get<llvm::APSInt>(literal->getLiteral()->getValue()) == 01234);
+    }
+    SECTION("Octal Point Literal")
+    {
+        ParsedExpression p("OCTAL ( 12.34 )");
+        auto literal = dynamic_cast<LiteralExpression*>(p.expression.get());
+        REQUIRE(literal != nullptr);
+        CHECK(literal->getLiteral()->getTokenType() == lexer::TokenType::Literal);
+        CHECK(literal->getLiteral()->getType() == lexer::CToken::Type::Floating);
+        CHECK(std::get<llvm::APFloat>(literal->getLiteral()->getValue()) == llvm::APFloat(10.4375));
+    }
+    SECTION("Signed Octal Point Literal")
+    {
+        ParsedExpression p("- OCTAL ( 1.4 )");
+        auto unary = dynamic_cast<UnaryExpression*>(p.expression.get());
+        REQUIRE(unary != nullptr);
+        auto literal = dynamic_cast<const LiteralExpression*>(&unary->getOperand());
+        REQUIRE(literal != nullptr);
+        CHECK(literal->getLiteral()->getType() == lexer::CToken::Type::Floating);
+        CHECK(std::get<llvm::APFloat>(literal->getLiteral()->getValue()) == llvm::APFloat(1.5));
+    }
+    SECTION("Octal Point Rejected as Typed Primary")
+    {
+        ParsedExpression p("a MASK OCTAL ( 12.34 )");
+        CHECK(p.expression == nullptr);
+        CHECK_FALSE(parser::DiagnosticCollector::getDiagnostics().empty());
     }
 }
 

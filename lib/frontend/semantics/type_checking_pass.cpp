@@ -1289,8 +1289,13 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
             isNegative = !isNegative;
             continue;
         }
-        if (token->getTokenType() == lexer::TokenType::Plus || token->getTokenType() == lexer::TokenType::Comma
-            || token->getTokenType() == lexer::TokenType::OpenParentheses
+        if (token->getTokenType() == lexer::TokenType::Plus
+            || token->getTokenType() == lexer::TokenType::OctalKeyword
+            || token->getTokenType() == lexer::TokenType::OpenParentheses)
+        {
+            continue;
+        }
+        if (token->getTokenType() == lexer::TokenType::Comma
             || token->getTokenType() == lexer::TokenType::CloseParentheses)
         {
             isNegative = false;
@@ -1308,8 +1313,7 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
             continue;
         }
 
-        if (token->getTokenType() == lexer::TokenType::Literal
-            || token->getTokenType() == lexer::TokenType::OctalKeyword)
+        if (token->getTokenType() == lexer::TokenType::Literal)
         {
             const auto tokenType = token->getType();
             if (isInteger)

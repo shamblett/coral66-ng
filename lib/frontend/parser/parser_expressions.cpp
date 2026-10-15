@@ -352,6 +352,29 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
         auto t = begin++;
         return std::make_unique<LiteralExpression>(t, begin, t);
     }
+    if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
+    {
+        if (const auto openParen = begin + 1;
+            openParen != end && openParen->getTokenType() == lexer::TokenType::OpenParentheses)
+        {
+            if (const auto lit = openParen + 1;
+                lit != end && lit->getTokenType() == lexer::TokenType::Literal
+                && lit->getType() == lexer::CToken::Type::Floating)
+            {
+                const auto startToken = begin;
+                begin = lit + 1;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                {
+                    begin++;
+                    return std::make_unique<LiteralExpression>(startToken, begin, lit);
+                }
+                context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
+                    *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
+                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
+                return nullptr;
+            }
+        }
+    }
 
     return parseBitwiseDiffer(begin, end, context);
 }
@@ -457,13 +480,18 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
         if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
         {
             begin++;
-            auto t = begin++; // Parse the octal digits list
-            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+            if (begin != end && begin->getTokenType() == lexer::TokenType::Literal
+                && begin->getType() == lexer::CToken::Type::Integer)
             {
-                begin++;
-                return std::make_unique<LiteralExpression>(startToken, begin, t);
+                auto t = begin++; // Parse the octal digits list
+                if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                {
+                    begin++;
+                    return std::make_unique<LiteralExpression>(startToken, begin, t);
+                }
             }
         }
+        return nullptr;
     }
 
     if (tType == lexer::TokenType::LiteralKeyword)

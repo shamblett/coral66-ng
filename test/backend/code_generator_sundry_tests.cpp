@@ -109,4 +109,94 @@ TEST_CASE("Sundry", "[Backend][Execution]")
 
         delete ee;
     }
+
+    SECTION("Octal Literals and Octal Points")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        const std::string source = R"(
+        PROGRAM OctalTest
+        BEGIN
+            INTEGER octint := OCTAL(1234);
+            FLOATING octfl := OCTAL(12.34);
+            FLOATING octexpr;
+            FIXED(16, 4) octfx := OCTAL(1.4);
+            FIXED(16, 4) octnegfx := -OCTAL(1.4);
+            octexpr := OCTAL(1.4) + OCTAL(0.2);
+        END;
+        )";
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("octal_test", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr);
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        if (!mainFunc)
+            mainFunc = ee->FindFunctionNamed("OctalTest");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto octintAddr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress("octint"));
+        REQUIRE(octintAddr != nullptr);
+        CHECK(*octintAddr == 01234);
+
+        auto octflAddr = reinterpret_cast<float*>(ee->getGlobalValueAddress("octfl"));
+        REQUIRE(octflAddr != nullptr);
+        CHECK(*octflAddr == 10.4375f);
+
+        auto octexprAddr = reinterpret_cast<float*>(ee->getGlobalValueAddress("octexpr"));
+        REQUIRE(octexprAddr != nullptr);
+        CHECK(*octexprAddr == 1.75f);
+
+        auto octfxAddr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress("octfx"));
+        REQUIRE(octfxAddr != nullptr);
+        CHECK(*octfxAddr == 24); // 1.5 * 2^4 = 24
+
+        auto octnegfxAddr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress("octnegfx"));
+        REQUIRE(octnegfxAddr != nullptr);
+        CHECK(*octnegfxAddr == -24); // -1.5 * 2^4 = -24
+
+        delete ee;
+    }
 }

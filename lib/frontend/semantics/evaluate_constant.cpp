@@ -14,18 +14,12 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
 {
     if (auto* lit = dynamic_cast<const syntax::LiteralExpression*>(&expr))
     {
-        if (lit->getLiteral()->getType() == lexer::CToken::Integer
-            || lit->getLiteral()->getType() == lexer::CToken::Floating)
+        if (lit->getLiteral()->getType() == lexer::CToken::Integer)
         {
             if (auto* intVal = std::get_if<llvm::APSInt>(&lit->getLiteral()->getValue()))
             {
                 return intVal->getExtValue();
             }
-        }
-        if (lit->begin()->getTokenType() == lexer::TokenType::OctalKeyword)
-        {
-            if (auto* intVal = std::get_if<llvm::APSInt>(&lit->getLiteral()->getValue()))
-                return intVal->getExtValue();
         }
     }
     else if (auto* unary = dynamic_cast<const syntax::UnaryExpression*>(&expr))

@@ -596,4 +596,43 @@ TEST_CASE("Type Checking - Recursive Validations", "[Semantics][TypeCheck]")
         TypeCheckingResult res(parsed);
         CHECK(res.hasDiagnostic("PRESET_FIXED_POINT_OVERFLOW"));
     }
+
+    SECTION("Octal Point Expressions and Presets")
+    {
+        const std::string source = R"(
+        FLOATING fl := OCTAL(12.34);
+        FIXED(16, 4) fx := -OCTAL(1.4);
+        fl := OCTAL(1.4) + OCTAL(0.2);
+        fx := -OCTAL(2.4);
+        )";
+
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN " + source + " END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
+        CHECK(!res.hasDiagnostic("PRESET_TYPE_MISMATCH"));
+        CHECK(!res.hasDiagnostic("PRESET_FIXED_POINT_OVERFLOW"));
+    }
+
+    SECTION("Octal Point Preset Type Mismatch on Integer")
+    {
+        const std::string source = R"(
+        INTEGER i := OCTAL(1.4);
+        )";
+
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN " + source + " END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("PRESET_TYPE_MISMATCH"));
+    }
+
+    SECTION("Octal Point Fixed Point Bounds")
+    {
+        // FIXED(5, 1) has range [-8.0, 7.5]; OCTAL(10.0) is 8.0, so -OCTAL(10.0) = -8.0 fits, +OCTAL(10.0) = +8.0 overflows
+        ParsedProgram const validParsed("PROGRAM TEST COMMON() BEGIN FIXED(5, 1) f := -OCTAL(10.0); END");
+        TypeCheckingResult validRes(validParsed);
+        CHECK(!validRes.hasDiagnostic("PRESET_FIXED_POINT_OVERFLOW"));
+
+        ParsedProgram const overflowParsed("PROGRAM TEST COMMON() BEGIN FIXED(5, 1) f := OCTAL(10.0); END");
+        TypeCheckingResult overflowRes(overflowParsed);
+        CHECK(overflowRes.hasDiagnostic("PRESET_FIXED_POINT_OVERFLOW"));
+    }
 }
