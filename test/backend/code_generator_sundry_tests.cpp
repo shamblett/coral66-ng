@@ -199,4 +199,81 @@ TEST_CASE("Sundry", "[Backend][Execution]")
 
         delete ee;
     }
+
+    SECTION("PartWord Assignment with Fixed-Point RHS")
+    {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        const std::string source = R"(
+        PROGRAM PartWordFixedTest
+        BEGIN
+            INTEGER word := 1;
+            INTEGER extracted := 0;
+            FIXED(16, 4) fx := 3.5;
+            BITS[4, 4] word := fx;
+            extracted := BITS[4, 4] word;
+        END;
+        )";
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        if (errors)
+            WARN(ss.str());
+        REQUIRE_FALSE(errors);
+
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("partword_fixed_test", context);
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+        REQUIRE_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr);
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        if (!mainFunc)
+            mainFunc = ee->FindFunctionNamed("PartWordFixedTest");
+        REQUIRE(mainFunc != nullptr);
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto wordAddr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress("word"));
+        REQUIRE(wordAddr != nullptr);
+        CHECK(*wordAddr == 49); // bit 0 preserved (1) | (int(3.5) << 4) = 1 | 48 = 49
+
+        auto extractedAddr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress("extracted"));
+        REQUIRE(extractedAddr != nullptr);
+        CHECK(*extractedAddr == 3);
+
+        delete ee;
+    }
 }

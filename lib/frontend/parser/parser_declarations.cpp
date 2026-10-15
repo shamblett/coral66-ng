@@ -382,6 +382,11 @@ std::vector<std::unique_ptr<syntax::Declaration>>
             }
         }
 
+        if (result.empty())
+        {
+            begin = typeToken;
+        }
+
         return result;
     }
 

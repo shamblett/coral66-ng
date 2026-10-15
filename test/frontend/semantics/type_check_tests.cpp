@@ -556,6 +556,21 @@ TEST_CASE("Type Checking - PartWord Bounds", "[Semantics][TypeChecking]")
         TypeCheckingResult res(parsed);
         CHECK(res.hasDiagnostic("EXPECTED_INTEGER_TYPE"));
     }
+
+    SECTION("Invalid Label base operand")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; MYLABEL: I := BITS [ 4 , 0 ] MYLABEL END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Invalid Untyped Procedure base operand")
+    {
+        ParsedProgram const parsed(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; PROCEDURE P ; BEGIN END ; I := BITS [ 4 , 0 ] P END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
 }
 
 TEST_CASE("Type Checking - Recursive Validations", "[Semantics][TypeCheck]")

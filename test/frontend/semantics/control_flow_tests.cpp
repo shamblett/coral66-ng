@@ -135,9 +135,23 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
         CHECK(!res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
 
+    SECTION("Valid Part Word Bounds (32-bit word)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 16 , 16 ] I END");
+        ControlFlowResult res(parsed);
+        CHECK(!res.hasDiagnostic("INVALID_BIT_RANGE"));
+    }
+
     SECTION("Invalid Part Word Range (Too large)")
     {
-        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 20 , 10 ] I END");
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 24 , 10 ] I END");
+        ControlFlowResult res(parsed);
+        CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
+    }
+
+    SECTION("Invalid Part Word Range (Zero Width)")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 0 , 5 ] I END");
         ControlFlowResult res(parsed);
         CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }
@@ -152,6 +166,13 @@ TEST_CASE("Control Flow - Constant Bounds", "[Semantics][ControlFlow]")
     SECTION("Invalid Part Word Range (Negative Width)")
     {
         ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := BITS [ 5 , -1 ] I END");
+        ControlFlowResult res(parsed);
+        CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
+    }
+
+    SECTION("Invalid Part Word Range on Assignment LHS")
+    {
+        ParsedProgram parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; BITS [ 24 , 10 ] I := 1 END");
         ControlFlowResult res(parsed);
         CHECK(res.hasDiagnostic("INVALID_BIT_RANGE"));
     }

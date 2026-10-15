@@ -198,20 +198,14 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
                     const double factor = pow(2, targetFraction);
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
                     llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
-                    llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
-                    auto* storeInst = m_builder.CreateStore(storeRhs, targetAddr);
-                    if (isVolatile)
-                        storeInst->setVolatile(true);
-                    return;
+                    rhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
                 }
-
-                // Integer type: already scaled by rhsFraction. Scale up by the difference.
-                llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), targetFraction - rhsFraction);
-                llvm::Value* scaledRhs = m_builder.CreateShl(rhs, shiftVal, "scaled_val_up");
-                auto* storeInst = m_builder.CreateStore(scaledRhs, targetAddr);
-                if (isVolatile)
-                    storeInst->setVolatile(true);
-                return;
+                else
+                {
+                    // Integer type: already scaled by rhsFraction. Scale up by the difference.
+                    llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), targetFraction - rhsFraction);
+                    rhs = m_builder.CreateShl(rhs, shiftVal, "scaled_val_up");
+                }
             }
             if (rhsFraction > targetFraction)
             {
@@ -221,20 +215,14 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
                     const double factor = pow(2, targetFraction);
                     llvm::Value* tempFloat = llvm::ConstantFP::get(rhs->getType(), factor);
                     llvm::Value* multiplied = m_builder.CreateFMul(rhs, tempFloat, "scaled_val");
-                    llvm::Value* storeRhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
-                    auto* storeInst = m_builder.CreateStore(storeRhs, targetAddr);
-                    if (isVolatile)
-                        storeInst->setVolatile(true);
-                    return;
+                    rhs = m_builder.CreateFPToUI(multiplied, m_builder.getInt32Ty(), "scaled_int");
                 }
-
-                // Integer type: already scaled by rhsFraction. Scale down by the difference.
-                llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), rhsFraction - targetFraction);
-                llvm::Value* scaledRhs = m_builder.CreateAShr(rhs, shiftVal, "scaled_val_down");
-                auto* storeInst = m_builder.CreateStore(scaledRhs, targetAddr);
-                if (isVolatile)
-                    storeInst->setVolatile(true);
-                return;
+                else
+                {
+                    // Integer type: already scaled by rhsFraction. Scale down by the difference.
+                    llvm::Value* shiftVal = llvm::ConstantInt::get(rhs->getType(), rhsFraction - targetFraction);
+                    rhs = m_builder.CreateAShr(rhs, shiftVal, "scaled_val_down");
+                }
             }
         }
     }

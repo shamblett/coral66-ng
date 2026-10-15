@@ -930,6 +930,17 @@ void TypeCheckingPass::visit(const syntax::PartWordExpression& node)
     visit(node.getStartBit());
     visit(node.getWidth());
 
+    if (const auto baseIt = m_context.expressionTypes.find(&node.getBase());
+        baseIt != m_context.expressionTypes.end() && !baseIt->second->is<ErrorType>())
+    {
+        if (!isNumericType(*baseIt->second) && !isBitsType(*baseIt->second) && !isPointerType(*baseIt->second))
+        {
+            m_context.log(errors::semantics::TYPE_MISMATCH.args(*node.getBase().begin(), m_context.source,
+                                                                *node.getBase().begin()));
+            DiagnosticCollector::addDiagnostic(errors::semantics::TYPE_MISMATCH);
+        }
+    }
+
     for (const auto* expr : {&node.getStartBit(), &node.getWidth()})
     {
         if (auto it = m_context.expressionTypes.find(expr);

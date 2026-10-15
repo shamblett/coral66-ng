@@ -254,7 +254,7 @@ void ControlFlowPass::visit(const syntax::PartWordExpression& node)
 
     if (const auto width = evaluateConstantInteger(node.getWidth()); start && width)
     {
-        if (*start < 0 || *width < 0 || *start + *width > 24) // Assuming 24-bit target word
+        if (*start < 0 || *width <= 0 || *start + *width > 32) // Assuming 32-bit target word
         {
             m_context.log(errors::semantics::INVALID_BIT_RANGE.args(*node.begin(), m_context.source, *node.begin()));
             DiagnosticCollector::addDiagnostic(errors::semantics::INVALID_BIT_RANGE);
