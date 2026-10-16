@@ -212,6 +212,8 @@ llvm::Value* CodeGenerator::visit(const syntax::Expression& expression)
         return visit(*e);
     if (auto* e = dynamic_cast<const syntax::ArrayAccessExpression*>(&expression))
         return visit(*e);
+    if (auto* e = dynamic_cast<const syntax::LocationExpression*>(&expression))
+        return visit(*e);
     if (auto* e = dynamic_cast<const syntax::TypeChangeExpression*>(&expression))
         return visit(*e);
     return nullptr;
@@ -693,6 +695,11 @@ llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expressio
     }
 
     return loaded;
+}
+
+llvm::Value* CodeGenerator::visit(const syntax::LocationExpression& expression)
+{
+    return emitAddress(expression.getWordReference());
 }
 
 llvm::Value* CodeGenerator::visit(const syntax::TypeChangeExpression& expression)

@@ -103,6 +103,19 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
             CHECK(sizeInBytes == 8);
         }
 
+        // Verify that LOCATION(base) actually stored the 64-bit runtime address of base
+        uint64_t baseAddress = ee->getGlobalValueAddress("base");
+        REQUIRE(baseAddress != 0);
+
+        auto* baseAddrPtr = reinterpret_cast<uint64_t*>(ee->getGlobalValueAddress("baseAddr"));
+        REQUIRE(baseAddrPtr != nullptr);
+        CHECK(*baseAddrPtr == baseAddress);
+
+        // Dereference the 64-bit address stored in baseAddr to verify it points to base (20)
+        auto* derefBase = reinterpret_cast<int32_t*>(*baseAddrPtr);
+        REQUIRE(derefBase != nullptr);
+        CHECK(*derefBase == 20);
+
         // Clean up
         delete ee;
     }

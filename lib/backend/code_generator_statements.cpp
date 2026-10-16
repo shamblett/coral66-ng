@@ -258,6 +258,10 @@ void CodeGenerator::visit(const syntax::AssignmentStatement& statement)
         {
             rhs = m_builder.CreateIntCast(rhs, targetType, true);
         }
+        else if (rhs->getType()->isIntegerTy() && targetType->isPointerTy())
+        {
+            rhs = m_builder.CreateIntToPtr(rhs, targetType);
+        }
     }
 
     if (auto* partWord = dynamic_cast<const syntax::PartWordExpression*>(&statement.getVariable()))

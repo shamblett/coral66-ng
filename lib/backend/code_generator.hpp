@@ -92,6 +92,7 @@ public:
     llvm::Value* visit(const syntax::FunctionCallExpression& expression);
     llvm::Value* visit(const syntax::PartWordExpression& expression);
     llvm::Value* visit(const syntax::ArrayAccessExpression& expression);
+    llvm::Value* visit(const syntax::LocationExpression& expression);
     llvm::Value* visit(const syntax::TypeChangeExpression& expression);
 
 private:

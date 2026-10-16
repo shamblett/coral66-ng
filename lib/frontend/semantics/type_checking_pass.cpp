@@ -321,7 +321,7 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             }
             else if (isPointerType(*lType))
             {
-                // Accept Pointer to Pointer, Pointer to Integer, or Integer to Pointer
+                // Accept Pointer to Pointer or Integer to Pointer
                 if (isPointerType(*rType)
                     || (resolveExprType(*rType).tryAs<PrimitiveType>()
                         && resolveExprType(*rType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
@@ -335,17 +335,7 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
             }
             else if (isPointerType(*rType))
             {
-                // Accept Integer to Pointer
-                if (isPointerType(*lType)
-                    || (resolveExprType(*lType).tryAs<PrimitiveType>()
-                        && resolveExprType(*lType).as<PrimitiveType>().getKind() == PrimitiveType::Integer))
-                {
-                    // Match
-                }
-                else
-                {
-                    mismatch = true;
-                }
+                mismatch = true;
             }
             else if (isBitsType(*lType) && isNumericType(*rType))
             {
@@ -1201,7 +1191,7 @@ void TypeCheckingPass::visit(const syntax::LocationExpression& node)
             *node.getWordReference().begin(), m_context.source, *node.getWordReference().begin()));
         DiagnosticCollector::addDiagnostic(errors::semantics::LOCATION_PARAMETER_REQUIRES_LVALUE);
     }
-    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
+    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(PrimitiveType{PrimitiveType::Pointer}));
 }
 
 void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)

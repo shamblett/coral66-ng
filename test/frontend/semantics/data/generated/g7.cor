@@ -5,7 +5,7 @@ DEFINE macroWithArgs(A, B) " A + B " ;
 COMMON ()
 
 BEGIN
-  INTEGER val1, val2, result;
+  INTEGER val1, result; POINTER val2;
   FLOATING fval;
   INTEGER ARRAY myArr [ 0 : 5 ];
 
@@ -17,6 +17,6 @@ BEGIN
   val2 := LOCATION ( myArr [ 1 ] );
 
   COMMENT Macro with arguments ;
-  result := macroWithArgs ( val1, val2 )
+  result := macroWithArgs ( val1, val1 )
 
 END end of program ;

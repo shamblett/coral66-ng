@@ -112,6 +112,34 @@ TEST_CASE("Type Checking - Assignment", "[Semantics][TypeChecking]")
         TypeCheckingResult res(parsed);
         CHECK(res.hasDiagnostic("TYPE_MISMATCH"));
     }
+
+    SECTION("Valid Assigning Location to Pointer")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; POINTER P ; P := LOCATION(I) END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Valid Assigning Integer to Pointer")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN POINTER P ; P := 0 END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Type Mismatch Assigning Pointer to Integer")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I ; POINTER P ; I := P END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Type Mismatch Assigning Location to Integer")
+    {
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN INTEGER I, J ; I := LOCATION(J) END");
+        TypeCheckingResult res(parsed);
+        CHECK(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
 }
 
 TEST_CASE("Type Checking - Binary Expression", "[Semantics][TypeChecking]")
