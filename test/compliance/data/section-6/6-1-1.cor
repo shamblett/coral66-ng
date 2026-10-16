@@ -1,0 +1,10 @@
+PROGRAM SIXONEONE
+COMMENT LOCATION handling.
+Note that the POINTER type is 64 bits not 32;
+
+BEGIN
+
+    INTEGER base := 20;
+    POINTER baseAddr := LOCATION(base);
+
+END
