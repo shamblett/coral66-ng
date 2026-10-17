@@ -1250,7 +1250,19 @@ void TypeCheckingPass::visit(const syntax::TypeChangeExpression& node)
     }
     else if (kind == lexer::TokenType::FixedKeyword)
     {
-        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(FixedType(24, 0)));
+        std::uint8_t total = 24;
+        std::uint8_t frac = 0;
+        if (node.getTotalBits())
+        {
+            if (const auto tVal = evaluateConstantInteger(*node.getTotalBits()); tVal && *tVal > 0)
+                total = static_cast<std::uint8_t>(*tVal);
+        }
+        if (node.getFractionBits())
+        {
+            if (const auto fVal = evaluateConstantInteger(*node.getFractionBits()); fVal && *fVal >= 0)
+                frac = static_cast<std::uint8_t>(*fVal);
+        }
+        m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(FixedType(total, frac)));
     }
     else
     {

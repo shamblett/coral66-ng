@@ -9,6 +9,10 @@
 
 # Antigravity Rules
 
+## Build and Test System
+- The project uses **Bazel** as its build and test system (e.g., `bazel build //...`, `bazel test //test/...`).
+- NEVER use `cmake` or `ctest` in this workspace.
+
 ## Safety and Version Control
 - NEVER automatically run `git commit`, `git add .`, or `git push` commands.
 - Do not attempt to save project state by generating git commits.

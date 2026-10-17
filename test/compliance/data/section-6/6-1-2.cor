@@ -4,7 +4,9 @@ COMMENT Type changing;
 BEGIN
 
     INTEGER base := 280;
-    FLOATING floatBase := (FLOATING) base;
-    FIXED(13,5) fixedBase := (FIXED(13,5)) base;
+    FLOATING floatBase;
+    FIXED(13,5) fixedBase;
 
+    floatBase := FLOATING(base);
+    fixedBase := FIXED(13,5)(base);
 END
