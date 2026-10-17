@@ -6,7 +6,13 @@ BEGIN
     INTEGER base := 280;
     FLOATING floatBase;
     FIXED(13,5) fixedBase;
+    FLOATING floatLiteral;
+    INTEGER integerLiteral;
 
     floatBase := FLOATING(base);
     fixedBase := FIXED(13,5)(base);
+    floatLiteral := FLOATING(10);
+    integerLiteral := INTEGER(90.5);
+
+
 END

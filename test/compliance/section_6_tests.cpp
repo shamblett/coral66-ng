@@ -149,7 +149,6 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         CHECK_FALSE(errors);
-        std::cout << ss.str() << std::endl;
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
@@ -196,9 +195,21 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
         float fixedFloat = static_cast<float>(fixedRaw) / static_cast<float>(1 << 5); // 280 / 32.0f = 8.75f
         CHECK(fixedFloat == 280.0f);
 
+        // floatLiteral
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("floatLiteral"));
+        REQUIRE(variableAddress != nullptr);
+
+        variable = *static_cast<float*>(variableAddress);
+        CHECK(variable == 10.0);
+
+        // integerLiteral
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("integerLiteral"));
+        REQUIRE(variableAddress != nullptr);
+
+        variable = *static_cast<int32_t*>(variableAddress);
+        CHECK(variable == 90);
+
         // Clean up
         delete ee;
     }
-
-
 }
