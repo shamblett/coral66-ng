@@ -135,6 +135,54 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
         CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
     }
 
+    SECTION("Untyped Primary Rejected on LHS of Word-Logic")
+    {
+        {
+            const ParsedExpression p("1.5 DIFFER 2");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
+        }
+        {
+            const ParsedExpression p("(a UNION b) MASK c");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
+        }
+        {
+            const ParsedExpression p("OCTAL(1.4) UNION a");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
+        }
+    }
+
+    SECTION("Untyped Primary Rejected on RHS of Word-Logic")
+    {
+        {
+            const ParsedExpression p("1 DIFFER 2.5");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_UNION));
+        }
+        {
+            const ParsedExpression p("1 UNION 2.5");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_MASK));
+        }
+        {
+            const ParsedExpression p("1 MASK 2.5");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
+        }
+        {
+            const ParsedExpression p("a MASK (b UNION c)");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_TYPED_PRIMARY));
+        }
+        {
+            const ParsedExpression p("a DIFFER (b MASK c)");
+            CHECK(p.expression.get() == nullptr);
+            CHECK(parser::DiagnosticCollector::findDiagnostic(EXPECTED_UNION));
+        }
+    }
+
     SECTION("Expected Word Reference (Typed Primary)")
     {
         const ParsedExpression p("LOCATION ( = )");

@@ -212,4 +212,100 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
         // Clean up
         delete ee;
     }
+
+    /// Any typed primary other than FLOATING is a sequence of bits to which the
+    /// logical operations DIFFER, UNION and MASK may be applied, bit by bit, to
+    /// produce an expression of the form Differ, where every bit takes part in the
+    /// operation, including any sign bit, and the result as a whole has the numeric
+    /// type INTEGER. The binding priorities are in the increasing order: DIFFER,
+    /// UNION, MASK.
+    SECTION("6-1-3")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-6/6-1-3.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("sixonethree", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto getGlobalInt = [&](const char* name) -> int32_t {
+            auto addr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress(name));
+            REQUIRE(addr != nullptr);
+            return *addr;
+        };
+
+        // Truth tables: 12 (1100b) and 10 (1010b)
+        CHECK(getGlobalInt("resDiffer") == 6); // 0110b
+        CHECK(getGlobalInt("resUnion") == 14); // 1110b
+        CHECK(getGlobalInt("resMask") == 8);   // 1000b
+
+        // Sign bit participation
+        CHECK(getGlobalInt("resSignMask") == static_cast<int32_t>(0x80000000u));
+        CHECK(getGlobalInt("resSignDiffer") == 0x7FFFFFFF);
+
+        // Binding priorities: 6 DIFFER (3 UNION (5 MASK 12)) = 6 ^ (3 | 4) = 1
+        CHECK(getGlobalInt("resPrecedence") == 1);
+
+        // Grouping via INTEGER(...): 12 MASK INTEGER(3 UNION 5) = 12 & 7 = 4
+        CHECK(getGlobalInt("resGrouped") == 4);
+
+        // Typed primaries: FIXED(16,4) 1.5 (raw 24) MASK 8 = 8
+        CHECK(getGlobalInt("resFixedMask") == 8);
+        // BITS [4, 2] 12 (3) UNION LITERAL(A) (65) = 67
+        CHECK(getGlobalInt("resPartWordUnion") == 67);
+        // LOCATION(a) MASK 0 = 0
+        CHECK(getGlobalInt("resLocMask") == 0);
+
+        // INTEGER result arithmetic and constant evaluation
+        CHECK(getGlobalInt("resArith") == 20);
+        CHECK(getGlobalInt("resConstBits") == 1);
+
+        // Clean up
+        delete ee;
+    }
 }

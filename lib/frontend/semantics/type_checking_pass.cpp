@@ -820,11 +820,12 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         {
             auto isBitsOrInt = [](const Type& t)
             {
-                if (isBitsType(t))
+                const Type& rt = resolveExprType(t);
+                if (isBitsType(rt) || isPointerType(rt) || rt.is<FixedType>())
                     return true;
-                if (const auto p = t.tryAs<PrimitiveType>())
-                    return p->getKind() != PrimitiveType::Floating;
-                return true; // Consider FIXED as numeric integer
+                if (const auto p = rt.tryAs<PrimitiveType>())
+                    return p->getKind() == PrimitiveType::Integer;
+                return false;
             };
             if (!isBitsOrInt(*type1) || !isBitsOrInt(*type2))
                 operandsValid = false;
@@ -855,7 +856,7 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         auto common = getCommonType(*type1, *type2);
         if (isBitwiseOp)
         {
-            common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits});
+            common = IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer});
         }
         else if (opType == lexer::TokenType::LessThan || opType == lexer::TokenType::LessThanOrEqual
                  || opType == lexer::TokenType::Equal || opType == lexer::TokenType::GreaterThanOrEqual
@@ -883,7 +884,7 @@ void TypeCheckingPass::visit(const syntax::BinaryExpression& node)
         else if (isBitwiseOp)
         {
             m_context.expressionTypes.insert_or_assign(&node,
-                                                       IntrusiveVariantValue(PrimitiveType{PrimitiveType::Bits}));
+                                                       IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         }
         else
         {

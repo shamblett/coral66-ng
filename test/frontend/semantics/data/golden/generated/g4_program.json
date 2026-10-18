@@ -1195,7 +1195,7 @@
             },
             "Type": {
                 "Name": "PrimitiveType",
-                "Kind": "Bits",
+                "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
                 "IsValue": false
@@ -1210,7 +1210,7 @@
             },
             "Type": {
                 "Name": "PrimitiveType",
-                "Kind": "Bits",
+                "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
                 "IsValue": false
@@ -1225,7 +1225,7 @@
             },
             "Type": {
                 "Name": "PrimitiveType",
-                "Kind": "Bits",
+                "Kind": "Integer",
                 "IsLocation": false,
                 "IsUndefined": false,
                 "IsValue": false

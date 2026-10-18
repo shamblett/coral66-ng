@@ -223,6 +223,18 @@ llvm::Value* CodeGenerator::visit(const syntax::Expression& expression)
 llvm::Value* CodeGenerator::visit(const syntax::LiteralExpression& expression)
 {
     auto& val = expression.getLiteral()->getValue();
+    if (expression.begin()->getTokenType() == lexer::TokenType::LiteralKeyword)
+    {
+        if (std::holds_alternative<std::string>(val))
+        {
+            const auto& strValue = std::get<std::string>(val);
+            if (!strValue.empty())
+            {
+                return llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()),
+                                              static_cast<std::uint8_t>(strValue[0]), false);
+            }
+        }
+    }
     if (std::holds_alternative<llvm::APSInt>(val))
     {
         return llvm::ConstantInt::get(m_module.getContext(), std::get<llvm::APSInt>(val));
@@ -377,6 +389,15 @@ llvm::Value* CodeGenerator::visit(const syntax::BinaryExpression& expression)
         {
             return value;
         }
+    }
+
+    if (kind == lexer::TokenType::MaskKeyword || kind == lexer::TokenType::UnionKeyword
+        || kind == lexer::TokenType::DifferKeyword)
+    {
+        if (L->getType()->isPointerTy())
+            L = m_builder.CreatePtrToInt(L, llvm::Type::getInt32Ty(m_module.getContext()));
+        if (R->getType()->isPointerTy())
+            R = m_builder.CreatePtrToInt(R, llvm::Type::getInt32Ty(m_module.getContext()));
     }
 
     if (L->getType() != R->getType())

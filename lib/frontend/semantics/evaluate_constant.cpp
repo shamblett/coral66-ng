@@ -14,6 +14,13 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
 {
     if (auto* lit = dynamic_cast<const syntax::LiteralExpression*>(&expr))
     {
+        if (lit->begin()->getTokenType() == lexer::TokenType::LiteralKeyword)
+        {
+            if (auto* strVal = std::get_if<std::string>(&lit->getLiteral()->getValue()); strVal && !strVal->empty())
+            {
+                return static_cast<std::uint8_t>((*strVal)[0]);
+            }
+        }
         if (lit->getLiteral()->getType() == lexer::CToken::Integer)
         {
             if (auto* intVal = std::get_if<llvm::APSInt>(&lit->getLiteral()->getValue()))
@@ -52,6 +59,19 @@ std::optional<std::int64_t> evaluateConstantInteger(const syntax::Expression& ex
                 if (*right != 0)
                     return *left / *right;
             }
+            if (opType == lexer::TokenType::DifferKeyword)
+                return *left ^ *right;
+            if (opType == lexer::TokenType::UnionKeyword)
+                return *left | *right;
+            if (opType == lexer::TokenType::MaskKeyword)
+                return *left & *right;
+        }
+    }
+    else if (auto* typeChange = dynamic_cast<const syntax::TypeChangeExpression*>(&expr))
+    {
+        if (typeChange->getType()->getTokenType() == lexer::TokenType::IntegerKeyword)
+        {
+            return evaluateConstantInteger(typeChange->getExpression());
         }
     }
     return std::nullopt;

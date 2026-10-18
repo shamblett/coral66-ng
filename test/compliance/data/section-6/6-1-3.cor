@@ -1,0 +1,57 @@
+PROGRAM SIXONETHREE
+COMMENT Word-logic operations (Section 6.1.2);
+
+BEGIN
+
+    INTEGER a := 12;
+    INTEGER b := 10;
+
+    INTEGER resDiffer;
+    INTEGER resUnion;
+    INTEGER resMask;
+
+    INTEGER negA := -1;
+    INTEGER signBit := OCTAL(20000000000);
+    INTEGER resSignMask;
+    INTEGER resSignDiffer;
+
+    INTEGER p1 := 6;
+    INTEGER p2 := 3;
+    INTEGER p3 := 5;
+    INTEGER p4 := 12;
+    INTEGER resPrecedence;
+    INTEGER resGrouped;
+
+    FIXED(16, 4) fx := 1.5;
+    INTEGER resFixedMask;
+    INTEGER resPartWordUnion;
+    INTEGER resLocMask;
+
+    INTEGER resArith;
+    INTEGER resConstBits;
+
+    COMMENT Truth tables across all 4 bit combinations (12 = 1100b, 10 = 1010b);
+    resDiffer := a DIFFER b;
+    resUnion := a UNION b;
+    resMask := a MASK b;
+
+    COMMENT Sign bit participation;
+    resSignMask := negA MASK signBit;
+    resSignDiffer := negA DIFFER signBit;
+
+    COMMENT Binding priorities: DIFFER < UNION < MASK;
+    resPrecedence := p1 DIFFER p2 UNION p3 MASK p4;
+
+    COMMENT Grouping via INTEGER(Expression);
+    resGrouped := p4 MASK INTEGER(p2 UNION p3);
+
+    COMMENT Typed primaries: FIXED, BITS[w,p], LITERAL, LOCATION;
+    resFixedMask := fx MASK 8;
+    resPartWordUnion := BITS [4, 2] a UNION LITERAL(A);
+    resLocMask := LOCATION(a) MASK 0;
+
+    COMMENT Result has numeric type INTEGER and works in constant expressions;
+    resArith := (a MASK b) + (a DIFFER b) * 2;
+    resConstBits := BITS [7 MASK 4, 1 UNION 2] a;
+
+END

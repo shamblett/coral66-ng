@@ -323,6 +323,7 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
     }
 
     // Untyped Primary
+    std::unique_ptr<Expression> untypedExpr;
     if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
     {
         begin++;
@@ -345,14 +346,14 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
             DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
             return nullptr; // Missing )
         }
-        return expr;
+        untypedExpr = std::move(expr);
     }
-    if (begin->getTokenType() == lexer::TokenType::Literal && begin->getType() != lexer::CToken::Type::Integer)
+    else if (begin->getTokenType() == lexer::TokenType::Literal && begin->getType() != lexer::CToken::Type::Integer)
     {
         auto t = begin++;
-        return std::make_unique<LiteralExpression>(t, begin, t);
+        untypedExpr = std::make_unique<LiteralExpression>(t, begin, t);
     }
-    if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
+    else if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
     {
         if (const auto openParen = begin + 1;
             openParen != end && openParen->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -366,14 +367,32 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
                 if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
                 {
                     begin++;
-                    return std::make_unique<LiteralExpression>(startToken, begin, lit);
+                    untypedExpr = std::make_unique<LiteralExpression>(startToken, begin, lit);
                 }
-                context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
-                    *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
-                DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
-                return nullptr;
+                else
+                {
+                    context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
+                        *(begin == end ? end - 1 : begin), context.getSourceInterface(),
+                        *(begin == end ? end - 1 : begin)));
+                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
+                    return nullptr;
+                }
             }
         }
+    }
+
+    if (untypedExpr)
+    {
+        if (begin != end
+            && (begin->getTokenType() == lexer::TokenType::DifferKeyword
+                || begin->getTokenType() == lexer::TokenType::UnionKeyword
+                || begin->getTokenType() == lexer::TokenType::MaskKeyword))
+        {
+            context.log(errors::parser::EXPECTED_TYPED_PRIMARY.args(*begin, context.getSourceInterface(), *begin));
+            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_TYPED_PRIMARY);
+            return nullptr;
+        }
+        return untypedExpr;
     }
 
     return parseBitwiseDiffer(begin, end, context);
@@ -685,28 +704,6 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
     if (tType == lexer::TokenType::OpenSquareBracket)
     {
         return parseWordReference(begin, end, context);
-    }
-
-    if (tType == lexer::TokenType::OpenParentheses)
-    {
-        begin++; // skip (
-        auto expr = parseExpression(begin, end, context);
-        if (!expr)
-        {
-            context.log(errors::parser::EXPECTED_EXPRESSION.args(
-                *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
-            DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_EXPRESSION);
-            return nullptr;
-        }
-        if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
-        {
-            begin++; // skip )
-            return expr;
-        }
-        context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
-            *(begin == end ? end - 1 : begin), context.getSourceInterface(), *(begin == end ? end - 1 : begin)));
-        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
-        return nullptr;
     }
 
     if (tType == lexer::TokenType::Identifier)

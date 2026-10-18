@@ -538,11 +538,103 @@ TEST_CASE("Type Checking - BITS Operations", "[Semantics][TypeChecking]")
         CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
+    SECTION("Valid word-logic Typedprimary operands")
+    {
+        ParsedProgram const parsed(
+            "PROGRAM TEST COMMON() BEGIN "
+            "INTEGER I, J ; "
+            "BITS B ; "
+            "FIXED(16, 4) FX ; "
+            "INTEGER PROCEDURE IP ; BEGIN ANSWER 3 END ; "
+            "FIXED(16, 4) PROCEDURE FXP ; BEGIN ANSWER 1.5 END ; "
+            "I := J MASK B UNION FX DIFFER LOCATION(I) ; "
+            "I := OCTAL(77) MASK LITERAL(A) UNION BITS [4, 0] J DIFFER INTEGER(J UNION B) ; "
+            "I := IP MASK FXP UNION FIXED(16, 4)(J) "
+            "END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Word-logic result has numeric type INTEGER")
+    {
+        ParsedProgram const parsed(
+            "PROGRAM TEST COMMON() BEGIN "
+            "INTEGER I, J ; "
+            "FLOATING FL ; "
+            "FIXED(16, 4) FX ; "
+            "INTEGER ARRAY ARR[0:3] ; "
+            "SWITCH SW := L1, L2 ; "
+            "PROCEDURE P(VALUE INTEGER X) ; BEGIN I := X END ; "
+            "INTEGER PROCEDURE Q ; BEGIN ANSWER I MASK J END ; "
+            "I := (I MASK J) + (I UNION J) * (I DIFFER J) ; "
+            "FL := I MASK J ; "
+            "FX := I UNION J ; "
+            "ARR[I MASK 3] := BITS [1 MASK 3, 2 UNION 1] J ; "
+            "P(I DIFFER J) ; "
+            "GOTO SW[(I MASK 1) + 1] ; "
+            "L1: L2: I := Q "
+            "END");
+        TypeCheckingResult res(parsed);
+        CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
     SECTION("Invalid floating DIFFER")
     {
-        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN BITS I ; I := 1.5 DIFFER 2.5 END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN BITS I ; FLOATING F ; I := F DIFFER 2 END");
         TypeCheckingResult res(parsed);
         CHECK(res.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Invalid floating UNION and MASK")
+    {
+        ParsedProgram const parsed1("PROGRAM TEST COMMON() BEGIN INTEGER I ; FLOATING F ; I := 1 UNION F END");
+        TypeCheckingResult res1(parsed1);
+        CHECK(res1.hasDiagnostic("TYPE_MISMATCH"));
+
+        ParsedProgram const parsed2("PROGRAM TEST COMMON() BEGIN INTEGER I ; I := 1 MASK FLOATING(2) END");
+        TypeCheckingResult res2(parsed2);
+        CHECK(res2.hasDiagnostic("TYPE_MISMATCH"));
+
+        ParsedProgram const parsed3(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+            "FLOATING PROCEDURE FP ; BEGIN ANSWER 1.0 END ; "
+            "I := FP MASK 1 END");
+        TypeCheckingResult res3(parsed3);
+        CHECK(res3.hasDiagnostic("TYPE_MISMATCH"));
+    }
+
+    SECTION("Invalid non-numeric operands to word-logic")
+    {
+        ParsedProgram const parsedVoidProc(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+            "PROCEDURE VP ; BEGIN I := 0 END ; "
+            "I := VP MASK 1 END");
+        TypeCheckingResult resVoidProc(parsedVoidProc);
+        CHECK(resVoidProc.hasDiagnostic("TYPE_MISMATCH"));
+
+        ParsedProgram const parsedLabel(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+            "MYLABEL: I := MYLABEL UNION 1 END");
+        TypeCheckingResult resLabel(parsedLabel);
+        CHECK(resLabel.hasDiagnostic("TYPE_MISMATCH"));
+
+        ParsedProgram const parsedSwitch(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; SWITCH SW := L1 ; "
+            "L1: I := SW DIFFER 1 END");
+        TypeCheckingResult resSwitch(parsedSwitch);
+        CHECK(resSwitch.hasDiagnostic("TYPE_MISMATCH"));
+
+        ParsedProgram const parsedArray(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; INTEGER ARRAY ARR[0:2] ; "
+            "I := ARR MASK 1 END");
+        TypeCheckingResult resArray(parsedArray);
+        CHECK(resArray.hasDiagnostic("TYPE_MISMATCH"));
+
+        ParsedProgram const parsedTable(
+            "PROGRAM TEST COMMON() BEGIN INTEGER I ; TABLE T[2, 2] [ E INTEGER 0, 0 ] ; "
+            "I := T UNION 1 END");
+        TypeCheckingResult resTable(parsedTable);
+        CHECK(resTable.hasDiagnostic("TYPE_MISMATCH"));
     }
 }
 

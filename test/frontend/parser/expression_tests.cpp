@@ -138,8 +138,76 @@ TEST_CASE("Coral Parse Expression - Bitwise", "[Parser][Expression]")
     {
         ParsedExpression p("a DIFFER b UNION c MASK d");
         auto diffOp = dynamic_cast<BinaryExpression*>(p.expression.get());
-        CHECK(diffOp != nullptr);
+        REQUIRE(diffOp != nullptr);
         CHECK(diffOp->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
+        CHECK(dynamic_cast<const IdentifierExpression*>(&diffOp->getLeft()) != nullptr);
+
+        auto unionOp = dynamic_cast<const BinaryExpression*>(&diffOp->getRight());
+        REQUIRE(unionOp != nullptr);
+        CHECK(unionOp->getOp()->getTokenType() == lexer::TokenType::UnionKeyword);
+        CHECK(dynamic_cast<const IdentifierExpression*>(&unionOp->getLeft()) != nullptr);
+
+        auto maskOp = dynamic_cast<const BinaryExpression*>(&unionOp->getRight());
+        REQUIRE(maskOp != nullptr);
+        CHECK(maskOp->getOp()->getTokenType() == lexer::TokenType::MaskKeyword);
+        CHECK(dynamic_cast<const IdentifierExpression*>(&maskOp->getLeft()) != nullptr);
+        CHECK(dynamic_cast<const IdentifierExpression*>(&maskOp->getRight()) != nullptr);
+    }
+    SECTION("Bitwise Left Associativity")
+    {
+        ParsedExpression pDiff("a DIFFER b DIFFER c");
+        auto diffOuter = dynamic_cast<BinaryExpression*>(pDiff.expression.get());
+        REQUIRE(diffOuter != nullptr);
+        CHECK(diffOuter->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
+        auto diffInner = dynamic_cast<const BinaryExpression*>(&diffOuter->getLeft());
+        REQUIRE(diffInner != nullptr);
+        CHECK(diffInner->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
+
+        ParsedExpression pUnion("a UNION b UNION c");
+        auto unionOuter = dynamic_cast<BinaryExpression*>(pUnion.expression.get());
+        REQUIRE(unionOuter != nullptr);
+        CHECK(unionOuter->getOp()->getTokenType() == lexer::TokenType::UnionKeyword);
+        auto unionInner = dynamic_cast<const BinaryExpression*>(&unionOuter->getLeft());
+        REQUIRE(unionInner != nullptr);
+        CHECK(unionInner->getOp()->getTokenType() == lexer::TokenType::UnionKeyword);
+
+        ParsedExpression pMask("a MASK b MASK c");
+        auto maskOuter = dynamic_cast<BinaryExpression*>(pMask.expression.get());
+        REQUIRE(maskOuter != nullptr);
+        CHECK(maskOuter->getOp()->getTokenType() == lexer::TokenType::MaskKeyword);
+        auto maskInner = dynamic_cast<const BinaryExpression*>(&maskOuter->getLeft());
+        REQUIRE(maskInner != nullptr);
+        CHECK(maskInner->getOp()->getTokenType() == lexer::TokenType::MaskKeyword);
+    }
+    SECTION("Bitwise Precedence Relative to PartWord and Arithmetic")
+    {
+        ParsedExpression p("a + b * BITS [4, 0] c DIFFER d");
+        auto addOp = dynamic_cast<BinaryExpression*>(p.expression.get());
+        REQUIRE(addOp != nullptr);
+        CHECK(addOp->getOp()->getTokenType() == lexer::TokenType::Plus);
+
+        auto mulOp = dynamic_cast<const BinaryExpression*>(&addOp->getRight());
+        REQUIRE(mulOp != nullptr);
+        CHECK(mulOp->getOp()->getTokenType() == lexer::TokenType::Asterisk);
+
+        auto diffOp = dynamic_cast<const BinaryExpression*>(&mulOp->getRight());
+        REQUIRE(diffOp != nullptr);
+        CHECK(diffOp->getOp()->getTokenType() == lexer::TokenType::DifferKeyword);
+        CHECK(dynamic_cast<const PartWordExpression*>(&diffOp->getLeft()) != nullptr);
+        CHECK(dynamic_cast<const IdentifierExpression*>(&diffOp->getRight()) != nullptr);
+    }
+    SECTION("Bitwise Grouping via INTEGER Type Change")
+    {
+        ParsedExpression p("a MASK INTEGER(b UNION c)");
+        auto maskOp = dynamic_cast<BinaryExpression*>(p.expression.get());
+        REQUIRE(maskOp != nullptr);
+        CHECK(maskOp->getOp()->getTokenType() == lexer::TokenType::MaskKeyword);
+        auto tcOp = dynamic_cast<const TypeChangeExpression*>(&maskOp->getRight());
+        REQUIRE(tcOp != nullptr);
+        CHECK(tcOp->getType()->getTokenType() == lexer::TokenType::IntegerKeyword);
+        auto unionOp = dynamic_cast<const BinaryExpression*>(&tcOp->getExpression());
+        REQUIRE(unionOp != nullptr);
+        CHECK(unionOp->getOp()->getTokenType() == lexer::TokenType::UnionKeyword);
     }
 }
 
