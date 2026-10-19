@@ -1,0 +1,14 @@
+PROGRAM SIXONEFOUR
+COMMENT Evaluation of expressions (Section 6.1.3);
+
+BEGIN
+
+    INTEGER i := 30;
+    INTEGER j := 10;
+    FLOATING x;
+    FLOATING y;
+
+    x := i - j;
+    y := INTEGER(i - j);
+
+END

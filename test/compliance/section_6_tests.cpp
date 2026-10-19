@@ -308,4 +308,87 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
         // Clean up
         delete ee;
     }
+
+    /// 6.1.3 - For example, if i and j are integer references and x is a
+    /// floating-point reference, the assignment statement
+    /// x <- i - j
+    ///
+    /// causes i and j to be converted to floating-point before subtraction, whilst
+    /// x <- INTEGER ( i - j )
+    ///
+    /// causes subtraction of integers before conversion to floating-point.
+    SECTION("6-1-4")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-6/6-1-4.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("sixonefour", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        // Run the `main` function
+
+        // Ensure all globals are allocated and JIT compilation is done before running
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        // x
+        auto variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("x"));
+        REQUIRE(variableAddress != nullptr);
+
+        auto variable = *static_cast<float*>(variableAddress);
+        CHECK(variable == 20.0f);
+
+        // y
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("y"));
+        REQUIRE(variableAddress != nullptr);
+
+        variable = *static_cast<float*>(variableAddress);
+        CHECK(variable == 20.0f);
+
+        // Clean up
+        delete ee;
+    }
 }
