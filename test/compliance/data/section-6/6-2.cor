@@ -1,0 +1,86 @@
+PROGRAM SIXTWO
+COMMENT Conditions: arithmetic comparisons connected by OR and AND,
+with AND more tightly binding than OR (Section 6.2.1);
+
+BEGIN
+
+    INTEGER a := 10;
+    INTEGER b := 20;
+    INTEGER c := 20;
+    INTEGER d := 30;
+
+    FLOATING x := 1.5;
+    FLOATING y := 2.5;
+
+    INTEGER resCompAll := 0;
+    INTEGER resFloatComp := 0;
+
+    INTEGER resAndTT := 0;
+    INTEGER resAndTF := 0;
+    INTEGER resAndFT := 0;
+    INTEGER resAndFF := 0;
+
+    INTEGER resOrTT := 0;
+    INTEGER resOrTF := 0;
+    INTEGER resOrFT := 0;
+    INTEGER resOrFF := 0;
+
+    INTEGER resPrec1 := 0;
+    INTEGER resPrec2 := 0;
+    INTEGER resPrec3 := 0;
+    INTEGER resPrec4 := 0;
+    INTEGER resPrec5 := 0;
+    INTEGER resPrec6 := 0;
+    INTEGER resArithCond := 0;
+
+    COMMENT All six arithmetic comparators: <, <=, =, >=, >, <>;
+    IF a < b AND b <= c AND b = c AND b >= c AND d > b AND a <> d THEN
+        resCompAll := 1;
+
+    COMMENT Floating-point arithmetic comparisons;
+    IF x < y AND y > x AND x <> y AND x <= 1.5 AND y >= 2.5 AND x = 1.5 THEN
+        resFloatComp := 1;
+
+    COMMENT Boolean AND truth table;
+    IF a = 10 AND b = 20 THEN resAndTT := 1;
+    IF a = 10 AND b = 99 THEN resAndTF := 1;
+    IF a = 99 AND b = 20 THEN resAndFT := 1;
+    IF a = 99 AND b = 99 THEN resAndFF := 1;
+
+    COMMENT Boolean OR truth table;
+    IF a = 10 OR b = 20 THEN resOrTT := 1;
+    IF a = 10 OR b = 99 THEN resOrTF := 1;
+    IF a = 99 OR b = 20 THEN resOrFT := 1;
+    IF a = 99 OR b = 99 THEN resOrFF := 1;
+
+    COMMENT Binding priority: AND binds more tightly than OR;
+    COMMENT TRUE OR FALSE AND FALSE -> TRUE OR (FALSE AND FALSE) = TRUE
+    (would be FALSE if evaluated as (TRUE OR FALSE) AND FALSE);
+    IF a = 10 OR b = 99 AND c = 99 THEN
+        resPrec1 := 1;
+
+    COMMENT FALSE AND FALSE OR TRUE -> (FALSE AND FALSE) OR TRUE = TRUE;
+    IF a = 99 AND b = 99 OR c = 20 THEN
+        resPrec2 := 1;
+
+    COMMENT FALSE AND TRUE OR FALSE -> (FALSE AND TRUE) OR FALSE = FALSE;
+    IF a = 99 AND b = 20 OR c = 99 THEN
+        resPrec3 := 1;
+
+    COMMENT FALSE OR TRUE AND TRUE -> FALSE OR (TRUE AND TRUE) = TRUE;
+    IF a = 99 OR b = 20 AND c = 20 THEN
+        resPrec4 := 1;
+
+    COMMENT TRUE AND FALSE OR FALSE AND TRUE -> (TRUE AND FALSE) OR (FALSE AND TRUE) = FALSE;
+    IF a = 10 AND b = 99 OR c = 99 AND d = 30 THEN
+        resPrec5 := 1;
+
+    COMMENT FALSE AND TRUE OR TRUE AND TRUE -> (FALSE AND TRUE) OR (TRUE AND TRUE) = TRUE;
+    IF a = 99 AND b = 20 OR c = 20 AND d = 30 THEN
+        resPrec6 := 1;
+
+    COMMENT Arithmetic simple expressions in comparisons connected by OR and AND;
+    IF a + b = d OR d - a <> b AND a * 2 = b THEN
+        resArithCond := 1;
+
+END

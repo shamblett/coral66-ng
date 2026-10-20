@@ -273,7 +273,8 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
         std::vector<llvm::GenericValue> noArgs;
         ee->runFunction(mainFunc, noArgs);
 
-        auto getGlobalInt = [&](const char* name) -> int32_t {
+        auto getGlobalInt = [&](const char* name) -> int32_t
+        {
             auto addr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress(name));
             REQUIRE(addr != nullptr);
             return *addr;
@@ -387,6 +388,99 @@ TEST_CASE("Section 6", "[Compliance][Section-6]")
 
         variable = *static_cast<float*>(variableAddress);
         CHECK(variable == 20.0f);
+
+        // Clean up
+        delete ee;
+    }
+
+    /// 6.2.1 - A condition is made up of arithmetic comparisons connected by Boolean
+    /// operators OR and AND, of which AND is the more tightly binding.
+    SECTION("6-2")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-6/6-2.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        // Code Generation
+        llvm::LLVMContext context;
+        auto module = std::make_unique<llvm::Module>("sixtwo", context);
+        REQUIRE(module.get() != nullptr); // Needs to be REQUIRE
+
+        coral66::cgllvm::Options codegenOptions;
+        auto targetMachine = coral66::cgllvm::generateLLVM(*module, parsed, program, codegenOptions);
+
+        CHECK_FALSE(llvm::verifyModule(*module, &llvm::errs()));
+
+        // JIT Execution
+        std::string errStr;
+        llvm::ExecutionEngine* ee =
+            llvm::EngineBuilder(std::move(module)).setErrorStr(&errStr).setEngineKind(llvm::EngineKind::JIT).create();
+        REQUIRE(ee != nullptr); // Needs to be REQUIRE
+
+        // Ensure all globals are allocated and JIT compilation is done before running
+        ee->finalizeObject();
+
+        llvm::Function* mainFunc = ee->FindFunctionNamed("main");
+        REQUIRE(mainFunc != nullptr); // Needs to be REQUIRE
+
+        std::vector<llvm::GenericValue> noArgs;
+        ee->runFunction(mainFunc, noArgs);
+
+        auto getGlobalInt = [&](const char* name) -> int32_t
+        {
+            auto addr = reinterpret_cast<int32_t*>(ee->getGlobalValueAddress(name));
+            REQUIRE(addr != nullptr);
+            return *addr;
+        };
+
+        // Arithmetic comparators (<, <=, =, >=, >, <>)
+        CHECK(getGlobalInt("resCompAll") == 1);
+        CHECK(getGlobalInt("resFloatComp") == 1);
+
+        // Boolean AND truth table
+        CHECK(getGlobalInt("resAndTT") == 1);
+        CHECK(getGlobalInt("resAndTF") == 0);
+        CHECK(getGlobalInt("resAndFT") == 0);
+        CHECK(getGlobalInt("resAndFF") == 0);
+
+        // Boolean OR truth table
+        CHECK(getGlobalInt("resOrTT") == 1);
+        CHECK(getGlobalInt("resOrTF") == 1);
+        CHECK(getGlobalInt("resOrFT") == 1);
+        CHECK(getGlobalInt("resOrFF") == 0);
+
+        // Binding priority: AND binds more tightly than OR
+        CHECK(getGlobalInt("resPrec1") == 1); // TRUE OR (FALSE AND FALSE) = TRUE
+        CHECK(getGlobalInt("resPrec2") == 1); // (FALSE AND FALSE) OR TRUE = TRUE
+        CHECK(getGlobalInt("resPrec3") == 0); // (FALSE AND TRUE) OR FALSE = FALSE
+        CHECK(getGlobalInt("resPrec4") == 1); // FALSE OR (TRUE AND TRUE) = TRUE
+        CHECK(getGlobalInt("resPrec5") == 0); // (TRUE AND FALSE) OR (FALSE AND TRUE) = FALSE
+        CHECK(getGlobalInt("resPrec6") == 1); // (FALSE AND TRUE) OR (TRUE AND TRUE) = TRUE
+        CHECK(getGlobalInt("resArithCond") == 1);
 
         // Clean up
         delete ee;
