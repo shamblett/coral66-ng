@@ -342,6 +342,26 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
 void CodeGenerator::visit(const semantics::Declaration& declaration)
 {
     // Only process global declarations here.
+    if (dynamic_cast<const syntax::ParameterDeclaration*>(declaration.getAstNode()) != nullptr)
+    {
+        if (auto* var = dynamic_cast<const semantics::VariableDeclaration*>(&declaration))
+        {
+            if (var->getType().is<semantics::ProcedureType>())
+            {
+                return;
+            }
+        }
+        for (const auto& global : m_program.getGlobals())
+        {
+            if (const auto* proc = global->tryAs<semantics::ProcedureDeclaration>())
+            {
+                if (proc->getMangledName() == declaration.getMangledName())
+                {
+                    return;
+                }
+            }
+        }
+    }
 
     if (auto* var = dynamic_cast<const semantics::VariableDeclaration*>(&declaration))
     {
@@ -371,6 +391,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(var->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(var->getMangledName());
+            if (!globalVar)
+                return;
             if (declaration.getCommunicatorType() == semantics::CommunicatorType::External
                 || declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
@@ -434,6 +456,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(arr->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(arr->getMangledName());
+            if (!globalVar)
+                return;
             if (declaration.getCommunicatorType() == semantics::CommunicatorType::External
                 || declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {
@@ -509,6 +533,8 @@ void CodeGenerator::visit(const semantics::Declaration& declaration)
         {
             m_module.getOrInsertGlobal(tab->getMangledName(), llvmType);
             llvm::GlobalVariable* globalVar = m_module.getNamedGlobal(tab->getMangledName());
+            if (!globalVar)
+                return;
             if (declaration.getCommunicatorType() == semantics::CommunicatorType::External
                 || declaration.getCommunicatorType() == semantics::CommunicatorType::Library)
             {

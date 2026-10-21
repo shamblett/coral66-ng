@@ -59,10 +59,10 @@ TEST_CASE("Section 8", "[Compliance][Section-8]")
 
         auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
         CHECK_FALSE(errors);
-        std::cout << ss.str() << std::endl;
 
         auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
         CHECK_FALSE(errors);
+        std::cout << ss.str() << std::endl;
 
         // Code Generation
         llvm::LLVMContext context;
@@ -97,6 +97,14 @@ TEST_CASE("Section 8", "[Compliance][Section-8]")
 
         // Dereference to get the actual value
         int32_t variable = *static_cast<int32_t*>(variableAddress);
+        REQUIRE(variable == 1);
+
+        // count1
+        variableAddress = reinterpret_cast<void*>(ee->getGlobalValueAddress("count1"));
+        REQUIRE(variableAddress != nullptr);
+
+        // Dereference to get the actual value
+        variable = *static_cast<int32_t*>(variableAddress);
         REQUIRE(variable == 1);
 
         // Clean up
