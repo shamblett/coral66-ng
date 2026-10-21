@@ -18,7 +18,7 @@
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
-#include "llvm/IR/DataLayout.h"
+#include "lib/frontend/semantics/semantic_support.hpp"
 #include "test/common/test_config.hpp"
 #include "test/compliance/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"
@@ -109,5 +109,41 @@ TEST_CASE("Section 8", "[Compliance][Section-8]")
 
         // Clean up
         delete ee;
+    }
+
+    /// A formal VALUE parameter may subsequently be used for working space in the body;
+    /// if the actual parameter is a variable, its value will be unaffected by assignments to
+    /// the formal parameter.
+    SECTION("8-2")
+    {
+        // Initialize LLVM Native Target for JIT Execution
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        auto sourcePath = getTestDataPath("section-8/8-2.cor", "COMPLIANCE_DATA_DIR");
+        auto source = readFile(sourcePath);
+        CHECK_FALSE(source.empty());
+
+        std::string reporterString;
+        llvm::raw_string_ostream ss(reporterString);
+
+        // Frontend passes
+        bool errors = false;
+        auto ppTokens = coral66::lexer::tokenize(source, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        ppTokens = coral66::pp::preprocess(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto cTokens = coral66::lexer::toCTokens(std::move(ppTokens), &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto parsed = coral66::parser::parseProgram(cTokens, &ss, &errors);
+        CHECK_FALSE(errors);
+
+        auto program = coral66::semantics::analyse(parsed, std::move(cTokens), &ss, &errors);
+        CHECK(errors);
+        CHECK(coral66::semantics::DiagnosticCollector::getDiagnostics().size() == 1);
+        CHECK(coral66::semantics::DiagnosticCollector::findDiagnostic(CANNOT_ASSIGN_TO_CONST));
     }
 }

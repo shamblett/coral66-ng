@@ -1,0 +1,17 @@
+PROGRAM EIGHTTWO
+COMMENT Procedure parameter passing and evaluation, value parameters;
+
+BEGIN
+
+    INTEGER count := 0;
+    INTEGER param := 1;
+
+    PROCEDURE incrementCount(VALUE INTEGER increment)
+    BEGIN
+       increment := increment + 1;
+       count := increment;
+    END;
+
+    COMMENT Value parameters cannot be changed in the procedure;
+    incrementCount(param);
+END
