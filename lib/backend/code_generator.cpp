@@ -375,6 +375,18 @@ llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
 
 void CodeGenerator::visit(const syntax::Program& program)
 {
+    for (const auto& usable : m_program.getGlobals())
+    {
+        if (const auto* varDecl = usable->tryAs<semantics::VariableDeclaration>())
+        {
+            if (varDecl->getType().is<semantics::LabelType>() || varDecl->getType().is<semantics::SwitchType>())
+            {
+                getNonLocalGotoTargetGlobal();
+                break;
+            }
+        }
+    }
+
     // Generate code for all top-level procedures
     for (const auto& global : m_program.getGlobals())
     {

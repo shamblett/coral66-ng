@@ -321,6 +321,18 @@ void ControlFlowPass::visit(const syntax::ArrayAccessExpression& node)
                     }
                 }
             }
+            else if (const auto* sw = usable->tryAs<SwitchDeclaration>(); sw && node.getIndices().size() == 1)
+            {
+                if (const auto constIdx = evaluateConstantInteger(*node.getIndices()[0]))
+                {
+                    if (*constIdx < 1 || *constIdx > static_cast<std::int64_t>(sw->getLabels().size()))
+                    {
+                        m_context.log(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS.args(
+                            *node.getIndices()[0]->begin(), m_context.source, *node.getIndices()[0]->begin()));
+                        DiagnosticCollector::addDiagnostic(errors::semantics::SWITCH_INDEX_OUT_OF_BOUNDS);
+                    }
+                }
+            }
         }
     }
 }

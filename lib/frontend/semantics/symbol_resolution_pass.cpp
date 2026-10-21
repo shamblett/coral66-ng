@@ -670,6 +670,7 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
     auto id = node.getIdentifier();
 
     std::vector<const LabelStatement*> switchLabels;
+    std::vector<const LabelDeclaration*> switchLabelDecls;
 
     for (const auto& labelToken : node.getLabels())
     {
@@ -686,14 +687,14 @@ void SymbolResolutionPass::visit(const syntax::SwitchDeclaration& node)
         }
         else
         {
-            // We cast the usable directly; true node links are handled if we needed them, but we only strictly need
-            // size later
             switchLabels.push_back(nullptr);
+            switchLabelDecls.push_back(&usable->as<LabelDeclaration>());
         }
     }
 
-    // We store the array of null pointers just so the size() correctly evaluates to the length of the switch later on
-    auto declaration = makeIntrusiveVariant<SwitchDeclaration>(id, std::move(switchLabels));
+    auto declaration =
+        makeIntrusiveVariant<SwitchDeclaration>(id, std::move(switchLabels), std::move(switchLabelDecls));
+    declaration->setAstNode(&node);
     const auto& name = std::get<std::string>(id->getValue());
 
     if (m_context.symbolTable.lookupInCurrentScope(name))

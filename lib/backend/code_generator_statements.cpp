@@ -444,16 +444,14 @@ void CodeGenerator::visit(const syntax::GotoStatement& statement)
                 llvm::BasicBlock* defaultBB =
                     llvm::BasicBlock::Create(m_module.getContext(), "switch.default", m_currentFunction);
 
-                auto& switchLabels = switchDeclaration->getLabels();
+                auto& switchLabels = switchDeclaration->getLabelDeclarations();
                 llvm::SwitchInst* switchInst = m_builder.CreateSwitch(indexVal, defaultBB, switchLabels.size());
 
                 for (size_t i = 0; i < switchLabels.size(); ++i)
                 {
                     if (switchLabels[i])
                     {
-                        const auto& targetLabelNameToken = switchLabels[i]->getName();
-
-                        if (const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
+                        if (const std::string targetLabelName(switchLabels[i]->getName());
                             m_namedLabels.contains(targetLabelName))
                         {
                             llvm::BasicBlock* targetBB = m_namedLabels[targetLabelName];
@@ -479,28 +477,7 @@ void CodeGenerator::visit(const syntax::GotoStatement& statement)
                 {
                     llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
                     llvm::Value* blockAddr = m_builder.CreateLoad(ptrType, ptrAddr, "label_param_load");
-
-                    llvm::IndirectBrInst* indirectBr =
-                        m_builder.CreateIndirectBr(blockAddr, std::max(static_cast<size_t>(1), m_namedLabels.size()));
-                    if (m_namedLabels.empty())
-                    {
-                        llvm::BasicBlock* dummyBB =
-                            llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
-                        indirectBr->addDestination(dummyBB);
-
-                        // We also need to add a terminator to the dummy block to keep LLVM IR valid
-                        llvm::BasicBlock* currentInsertBlock = m_builder.GetInsertBlock();
-                        m_builder.SetInsertPoint(dummyBB);
-                        m_builder.CreateUnreachable();
-                        m_builder.SetInsertPoint(currentInsertBlock);
-                    }
-                    else
-                    {
-                        for (const auto& bb : m_namedLabels | std::views::values)
-                        {
-                            indirectBr->addDestination(bb);
-                        }
-                    }
+                    emitNonLocalGoto(blockAddr);
                 }
             }
             else if (varDeclaration->getType().is<semantics::SwitchType>())
@@ -532,32 +509,94 @@ void CodeGenerator::visit(const syntax::GotoStatement& statement)
                             llvm::Value* blockAddr =
                                 m_builder.CreateLoad(ptrType, targetBlockPtrAddr, "switch_target_load");
 
-                            llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(
-                                blockAddr, std::max(static_cast<size_t>(1), m_namedLabels.size()));
-                            if (m_namedLabels.empty())
-                            {
-                                llvm::BasicBlock* dummyBB =
-                                    llvm::BasicBlock::Create(m_module.getContext(), "dummy_dest", m_currentFunction);
-                                indirectBr->addDestination(dummyBB);
-
-                                llvm::BasicBlock* currentInsertBlock = m_builder.GetInsertBlock();
-                                m_builder.SetInsertPoint(dummyBB);
-                                m_builder.CreateUnreachable();
-                                m_builder.SetInsertPoint(currentInsertBlock);
-                            }
-                            else
-                            {
-                                for (const auto& bb : m_namedLabels | std::views::values)
-                                {
-                                    indirectBr->addDestination(bb);
-                                }
-                            }
+                            emitNonLocalGoto(blockAddr);
                         }
                     }
                 }
             }
         }
     }
+}
+
+llvm::GlobalVariable* CodeGenerator::getNonLocalGotoTargetGlobal()
+{
+    if (llvm::GlobalVariable* gv = m_module.getNamedGlobal("__c66_nonlocal_goto_target"))
+        return gv;
+    auto* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+    return new llvm::GlobalVariable(m_module, ptrType, false, llvm::GlobalValue::InternalLinkage,
+                                    llvm::ConstantPointerNull::get(ptrType), "__c66_nonlocal_goto_target");
+}
+
+void CodeGenerator::emitNonLocalGoto(llvm::Value* blockAddr)
+{
+    llvm::GlobalVariable* targetGlobal = getNonLocalGotoTargetGlobal();
+    m_builder.CreateStore(blockAddr, targetGlobal);
+    llvm::Type* retType = m_currentFunction->getReturnType();
+    if (retType->isVoidTy())
+        m_builder.CreateRetVoid();
+    else
+        m_builder.CreateRet(llvm::Constant::getNullValue(retType));
+}
+
+void CodeGenerator::emitNonLocalGotoCheck()
+{
+    llvm::GlobalVariable* targetGlobal = m_module.getNamedGlobal("__c66_nonlocal_goto_target");
+    if (!targetGlobal)
+        return;
+
+    auto* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+    llvm::Value* target = m_builder.CreateLoad(ptrType, targetGlobal, "nonlocal_goto_target");
+    llvm::Value* isNonNull =
+        m_builder.CreateICmpNE(target, llvm::ConstantPointerNull::get(ptrType), "has_nonlocal_goto");
+
+    llvm::BasicBlock* dispatchBB =
+        llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.dispatch", m_currentFunction);
+    llvm::BasicBlock* contBB =
+        llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.cont", m_currentFunction);
+
+    m_builder.CreateCondBr(isNonNull, dispatchBB, contBB);
+    m_builder.SetInsertPoint(dispatchBB);
+
+    std::vector<llvm::BasicBlock*> uniqueLabels;
+    for (const auto& bb : m_namedLabels | std::views::values)
+    {
+        if (std::ranges::find(uniqueLabels, bb) == uniqueLabels.end())
+            uniqueLabels.push_back(bb);
+    }
+
+    if (!uniqueLabels.empty())
+    {
+        llvm::Value* isLocalTarget = llvm::ConstantInt::getFalse(m_module.getContext());
+        for (llvm::BasicBlock* bb : uniqueLabels)
+        {
+            llvm::Value* eq = m_builder.CreateICmpEQ(target, llvm::BlockAddress::get(m_currentFunction, bb));
+            isLocalTarget = m_builder.CreateOr(isLocalTarget, eq);
+        }
+
+        llvm::BasicBlock* localJumpBB =
+            llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.local", m_currentFunction);
+        llvm::BasicBlock* unwindBB =
+            llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.unwind", m_currentFunction);
+        m_builder.CreateCondBr(isLocalTarget, localJumpBB, unwindBB);
+
+        m_builder.SetInsertPoint(localJumpBB);
+        m_builder.CreateStore(llvm::ConstantPointerNull::get(ptrType), targetGlobal);
+        llvm::IndirectBrInst* indirectBr = m_builder.CreateIndirectBr(target, uniqueLabels.size());
+        for (llvm::BasicBlock* bb : uniqueLabels)
+        {
+            indirectBr->addDestination(bb);
+        }
+
+        m_builder.SetInsertPoint(unwindBB);
+    }
+
+    llvm::Type* retType = m_currentFunction->getReturnType();
+    if (retType->isVoidTy())
+        m_builder.CreateRetVoid();
+    else
+        m_builder.CreateRet(llvm::Constant::getNullValue(retType));
+
+    m_builder.SetInsertPoint(contBB);
 }
 
 void CodeGenerator::visit(const syntax::ForStatement& statement)

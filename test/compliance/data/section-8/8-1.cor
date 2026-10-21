@@ -5,6 +5,10 @@ BEGIN
 
     INTEGER count := 0;
     INTEGER count1 := 0;
+    INTEGER switchVal := 0;
+    INTEGER labelVal := 0;
+
+    SWITCH labels := lab1, lab2, lab3;
 
     PROCEDURE incrementCount
     BEGIN
@@ -26,11 +30,42 @@ BEGIN
        count1 := count1 + returnCount;
     END;
 
+    PROCEDURE switchTest(SWITCH theSwitch)
+    BEGIN
+       GOTO theSwitch[1];
+    END;
+
+    PROCEDURE labelTest(LABEL theLabel)
+    BEGIN
+       GOTO theLabel;
+    END;
 
     COMMENT Pass an untyped procedure to a procedure;
     doCount(incrementCount);
 
-    COMMENT Pass a types procedure to a procedure;
+    COMMENT Pass a typed procedure to a procedure;
     incrementCount1(returnCount);
+
+    COMMENT Pass a switch to a procedure;
+    switchTest(labels);
+
+    GOTO lab2;
+
+lab1:
+
+  switchVal := switchVal + 1;
+
+lab2:
+
+    COMMENT Pass a label to a procedure;
+    labelTest(lab3);
+
+    GOTO lab4;
+
+lab3:
+
+  labelVal := labelVal + 1;
+
+lab4:
 
 END

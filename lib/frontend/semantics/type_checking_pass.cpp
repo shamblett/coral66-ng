@@ -1202,6 +1202,18 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
             m_context.expressionTypes.insert_or_assign(&node,
                                                        IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         }
+        else if (usable->is<SwitchDeclaration>()
+                 || (usable->is<VariableDeclaration>()
+                     && usable->as<VariableDeclaration>().getType().is<SwitchType>()))
+        {
+            if (node.getIndices().size() != 1)
+            {
+                m_context.log(errors::semantics::INCORRECT_NUMBER_OF_INDICES.args(*node.begin(), m_context.source,
+                                                                                  *node.begin()));
+                DiagnosticCollector::addDiagnostic(errors::semantics::INCORRECT_NUMBER_OF_INDICES);
+            }
+            m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(LabelType{}));
+        }
         else
         {
             m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(ErrorType{}));

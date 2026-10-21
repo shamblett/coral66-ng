@@ -1089,12 +1089,15 @@ public:
 class SwitchDeclaration final : public Declaration
 {
     std::vector<const LabelStatement*> m_labels;
+    std::vector<const LabelDeclaration*> m_labelDeclarations;
     IntrusiveVariantValue<Type> m_type;
 
 public:
-    SwitchDeclaration(const lexer::CTokenIterator nameToken, std::vector<const LabelStatement*> labels)
+    SwitchDeclaration(const lexer::CTokenIterator nameToken, std::vector<const LabelStatement*> labels,
+                      std::vector<const LabelDeclaration*> labelDeclarations = {})
         : Declaration(std::in_place_type<SwitchDeclaration>, nameToken),
           m_labels(std::move(labels)),
+          m_labelDeclarations(std::move(labelDeclarations)),
           m_type(std::in_place_type<SwitchType>)
     {
     }
@@ -1105,6 +1108,10 @@ public:
     [[nodiscard]] const std::vector<const LabelStatement*>& getLabels() const
     {
         return m_labels;
+    }
+    [[nodiscard]] const std::vector<const LabelDeclaration*>& getLabelDeclarations() const
+    {
+        return m_labelDeclarations;
     }
     CORAL66_GEN_INTR_VAR_WARNING_FUNCS(SwitchDeclaration)
 };

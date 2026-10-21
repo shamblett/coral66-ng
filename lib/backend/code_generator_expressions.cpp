@@ -276,7 +276,11 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
                 ft = llvm::FunctionType::get(retType, params, false);
             }
             if (ft)
-                return m_builder.CreateCall(ft, funcVal, {});
+            {
+                llvm::Value* callRes = m_builder.CreateCall(ft, funcVal, {});
+                emitNonLocalGotoCheck();
+                return callRes;
+            }
             return nullptr;
         }
         if (auto* varDeclaration = declaration->tryAs<semantics::VariableDeclaration>())
@@ -293,7 +297,9 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
                     retType = convertType(*procType->getReturnType());
                 constexpr std::vector<llvm::Type*> params;
                 llvm::FunctionType* ft = llvm::FunctionType::get(retType, params, false);
-                return m_builder.CreateCall(ft, funcVal, {});
+                llvm::Value* callRes = m_builder.CreateCall(ft, funcVal, {});
+                emitNonLocalGotoCheck();
+                return callRes;
             }
         }
         if (declaration->is<semantics::LabelDeclaration>())
@@ -306,7 +312,7 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
         }
         else if (auto* switchDeclaration = declaration->tryAs<semantics::SwitchDeclaration>())
         {
-            auto& switchLabels = switchDeclaration->getLabels();
+            auto& switchLabels = switchDeclaration->getLabelDeclarations();
             llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
             llvm::ArrayType* arrType = llvm::ArrayType::get(ptrType, switchLabels.size());
 
@@ -316,8 +322,7 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
             {
                 if (switchLabels[i])
                 {
-                    const auto& targetLabelNameToken = switchLabels[i]->getName();
-                    if (const auto& targetLabelName = std::get<std::string>(targetLabelNameToken->getValue());
+                    if (const std::string targetLabelName(switchLabels[i]->getName());
                         m_namedLabels.contains(targetLabelName))
                     {
                         llvm::BlockAddress* blockAddr =
@@ -645,7 +650,9 @@ llvm::Value* CodeGenerator::visit(const syntax::FunctionCallExpression& expressi
                 // If it's something else (like an array value), we skip casting to avoid crashes.
             }
         }
-        return m_builder.CreateCall(ft, funcVal, args);
+        llvm::Value* callRes = m_builder.CreateCall(ft, funcVal, args);
+        emitNonLocalGotoCheck();
+        return callRes;
     }
     return nullptr;
 }
@@ -683,11 +690,90 @@ llvm::Value* CodeGenerator::visit(const syntax::PartWordExpression& expression)
 
 llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expression)
 {
+    const auto rit = m_program.getContext().resolvedIdentifiers.find(&expression);
+    if (rit != m_program.getContext().resolvedIdentifiers.end() && expression.getIndices().size() == 1)
+    {
+        if (auto* switchDeclaration = rit->second->tryAs<semantics::SwitchDeclaration>())
+        {
+            llvm::Value* indexVal = visit(*expression.getIndices()[0]);
+            if (!indexVal)
+                return nullptr;
+            if (!indexVal->getType()->isIntegerTy(32))
+                indexVal = m_builder.CreateIntCast(indexVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
+
+            const auto& switchLabels = switchDeclaration->getLabelDeclarations();
+            if (auto* constIdx = llvm::dyn_cast<llvm::ConstantInt>(indexVal))
+            {
+                const std::int64_t idx = constIdx->getSExtValue() - 1;
+                if (idx >= 0 && static_cast<std::size_t>(idx) < switchLabels.size() && switchLabels[idx])
+                {
+                    if (const std::string targetLabelName(switchLabels[idx]->getName());
+                        m_namedLabels.contains(targetLabelName))
+                    {
+                        return llvm::BlockAddress::get(m_currentFunction, m_namedLabels[targetLabelName]);
+                    }
+                }
+                return llvm::ConstantPointerNull::get(llvm::PointerType::getUnqual(m_module.getContext()));
+            }
+
+            llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+            llvm::ArrayType* arrType = llvm::ArrayType::get(ptrType, switchLabels.size());
+            llvm::AllocaInst* switchArray = m_builder.CreateAlloca(arrType, nullptr, "switch_array");
+
+            for (std::size_t i = 0; i < switchLabels.size(); ++i)
+            {
+                if (switchLabels[i])
+                {
+                    if (const std::string targetLabelName(switchLabels[i]->getName());
+                        m_namedLabels.contains(targetLabelName))
+                    {
+                        llvm::BlockAddress* blockAddr =
+                            llvm::BlockAddress::get(m_currentFunction, m_namedLabels[targetLabelName]);
+                        llvm::Value* indices[] = {
+                            llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
+                            llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), i)};
+                        llvm::Value* gep = m_builder.CreateGEP(arrType, switchArray, indices);
+                        m_builder.CreateStore(blockAddr, gep);
+                    }
+                }
+            }
+
+            llvm::Value* zeroIdx = m_builder.CreateSub(
+                indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
+            llvm::Value* indices[] = {llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
+                                      zeroIdx};
+            llvm::Value* elemPtr = m_builder.CreateGEP(arrType, switchArray, indices, "switch_elem_gep");
+            return m_builder.CreateLoad(ptrType, elemPtr, "switch_elem_load");
+        }
+        if (auto* varDeclaration = rit->second->tryAs<semantics::VariableDeclaration>();
+            varDeclaration && varDeclaration->getType().is<semantics::SwitchType>())
+        {
+            llvm::Value* ptrAddr = m_locals.contains(varDeclaration) ? m_locals[varDeclaration] : nullptr;
+            if (!ptrAddr && m_globals.contains(varDeclaration))
+                ptrAddr = m_globals[varDeclaration];
+            if (!ptrAddr)
+                return nullptr;
+
+            llvm::Value* indexVal = visit(*expression.getIndices()[0]);
+            if (!indexVal)
+                return nullptr;
+            if (!indexVal->getType()->isIntegerTy(32))
+                indexVal = m_builder.CreateIntCast(indexVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
+            indexVal = m_builder.CreateSub(
+                indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
+
+            llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
+            llvm::Value* switchArrayPtr = m_builder.CreateLoad(ptrType, ptrAddr, "switch_array_load");
+            llvm::Value* targetBlockPtrAddr =
+                m_builder.CreateGEP(ptrType, switchArrayPtr, indexVal, "switch_target_gep");
+            return m_builder.CreateLoad(ptrType, targetBlockPtrAddr, "switch_target_load");
+        }
+    }
+
     llvm::Value* addr = emitAddress(expression);
     if (!addr)
         return nullptr;
 
-    const auto rit = m_program.getContext().resolvedIdentifiers.find(&expression);
     llvm::Type* type = llvm::Type::getInt32Ty(m_module.getContext());
     const semantics::TableElementDeclaration* tableElem = nullptr;
 

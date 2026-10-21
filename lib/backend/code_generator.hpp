@@ -106,6 +106,10 @@ private:
                            const syntax::ProcedureDeclaration& astNode);
 
     llvm::Value* processFixedBinaryExpression(const syntax::BinaryExpression& expression);
+
+    llvm::GlobalVariable* getNonLocalGotoTargetGlobal();
+    void emitNonLocalGoto(llvm::Value* blockAddr);
+    void emitNonLocalGotoCheck();
 };
 
 } // namespace coral66::cgllvm
