@@ -185,18 +185,64 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                      || type == lexer::TokenType::FloatingKeyword || type == lexer::TokenType::BitsKeyword
                      || type == lexer::TokenType::BitKeyword || type == lexer::TokenType::FixedKeyword)
             {
-                if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
+                auto rollbackParam = begin;
+                auto paramTypeToken = begin;
+                begin++;
+                std::pair<std::unique_ptr<syntax::Expression>, std::unique_ptr<syntax::Expression>> fixedScale;
+                if (type == lexer::TokenType::FixedKeyword)
                 {
-                    for (auto& d : declarations)
-                        parameters.push_back(std::move(d));
+                    fixedScale = parseFixedFormat(begin, end, context);
+                }
+                if (begin != end && begin->getTokenType() == lexer::TokenType::ProcedureKeyword)
+                {
+                    begin++;
+                    std::vector<lexer::CTokenIterator> ids;
+                    while (begin != end && begin->getTokenType() == lexer::TokenType::Identifier)
+                    {
+                        ids.push_back(begin);
+                        begin++;
+                        if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                        {
+                            int depth = 1;
+                            begin++;
+                            while (begin != end && depth > 0)
+                            {
+                                if (begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                                    depth++;
+                                else if (begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                                    depth--;
+                                begin++;
+                            }
+                        }
+                        if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
+                        {
+                            begin++;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    parameters.push_back(std::make_unique<syntax::ParameterDeclaration>(
+                        rollbackParam, begin, syntax::ParameterDeclaration::ParameterMode::Procedure, paramTypeToken,
+                        std::move(ids), std::move(fixedScale.first), std::move(fixedScale.second)));
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? end - 1 : begin),
-                                                                          context.getSourceInterface(),
-                                                                          *(begin == end ? end - 1 : begin)));
-                    DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
-                    return std::nullopt;
+                    begin = rollbackParam;
+                    if (auto declarations = parseDeclaration(begin, end, context); !declarations.empty())
+                    {
+                        for (auto& d : declarations)
+                            parameters.push_back(std::move(d));
+                    }
+                    else
+                    {
+                        context.log(errors::parser::EXPECTED_DECLARATION.args(*(begin == end ? end - 1 : begin),
+                                                                              context.getSourceInterface(),
+                                                                              *(begin == end ? end - 1 : begin)));
+                        DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_DECLARATION);
+                        return std::nullopt;
+                    }
                 }
             }
             else
@@ -225,6 +271,7 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                      && begin->getTokenType() != lexer::TokenType::LocationKeyword
                      && begin->getTokenType() != lexer::TokenType::LabelKeyword
                      && begin->getTokenType() != lexer::TokenType::SwitchKeyword
+                     && begin->getTokenType() != lexer::TokenType::ProcedureKeyword
                      && begin->getTokenType() != lexer::TokenType::IntegerKeyword
                      && begin->getTokenType() != lexer::TokenType::PointerKeyword
                      && begin->getTokenType() != lexer::TokenType::FloatingKeyword

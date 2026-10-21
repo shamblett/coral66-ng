@@ -130,16 +130,21 @@ bool OverlayType::equalsImpl(const OverlayType& rhs) const
 // ProcedureType
 bool ProcedureType::equalsImpl([[maybe_unused]] const ProcedureType& rhs) const
 {
-    if (*m_returnType != *rhs.m_returnType)
+    if ((m_returnType == nullptr) != (rhs.m_returnType == nullptr))
         return false;
-    if (m_parameters.size() != rhs.m_parameters.size())
+    if (m_returnType && rhs.m_returnType && *m_returnType != *rhs.m_returnType)
         return false;
-    for (size_t i = 0; i < m_parameters.size(); ++i)
+    if (!m_parameters.empty() && !rhs.m_parameters.empty())
     {
-        if (*m_parameters[i].type != *rhs.m_parameters[i].type)
+        if (m_parameters.size() != rhs.m_parameters.size())
             return false;
-        if (m_parameters[i].isValue != rhs.m_parameters[i].isValue)
-            return false;
+        for (size_t i = 0; i < m_parameters.size(); ++i)
+        {
+            if (*m_parameters[i].type != *rhs.m_parameters[i].type)
+                return false;
+            if (m_parameters[i].isValue != rhs.m_parameters[i].isValue)
+                return false;
+        }
     }
     return true;
 }

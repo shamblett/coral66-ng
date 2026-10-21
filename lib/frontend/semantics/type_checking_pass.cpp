@@ -1089,10 +1089,40 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                         m_context.expressionTypes.insert_or_assign(&node,
                                                                    IntrusiveVariantValue(PrimitiveType{p->getKind()}));
                     }
+                    else if (const auto f = procType->getReturnType()->tryAs<FixedType>())
+                    {
+                        m_context.expressionTypes.insert_or_assign(
+                            &node, IntrusiveVariantValue(FixedType{f->getTotalBits(), f->getFractionalBits()}));
+                    }
                     else
                     {
                         m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
                     }
+                }
+                else
+                {
+                    m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
+                }
+            }
+            else
+            {
+                m_context.expressionTypes.insert_or_assign(&node, IntrusiveVariantValue(UntypedType{}));
+            }
+        }
+        else if (auto* var = usable->tryAs<VariableDeclaration>(); var && var->getType().is<ProcedureType>())
+        {
+            const auto* procType = var->getType().tryAs<ProcedureType>();
+            if (procType && procType->getReturnType())
+            {
+                if (const auto p = procType->getReturnType()->tryAs<PrimitiveType>())
+                {
+                    m_context.expressionTypes.insert_or_assign(&node,
+                                                               IntrusiveVariantValue(PrimitiveType{p->getKind()}));
+                }
+                else if (const auto f = procType->getReturnType()->tryAs<FixedType>())
+                {
+                    m_context.expressionTypes.insert_or_assign(
+                        &node, IntrusiveVariantValue(FixedType{f->getTotalBits(), f->getFractionalBits()}));
                 }
                 else
                 {

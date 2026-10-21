@@ -356,7 +356,7 @@ llvm::Type* CodeGenerator::convertType(const semantics::Type& type)
             baseType = llvm::Type::getVoidTy(ctx);
         }
     }
-    else if (type.is<semantics::LabelType>() || type.is<semantics::SwitchType>())
+    else if (type.is<semantics::LabelType>() || type.is<semantics::SwitchType>() || type.is<semantics::ProcedureType>())
     {
         baseType = llvm::PointerType::getUnqual(ctx);
     }

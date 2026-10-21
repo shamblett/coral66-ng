@@ -1,0 +1,20 @@
+PROGRAM EIGHTONE
+COMMENT Procedure parameter passing and evaluation;
+
+BEGIN
+
+    INTEGER count := 0;
+
+    PROCEDURE incrementCount
+    BEGIN
+      count := count + 1;
+    END;
+
+    PROCEDURE doCount(PROCEDURE proc)
+    BEGIN
+      proc;
+    END;
+
+    doCount(incrementCount);
+
+END

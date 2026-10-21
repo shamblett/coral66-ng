@@ -279,6 +279,23 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
                 return m_builder.CreateCall(ft, funcVal, {});
             return nullptr;
         }
+        if (auto* varDeclaration = declaration->tryAs<semantics::VariableDeclaration>())
+        {
+            if (const auto* procType = varDeclaration->getType().tryAs<semantics::ProcedureType>())
+            {
+                llvm::Value* addr = emitAddress(expression);
+                if (!addr)
+                    return nullptr;
+                llvm::Value* funcVal = m_builder.CreateLoad(llvm::PointerType::getUnqual(m_module.getContext()), addr,
+                                                            "proc_param_load");
+                llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
+                if (procType->getReturnType())
+                    retType = convertType(*procType->getReturnType());
+                constexpr std::vector<llvm::Type*> params;
+                llvm::FunctionType* ft = llvm::FunctionType::get(retType, params, false);
+                return m_builder.CreateCall(ft, funcVal, {});
+            }
+        }
         if (declaration->is<semantics::LabelDeclaration>())
         {
             if (const auto& labelName = std::get<std::string>(expression.getIdentifier()->getValue());
@@ -512,6 +529,11 @@ llvm::Value* CodeGenerator::visit(const syntax::FunctionCallExpression& expressi
 
     const auto* declaration = it->second;
     llvm::Value* funcVal = m_globals.contains(declaration) ? m_globals[declaration] : nullptr;
+    if (!funcVal && m_locals.contains(declaration))
+    {
+        funcVal = m_builder.CreateLoad(llvm::PointerType::getUnqual(m_module.getContext()), m_locals[declaration],
+                                       "proc_param_load");
+    }
     if (!funcVal)
         return nullptr;
 
@@ -534,6 +556,10 @@ llvm::Value* CodeGenerator::visit(const syntax::FunctionCallExpression& expressi
             ft = llvm::FunctionType::get(retType, params, false);
         }
     }
+    else if (auto* varDeclaration = declaration->tryAs<semantics::VariableDeclaration>())
+    {
+        procType = varDeclaration->getType().tryAs<semantics::ProcedureType>();
+    }
 
     size_t i = 0;
     for (const auto& arg : expression.getArguments())
@@ -547,11 +573,53 @@ llvm::Value* CodeGenerator::visit(const syntax::FunctionCallExpression& expressi
                 addr = visit(*arg); // Fallback
             args.push_back(addr);
         }
+        else if (procType && i < procType->getParameters().size()
+                 && procType->getParameters()[i].type->is<semantics::ProcedureType>())
+        {
+            llvm::Value* procArg = nullptr;
+            if (auto* idExpr = dynamic_cast<const syntax::IdentifierExpression*>(arg.get()))
+            {
+                if (const auto argIt = m_program.getContext().resolvedIdentifiers.find(idExpr);
+                    argIt != m_program.getContext().resolvedIdentifiers.end())
+                {
+                    if (argIt->second->is<semantics::ProcedureDeclaration>())
+                    {
+                        procArg = m_globals.contains(argIt->second) ? m_globals[argIt->second] : nullptr;
+                    }
+                    else if (argIt->second->is<semantics::VariableDeclaration>())
+                    {
+                        if (llvm::Value* addr = emitAddress(*arg))
+                        {
+                            procArg = m_builder.CreateLoad(llvm::PointerType::getUnqual(m_module.getContext()), addr,
+                                                           "proc_param_forward");
+                        }
+                    }
+                }
+            }
+            if (!procArg)
+                procArg = visit(*arg);
+            args.push_back(procArg);
+        }
         else
         {
             args.push_back(visit(*arg));
         }
         i++;
+    }
+
+    if (!ft && procType)
+    {
+        llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
+        if (procType->getReturnType())
+            retType = convertType(*procType->getReturnType());
+        std::vector<llvm::Type*> params;
+        for (auto* a : args)
+        {
+            if (!a)
+                return nullptr;
+            params.push_back(a->getType());
+        }
+        ft = llvm::FunctionType::get(retType, params, false);
     }
 
     if (ft)

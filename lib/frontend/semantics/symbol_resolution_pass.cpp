@@ -1110,7 +1110,8 @@ void SymbolResolutionPass::visit(const syntax::ParameterDeclaration& node)
                 const Type* procReturnType = nullptr;
                 if (node.getType())
                 {
-                    m_context.ownedTypes.push_back(createTypeFromToken(node.getType()));
+                    m_context.ownedTypes.push_back(createTypeFromToken(
+                        node.getType(), node.getFixedTotalBits(), node.getFixedFractionBits()));
                     procReturnType = m_context.ownedTypes.back().data();
                 }
                 typeCopy = IntrusiveVariantValue(ProcedureType{procReturnType, {}});
