@@ -1,0 +1,21 @@
+PROGRAM EIGHTTHREE
+COMMENT Procedure parameter passing and evaluation - Tables;
+
+BEGIN
+
+    TABLE param[3,1] [
+       param1 INTEGER 0;
+       param2 INTEGER 1;
+       param3 INTEGER 2
+    ];
+
+    COMMENT Only pass the fields we use;
+    PROCEDURE updateTable(TABLE p[3,1] [ p1 INTEGER 0; p3 INTEGER 2 ])
+    BEGIN
+      p1[0] := 10;
+      p3[0] := 20;
+    END;
+
+    updateTable(param);
+
+END

@@ -277,7 +277,9 @@ std::optional<std::vector<std::unique_ptr<syntax::Declaration>>>
                      && begin->getTokenType() != lexer::TokenType::FloatingKeyword
                      && begin->getTokenType() != lexer::TokenType::BitsKeyword
                      && begin->getTokenType() != lexer::TokenType::BitKeyword
-                     && begin->getTokenType() != lexer::TokenType::FixedKeyword)
+                     && begin->getTokenType() != lexer::TokenType::FixedKeyword
+                     && begin->getTokenType() != lexer::TokenType::ArrayKeyword
+                     && begin->getTokenType() != lexer::TokenType::TableKeyword)
                 begin++;
         }
         if (begin != end)

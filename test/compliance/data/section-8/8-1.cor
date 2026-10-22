@@ -1,5 +1,5 @@
 PROGRAM EIGHTONE
-COMMENT Procedure parameter passing and evaluation;
+COMMENT Procedure parameter passing and evaluation Labels, Switches, Procedures;
 
 BEGIN
 

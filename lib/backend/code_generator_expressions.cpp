@@ -571,7 +571,8 @@ llvm::Value* CodeGenerator::visit(const syntax::FunctionCallExpression& expressi
     {
         if (procType && i < procType->getParameters().size()
             && (procType->getParameters()[i].type->isLocation()
-                || procType->getParameters()[i].type->tryAs<semantics::ArrayType>()))
+                || procType->getParameters()[i].type->tryAs<semantics::ArrayType>()
+                || procType->getParameters()[i].type->tryAs<semantics::TableType>()))
         {
             llvm::Value* addr = emitAddress(*arg);
             if (!addr)

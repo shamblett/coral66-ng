@@ -860,6 +860,32 @@ void SymbolResolutionPass::visit(const syntax::ProcedureDeclaration& node)
                     {.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = false});
             }
         }
+        else if (auto* tableNode = dynamic_cast<const syntax::TableDeclaration*>(paramDeclarationNode.get()))
+        {
+            std::uint64_t widthVal = 0;
+            std::uint64_t lengthVal = 0;
+            if (tableNode->getWidth())
+            {
+                if (const auto w = evaluateConstantInteger(*tableNode->getWidth()))
+                    widthVal = static_cast<std::uint64_t>(*w);
+            }
+            if (tableNode->getLength())
+            {
+                if (const auto l = evaluateConstantInteger(*tableNode->getLength()))
+                    lengthVal = static_cast<std::uint64_t>(*l);
+            }
+
+            const auto paramId = tableNode->getIdentifier();
+            m_context.ownedTableInfos.push_back(TableInfo{.name = std::get<std::string>(paramId->getValue()),
+                                                          .id = 0,
+                                                          .type = TableDefinition{{}, widthVal, lengthVal}});
+
+            m_context.ownedTypes.emplace_back(TableType{m_context.ownedTableInfos.back(), Type::Location});
+            const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+            parameters.push_back(
+                {.type = finalParamTypePtr, .name = std::get<std::string>(paramId->getValue()), .isValue = false});
+        }
     }
 
     auto typeCopy = IntrusiveVariantValue(ProcedureType{returnTypePtr, std::move(parameters)});
@@ -995,6 +1021,43 @@ void SymbolResolutionPass::visit(const syntax::ProcedureSpecification& node)
 
             for (size_t i = 0; i < varNode->getIdentifiers().size(); ++i)
                 parameters.push_back({.type = m_context.ownedTypes.back().data(), .name = "", .isValue = false});
+        }
+        else if (auto* arrayNode = dynamic_cast<const syntax::ArrayDeclaration*>(paramDeclarationNode.get()))
+        {
+            auto baseTypeVal = createTypeFromToken(arrayNode->getType());
+            m_context.ownedTypes.push_back(std::move(baseTypeVal));
+            const Type* baseTypePtr = m_context.ownedTypes.back().data();
+
+            m_context.ownedTypes.emplace_back(ArrayType{baseTypePtr, {}});
+            const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+            for (size_t i = 0; i < arrayNode->getIdentifiers().size(); ++i)
+                parameters.push_back({.type = finalParamTypePtr, .name = "", .isValue = false});
+        }
+        else if (auto* tableNode = dynamic_cast<const syntax::TableDeclaration*>(paramDeclarationNode.get()))
+        {
+            std::uint64_t widthVal = 0;
+            std::uint64_t lengthVal = 0;
+            if (tableNode->getWidth())
+            {
+                if (const auto w = evaluateConstantInteger(*tableNode->getWidth()))
+                    widthVal = static_cast<std::uint64_t>(*w);
+            }
+            if (tableNode->getLength())
+            {
+                if (const auto l = evaluateConstantInteger(*tableNode->getLength()))
+                    lengthVal = static_cast<std::uint64_t>(*l);
+            }
+
+            const auto paramId = tableNode->getIdentifier();
+            m_context.ownedTableInfos.push_back(TableInfo{.name = std::get<std::string>(paramId->getValue()),
+                                                          .id = 0,
+                                                          .type = TableDefinition{{}, widthVal, lengthVal}});
+
+            m_context.ownedTypes.emplace_back(TableType{m_context.ownedTableInfos.back(), Type::Location});
+            const Type* finalParamTypePtr = m_context.ownedTypes.back().data();
+
+            parameters.push_back({.type = finalParamTypePtr, .name = "", .isValue = false});
         }
     }
 

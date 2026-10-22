@@ -1055,6 +1055,20 @@ void TypeCheckingPass::visit(const syntax::FunctionCallExpression& node)
                                     }
                                 }
 
+                                if (auto* paramTab = param.type->tryAs<TableType>())
+                                {
+                                    if (const auto* argTab = itArg->second->tryAs<TableType>())
+                                    {
+                                        const auto* paramDef = std::get_if<TableDefinition>(&paramTab->getInfo().type);
+                                        const auto* argDef = std::get_if<TableDefinition>(&argTab->getInfo().type);
+                                        if (paramDef && argDef && paramDef->getWidth() == argDef->getWidth()
+                                            && paramDef->getLength() == argDef->getLength())
+                                        {
+                                            isCompatible = true;
+                                        }
+                                    }
+                                }
+
                                 if (auto* paramPointer = param.type->tryAs<PrimitiveType>())
                                 {
                                     if (const auto* argPointer = resolveExprType(*itArg->second).tryAs<PrimitiveType>())
