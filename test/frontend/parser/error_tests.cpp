@@ -251,8 +251,8 @@ TEST_CASE("Expressions - Errors", "[Parser][Expression]")
     {
         // Testing specific end-of-stream edge cases without trailing fallback tokens
         // to ensure bounds checking correctly catches 'begin == end' instead of aborting.
-        const char* strings[] = {"a + ",    "a * ",          "a DIFFER ",    "a UNION ",    "a MASK ",
-                                 "IF a = ", "IF a = b AND ", "IF a = b OR ", "LOCATION ( ", "FIXED (1 "};
+        const char* strings[] = {"a + ",          "a * ",       "a DIFFER ",  "a UNION ",    "a MASK ",   "IF a = ",
+                                 "IF a = b AND ", "IF a = b OR ", "LOCATION ( ", "FIXED (1 ", "LITERAL ( "};
 
         for (auto src : strings)
         {

@@ -96,8 +96,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                     || begin->getTokenType() == lexer::TokenType::OctalKeyword
                     || begin->getTokenType() == lexer::TokenType::LiteralKeyword))
             {
-                if (begin->getTokenType() == lexer::TokenType::OctalKeyword
-                    || begin->getTokenType() == lexer::TokenType::LiteralKeyword)
+                if (begin->getTokenType() == lexer::TokenType::OctalKeyword)
                 {
                     begin++;
                     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -114,6 +113,26 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                         }
                     }
                 }
+                else if (begin->getTokenType() == lexer::TokenType::LiteralKeyword)
+                {
+                    auto litStart = begin++;
+                    if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                    {
+                        begin++;
+                        if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses
+                            && begin->getLength() == 1)
+                        {
+                            begin++;
+                            if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                            {
+                                begin++;
+                                return true;
+                            }
+                        }
+                    }
+                    begin = litStart;
+                    return false;
+                }
                 else
                 {
                     begin++;
@@ -127,7 +146,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
             || tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::LiteralKeyword
             || tType == lexer::TokenType::StringLiteral)
         {
-            if (tType == lexer::TokenType::OctalKeyword || tType == lexer::TokenType::LiteralKeyword)
+            if (tType == lexer::TokenType::OctalKeyword)
             {
                 begin++;
                 if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
@@ -144,6 +163,26 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                     }
                 }
                 return true;
+            }
+            if (tType == lexer::TokenType::LiteralKeyword)
+            {
+                auto litStart = begin++;
+                if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
+                {
+                    begin++;
+                    if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses
+                        && begin->getLength() == 1)
+                    {
+                        begin++;
+                        if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)
+                        {
+                            begin++;
+                            return true;
+                        }
+                    }
+                }
+                begin = litStart;
+                return false;
             }
             if (tType == lexer::TokenType::StringLiteral)
             {

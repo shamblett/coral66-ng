@@ -136,6 +136,26 @@ TEST_CASE("Presetting", "[Parser][Declarations]")
         CHECK(p.declaration.size() == 1);
         CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
     }
+
+    SECTION("Literal Presetting")
+    {
+        ParsedDeclaration p1("INTEGER a := LITERAL(A)");
+        CHECK(p1.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+
+        ParsedDeclaration p2("INTEGER a := -LITERAL(A)");
+        CHECK(p2.declaration.size() == 1);
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+
+        const char* invalidPresets[] = {"INTEGER a := LITERAL( )", "INTEGER a := LITERAL(\t)",
+                                        "INTEGER a := LITERAL(\n)", "INTEGER a := -LITERAL( )",
+                                        "INTEGER a := LITERAL(AB)"};
+        for (const auto* src : invalidPresets)
+        {
+            ParsedDeclaration p(src);
+            CHECK_FALSE(parser::DiagnosticCollector::getDiagnostics().empty());
+        }
+    }
 }
 
 TEST_CASE("Overlay Declarations", "[Parser][Declarations]")

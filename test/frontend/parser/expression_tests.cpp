@@ -106,6 +106,31 @@ TEST_CASE("Coral Parse Expression - Typed Primaries", "[Parser][Expression]")
         CHECK(p.expression == nullptr);
         CHECK_FALSE(parser::DiagnosticCollector::getDiagnostics().empty());
     }
+    SECTION("Literal Constant")
+    {
+        ParsedExpression p1("LITERAL(a)");
+        auto literal1 = dynamic_cast<LiteralExpression*>(p1.expression.get());
+        REQUIRE(literal1 != nullptr);
+        CHECK(literal1->getLiteral()->getText() == "a");
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+
+        ParsedExpression p2("LITERAL ( A )");
+        auto literal2 = dynamic_cast<LiteralExpression*>(p2.expression.get());
+        REQUIRE(literal2 != nullptr);
+        CHECK(literal2->getLiteral()->getText() == "A");
+        CHECK(parser::DiagnosticCollector::getDiagnostics().empty());
+    }
+    SECTION("Literal Constant Rejects Layout Characters and Invalid Arguments")
+    {
+        const char* invalidLiterals[] = {"LITERAL( )",   "LITERAL(\t)", "LITERAL(\n)",
+                                         "(LITERAL( ))", "LITERAL()",   "LITERAL(ab)"};
+        for (const auto* src : invalidLiterals)
+        {
+            ParsedExpression p(src);
+            CHECK(p.expression == nullptr);
+            CHECK_FALSE(parser::DiagnosticCollector::getDiagnostics().empty());
+        }
+    }
 }
 
 /*
