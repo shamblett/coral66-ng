@@ -114,6 +114,12 @@ TEST_CASE("Tokenize - Errors", "[lexer]")
         auto result = lex(source, errors);
         CHECK(errors);
         CHECK(result.findDiagnostic(UNTERMINATED_BRACKETED_COMMENT));
+
+        errors = false;
+        std::string nestedSource = "; ( outer ( inner ) still open";
+        auto nestedResult = lex(nestedSource, errors);
+        CHECK(errors);
+        CHECK(nestedResult.findDiagnostic(UNTERMINATED_BRACKETED_COMMENT));
     }
 
     SECTION("Malformed Number Literal")

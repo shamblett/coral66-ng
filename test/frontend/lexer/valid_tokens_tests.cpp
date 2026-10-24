@@ -444,6 +444,38 @@ TEST_CASE("Comments", "[lexer]")
         }
     }
 
+    SECTION("Nested Bracketed Comment")
+    {
+        auto result = lex("INTEGER a; (Outer (inner (deeply nested) comment) text) INTEGER b;");
+
+        const std::vector correct = {TokenType::IntegerKeyword, TokenType::Identifier, TokenType::SemiColon,
+                                     TokenType::IntegerKeyword, TokenType::Identifier, TokenType::SemiColon};
+
+        CHECK(result.data().size() == correct.size());
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+
+    SECTION("Multi-Line Bracketed Comment")
+    {
+        auto result = lex("INTEGER a;\n"
+                          "(This is a\n"
+                          " multi-line (with nested\n"
+                          " brackets) comment)\n"
+                          "INTEGER b;");
+
+        const std::vector correct = {TokenType::IntegerKeyword, TokenType::Identifier, TokenType::SemiColon,
+                                     TokenType::IntegerKeyword, TokenType::Identifier, TokenType::SemiColon};
+
+        CHECK(result.data().size() == correct.size());
+        for (size_t i = 0; i < correct.size(); ++i)
+        {
+            CHECK(result.data()[i].getTokenType() == correct[i]);
+        }
+    }
+
     SECTION("Non-Printable Character")
     {
         std::string source = "\u200B";
