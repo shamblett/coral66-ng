@@ -16,10 +16,10 @@
 #include "command_line_processor.hpp"
 #include "lib/frontend/common/messages/errors.hpp"
 #include "lib/frontend/common/messages/warnings.hpp"
-#include "lib/support/scope_exit.hpp"
 #include "lib/frontend/parser/parser.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/support/filesystem.hpp"
+#include "lib/support/scope_exit.hpp"
 
 int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter)
 {
@@ -36,11 +36,12 @@ int coral66::main(const int argc, char** argv, llvm::raw_ostream* const reporter
     // Set and Enable colours. default for errors is red, warnings yellow.
     reporter->enable_colors(reporter->has_colors());
     reporter->changeColor(llvm::raw_ostream::RED);
-    ScopeExit colorResetter([reporter]
+    ScopeExit colorResetter(
+        [reporter]
         {
-        reporter->resetColor();
-        reporter->flush();
-    });
+            reporter->resetColor();
+            reporter->flush();
+        });
 
     // Initialise the action executor
     auto executor = ActionExecutor(reporter);

@@ -686,9 +686,9 @@ void CodeGenerator::generateProcedure(const semantics::ProcedureDeclaration& pro
 
             if (parameterDeclaration)
             {
-                if (llvm::Type* llvmType = convertType(*param.type);
-                    param.type->isLocation() || param.type->is<semantics::ArrayType>()
-                    || param.type->is<semantics::TableType>())
+                if (llvm::Type* llvmType = convertType(*param.type); param.type->isLocation()
+                                                                     || param.type->is<semantics::ArrayType>()
+                                                                     || param.type->is<semantics::TableType>())
                 {
                     m_locals[parameterDeclaration] = arg;
                 }

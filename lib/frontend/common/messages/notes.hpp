@@ -17,5 +17,6 @@
 namespace coral66::notes::pp
 {
 constexpr auto TO_MATCH_N_HERE = ::coral66::makeDiagnostic<"To match %0 here:", PointAt<0>>(Severity::Note, "");
-constexpr auto PREVIOUSLY_DECLARED_HERE = ::coral66::makeDiagnostic<"Previously declared here:", Underline<0>>(Severity::Note, "");
+constexpr auto PREVIOUSLY_DECLARED_HERE =
+    ::coral66::makeDiagnostic<"Previously declared here:", Underline<0>>(Severity::Note, "");
 } // namespace coral66::notes::pp

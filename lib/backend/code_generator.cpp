@@ -142,8 +142,7 @@ void CodeGenerator::generate()
                      [&](const semantics::TableDeclaration& tab) { gName = tab.getName(); },
                      [&](const semantics::OverlayDeclaration& over) { gName = over.getName(); },
                      [&](const semantics::ProcedureDeclaration& proc) { gName = proc.getName(); },
-                     [&](const semantics::TableElementDeclaration& te) { gName = te.getName(); },
-                     [](const auto&) {});
+                     [&](const semantics::TableElementDeclaration& te) { gName = te.getName(); }, [](const auto&) {});
             if (gName == baseName)
             {
                 baseUsable = g.get();
@@ -164,16 +163,16 @@ void CodeGenerator::generate()
                     {
                         llvm::Constant* parentAddr = llvm::cast<llvm::Constant>(m_globals[parentTable]);
                         llvm::Type* parentType = convertType(parentTable->getType());
-                        
+
                         llvm::Type* i32Ty = llvm::Type::getInt32Ty(m_module.getContext());
                         std::vector<llvm::Constant*> indices;
                         if (parentType->isArrayTy())
                             indices.push_back(llvm::ConstantInt::get(i32Ty, 0));
-                        
+
                         std::int64_t idxVal = 0;
                         if (tableElem->getWordPosition().has_value() && tableElem->getWordPosition().value() > 0)
                             idxVal = tableElem->getWordPosition().value();
-                            
+
                         indices.push_back(llvm::ConstantInt::get(i32Ty, idxVal));
                         baseAddr = llvm::ConstantExpr::getGetElementPtr(parentType, parentAddr, indices);
                     }
@@ -261,32 +260,33 @@ void CodeGenerator::generate()
                 if (targetUsable)
                 {
                     llvm::Type* valueTy = nullptr;
-                    targetUsable->match([&](const semantics::VariableDeclaration& var)
-                                        { valueTy = convertType(var.getType()); },
-                                        [&](const semantics::ArrayDeclaration& arr)
-                                        { valueTy = convertType(arr.getType()); },
-                                        [&](const semantics::TableDeclaration& tab)
-                                        { valueTy = convertType(tab.getType()); },
-                                        [](const auto&) {});
+                    targetUsable->match(
+                        [&](const semantics::VariableDeclaration& var) { valueTy = convertType(var.getType()); },
+                        [&](const semantics::ArrayDeclaration& arr) { valueTy = convertType(arr.getType()); },
+                        [&](const semantics::TableDeclaration& tab) { valueTy = convertType(tab.getType()); },
+                        [](const auto&) {});
 
                     llvm::Value* aliasOrAddr = finalAddr;
                     if (valueTy)
                     {
                         std::string mangledTargetName;
-                        targetUsable->match([&](const semantics::VariableDeclaration& var) { mangledTargetName = var.getMangledName(); },
-                                            [&](const semantics::ArrayDeclaration& arr) { mangledTargetName = arr.getMangledName(); },
-                                            [&](const semantics::TableDeclaration& tab) { mangledTargetName = tab.getMangledName(); },
-                                            [&](const semantics::OverlayDeclaration& over) { mangledTargetName = over.getMangledName(); },
-                                            [&](const semantics::ProcedureDeclaration& proc) { mangledTargetName = proc.getMangledName(); },
-                                            [](const auto&) {});
+                        targetUsable->match(
+                            [&](const semantics::VariableDeclaration& var)
+                            { mangledTargetName = var.getMangledName(); },
+                            [&](const semantics::ArrayDeclaration& arr) { mangledTargetName = arr.getMangledName(); },
+                            [&](const semantics::TableDeclaration& tab) { mangledTargetName = tab.getMangledName(); },
+                            [&](const semantics::OverlayDeclaration& over)
+                            { mangledTargetName = over.getMangledName(); },
+                            [&](const semantics::ProcedureDeclaration& proc)
+                            { mangledTargetName = proc.getMangledName(); }, [](const auto&) {});
                         if (mangledTargetName.empty())
                             mangledTargetName = targetName;
-                            
-                        aliasOrAddr = llvm::GlobalAlias::create(valueTy, 0, llvm::GlobalValue::ExternalLinkage,
-                                                                mangledTargetName, llvm::cast<llvm::Constant>(finalAddr),
-                                                                &m_module);
+
+                        aliasOrAddr =
+                            llvm::GlobalAlias::create(valueTy, 0, llvm::GlobalValue::ExternalLinkage, mangledTargetName,
+                                                      llvm::cast<llvm::Constant>(finalAddr), &m_module);
                     }
-                    
+
                     m_globals[targetUsable] = aliasOrAddr;
                 }
             }

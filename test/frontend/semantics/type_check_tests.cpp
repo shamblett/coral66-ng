@@ -540,40 +540,38 @@ TEST_CASE("Type Checking - BITS Operations", "[Semantics][TypeChecking]")
 
     SECTION("Valid word-logic Typedprimary operands")
     {
-        ParsedProgram const parsed(
-            "PROGRAM TEST COMMON() BEGIN "
-            "INTEGER I, J ; "
-            "BITS B ; "
-            "FIXED(16, 4) FX ; "
-            "INTEGER PROCEDURE IP ; BEGIN ANSWER 3 END ; "
-            "FIXED(16, 4) PROCEDURE FXP ; BEGIN ANSWER 1.5 END ; "
-            "I := J MASK B UNION FX DIFFER LOCATION(I) ; "
-            "I := OCTAL(77) MASK LITERAL(A) UNION BITS [4, 0] J DIFFER INTEGER(J UNION B) ; "
-            "I := IP MASK FXP UNION FIXED(16, 4)(J) "
-            "END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
+                                   "INTEGER I, J ; "
+                                   "BITS B ; "
+                                   "FIXED(16, 4) FX ; "
+                                   "INTEGER PROCEDURE IP ; BEGIN ANSWER 3 END ; "
+                                   "FIXED(16, 4) PROCEDURE FXP ; BEGIN ANSWER 1.5 END ; "
+                                   "I := J MASK B UNION FX DIFFER LOCATION(I) ; "
+                                   "I := OCTAL(77) MASK LITERAL(A) UNION BITS [4, 0] J DIFFER INTEGER(J UNION B) ; "
+                                   "I := IP MASK FXP UNION FIXED(16, 4)(J) "
+                                   "END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Word-logic result has numeric type INTEGER")
     {
-        ParsedProgram const parsed(
-            "PROGRAM TEST COMMON() BEGIN "
-            "INTEGER I, J ; "
-            "FLOATING FL ; "
-            "FIXED(16, 4) FX ; "
-            "INTEGER ARRAY ARR[0:3] ; "
-            "SWITCH SW := L1, L2 ; "
-            "PROCEDURE P(VALUE INTEGER X) ; BEGIN I := X END ; "
-            "INTEGER PROCEDURE Q ; BEGIN ANSWER I MASK J END ; "
-            "I := (I MASK J) + (I UNION J) * (I DIFFER J) ; "
-            "FL := I MASK J ; "
-            "FX := I UNION J ; "
-            "ARR[I MASK 3] := BITS [1 MASK 3, 2 UNION 1] J ; "
-            "P(I DIFFER J) ; "
-            "GOTO SW[(I MASK 1) + 1] ; "
-            "L1: L2: I := Q "
-            "END");
+        ParsedProgram const parsed("PROGRAM TEST COMMON() BEGIN "
+                                   "INTEGER I, J ; "
+                                   "FLOATING FL ; "
+                                   "FIXED(16, 4) FX ; "
+                                   "INTEGER ARRAY ARR[0:3] ; "
+                                   "SWITCH SW := L1, L2 ; "
+                                   "PROCEDURE P(VALUE INTEGER X) ; BEGIN I := X END ; "
+                                   "INTEGER PROCEDURE Q ; BEGIN ANSWER I MASK J END ; "
+                                   "I := (I MASK J) + (I UNION J) * (I DIFFER J) ; "
+                                   "FL := I MASK J ; "
+                                   "FX := I UNION J ; "
+                                   "ARR[I MASK 3] := BITS [1 MASK 3, 2 UNION 1] J ; "
+                                   "P(I DIFFER J) ; "
+                                   "GOTO SW[(I MASK 1) + 1] ; "
+                                   "L1: L2: I := Q "
+                                   "END");
         TypeCheckingResult res(parsed);
         CHECK(!res.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -595,44 +593,38 @@ TEST_CASE("Type Checking - BITS Operations", "[Semantics][TypeChecking]")
         TypeCheckingResult res2(parsed2);
         CHECK(res2.hasDiagnostic("TYPE_MISMATCH"));
 
-        ParsedProgram const parsed3(
-            "PROGRAM TEST COMMON() BEGIN INTEGER I ; "
-            "FLOATING PROCEDURE FP ; BEGIN ANSWER 1.0 END ; "
-            "I := FP MASK 1 END");
+        ParsedProgram const parsed3("PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+                                    "FLOATING PROCEDURE FP ; BEGIN ANSWER 1.0 END ; "
+                                    "I := FP MASK 1 END");
         TypeCheckingResult res3(parsed3);
         CHECK(res3.hasDiagnostic("TYPE_MISMATCH"));
     }
 
     SECTION("Invalid non-numeric operands to word-logic")
     {
-        ParsedProgram const parsedVoidProc(
-            "PROGRAM TEST COMMON() BEGIN INTEGER I ; "
-            "PROCEDURE VP ; BEGIN I := 0 END ; "
-            "I := VP MASK 1 END");
+        ParsedProgram const parsedVoidProc("PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+                                           "PROCEDURE VP ; BEGIN I := 0 END ; "
+                                           "I := VP MASK 1 END");
         TypeCheckingResult resVoidProc(parsedVoidProc);
         CHECK(resVoidProc.hasDiagnostic("TYPE_MISMATCH"));
 
-        ParsedProgram const parsedLabel(
-            "PROGRAM TEST COMMON() BEGIN INTEGER I ; "
-            "MYLABEL: I := MYLABEL UNION 1 END");
+        ParsedProgram const parsedLabel("PROGRAM TEST COMMON() BEGIN INTEGER I ; "
+                                        "MYLABEL: I := MYLABEL UNION 1 END");
         TypeCheckingResult resLabel(parsedLabel);
         CHECK(resLabel.hasDiagnostic("TYPE_MISMATCH"));
 
-        ParsedProgram const parsedSwitch(
-            "PROGRAM TEST COMMON() BEGIN INTEGER I ; SWITCH SW := L1 ; "
-            "L1: I := SW DIFFER 1 END");
+        ParsedProgram const parsedSwitch("PROGRAM TEST COMMON() BEGIN INTEGER I ; SWITCH SW := L1 ; "
+                                         "L1: I := SW DIFFER 1 END");
         TypeCheckingResult resSwitch(parsedSwitch);
         CHECK(resSwitch.hasDiagnostic("TYPE_MISMATCH"));
 
-        ParsedProgram const parsedArray(
-            "PROGRAM TEST COMMON() BEGIN INTEGER I ; INTEGER ARRAY ARR[0:2] ; "
-            "I := ARR MASK 1 END");
+        ParsedProgram const parsedArray("PROGRAM TEST COMMON() BEGIN INTEGER I ; INTEGER ARRAY ARR[0:2] ; "
+                                        "I := ARR MASK 1 END");
         TypeCheckingResult resArray(parsedArray);
         CHECK(resArray.hasDiagnostic("TYPE_MISMATCH"));
 
-        ParsedProgram const parsedTable(
-            "PROGRAM TEST COMMON() BEGIN INTEGER I ; TABLE T[2, 2] [ E INTEGER 0, 0 ] ; "
-            "I := T UNION 1 END");
+        ParsedProgram const parsedTable("PROGRAM TEST COMMON() BEGIN INTEGER I ; TABLE T[2, 2] [ E INTEGER 0, 0 ] ; "
+                                        "I := T UNION 1 END");
         TypeCheckingResult resTable(parsedTable);
         CHECK(resTable.hasDiagnostic("TYPE_MISMATCH"));
     }
@@ -761,7 +753,8 @@ TEST_CASE("Type Checking - Recursive Validations", "[Semantics][TypeCheck]")
 
     SECTION("Octal Point Fixed Point Bounds")
     {
-        // FIXED(5, 1) has range [-8.0, 7.5]; OCTAL(10.0) is 8.0, so -OCTAL(10.0) = -8.0 fits, +OCTAL(10.0) = +8.0 overflows
+        // FIXED(5, 1) has range [-8.0, 7.5]; OCTAL(10.0) is 8.0, so -OCTAL(10.0) = -8.0 fits, +OCTAL(10.0) = +8.0
+        // overflows
         ParsedProgram const validParsed("PROGRAM TEST COMMON() BEGIN FIXED(5, 1) f := -OCTAL(10.0); END");
         TypeCheckingResult validRes(validParsed);
         CHECK(!validRes.hasDiagnostic("PRESET_FIXED_POINT_OVERFLOW"));

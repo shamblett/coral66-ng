@@ -49,8 +49,9 @@ TEST_CASE("Message construction and segment validation", "[Message]")
 
 TEST_CASE("Message segment streaming with colors_enabled", "[Message]")
 {
-    std::vector<coral66::Message::Segment> segments = {{.text = "RedBold", .color = llvm::raw_ostream::RED, .bold = true, .bg = false},
-                                                       {.text = "Normal", .color = llvm::raw_ostream::SAVEDCOLOR, .bold = false, .bg = false}};
+    std::vector<coral66::Message::Segment> segments = {
+        {.text = "RedBold", .color = llvm::raw_ostream::RED, .bold = true, .bg = false},
+        {.text = "Normal", .color = llvm::raw_ostream::SAVEDCOLOR, .bold = false, .bg = false}};
     coral66::Message msg(coral66::Severity::Error, std::move(segments));
 
     SECTION("Streaming with colors disabled")

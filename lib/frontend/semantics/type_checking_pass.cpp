@@ -283,7 +283,7 @@ void TypeCheckingPass::visit(const syntax::AssignmentStatement& node)
     if (isSwitch(node.getVariable(), m_context))
     {
         m_context.log(errors::semantics::CANNOT_ASSIGN_TO_SWITCH.args(*node.getVariable().begin(), m_context.source,
-                                                                     *node.getVariable().begin()));
+                                                                      *node.getVariable().begin()));
         DiagnosticCollector::addDiagnostic(errors::semantics::CANNOT_ASSIGN_TO_SWITCH);
         return;
     }
@@ -1217,8 +1217,7 @@ void TypeCheckingPass::visit(const syntax::ArrayAccessExpression& node)
                                                        IntrusiveVariantValue(PrimitiveType{PrimitiveType::Integer}));
         }
         else if (usable->is<SwitchDeclaration>()
-                 || (usable->is<VariableDeclaration>()
-                     && usable->as<VariableDeclaration>().getType().is<SwitchType>()))
+                 || (usable->is<VariableDeclaration>() && usable->as<VariableDeclaration>().getType().is<SwitchType>()))
         {
             if (node.getIndices().size() != 1)
             {
@@ -1359,8 +1358,7 @@ void TypeCheckingPass::validatePresets(const std::vector<lexer::CTokenIterator>&
             isNegative = !isNegative;
             continue;
         }
-        if (token->getTokenType() == lexer::TokenType::Plus
-            || token->getTokenType() == lexer::TokenType::OctalKeyword
+        if (token->getTokenType() == lexer::TokenType::Plus || token->getTokenType() == lexer::TokenType::OctalKeyword
             || token->getTokenType() == lexer::TokenType::OpenParentheses)
         {
             continue;

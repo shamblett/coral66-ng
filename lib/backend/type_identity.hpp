@@ -84,10 +84,9 @@ struct TypeHasher<semantics::FunctionType>
 {
     std::size_t operator()(const semantics::FunctionType& arg) const noexcept
     {
-        const std::size_t hash =
-            std::ranges::fold_left(arg.getParameters(), 0ULL,
-                                   [](std::size_t h, const semantics::FunctionType::Parameter& param)
-                                   { return coral66::rawHashCombine(h, TypeHasher<semantics::Type>{}(*param.type)); });
+        const std::size_t hash = std::ranges::fold_left(
+            arg.getParameters(), 0ULL, [](std::size_t h, const semantics::FunctionType::Parameter& param)
+            { return coral66::rawHashCombine(h, TypeHasher<semantics::Type>{}(*param.type)); });
         return coral66::rawHashCombine(hash, coral66::hashCombine<TypeHasher>(arg.isLastVararg(), arg.getReturnType()));
     }
 };

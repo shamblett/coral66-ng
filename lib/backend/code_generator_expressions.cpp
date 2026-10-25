@@ -48,12 +48,13 @@ llvm::Value* CodeGenerator::emitAddress(const syntax::Expression& expression)
                     if (baseType->isArrayTy())
                         indices.push_back(llvm::ConstantInt::get(m_module.getContext(), llvm::APInt(32, 0)));
 
-                    llvm::Value* idxVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0, true);
+                    llvm::Value* idxVal =
+                        llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0, true);
 
                     if (tableElem->getWordPosition().has_value() && tableElem->getWordPosition().value() > 0)
                     {
-                        llvm::Value* wordOffsetVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()),
-                                                                            tableElem->getWordPosition().value(), true);
+                        llvm::Value* wordOffsetVal = llvm::ConstantInt::get(
+                            llvm::Type::getInt32Ty(m_module.getContext()), tableElem->getWordPosition().value(), true);
                         idxVal = m_builder.CreateAdd(idxVal, wordOffsetVal, "table_word_offset");
                     }
 
@@ -108,9 +109,13 @@ llvm::Value* CodeGenerator::emitAddress(const syntax::Expression& expression)
             [&](const semantics::TableElementDeclaration& tableElemDecl)
             {
                 tableElemNode = &tableElemDecl;
-                if (tableElemDecl.getWordPosition().has_value()) {
-                    llvm::errs() << "TableElem: " << tableElemDecl.getMangledName() << " WP: " << tableElemDecl.getWordPosition().value() << "\n";
-                } else {
+                if (tableElemDecl.getWordPosition().has_value())
+                {
+                    llvm::errs() << "TableElem: " << tableElemDecl.getMangledName()
+                                 << " WP: " << tableElemDecl.getWordPosition().value() << "\n";
+                }
+                else
+                {
                     llvm::errs() << "TableElem: " << tableElemDecl.getMangledName() << " NO WP\n";
                 }
                 if (auto* parentTable = tableElemDecl.getParentTable())
@@ -289,8 +294,8 @@ llvm::Value* CodeGenerator::visit(const syntax::IdentifierExpression& expression
                 llvm::Value* addr = emitAddress(expression);
                 if (!addr)
                     return nullptr;
-                llvm::Value* funcVal = m_builder.CreateLoad(llvm::PointerType::getUnqual(m_module.getContext()), addr,
-                                                            "proc_param_load");
+                llvm::Value* funcVal =
+                    m_builder.CreateLoad(llvm::PointerType::getUnqual(m_module.getContext()), addr, "proc_param_load");
                 llvm::Type* retType = llvm::Type::getVoidTy(m_module.getContext());
                 if (procType->getReturnType())
                     retType = convertType(*procType->getReturnType());
@@ -738,8 +743,8 @@ llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expressio
                 }
             }
 
-            llvm::Value* zeroIdx = m_builder.CreateSub(
-                indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
+            llvm::Value* zeroIdx =
+                m_builder.CreateSub(indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
             llvm::Value* indices[] = {llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0),
                                       zeroIdx};
             llvm::Value* elemPtr = m_builder.CreateGEP(arrType, switchArray, indices, "switch_elem_gep");
@@ -759,8 +764,8 @@ llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expressio
                 return nullptr;
             if (!indexVal->getType()->isIntegerTy(32))
                 indexVal = m_builder.CreateIntCast(indexVal, llvm::Type::getInt32Ty(m_module.getContext()), true);
-            indexVal = m_builder.CreateSub(
-                indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
+            indexVal =
+                m_builder.CreateSub(indexVal, llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 1));
 
             llvm::Type* ptrType = llvm::PointerType::getUnqual(m_module.getContext());
             llvm::Value* switchArrayPtr = m_builder.CreateLoad(ptrType, ptrAddr, "switch_array_load");

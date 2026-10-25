@@ -557,13 +557,13 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                             auto savedBegin = begin;
                             begin++;
                             fixedScale.first = parseExpression(begin, end, context);
-                            
+
                             if (begin != end && begin->getTokenType() == lexer::TokenType::Comma)
                             {
                                 begin++;
                                 fixedScale.second = parseExpression(begin, end, context);
                             }
-                            
+
                             if (begin == end || begin->getTokenType() != lexer::TokenType::CloseParentheses)
                             {
                                 begin = savedBegin;

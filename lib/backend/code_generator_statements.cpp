@@ -550,8 +550,7 @@ void CodeGenerator::emitNonLocalGotoCheck()
 
     llvm::BasicBlock* dispatchBB =
         llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.dispatch", m_currentFunction);
-    llvm::BasicBlock* contBB =
-        llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.cont", m_currentFunction);
+    llvm::BasicBlock* contBB = llvm::BasicBlock::Create(m_module.getContext(), "nonlocal_goto.cont", m_currentFunction);
 
     m_builder.CreateCondBr(isNonNull, dispatchBB, contBB);
     m_builder.SetInsertPoint(dispatchBB);

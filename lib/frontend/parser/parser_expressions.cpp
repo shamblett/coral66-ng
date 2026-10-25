@@ -358,9 +358,8 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
         if (const auto openParen = begin + 1;
             openParen != end && openParen->getTokenType() == lexer::TokenType::OpenParentheses)
         {
-            if (const auto lit = openParen + 1;
-                lit != end && lit->getTokenType() == lexer::TokenType::Literal
-                && lit->getType() == lexer::CToken::Type::Floating)
+            if (const auto lit = openParen + 1; lit != end && lit->getTokenType() == lexer::TokenType::Literal
+                                                && lit->getType() == lexer::CToken::Type::Floating)
             {
                 const auto startToken = begin;
                 begin = lit + 1;
@@ -371,9 +370,9 @@ std::unique_ptr<Expression> parseFactor(lexer::CTokenIterator& begin, const lexe
                 }
                 else
                 {
-                    context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(
-                        *(begin == end ? end - 1 : begin), context.getSourceInterface(),
-                        *(begin == end ? end - 1 : begin)));
+                    context.log(errors::parser::EXPECTED_CLOSE_PARENTHESIS.args(*(begin == end ? end - 1 : begin),
+                                                                                context.getSourceInterface(),
+                                                                                *(begin == end ? end - 1 : begin)));
                     DiagnosticCollector::addDiagnostic(errors::parser::EXPECTED_CLOSE_PARENTHESIS);
                     return nullptr;
                 }
@@ -519,8 +518,7 @@ std::unique_ptr<Expression> parseTypedPrimary(lexer::CTokenIterator& begin, cons
         if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
         {
             begin++;
-            if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses
-                && begin->getLength() == 1)
+            if (begin != end && begin->getTokenType() != lexer::TokenType::CloseParentheses && begin->getLength() == 1)
             {
                 auto t = begin++; // Parse the character
                 if (begin != end && begin->getTokenType() == lexer::TokenType::CloseParentheses)

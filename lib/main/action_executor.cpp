@@ -53,7 +53,7 @@ int coral66::ActionExecutor::execute(const Action action, const std::string& fil
             m_linkableFiles.emplace_back(obj);
         }
     }
-    if (action == Action::Link && !cl::SyntaxOnly && !cl::ParseOnly &&!cl::EmitLLVM)
+    if (action == Action::Link && !cl::SyntaxOnly && !cl::ParseOnly && !cl::EmitLLVM)
     {
         return linkExecutable();
     }

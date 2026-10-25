@@ -100,7 +100,8 @@ private:
                                            std::size_t numElements, std::size_t startElementIndex = 0,
                                            const semantics::Type* semanticType = nullptr,
                                            const syntax::TableDeclaration* astTable = nullptr);
-    static llvm::Constant* reshapeArray(llvm::Type* targetType, const std::vector<llvm::Constant*>& flatElements, std::size_t& offset);
+    static llvm::Constant* reshapeArray(llvm::Type* targetType, const std::vector<llvm::Constant*>& flatElements,
+                                        std::size_t& offset);
 
     void generateProcedure(const semantics::ProcedureDeclaration& procedureDeclaration,
                            const syntax::ProcedureDeclaration& astNode);

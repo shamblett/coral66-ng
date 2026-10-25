@@ -610,10 +610,10 @@ std::vector<CToken> coral66::lexer::toCTokens(const PPTokenIterator begin, const
                                       .sourceInterface = sourceInterface,
                                       .token = *startIter,
                                       .errorsOccurred = errorsOccurred};
-            auto number = isOctalContext
-                              ? processOctalNumber(numberText.data(), numberText.data() + numberText.size())
-                              : processNumber(numberText.data(), numberText.data() + numberText.size(),
-                                              startIter->getCharSpaceOffset(), context);
+            auto number = isOctalContext ?
+                              processOctalNumber(numberText.data(), numberText.data() + numberText.size()) :
+                              processNumber(numberText.data(), numberText.data() + numberText.size(),
+                                            startIter->getCharSpaceOffset(), context);
             if (number)
             {
                 std::uint64_t length = iter->getOffset() + iter->getLength() - startIter->getOffset();
