@@ -107,7 +107,7 @@ private:
 
     llvm::Value* processFixedBinaryExpression(const syntax::BinaryExpression& expression);
 
-    llvm::GlobalVariable* getNonLocalGotoTargetGlobal();
+    llvm::GlobalVariable* getNonLocalGotoTargetGlobal() const;
     void emitNonLocalGoto(llvm::Value* blockAddr);
     void emitNonLocalGotoCheck();
 };

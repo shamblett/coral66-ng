@@ -95,7 +95,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
             {
                 for (std::int64_t j = i - 1; j >= 0; --j)
                 {
-                    auto prevType = tokens[j]->getTokenType();
+                    const auto prevType = tokens[j]->getTokenType();
                     if (prevType == lexer::TokenType::OpenParentheses || prevType == lexer::TokenType::CloseParentheses)
                         continue;
                     if (prevType == lexer::TokenType::Comma)
@@ -272,7 +272,7 @@ llvm::Constant* CodeGenerator::parsePresetList(const std::vector<lexer::CTokenIt
         bool trailingVoid = false;
         for (std::int64_t i = tokens.size() - 1; i >= 0; --i)
         {
-            auto type = tokens[i]->getTokenType();
+            const auto type = tokens[i]->getTokenType();
             if (type == lexer::TokenType::OpenParentheses || type == lexer::TokenType::CloseParentheses)
                 continue;
             if (type == lexer::TokenType::Comma)

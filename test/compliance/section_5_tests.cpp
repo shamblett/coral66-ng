@@ -5,11 +5,7 @@
  */
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/IR/Instructions.h>
-#include <llvm/IR/Verifier.h>
-#include <llvm/Support/TargetSelect.h>
-
 #include <iostream>
 
 #include "lib/backend/code_generation.hpp"
@@ -19,7 +15,6 @@
 #include "lib/frontend/preprocessor/preprocessor.hpp"
 #include "lib/frontend/semantics/program.hpp"
 #include "lib/frontend/semantics/semantic_support.hpp"
-#include "llvm/IR/DataLayout.h"
 #include "test/common/test_config.hpp"
 #include "test/compliance/common/common.hpp"
 #include "test/vendor/catch2v3/catch_amalgamated.hpp"

@@ -227,8 +227,7 @@ llvm::Value* CodeGenerator::visit(const syntax::LiteralExpression& expression)
     {
         if (std::holds_alternative<std::string>(val))
         {
-            const auto& strValue = std::get<std::string>(val);
-            if (!strValue.empty())
+            if (const auto& strValue = std::get<std::string>(val); !strValue.empty())
             {
                 return llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()),
                                               static_cast<std::uint8_t>(strValue[0]), false);
@@ -705,8 +704,8 @@ llvm::Value* CodeGenerator::visit(const syntax::ArrayAccessExpression& expressio
             const auto& switchLabels = switchDeclaration->getLabelDeclarations();
             if (auto* constIdx = llvm::dyn_cast<llvm::ConstantInt>(indexVal))
             {
-                const std::int64_t idx = constIdx->getSExtValue() - 1;
-                if (idx >= 0 && static_cast<std::size_t>(idx) < switchLabels.size() && switchLabels[idx])
+                if (const std::int64_t idx = constIdx->getSExtValue() - 1;
+                    idx >= 0 && static_cast<std::size_t>(idx) < switchLabels.size() && switchLabels[idx])
                 {
                     if (const std::string targetLabelName(switchLabels[idx]->getName());
                         m_namedLabels.contains(targetLabelName))

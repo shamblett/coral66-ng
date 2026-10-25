@@ -115,7 +115,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
                 }
                 else if (begin->getTokenType() == lexer::TokenType::LiteralKeyword)
                 {
-                    auto litStart = begin++;
+                    const auto litStart = begin++;
                     if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
                     {
                         begin++;
@@ -166,7 +166,7 @@ std::vector<std::unique_ptr<syntax::Declaration>>
             }
             if (tType == lexer::TokenType::LiteralKeyword)
             {
-                auto litStart = begin++;
+                const auto litStart = begin++;
                 if (begin != end && begin->getTokenType() == lexer::TokenType::OpenParentheses)
                 {
                     begin++;

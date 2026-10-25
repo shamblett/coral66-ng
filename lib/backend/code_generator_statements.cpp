@@ -518,7 +518,7 @@ void CodeGenerator::visit(const syntax::GotoStatement& statement)
     }
 }
 
-llvm::GlobalVariable* CodeGenerator::getNonLocalGotoTargetGlobal()
+llvm::GlobalVariable* CodeGenerator::getNonLocalGotoTargetGlobal() const
 {
     if (llvm::GlobalVariable* gv = m_module.getNamedGlobal("__c66_nonlocal_goto_target"))
         return gv;
@@ -531,8 +531,7 @@ void CodeGenerator::emitNonLocalGoto(llvm::Value* blockAddr)
 {
     llvm::GlobalVariable* targetGlobal = getNonLocalGotoTargetGlobal();
     m_builder.CreateStore(blockAddr, targetGlobal);
-    llvm::Type* retType = m_currentFunction->getReturnType();
-    if (retType->isVoidTy())
+    if (llvm::Type* retType = m_currentFunction->getReturnType(); retType->isVoidTy())
         m_builder.CreateRetVoid();
     else
         m_builder.CreateRet(llvm::Constant::getNullValue(retType));
@@ -590,8 +589,7 @@ void CodeGenerator::emitNonLocalGotoCheck()
         m_builder.SetInsertPoint(unwindBB);
     }
 
-    llvm::Type* retType = m_currentFunction->getReturnType();
-    if (retType->isVoidTy())
+    if (llvm::Type* retType = m_currentFunction->getReturnType(); retType->isVoidTy())
         m_builder.CreateRetVoid();
     else
         m_builder.CreateRet(llvm::Constant::getNullValue(retType));
