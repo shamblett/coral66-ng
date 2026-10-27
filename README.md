@@ -5,7 +5,7 @@ A Coral66 compiler for the modern age.
 This project provides a Coral 66 language compiler for x64 linux based platforms. It implements the 
 Official Definition of Coral 66 as defined in [this](documentation/specification/Official%20Definition%20of%20Coral%2066.pdf) 
 document published by the UK MOD in 1970 and qualified
-by the compliance matrix found [here](documentation/compliance/Compliance Matrix.ods). The language is largely fully 
+by the compliance matrix found [here](documentation/compliance/Compliance%20Matrix.ods). The language is largely fully 
 compliant with the specification, implementation of libraries and the linkage of these to the main program is achieved through an implementation defined means as
 allowed by the specification.
 
