@@ -41,7 +41,12 @@ The code does however depend on an installed LLVM development toolchain targetin
 
 To build the compiler an run all the unit tests do the following :-
 ```aiignore
-bazel test \\test
+bazel test //...
+```
+
+To just build the compiler :-
+```
+bazel build //...
 ```
 
 The unit test harness used is the [Catch2](https://github.com/catchorg/catch2) library.
