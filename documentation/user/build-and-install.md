@@ -8,4 +8,4 @@ The project was originally built on a Fedora 44 platform. This comes with LLVM 2
 wish but your mileage may vary, only LLVM 22 is guaranteed to be OK.
 
 ### Building locally
-To build locally pull the repo and insure yo have the following dependencies installed :-
+To build locally pull the repo and insure you have the following dependencies installed :-
