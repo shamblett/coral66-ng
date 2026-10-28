@@ -75,7 +75,18 @@ I decided  to scratch that particular itch by providing one myself.
 
 ## Getting Started
 
+To build and install the compiler please read the build and install document [here](documentation/user/build-and-install.md)
+
+Once installed the [usage](documentation/user/usage.md) document describes usage of the compiler from the command line and its supporting helper scripts.
+
+The user directory in the documentation directory contains other documents describing Coral 66 program structure, library creation etc. and can be read in
+any order you wish.
+
+The examples directory contains several examples for your perusal, these can be built from the command line, using the helper scripts or
+the build-examples.sh script in the scripts directory.
 
 
+## Maintenance
+Please raise any issues or submit any PR's you wish for bugs, feature additions etc.
 
 
