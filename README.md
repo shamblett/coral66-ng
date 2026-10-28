@@ -1,5 +1,5 @@
 # coral66-ng
-A Coral66 compiler for the modern age implemented in C++.
+A Coral66 compiler for the next generation implemented in C++.
 
 ## Introduction
 This project provides a Coral 66 language compiler for x64 linux based platforms. It implements the 
@@ -23,7 +23,7 @@ runnable executable.
 Various code examples with instructions on how to build them can be found in the [examples](examples) directory with compiler usage examples
 and options documented in the usage document [here](documentation/user/usage.md).
 
-## Implementation
+### Implementation
 The compiler uses a standard frontend implementation comprising a lexer, parser, preprocessor and semantic analyser. This produces a
 semantic AST that is used by the backend code generation to generate the executable. LLVM is used to generate the code although no LLVM
 libraries are needed at runtime. A working gcc install however is required as gcc is used to provide final linkage of compiled object files.
@@ -31,7 +31,7 @@ The C++ standard used is c++23 allowing use of modern idiomatic C++ constructs s
 
 Currently only a linux x64 ABI is implemented although provision has been made for a bare metal target for future usage.
 
-## Build System and Dependencies
+### Build System and Dependencies
 The project is fully contained in a single repository built using the [bazel](https://bazel.build/) build system. 
 You will need a local Bazel install to build the compiler locally however podman scripts are provided to build the
 compiler in a container if you do not want to to install Bazel and other dependencies.
@@ -46,7 +46,7 @@ bazel test \\test
 
 The unit test harness used is the [Catch2](https://github.com/catchorg/catch2) library.
 
-## Batteries Included
+### Batteries Included
 Unlike many other languages Coral 66 does not specify I/O functionality 
 such as 'print' statements etc. The omission of these makes the language largely unusable on modern platforms.
 To alleviate this the compiler comes equipped with a basic set of library functions implementing subsets of stdio, string, unistd and time C functions from the
@@ -58,7 +58,7 @@ functionality needed.
 A range of tools and helper scripts are also provided to facilitate building of programs using the supporting libraries and diagnostic
 generation through the dumping of parser and semantic AST's.
 
-## Credits
+### Credits
 Besides the dependence on LLVM for code generation the [cld](https://github.com/zero9178/cld) project provided the overall project structure and support 
 implementations although the frontend and backend has been completely re written for coral66-ng.
 
@@ -67,13 +67,13 @@ what they are good at and what they aren't. A question often asked in here is 'C
 A better question is 'Could you have done this in the same timeframe without AI assistance?'. The answer being an unqualified 'No, not a chance' and that includes a
 somewhat steep learning curve at the start of the project.
 
-## Motivation
+### Motivation
 So, why do this? Well, Coral 66 was the first programming language I had formal instruction on back in 1985. I then used it for a few years in production
 environments on a number of defence projects, finally moving to Ada 83 in the early 90's so its sort of a historical thing for me. I looked around for some 
 Coral 66 compilers and couldn't find any other than binary implementations on old PDP 11 images which was not really what I wanted, so in true open source  fashion 
 I decided  to scratch that particular itch by providing one myself.
 
-## Documentation
+## Getting Started
 
 
 
