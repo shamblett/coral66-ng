@@ -67,7 +67,7 @@ generation through the dumping of parser and semantic AST's.
 Besides the dependence on LLVM for code generation the [cld](https://github.com/zero9178/cld) project provided the overall project structure and support 
 implementations although the frontend and backend has been completely re written for coral66-ng.
 
-Also a shout out to my coding assistants being gemini-cli originally and antigravity now. I learned lots about using these tools developing this project,
+Also a shout out to my coding assistants, those being gemini-cli originally and antigravity now. I learned lots about using these tools developing this project,
 what they are good at and what they aren't. A question often asked in here is 'Could you have done this without AI assistance?'. The answer to this is 'Yes'.
 A better question is 'Could you have done this in the same timeframe without AI assistance?'. The answer being an unqualified 'No, not a chance' and that includes a
 somewhat steep learning curve at the start of the project.
