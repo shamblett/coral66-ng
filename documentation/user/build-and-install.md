@@ -96,6 +96,8 @@ i.e the annotation '(cached)' is added to the test results for a target, example
 ```
 //test/backend:backend                                          (cached) PASSED in 8.2s
 ```
+Test logs if needed van be found in the 'bazel-testlogs' directory from the info above.
+
 You may also get a notification about a service or application crash, this is expected, one of the unit tests is expected to crash.
 
 When built the compiler is found in the 'bazel-bin' directory from the info output above. See below for installation.
@@ -104,3 +106,5 @@ If you wish to rebuild from a fresh start(bazel builds incrementally) then enter
 ```
 bazel clean
 ```
+
+## Building using a podman development environment.
