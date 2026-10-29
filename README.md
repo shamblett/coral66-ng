@@ -85,11 +85,17 @@ To build and install the compiler please read the build and install document [he
 Once installed the [usage](documentation/user/usage.md) document describes usage of the compiler from the command line and its supporting helper scripts.
 
 The user directory in the documentation directory contains other documents describing Coral 66 program structure, library creation etc. and can be read in
-any order you wish.
+any order you wish although the [Program Structure](documentation/user/program-structure-linking-and-externals.md) document is a good starting place.
 
 The examples directory contains several examples for your perusal, these can be built from the command line, using the helper scripts or
 the build-examples.sh script in the scripts directory.
 
+## Other reading
+The documentation directory contains the specification document, along with others. The compliance
+directory contains the compliance matrix for the compiler. The development directory is effectively the project development file.
+This contains a lot of information on why/how features were added, review documentation and other general development information.
+Note this is for general interest only, some information it contains may be wrong or outdated. Current functionality supported by
+the compiler is to be found in the user directory.
 
 ## Maintenance
 Please raise any issues or submit any PR's you wish for bugs, feature additions etc.
