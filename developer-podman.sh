@@ -56,7 +56,7 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
     bazel test --symlink_prefix=podman- //... > ./podman-build/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
     
     echo 'Copying produced coral66 binary to podman-build...'
-    cp bazel-bin/bin/coral66 ./podman-build/coral66
+    cp podman-bin/bin/coral66 ./podman-build/coral66
     
     echo 'Info, build and test phases completed successfully.'
 "
