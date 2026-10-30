@@ -149,4 +149,23 @@ the build process, these will not allow the compiler binary to be generated corr
 the selinux directory contains a commands.txt file, run these commands, follow the on screen
 instructions and re run the developer-podman.sh script, this should fix these problems.
 
+The end of the terminal output should show this for a successful build :-
+```
+=================================================
+ Running Bazel tests and build inside Podman
+=================================================
+Creating required ccache directory for sandbox...
+Bazel Information...
+Running bazel build...
+Running bazel tests...
+Copying produced coral66 binary to podman-build...
+Info, build and test phases completed successfully.
+=================================================
+ Build Completed successfully!
+=================================================
+The coral66 binary is available at: ./podman-build/coral66
+The test logs are available at: ./podman-build/bazel_test.log
+The build logs are available at: ./podman-build/bazel_build.log
+```
+
 
