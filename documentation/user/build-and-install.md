@@ -168,4 +168,9 @@ The test logs are available at: ./podman-build/bazel_test.log
 The build logs are available at: ./podman-build/bazel_build.log
 ```
 
+### Building using a podman user environment
+This performs the same function as the podman developer build except the repo is pulled into the container image and built from there. This allows a
+more hermetic build but does limit builds to the repo contents. The outputs are in the podman-build directory as for the developer podman build.
+It is recommended the user-podman.sh script is copied into its own directory and run from there, the podman-build directory will be created if needed,
+
 
