@@ -175,3 +175,10 @@ It is recommended the user-podman.sh script is copied into its own directory and
 
 Note that the repo branch is defaulted to main but can be changed by editing the 'BRANCH' environment variable at the top of the script.
 
+## Installation
+Installation is a simple matter of copying the built coral66 binary to somewhere on your path, or add its location to your path. The install.sh script in
+scripts will install the binary in your '$USER/bin' directory as this is on your path by default. 
+
+Note that the helper scripts in the scripts directory do assume the coral66 binary is on your path.
+
+As stated above the compiler does use gcc to perform linking operations and executable generation so a gcc toolchain will be needed in your runtime environment.
