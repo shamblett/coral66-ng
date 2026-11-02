@@ -18,3 +18,7 @@ Before expanding on this other structural requirements of Coral 66 source progra
      stropped and unstropped keywords but they must be in uppercase. This allows compatibility
      with legacy source code implementations. Mixing is allowed in a source file although this is
      discouraged.
+
+Various examples of Coral 66 program construction can be found in the [examples](examples) directory.
+
+## Libraries and the COMMON Communicator
