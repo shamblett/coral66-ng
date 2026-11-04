@@ -1,6 +1,6 @@
 # Coral Module Interface (CMI) Specification
 
-This document defines the layout, data sourcing, and behavioral expectations for Coral Module Interface (`.cmi`) files. The `.cmi` file serves as the bridge between pre-compiled Coral 66 libraries and the consuming programs, encapsulating a library's public API.
+This document defines the layout, data sourcing, and behavioural expectations for Coral Module Interface (`.cmi`) files. The `.cmi` file serves as the bridge between pre-compiled Coral 66 libraries and the consuming programs, encapsulating a library's public API.
 
 ## 1. Data Source and Generation
 
