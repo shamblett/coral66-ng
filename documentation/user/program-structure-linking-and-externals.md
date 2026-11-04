@@ -62,10 +62,15 @@ END;
 ```
 Here the support libraries 'stdio', 'time' and 'unistd' are imported and the public API of these libraries made available to 
 the program via processing of the corresponding cmi file. This method alleviates the need for the main program to have a COMMON
-communicator section that mirrors that of a corresponding imported library as is common in older Coral 66 implementations. 
+communicator section that mirrors that of a corresponding imported library as is common in older Coral 66 implementations that
+implement inter segment symbol resolution via COMMON communicators.
+
 Doing this of course doesn't allow the main program to filter a libraries public API by declaring a COMMON communicator that
-contains only the libray functions required, the whole public API is made available to the main program. It is thought however
+contains only the library functions required, the whole public API is made available to the main program. It is thought however
 that the convenience of the cmi file approach greatly outweighs the loss of this mechanism.
+
+## Externals
+
 
 
 
