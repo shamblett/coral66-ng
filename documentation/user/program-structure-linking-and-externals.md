@@ -70,7 +70,29 @@ contains only the library functions required, the whole public API is made avail
 that the convenience of the cmi file approach greatly outweighs the loss of this mechanism.
 
 ## Externals
+To be truly useful on modern platforms we need a way to allow Coral 66 programs to call platform supplied library code such as that 
+supplied by libc for instance to allow I/O functions such as printf to be used.
 
+To achieve linkage between Coral 66 procedures and external C libraries like libc, we must bridge Coral 66's abstract
+semantics with LLVM's code generation and the system linker via the x64 ABI. 
+
+Since the Coral 66 specification allows for implementation-defined behaviour regarding the EXTERNAL
+communicator. Specifically it says :-
+```
+It may be desirable to refer to an object external to a Coral 66 program by 
+means of an identifier. Provided the loader permits, this may be achieved by 
+an EXTERNAL communicator similar in form to a COMMON communicator. 
+```
+To achieve the above the EXTERNAL communicator is used along with a name mangling mechanism. This [document](name-mangling-specification.md) contains 
+a detailed breakdown of how this is achieved and how COMMON and EXTERNAL communicators are implemented. If you intend to implement your own libraries
+this document is required reading.
+
+Examples of real usage can be found in the external directory of the support libraries.
+
+## Support libraries
+To get the user up and running with coral66-ng a basic support library is supplied under the top level support directory. This allows basic
+I/O and string handling to be performed out of the box. Helper scripts are supplied to assist in the building of both libraries and externals under
+the top level scripts directory, see the [README.md](../../support/README.md).
 
 
 
