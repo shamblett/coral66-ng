@@ -27,7 +27,7 @@ and options documented in the usage document [here](documentation/user/usage.md)
 The compiler uses a standard frontend implementation comprising a lexer, parser, preprocessor and semantic analysis phase. This produces a
 semantic AST that is used by the backend code generation phase. LLVM is used to generate the code although no LLVM
 libraries are needed at runtime. A working gcc install however is required as gcc is used to provide final linkage of compiled object files.
-The C++ standard used is c++23 allowing use of modern idiomatic C++ constructs such as contracts etc.
+The C++ standard used is c++23 allowing use of modern idiomatic C++ constructs such as conceptss etc.
 
 Currently only a linux x64 ABI is implemented although provision has been made for a bare metal target for future usage.
 
