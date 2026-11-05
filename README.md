@@ -88,7 +88,7 @@ The user directory in the documentation directory contains other documents descr
 any order you wish although the [Program Structure](documentation/user/program-structure-linking-and-externals.md) document is a good starting place.
 
 The examples directory contains several examples for your perusal, these can be built from the command line, using the helper scripts or
-the build-examples.sh script in the scripts directory.
+the build-examples.sh script in the [scripts](scripts) directory.
 
 ## Other reading
 The documentation directory contains the specification document, along with others. The compliance

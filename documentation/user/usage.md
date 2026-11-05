@@ -165,3 +165,7 @@ You can combine multiple `-l` and `-x` flags to build complex projects easily.
 ```bash
 ./scripts/compile.sh main.cor -l string_utils -L common_libs -x hardware_io -X drivers
 ```
+
+## Other helper scripts
+
+## Support tools
