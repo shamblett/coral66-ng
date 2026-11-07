@@ -1,1 +1,1 @@
-This directory will contain the log files and the coral66 executable generated from running the podman builder scripts
+This directory will contain the log files and the coral66 executable generated from running the developer podman builder script.
