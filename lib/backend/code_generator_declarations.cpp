@@ -710,7 +710,7 @@ void CodeGenerator::generateProcedure(const semantics::ProcedureDeclaration& pro
         visit(astNode.getBody());
     }
 
-    if (!m_builder.GetInsertBlock()->getTerminator())
+    if (!m_builder.GetInsertBlock()->hasTerminator())
     {
         if (m_currentFunction->getReturnType()->isVoidTy())
             m_builder.CreateRetVoid();

@@ -424,7 +424,7 @@ void CodeGenerator::visit(const syntax::Program& program)
 
         visit(program.getBlock());
 
-        if (!m_builder.GetInsertBlock()->getTerminator())
+        if (!m_builder.GetInsertBlock()->hasTerminator())
         {
             m_builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(m_module.getContext()), 0));
         }

@@ -67,7 +67,7 @@ void CodeGenerator::visit(const syntax::Statement& statement)
     if (!statement.getLabels().empty())
     {
         llvm::BasicBlock* stmtBB = getOrCreateLabel(&statement);
-        if (!m_builder.GetInsertBlock()->getTerminator())
+        if (!m_builder.GetInsertBlock()->hasTerminator())
         {
             m_builder.CreateBr(stmtBB);
         }
@@ -75,7 +75,7 @@ void CodeGenerator::visit(const syntax::Statement& statement)
         // already attached it to the function. Doing so corrupts the LLVM ilist!
         m_builder.SetInsertPoint(stmtBB);
     }
-    else if (m_builder.GetInsertBlock() && m_builder.GetInsertBlock()->getTerminator())
+    else if (m_builder.GetInsertBlock() && m_builder.GetInsertBlock()->hasTerminator())
     {
         // Dead code: current block is terminated and this statement has no label to branch to.
         return;
@@ -389,7 +389,7 @@ void CodeGenerator::visit(const syntax::IfStatement& statement)
 
     m_builder.SetInsertPoint(thenBB);
     visit(statement.getThenBranch());
-    if (!m_builder.GetInsertBlock()->getTerminator())
+    if (!m_builder.GetInsertBlock()->hasTerminator())
         m_builder.CreateBr(mergeBB);
 
     if (hasElse)
@@ -397,7 +397,7 @@ void CodeGenerator::visit(const syntax::IfStatement& statement)
         m_currentFunction->insert(m_currentFunction->end(), elseBB);
         m_builder.SetInsertPoint(elseBB);
         visit(*statement.getElseBranch());
-        if (!m_builder.GetInsertBlock()->getTerminator())
+        if (!m_builder.GetInsertBlock()->hasTerminator())
             m_builder.CreateBr(mergeBB);
     }
 
