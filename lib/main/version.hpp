@@ -9,5 +9,5 @@
 
 namespace coral66
 {
-inline constexpr std::string version = "1.0-frontend";
+inline constexpr std::string version = "1.0.0";
 }

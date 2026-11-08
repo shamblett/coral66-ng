@@ -153,7 +153,7 @@ TEST_CASE("Version", "[cli]")
     std::string str;
     llvm::raw_string_ostream os(str);
     coral66::CommandLineProcessor::PrintVersion(os);
-    CHECK(os.str() == "1.0-frontend\n");
+    CHECK(os.str() == "1.0.0\n");
 }
 
 TEST_CASE("String options")
