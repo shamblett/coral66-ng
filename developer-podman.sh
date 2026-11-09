@@ -2,16 +2,15 @@
 set -e
 
 # ==============================================================================
-# Script to automate the build of coral66-ng in a Fedora 44 Podman container
+# Script to automate the build of coral66-ng in a Fedora 45 Podman container
 # ==============================================================================
 
 echo "================================================="
-echo " Generating Containerfile for Fedora 44 builder"
+echo " Generating Containerfile for Fedora 45 builder"
 echo "================================================="
 
-cat << 'EOF' > ./podman-build/Containerfile.fedora44
-# 1. Pull down the latest Fedora 44 image
-FROM registry.fedoraproject.org/fedora:44
+cat << 'EOF' > ./podman-build/Containerfile.fedora45# 1. Pull down the latest Fedora 45 image
+FROM registry.fedoraproject.org/fedora:45
 
 # 2. Install full SW development environment and LLVM dev packages
 RUN dnf -y update && \
@@ -27,16 +26,16 @@ WORKDIR /workspace
 EOF
 
 echo "================================================="
-echo " Building Podman image (fedora44-coral66-builder)"
+echo " Building Podman image (fedora45-coral66-builder)"
 echo "================================================="
-podman build -t fedora44-coral66-builder -f ./podman-build/Containerfile.fedora44 .
+podman build -t fedora45-coral66-builder -f ./podman-build/Containerfile.fedora45 .
 
 echo "================================================="
 echo " Running Bazel tests and build inside Podman"
 echo "================================================="
 # We mount the current directory into /workspace.
 # The :Z flag ensures SELinux context is correctly handled on Fedora/RHEL.
-podman run --rm -v "$(pwd)":/workspace:Z fedora44-coral66-builder /bin/bash -c "
+podman run --rm -v "$(pwd)":/workspace:Z fedora45-coral66-builder /bin/bash -c "
 
     echo 'Creating required ccache directory for sandbox...'
     sudo mkdir -p /var/cache/ccache

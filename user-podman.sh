@@ -9,18 +9,18 @@ set -e
 REPO_URL="https://github.com/shamblett/coral66-ng.git"
 BRANCH="${1:-main}" # Allow overriding the branch, default to main
 CONTAINER_NAME="coral66-clean-builder-$(date +%s)"
-IMAGE_NAME="fedora44-coral66-builder"
+IMAGE_NAME="fedora45-coral66-builder"
 
 echo "================================================="
-echo " Generating Containerfile for Fedora 44 builder"
+echo " Generating Containerfile for Fedora 45 builder"
 echo "================================================="
 
 # Create an output directory for clean build artifacts to avoid overwriting local dev state
 mkdir -p user_build_artifacts
 
-cat << 'EOF' > ./user_build_artifacts/Containerfile.fedora44
-# 1. Pull down the latest Fedora 44 image
-FROM registry.fedoraproject.org/fedora:44
+cat << 'EOF' > ./user_build_artifacts/Containerfile.fedora45
+# 1. Pull down the latest Fedora 45 image
+FROM registry.fedoraproject.org/fedora:45
 
 # 2. Install full SW development environment and LLVM dev packages
 RUN dnf -y update && \
@@ -38,7 +38,7 @@ EOF
 echo "================================================="
 echo " Building Podman image (${IMAGE_NAME})"
 echo "================================================="
-podman build -t "${IMAGE_NAME}" -f ./user_build_artifacts/Containerfile.fedora44 .
+podman build -t "${IMAGE_NAME}" -f ./user_build_artifacts/Containerfile.fedora45 .
 
 echo "================================================="
 echo " Starting clean build container..."
