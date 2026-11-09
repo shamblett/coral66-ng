@@ -256,7 +256,7 @@ Completely cleans the local build environment by expunging the Bazel build cache
 
 ### Podman Build Scripts (`developer-podman.sh` and `user-podman.sh`)
 
-Located in the repository root, these scripts build and test `coral66-ng` inside a Fedora 44 Podman container without requiring local Bazel or LLVM 22 installations:
+Located in the repository root, these scripts build and test `coral66-ng` inside a Fedora 45 Podman container without requiring local Bazel or LLVM 23 installations:
 
 * **`./developer-podman.sh`**: Mounts the local repository into the container, runs the Bazel build and test suite, and outputs the `coral66` binary and logs to `./podman-build/`.
 * **`./user-podman.sh [branch]`**: Clones a clean copy of the repository (defaulting to `main`) inside the container, builds and tests it hermetically, and extracts the binary and logs to `./user_build_artifacts/`.

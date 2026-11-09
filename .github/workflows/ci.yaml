@@ -1,4 +1,4 @@
-name: C++ CI (Ubuntu 26.04 + LLVM 22)
+name: C++ CI (Ubuntu 26.04 + LLVM 23)
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
           sudo chown $(whoami):$(whoami) /var/cache/ccache
           sudo chmod 1777 /var/cache/ccache
 
-      - name: Install LLVM 22 Toolchain
+      - name: Install LLVM 23 Toolchain
         run: |
           sudo apt-get update
           sudo apt-get install -y wget lsb-release software-properties-common gnupg
@@ -31,14 +31,14 @@ jobs:
           # Download and execute the official LLVM installation script
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 22 all
-          sudo apt-get install -y llvm-22-dev
+          sudo ./llvm.sh 23 all
+          sudo apt-get install -y llvm-23-dev
 
           # Create symlinks to match the expected header and library layout
-          sudo ln -sfn /usr/include/llvm-22/llvm /usr/include/llvm
-          sudo ln -sfn /usr/include/llvm-c-22/llvm-c /usr/include/llvm-c
-          sudo mkdir -p /usr/lib64/llvm22
-          sudo ln -sfn /usr/lib/llvm-22/lib /usr/lib64/llvm22/lib64
+          sudo ln -sfn /usr/include/llvm-23/llvm /usr/include/llvm
+          sudo ln -sfn /usr/include/llvm-c-23/llvm-c /usr/include/llvm-c
+          sudo mkdir -p /usr/lib64/llvm23
+          sudo ln -sfn /usr/lib/llvm-23/lib /usr/lib64/llvm23/lib64
 
       - name: Install Bazel using Bazelisk
         run: |

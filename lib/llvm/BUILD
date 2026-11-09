@@ -23,3 +23,13 @@ cc_library(
         "//lib/support:__pkg__",
     ],
 )
+
+cc_library(
+    name = "llvm-23",
+    linkopts = [
+        "-L /usr/lib64/llvm23/lib64/ -lLLVM",
+    ],
+    visibility = [
+        "//lib/support:__pkg__",
+    ],
+)
