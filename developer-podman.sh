@@ -9,7 +9,8 @@ echo "================================================="
 echo " Generating Containerfile for Fedora 45 builder"
 echo "================================================="
 
-cat << 'EOF' > ./podman-build/Containerfile.fedora45# 1. Pull down the latest Fedora 45 image
+cat << 'EOF' > ./podman-build/Containerfile.fedora45
+# 1. Pull down the latest Fedora 45 image
 FROM registry.fedoraproject.org/fedora:45
 
 # 2. Install full SW development environment and LLVM dev packages
