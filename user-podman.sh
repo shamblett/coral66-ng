@@ -16,7 +16,7 @@ echo " Generating Containerfile for Fedora 45 builder"
 echo "================================================="
 
 # Create an output directory for clean build artifacts to avoid overwriting local dev state
-mkdir -p user_build_artifacts
+mkdir -p user_build_artifacts/tools
 
 cat << 'EOF' > ./user_build_artifacts/Containerfile.fedora45
 # 1. Pull down the latest Fedora 45 image
@@ -55,6 +55,9 @@ cleanup() {
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_test.log ./user_build_artifacts/bazel_test.log 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_build.log ./user_build_artifacts/bazel_build.log 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/bin/coral66 ./user_build_artifacts/coral66 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/tools/parser/astdump/bin/astdump ./user_build_artifacts/tools/astdump 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/tools/preprocessor/ppdump/bin/ppdump ./user_build_artifacts/tools/ppdump 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/tools/semantics/programdump/bin/programdump ./user_build_artifacts/tools/programdump 2>/dev/null || true
     
     echo 'Removing container...'
     podman rm -f "$CONTAINER_NAME" >/dev/null

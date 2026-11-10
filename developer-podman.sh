@@ -56,6 +56,12 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora45-coral66-builder /bin/bash -c "
     
     echo 'Copying produced coral66 binary to podman-build...'
     cp podman-bin/bin/coral66 ./podman-build/coral66
+
+    echo 'Copying produced tools binaries to podman-build/tools...'
+    mkdir -p ./podman-build/tools
+    cp podman-bin/tools/parser/astdump/bin/astdump ./podman-build/tools/astdump
+    cp podman-bin/tools/preprocessor/ppdump/bin/ppdump ./podman-build/tools/ppdump
+    cp podman-bin/tools/semantics/programdump/bin/programdump ./podman-build/tools/programdump
     
     echo 'Info, build and test phases completed successfully.'
 "
@@ -64,5 +70,6 @@ echo "================================================="
 echo " Build Completed successfully!"
 echo "================================================="
 echo "The coral66 binary is available at: ./podman-build/coral66"
+echo "The tools binaries are available at: ./podman-build/tools/"
 echo "The test logs are available at: ./podman-build/bazel_test.log"
 echo "The build logs are available at: ./podman-build/bazel_build.log"
