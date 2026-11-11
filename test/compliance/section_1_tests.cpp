@@ -138,6 +138,7 @@ TEST_CASE("Section 1-4", "[Compliance][Section-1-4]")
 
             std::vector<llvm::GenericValue> noArgs;
             ee->runFunction(mainFunc, noArgs);
+            _exit(0);
         }
         else
         {

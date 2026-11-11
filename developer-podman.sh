@@ -16,7 +16,7 @@ FROM registry.fedoraproject.org/fedora:45
 # 2. Install full SW development environment and LLVM dev packages
 RUN dnf -y update && \
     dnf -y group install development-tools && \
-    dnf -y install llvm-devel curl wget findutils gcc-c++ && \
+    dnf -y install llvm-devel lld curl wget findutils gcc-c++ && \
     dnf -y clean all
 
 # 3. Install Bazelisk as /usr/local/bin/bazel

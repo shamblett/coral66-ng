@@ -11,7 +11,7 @@ BEGIN
    flags[1] := 20;
    indices[0] := 0;
    COMMENT Use an out of bounds value that is outside the allocated address space to cause the sigsev;
-   indices[1] := 10000000;
+   indices[1] := 500000000;
 
    result := -1;
    flags0 := flags[0];
