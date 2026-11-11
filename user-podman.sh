@@ -17,6 +17,8 @@ echo "================================================="
 
 # Create an output directory for clean build artifacts to avoid overwriting local dev state
 mkdir -p user_build_artifacts/tools
+mkdir -p user_build_artifacts/logs
+rm -f user_build_artifacts/logs/*.log
 
 cat << 'EOF' > ./user_build_artifacts/Containerfile.fedora45
 # 1. Pull down the latest Fedora 45 image
@@ -51,9 +53,18 @@ cleanup() {
     echo 'Cleaning up and extracting logs if available...'
 
     # Attempt to copy logs if they exist
-    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_info.log ./user_build_artifacts/bazel_info.log 2>/dev/null || true
-    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_test.log ./user_build_artifacts/bazel_test.log 2>/dev/null || true
-    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_build.log ./user_build_artifacts/bazel_build.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_info.log ./user_build_artifacts/logs/bazel_info.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_test.log ./user_build_artifacts/logs/bazel_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel_build.log ./user_build_artifacts/logs/bazel_build.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/backend/backend/test.log ./user_build_artifacts/logs/backend_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/compliance/compliance/test.log ./user_build_artifacts/logs/compliance_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/frontend/common/common_test/test.log ./user_build_artifacts/logs/frontend_common_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/frontend/lexer/lexer/test.log ./user_build_artifacts/logs/frontend_lexer_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/frontend/parser/parser/test.log ./user_build_artifacts/logs/frontend_parser_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/frontend/preprocessor/preprocessor/test.log ./user_build_artifacts/logs/frontend_preprocessor_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/frontend/semantics/semantics/test.log ./user_build_artifacts/logs/frontend_semantics_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/main/main/test.log ./user_build_artifacts/logs/main_test.log 2>/dev/null || true
+    podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-testlogs/test/support/support/test.log ./user_build_artifacts/logs/support_test.log 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/bin/coral66 ./user_build_artifacts/coral66 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/tools/parser/astdump/bin/astdump ./user_build_artifacts/tools/astdump 2>/dev/null || true
     podman cp "$CONTAINER_NAME":/workspace/coral66-ng/bazel-bin/tools/preprocessor/ppdump/bin/ppdump ./user_build_artifacts/tools/ppdump 2>/dev/null || true
@@ -83,15 +94,15 @@ podman exec "$CONTAINER_NAME" /bin/bash -c "
 
     echo 'Bazel Information...'
     # Bazel build and install info
-    bazel info > bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
+    bazel info > bazel_info.log 2>&1 || { echo 'Bazel info failed, check ./user_build_artifacts/logs/bazel_info.log'; exit 1; }
 
     echo 'Running bazel build...'
     # Build everything and output log to host directory
-    bazel build //... > bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+    bazel build //... > bazel_build.log 2>&1 || { echo 'Bazel build failed, check ./user_build_artifacts/logs/bazel_build.log'; exit 1; }
 
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
-    bazel test //... > bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
+    bazel test //... > bazel_test.log 2>&1 || { echo 'Bazel test failed, check logs in ./user_build_artifacts/logs/'; exit 1; }
     
     echo 'Info, build and test phases completed successfully.'
 "

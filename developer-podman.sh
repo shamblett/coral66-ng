@@ -45,15 +45,31 @@ podman run --rm -v "$(pwd)":/workspace:Z fedora45-coral66-builder /bin/bash -c "
 
     echo 'Bazel Information...'
     # Bazel build and install info
-    bazel info > ./podman-build/bazel_info.log 2>&1 || { echo 'Bazel info failed, check bazel_info.log'; exit 1; }
+    mkdir -p ./podman-build/logs
+    rm -f ./podman-build/logs/*.log
+    bazel info > ./podman-build/logs/bazel_info.log 2>&1 || { echo 'Bazel info failed, check ./podman-build/logs/bazel_info.log'; exit 1; }
 
     echo 'Running bazel build...'
     # Build everything and output log to host directory
-    bazel build --symlink_prefix=podman- //... > ./podman-build/bazel_build.log 2>&1 || { echo 'Bazel build failed, check bazel_build.log'; exit 1; }
+    bazel build --symlink_prefix=podman- //... > ./podman-build/logs/bazel_build.log 2>&1 || { echo 'Bazel build failed, check ./podman-build/logs/bazel_build.log'; exit 1; }
+
+    copy_test_logs() {
+        echo 'Copying Catch2 test logs to podman-build/logs...'
+        cp -f podman-testlogs/test/backend/backend/test.log ./podman-build/logs/backend_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/compliance/compliance/test.log ./podman-build/logs/compliance_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/frontend/common/common_test/test.log ./podman-build/logs/frontend_common_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/frontend/lexer/lexer/test.log ./podman-build/logs/frontend_lexer_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/frontend/parser/parser/test.log ./podman-build/logs/frontend_parser_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/frontend/preprocessor/preprocessor/test.log ./podman-build/logs/frontend_preprocessor_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/frontend/semantics/semantics/test.log ./podman-build/logs/frontend_semantics_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/main/main/test.log ./podman-build/logs/main_test.log 2>/dev/null || true
+        cp -f podman-testlogs/test/support/support/test.log ./podman-build/logs/support_test.log 2>/dev/null || true
+    }
 
     echo 'Running bazel tests...'
     # Run tests and output log to host directory
-    bazel test --symlink_prefix=podman- //... > ./podman-build/bazel_test.log 2>&1 || { echo 'Bazel test failed, check bazel_test.log'; exit 1; }
+    bazel test --symlink_prefix=podman- //... > ./podman-build/logs/bazel_test.log 2>&1 || { copy_test_logs; echo 'Bazel test failed, check logs in ./podman-build/logs/'; exit 1; }
+    copy_test_logs
     
     echo 'Copying produced coral66 binary to podman-build...'
     cp podman-bin/bin/coral66 ./podman-build/coral66
@@ -72,5 +88,4 @@ echo " Build Completed successfully!"
 echo "================================================="
 echo "The coral66 binary is available at: ./podman-build/coral66"
 echo "The tools binaries are available at: ./podman-build/tools/"
-echo "The test logs are available at: ./podman-build/bazel_test.log"
-echo "The build logs are available at: ./podman-build/bazel_build.log"
+echo "The logs are available at: ./podman-build/logs/"
