@@ -37,6 +37,11 @@ echo "================================================="
 # We mount the current directory into /workspace.
 # The :Z flag ensures SELinux context is correctly handled on Fedora/RHEL.
 podman run --rm -v "$(pwd)":/workspace:Z fedora45-coral66-builder /bin/bash -c "
+    cleanup_symlinks() {
+        echo 'Removing temporary podman-* symlinks...'
+        rm -f podman-bin podman-out podman-testlogs podman-workspace
+    }
+    trap cleanup_symlinks EXIT
 
     echo 'Creating required ccache directory for sandbox...'
     sudo mkdir -p /var/cache/ccache
